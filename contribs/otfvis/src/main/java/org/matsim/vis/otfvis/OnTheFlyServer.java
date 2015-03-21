@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -55,7 +54,6 @@ import org.matsim.vis.otfvis.interfaces.OTFQueryRemote;
 import org.matsim.vis.otfvis.opengl.queries.AbstractQuery;
 import org.matsim.vis.otfvis.utils.WGS84ToMercator;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
@@ -71,7 +69,7 @@ import org.matsim.vis.snapshotwriters.VisNetwork;
  * @author dstrippgen
  *
  */
-public class OnTheFlyServer implements OTFLiveServer {
+public class OnTheFlyServer extends PlayPauseSimulation implements OTFLiveServer {
 
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 
@@ -138,20 +136,6 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	private static final Logger log = Logger.getLogger(OnTheFlyServer.class);
 
-	private enum Status {
-		PAUSE, PLAY, STEP, FINISHED;
-	}
-
-	private volatile Status status = Status.PAUSE;
-
-	private final Object paused = new Object();
-
-	private final Object stepDone = new Object();
-
-	private final Object updateFinished = new Object();
-
-	private volatile int localTime = 0;
-
 	private OTFServerQuadTree quad;
 
 	private final List<OTFDataWriter<?>> additionalElements= new LinkedList<OTFDataWriter<?>>();
@@ -161,8 +145,6 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private Collection<AbstractQuery> activeQueries = new ArrayList<AbstractQuery>();
 
 	private final ByteBuffer buf = ByteBuffer.allocate(80000000);
-
-	private volatile double stepToTime = 0;
 
 	private VisMobsim visMobsim;
 
@@ -180,16 +162,10 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	private final CurrentTimeStepView currentTimeStepView = new CurrentTimeStepView();
 
-	// A fair semaphore used to control access to the simulation data.
-	// If you remove the fairness option ("true"), the simulation will
-	// probably 'barge', i.e. the visualizer will not take turn for long times
-	// and the GUI will freeze.
-	private Semaphore accessToQNetwork = new Semaphore(1, true);
-
 	private Scenario scenario;
 
 	private Map<Id<Person>, Plan> plans = new HashMap<Id<Person>, Plan>();
-
+	
 	OnTheFlyServer(Scenario scenario, EventsManager events) {
 		this.scenario = scenario;
 		this.events = events; 
@@ -200,89 +176,9 @@ public class OnTheFlyServer implements OTFLiveServer {
 		return instance;
 	}
 
-	public void updateStatus(double time) {
-		localTime = (int) time;
-		if (status == Status.STEP) {
-			// Time and Iteration reached?
-			if (stepToTime <= localTime) {
-				synchronized (stepDone) {
-					stepDone.notifyAll();
-					status = Status.PAUSE;
-				}
-			}
-		}
-		synchronized(paused) {
-			while (status == Status.PAUSE) {
-				try {
-					paused.wait();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	@Override
-	public boolean requestNewTime(final int time, final TimePreference searchDirection) {
-		if (status == Status.FINISHED) {
-			return true;
-		} else if( ((searchDirection == TimePreference.RESTART) && (time < localTime))) { 
-			doStep(time);
-			return true;
-		} else if (time < localTime) {
-			// if requested time lies in the past, sorry we cannot do that right now
-			stepToTime = 0;
-			// if forward search is OK, then the actual timestep is the BEST fit
-			return (searchDirection != TimePreference.EARLIER);
-		} else if (time == localTime) {
-			stepToTime = 0;
-			return true;
-		} else {
-			doStep(time);
-			return true;
-		}
-	}
-
-	private void doStep(int stepcounter) {
-		// leave Status on pause but let one step run (if one is waiting)
-		synchronized(paused) {
-			stepToTime = stepcounter;
-			status = Status.STEP;
-			paused.notifyAll();
-		}
-		synchronized (stepDone) {
-			if (status == Status.PAUSE) return;
-			try {
-				stepDone.wait();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	@Override
-	public void pause(){
-		if (status != Status.FINISHED) {
-			synchronized (updateFinished) {
-				status = Status.PAUSE;
-			}
-		}
-	}
-
-	@Override
-	public void play() {
-		if (status != Status.FINISHED) {
-			synchronized(paused) {
-				status = Status.PLAY;
-				paused.notifyAll();
-			}
-		}
-	}
-
-
 	@Override
 	public int getLocalTime() {
-		return localTime;
+		return getLocalTime();
 	}
 
 	@Override
@@ -350,7 +246,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 	@Override
 	public byte[] getQuadConstStateBuffer() {
 		try {
-			accessToQNetwork.acquire();
+			getAccessToQNetwork().acquire();
 			byte[] result;
 			buf.position(0);
 			quad.writeConstData(buf);
@@ -362,14 +258,14 @@ public class OnTheFlyServer implements OTFLiveServer {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
-			accessToQNetwork.release();
+			getAccessToQNetwork().release();
 		}
 	}
 
 	@Override
 	public byte[] getQuadDynStateBuffer(final QuadTree.Rect bounds) {
 		try {
-			accessToQNetwork.acquire();
+			getAccessToQNetwork().acquire();
 			byte[] result;
 			buf.position(0);
 			quad.writeDynData(bounds, buf);
@@ -381,19 +277,19 @@ public class OnTheFlyServer implements OTFLiveServer {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
-			accessToQNetwork.release();
+			getAccessToQNetwork().release();
 		}
 	}
 
 	@Override
 	public OTFQueryRemote answerQuery(AbstractQuery query) {
 		try {
-			accessToQNetwork.acquire();
+			getAccessToQNetwork().acquire();
 			query.installQuery(currentTimeStepView);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
-			accessToQNetwork.release();
+			getAccessToQNetwork().release();
 		}
 		activeQueries.add(query);
 		return query;
@@ -434,47 +330,57 @@ public class OnTheFlyServer implements OTFLiveServer {
 		return otfVisConfig ;
 	}
 
-	public void blockUpdates() {
-		try {
-			accessToQNetwork.acquire();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public void unblockUpdates() {
-		accessToQNetwork.release();
-	}
-
-	public SnapshotWriter getSnapshotReceiver() {
-		return new SnapshotWriter() {
-
-			@Override
-			public void beginSnapshot(double time) {
-				snapshots.clear();
-				localTime = (int) time;
-			}
-
-			@Override
-			public void endSnapshot() {
-
-			}
-
-			@Override
-			public void addAgent(AgentSnapshotInfo position) {
-				snapshots.put(position.getId(), position);
-			}
-
-			@Override
-			public void finish() {
-				status = Status.FINISHED;
-			}
-
-		};
-	}
+//	public SnapshotWriter getSnapshotReceiver() {
+//		return new SnapshotWriter() {
+//
+//			@Override
+//			public void beginSnapshot(double time) {
+//				snapshots.clear();
+//				setLocalTime((int) time);
+//			}
+//
+//			@Override
+//			public void endSnapshot() {
+//
+//			}
+//
+//			@Override
+//			public void addAgent(AgentSnapshotInfo position) {
+//				snapshots.put(position.getId(), position);
+//			}
+//
+//			@Override
+//			public void finish() {
+//				setStatus(Status.FINISHED);
+//			}
+//
+//		};
+//	}
+	// this does not seem to be used anywhere. kai, mar'15
 
 	public void addAdditionalPlans(Map<Id<Person>, Plan> additionalPlans) {
 		this.plans.putAll(additionalPlans);
+	}
+
+	@Override
+	public boolean requestNewTime(final int time, final TimePreference searchDirection) {
+		if (getStatus() == Status.FINISHED) {
+			return true;
+		} else if( ((searchDirection == TimePreference.RESTART) && (time < getLocalTime()))) { 
+			doStep(time);
+			return true;
+		} else if (time < getLocalTime()) {
+			// if requested time lies in the past, sorry we cannot do that right now
+			setStepToTime(0);
+			// if forward search is OK, then the actual timestep is the BEST fit
+			return (searchDirection != TimePreference.EARLIER);
+		} else if (time == getLocalTime()) {
+			setStepToTime(0);
+			return true;
+		} else {
+			doStep(time);
+			return true;
+		}
 	}
 
 }

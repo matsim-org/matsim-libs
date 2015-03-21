@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,23 +16,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.vis.otfvis.interfaces;
 
-package org.matsim.vis.otfvis;
+/**
+ * @author nagel
+ *
+ */
+public interface PlayPauseSimulationI {
+	
+	public void pause();
+	
+	public void play();
 
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-
-public class OTFVisMobsimListener implements MobsimBeforeCleanupListener {
-
-//	private final OnTheFlyServer server;
-
-	public OTFVisMobsimListener(OnTheFlyServer server) {
-//		this.server = server;
-	}
-
-	@Override
-	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent event) {
-//		this.server.getSnapshotReceiver().finish();
-	}
-
+	void doStep(int time);
+	
 }

@@ -52,7 +52,10 @@ public abstract class MatsimXmlParser extends DefaultHandler {
 	private boolean isValidating = true;
 	private boolean isNamespaceAware = true;
 
-	private String localDtdBase = "dtd";
+//	private String localDtdBase = "dtd";
+	private String localDtdBase = null;
+	// yy this is NOT working for me with "dtd", but it IS working with null. 
+	// Note that I am typically NOT running java from the root of the classpath. kai, mar'15
 	
 	private boolean preferLocalDtds = false;
 

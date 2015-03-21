@@ -55,6 +55,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -195,8 +196,15 @@ public class OTFVis {
 
     public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
 		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events);
-		OTFVisMobsimListener queueSimulationFeature = new OTFVisMobsimListener(server);
-		qSim.addQueueSimulationListeners(queueSimulationFeature);
+
+		// this is the start/stop facility, which may be used outside of otfvis:
+		PlayPauseMobsimListener playPauseMobsimListener = new PlayPauseMobsimListener();
+		server.setListener( playPauseMobsimListener ) ;
+		qSim.addQueueSimulationListeners(playPauseMobsimListener);
+		
+		// this is to trigger otfvis-specific cleanup (quite possibly not needed):
+		qSim.addQueueSimulationListeners( new OTFVisMobsimListener(server) );
+
 		server.setSimulation(qSim);
 
 		if (config.scenario().isUseTransit()) {

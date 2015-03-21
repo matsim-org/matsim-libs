@@ -19,20 +19,46 @@
 
 package org.matsim.vis.otfvis;
 
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.vis.otfvis.PlayPauseSimulation.AccessToBlockingEtc;
 
-public class OTFVisMobsimListener implements MobsimBeforeCleanupListener {
+public class PlayPauseMobsimListener implements MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 
-//	private final OnTheFlyServer server;
+	private AccessToBlockingEtc internalInterface;
 
-	public OTFVisMobsimListener(OnTheFlyServer server) {
-//		this.server = server;
+	public PlayPauseMobsimListener() {
 	}
 
 	@Override
-	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent event) {
-//		this.server.getSnapshotReceiver().finish();
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+		if ( this.internalInterface==null ) {
+			throw new RuntimeException("internalInterface==null.  Syntax is not yet stable; find out where the corresponding "
+					+ "setter is.") ;
+		}
 	}
+	
+	@Override
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
+		this.internalInterface.blockOtherUpdates();
+	}
+	
+	@Override
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
+		double time = event.getSimulationTime();
+		this.internalInterface.unblockOtherUpdates();
+		this.internalInterface.updateStatus(time);
+	}
+
+	public void setInternalInterface(AccessToBlockingEtc internalInterface) {
+		this.internalInterface = internalInterface ;
+	}
+
 
 }
