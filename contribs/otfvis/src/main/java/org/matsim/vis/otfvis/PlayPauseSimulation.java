@@ -20,6 +20,7 @@ package org.matsim.vis.otfvis;
 
 import java.util.concurrent.Semaphore;
 
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.interfaces.PlayPauseSimulationI;
 
 /**
@@ -77,7 +78,7 @@ public class PlayPauseSimulation implements PlayPauseSimulationI {
 	private final Object stepDone = new Object();
 	private final Object updateFinished = new Object();
 	private AccessToBlockingEtc internalInterface = new AccessToBlockingEtc() ;
-
+	
 	@Override
 	public final void doStep(int time) {
 		// leave Status on pause but let one step run (if one is waiting)

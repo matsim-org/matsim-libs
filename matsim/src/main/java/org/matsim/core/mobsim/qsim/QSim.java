@@ -89,7 +89,7 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
  * @author dgrether
  * @author knagel
  */
-public final class QSim implements VisMobsim, Netsim {
+public final class QSim extends Thread implements VisMobsim, Netsim {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
