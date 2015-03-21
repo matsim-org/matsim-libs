@@ -35,11 +35,6 @@ public class FreeSpeedTravelTime implements TravelTime {
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		if ( link.getId().equals( Id.createLinkId( 7012 ) ) ) {
-			Logger.getLogger( this.getClass() ).warn( "time: " + time + "; speed: " + link.getFreespeed(time) ) ;
-		}
-		
-		
 		return link.getLength() / link.getFreespeed(time);
 	}
 
