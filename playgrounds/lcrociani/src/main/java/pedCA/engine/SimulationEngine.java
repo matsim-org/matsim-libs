@@ -3,7 +3,6 @@ package pedCA.engine;
 import java.io.IOException;
 
 import pedCA.context.Context;
-import pedCA.output.Log;
 
 public class SimulationEngine {
 	private int step;

@@ -6,7 +6,6 @@ import pedCA.agents.Agent;
 import pedCA.agents.PhysicalObject;
 import pedCA.agents.Shadow;
 import pedCA.utility.Constants;
-import pedCA.utility.Lottery;
 
 public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 	private ArrayList<Shadow> shadows;
@@ -21,7 +20,7 @@ public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 	public void moveTo(Agent pedestrian, GridPoint newPos) {
 		GridPoint oldPos = pedestrian.getPosition();
 		removePedestrian(oldPos, pedestrian);
-		if (Lottery.simpleExtraction(Constants.SHADOWS_PROBABILITY))
+		//if (Lottery.simpleExtraction(Constants.SHADOWS_PROBABILITY))
 			generateShadow(pedestrian);
 		addPedestrian(newPos,pedestrian);
 	}
@@ -57,7 +56,10 @@ public class PedestrianGrid extends ActiveGrid<PhysicalObject>{
 	
 	private void generateShadow(Agent pedestrian) {
 		GridPoint position = pedestrian.getPosition();
-		Shadow shadow = new Shadow(this.step, position , pedestrian.getID());
+		double pedestrianDensity = this.densityGrid.getDensityAt(position);
+		double shadow_life = Math.pow(pedestrianDensity*.61,1.45)*0.4;//Math.pow(pedestrianDensity*.61,1.43)*0.39;
+		shadow_life = shadow_life/Constants.STEP_DURATION;
+		Shadow shadow = new Shadow(this.step, position , pedestrian.getID(), shadow_life);
 		get(position.getY(),position.getX()).add(shadow);
 		shadows.add(shadow);
 	}

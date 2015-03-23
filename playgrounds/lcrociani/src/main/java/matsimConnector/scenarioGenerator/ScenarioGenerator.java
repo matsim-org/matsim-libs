@@ -26,11 +26,12 @@ public class ScenarioGenerator {
 	private static final int CA_ROWS = (int)Math.round((DOOR_WIDTH/Constants.CA_CELL_SIDE));
 	private static final int CA_COLS = (int)Math.round((CA_LENGTH/Constants.CA_CELL_SIDE));
 	private static Double TOTAL_DENSITY = 4.;
-	private static int POPULATION_SIZE = 1000;//(int)((CA_ROWS*Constants.CA_CELL_SIDE) * (CA_COLS*Constants.CA_CELL_SIDE) * TOTAL_DENSITY);
+	private static int POPULATION_SIZE = 2000;
 
 	
 	public static void main(String [] args) {
-		if (args.length>0){
+		boolean calcFundDiag = args.length>0;
+		if (calcFundDiag){
 			TOTAL_DENSITY = Double.parseDouble(args[0]);
 			inputDir = Constants.FD_TEST_PATH+args[0]+"/input";
 			outputDir = Constants.FD_TEST_PATH+args[0]+"/output";
@@ -42,21 +43,21 @@ public class ScenarioGenerator {
 		Config c = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(c);
 		
-		Context contextCA = createCAScenario();
+		Context contextCA = createCAScenario(calcFundDiag);
 		NetworkGenerator.createNetwork(scenario, contextCA);
 		
 		c.network().setInputFile(inputDir + "/network.xml.gz");
 
-		//		c.strategy().addParam("Module_1", "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
+		//c.strategy().addParam("Module_1", "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
 		c.strategy().addParam("Module_1", "ReRoute");
 		c.strategy().addParam("ModuleProbability_1", ".1");
-		c.strategy().addParam("ModuleDisableAfterIteration_1", "100");
+		c.strategy().addParam("ModuleDisableAfterIteration_1", "30");
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", ".9");
 
 		c.controler().setOutputDirectory(outputDir);
 		c.controler().setLastIteration(200);
-		c.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks);
+		c.controler().setRoutingAlgorithmType(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra);
 
 		c.plans().setInputFile(inputDir + "/population.xml.gz");
 
@@ -97,9 +98,10 @@ public class ScenarioGenerator {
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(c.plans().getInputFile());
 	}
 	
-	private static Context createCAScenario() {
+	private static Context createCAScenario(boolean calcFundDiag) {
 		Log.log("CA Scenario generation");
-		//ContextGenerator.createAndSaveBidCorridorContext(inputDir+"/CAScenario", CA_ROWS, CA_COLS, 2);
+		if (calcFundDiag)
+			return ContextGenerator.createAndSaveBidCorridorContext(inputDir+"/CAScenario", CA_ROWS, CA_COLS, 2);
 		return ContextGenerator.createContextWithResourceEnvironmentFile(inputDir+"/CAScenario");
 	}
 }

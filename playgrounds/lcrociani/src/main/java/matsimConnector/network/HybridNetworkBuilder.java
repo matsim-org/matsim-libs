@@ -1,5 +1,6 @@
 package matsimConnector.network;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +30,10 @@ public class HybridNetworkBuilder {
 		NetworkFactoryImpl fac = net.getFactory();
 		environmentCA.setNetwork(net);
 		
+		//////THIS LIST CONTAINS ID OF LINKS THAT WILL NOT BE ADDED IN THE MATSIM NETWORK
+		ArrayList<String> linkIdBlackList = new ArrayList<String>();
+		//linkIdBlackList.add("HybridNode_53-->HybridNode_12");
+		
 		net.setCapacityPeriod(1);
 		net.setEffectiveCellSize(.26);
 		net.setEffectiveLaneWidth(.71);
@@ -53,19 +58,21 @@ public class HybridNetworkBuilder {
 			Node to = net.getNodes().get(toId);
 				
 			Id <Link> linkId = IdUtility.createLinkId(fromId, toId);
-			Link link = fac.createLink(linkId, from, to);
-			link.setLength(edgeCA.getLength());
-			link.setFreespeed(Constants.PEDESTRIAN_SPEED);
-			
-			//TODO FIX THE FLOW CAPACITY
-			double width = Constants.FAKE_LINK_WIDTH;
-			double lanes = width/net.getEffectiveLaneWidth();
-			double cap = width*Constants.FLOPW_CAP_PER_METER_WIDTH;
-			link.setCapacity(cap);
-			link.setNumberOfLanes(lanes);
-			link.setAllowedModes(modes);
-			net.addLink(link);
-			scenarioCA.mapLinkToEnvironment(link, environmentCA);
+			if (!(linkIdBlackList.contains(linkId.toString()))){
+				Link link = fac.createLink(linkId, from, to);
+				link.setLength(edgeCA.getLength());
+				link.setFreespeed(Constants.PEDESTRIAN_SPEED);
+				
+				//TODO FIX THE FLOW CAPACITY
+				double width = Constants.FAKE_LINK_WIDTH;
+				double lanes = width/net.getEffectiveLaneWidth();
+				double cap = width*Constants.FLOPW_CAP_PER_METER_WIDTH;
+				link.setCapacity(cap);
+				link.setNumberOfLanes(lanes);
+				link.setAllowedModes(modes);
+				net.addLink(link);
+				scenarioCA.mapLinkToEnvironment(link, environmentCA);
+			}
 		}
 	}
 

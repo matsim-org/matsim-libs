@@ -17,7 +17,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.CAQLink;
 import pedCA.context.Context;
 import pedCA.engine.AgentMover;
 import pedCA.environment.grid.GridPoint;
-import pedCA.output.Log;
 
 public class CAAgentMover extends AgentMover {
 

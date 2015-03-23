@@ -16,10 +16,16 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import pedCA.environment.grid.EnvironmentGrid;
-import pedCA.output.OutputManager;
+import pedCA.output.AgentTracker;
+import pedCA.output.FundamentalDiagramWriter;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
+import playground.vsp.congestion.handlers.TollHandler;
+import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 public class CASimulationRunner implements IterationStartsListener{
 
@@ -49,6 +55,17 @@ public class CASimulationRunner implements IterationStartsListener{
 		
 		Controler controller = new Controler(scenario);
 		
+		
+		//////////////------------THIS IS FOR THE SYSTEM OPTIMUM SEARCH
+		TollHandler tollHandler = new TollHandler(controller.getScenario());
+		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		controller.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+		// Define the pricing approach and the congestion implementation.
+		//		controler.addControlerListener(new AverageCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
+		controller.addControlerListener(new MarginalCongestionPricingContolerListener(controller.getScenario(), tollHandler, new CongestionHandlerImplV6(controller.getEvents(), (ScenarioImpl) controller.getScenario())));
+		//////////////------------
+		
+		
 		controller.setOverwriteFiles(true);
 		
 		CATripRouterFactory tripRouterFactoryCA = new CATripRouterFactory(scenario);
@@ -63,11 +80,9 @@ public class CASimulationRunner implements IterationStartsListener{
 			dbg.addAdditionalDrawer(iBox);
 			controller.getEvents().addHandler(dbg);
 			EnvironmentGrid environmentGrid = scenarioCA.getEnvironments().get(Id.create("0",CAEnvironment.class)).getContext().getEnvironmentGrid();
-			
-			double density = scenario.getPopulation().getPersons().size()/(environmentGrid.getColumns()*environmentGrid.getRows()*Math.pow(Constants.CA_CELL_SIDE, 2));
-			controller.getEvents().addHandler(new OutputManager(density,scenario.getPopulation().getPersons().size(),Constants.OUTPUT_PATH+"/travel_times.csv"));
+			controller.getEvents().addHandler(new AgentTracker(Constants.OUTPUT_PATH+"/agentTrajectories.txt",environmentGrid.getRows(),environmentGrid.getColumns()));
 		}else{
-			controller.getEvents().addHandler(new OutputManager(Double.parseDouble(args[0]),scenario.getPopulation().getPersons().size(), Constants.FD_TEST_PATH+"fd_data.csv"));
+			controller.getEvents().addHandler(new FundamentalDiagramWriter(Double.parseDouble(args[0]),scenario.getPopulation().getPersons().size(), Constants.FD_TEST_PATH+"fd_data.csv"));
 		}
 		
 		CASimulationRunner runner = new CASimulationRunner();

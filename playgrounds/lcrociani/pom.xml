@@ -19,6 +19,11 @@
 	<version>2.2.1</version>
 	<systemPath>${basedir}/libraries/processing-2.2.1/core.jar</systemPath>
 </dependency>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>vsp</artifactId>
+  		<version>0.7.0-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
   <modelVersion>4.0.0</modelVersion>
   <groupId>playground</groupId>

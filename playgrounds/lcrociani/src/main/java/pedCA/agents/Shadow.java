@@ -1,18 +1,21 @@
 package pedCA.agents;
 
 import pedCA.environment.grid.GridPoint;
-import pedCA.utility.Constants;
+import pedCA.utility.Lottery;
 
 public class Shadow extends PhysicalObject{
 	private final int step;
 	private final int duration;
 	private final int pedestrianId;
 	
-	public Shadow(int step, GridPoint position, int pedestrianId){
+	public Shadow(int step, GridPoint position, int pedestrianId, double duration){
 		this.step = step;
 		this.position = position;
 		this.pedestrianId = pedestrianId;
-		this.duration = Constants.SHADOWS_LIFE;
+		if (Lottery.simpleExtraction(duration - (int)duration))
+			this.duration = (int)duration + 1;
+		else
+			this.duration = (int)duration;
 	}
 	
 	public int getExpirationTime(){

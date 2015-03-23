@@ -32,18 +32,21 @@ public class ContextGenerator {
 		return context;
 	}
 	
-	public static void createAndSaveBidCorridorContext(String path, int rows, int cols, int populationSize){
+	public static Context createAndSaveBidCorridorContext(String path, int rows, int cols, int populationSize){
 		Context context = getBidCorridorContext(rows, cols, populationSize);
 		try {
 			context.saveConfiguration(path);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return context;
 	}
 	
 	private static Context getBidCorridorContext(int rows, int cols, int populationSize) {
 		EnvironmentGrid environmentGrid = new EnvironmentGrid(rows, cols);
 		EnvironmentGenerator.initCorridorWithWalls(environmentGrid);
+		MarkerConfiguration markerConfiguration = EnvironmentGenerator.generateBorderDestinations(environmentGrid);
+		/**
 		MarkerConfiguration markerConfiguration = new MarkerConfiguration();
 		markerConfiguration.addDestination(EnvironmentGenerator.getCorridorEastDestination(environmentGrid));
 		markerConfiguration.addDestination(EnvironmentGenerator.getCorridorWestDestination(environmentGrid));
@@ -53,6 +56,7 @@ public class ContextGenerator {
 		startE.setTotalPedestrians(populationSize);
 		markerConfiguration.addStart(startE);
 		markerConfiguration.addStart(startW);
+		**/
 		return new Context(environmentGrid, markerConfiguration);
 	}
 
