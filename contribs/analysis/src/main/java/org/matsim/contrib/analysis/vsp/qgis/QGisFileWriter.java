@@ -191,7 +191,7 @@ public class QGisFileWriter {
 			
 		} else{
 			
-			relP.replace("file:/", "./");
+			relP.replace("file:/", "");
 			
 			out.write("\t\t\t<datasource>" + relP + "</datasource>\n");
 			
@@ -292,9 +292,7 @@ public class QGisFileWriter {
 		out.write("\t\t<maplayer minimumScale=\"0\" maximumScale=\"1e+08\" type=\"" + rlayer.getType() + "\" hasScaleBasedVisibilityFlag=\"0\">\n");
 		out.write("\t\t\t<id>" + rlayer.getId().toString() + "</id>\n");
 		
-		String base = rlayer.getPath();
-		String relP = new File(writer.getWorkingDir()).toURI().relativize(new File(base).toURI()).toString();
-		relP.replace("file:/", "");
+		String relP = Paths.get(this.writer.getWorkingDir()).relativize(Paths.get(layer.getPath())).toString();
 		
 		out.write("\t\t\t<datasource>" + relP + "</datasource>\n");
 		out.write("\t\t\t<layername>" + layer.getName() + "</layername>\n");
