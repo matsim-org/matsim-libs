@@ -23,6 +23,9 @@ import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
  * Class to write the BTU commodities (which came from agents 
  * traveling in the morning peak) as MATSim population.
  * 
+ * Uniformly distributes the agents activity end times in the 
+ * given time interval.
+ * 
  * @author tthunig
  */
 public class TtMorningCommodityAsMatsimPopWriter {
@@ -154,8 +157,14 @@ public class TtMorningCommodityAsMatsimPopWriter {
 		return source;
 	}
 
+	/**
+	 * creates an uniformly distributed activity end time in the given time interval
+	 * 
+	 * @param minTime the interval start in seconds
+	 * @param maxTime the interval end in seconds
+	 * @return
+	 */
 	private double createEndTime(double minTime, double maxTime) {
-		// create uniformly distributed activity end time in the given time interval
 		double r = Math.random();
 		return minTime + r*(maxTime-minTime);
 	}
