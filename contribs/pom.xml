@@ -91,6 +91,7 @@
 	<modules>
 		<module>accessibility</module>
 		<module>analysis</module>
+		<module>bdiintegration</module>
 		<module>cadytsIntegration</module>
 		<module>dvrp</module>
 		<module>emissions</module>
