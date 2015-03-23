@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
-import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
@@ -60,7 +60,7 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 	private final TripRouter tripRouter;
 	private final AgentsToDropOffIdentifier agentsToDropOffIdentifier;
 	
-	/*package*/ DropOffAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
+	/*package*/ DropOffAgentReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface,
 			TripRouter tripRouter, AgentsToDropOffIdentifier agentsToDropOffIdentifier) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;

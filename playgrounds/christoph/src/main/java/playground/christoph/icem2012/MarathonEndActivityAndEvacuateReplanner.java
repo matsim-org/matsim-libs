@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
@@ -43,7 +44,7 @@ public class MarathonEndActivityAndEvacuateReplanner extends WithinDayDuringActi
 		
 	private final EndActivityAndEvacuateReplanner replanner;
 	
-	/*package*/ MarathonEndActivityAndEvacuateReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
+	/*package*/ MarathonEndActivityAndEvacuateReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface, 
 			EndActivityAndEvacuateReplanner replanner) {
 		super(id, scenario, internalInterface);
 		this.replanner = replanner;

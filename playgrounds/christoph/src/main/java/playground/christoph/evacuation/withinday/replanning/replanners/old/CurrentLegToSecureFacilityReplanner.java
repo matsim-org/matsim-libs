@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -62,7 +63,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 
 	protected final TripRouter tripRouter;
 	
-	/*package*/ CurrentLegToSecureFacilityReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
+	/*package*/ CurrentLegToSecureFacilityReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;

@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -22,7 +23,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 	private final TripRouter tripRouter;
 	private final EditRoutes editRoutes;
 	
-	/*package*/ ReplannerYoungPeople(Id id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
+	/*package*/ ReplannerYoungPeople(Id id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
 		this.editRoutes = new EditRoutes();

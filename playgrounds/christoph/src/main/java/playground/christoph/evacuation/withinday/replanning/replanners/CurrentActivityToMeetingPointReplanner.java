@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -59,7 +59,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	protected final TripRouter tripRouter;
 	
 	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario,
-			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
+			ActivityEndRescheduler internalInterface, DecisionDataProvider decisionDataProvider,
 			ModeAvailabilityChecker modeAvailabilityChecker, SwissPTTravelTimeCalculator ptTravelTime,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);

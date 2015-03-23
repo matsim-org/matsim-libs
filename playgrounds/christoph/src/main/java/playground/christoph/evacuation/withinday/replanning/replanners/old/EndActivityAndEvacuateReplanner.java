@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -53,7 +54,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 	private final SwissPTTravelTimeCalculator ptTravelTime;
 	private final TripRouter tripRouter;
 	
-	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
+	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface, 
 			SwissPTTravelTimeCalculator ptTravelTime, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.ptTravelTime = ptTravelTime;

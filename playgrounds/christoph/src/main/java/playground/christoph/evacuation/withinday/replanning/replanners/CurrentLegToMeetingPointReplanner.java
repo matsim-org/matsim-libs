@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -51,7 +52,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 	protected final TripRouter tripRouter;
 	
 	/*package*/ CurrentLegToMeetingPointReplanner(Id id, Scenario scenario,
-			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
+			ActivityEndRescheduler internalInterface, DecisionDataProvider decisionDataProvider,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.decisionDataProvider = decisionDataProvider;

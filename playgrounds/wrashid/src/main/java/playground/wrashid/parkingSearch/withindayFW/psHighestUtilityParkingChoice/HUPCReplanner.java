@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -58,7 +59,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	private final TripRouter tripRouter;
 
-	HUPCReplanner(Id id, Scenario scenario, InternalInterface internalInterface, ParkingAgentsTracker parkingAgentsTracker,
+	HUPCReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface, ParkingAgentsTracker parkingAgentsTracker,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.parkingAgentsTracker = parkingAgentsTracker;

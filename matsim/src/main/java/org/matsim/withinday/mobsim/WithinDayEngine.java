@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
@@ -207,7 +208,7 @@ public class WithinDayEngine implements MobsimEngine {
 		this.internalInterface = internalInterface;
 	}
 	
-	public InternalInterface getInternalInterface() {
+	public ActivityEndRescheduler getInternalInterface() {
 		return this.internalInterface;
 	}
 }

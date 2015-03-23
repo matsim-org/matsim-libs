@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.PersonImpl;
@@ -56,7 +57,7 @@ public class CurrentLegMicroReplanner extends WithinDayDuringLegReplanner {
 	private Controler controler;
 	
 	
-	/*package*/ CurrentLegMicroReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter, Controler controler) {
+	/*package*/ CurrentLegMicroReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter, Controler controler) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
 		this.controler = controler;

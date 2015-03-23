@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -42,7 +43,7 @@ public class MarathonCurrentLegReplanner extends WithinDayDuringLegReplanner {
 	private final TripRouter tripRouter;
 	private final EditRoutes editRoutes;
 	
-	/*package*/ MarathonCurrentLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
+	/*package*/ MarathonCurrentLegReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;

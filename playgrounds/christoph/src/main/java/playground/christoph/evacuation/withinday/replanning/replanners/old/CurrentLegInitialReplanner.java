@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -55,7 +55,7 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 	private final CoordAnalyzer coordAnalyzer;
 	private final TripRouter tripRouter;
 	
-	/*package*/ CurrentLegInitialReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
+	/*package*/ CurrentLegInitialReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface,
 			CoordAnalyzer coordAnalyzer, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.coordAnalyzer = coordAnalyzer;

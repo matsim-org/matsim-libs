@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
@@ -64,7 +64,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 	private final SwissPTTravelTimeCalculator ptTravelTime;
 	private final TripRouter tripRouter;
 	
-	public JoinedHouseholdsReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
+	public JoinedHouseholdsReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface, 
 			DecisionDataProvider decisionDataProvider, JoinedHouseholdsIdentifier identifier,
 			SwissPTTravelTimeCalculator ptTravelTime, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);

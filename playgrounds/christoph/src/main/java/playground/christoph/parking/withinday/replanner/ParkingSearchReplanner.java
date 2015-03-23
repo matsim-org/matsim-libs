@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -72,7 +73,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 	protected final ParkingSearchStrategy randomParkingSearch;
 	protected final ParkingSearchStrategy nearestAvailableParkingSearch;
 	
-	protected ParkingSearchReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
+	protected ParkingSearchReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface, 
 			ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure, ParkingRouter parkingRouter) {
 		super(id, scenario, internalInterface);
 		this.parkingAgentsTracker = parkingAgentsTracker;

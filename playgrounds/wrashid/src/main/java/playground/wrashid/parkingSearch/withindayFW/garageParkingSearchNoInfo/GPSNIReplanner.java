@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -55,7 +56,7 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	private final TripRouter tripRouter;
 	
-	GPSNIReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
+	GPSNIReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface, 
 			ParkingAgentsTracker parkingAgentsTracker, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.parkingAgentsTracker = parkingAgentsTracker;

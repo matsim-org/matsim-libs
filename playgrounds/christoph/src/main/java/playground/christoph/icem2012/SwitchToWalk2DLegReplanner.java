@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -43,7 +44,7 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 
 	private final CoordAnalyzer coordAnalyzer;
 
-	/*package*/ SwitchToWalk2DLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
+	/*package*/ SwitchToWalk2DLegReplanner(Id id, Scenario scenario, ActivityEndRescheduler internalInterface,
 			CoordAnalyzer coordAnalyzer) {
 		super(id, scenario, internalInterface);
 		this.coordAnalyzer = coordAnalyzer;

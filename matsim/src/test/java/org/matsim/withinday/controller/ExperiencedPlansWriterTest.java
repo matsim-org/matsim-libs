@@ -41,6 +41,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.PersonImpl;
@@ -205,7 +206,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 	 */
 	private static class Replanner extends WithinDayDuringActivityReplanner {
 
-		public Replanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface) {
+		public Replanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface) {
 			super(id, scenario, internalInterface);
 		}
 		
