@@ -124,7 +124,7 @@ public class SpatialInterpolation {
 	
 	/**
 	 * @param act actType
-	 * @param intensityOfPoint (userWelfare etc) intensity for 100% sample.
+	 * @param intensityOfPoint (userWelfare, personToll etc) intensity for 100% sample.
 	 */
 	public void processHomeLocation(Activity act, double intensityOfPoint){
 
@@ -148,7 +148,7 @@ public class SpatialInterpolation {
 
 				weightNow = intensityOfPoint * calculateWeightFromPoint(actCoordinate, pointCoord) * normalizationFactor;
 
-			} else throw new RuntimeException("Averaginh method other than point method is not possible for a point intensity. Aborting ...");
+			} else throw new RuntimeException("Averaging method other than point method is not possible for a point intensity. Aborting ...");
 
 			this.cellWeights.put(p, weightNow+weightSoFar);
 		}
@@ -158,7 +158,7 @@ public class SpatialInterpolation {
 	 * @param point
 	 * <p> No normalization, simple count in each cell, made specially for population density count.
 	 */
-	public void processLocationForDensityCount(Activity act){
+	public void processLocationForDensityCount(Activity act, double countScaleFactor){
 
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
 		Point actLocation = gf.createPoint(actCoordinate);
@@ -169,7 +169,7 @@ public class SpatialInterpolation {
 
 			if(this.grid.getCellGeometry(p).covers(actLocation)){
 				double weightSoFar = this.cellWeights.get(p);
-				this.cellWeights.put(p, weightSoFar+1);
+				this.cellWeights.put(p, weightSoFar+1*countScaleFactor);
 				return;
 			} 
 		}

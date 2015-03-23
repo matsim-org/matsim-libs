@@ -19,6 +19,7 @@
 package playground.agarwalamit.munich.analysis;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 
@@ -29,6 +30,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
@@ -38,6 +43,7 @@ import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 import com.vividsolutions.jts.geom.Point;
@@ -50,21 +56,23 @@ public class MunichSpatialPlots {
 
 	String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";
 	String bau = runDir+"/bau";
-	String policyScenario = runDir+"/ei";
-	private double countScaleFactor = 100;
+	String policyCase = runDir+"/ei";
+	private final double countScaleFactor = 100;
+	private final double gridSize = 500;
 
 	public static void main(String[] args) {
 		MunichSpatialPlots plots = new MunichSpatialPlots();
-//		plots.writeCongestionToCells();
-//		plots.writeEmissionToCells();
-		plots.writeUserWelfareToCells();
-		plots.writePopulationDensityCountToCells();
+		//		plots.writeCongestionToCells();
+//				plots.writeEmissionToCells();
+		//		plots.writeUserWelfareToCells();
+//				plots.writePopulationDensityCountToCells();
+		plots.writePersonTollToCells();
 	}
 
 	public void writePopulationDensityCountToCells(){
 
 		SpatialDataInputs inputs = new SpatialDataInputs("point",bau);
-		inputs.setGridInfo(GridType.HEX, 500);
+		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
 		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
@@ -72,19 +80,20 @@ public class MunichSpatialPlots {
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.initialCasePlansFile,inputs.initialCaseNetworkFile);
 
 		for(Person p : sc.getPopulation().getPersons().values()){
-			
+
 			Activity act  = sc.getPopulation().getFactory().createActivityFromLinkId("NA", Id.createLinkId("NA"));
-			
+
 			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
 				if(pe instanceof Activity){
 					act = (Activity) pe;
 					break;
 				}
 			}
-			plot.processLocationForDensityCount(act); //this is only for sample population, others are already 
+//			plot.processLocationForDensityCount(act,countScaleFactor);
+			plot.processHomeLocation(act, 1*countScaleFactor); // if want to interpolate
 		}
 
-		plot.writeRData("popDensity");
+		plot.writeRData("popDensity_interpolate");
 
 	}
 
@@ -94,8 +103,8 @@ public class MunichSpatialPlots {
 		Map<Id<Person>, Double> person_userWElfare_money_policy = new HashMap<>();
 
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("point",bau,policyScenario);
-		inputs.setGridInfo(GridType.HEX, 500);
+		SpatialDataInputs inputs = new SpatialDataInputs("point",bau,policyCase);
+		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
 		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
@@ -121,22 +130,22 @@ public class MunichSpatialPlots {
 		for(Person p : sc.getPopulation().getPersons().values()){
 			Id<Person> id = p.getId();
 
-			if(inputs.isComparing){
 
-				Activity act  = sc.getPopulation().getFactory().createActivityFromLinkId("NA", Id.createLinkId("NA"));
-				for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
-					if(pe instanceof Activity){
-						act = (Activity) pe;
-						break;
-					}
+			Activity act  = sc.getPopulation().getFactory().createActivityFromLinkId("NA", Id.createLinkId("NA"));
+			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
+				if(pe instanceof Activity){
+					act = (Activity) pe;
+					break;
 				}
+			}
 
+			if(inputs.isComparing){
 				double userWelfare_diff ;
-
 				userWelfare_diff = person_userWElfare_money_policy.get(id) - person_userWElfare_money_Bau.get(id);
-
 				plot.processHomeLocation(act, userWelfare_diff*countScaleFactor);
 
+			} else {
+				plot.processHomeLocation(act, countScaleFactor * person_userWElfare_money_Bau.get(id));
 			}
 		}
 
@@ -144,13 +153,54 @@ public class MunichSpatialPlots {
 
 	}
 
+	/**
+	 * This will write person toll to cell using point method.
+	 */
+	public void writePersonTollToCells(){
+		Map<Id<Person>, Double> personTollPolicy = new HashMap<>();
+
+		SpatialDataInputs inputs = new SpatialDataInputs("point",policyCase); //bau do not have toll
+		inputs.setGridInfo(GridType.HEX, gridSize);
+		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
+
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
+
+		Scenario scPolicy = LoadMyScenarios.loadScenarioFromOutputDir(policyCase);
+
+		personTollPolicy = getPersonIdToTollPayments(scPolicy);
+
+		for(Person p : scPolicy.getPopulation().getPersons().values()){
+			Id<Person> id = p.getId();
+
+			Activity act  = scPolicy.getPopulation().getFactory().createActivityFromLinkId("NA", Id.createLinkId("NA"));
+			for (PlanElement pe : p.getSelectedPlan().getPlanElements()){
+				if(pe instanceof Activity){
+					act = (Activity) pe;
+					break;
+				}
+			}
+
+			/*
+			 * personId2toll is stored negative in case of toll (==> showing that person has to pay). Since, here toll is calculated, so taking
+			 * negative of stored number. 
+			 */
+			double processableIntensity = 0;
+			if(personTollPolicy.containsKey(id)) processableIntensity = - countScaleFactor * personTollPolicy.get(id);
+			else processableIntensity =0;
+
+			plot.processHomeLocation(act, processableIntensity);
+		}
+		plot.writeRData("tollAtHomeLocation");
+	}
+
+
 	public void writeCongestionToCells(){
 		Map<Double, Map<Id<Link>, Double>> linkDelaysBau = new HashMap<>();
 		Map<Double, Map<Id<Link>, Double>> linkDelaysPolicy = new HashMap<>();
 
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
-		inputs.setGridInfo(GridType.HEX, 500);
+		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,policyCase);
+		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
 		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
@@ -225,7 +275,7 @@ public class MunichSpatialPlots {
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
-		inputs.setGridInfo(GridType.HEX, 500);
+		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
 		// set bounding box, smoothing radius and targetCRS if different.
@@ -297,6 +347,28 @@ public class MunichSpatialPlots {
 		}
 		SpatialDataInputs.LOG.info("Total NO2 emissions from cell weights  is "+cellWeights);
 
+	}
+
+	private Map<Id<Person>, Double> getPersonIdToTollPayments (Scenario sc){
+
+		MonetaryPaymentsAnalyzer paymentsAnalzer = new MonetaryPaymentsAnalyzer();
+		paymentsAnalzer.init((ScenarioImpl)sc);
+		paymentsAnalzer.preProcessData();
+
+		EventsManager events = EventsUtils.createEventsManager();
+		List<EventHandler> handler = paymentsAnalzer.getEventHandler();
+
+		for(EventHandler eh : handler){
+			events.addHandler(eh);
+		}
+
+		int lastIteration = sc.getConfig().controler().getLastIteration();
+
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(sc.getConfig().controler().getOutputDirectory()+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz");
+
+		paymentsAnalzer.postProcessData();
+		return paymentsAnalzer.getPersonId2amount();
 	}
 
 }
