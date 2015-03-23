@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
 import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
@@ -16,6 +17,7 @@ import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory
 import playground.singapore.transitRouterEventsBased.TransitRouterEventsWSFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculatorSerializable;
+import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterModule;
 
 public class ControlerReference {
@@ -29,6 +31,7 @@ public class ControlerReference {
         options.addOption("s", "singapore", false, "Switch to indicate if this is the Singapore scenario, i.e. special scoring function");
         options.addOption("g", "genomeTracking", false, "Track plan genomes");
         options.addOption("I", "IntelligentRouters", false, "Intelligent routers");
+        options.addOption("D", "Diversify", false, "Use the DiversityGeneratingPlansRemover");
 //        CommandLineParser parser = new BasicParser();
         CommandLineParser parser = new GnuParser();
         CommandLine commandLine = parser.parse(options, args);
@@ -39,6 +42,7 @@ public class ControlerReference {
         boolean trackGenome = commandLine.hasOption("genomeTracking") || commandLine.hasOption("g");
         boolean singapore = commandLine.hasOption("singapore") || commandLine.hasOption("s");
         boolean intelligentRouters = commandLine.hasOption("IntelligentRouters") || commandLine.hasOption("I");
+        boolean diversityGeneratingPlanSelection = commandLine.hasOption("Diversify") || commandLine.hasOption("D");
         if (trackGenome) {
 
             DistributedPlanStrategyTranslationAndRegistration.TrackGenome = true;
@@ -102,11 +106,22 @@ public class ControlerReference {
 //            delegate.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(config.planCalcScore(), scenario, singapore));
             delegate.addControlerListener(new GenomeAnalysis(false, false, false));
         }
+        delegate.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addPlanSelectorForRemovalBinding("DiversityGeneratingPlansRemover").toProvider(playground.pieter.distributed.replanning.selectors.DiversityGeneratingPlansRemover.Builder.class);
+            }
+        });
+        if(diversityGeneratingPlanSelection)
+            delegate.getConfig().strategy().setPlanSelectorForRemoval("DiversityGeneratingPlansRemover");
+
         String outputDirectory = config.controler().getOutputDirectory();
         outputDirectory += "_ref" +
                 (trackGenome ? "_g" : "") +
                 (singapore ? "_s" : "") +
-                (intelligentRouters ? "_I" : "");
+                (intelligentRouters ? "_I" : "") +
+                (diversityGeneratingPlanSelection ? "_D" : "")
+        ;
         config.controler().setOutputDirectory(outputDirectory);
     }
 

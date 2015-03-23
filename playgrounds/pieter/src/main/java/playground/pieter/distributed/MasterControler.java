@@ -50,6 +50,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private static CommandLine commandLine;
     private static Options options;
     private static StringBuilder masterInitialLogString;
+    private static boolean DiversityGeneratingPlanSelection;
     private final HashMap<String, Plan> newPlans = new HashMap<>();
     private final long startMillis;
     private final Hydra hydra;
@@ -111,9 +112,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         System.setProperty("matsim.preferLocalDtds", "true");
         options = new Options();
         options.addOption(OptionBuilder.withLongOpt("config")
-                .withDescription("Config file location")
                 .hasArg(true)
                 .withArgName("CONFIG.XML")
+                .withDescription("Config file location")
                 .isRequired(true)
                 .create("c"));
         options.addOption(OptionBuilder.withLongOpt("port")
@@ -153,6 +154,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 "but having a multinomial distribution");
         options.addOption("g", "genomeTracking", false, "Track plan genomes");
         options.addOption("I", "IntelligentRouters", false, "Intelligent routers");
+        options.addOption("D", "Diversify", false, "Use the DiversityGeneratingPlansRemover");
         CommandLineParser parser = new BasicParser();
         commandLine = null;
         try {
@@ -161,8 +163,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             printHelp();
             System.exit(1);
         }
+        DiversityGeneratingPlanSelection = commandLine.hasOption("Diversify") || commandLine.hasOption("D");
         masterInitialLogString = new StringBuilder();
-        if (commandLine.hasOption("f")) {
+        if (commandLine.hasOption("f")||commandLine.hasOption("fullTransit")) {
             FullTransitPerformanceTransmission = true;
             masterInitialLogString.append("Transmitting full transit performance to slaves.\n");
         } else {
@@ -234,6 +237,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             masterInitialLogString.append("ROUTING initial plans on slaves.\n");
             initialRoutingOnSlaves = true;
         }
+        if(DiversityGeneratingPlanSelection)
+            masterInitialLogString.append("Using experimental DiversityGeneratingPlanSelectorForRemoval");
         SingaporeScenario = commandLine.hasOption("s");
     }
 
@@ -357,10 +362,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 (SingaporeScenario ? "_s" : "") +
                 (FullTransitPerformanceTransmission ? "_f" : "") +
                 (QuickReplanning ? "_q" : "") +
-                (IntelligentRouters? "_x" : "");
+                (IntelligentRouters? "_I" : "")+
+                (DiversityGeneratingPlanSelection? "_D" : "");
         config.controler().setOutputDirectory(outputDirectory);
         if (TrackGenome) {
-            matsimControler.addControlerListener(new GenomeAnalysis(true, true, true));
+            matsimControler.addControlerListener(new GenomeAnalysis(true, false, true));
             matsimControler.addOverridingModule(new DefaultTripRouterFactoryForPlanGenomesModule());
 //            matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(config.planCalcScore(), scenario, SingaporeScenario));
         }
@@ -1071,6 +1077,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         slave.sendBoolean(SingaporeScenario);
         slave.sendBoolean(TrackGenome);
         slave.sendBoolean(IntelligentRouters);
+        slave.sendBoolean(DiversityGeneratingPlanSelection);
         slave.readMemoryStats();
         slave.readNumberOfThreadsOnSlave();
     }

@@ -46,6 +46,7 @@ import playground.pieter.distributed.randomizedcarrouter.RandomizedCarRouterTrav
 import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.distributed.replanning.PlanCatcher;
+import playground.pieter.distributed.replanning.selectors.DiversityGeneratingPlansRemover;
 import playground.pieter.distributed.scoring.CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -78,6 +79,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final Logger slaveLogger;
     private final int myNumber;
     private final PlanCatcher plancatcher;
+    private final boolean DiversityGeneratingPlanSelection;
     private boolean initialRouting;
     private int numberOfIterations = -1;
     private int executedPlanCount;
@@ -202,6 +204,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         SingaporeScenario = reader.readBoolean();
         TrackGenome = reader.readBoolean();
         IntelligentRouters = reader.readBoolean();
+        DiversityGeneratingPlanSelection = reader.readBoolean();
 
         if (initialRouting) slaveLogger.warn("Performing initial routing.");
 
@@ -242,6 +245,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 else
                     include(new RandomizedCarRouterTravelTimeAndDisutilityModule());
                 bindToInstance(TravelTime.class, travelTime);
+                addPlanSelectorForRemovalBinding("DiversityGeneratingPlansRemover").toProvider(DiversityGeneratingPlansRemover.Builder.class);
             }
         });
 //        new Thread(new TimesReceiver()).start();
@@ -297,6 +301,8 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 //            matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes(config.planCalcScore(),scenario, SingaporeScenario));
 //            matsimControler.addControlerListener(new GenomeAnalysis(false, false,false));
         }
+        if(DiversityGeneratingPlanSelection)
+            matsimControler.getConfig().strategy().setPlanSelectorForRemoval("DiversityGeneratingPlansRemover");
         //no use for this, if you don't exactly know the communicationsMode of population when something goes wrong.
         // better to have plans written out every n successful iterations, specified in the config
         matsimControler.setDumpDataAtEnd(false);
