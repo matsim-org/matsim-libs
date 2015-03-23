@@ -26,7 +26,7 @@ public class MainForQGisWriter {
 		// use case 1: nodes
 //		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
 //		writer.setExtent(extent);
-//		VectorLayer nodesLayer = new VectorLayer("nodes", workingDirectory + "nodes.shp", QGisConstants.geometryType.Point);
+//		VectorLayer nodesLayer = new VectorLayer("nodes", workingDirectory + "nodes.shp", QGisConstants.geometryType.Point,false);
 //		new SimpleNetworkRenderer(nodesLayer);
 //		writer.addLayer(nodesLayer);
 		
@@ -35,7 +35,7 @@ public class MainForQGisWriter {
 //		// use case 2: links
 //		double[] extent = {4582770.625,5807267.875,4608784.375,5825459.125};
 //		writer.setExtent(extent);
-//		VectorLayer linksLayer = new VectorLayer("links", workingDirectory + "links.shp", QGisConstants.geometryType.Line);
+//		VectorLayer linksLayer = new VectorLayer("links", workingDirectory + "links.shp", QGisConstants.geometryType.Line,false);
 //		new SimpleNetworkRenderer(linksLayer);
 //		writer.addLayer(linksLayer);
 	
@@ -50,7 +50,7 @@ public class MainForQGisWriter {
 //		writer.addLayer(networkLayer);
 //		
 //		VectorLayer noiseLayer = new VectorLayer("receiverPoints", workingDirectory + "testFiles/baseCase_rpGap25meters/receiverPoints/receiverPoints.csv",
-//				QGisConstants.geometryType.Point);
+//				QGisConstants.geometryType.Point,true);
 //		noiseLayer.setDelimiter(";");
 //		noiseLayer.setXField("xCoord");
 //		noiseLayer.setYField("yCoord");
@@ -58,7 +58,7 @@ public class MainForQGisWriter {
 //		writer.addLayer(noiseLayer);
 //		
 //		VectorLayer joinLayer = new VectorLayer("immissions_3600", workingDirectory + "testFiles/baseCase_rpGap25meters/immissions/100.immission_39600.0.csv",
-//				QGisConstants.geometryType.No_geometry);
+//				QGisConstants.geometryType.No_geometry,true);
 //		writer.addLayer(joinLayer);
 //		
 //		noiseLayer.addVectorJoin(joinLayer, "Receiver Point Id", "receiverPointId", "Immission 11:00:00");
@@ -78,7 +78,8 @@ public class MainForQGisWriter {
 		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
 		writer.addLayer(mapnikLayer);
 
-		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
+		VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", 
+				QGisConstants.geometryType.Point);
 		densityLayer.setXField(1);
 		densityLayer.setYField(2);
 		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
@@ -102,7 +103,7 @@ public class MainForQGisWriter {
 //		writer.setExtent(extent);
 //		
 //		VectorLayer layer = new VectorLayer("immissions", workingDirectory + "/testFiles/noise/immission_merged.csv",
-//				QGisConstants.geometryType.Point);
+//				QGisConstants.geometryType.Point,true);
 //		layer.setXField("xCoord");
 //		layer.setYField("yCoord");
 //		layer.setDelimiter(",");

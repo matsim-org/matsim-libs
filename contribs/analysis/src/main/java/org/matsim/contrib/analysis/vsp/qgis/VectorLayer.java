@@ -29,6 +29,8 @@ public class VectorLayer extends QGisLayer {
 	private String yField;
 	private String header;
 	
+	private final boolean useHeader;
+	
 	/**
 	 * Instantiates a new qgis layer that contains vector data (can still be geometry OR data).
 	 * After calling the constructor you have to:
@@ -48,12 +50,14 @@ public class VectorLayer extends QGisLayer {
 	 * @param name layer name name of the layer (representation in qgis layer tree)
 	 * @param path path to the input file
 	 * @param geometryType type of geometry within the file
+	 * @param useHeader 
 	 */
-	public VectorLayer(String name, String path, org.matsim.contrib.analysis.vsp.qgis.QGisConstants.geometryType geometryType) {
+	public VectorLayer(String name, String path, org.matsim.contrib.analysis.vsp.qgis.QGisConstants.geometryType geometryType, boolean useHeader) {
 		
 		super(name, path);
 		
 		this.geometryType = geometryType;
+		this.useHeader = useHeader;
 		this.vectorJoins = new HashSet<VectorJoin>();
 		this.setType(QGisConstants.layerType.vector);
 		
@@ -71,11 +75,44 @@ public class VectorLayer extends QGisLayer {
 			
 		}
 		
-		checkConsistency();
+		if(this.useHeader){
+			this.setHeader();
+		}
 		
 	}
 	
-	private void checkConsistency(){
+
+	public VectorLayer(String name, String path, org.matsim.contrib.analysis.vsp.qgis.QGisConstants.geometryType geometryType){
+		
+		super(name, path);
+		
+		this.geometryType = geometryType;
+		this.useHeader = false;
+		
+		this.vectorJoins = new HashSet<VectorJoin>();
+		this.setType(QGisConstants.layerType.vector);
+		
+		if(!this.getInputType().equals(QGisConstants.inputType.xml)){
+			
+			if(this.getGeometryType().equals(QGisConstants.geometryType.Line)){
+				
+				this.setLayerClass(QGisConstants.layerClass.SimpleLine);
+				
+			} else if(this.getGeometryType().equals(QGisConstants.geometryType.Point)){
+				
+				this.setLayerClass(QGisConstants.layerClass.SimpleMarker);
+				
+			}
+			
+		}
+		
+	}
+	
+	public String getHeader(){
+		return this.header;
+	}
+	
+	private void setHeader(){
 		
 		File file = new File(this.getPath());
 		
@@ -87,22 +124,7 @@ public class VectorLayer extends QGisLayer {
 					
 					BufferedReader reader = IOUtils.getBufferedReader(this.getPath());
 					
-					String header = reader.readLine();
-					
-					String[] headerParts = header.split(",").length < 2 ? header.split(";") : header.split(",");
-
-					for(String s : headerParts){
-						
-						if(containsCharacters(s)){
-							
-							this.header = header;
-							break;
-							
-						}
-							
-							
-
-					}
+					this.header = reader.readLine();
 					
 				} catch (FileNotFoundException e) {
 					
@@ -123,32 +145,6 @@ public class VectorLayer extends QGisLayer {
 		}
 		
 	}
-	
-	private boolean containsCharacters(String s) {
-		
-		String[] chars = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
-		
-		for(String c : chars){
-			
-			if(s.contains(c)) return true;
-			
-		}
-		
-		return false;
-		
-	}
-	
-//	private boolean headerContainsField(String s){
-//		
-//		for(String c : this.header){
-//		
-//			if(c.equals(s)) return true;
-//			
-//		}
-//		
-//		return false;
-//		
-//	}
 
 	public QGisConstants.geometryType getGeometryType() {
 		return geometryType;
@@ -175,7 +171,7 @@ public class VectorLayer extends QGisLayer {
 	 */
 	public void setXField(int columnIndex){
 		
-		if(this.header == null){
+		if(!this.useHeader){
 			
 			this.xField = "field_" + Integer.valueOf(columnIndex);
 			
@@ -196,15 +192,15 @@ public class VectorLayer extends QGisLayer {
 	 */
 	public void setXField(String xField){
 		
-		if(this.header != null){
+		if(this.useHeader){
 			
 			if(this.header.contains(xField)){
 				
 				this.xField = xField;
 				
 			} else{
-				
-				throw new RuntimeException("Field " + xField + " does not exist in header!");
+			
+				throw new RuntimeException("Field " + xField + " cannot be found in the file header.");
 				
 			}
 			
@@ -236,7 +232,7 @@ public class VectorLayer extends QGisLayer {
 	 */
 	public void setYField(int columnIndex){
 		
-		if(this.header == null){
+		if(!this.useHeader){
 			
 				this.yField = "field_" + Integer.valueOf(columnIndex);
 			
@@ -250,7 +246,7 @@ public class VectorLayer extends QGisLayer {
 	
 	public void setYField(String yField){
 		
-		if(this.header != null){
+		if(this.useHeader){
 			
 			if(this.header.contains(yField)){
 				
@@ -258,7 +254,7 @@ public class VectorLayer extends QGisLayer {
 				
 			} else{
 				
-				throw new RuntimeException("Field " + yField + " does not exist in header!");
+				throw new RuntimeException("Field " + yField + " cannot be found in file header.");
 				
 			}
 			
@@ -305,11 +301,7 @@ public class VectorLayer extends QGisLayer {
 	}
 	
 	public boolean isUsingHeader(){
-		if(header != null){
-			return true;
-		} else{
-			return false;
-		}
+		return this.useHeader;
 	}
 	
 	/**
@@ -318,15 +310,11 @@ public class VectorLayer extends QGisLayer {
 	 * @return true is the header is not equal to null
 	 */
 	protected String headerUsed(){
-		if(this.header == null){
+		if(!this.useHeader){
 			return "No";
 		} else{
 			return "Yes";
 		}
 	}
 	
-	public String getHeader(){
-		return this.header;
-	}
-
 }
