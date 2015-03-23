@@ -159,6 +159,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim {
 		}
 
 		@Override
+		@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
 		public void rescheduleActivityEnd(MobsimAgent agent) {
 			// yy my current intuition would be that this could become a public QSim method.  The original idea was that I wanted external
 			// code only to insert agents into the QSim, and from then on the QSim handles it internally.  However, the main thing that truly seems to be
@@ -168,6 +169,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim {
 		}
 
 	};
+	
+	public final void rescheduleActivityEnd( MobsimAgent agent ) {
+		this.activityEngine.rescheduleActivityEnd(agent);
+	}
 
 	/**
 	 * Constructs an instance of this simulation which does not do anything by itself, but accepts handlers for Activities and Legs.

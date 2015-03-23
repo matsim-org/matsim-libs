@@ -30,5 +30,6 @@ public interface InternalInterface {
 	public void arrangeNextAgentState(MobsimAgent agent);
 	void registerAdditionalAgentOnLink(MobsimAgent agent);
 	MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId);
+	@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
 	public void rescheduleActivityEnd(MobsimAgent agent);
 }
