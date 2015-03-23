@@ -71,7 +71,7 @@ public class QGisFileWriter {
 		out.write("\t\t\t<ymax>" + this.writer.getExtent()[3] + "</ymax>\n");
 		
 		out.write("\t\t</extent>\n");
-		out.write("\t\t<projections>0</projections>\n");
+		out.write("\t\t<projections>1</projections>\n");
 		this.writeDestinationSrs(out);
 		out.write("\t\t<layer_coordinate_transform_info/>\n");
 		
@@ -176,7 +176,7 @@ public class QGisFileWriter {
 		
 		if(isCsvDataLayer(vlayer)){
 			
-			String datasource = "file:./" + relP + "?type=csv&amp;useHeader=" + vlayer.headerUsed() + "&amp;";
+			String datasource = relP + "?type=csv&amp;useHeader=" + vlayer.headerUsed() + "&amp;";
 			
 			if(vlayer.getDelimiter() != null){
 				
@@ -499,13 +499,6 @@ public class QGisFileWriter {
 		
 		out.write("\t<properties>\n");
 		
-		out.write("\t\t<SpatialRefSys>\n");
-		
-		out.write("\t\t\t<ProjectCRSProj4String type=\"QString\">+proj=longlat +datum=WGS84 +no_defs</ProjectCRSProj4String>\n");
-		out.write("\t\t\t<ProjectCrs type=\"QString\">EPSG:4326</ProjectCrs>\n");
-		out.write("\t\t\t<ProjectCRSID type=\"int\">3452</ProjectCRSID>\n");
-		
-		out.write("\t\t</SpatialRefSys>\n");
 		out.write("\t\t<Paths>\n");
 		
 		out.write("\t\t\t<Absolute type=\"bool\">false</Absolute>\n");
