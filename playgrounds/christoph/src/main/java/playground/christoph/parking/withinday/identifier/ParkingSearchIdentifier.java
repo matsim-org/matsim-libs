@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 
 import playground.christoph.parking.ParkingTypes;
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
@@ -48,7 +48,7 @@ import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
  * 
  * @author cdobler
  */
-public class ParkingSearchIdentifier extends DuringLegIdentifier {
+public class ParkingSearchIdentifier extends DuringLegAgentSelector {
 	
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	private final ParkingInfrastructure parkingInfrastructure;

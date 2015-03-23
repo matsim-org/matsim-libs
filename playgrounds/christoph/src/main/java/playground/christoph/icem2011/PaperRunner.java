@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
@@ -113,7 +113,7 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 	
 //	protected InitialIdentifier initialIdentifier;
 //	protected DuringActivityIdentifier duringActivityIdentifier;
-	protected DuringLegIdentifier duringLegIdentifier;
+	protected DuringLegAgentSelector duringLegIdentifier;
 //	protected WithinDayInitialReplanner initialReplanner;
 //	protected WithinDayDuringActivityReplanner duringActivityReplanner;
 	protected WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
@@ -169,7 +169,7 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 		
 		LinkReplanningMap linkReplanningMap = this.withinDayControlerListener.getLinkReplanningMap();
 		MobsimDataProvider mobsimDataProvider = this.withinDayControlerListener.getMobsimDataProvider();
-		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap, mobsimDataProvider).createIdentifier();
+		DuringLegAgentSelector identifier = new LeaveLinkIdentifierFactory(linkReplanningMap, mobsimDataProvider).createIdentifier();
 		this.selector.addIdentifier(identifier, pDuringLegReplanning);
 		this.duringLegIdentifier = new AgentFilteredDuringLegIdentifier(new LinkFilteredDuringLegIdentifier(identifier, this.replanningLinks), this.replanningAgents);
 		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, 
@@ -294,12 +294,12 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 	 * the delegate DuringLegIdentifier whether they are currently on a Link on which
 	 * replanning shall be performed.
 	 */
-	private static class LinkFilteredDuringLegIdentifier extends DuringLegIdentifier {
+	private static class LinkFilteredDuringLegIdentifier extends DuringLegAgentSelector {
 
-		private DuringLegIdentifier delegate;
+		private DuringLegAgentSelector delegate;
 		private Set<Id<Link>> replanningLinks;
 		
-		public LinkFilteredDuringLegIdentifier(DuringLegIdentifier identifier, Set<Id<Link>> replanningLinks) {
+		public LinkFilteredDuringLegIdentifier(DuringLegAgentSelector identifier, Set<Id<Link>> replanningLinks) {
 			this.delegate = identifier;
 			this.replanningLinks = replanningLinks;
 		}	
@@ -320,12 +320,12 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 	 * the delegate DuringLegIdentifier whether they are currently on a Link on which
 	 * replanning shall be performed.
 	 */
-	private static class AgentFilteredDuringLegIdentifier extends DuringLegIdentifier {
+	private static class AgentFilteredDuringLegIdentifier extends DuringLegAgentSelector {
 
-		private DuringLegIdentifier delegate;
+		private DuringLegAgentSelector delegate;
 		private Set<Id> replanningAgents;
 		
-		public AgentFilteredDuringLegIdentifier(DuringLegIdentifier identifier, Set<Id> replanningAgents) {
+		public AgentFilteredDuringLegIdentifier(DuringLegAgentSelector identifier, Set<Id> replanningAgents) {
 			this.delegate = identifier;
 			this.replanningAgents = replanningAgents;
 		}	

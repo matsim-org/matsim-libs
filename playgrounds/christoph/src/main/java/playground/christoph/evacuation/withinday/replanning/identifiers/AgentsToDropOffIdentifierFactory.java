@@ -24,7 +24,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.filter.EarliestLinkExitTimeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 
@@ -65,9 +65,9 @@ public class AgentsToDropOffIdentifierFactory extends DuringLegIdentifierFactory
 	}
 	
 	@Override
-	public DuringLegIdentifier createIdentifier() {
+	public DuringLegAgentSelector createIdentifier() {
 		
-		DuringLegIdentifier identifier = new AgentsToDropOffIdentifier(this.mobsimDataProvider, this.linkEnteredProvider, 
+		DuringLegAgentSelector identifier = new AgentsToDropOffIdentifier(this.mobsimDataProvider, this.linkEnteredProvider, 
 				this.jointDepartureOrganizer, this.jointDepartureCoordinator);
 		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);

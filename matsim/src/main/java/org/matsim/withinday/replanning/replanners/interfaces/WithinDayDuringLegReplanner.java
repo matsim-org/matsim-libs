@@ -23,12 +23,12 @@ package org.matsim.withinday.replanning.replanners.interfaces;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 
 /*
  * Replans only Agents that are currently performing a Leg.
  */
-public abstract class WithinDayDuringLegReplanner extends WithinDayReplanner<DuringLegIdentifier> {
+public abstract class WithinDayDuringLegReplanner extends WithinDayReplanner<DuringLegAgentSelector> {
 
 	public WithinDayDuringLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface) {
 		super(id, scenario, internalInterface);

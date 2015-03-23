@@ -23,6 +23,7 @@ package org.matsim.withinday.replanning.replanners.interfaces;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.utils.misc.Time;
@@ -34,20 +35,23 @@ import org.matsim.withinday.utils.EditRoutes;
  *	which identifies Agents that need a Replanning of their scheduled
  * 	Plans.
  */
+/**
+ * @param <T>  
+ */
 public abstract class WithinDayReplanner<T extends AgentSelector> {
 	
 	protected final Id<WithinDayReplanner> id;
 	protected final Scenario scenario;
-	protected final InternalInterface internalInterface;
+	protected final ActivityEndRescheduler internalInterface;
 	protected final EditRoutes editRoutes;
 	protected final WithinDayAgentUtils withinDayAgentUtils;
 
 	protected double time = Time.UNDEFINED_TIME;
 
-	public WithinDayReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface) {
+	public WithinDayReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler activityEndRescheduler) {
 		this.id = id;
 		this.scenario = scenario;
-		this.internalInterface = internalInterface;
+		this.internalInterface = activityEndRescheduler;
 		this.editRoutes = new EditRoutes();
 		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}

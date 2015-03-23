@@ -23,7 +23,7 @@ package playground.christoph.burgdorf.withinday.identifiers;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifier;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
@@ -36,7 +36,7 @@ public class ParkingIdentifierFactory extends DuringLegIdentifierFactory {
 	}
 	
 	@Override
-	public DuringLegIdentifier createIdentifier() {
+	public DuringLegAgentSelector createIdentifier() {
 		/*
 		 * Here, the leaveLinkIdentifier has to do apply the filters. Therefore,
 		 * add them to it instead of to the  ParkingIdentifier. The later one only
@@ -45,7 +45,7 @@ public class ParkingIdentifierFactory extends DuringLegIdentifierFactory {
 		LeaveLinkIdentifier leaveLinkIdentifier = (LeaveLinkIdentifier) leaveLinkIdentifierFactory.createIdentifier();
 		this.addAgentFiltersToIdentifier(leaveLinkIdentifier);
 		
-		DuringLegIdentifier identifier = new ParkingIdentifier(leaveLinkIdentifier);
+		DuringLegAgentSelector identifier = new ParkingIdentifier(leaveLinkIdentifier);
 		identifier.setAgentSelectorFactory(this);
 		return identifier;
 	}

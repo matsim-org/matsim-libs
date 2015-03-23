@@ -43,7 +43,7 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -84,7 +84,7 @@ public class CostNavigationRouteRunner implements MobsimInitializedListener, Aft
 	/*package*/ String eventsFile = null;
 	
 	protected int handledAgents;
-	protected DuringLegIdentifier duringLegIdentifier;
+	protected DuringLegAgentSelector duringLegIdentifier;
 	protected WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
 
 	protected Set<Id> replannedAgents;

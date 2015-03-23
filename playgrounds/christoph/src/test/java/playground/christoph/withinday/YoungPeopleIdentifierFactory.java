@@ -21,7 +21,7 @@
 package playground.christoph.withinday;
 
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 
 public class YoungPeopleIdentifierFactory extends DuringLegIdentifierFactory {
@@ -33,8 +33,8 @@ public class YoungPeopleIdentifierFactory extends DuringLegIdentifierFactory {
 	}
 	
 	@Override
-	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new YoungPeopleIdentifier(mobsim);
+	public DuringLegAgentSelector createIdentifier() {
+		DuringLegAgentSelector identifier = new YoungPeopleIdentifier(mobsim);
 		identifier.setAgentSelectorFactory(this);
 		return identifier;
 	}

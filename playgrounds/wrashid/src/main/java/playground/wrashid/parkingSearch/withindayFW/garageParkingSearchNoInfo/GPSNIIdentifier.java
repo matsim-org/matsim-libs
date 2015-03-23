@@ -31,12 +31,12 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
-public class GPSNIIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
+public class GPSNIIdentifier extends DuringLegAgentSelector implements MobsimInitializedListener {
 	
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	private final ParkingInfrastructure parkingInfrastructure;

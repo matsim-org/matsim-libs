@@ -37,7 +37,7 @@ import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.LinkFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import playground.christoph.burgdorf.withinday.identifiers.ParkingIdentifierFactory;
@@ -58,7 +58,7 @@ public class BurgdorfRunner implements StartupListener {
 	private WithinDayControlerListener withinDayControlerListener;
 	
 	private DuringLegIdentifierFactory duringLegFactory;
-	private DuringLegIdentifier parkingIdentifier;
+	private DuringLegAgentSelector parkingIdentifier;
 	
 	private CollectionAgentFilterFactory visitorAgentFilterFactory;
 	private TransportModeFilterFactory carLegAgentsFilterFactory;

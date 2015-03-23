@@ -23,7 +23,7 @@ package playground.christoph.evacuation.withinday.replanning.identifiers.old;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
@@ -45,8 +45,8 @@ public class SecureLegPerformingIdentifierFactory extends DuringLegIdentifierFac
 	}
 	
 	@Override
-	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new SecureLegPerformingIdentifier(this.linkReplanningMap, this.mobsimDataProvider, 
+	public DuringLegAgentSelector createIdentifier() {
+		DuringLegAgentSelector identifier = new SecureLegPerformingIdentifier(this.linkReplanningMap, this.mobsimDataProvider, 
 				this.network, this.centerCoord, this.secureDistance);
 		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);

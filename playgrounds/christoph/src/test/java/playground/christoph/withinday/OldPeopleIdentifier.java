@@ -5,9 +5,9 @@ import java.util.Set;
 
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
 
-public class OldPeopleIdentifier extends DuringActivityIdentifier {
+public class OldPeopleIdentifier extends DuringActivityAgentSelector {
 
 	private Netsim mobsim;
 

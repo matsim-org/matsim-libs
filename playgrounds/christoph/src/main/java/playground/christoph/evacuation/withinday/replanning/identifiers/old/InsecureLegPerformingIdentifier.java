@@ -33,13 +33,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 
-public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
+public class InsecureLegPerformingIdentifier extends DuringLegAgentSelector {
 	
 	private static final Logger log = Logger.getLogger(InsecureLegPerformingIdentifier.class);
 	

@@ -35,12 +35,12 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 
-public class InsecureActivityPerformingIdentifier extends DuringActivityIdentifier {
+public class InsecureActivityPerformingIdentifier extends DuringActivityAgentSelector {
 
 	private static final Logger log = Logger.getLogger(InsecureActivityPerformingIdentifier.class);
 	

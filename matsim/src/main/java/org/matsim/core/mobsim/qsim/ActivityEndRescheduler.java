@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * ActivityEndIdentifierFactory.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,27 +16,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.mobsim.qsim;
 
-package org.matsim.withinday.replanning.identifiers;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
-
-public class ActivityEndIdentifierFactory extends DuringActivityIdentifierFactory {
-
-	private ActivityReplanningMap activityReplanningMap;
-	
-	public ActivityEndIdentifierFactory(ActivityReplanningMap activityReplanningMap) {
-		this.activityReplanningMap = activityReplanningMap;
-	}
-	
-	@Override
-	public DuringActivityAgentSelector createIdentifier() {
-		DuringActivityAgentSelector identifier = new ActivityEndIdentifier(activityReplanningMap);
-		identifier.setAgentSelectorFactory(this);
-		this.addAgentFiltersToIdentifier(identifier);
-		return identifier;
-	}
+/**
+ * @author nagel
+ *
+ */
+public interface ActivityEndRescheduler {
+	@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
+	public void rescheduleActivityEnd(MobsimAgent agent);
 
 }

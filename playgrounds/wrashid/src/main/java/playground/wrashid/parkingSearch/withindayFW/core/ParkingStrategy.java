@@ -2,7 +2,7 @@ package playground.wrashid.parkingSearch.withindayFW.core;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -12,9 +12,9 @@ public class ParkingStrategy {
 
 	private TwoKeyHashMapWithDouble<Id, Integer> score;
 	
-	private final DuringLegIdentifier identifier;
+	private final DuringLegAgentSelector identifier;
 
-	public ParkingStrategy(DuringLegIdentifier identifier) {
+	public ParkingStrategy(DuringLegAgentSelector identifier) {
 		this.identifier = identifier;
 		score=new TwoKeyHashMapWithDouble<Id, Integer>();
 	}
@@ -31,7 +31,7 @@ public class ParkingStrategy {
 		this.score.get(agentId).remove(legPlanElementIndex);
 	}
 
-	public DuringLegIdentifier getIdentifier() {
+	public DuringLegAgentSelector getIdentifier() {
 		return identifier;
 	}
 	

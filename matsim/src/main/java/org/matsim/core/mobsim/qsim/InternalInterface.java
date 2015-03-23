@@ -25,11 +25,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
-public interface InternalInterface {
+public interface InternalInterface extends ActivityEndRescheduler {
 	public Netsim getMobsim(); 
 	public void arrangeNextAgentState(MobsimAgent agent);
 	void registerAdditionalAgentOnLink(MobsimAgent agent);
 	MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId);
-	@Deprecated // use same method from QSim directly and try to get rid of the handle to internal interface. kai, mar'15
-	public void rescheduleActivityEnd(MobsimAgent agent);
 }

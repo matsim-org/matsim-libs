@@ -39,8 +39,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
@@ -81,8 +81,8 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 					agentsToHandle.add(agentId);
 					
 					if (tuple.getFirst() instanceof InitialIdentifier) initialIdentificationCounter++;
-					else if (tuple.getFirst() instanceof DuringActivityIdentifier) activityIdentificationCounter++;
-					else if (tuple.getFirst() instanceof DuringLegIdentifier) legIdentificationCounter++;
+					else if (tuple.getFirst() instanceof DuringActivityAgentSelector) activityIdentificationCounter++;
+					else if (tuple.getFirst() instanceof DuringLegAgentSelector) legIdentificationCounter++;
 					else unknownIdentificationCounter++;
 				}				
 			}

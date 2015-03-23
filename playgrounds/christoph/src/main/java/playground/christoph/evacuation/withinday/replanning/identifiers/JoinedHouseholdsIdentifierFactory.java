@@ -23,7 +23,7 @@ package playground.christoph.evacuation.withinday.replanning.identifiers;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 
 import playground.christoph.evacuation.mobsim.HouseholdDepartureManager;
@@ -51,8 +51,8 @@ public class JoinedHouseholdsIdentifierFactory extends DuringActivityIdentifierF
 	}
 
 	@Override
-	public DuringActivityIdentifier createIdentifier() {
-		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(this.scenario, this.selectHouseholdMeetingPoint, 
+	public DuringActivityAgentSelector createIdentifier() {
+		DuringActivityAgentSelector identifier = new JoinedHouseholdsIdentifier(this.scenario, this.selectHouseholdMeetingPoint, 
 				this.modeAvailabilityChecker.createInstance(), this.jointDepartureOrganizer, this.mobsimDataProvider,
 				this.householdDepartureManager);
 		this.addAgentFiltersToIdentifier(identifier);

@@ -21,7 +21,7 @@
 package org.matsim.withinday.replanning.identifiers;
 
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
@@ -36,8 +36,8 @@ public class ActivityPerformingIdentifierFactory extends DuringActivityIdentifie
 	}
 	
 	@Override
-	public DuringActivityIdentifier createIdentifier() {
-		DuringActivityIdentifier identifier = new ActivityPerformingIdentifier(this.activityReplanningMap, this.mobsimDataProvider);
+	public DuringActivityAgentSelector createIdentifier() {
+		DuringActivityAgentSelector identifier = new ActivityPerformingIdentifier(this.activityReplanningMap, this.mobsimDataProvider);
 		this.addAgentFiltersToIdentifier(identifier);
 		identifier.setAgentSelectorFactory(this);
 		return identifier;

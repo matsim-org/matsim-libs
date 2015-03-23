@@ -51,7 +51,7 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import playground.wrashid.lib.obj.HashMapHashSetConcat;
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.lib.obj.event.EventHandlerCodeSeparator;
@@ -98,7 +98,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 	private UpdateLastParkingArrivalTime lastCarArrivalTimeAtParking;
 	private DoubleValueHashMap<Id> parkingIterationScoreSum;
 	private ParkingStrategyManager parkingStrategyManager;
-	private HashMapHashSetConcat<DuringLegIdentifier, Id> activeReplanningIdentifiers;
+	private HashMapHashSetConcat<DuringLegAgentSelector, Id> activeReplanningIdentifiers;
 	private Map<Id, Double> previousNonParkingActivityStartTime;
 	// private Map<Id, Double> firstParkingWalkTime;
 	// private Map<Id, Double> secondParkingWalkTime;
@@ -155,7 +155,7 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		this.nextNonParkingActivity = new HashMap<Id, Activity>();
 
 		this.parkingIterationScoreSum = new DoubleValueHashMap<Id>();
-		this.setActiveReplanningIdentifiers(new HashMapHashSetConcat<DuringLegIdentifier, Id>());
+		this.setActiveReplanningIdentifiers(new HashMapHashSetConcat<DuringLegAgentSelector, Id>());
 		this.previousNonParkingActivityStartTime = new HashMap<Id, Double>();
 		this.setSearchStartTime(new HashMap<Id, Double>());
 		this.lastParkingFacilityId = new HashMap<Id, Id>();
@@ -881,11 +881,11 @@ public class ParkingAgentsTracker extends EventHandlerCodeSeparator implements M
 		this.parkingStrategyManager = parkingStrategyManager;
 	}
 
-	public HashMapHashSetConcat<DuringLegIdentifier, Id> getActiveReplanningIdentifiers() {
+	public HashMapHashSetConcat<DuringLegAgentSelector, Id> getActiveReplanningIdentifiers() {
 		return activeReplanningIdentifiers;
 	}
 
-	public void setActiveReplanningIdentifiers(HashMapHashSetConcat<DuringLegIdentifier, Id> activeReplanningIdentifiers) {
+	public void setActiveReplanningIdentifiers(HashMapHashSetConcat<DuringLegAgentSelector, Id> activeReplanningIdentifiers) {
 		this.activeReplanningIdentifiers = activeReplanningIdentifiers;
 	}
 

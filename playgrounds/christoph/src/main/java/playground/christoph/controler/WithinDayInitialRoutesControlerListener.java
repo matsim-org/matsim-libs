@@ -40,7 +40,7 @@ import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegStartedIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.filter.ProbabilityFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -49,8 +49,8 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 
 	private DuringLegIdentifierFactory duringLegFactory;
 	private DuringLegIdentifierFactory startedLegFactory;
-	private DuringLegIdentifier legPerformingIdentifier;
-	private DuringLegIdentifier legStartedIdentifier;
+	private DuringLegAgentSelector legPerformingIdentifier;
+	private DuringLegAgentSelector legStartedIdentifier;
 	
 //	private DuringActivityIdentifierFactory activityEndingFactory;
 //	private DuringActivityIdentifier activityEndingIdentifier;

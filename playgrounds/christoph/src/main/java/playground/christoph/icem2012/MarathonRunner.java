@@ -86,9 +86,9 @@ import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierF
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.filter.ProbabilityFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -155,10 +155,10 @@ public final class MarathonRunner implements StartupListener,
 	/*
 	 * Identifiers
 	 */
-	private DuringActivityIdentifier affectedActivityPerformingIdentifier;
-	private DuringActivityIdentifier notAffectedActivityPerformingIdentifier;
-	private DuringLegIdentifier legPerformingIdentifier;
-	private DuringLegIdentifier duringLegRerouteIdentifier;
+	private DuringActivityAgentSelector affectedActivityPerformingIdentifier;
+	private DuringActivityAgentSelector notAffectedActivityPerformingIdentifier;
+	private DuringLegAgentSelector legPerformingIdentifier;
+	private DuringLegAgentSelector duringLegRerouteIdentifier;
 	
 	/*
 	 * ReplannerFactories

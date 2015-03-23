@@ -21,9 +21,9 @@
 package org.matsim.withinday.replanning.replanners.interfaces;
 
 import org.matsim.withinday.mobsim.WithinDayEngine;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 
-public abstract class WithinDayDuringLegReplannerFactory extends WithinDayReplannerFactory<DuringLegIdentifier> {
+public abstract class WithinDayDuringLegReplannerFactory extends WithinDayReplannerFactory<DuringLegAgentSelector> {
 
 	public WithinDayDuringLegReplannerFactory(WithinDayEngine withinDayEngine) {
 		super(withinDayEngine);

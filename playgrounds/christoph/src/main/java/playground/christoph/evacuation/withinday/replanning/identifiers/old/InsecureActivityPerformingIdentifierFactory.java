@@ -22,7 +22,7 @@ package playground.christoph.evacuation.withinday.replanning.identifiers.old;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
@@ -42,8 +42,8 @@ public class InsecureActivityPerformingIdentifierFactory extends DuringActivityI
 	}
 	
 	@Override
-	public DuringActivityIdentifier createIdentifier() {
-		DuringActivityIdentifier identifier = new InsecureActivityPerformingIdentifier(this.activityReplanningMap, 
+	public DuringActivityAgentSelector createIdentifier() {
+		DuringActivityAgentSelector identifier = new InsecureActivityPerformingIdentifier(this.activityReplanningMap, 
 				this.mobsimDataProvider, this.centerCoord, this.secureDistance);
 		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);

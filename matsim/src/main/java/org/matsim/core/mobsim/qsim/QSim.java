@@ -89,7 +89,7 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
  * @author dgrether
  * @author knagel
  */
-public final class QSim extends Thread implements VisMobsim, Netsim {
+public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEndRescheduler {
 
 	final private static Logger log = Logger.getLogger(QSim.class);
 
@@ -170,6 +170,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim {
 
 	};
 	
+	@Override
 	public final void rescheduleActivityEnd( MobsimAgent agent ) {
 		this.activityEngine.rescheduleActivityEnd(agent);
 	}

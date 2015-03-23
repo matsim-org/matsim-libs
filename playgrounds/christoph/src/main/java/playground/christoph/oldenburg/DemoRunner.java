@@ -52,8 +52,8 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
@@ -76,8 +76,8 @@ public class DemoRunner implements MobsimInitializedListener, StartupListener,
 	protected int numReplanningThreads = 1;
 
 	protected InitialIdentifier initialIdentifier;
-	protected DuringActivityIdentifier duringActivityIdentifier;
-	protected DuringLegIdentifier duringLegIdentifier;
+	protected DuringActivityAgentSelector duringActivityIdentifier;
+	protected DuringLegAgentSelector duringLegIdentifier;
 	protected WithinDayInitialReplannerFactory initialReplannerFactory;
 	protected WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
 	protected WithinDayDuringLegReplannerFactory duringLegReplannerFactory;

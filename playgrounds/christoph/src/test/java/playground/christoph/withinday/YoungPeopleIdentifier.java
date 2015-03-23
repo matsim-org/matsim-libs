@@ -13,9 +13,9 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 
-public class YoungPeopleIdentifier extends DuringLegIdentifier {
+public class YoungPeopleIdentifier extends DuringLegAgentSelector {
 
 	private Netsim mobsim;
 

@@ -20,6 +20,6 @@
 
 package org.matsim.withinday.replanning.identifiers.interfaces;
 
-public abstract class DuringLegIdentifier extends AgentSelector {
+public abstract class DuringLegAgentSelector extends AgentSelector {
 
 }

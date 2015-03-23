@@ -38,7 +38,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 
 /**
@@ -58,7 +58,7 @@ import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
  * 
  * @author cdobler
  */
-public class AgentsToDropOffIdentifier extends DuringLegIdentifier { 
+public class AgentsToDropOffIdentifier extends DuringLegAgentSelector { 
 
 	private final MobsimDataProvider mobsimDataProvider;
 	private final LinkEnteredProvider linkEnteredProvider;

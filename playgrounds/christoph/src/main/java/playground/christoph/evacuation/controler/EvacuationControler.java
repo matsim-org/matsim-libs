@@ -130,12 +130,12 @@ public class EvacuationControler extends WithinDayController implements
 	/*
 	 * Identifiers
 	 */
-	protected DuringActivityIdentifier joinedHouseholdsIdentifier;
-	protected DuringActivityIdentifier activityPerformingIdentifier;
-	protected DuringLegIdentifier legPerformingIdentifier;
-	protected DuringLegIdentifier agentsToDropOffIdentifier;
-	protected DuringLegIdentifier agentsToPickupIdentifier;
-	protected DuringLegIdentifier duringLegRerouteIdentifier;
+	protected DuringActivityAgentSelector joinedHouseholdsIdentifier;
+	protected DuringActivityAgentSelector activityPerformingIdentifier;
+	protected DuringLegAgentSelector legPerformingIdentifier;
+	protected DuringLegAgentSelector agentsToDropOffIdentifier;
+	protected DuringLegAgentSelector agentsToPickupIdentifier;
+	protected DuringLegAgentSelector duringLegRerouteIdentifier;
 	
 	/*
 	 * ReplannerFactories

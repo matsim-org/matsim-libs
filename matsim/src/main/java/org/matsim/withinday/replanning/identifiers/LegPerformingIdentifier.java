@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
-public class LegPerformingIdentifier extends DuringLegIdentifier {
+public class LegPerformingIdentifier extends DuringLegAgentSelector {
 
 	private final LinkReplanningMap linkReplanningMap;
 	private final MobsimDataProvider mobsimDataProvider;

@@ -44,7 +44,7 @@ import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
 
 import playground.christoph.evacuation.mobsim.HouseholdDepartureManager;
 import playground.christoph.evacuation.mobsim.HouseholdDepartureManager.HouseholdDeparture;
@@ -62,7 +62,7 @@ import playground.christoph.evacuation.withinday.replanning.utils.SelectHousehol
  *  
  *  @author cdobler
  */
-public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier {
+public class JoinedHouseholdsIdentifier extends DuringActivityAgentSelector {
 
 	private static final Logger log = Logger.getLogger(JoinedHouseholdsIdentifier.class);
 	

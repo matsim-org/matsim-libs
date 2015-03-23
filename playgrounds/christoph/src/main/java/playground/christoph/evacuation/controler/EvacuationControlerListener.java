@@ -145,12 +145,12 @@ public class EvacuationControlerListener implements StartupListener {
 	/*
 	 * Identifiers
 	 */
-	private DuringActivityIdentifier joinedHouseholdsIdentifier;
-	private DuringActivityIdentifier activityPerformingIdentifier;
-	private DuringLegIdentifier legPerformingIdentifier;
-	private DuringLegIdentifier agentsToDropOffIdentifier;
-	private DuringLegIdentifier agentsToPickupIdentifier;
-	private DuringLegIdentifier duringLegRerouteIdentifier;
+	private DuringActivityAgentSelector joinedHouseholdsIdentifier;
+	private DuringActivityAgentSelector activityPerformingIdentifier;
+	private DuringLegAgentSelector legPerformingIdentifier;
+	private DuringLegAgentSelector agentsToDropOffIdentifier;
+	private DuringLegAgentSelector agentsToPickupIdentifier;
+	private DuringLegAgentSelector duringLegRerouteIdentifier;
 	
 	/*
 	 * ReplannerFactories

@@ -44,7 +44,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -65,7 +65,7 @@ import playground.christoph.evacuation.mobsim.decisionmodel.PickupModel.PickupDe
  * 
  * @author cdobler
  */
-public class AgentsToPickupIdentifier extends DuringLegIdentifier {
+public class AgentsToPickupIdentifier extends DuringLegAgentSelector {
 
 	/*
 	 * If true, agents are only picked up if their destination matches the drivers 

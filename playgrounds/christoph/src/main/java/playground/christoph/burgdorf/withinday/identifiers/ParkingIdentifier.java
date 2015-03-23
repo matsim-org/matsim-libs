@@ -25,11 +25,11 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 
 import playground.christoph.burgdorf.ParkingInfrastructure;
 
-public class ParkingIdentifier extends DuringLegIdentifier {
+public class ParkingIdentifier extends DuringLegAgentSelector {
 
 	protected LeaveLinkIdentifier leaveLinkIdentifier;
 	
