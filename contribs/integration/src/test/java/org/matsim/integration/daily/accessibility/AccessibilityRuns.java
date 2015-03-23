@@ -1,5 +1,7 @@
 package org.matsim.integration.daily.accessibility;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,11 +10,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
+import org.matsim.contrib.analysis.vsp.qgis.QGisMapnikFileCreator;
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
 import org.matsim.contrib.analysis.vsp.qgis.RasterLayer;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
@@ -27,7 +31,10 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDuration
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -103,15 +110,15 @@ public class AccessibilityRuns {
 		
 		// two loops over activity types and modes to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
-			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
+//			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
 				if ( !actType.equals("w") ) {
 					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 					continue ;
 				}
-				if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
-					log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
-					continue ;
-				}
+//				if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
+//					log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
+//					continue ;
+//				}
 
 				config.controler().setOutputDirectory( utils.getOutputDirectory());
 				ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
@@ -128,17 +135,18 @@ public class AccessibilityRuns {
 				GridBasedAccessibilityControlerListenerV3 listener = 
 						new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
 				// define the mode that will be considered
-				// listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-				listener.setComputingAccessibilityForMode(mode, true);
+				listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+//				listener.setComputingAccessibilityForMode(mode, true);
 				listener.addAdditionalFacilityData(homes) ;
 				listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 
-				listener.writeToSubdirectoryWithName(actType + "/" + mode);
+//				listener.writeToSubdirectoryWithName(actType + "/" + mode);
+				listener.writeToSubdirectoryWithName(actType);
 				
 				listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 
 				controler.addControlerListener(listener);
-			}
+//			}
 		}
 
 		controler.run();
@@ -149,87 +157,61 @@ public class AccessibilityRuns {
 		// creating visual output
 		// ############################################################################################################
 		
-		//		GnuplotScriptWriter.createGnuplotScript(config, activityTypes);
-
-
-		// write mapnik file that is neded to have osm layer in QGis project
+		// GnuplotScriptWriter.createGnuplotScript(config, activityTypes);
 		
-		// old version
-//		final String mapnikFileName = "osm_mapnik.xml";
-//		String osmMapnikFile = config.controler().getOutputDirectory() + mapnikFileName;
-//		
-//		try {
-//			BufferedWriter writer = IOUtils.getBufferedWriter( osmMapnikFile ) ;
-//
-//			writer.write("<GDAL_WMS>\n");
-//			writer.write("\t<Service name=\"TMS\">\n");
-//			writer.write("\t\t<ServerUrl>http://tile.openstreetmap.org/${z}/${x}/${y}.png</ServerUrl>\n");
-//			writer.write("\t</Service>\n");
-//			writer.write("\t<DataWindow>\n");
-//			//TODO make coordinates adjustable, ideally with an automatic coordinate system conversion so that they only have to be set once (dz, dez'14)
-//			writer.write("\t\t<UpperLeftX>-20037508.34</UpperLeftX>\n");
-//			writer.write("\t\t<UpperLeftY>20037508.34</UpperLeftY>\n");
-//			writer.write("\t\t<LowerRightX>20037508.34</LowerRightX>\n");
-//			writer.write("\t\t<LowerRightY>-20037508.34</LowerRightY>\n");
-//			writer.write("\t\t<TileLevel>18</TileLevel>\n");
-//			writer.write("\t\t<TileCountX>1</TileCountX>\n");
-//			writer.write("\t\t<TileCountY>1</TileCountY>\n");
-//			writer.write("\t\t<YOrigin>top</YOrigin>\n");
-//			writer.write("\t</DataWindow>\n");
-//			writer.write("\t<Projection>EPSG:3857</Projection>\n");
-//			writer.write("\t<BlockSizeX>256</BlockSizeX>\n");
-//			writer.write("\t<BlockSizeY>256</BlockSizeY>\n");
-//			writer.write("\t<BandsCount>3</BandsCount>\n");
-//			writer.write("\t<Cache>\n");
-//			writer.write("\t\t<Path>/tmp/cache_osm_mapnik</Path>\n");
-//			writer.write("\t</Cache>\t\n");
-//			writer.write("</GDAL_WMS>\n");
-//
-//			writer.flush();
-//			writer.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			throw new RuntimeException( "writing Mapnik file did not work") ;
-//		}
-		
-		
-		
-//		String workingDirectory =  "C:/Users/Daniel/Desktop/MATSimQGisIntegration/";
 		String workingDirectory =  config.controler().getOutputDirectory();
-//		String qGisProjectFile = "testWithMergedImmissionsCSV.qgs";
+
+		// create Mapnik file that is needed to have OSM layer in QGis project
+		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
+				
 		
+		// Write QGis project file
 		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_SA_Albers, workingDirectory);
+		
+//		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SA_Albers, TransformationFactory.WGS84);
+//		
+//		Coord lowerLeftCoordinateSAALbers = new CoordImpl(100000,-3720000);
+//		Coord upperRightCoordinateSAALbers = new CoordImpl(180000,-3675000);
+//		Coord lowerLeftCoordinateWGS84 = transformation.transform(lowerLeftCoordinateSAALbers);
+//		Coord upperRightCoordinateWGS84 = transformation.transform(upperRightCoordinateSAALbers);
+//		
+//		System.out.println("###########################################################################");
+//		System.out.println("lowerLeftCoordinateWGS84: " + lowerLeftCoordinateWGS84);
+//		System.out.println("upperRightCoordinateWGS84: " + upperRightCoordinateWGS84);
+//		System.out.println("###########################################################################");
+//		
+//		//extent double array of the minx, miny, maxx and maxy coordinates of the starting view
 		
 		
 		double[] extent = {100000,-3720000,180000,-3675000};
 		writer.setExtent(extent);
 		
-		//example for adding a raster layer
-		//RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "testfiles/accessibility/osm_mapnik.xml");
+		//raster layer
 		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "/osm_mapnik.xml");
-//		mapnikLayer.setRenderer(new AccessibilityXmlRenderer()); // old implementation
 		new AccessibilityXmlRenderer(mapnikLayer);
 		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
 		writer.addLayer(0,mapnikLayer);
 		
 		
 
-		// two loops over activity types and modes to produce one QGIs project file for each combination
+		// loop over activity types to produce one QGIs project file for each combination
 		for (String actType : activityTypes) {
-			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
+//			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
 				if ( !actType.equals("w") ) {
 					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 					continue ;
 				}
-				if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
-					log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
-					continue ;
-				}
+//				if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
+//					log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
+//					continue ;
+//				}
 				
-				String qGisProjectFile = "QGisProjectFile.qgs";
+				workingDirectory =  config.controler().getOutputDirectory() + actType + "/";
+				writer.changeWorkingDirectory(workingDirectory);
 				
-//				VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "testFiles/accessibility/accessibilities.csv", QGisConstants.geometryType.Point);
-				VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "/" + actType + "/" + mode + "/accessibilities.csv", QGisConstants.geometryType.Point);
+				String qGisProjectFile = "/QGisProjectFile.qgs";
+				
+				VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point);
 				densityLayer.setXField(1);
 				densityLayer.setYField(2);
 				AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
@@ -237,8 +219,7 @@ public class AccessibilityRuns {
 				writer.addLayer(densityLayer);
 				
 				
-//				VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "testFiles/accessibility/accessibilities.csv",	QGisConstants.geometryType.Point);
-				VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "/" + actType + "/" + mode + "/accessibilities.csv", QGisConstants.geometryType.Point);
+				VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point);
 				//there are two ways to set x and y fields for csv geometry files
 				//1) if there is a header, you can set the members xField and yField to the name of the column headers
 				//2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
@@ -251,7 +232,7 @@ public class AccessibilityRuns {
 				writer.write(qGisProjectFile);
 				
 				
-				// old version
+				// old version, not dependent on analysis.vsp
 //				String version = "<qgis projectname=\"\" version=\"2.6.1-Brighton\">\n";
 //
 //				QGisProjectFileWriter qgisWriter = new QGisProjectFileWriter();
@@ -286,18 +267,26 @@ public class AccessibilityRuns {
 //					e.printStackTrace();
 //					throw new RuntimeException( "writing QGis project file did not work") ;
 //				}
+				// end old version
 				
 
-				// now creating a snapshot based on above-created project file
+			// now creating a snapshot based on above-created project file
+			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
+				if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
+					log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
+					continue ;
+				}
+					
+					
 				// if OS is Windows
-				// example (daniel) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
+				// example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
 				if ( System.getProperty("os.name").contains("Win") || System.getProperty("os.name").contains("win")) {
 					// On Windows, the PATH variables need to be set correctly to be able to call "qgis.bat" on the command line
 					// This needs to be done manually. It does not seem to be set automatically when installing QGis
-					String cmd = "qgis.bat " + config.controler().getOutputDirectory() + actType + "/" + mode + "/QGisProjectFile.qgs" +
-							" --snapshot " + config.controler().getOutputDirectory() + actType + "/" + mode + "/" + actType + "_" + mode + "_snapshot.png";
+					String cmd = "qgis.bat " + workingDirectory + "QGisProjectFile.qgs" +
+							" --snapshot " + workingDirectory + "snapshot.png";
 
-					String stdoutFileName = config.controler().getOutputDirectory() + actType + "/" + mode + "/" + actType + "_" + mode + "_snapshot.log";
+					String stdoutFileName = workingDirectory + "snapshot.log";
 					int timeout = 99999;
 
 					ExeRunner.run(cmd, stdoutFileName, timeout);
@@ -307,10 +296,12 @@ public class AccessibilityRuns {
 				// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
 				//} else if ( System.getProperty("os.arch").contains("mac")) {
 				} else if ( System.getProperty("os.name").contains("Mac") || System.getProperty("os.name").contains("mac") ) {
-					String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + config.controler().getOutputDirectory() + actType + "/" + mode + "/QGisProjectFile.qgs" +
-							" --snapshot " + config.controler().getOutputDirectory() + actType + "/" + mode + "/" + actType + "_" + mode + "_snapshot.png";
+					
+					String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile.qgs" +
+					" --snapshot " + workingDirectory + "snapshot.png";
 
-					String stdoutFileName = config.controler().getOutputDirectory() + actType + "/" + mode + "/" + actType + "_" + mode + "_snapshot.log";
+					String stdoutFileName = workingDirectory + "snapshot.log";
+					
 					int timeout = 99999;
 
 					ExeRunner.run(cmd, stdoutFileName, timeout);
