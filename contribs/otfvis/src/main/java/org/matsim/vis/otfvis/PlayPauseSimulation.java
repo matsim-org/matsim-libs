@@ -20,7 +20,6 @@ package org.matsim.vis.otfvis;
 
 import java.util.concurrent.Semaphore;
 
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.interfaces.PlayPauseSimulationI;
 
 /**
