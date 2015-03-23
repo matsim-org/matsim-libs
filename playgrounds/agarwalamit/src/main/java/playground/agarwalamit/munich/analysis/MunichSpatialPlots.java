@@ -56,17 +56,19 @@ public class MunichSpatialPlots {
 
 	String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";
 	String bau = runDir+"/bau";
-	String policyCase = runDir+"/ei";
+	String policyName = "ci";
+	String policyCase = runDir+"/"+policyName;
 	private final double countScaleFactor = 100;
 	private final double gridSize = 500;
 
 	public static void main(String[] args) {
 		MunichSpatialPlots plots = new MunichSpatialPlots();
 		//		plots.writeCongestionToCells();
-//				plots.writeEmissionToCells();
+		//				plots.writeEmissionToCells();
 		//		plots.writeUserWelfareToCells();
-//				plots.writePopulationDensityCountToCells();
-		plots.writePersonTollToCells();
+		//				plots.writePopulationDensityCountToCells();
+//		plots.writePersonTollToCells();
+		plots.writeLinkTollToCells();
 	}
 
 	public void writePopulationDensityCountToCells(){
@@ -89,7 +91,7 @@ public class MunichSpatialPlots {
 					break;
 				}
 			}
-//			plot.processLocationForDensityCount(act,countScaleFactor);
+			//			plot.processLocationForDensityCount(act,countScaleFactor);
 			plot.processHomeLocation(act, 1*countScaleFactor); // if want to interpolate
 		}
 
@@ -191,6 +193,40 @@ public class MunichSpatialPlots {
 			plot.processHomeLocation(act, processableIntensity);
 		}
 		plot.writeRData("tollAtHomeLocation");
+	}
+
+	public void writeLinkTollToCells() {
+		Map<Id<Link>, Double> linkTollPolicy = new HashMap<>();
+
+		// setting of input data
+		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,policyCase);
+		inputs.setGridInfo(GridType.HEX, gridSize);
+		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
+
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
+
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
+
+		double processIntensity = 0;
+		
+		if(inputs.isComparing){
+			Scenario scPolicy = LoadMyScenarios.loadScenarioFromOutputDir(policyCase);
+			LinkTollFromExternalCosts linktollsAnalyzer = new LinkTollFromExternalCosts();
+			linkTollPolicy = linktollsAnalyzer.getLinkToTotalExternalCost(scPolicy, policyName);
+		}
+		
+		for(Link l : sc.getNetwork().getLinks().values()){
+			
+			if(inputs.isComparing){
+				processIntensity = linkTollPolicy.get(l.getId());
+			} else {
+				processIntensity = 0; // for bau --> no toll
+			}
+			
+			plot.processLink(l, processIntensity*countScaleFactor);
+			
+		}
+		plot.writeRData("linkTolls");
 	}
 
 

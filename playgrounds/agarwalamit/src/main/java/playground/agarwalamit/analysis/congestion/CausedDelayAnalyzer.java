@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -58,14 +59,20 @@ public class CausedDelayAnalyzer {
 		return handler.getPersonId2DelayCaused();
 	}
 	
+	public Map<Id<Link>, Double> getLinkId2DelayCaused() {
+		return handler.getLinkId2DelayCaused();
+	}
+	
 
 	public class CausedDelayHandler implements CongestionEventHandler {
 		private Map<Id<Person>, Double> personId2DelayCaused = new HashMap<Id<Person>, Double>();
+		private Map<Id<Link>, Double> linkId2DelayCaused = new HashMap<Id<Link>, Double>();
 		
 		@Override
 		public void reset(int iteration) {
 
 			this.personId2DelayCaused.clear();
+			this.linkId2DelayCaused.clear();
 		}
 
 		@Override
@@ -78,10 +85,23 @@ public class CausedDelayAnalyzer {
 			} else {
 				personId2DelayCaused.put(causingAgentId, event.getDelay());
 			}
+			
+			Id<Link> linkId = event.getLinkId();
+			if(linkId2DelayCaused.containsKey(linkId)){
+				double delaySoFar = linkId2DelayCaused.get(linkId);
+				linkId2DelayCaused.put(linkId, event.getDelay()+delaySoFar);
+			} else {
+				linkId2DelayCaused.put(linkId, event.getDelay());
+			}
+			
 		}
 
 		public Map<Id<Person>, Double> getPersonId2DelayCaused() {
 			return personId2DelayCaused;
+		}
+
+		public Map<Id<Link>, Double> getLinkId2DelayCaused() {
+			return linkId2DelayCaused;
 		}
 	
 	}
