@@ -47,7 +47,7 @@ public class InsecureLegPerformingIdentifierFactory extends DuringLegIdentifierF
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new InsecureLegPerformingIdentifier(this.linkReplanningMap, this.mobsimDataProvider,
 				this.network, this.coordAnalyzer);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}

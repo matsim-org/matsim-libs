@@ -24,13 +24,13 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public abstract class IdentifierFactory {
+public abstract class AgentSelectorFactory {
 
 	private final Set<AgentFilterFactory> agentFilterFactories = new LinkedHashSet<AgentFilterFactory>();
 	
-	public abstract Identifier createIdentifier();
+	public abstract AgentSelector createIdentifier();
 	
-	protected final void addAgentFiltersToIdentifier(Identifier identifier) {
+	protected final void addAgentFiltersToIdentifier(AgentSelector identifier) {
 		for (AgentFilterFactory agentFilterFactory : agentFilterFactories) {
 			identifier.addAgentFilter(agentFilterFactory.createAgentFilter());
 		}

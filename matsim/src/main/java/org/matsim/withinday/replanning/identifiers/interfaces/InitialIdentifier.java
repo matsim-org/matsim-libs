@@ -20,6 +20,6 @@
 
 package org.matsim.withinday.replanning.identifiers.interfaces;
 
-public abstract class InitialIdentifier extends Identifier {
+public abstract class InitialIdentifier extends AgentSelector {
 
 }

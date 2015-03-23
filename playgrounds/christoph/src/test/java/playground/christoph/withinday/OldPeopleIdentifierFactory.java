@@ -35,7 +35,7 @@ public class OldPeopleIdentifierFactory extends DuringActivityIdentifierFactory 
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new OldPeopleIdentifier(mobsim);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		return identifier;
 	}
 

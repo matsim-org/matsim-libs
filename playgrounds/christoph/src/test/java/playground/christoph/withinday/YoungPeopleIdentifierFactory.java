@@ -35,7 +35,7 @@ public class YoungPeopleIdentifierFactory extends DuringLegIdentifierFactory {
 	@Override
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new YoungPeopleIdentifier(mobsim);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		return identifier;
 	}
 

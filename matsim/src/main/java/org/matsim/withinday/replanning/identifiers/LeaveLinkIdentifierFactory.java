@@ -38,7 +38,7 @@ public class LeaveLinkIdentifierFactory extends DuringLegIdentifierFactory {
 	@Override
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new LeaveLinkIdentifier(this.linkReplanningMap, this.mobsimDataProvider);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}

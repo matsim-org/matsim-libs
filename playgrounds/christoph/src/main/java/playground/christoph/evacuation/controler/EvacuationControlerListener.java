@@ -588,7 +588,7 @@ public class EvacuationControlerListener implements StartupListener {
 		 * after all agents have been informed and have adapted their plans.
 		 */
 		private final List<WithinDayReplannerFactory<?>> initialReplannerFactories = new ArrayList<WithinDayReplannerFactory<?>>();
-		private final List<Identifier> identifiers = new ArrayList<Identifier>();
+		private final List<AgentSelector> identifiers = new ArrayList<AgentSelector>();
 		
 		private final WithinDayEngine withinDayEngine; 
 		private final ReplanningTracker replanningTracker;
@@ -600,7 +600,7 @@ public class EvacuationControlerListener implements StartupListener {
 			this.replanningTracker = replanningTracker;
 		}
 		
-		public void addIdentifier(Identifier identifier) {
+		public void addIdentifier(AgentSelector identifier) {
 			this.identifiers.add(identifier);
 		}
 		
@@ -621,7 +621,7 @@ public class EvacuationControlerListener implements StartupListener {
 				log.info("Disabled " + this.initialReplannerFactories.size() + " initial within-day replanners.");
 
 				int removedAgentFilters = 0;
-				for (Identifier identifier : this.identifiers) {
+				for (AgentSelector identifier : this.identifiers) {
 					List<AgentFilter> filtersToRemove = new ArrayList<AgentFilter>();
 					for (AgentFilter agentFilter : identifier.getAgentFilters()) {
 						if (agentFilter instanceof InformedAgentsFilter) filtersToRemove.add(agentFilter);

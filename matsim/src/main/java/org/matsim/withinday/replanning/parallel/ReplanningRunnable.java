@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.events.ReplanningEvent;
-import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
 
@@ -59,7 +59,7 @@ public abstract class ReplanningRunnable implements Runnable {
 	 *  Threads. Each agents has references to the original Replanners,
 	 *  so we have to identify the corresponding clone! 
 	 */
-	protected Map<Id<WithinDayReplanner>, WithinDayReplanner<? extends Identifier>> withinDayReplanners = new HashMap<>();
+	protected Map<Id<WithinDayReplanner>, WithinDayReplanner<? extends AgentSelector>> withinDayReplanners = new HashMap<>();
 	
 	/*
 	 * Use one List of ReplanningTasks per WithinDayReplanner. By doing so
@@ -104,7 +104,7 @@ public abstract class ReplanningRunnable implements Runnable {
 		queue.add(replanningTask);
 	}
 	
-	public final void addWithinDayReplanner(WithinDayReplanner<? extends Identifier> withinDayReplanner, Queue<ReplanningTask> queue) {
+	public final void addWithinDayReplanner(WithinDayReplanner<? extends AgentSelector> withinDayReplanner, Queue<ReplanningTask> queue) {
 		this.withinDayReplanners.put(withinDayReplanner.getId(), withinDayReplanner);
 		this.replanningTasks.put(withinDayReplanner.getId(), queue);
 	}
@@ -116,7 +116,7 @@ public abstract class ReplanningRunnable implements Runnable {
 	
 	public final void resetReplanners() {
 		this.counter.reset();
-		for (WithinDayReplanner<? extends Identifier> withinDayReplanner : this.withinDayReplanners.values()) {
+		for (WithinDayReplanner<? extends AgentSelector> withinDayReplanner : this.withinDayReplanners.values()) {
 			withinDayReplanner.reset();
 		}
 	}
@@ -140,7 +140,7 @@ public abstract class ReplanningRunnable implements Runnable {
 			Id<WithinDayReplanner> withinDayReplannerId = entry.getKey();
 			Queue<ReplanningTask> queue = entry.getValue();
 			
-			WithinDayReplanner<? extends Identifier> withinDayReplanner = this.withinDayReplanners.get(withinDayReplannerId);
+			WithinDayReplanner<? extends AgentSelector> withinDayReplanner = this.withinDayReplanners.get(withinDayReplannerId);
 			
 			if (withinDayReplannerId == null) {
 				log.error("WithinDayReplanner Id is null!");

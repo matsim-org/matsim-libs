@@ -24,22 +24,22 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
 import org.matsim.withinday.replanning.parallel.ParallelReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
 
-public abstract class WithinDayReplanningModule<T extends WithinDayReplannerFactory<? extends Identifier>> {
+public abstract class WithinDayReplanningModule<T extends WithinDayReplannerFactory<? extends AgentSelector>> {
 
 	protected ParallelReplanner<T> parallelReplanner;
 	
 	public void doReplanning(double time) {
 		for (T factory : this.parallelReplanner.getWithinDayReplannerFactories()) {
-			Set<? extends Identifier> identifiers = factory.getIdentifers(); 
+			Set<? extends AgentSelector> identifiers = factory.getIdentifers(); 
 			Id<WithinDayReplanner> id = factory.getId();
 			
-			for (Identifier identifier : identifiers) {
+			for (AgentSelector identifier : identifiers) {
 				for (MobsimAgent withinDayAgent : identifier.getAgentsToReplan(time)) {					
 					ReplanningTask replanningTask = new ReplanningTask(withinDayAgent, id);
 					this.parallelReplanner.addReplanningTask(replanningTask);

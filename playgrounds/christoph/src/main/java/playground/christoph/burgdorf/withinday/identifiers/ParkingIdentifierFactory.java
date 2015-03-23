@@ -46,7 +46,7 @@ public class ParkingIdentifierFactory extends DuringLegIdentifierFactory {
 		this.addAgentFiltersToIdentifier(leaveLinkIdentifier);
 		
 		DuringLegIdentifier identifier = new ParkingIdentifier(leaveLinkIdentifier);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		return identifier;
 	}
 

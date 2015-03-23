@@ -45,7 +45,7 @@ public class SecureActivityPerformingIdentifierFactory extends DuringActivityIde
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new SecureActivityPerformingIdentifier(this.activityReplanningMap, 
 				this.mobsimDataProvider, this.centerCoord, this.secureDistance);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}

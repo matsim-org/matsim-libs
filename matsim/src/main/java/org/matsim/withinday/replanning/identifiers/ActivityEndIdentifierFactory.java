@@ -35,7 +35,7 @@ public class ActivityEndIdentifierFactory extends DuringActivityIdentifierFactor
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new ActivityEndIdentifier(activityReplanningMap);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}

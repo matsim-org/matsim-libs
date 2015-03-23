@@ -39,7 +39,7 @@ public class LegPerformingIdentifierFactory extends DuringLegIdentifierFactory {
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new LegPerformingIdentifier(this.linkReplanningMap, this.mobsimDataProvider);
 		this.addAgentFiltersToIdentifier(identifier);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		return identifier;
 	}
 

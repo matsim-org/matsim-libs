@@ -48,7 +48,7 @@ public class SecureLegPerformingIdentifierFactory extends DuringLegIdentifierFac
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new SecureLegPerformingIdentifier(this.linkReplanningMap, this.mobsimDataProvider, 
 				this.network, this.centerCoord, this.secureDistance);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}

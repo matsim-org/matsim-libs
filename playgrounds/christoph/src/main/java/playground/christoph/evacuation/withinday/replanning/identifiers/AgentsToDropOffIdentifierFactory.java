@@ -69,7 +69,7 @@ public class AgentsToDropOffIdentifierFactory extends DuringLegIdentifierFactory
 		
 		DuringLegIdentifier identifier = new AgentsToDropOffIdentifier(this.mobsimDataProvider, this.linkEnteredProvider, 
 				this.jointDepartureOrganizer, this.jointDepartureCoordinator);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}

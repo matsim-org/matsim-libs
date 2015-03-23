@@ -56,7 +56,7 @@ public class JoinedHouseholdsIdentifierFactory extends DuringActivityIdentifierF
 				this.modeAvailabilityChecker.createInstance(), this.jointDepartureOrganizer, this.mobsimDataProvider,
 				this.householdDepartureManager);
 		this.addAgentFiltersToIdentifier(identifier);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		return identifier;
 	}
 

@@ -82,7 +82,7 @@ public class AgentsToPickupIdentifierFactory extends DuringLegIdentifierFactory 
 		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(this.scenario, this.coordAnalyzer.createInstance(), 
 				this.vehiclesTracker, this.mobsimDataProvider, this.earliestLinkExitTimeProvider, this.informedAgentsTracker, 
 				this.decisionDataProvider, this.jointDepartureOrganizer, this.jointDepartureCoordinator);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}

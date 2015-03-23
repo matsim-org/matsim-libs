@@ -20,7 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;

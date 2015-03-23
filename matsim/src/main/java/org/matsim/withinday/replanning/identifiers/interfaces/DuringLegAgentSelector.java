@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DuringActivityIdentifier.java
+ * DuringLegIdentifier.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,6 +20,6 @@
 
 package org.matsim.withinday.replanning.identifiers.interfaces;
 
-public abstract class DuringActivityIdentifier extends Identifier {
+public abstract class DuringLegIdentifier extends AgentSelector {
 
 }

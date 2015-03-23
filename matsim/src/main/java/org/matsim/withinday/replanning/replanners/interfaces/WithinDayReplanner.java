@@ -26,7 +26,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
 import org.matsim.withinday.utils.EditRoutes;
 
 /*
@@ -34,7 +34,7 @@ import org.matsim.withinday.utils.EditRoutes;
  *	which identifies Agents that need a Replanning of their scheduled
  * 	Plans.
  */
-public abstract class WithinDayReplanner<T extends Identifier> {
+public abstract class WithinDayReplanner<T extends AgentSelector> {
 	
 	protected final Id<WithinDayReplanner> id;
 	protected final Scenario scenario;

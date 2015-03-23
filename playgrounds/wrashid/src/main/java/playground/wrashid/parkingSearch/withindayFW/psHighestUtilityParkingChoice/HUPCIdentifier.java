@@ -79,7 +79,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		
 		Set<Id> searchingAgentsAssignedToThisIdentifier = this.parkingAgentsTracker.getActiveReplanningIdentifiers().getValueSet(this);
 		
-		if (this.getIdentifierFactory()==null && searchingAgentsAssignedToThisIdentifier==null){
+		if (this.getAgentSelectorFactory()==null && searchingAgentsAssignedToThisIdentifier==null){
 			return identifiedAgents;
 		} else {
 			//System.out.println();

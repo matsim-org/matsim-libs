@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
@@ -46,7 +46,7 @@ import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
  * split up of the replanning actions have to be implemented in
  * the subclasses.
  */
-public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? extends Identifier>> { 
+public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? extends AgentSelector>> { 
 
 	private final static Logger log = Logger.getLogger(ParallelReplanner.class);
 
@@ -115,12 +115,12 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 			if (shareReplannerQueue) {
 				Queue<ReplanningTask> queue = new LinkedBlockingQueue<ReplanningTask>();
 				for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
-					WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
+					WithinDayReplanner<? extends AgentSelector> newInstance = factory.createReplanner();
 					replanningRunnable.addWithinDayReplanner(newInstance, queue);
 				}
 			} else {
 				for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
-					WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
+					WithinDayReplanner<? extends AgentSelector> newInstance = factory.createReplanner();
 					replanningRunnable.addWithinDayReplanner(newInstance, new LinkedList<ReplanningTask>());
 				}
 			}			
@@ -257,12 +257,12 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 			if (shareReplannerQueue) {
 				Queue<ReplanningTask> queue = new LinkedBlockingQueue<ReplanningTask>();
 				for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
-					WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
+					WithinDayReplanner<? extends AgentSelector> newInstance = factory.createReplanner();
 					replanningRunnable.addWithinDayReplanner(newInstance, queue);
 				}
 			} else {
 				for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
-					WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
+					WithinDayReplanner<? extends AgentSelector> newInstance = factory.createReplanner();
 					replanningRunnable.addWithinDayReplanner(newInstance, new LinkedList<ReplanningTask>());
 				}
 			}						

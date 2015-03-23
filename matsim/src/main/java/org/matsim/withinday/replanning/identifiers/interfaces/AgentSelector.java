@@ -33,9 +33,9 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
  * 
  * @author cdobler
  */
-public abstract class Identifier {
+public abstract class AgentSelector {
 	
-	private IdentifierFactory identifierFactory;
+	private AgentSelectorFactory identifierFactory;
 	private final Set<AgentFilter> agentFilters = new LinkedHashSet<AgentFilter>();
 	
 	public abstract Set<MobsimAgent> getAgentsToReplan(double time);
@@ -63,11 +63,11 @@ public abstract class Identifier {
 		return true;
 	}
 	
-	public final void setIdentifierFactory(IdentifierFactory factory) {
+	public final void setAgentSelectorFactory(AgentSelectorFactory factory) {
 		this.identifierFactory = factory;
 	}
 	
-	public final IdentifierFactory getIdentifierFactory() {
+	public final AgentSelectorFactory getAgentSelectorFactory() {
 		return identifierFactory;
 	}
 }

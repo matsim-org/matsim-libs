@@ -41,7 +41,7 @@ import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
 public class SelectHandledAgentsByProbability implements MobsimInitializedListener {
@@ -50,10 +50,10 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 	
 	protected Collection<Id<Person>> withinDayAgents;
 
-	protected List<Tuple<Identifier, Double>> identifierProbabilities;	// <Identifier, probability for handling an agent>
+	protected List<Tuple<AgentSelector, Double>> identifierProbabilities;	// <Identifier, probability for handling an agent>
 
 	public SelectHandledAgentsByProbability() {
-		identifierProbabilities = new ArrayList<Tuple<Identifier, Double>>();
+		identifierProbabilities = new ArrayList<Tuple<AgentSelector, Double>>();
 	}
 	
 	@Override
@@ -72,7 +72,7 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 		double probability;
 		Set<Id<Person>> agentsToHandle;
 
-		for (Tuple<Identifier, Double> tuple : identifierProbabilities) {
+		for (Tuple<AgentSelector, Double> tuple : identifierProbabilities) {
 			agentsToHandle = new LinkedHashSet<Id<Person>>();
 
 			for (Id<Person> agentId : this.withinDayAgents) {
@@ -112,14 +112,14 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 		log.info("Collected " + withinDayAgents.size() + " registered WithinDayAgents.");
 	}
 	
-	public void addIdentifier(Identifier identifier, double probability) { 
-		identifierProbabilities.add(new Tuple<Identifier, Double>(identifier, probability));
+	public void addIdentifier(AgentSelector identifier, double probability) { 
+		identifierProbabilities.add(new Tuple<AgentSelector, Double>(identifier, probability));
 	}
 	
-	public void removeIdentifier(Identifier identifier) {
-		Iterator<Tuple<Identifier, Double>> iter = identifierProbabilities.iterator();
+	public void removeIdentifier(AgentSelector identifier) {
+		Iterator<Tuple<AgentSelector, Double>> iter = identifierProbabilities.iterator();
 		while (iter.hasNext()) {
-			Tuple<Identifier, Double> tuple = iter.next();
+			Tuple<AgentSelector, Double> tuple = iter.next();
 			if (identifier == tuple.getFirst()) iter.remove();
 		}
 	}

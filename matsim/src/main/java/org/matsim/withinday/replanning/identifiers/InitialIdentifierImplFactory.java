@@ -35,7 +35,7 @@ public class InitialIdentifierImplFactory extends InitialIdentifierFactory {
 	@Override
 	public InitialIdentifier createIdentifier() {
 		InitialIdentifier identifier = new InitialIdentifierImpl(mobsimDataProvider);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
 	}

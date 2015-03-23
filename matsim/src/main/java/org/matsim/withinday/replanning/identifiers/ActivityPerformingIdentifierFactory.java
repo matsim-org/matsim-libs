@@ -39,7 +39,7 @@ public class ActivityPerformingIdentifierFactory extends DuringActivityIdentifie
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new ActivityPerformingIdentifier(this.activityReplanningMap, this.mobsimDataProvider);
 		this.addAgentFiltersToIdentifier(identifier);
-		identifier.setIdentifierFactory(this);
+		identifier.setAgentSelectorFactory(this);
 		return identifier;
 	}
 
