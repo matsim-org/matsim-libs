@@ -172,8 +172,7 @@ public class QGisFileWriter {
 
 		out.write("\t\t\t<id>" + vlayer.getId().toString() + "</id>\n");
 		
-		String base = vlayer.getPath();
-		String relP = new File(writer.getWorkingDir()).toURI().relativize(new File(base).toURI()).toString();
+		String relP = Paths.get(this.writer.getWorkingDir()).relativize(Paths.get(layer.getPath())).toString();
 		
 		if(isCsvDataLayer(vlayer)){
 			
