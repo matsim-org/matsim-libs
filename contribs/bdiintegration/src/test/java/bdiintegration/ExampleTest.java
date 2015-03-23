@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
+ * See <a href="http://matsim.org/node/374">here</a> for more info.
+ * 
  * @author nagel
  *
  */
