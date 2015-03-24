@@ -137,9 +137,7 @@ implements ShutdownListener, StartupListener {
 	// for consideration of different activity types or different modes (or both) subdirectories are
 	// required in order not to confuse the output
 	private String outputSubdirectory;
-	
-	
-	
+		
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -212,7 +210,7 @@ implements ShutdownListener, StartupListener {
 	private Map<String,Tuple<SpatialGrid,SpatialGrid>> additionalSpatialGrids = new TreeMap<String,Tuple<SpatialGrid,SpatialGrid>>() ;
 	//(not sure if this is a bit odd ... but I always need TWO spatial grids. kai, mar'14)
 	private boolean lockedForAdditionalFacilityData = false;
-
+	
 	
 	@Override
 	public void notifyShutdown(ShutdownEvent event){
@@ -556,10 +554,15 @@ implements ShutdownListener, StartupListener {
 		this.additionalFacilityData.add( facilities ) ;
 	}
 	
-
-	// new .... testing
+	
+	/**
+	 * Using this method changes the folder structure of the output. The output of the calculation will be written into the
+	 * subfolder. This is needed if for than one ContolerListener is added since otherwise the output would be overwritten
+	 * and not be available for analyses anymore.
+	 * 
+	 * @param subdirectory the name of the subdirectory
+	 */
 	public void writeToSubdirectoryWithName(String subdirectory) {
 		this.outputSubdirectory = subdirectory;
 	}
-	// end new
 }
