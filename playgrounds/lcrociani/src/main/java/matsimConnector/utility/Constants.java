@@ -26,7 +26,7 @@ public class Constants {
 	public static final Double FLOPW_CAP_PER_METER_WIDTH = 2.4;
 	
 	public static final Double TRANSITION_AREA_LENGTH = CA_CELL_SIDE*5;
-	public static final Double FAKE_LINK_WIDTH = 1.2;
+	public static final Double FAKE_LINK_WIDTH = 4.;
 	public static final Double CA_LINK_LENGTH = 10.;
 	public static final Double TRANSITION_LINK_LENGTH = TRANSITION_AREA_LENGTH/2.;
 	public static final int TRANSITION_AREA_COLUMNS = (int)(TRANSITION_AREA_LENGTH/CA_CELL_SIDE);

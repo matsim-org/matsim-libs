@@ -7,8 +7,8 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -91,7 +91,8 @@ public class ScenarioGenerator {
 		c.global().setCoordinateSystem(Constants.COORDINATE_SYSTEM);
 		c.qsim().setEndTime(60*10);
 
-		PopulationGenerator.createPopulation(scenario, POPULATION_SIZE);
+//		PopulationGenerator.createPopulation(scenario, POPULATION_SIZE);
+		MyPopulationGenerator.createPopulation(scenario);
 		
 		new ConfigWriter(c).write(inputDir+ "/config.xml");
 		new NetworkWriter(scenario.getNetwork()).write(c.network().getInputFile());
