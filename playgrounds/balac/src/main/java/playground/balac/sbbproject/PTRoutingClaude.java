@@ -198,6 +198,7 @@ public class PTRoutingClaude {
 //	final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/coord_"+args[0]+".txt");
 			final BufferedWriter outLink = IOUtils.getBufferedWriter("./travelTimesPT_"+args[0]+".txt");
 			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("./travelTimesPTFr_"+args[0]+".txt");
+			final BufferedWriter outLinkOccupancy = IOUtils.getBufferedWriter("./travelTimesPTOccupancy_"+args[0]+".txt");
 
 			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("./frequency_"+args[0]+".txt");
 			((TransitRouterConfigGroup) config.getModule("transitRouter")).setSearchRadius(2000.0);
@@ -363,11 +364,10 @@ public class PTRoutingClaude {
 					
 					if (countTransfers == 0)
 						firstWaitingTime = transfertTimePart;
-						
-					
+											
 					else
 						
-					transferTime += transfertTimePart;
+						transferTime += transfertTimePart;
 						
 					lastArrival +=  ((Leg) pe1).getTravelTime();
 					Collection<Departure> dep = scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures().values();
@@ -397,10 +397,14 @@ public class PTRoutingClaude {
 						countTrainSeg++;
 						if (trainData == null) {
 							System.out.println("train data je null! " + (tr1.getRouteId().toString()) + " ");
-							outLinkF.write("TRAIN ");
-							outLinkF.write(temp + " " +Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart)+ " ");
-							outLinkF.write("-1.0 -1.0");
-							outLinkF.newLine();
+							outLinkOccupancy.write(arr[0] + " ");
+							outLinkOccupancy.write("TRAIN ");
+							outLinkOccupancy.write(d.getVehicleId().toString() + " ");
+							outLinkOccupancy.write(temp + " " +Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart)+ " ");
+							outLinkOccupancy.write(Double.toString(((Leg) pe1).getRoute().getDistance()) + " ");
+
+							outLinkOccupancy.write("-1.0 -1.0");
+							outLinkOccupancy.newLine();
 
 						}
 						else {
@@ -428,17 +432,27 @@ public class PTRoutingClaude {
 							
 							if (trainData != null &(!countDidokFrom || !countDidokTo)) {
 								System.out.println("One of didok stops has not been found " + tr1.getRouteId().toString() +" " + tr1.getAccessStopId().toString() + " " + tr1.getEgressStopId().toString());
-								outLinkF.write("TRAIN ");
-								outLinkF.write(temp + " " +Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart) + " ");
-								outLinkF.write("-1.0 -1.0");
-								outLinkF.newLine();
+								outLinkOccupancy.write(arr[0] + " ");
+								outLinkOccupancy.write("TRAIN ");
+								outLinkOccupancy.write(d.getVehicleId().toString() + " ");
+
+								outLinkOccupancy.write(temp + " " +Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart) + " ");
+								outLinkOccupancy.write(Double.toString(((Leg) pe1).getRoute().getDistance()) + " ");
+
+								outLinkOccupancy.write("-1.0 -1.0");
+								outLinkOccupancy.newLine();
 
 							}
 							else {
-								outLinkF.write("TRAIN ");
-								outLinkF.write(temp + " " +Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart)+ " ");
-								outLinkF.write(Double.toString(occupancy1/vehicleTime) + " " + Double.toString(occupancy2/vehicleTime));
-								outLinkF.newLine();
+								outLinkOccupancy.write(arr[0] + " ");
+								outLinkOccupancy.write("TRAIN ");
+								outLinkOccupancy.write(d.getVehicleId().toString() + " ");
+
+								outLinkOccupancy.write(temp + " " +Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart)+ " ");
+								outLinkOccupancy.write(Double.toString(((Leg) pe1).getRoute().getDistance()) + " ");
+
+								outLinkOccupancy.write(Double.toString(occupancy1/vehicleTime) + " " + Double.toString(occupancy2/vehicleTime));
+								outLinkOccupancy.newLine();
 								
 							}
 						}
@@ -446,23 +460,35 @@ public class PTRoutingClaude {
 					else {
 						
 						if (vehiclesBus.contains(vehId)) {
-							outLinkF.write("BUS ");
-							outLinkF.write(temp + " " +Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart) + " ");
-							outLinkF.write("-1.0 -1.0");
-							outLinkF.newLine();
+							outLinkOccupancy.write(arr[0] + " ");
+							outLinkOccupancy.write("BUS ");
+							outLinkOccupancy.write(d.getVehicleId().toString() + " ");
+							outLinkOccupancy.write(temp + " " +Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart) + " ");
+							outLinkOccupancy.write(Double.toString(((Leg) pe1).getRoute().getDistance()));
+
+							outLinkOccupancy.write("-1.0 -1.0");
+							outLinkOccupancy.newLine();
 						}
 						else if (vehiclesTram.contains(vehId)) {
-							outLinkF.write("TRAM ");
-							outLinkF.write(temp + " " + Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart) + " ");
-							outLinkF.write("-1.0 -1.0");
-							outLinkF.newLine();
+							outLinkOccupancy.write(arr[0] + " ");
+							outLinkOccupancy.write("TRAM ");
+							outLinkOccupancy.write(d.getVehicleId().toString() + " ");
+							outLinkOccupancy.write(temp + " " + Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart) + " ");
+							outLinkOccupancy.write(Double.toString(((Leg) pe1).getRoute().getDistance()) + " ");
+
+							outLinkOccupancy.write("-1.0 -1.0");
+							outLinkOccupancy.newLine();
 							
 						}
 						else if (vehiclesMetro.contains(vehId)) {
-							outLinkF.write("METRO ");
-							outLinkF.write(temp + " " + Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart) + " ");
-							outLinkF.write("-1.0 -1.0");
-							outLinkF.newLine();
+							outLinkOccupancy.write(arr[0] + " ");
+							outLinkOccupancy.write("METRO ");
+							outLinkOccupancy.write(d.getVehicleId().toString() + " ");
+							outLinkOccupancy.write(temp + " " + Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart) + " ");
+							outLinkOccupancy.write(Double.toString(((Leg) pe1).getRoute().getDistance()) + " ");
+
+							outLinkOccupancy.write("-1.0 -1.0");
+							outLinkOccupancy.newLine();
 							
 						}
 						else
@@ -576,6 +602,8 @@ public class PTRoutingClaude {
 		System.out.println(countTrainSeg);
 		outFrequency.flush();
 		outFrequency.close();
+		outLinkOccupancy.flush();
+		outLinkOccupancy.close();
 		outLink.flush();
 		outLink.close();
 		outLinkF.flush();
