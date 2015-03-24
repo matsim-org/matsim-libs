@@ -20,13 +20,6 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -42,12 +35,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -59,6 +47,8 @@ import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
+
+import java.util.*;
 
 /**
  * This has developed over the last couple of months/years towards an increasingly pluggable module.  The current (dec'2011)
@@ -283,7 +273,7 @@ public final class QSim implements VisMobsim, Netsim {
 		 * The WithinDayEngine has to perform its replannings before
 		 * the other engines simulate the sim step.
 		 */
-		if (withindayEngine != null) withindayEngine.doSimStep(time);
+		if (withindayEngine != null) withindayEngine.doSimStep(this.simTimer.getTimeOfDay());
 
 		// "added" engines
 		for (MobsimEngine mobsimEngine : mobsimEngines) {
@@ -291,12 +281,12 @@ public final class QSim implements VisMobsim, Netsim {
 			// withindayEngine.doSimStep(time) has already been called
 			if (mobsimEngine == this.withindayEngine) continue;
 
-			mobsimEngine.doSimStep(time);
+			mobsimEngine.doSimStep(this.simTimer.getTimeOfDay());
 		}
 
 		// console printout:
-		this.printSimLog(time);
-		return (this.agentCounter.isLiving() && (this.stopTime > time));
+		this.printSimLog(this.simTimer.getTimeOfDay());
+		return (this.agentCounter.isLiving() && (this.stopTime > this.simTimer.getTimeOfDay()));
 	}
 
 	public void insertAgentIntoMobsim( MobsimAgent agent ) {
