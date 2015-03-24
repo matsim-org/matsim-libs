@@ -16,7 +16,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import pedCA.environment.grid.EnvironmentGrid;
@@ -62,7 +61,7 @@ public class CASimulationRunner implements IterationStartsListener{
 		controller.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
 		// Define the pricing approach and the congestion implementation.
 		//		controler.addControlerListener(new AverageCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
-		controller.addControlerListener(new MarginalCongestionPricingContolerListener(controller.getScenario(), tollHandler, new CongestionHandlerImplV6(controller.getEvents(), (ScenarioImpl) controller.getScenario())));
+		controller.addControlerListener(new MarginalCongestionPricingContolerListener(controller.getScenario(), tollHandler, new CongestionHandlerImplV6(controller.getEvents(), controller.getScenario())));
 		//////////////------------
 		
 		
@@ -80,7 +79,9 @@ public class CASimulationRunner implements IterationStartsListener{
 			dbg.addAdditionalDrawer(iBox);
 			controller.getEvents().addHandler(dbg);
 			EnvironmentGrid environmentGrid = scenarioCA.getEnvironments().get(Id.create("0",CAEnvironment.class)).getContext().getEnvironmentGrid();
-			controller.getEvents().addHandler(new AgentTracker(Constants.OUTPUT_PATH+"/agentTrajectories.txt",environmentGrid.getRows(),environmentGrid.getColumns()));
+			AgentTracker tracker = new AgentTracker(Constants.OUTPUT_PATH+"/agentTrajectories.txt",environmentGrid.getRows(),environmentGrid.getColumns());
+			controller.getEvents().addHandler(tracker);
+			controller.addControlerListener(tracker);
 		}else{
 			controller.getEvents().addHandler(new FundamentalDiagramWriter(Double.parseDouble(args[0]),scenario.getPopulation().getPersons().size(), Constants.FD_TEST_PATH+"fd_data.csv"));
 		}
