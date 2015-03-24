@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Set;
 
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
@@ -39,75 +38,54 @@ import playground.johannes.gsv.zones.io.Zone2GeoJSON;
  */
 public class Aggregate2Nuts3 {
 
+	private static final String TEMP_ID = "gsv2008";
+	
+	private static final String ZONE_KEY = "NO";
 	/**
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
+//		String matrixFile = "/home/johannes/sge/prj/matsim/run/826/output/matrices-averaged/miv.sym.xml";
+//		String zonesFile = "/home/johannes/gsv/gis/modena/zones.gk3.geojson";
+//		String idMappingsFile = "/home/johannes/gsv/matrices/refmatrices/modena2gsv2008.txt";
+//		String outFile = "/home/johannes/sge/prj/matsim/run/826/output/matrices-averaged/miv.sym.nuts3.xml";
+		
+		String matrixFile = args[0];
+		String zonesFile = args[1];
+		String idMappingsFile = args[2];
+		String outFile = args[3];
+		
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
-		reader.parse("/home/johannes/gsv/matrices/analysis/marketShares/rail.all.xml");
-//		reader.parse("/home/johannes/sge/prj/matsim/run/819/output/matrices-averaged/miv.xml");
+		reader.parse(matrixFile);
 		KeyMatrix m = reader.getMatrix();
 
-		// ZoneCollection nuts3Zones = new ZoneCollection();
-		// String data = new
-		// String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
-		// nuts3Zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
-		// nuts3Zones.setPrimaryKey("nuts3_code");
-
 		ZoneCollection modenaZones = new ZoneCollection();
-		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/modena/zones.gk3.geojson")));
+		String data = new String(Files.readAllBytes(Paths.get(zonesFile)));
 		modenaZones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
-		modenaZones.setPrimaryKey("NO");
+		modenaZones.setPrimaryKey(ZONE_KEY);
 		data = null;
 
-		Map<String, String> idMap = ZoneIDMappings.modena2gsv2008("/home/johannes/gsv/matrices/refmatrices/modena2gsv2008.txt");
+		Map<String, String> idMap = ZoneIDMappings.modena2gsv2008(idMappingsFile);
 
-		int cnt = 0;
 		for (Zone zone : modenaZones.zoneSet()) {
-			String id = zone.getAttribute("NO");
+			String id = zone.getAttribute(ZONE_KEY);
 			String gsvId = idMap.get(id);
 			if (gsvId != null) {
-				zone.setAttribute("gsv2008", gsvId);
+				zone.setAttribute(TEMP_ID, gsvId);
 			} else {
-				if(zone.getAttribute("NUTS3_CODE").startsWith("DE")) {
-					zone.setAttribute("gsv2008", "unknownDE" + cnt);
-				} else {
-					zone.setAttribute("gsv2008", "unknownEU" + cnt);
-				}
-				cnt++;
+				gsvId = id.substring(0, 5);
+				zone.setAttribute(TEMP_ID, gsvId);
 			}
 		}
 
-		System.out.println("No mappings found for " + cnt + " zones");
 		
-		m = MatrixOperations.aggregate(m, modenaZones, "gsv2008");
+		m = MatrixOperations.aggregate(m, modenaZones, TEMP_ID);
 
-//		KeyMatrix nuts3Matrix = new KeyMatrix();
-//		Set<String> keys = m.keys();
-//		for (String i : keys) {
-//			String i_gsv = idMap.get(i);
-//			if (i_gsv == null) {
-//				System.err.println(String.format("No mapping found for %s", i));
-//			} else {
-//				for (String j : keys) {
-//
-//					String j_gsv = idMap.get(j);
-//
-//					if (j_gsv != null) {
-//						nuts3Matrix.set(i_gsv, j_gsv, m.get(i, j));
-//					} else {
-//						System.err.println(String.format("No mapping found for %s", j));
-//					}
-//				}
-//			}
-//		}
-
-		MatrixOperations.symetrize(m);
+//		MatrixOperations.symetrize(m);
 		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(m, "/home/johannes/gsv/matrices/analysis/marketShares/rail.all.nuts3.xml");
-//		writer.write(m, "/home/johannes/sge/prj/matsim/run/819/output/matrices-averaged/miv.sym.nuts3.xml");
+		writer.write(m, outFile);
 	}
 
 }

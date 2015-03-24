@@ -63,9 +63,9 @@ public class MatrixCompare2 {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "744";
-//		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
-		String simFile = "/home/johannes/gsv/matrices/simmatrices/avr/779-780/miv.sym.xml";
+		String runId = "826";
+		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
+//		String simFile = "/home/johannes/gsv/matrices/simmatrices/avr/779-780/miv.sym.xml";
 		String refFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
 		/*
 		 * load ref matrix
@@ -111,8 +111,8 @@ public class MatrixCompare2 {
 		hist = writeDistanceHist(m2, m_d);
 		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/" + runId + ".dist.stat.txt");
 		
-		System.out.println(String.format("PKM Intraplan (> 100 KM): %s", pkm(m1, itp_d)));
-		System.out.println(String.format("PKM matsim (> 100 KM): %s", pkm(m2, m_d)));
+//		System.out.println(String.format("PKM Intraplan (> 100 KM): %s", pkm(m1, itp_d)));
+//		System.out.println(String.format("PKM matsim (> 100 KM): %s", pkm(m2, m_d)));
 		
 		System.out.println(String.format("Avr length Intraplan (> 100 KM): %s", avr(m1, itp_d)));
 		System.out.println(String.format("Avt length matsim (> 100 KM): %s", avr(m2, m_d)));
@@ -218,6 +218,7 @@ public class MatrixCompare2 {
 			for (String j : keys) {
 				if(i.equals(j)) {
 					Zone zone = zones.get(i);
+					if(zone != null) {
 					MinimumDiameter dia = new MinimumDiameter(zone.getGeometry());
 					LineString ls = dia.getDiameter();
 					Coordinate pi = ls.getCoordinateN(0);
@@ -226,14 +227,20 @@ public class MatrixCompare2 {
 					double d = WGS84DistanceCalculator.getInstance().distance(factory.createPoint(pi), factory.createPoint(pj));
 //					m_d.set(i, j, d/2.0);
 					m_d.set(i, j, -1.0);
+					}
 				} else {
-				Point pi = zones.get(i).getGeometry().getCentroid();
-				Point pj = zones.get(j).getGeometry().getCentroid();
+					Zone zi = zones.get(i);
+					Zone zj = zones.get(j);
+					if (zi != null && zj != null) {
+						Point pi = zi.getGeometry().getCentroid();
+						Point pj = zj.getGeometry().getCentroid();
 
-				// double d =
-				// CartesianDistanceCalculator.getInstance().distance(pi, pj);
-				double d = WGS84DistanceCalculator.getInstance().distance(pi, pj);
-				m_d.set(i, j, d);
+						// double d =
+						// CartesianDistanceCalculator.getInstance().distance(pi,
+						// pj);
+						double d = WGS84DistanceCalculator.getInstance().distance(pi, pj);
+						m_d.set(i, j, d);
+					}
 				}
 			}
 		}
@@ -247,10 +254,11 @@ public class MatrixCompare2 {
 		for (String i : keys) {
 			for (String j : keys) {
 				Double val = m.get(i, j);
+				Double dist = m_d.get(i, j);
 				// if(val == null) val = 1.0;
-				if (val != null) {
-					double d = m_d.get(i, j);
-					stats.addValue(d, 1 / val);
+				if (val != null && dist != null) {
+					
+					stats.addValue(dist, 1 / val);
 				}
 			}
 		}
@@ -286,7 +294,8 @@ public class MatrixCompare2 {
 		
 		for (String i : keys) {
 			for (String j : keys) {
-				double d = m_d.get(i, j);
+				Double d = m_d.get(i, j);
+				if(d != null) {
 				if(Double.isInfinite(d)) {
 					System.err.println();
 				} else if (Double.isNaN(d)) {
@@ -299,6 +308,7 @@ public class MatrixCompare2 {
 					if (val != null && val > 0) {
 						stats.addValue(d, 1/val);
 					}
+				}
 				}
 			}
 		}

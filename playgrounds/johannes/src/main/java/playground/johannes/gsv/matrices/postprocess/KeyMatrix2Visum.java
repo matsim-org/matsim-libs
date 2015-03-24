@@ -25,9 +25,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
 
-import org.matsim.matrices.Matrix;
-import org.matsim.visum.VisumMatrixWriter;
-
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 
@@ -42,19 +39,19 @@ public class KeyMatrix2Visum {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-//		String basedir = "/home/johannes/sge/prj/synpop/run/789/output/scaled/pkw.xml";
-//		String outdir = "/home/johannes/sge/prj/synpop/run/789/output/scaled/pkw.mtx";
-//		File file = new File(basedir);
-//		for (String filename : file.list()) {
+		String basedir = "/home/johannes/sge/prj/matsim/run/826/output/matrices-averaged/";
+		String outdir = "/home/johannes/gsv/matrices/deploy/r32483/modena2/";
+		File file = new File(basedir);
+		for (String filename : file.list()) {
 			KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 			reader.setValidating(false);
-//			reader.parse(String.format("%s/%s", basedir, filename));
-			reader.parse("/home/johannes/sge/prj/synpop/run/791/output/scaled/pkw.xml");
+			reader.parse(String.format("%s/%s", basedir, filename));
+//			reader.parse("/home/johannes/sge/prj/synpop/run/791/output/scaled/pkw.xml");
 			KeyMatrix inMatrix = reader.getMatrix();
 
-//			String filename2 = filename.substring(0, filename.lastIndexOf("."));
-//			BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/%s.fma", outdir, filename2)));
-			BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/sge/prj/synpop/run/791/output/scaled/pkw.mtx"));
+			String filename2 = filename.substring(0, filename.lastIndexOf("."));
+			BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/%s.txt", outdir, filename2)));
+//			BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/sge/prj/synpop/run/791/output/scaled/pkw.mtx"));
 			writer.write("$O;D3");
 			writer.newLine();
 			writer.write("* Von  Bis");
@@ -92,6 +89,6 @@ public class KeyMatrix2Visum {
 				writer.newLine();
 			}
 			writer.close();
-//		}
+		}
 	}
 }

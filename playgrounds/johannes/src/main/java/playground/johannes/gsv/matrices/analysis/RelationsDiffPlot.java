@@ -68,7 +68,7 @@ public class RelationsDiffPlot {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String runId = "819";
+		String runId = "827";
 		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
 //		String simFile = "/home/johannes/gsv/matrices/simmatrices/avr/763/miv2.sym.nuts3.xml";
 		String tomtomFile = "/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml";
@@ -100,7 +100,7 @@ public class RelationsDiffPlot {
 		MatrixOperations.applyFactor(itp, 1 / 365.0);
 
 		ODUtils.cleanDistances(tomtom, zones, 100000, new WGS84DistanceCalculator());
-		ODUtils.cleanVolumes(tomtom, zones, 1500);
+		ODUtils.cleanVolumes(tomtom, zones, 1000);
 		double c = ODUtils.calcNormalization(tomtom, simulation);
 		MatrixOperations.applyFactor(tomtom, c);
 		MatrixOperations.symetrize(tomtom);
