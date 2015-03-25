@@ -11,6 +11,7 @@ import java.util.Set;
 
 import matsimConnector.utility.Constants;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -26,6 +27,8 @@ import org.matsim.core.utils.misc.StringUtils;
 
 public class MyPopulationGenerator {
 
+	private static final Logger log = Logger.getLogger(MyPopulationGenerator.class);
+	
 	protected static void createPopulation(Scenario sc) {
 		Network network = sc.getNetwork();
 		ArrayList <Link> initLinks = new ArrayList<Link>();
@@ -110,6 +113,7 @@ public class MyPopulationGenerator {
 			l = br.readLine();
 		}
 		br.close();
+		log.info(topDownDepartureTimes.size() + " agents walking top-down and " + leftRightDepartureTimes.size() + " agents walking left-right");
 	}
 
 	private static Id<Link> getDestinationLinkId(Link originLink, ArrayList<Link> destinationLinks) {

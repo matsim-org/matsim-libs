@@ -25,7 +25,7 @@ public class Constants {
 
 	public static final int STEP_FOR_BIDIRECTIONAL_SWAPPING = 2;
 
-	public static final double DENSITY_GRID_RADIUS = 1.2;
+	public static final double DENSITY_GRID_RADIUS = 0.4;
 
 	
 	//Constants for Pedestrian Model

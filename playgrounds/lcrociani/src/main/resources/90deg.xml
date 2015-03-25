@@ -55,11 +55,8 @@ xsi:noNamespaceSchemaLocation="http://xsd.jupedsim.org/0.6/jps_report.xsd" >
 
     <!-- Method D (Zhang2011a) Voronoi density and Vel --> 
     <method_D enabled="true" outputGraph="false" individualFDdata="false"> 
-	         <timeInterval unit="frame">
-		                 16 
-			           </timeInterval>	  
 	 <measurementArea id="1" /> 
-        <cutByCircle enabled="true" radius= "1" edges = "10"/> 
+        <cutByCircle enabled="false" radius= "1" edges = "10"/> 
         <!-- edges represent the precision of discretization of the circle --> 
         <getProfile enabled="false" scale_x="0.10" scale_y="0.10"/> 
     </method_D> 
