@@ -39,6 +39,7 @@ public final class BasicOperator extends AbstractOperator{
 		super(id, pConfig, franchise);
 	}
 
+	@Override
 	public void replan(PStrategyManager pStrategyManager, int iteration) {
 		this.currentIteration = iteration;
 		

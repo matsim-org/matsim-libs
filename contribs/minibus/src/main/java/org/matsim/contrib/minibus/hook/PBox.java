@@ -146,6 +146,7 @@ final class PBox implements Operators {
         }
 
         // Collect current lines offered
+		// why is the following done twice (see notifyScoring)?
         this.pTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
         for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
             this.pTransitSchedule.addStopFacility(stop);
@@ -164,11 +165,11 @@ final class PBox implements Operators {
 			operator.score(driverId2ScoreMap);
 		}
 		
+		// why is the following done twice (see notifyIterationstarts)?
 		this.pTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
 		}
-		
 		for (Operator operator : this.operators) {
 			this.pTransitSchedule.addTransitLine(operator.getCurrentTransitLine());
 		}

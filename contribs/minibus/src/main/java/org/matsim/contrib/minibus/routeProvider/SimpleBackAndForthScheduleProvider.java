@@ -75,7 +75,7 @@ final class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 
 	private TransitLine createTransitLine(Id<TransitLine> pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id<TransitRoute> routeId){
 		if (stopsToBeServed.size() != 2) {
-			log.warn("This route provider can only handle as much as to stops. Please use a different route provider.");
+			log.warn("This route provider can only handle as much as two stops. Please use a different route provider.");
 			return null;
 		}
 		
@@ -95,6 +95,7 @@ final class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		// add departures
 		int n = 0;
 		int headway = (int) (transitRoute_H.getStop(endStop).getDepartureOffset() + transitRoute_R.getStop(startStop).getDepartureOffset()) / numberOfVehicles;
+		// (headway = round trip time / number of vehicles)
 		for (int i = 0; i < numberOfVehicles; i++) {
 			for (double j = startTime + i * headway; j < endTime; ) {
 				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);

@@ -85,6 +85,7 @@ abstract class AbstractOperator implements Operator{
 		this.franchise = franchise;
 	}
 
+	@Override
 	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
 		this.operatorState = OperatorState.PROSPECTING;
 		this.budget = initialBudget;
@@ -105,6 +106,7 @@ abstract class AbstractOperator implements Operator{
 		return true;
 	}
 
+	@Override
 	public void score(Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap) {
 		this.scoreLastIteration = this.score;
 		this.score = 0;
@@ -151,18 +153,22 @@ abstract class AbstractOperator implements Operator{
 		}
 	}
 	
+	@Override
 	abstract public void replan(PStrategyManager pStrategyManager, int iteration);
 	
+	@Override
 	public Id<Operator> getId() {
 		return this.id;
 	}
 	
+	@Override
 	public Id<PPlan> getNewPlanId() {
 		Id<PPlan> planId = Id.create(this.currentIteration + "_" + numberOfPlansTried, PPlan.class);
 		this.numberOfPlansTried++;
 		return planId;
 	}
 	
+	@Override
 	public PFranchise getFranchise(){
 		return this.franchise;
 	}
@@ -172,6 +178,7 @@ abstract class AbstractOperator implements Operator{
 		return this.minOperationTime;
 	}
 
+	@Override
 	public TransitLine getCurrentTransitLine() {
 		if (this.currentTransitLine == null) {
 			this.updateCurrentTransitLine();
@@ -184,10 +191,12 @@ abstract class AbstractOperator implements Operator{
 		return this.currentTransitLine;		
 	}	
 
+	@Override
 	public PPlan getBestPlan() {
 		return this.bestPlan;
 	}
 
+	@Override
 	public List<PPlan> getAllPlans(){
 		List<PPlan> plans = new LinkedList<>();
 		if(this.bestPlan != null){
@@ -199,10 +208,12 @@ abstract class AbstractOperator implements Operator{
 		return plans;
 	}
 	
+	@Override
 	public double getBudget(){
 		return this.budget;
 	}
 
+	@Override
 	public int getNumberOfVehiclesOwned() {
 		int numberOfVehicles = 0;			
 		for (PPlan plan : this.getAllPlans()) {
@@ -212,10 +223,12 @@ abstract class AbstractOperator implements Operator{
 		return numberOfVehicles;
 	}
 
+	@Override
 	public int getCurrentIteration() {
 		return this.currentIteration;
 	}
 
+	@Override
 	public PRouteProvider getRouteProvider() {
 		return this.routeProvider;
 	}
@@ -233,6 +246,7 @@ abstract class AbstractOperator implements Operator{
 		return this.operatorState;
 	}
 
+	@Override
 	public void setBudget(double budget) {
 		this.budget = budget;
 	}
