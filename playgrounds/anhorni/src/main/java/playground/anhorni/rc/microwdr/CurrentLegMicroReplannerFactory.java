@@ -47,7 +47,7 @@ public class CurrentLegMicroReplannerFactory extends WithinDayDuringLegReplanner
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CurrentLegMicroReplanner(super.getId(), scenario,
-				this.getWithinDayEngine().getInternalInterface(), 
+				this.getWithinDayEngine().getActivityRescheduler(), 
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext),
 				this.controler);
 		return replanner;

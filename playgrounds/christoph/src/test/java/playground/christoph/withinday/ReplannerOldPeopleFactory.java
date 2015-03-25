@@ -44,7 +44,7 @@ public class ReplannerOldPeopleFactory extends WithinDayDuringActivityReplannerF
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new ReplannerOldPeople(super.getId(), this.scenario,
-				this.getWithinDayEngine().getInternalInterface(),
+				this.getWithinDayEngine().getActivityRescheduler(),
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}

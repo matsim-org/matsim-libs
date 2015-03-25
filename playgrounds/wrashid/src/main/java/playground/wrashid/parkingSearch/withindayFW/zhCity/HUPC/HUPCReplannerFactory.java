@@ -47,7 +47,7 @@ public class HUPCReplannerFactory extends WithinDayDuringLegReplannerFactory {
 	@Override
 	public HUPCReplanner createReplanner() {
 		HUPCReplanner replanner = new HUPCReplanner(super.getId(), this.scenario, 
-				this.getWithinDayEngine().getInternalInterface(), this.parkingAgentsTracker,
+				this.getWithinDayEngine().getActivityRescheduler(), this.parkingAgentsTracker,
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}

@@ -55,7 +55,7 @@ public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityRep
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new JoinedHouseholdsReplanner(super.getId(), scenario, 
-				this.getWithinDayEngine().getInternalInterface(), decisionDataProvider, identifier, ptTravelTime,
+				this.getWithinDayEngine().getActivityRescheduler(), decisionDataProvider, identifier, ptTravelTime,
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}

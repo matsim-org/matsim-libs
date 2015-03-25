@@ -44,7 +44,7 @@ public class CurrentLegToRescueFacilityReplannerFactory extends WithinDayDuringL
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CurrentLegToRescueFacilityReplanner(super.getId(), 
-				this.scenario, this.getWithinDayEngine().getInternalInterface(),
+				this.scenario, this.getWithinDayEngine().getActivityRescheduler(),
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}

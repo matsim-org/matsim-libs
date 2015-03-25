@@ -44,7 +44,7 @@ public class MarathonCurrentLegReplannerFactory extends WithinDayDuringLegReplan
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new MarathonCurrentLegReplanner(super.getId(), this.scenario,
-				this.getWithinDayEngine().getInternalInterface(),
+				this.getWithinDayEngine().getActivityRescheduler(),
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}

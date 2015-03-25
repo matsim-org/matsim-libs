@@ -21,9 +21,9 @@
 package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.mobsim.qsim.ActivityEndReschedulerProvider;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -33,7 +33,7 @@ public class CurrentLegReplannerFactory extends WithinDayDuringLegReplannerFacto
 	private final TripRouterFactory tripRouterFactory;
 	private final RoutingContext routingContext;
 	
-	public CurrentLegReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
+	public CurrentLegReplannerFactory(Scenario scenario, ActivityEndReschedulerProvider withinDayEngine,
 			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
@@ -44,7 +44,7 @@ public class CurrentLegReplannerFactory extends WithinDayDuringLegReplannerFacto
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CurrentLegReplanner(super.getId(), scenario,
-				this.getWithinDayEngine().getInternalInterface(), 
+				this.getWithinDayEngine().getActivityRescheduler(), 
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext));
 		return replanner;
 	}

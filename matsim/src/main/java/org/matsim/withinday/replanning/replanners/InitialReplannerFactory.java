@@ -46,7 +46,7 @@ public class InitialReplannerFactory extends WithinDayInitialReplannerFactory {
 	@Override
 	public WithinDayInitialReplanner createReplanner() {
 		WithinDayInitialReplanner replanner = new InitialReplanner(super.getId(), scenario, 
-				this.getWithinDayEngine().getInternalInterface(),
+				this.getWithinDayEngine().getActivityRescheduler(),
 				new PlanRouter(this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), 
 						this.scenario.getActivityFacilities()));
 		return replanner;

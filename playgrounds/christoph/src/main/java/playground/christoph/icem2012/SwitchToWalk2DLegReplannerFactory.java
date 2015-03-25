@@ -42,7 +42,7 @@ public class SwitchToWalk2DLegReplannerFactory extends WithinDayDuringLegReplann
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new SwitchToWalk2DLegReplanner(super.getId(), scenario,
-				this.getWithinDayEngine().getInternalInterface(), this.coordAnalyzer);
+				this.getWithinDayEngine().getActivityRescheduler(), this.coordAnalyzer);
 		return replanner;
 	}
 }

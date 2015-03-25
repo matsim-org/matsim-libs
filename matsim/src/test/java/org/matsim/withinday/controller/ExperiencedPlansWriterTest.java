@@ -245,7 +245,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		public WithinDayDuringActivityReplanner createReplanner() {
 			Id<WithinDayReplanner> id = super.getId();
 			WithinDayDuringActivityReplanner replanner = new Replanner(id, scenario, 
-					this.getWithinDayEngine().getInternalInterface());
+					this.getWithinDayEngine().getActivityRescheduler());
 			return replanner;
 		}
 	}

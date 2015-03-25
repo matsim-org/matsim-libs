@@ -46,7 +46,7 @@ public class MarathonEndActivityAndEvacuateReplannerFactory extends WithinDayDur
 		EndActivityAndEvacuateReplanner delegate = (EndActivityAndEvacuateReplanner) factory.createReplanner();
 		
 		WithinDayDuringActivityReplanner replanner = new MarathonEndActivityAndEvacuateReplanner(super.getId(), 
-				scenario, this.getWithinDayEngine().getInternalInterface(), delegate);
+				scenario, this.getWithinDayEngine().getActivityRescheduler(), delegate);
 		return replanner;
 	}
 

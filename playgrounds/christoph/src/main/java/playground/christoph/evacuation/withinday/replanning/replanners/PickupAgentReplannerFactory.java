@@ -41,7 +41,7 @@ public class PickupAgentReplannerFactory extends WithinDayDuringLegReplannerFact
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new PickupAgentReplanner(super.getId(), scenario,
-				this.getWithinDayEngine().getInternalInterface(), this.agentsToPickupIdentifier);
+				this.getWithinDayEngine().getActivityRescheduler(), this.agentsToPickupIdentifier);
 		return replanner;
 	}
 }

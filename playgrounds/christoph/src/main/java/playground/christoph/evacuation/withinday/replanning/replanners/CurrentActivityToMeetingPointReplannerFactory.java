@@ -57,7 +57,7 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new CurrentActivityToMeetingPointReplanner(super.getId(), scenario,
-				this.getWithinDayEngine().getInternalInterface(), decisionDataProvider, 
+				this.getWithinDayEngine().getActivityRescheduler(), decisionDataProvider, 
 				modeAvailabilityChecker.createInstance(), ptTravelTime,
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;

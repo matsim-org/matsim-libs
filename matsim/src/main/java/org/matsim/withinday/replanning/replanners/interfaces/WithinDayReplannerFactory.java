@@ -25,24 +25,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.qsim.ActivityEndReschedulerProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentSelector;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningIdGenerator;
 
 public abstract class WithinDayReplannerFactory<T extends AgentSelector> {
 
-	private final WithinDayEngine withinDayEngine;
+	private final ActivityEndReschedulerProvider withinDayEngine;
 	private Id<WithinDayReplanner> id;
 	private Set<T> identifiers = new HashSet<T>();
 	
-	public WithinDayReplannerFactory(WithinDayEngine withinDayEngine) {
+	public WithinDayReplannerFactory(ActivityEndReschedulerProvider withinDayEngine) {
 		this.withinDayEngine = withinDayEngine;
 		this.id = ReplanningIdGenerator.getNextId();
 	}
 	
 	public abstract WithinDayReplanner<? extends AgentSelector> createReplanner();
 	
-	public final WithinDayEngine getWithinDayEngine() {
+	public final ActivityEndReschedulerProvider getWithinDayEngine() {
 		return this.withinDayEngine;
 	}
 	

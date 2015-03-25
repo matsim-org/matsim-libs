@@ -51,7 +51,7 @@ public class ParkingSearchReplannerFactory extends WithinDayDuringLegReplannerFa
 	public ParkingSearchReplanner createReplanner() {
 		ParkingRouter parkingRouter = this.parkingRouterFactory.createParkingRouter();
 		ParkingSearchReplanner replanner = new ParkingSearchReplanner(super.getId(), scenario, 
-				this.getWithinDayEngine().getInternalInterface(), parkingAgentsTracker, parkingInfrastructure, parkingRouter);
+				this.getWithinDayEngine().getActivityRescheduler(), parkingAgentsTracker, parkingInfrastructure, parkingRouter);
 		return replanner;
 	}
 

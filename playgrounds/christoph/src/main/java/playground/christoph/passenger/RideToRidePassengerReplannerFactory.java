@@ -49,7 +49,7 @@ public class RideToRidePassengerReplannerFactory extends WithinDayInitialReplann
 	@Override
 	public WithinDayInitialReplanner createReplanner() {
 		WithinDayInitialReplanner replanner = new RideToRidePassengerReplanner(super.getId(), scenario, 
-				this.getWithinDayEngine().getInternalInterface(),
+				this.getWithinDayEngine().getActivityRescheduler(),
 				this.tripRouterFactory.get(),
 				this.rideToRidePassengerContextProvider, this.jointDepartureOrganizer);
 		return replanner;

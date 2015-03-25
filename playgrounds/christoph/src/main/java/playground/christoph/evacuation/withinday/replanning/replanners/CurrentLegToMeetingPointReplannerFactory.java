@@ -48,7 +48,7 @@ public class CurrentLegToMeetingPointReplannerFactory extends WithinDayDuringLeg
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CurrentLegToMeetingPointReplanner(super.getId(), 
-				this.scenario, this.getWithinDayEngine().getInternalInterface(), this.decisionDataProvider,
+				this.scenario, this.getWithinDayEngine().getActivityRescheduler(), this.decisionDataProvider,
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}

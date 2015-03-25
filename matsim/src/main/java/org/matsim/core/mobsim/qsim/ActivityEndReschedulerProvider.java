@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * ExtendCurrentActivityReplannerFactory.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.core.mobsim.qsim;
 
-package playground.christoph.evacuation.withinday.replanning.replanners.old;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.withinday.mobsim.WithinDayEngine;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
-
-public class ExtendCurrentActivityReplannerFactory extends WithinDayDuringActivityReplannerFactory {
-
-	private Scenario scenario;
-	
-	public ExtendCurrentActivityReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
-		super(withinDayEngine);
-		this.scenario = scenario;
-	}
-
-	@Override
-	public WithinDayDuringActivityReplanner createReplanner() {
-		WithinDayDuringActivityReplanner replanner = new ExtendCurrentActivityReplanner(super.getId(),
-				scenario, this.getWithinDayEngine().getActivityRescheduler());
-		return replanner;
-	}
-
+/**
+ * need this because a lot of code passes the withinDayEngine around, in order to later get to the activity end scheduling possibility
+ * via the InternalInterface
+ * 
+ * @author nagel
+ */
+public interface ActivityEndReschedulerProvider {
+	public ActivityEndRescheduler getActivityRescheduler() ;
 }

@@ -48,7 +48,7 @@ public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActiv
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new EndActivityAndEvacuateReplanner(super.getId(), 
-				this.scenario, this.getWithinDayEngine().getInternalInterface(), ptTravelTime,
+				this.scenario, this.getWithinDayEngine().getActivityRescheduler(), ptTravelTime,
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}

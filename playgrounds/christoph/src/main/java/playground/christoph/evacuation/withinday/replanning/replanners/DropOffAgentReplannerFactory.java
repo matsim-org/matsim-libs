@@ -49,7 +49,7 @@ public class DropOffAgentReplannerFactory extends WithinDayDuringLegReplannerFac
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new DropOffAgentReplanner(super.getId(), this.scenario,
-				this.getWithinDayEngine().getInternalInterface(),
+				this.getWithinDayEngine().getActivityRescheduler(),
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext), 
 				agentsToDropOffIdentifier);
 		return replanner;

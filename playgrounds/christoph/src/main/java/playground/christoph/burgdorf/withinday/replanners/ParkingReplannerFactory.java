@@ -37,7 +37,7 @@ public class ParkingReplannerFactory extends WithinDayDuringLegReplannerFactory 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new ParkingReplanner(super.getId(), scenario,
-				this.getWithinDayEngine().getInternalInterface());
+				this.getWithinDayEngine().getActivityRescheduler());
 		return replanner;
 	}
 }

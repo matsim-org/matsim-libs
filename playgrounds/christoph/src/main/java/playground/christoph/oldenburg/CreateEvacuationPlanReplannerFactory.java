@@ -45,7 +45,7 @@ public class CreateEvacuationPlanReplannerFactory extends WithinDayInitialReplan
 	@Override
 	public WithinDayInitialReplanner createReplanner() {
 		WithinDayInitialReplanner replanner = new CreateEvacuationPlanReplanner(super.getId(), this.scenario,
-				this.getWithinDayEngine().getInternalInterface(),
+				this.getWithinDayEngine().getActivityRescheduler(),
 				new PlanRouter(this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext)));
 		return replanner;
 	}

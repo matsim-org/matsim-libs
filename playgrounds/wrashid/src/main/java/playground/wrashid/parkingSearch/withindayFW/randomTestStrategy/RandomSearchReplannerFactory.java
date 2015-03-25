@@ -47,7 +47,7 @@ public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFac
 	@Override
 	public RandomSearchReplanner createReplanner() {
 		RandomSearchReplanner replanner = new RandomSearchReplanner(super.getId(), this.scenario, 
-				this.getWithinDayEngine().getInternalInterface(), this.parkingAgentsTracker,
+				this.getWithinDayEngine().getActivityRescheduler(), this.parkingAgentsTracker,
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}

@@ -53,7 +53,7 @@ public class CostNavigationRouteFactory extends WithinDayDuringLegReplannerFacto
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CostNavigationRoute(super.getId(), scenario, 
-				this.getWithinDayEngine().getInternalInterface(), network, costNavigationTravelTimeLogger, 
+				this.getWithinDayEngine().getActivityRescheduler(), network, costNavigationTravelTimeLogger, 
 				travelCostFactory, travelTime, routerFactory);
 		return replanner;
 	}

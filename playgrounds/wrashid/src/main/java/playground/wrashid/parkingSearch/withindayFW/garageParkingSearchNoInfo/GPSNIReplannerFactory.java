@@ -47,7 +47,7 @@ public class GPSNIReplannerFactory extends WithinDayDuringLegReplannerFactory {
 	@Override
 	public GPSNIReplanner createReplanner() {
 		GPSNIReplanner replanner = new GPSNIReplanner(super.getId(), this.scenario, 
-				this.getWithinDayEngine().getInternalInterface(), this.parkingAgentsTracker,
+				this.getWithinDayEngine().getActivityRescheduler(), this.parkingAgentsTracker,
 				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}
