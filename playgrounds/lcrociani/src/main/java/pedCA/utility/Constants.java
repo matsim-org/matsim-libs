@@ -5,7 +5,7 @@ public class Constants {
 	public static final double SQRT2 = Math.sqrt(2);
 	
 	//Constant for the random seed
-	public static final long RANDOM_SEED = 24;
+	public static final long RANDOM_SEED = 42;
 	
 	//Constants for environment
 	public static final int ENV_OBSTACLE = -1;

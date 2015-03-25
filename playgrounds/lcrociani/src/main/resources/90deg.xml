@@ -18,7 +18,12 @@ xsi:noNamespaceSchemaLocation="http://xsd.jupedsim.org/0.6/jps_report.xsd" >
             <vertex x="3.65" y="-3.0" /> 
             <vertex x="0.65" y="-3.0" /> 
             <vertex x="0.65" y="0.0" /> 
-            <Length_in_movement_direction distance="3.0" /> 
+            <Length_in_movement_direction distance="3.0" />
+<!--             <vertex x="3" y="0" /> 
+            <vertex x="3" y="-2.5" /> 
+            <vertex x="0.5" y="-2.5" /> 
+            <vertex x="0.5" y="0" /> 
+            <Length_in_movement_direction distance="2.5" />  -->
         </area_B> 
 	<area_L id="2" type="Line"> 
             <start x="-2.25" y="0.00" /> 
@@ -54,7 +59,7 @@ xsi:noNamespaceSchemaLocation="http://xsd.jupedsim.org/0.6/jps_report.xsd" >
     </method_C> 
 
     <!-- Method D (Zhang2011a) Voronoi density and Vel --> 
-    <method_D enabled="true" outputGraph="false" individualFDdata="false"> 
+    <method_D enabled="true" outputGraph="false" individualFDdata="true"> 
 	 <measurementArea id="1" /> 
         <cutByCircle enabled="false" radius= "1" edges = "10"/> 
         <!-- edges represent the precision of discretization of the circle --> 
