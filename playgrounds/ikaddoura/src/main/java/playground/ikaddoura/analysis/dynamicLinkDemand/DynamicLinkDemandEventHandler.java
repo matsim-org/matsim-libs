@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.misc.Time;
 
 /**
  * @author Ihab
@@ -95,7 +96,7 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 			bw2.write("\"String\"");
 			
 			for (Double timeBinEndTime : this.timeBinEndTime2linkId2demand.keySet()) {
-				bw1.write(";" + timeBinEndTime);
+				bw1.write(";" + "leavingAgents_" + Time.writeTime(timeBinEndTime, Time.TIMEFORMAT_HHMMSS));
 				bw2.write(",\"Real\"");
 			}
 			bw1.newLine();
