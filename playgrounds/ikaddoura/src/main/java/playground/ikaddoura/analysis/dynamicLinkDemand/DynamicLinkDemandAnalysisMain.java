@@ -20,6 +20,7 @@
 
 package playground.ikaddoura.analysis.dynamicLinkDemand;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -29,30 +30,46 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class DynamicLinkDemandAnalysisMain {
+	private static final Logger log = Logger.getLogger(DynamicLinkDemandAnalysisMain.class);
 	
-	private static String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_2a/ITERS/it.100/100.events.xml.gz";
-	private static String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_2a/output_network.xml.gz";
-	private static String outputFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_2a/ITERS/it.100/link_demand.csv";
+	private static String runDirectory;
 	
 	public static void main(String[] args) {
-		DynamicLinkDemandAnalysisMain anaMain = new DynamicLinkDemandAnalysisMain();
-		anaMain.run();
+		
+		if (args.length > 0) {
+			runDirectory = args[0];		
+			log.info("run directory: " + runDirectory);
+			
+		} else {
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
+		}
+		
+		DynamicLinkDemandAnalysisMain analysis = new DynamicLinkDemandAnalysisMain();
+		analysis.run();
 	}
 
 	private void run() {
+		
+		String configFile = runDirectory + "output_config.xml.gz";
+		String networkFile = runDirectory + "output_network.xml.gz";
 	
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(netFile);
+		Config config = ConfigUtils.loadConfig(configFile);		
+		config.plans().setInputFile(null);		
+		config.network().setInputFile(networkFile);
+		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 				
 		DynamicLinkDemandEventHandler handler = new DynamicLinkDemandEventHandler(scenario.getNetwork());
 		events.addHandler(handler);
 		
+		int iteration = config.controler().getLastIteration();
+		String eventsFile = runDirectory + "ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
+		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
-		handler.printResults(outputFile);
+		handler.printResults(runDirectory + "ITERS/it." + iteration + "/");
 	}
 			 
 }

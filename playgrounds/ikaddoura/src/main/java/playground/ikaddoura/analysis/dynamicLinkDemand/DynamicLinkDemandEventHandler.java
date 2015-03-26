@@ -30,6 +30,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -48,7 +50,7 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 	private double timeBinSize = 3600.;
 	private Network network;
 	
-	private Map<Double, Map<Id<Link>, Integer>> timeBinEndTime2linkId2demand = new HashMap<Double, Map<Id<Link>, Integer>>();
+	private SortedMap<Double, Map<Id<Link>, Integer>> timeBinEndTime2linkId2demand = new TreeMap<Double, Map<Id<Link>, Integer>>();
 
 	public DynamicLinkDemandEventHandler(Network network) {
 		this.network = network;
@@ -71,6 +73,7 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 			} else {
 				this.timeBinEndTime2linkId2demand.get(currentTimeBin).put(event.getLinkId(), 1);
 			}
+			
 		} else {
 			Map<Id<Link>, Integer> linkId2demand = new HashMap<Id<Link>, Integer>();
 			linkId2demand.put(event.getLinkId(), 1);
@@ -78,33 +81,47 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 		}
 	}
 
-	public void printResults(String fileName) {
-		File file = new File(fileName);
+	public void printResults(String path) {
+		
+		String fileName = path + "dynamicLinkDemand.csv";
+		File file1 = new File(fileName);
+		File file2 = new File(fileName + "t");
 		
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("link");
+			BufferedWriter bw1 = new BufferedWriter(new FileWriter(file1));
+			BufferedWriter bw2 = new BufferedWriter(new FileWriter(file2));
+
+			bw1.write("link");
+			bw2.write("\"String\"");
+			
 			for (Double timeBinEndTime : this.timeBinEndTime2linkId2demand.keySet()) {
-				bw.write(";" + timeBinEndTime);
+				bw1.write(";" + timeBinEndTime);
+				bw2.write(",\"Real\"");
 			}
-			bw.newLine();
+			bw1.newLine();
 			
 			for (Id<Link> linkId : this.network.getLinks().keySet()){
 				
-				bw.write(linkId.toString());
+				bw1.write(linkId.toString());
 				
 				for (Double timeBinEndTime : this.timeBinEndTime2linkId2demand.keySet()) {
-					bw.write(";" + this.timeBinEndTime2linkId2demand.get(timeBinEndTime).get(linkId));
+					int agents = 0;
+					if (this.timeBinEndTime2linkId2demand.get(timeBinEndTime).containsKey(linkId)) {
+						agents = this.timeBinEndTime2linkId2demand.get(timeBinEndTime).get(linkId);
+					}
+					bw1.write(";" + agents);
 				}
-				bw.newLine();
+				bw1.newLine();
 			}
 			
-			bw.close();
+			bw1.close();
+			bw2.close();
 			log.info("Output written to " + fileName);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 	}
 
 }
