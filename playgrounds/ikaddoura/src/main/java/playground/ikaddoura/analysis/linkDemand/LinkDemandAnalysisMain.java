@@ -30,9 +30,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class LinkDemandAnalysisMain {
 	
-	private static String eventsFile = "100.events.xml.gz";
-	private static String netFile = "output_network.xml.gz";
-	private static String outputFile = "linkDemand.csv";
+	private static String eventsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_2a/ITERS/it.100/100.events.xml.gz";
+	private static String netFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_2a/output_network.xml.gz";
+	private static String outputFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_2a/ITERS/it.100/link_demand.csv";
 	
 	public static void main(String[] args) {
 		LinkDemandAnalysisMain anaMain = new LinkDemandAnalysisMain();

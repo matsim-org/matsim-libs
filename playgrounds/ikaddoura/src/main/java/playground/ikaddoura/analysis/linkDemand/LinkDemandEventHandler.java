@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 /**
@@ -45,7 +46,7 @@ public class LinkDemandEventHandler implements  LinkLeaveEventHandler {
 	private static final Logger log = Logger.getLogger(LinkDemandEventHandler.class);
 	private Network network;
 	
-	private Map<Id,Integer> linkId2demand = new HashMap<Id, Integer>();
+	private Map<Id<Link>,Integer> linkId2demand = new HashMap<Id<Link>, Integer>();
 
 	public LinkDemandEventHandler(Network network) {
 		this.network = network;
@@ -76,7 +77,7 @@ public class LinkDemandEventHandler implements  LinkLeaveEventHandler {
 			bw.write("link;agents");
 			bw.newLine();
 			
-			for (Id linkId : this.network.getLinks().keySet()){
+			for (Id<Link> linkId : this.network.getLinks().keySet()){
 				
 				bw.write(linkId + ";" + this.linkId2demand.get(linkId));
 				bw.newLine();
