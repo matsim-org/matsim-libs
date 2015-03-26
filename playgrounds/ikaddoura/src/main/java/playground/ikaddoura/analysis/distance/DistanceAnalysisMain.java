@@ -14,21 +14,21 @@ import org.matsim.core.config.ConfigUtils;
 
 public class DistanceAnalysisMain {
 
-	String netFile1 = "input/output_network.xml";
-	String plansFile1 = "input/0.plans.xml";
-	String outputFile1 = "output_planFileAnalysis/analyse_it.0_Basis2.txt";
-	String outputFile_XYLineChart1 = "output_planFileAnalysis/analyse_it.0_Basis2_xyLineChart.png";
-	String outputFile_LineChart1 = "output_planFileAnalysis/analyse_it.0_Basis2_LineChart.png";
-	String outputFile_BarChart1 = "output_planFileAnalysis/analyse_it.0_Basis2_BarChart.png";
+	String netFile1 = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/baseCase_2/output_network.xml.gz";
+	String plansFile1 = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/baseCase_2/output_plans.xml.gz";
+	String outputFile1 = "/Users/ihab/Desktop/analysis_baseCase_2.txt";
+	String outputFile_XYLineChart1 = "/Users/ihab/Desktop/analysis_baseCase_2_a.png";
+	String outputFile_LineChart1 = "/Users/ihab/Desktop/analysis_baseCase_2_b.png";
+	String outputFile_BarChart1 = "/Users/ihab/Desktop/analysis_baseCase_2_c.png";
 
-	String netFile2 = "input/output_network.xml";
-	String plansFile2 = "input/500.plans.xml";
-	String outputFile2 = "output_planFileAnalysis/analyse_it.500_Basis2.txt";
-	String outputFile_XYLineChart2 = "output_planFileAnalysis/analyse_it.500_Basis2_xyLineChart.png";
-	String outputFile_LineChart2 = "output_planFileAnalysis/analyse_it.500_Basis2_LineChart.png";
-	String outputFile_BarChart2 = "output_planFileAnalysis/analyse_it.500_Basis2_BarChart.png";
+	String netFile2 = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_2/output_network.xml.gz";
+	String plansFile2 = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/internalization_2/output_plans.xml.gz";
+	String outputFile2 = "/Users/ihab/Desktop/analysis_internalization_2.txt";
+	String outputFile_XYLineChart2 = "/Users/ihab/Desktop/analysis_internalization_2_a.png";
+	String outputFile_LineChart2 = "/Users/ihab/Desktop/analysis_internalization_2_b.png";
+	String outputFile_BarChart2 = "/Users/ihab/Desktop/analysis_internalization_2_c.png";
 	
-	double basis = 2; 
+	double basis = 10; 
 		
 	public static void main(String[] args) {
 		DistanceAnalysisMain analyse = new DistanceAnalysisMain();
@@ -58,12 +58,12 @@ public class DistanceAnalysisMain {
 		writer.writeFile(plansFile2, outputFile2, resultMap2);
 		
 		ChartFileWriterDistance chartWriter = new ChartFileWriterDistance();
-		chartWriter.writeXYLineChartFile("PlanFile_Iteration_0", modiMap1, outputFile_XYLineChart1);
-		chartWriter.writeXYLineChartFile("PlanFile_Iteration_500", modiMap2, outputFile_XYLineChart2);
-		chartWriter.writeBarChartFile("PlanFile_Iteration_0", modiMap1, outputFile_BarChart1);
-		chartWriter.writeBarChartFile("PlanFile_Iteration_500", modiMap2, outputFile_BarChart2);
-		chartWriter.writeLineChartFile("PlanFile_Iteration_0", modiMap1, outputFile_LineChart1);
-		chartWriter.writeLineChartFile("PlanFile_Iteration_500", modiMap2, outputFile_LineChart2);
+		chartWriter.writeXYLineChartFile("base case", modiMap1, outputFile_XYLineChart1);
+		chartWriter.writeXYLineChartFile("policy case", modiMap2, outputFile_XYLineChart2);
+		chartWriter.writeBarChartFile("base case", modiMap1, outputFile_BarChart1);
+		chartWriter.writeBarChartFile("policy case", modiMap2, outputFile_BarChart2);
+		chartWriter.writeLineChartFile("base case", modiMap1, outputFile_LineChart1);
+		chartWriter.writeLineChartFile("policy case", modiMap2, outputFile_LineChart2);
 	}
 
 //------------------------------------------------------------------------------------------------------------------------
