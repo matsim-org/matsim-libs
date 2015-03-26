@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author ikaddoura
@@ -43,7 +44,7 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 	
 	private final static Logger log = Logger.getLogger(TripAnalysisHandler.class);
 
-	private Map<Id, Double> personId2departureTime = new HashMap<Id, Double>();
+	private Map<Id<Person>, Double> personId2departureTime = new HashMap<Id<Person>, Double>();
 	private double totalTravelTimeAllModes = 0.;
 	private double totalTravelTimeCarMode = 0.;
 	private int agentStuckEvents = 0;
