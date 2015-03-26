@@ -417,15 +417,12 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 			this.persons.add(event.getPersonId());
 		}
 		
-		// A transit driver should not perform any activity,
-		// otherwise the code has to be adapted here.
-		if (ptDrivers.contains(event.getPersonId())){
-			throw new RuntimeException("ActivityEndEvent by a transit-driver! The code has to be adapted.");
-		}
 		if(event.getActType().toString().equals("pt interaction")){
-			// pt_interactions are not considered
+			// pseudo activities are excluded
+			
 		} else {
-			if(personId2currentTripNumber.containsKey(event.getPersonId())){
+			
+			if (personId2currentTripNumber.containsKey(event.getPersonId())){
 				// The trip which starts immediately is at least the second trip of the person
 				personId2currentTripNumber.put(event.getPersonId(), personId2currentTripNumber.get(event.getPersonId())+1);
 				Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getPersonId());

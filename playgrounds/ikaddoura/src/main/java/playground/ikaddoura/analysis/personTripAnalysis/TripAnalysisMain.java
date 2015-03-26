@@ -19,6 +19,7 @@
 
 package playground.ikaddoura.analysis.personTripAnalysis;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -29,21 +30,30 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class TripAnalysisMain {
-	
-//	private String runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/bln2/output/noise_int_1a_rndSeed2/";
-	private String runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
-	
-	private String configFile = runDirectory + "output_config.xml.gz";
-	private String populationFile = runDirectory + "output_plans.xml.gz";
-	private String networkFile = runDirectory + "output_network.xml.gz";
+	private static final Logger log = Logger.getLogger(TripAnalysisMain.class);
+
+	private static String runDirectory;
 	
 	public static void main(String[] args) {
+		
+		if (args.length > 0) {
+			runDirectory = args[0];		
+			log.info("run directory: " + runDirectory);
+			
+		} else {
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
+		}
+		
 		TripAnalysisMain analysis = new TripAnalysisMain();
 		analysis.run();
 	}
 
 	private void run() {
-	
+		
+		String configFile = runDirectory + "output_config.xml.gz";
+		String populationFile = runDirectory + "output_plans.xml.gz";
+		String networkFile = runDirectory + "output_network.xml.gz";
+		
 		Config config = ConfigUtils.loadConfig(configFile);		
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
@@ -55,7 +65,7 @@ public class TripAnalysisMain {
 		events.addHandler(tripHandler);
 		
 		int iteration = config.controler().getLastIteration();
-		String eventsFile = this.runDirectory + "ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
+		String eventsFile = runDirectory + "ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
