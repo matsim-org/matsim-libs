@@ -84,11 +84,11 @@ public class KS2010Solution2Matsim {
 //			if (! solution.getProgramIdOffsetMap().containsKey(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID)) {
 				Id<DgProgram> programId = solution.getProgramIdOffsetMap().keySet().iterator().next();
 				if (! signalControl.getSignalSystemControllerDataBySystemId().containsKey(programId)) {
-					throw new IllegalStateException(" something's wrong");
+					throw new IllegalStateException("something's wrong with program id " + programId);
 				}
 				SignalSystemControllerData controllerData = signalControl.getSignalSystemControllerDataBySystemId().get(programId);
 				if (! (controllerData.getSignalPlanData().size() == 1)) {
-					throw new IllegalStateException(" something's wrong");
+					throw new IllegalStateException("something's wrong");
 				}
 				SignalPlanData plan = controllerData.getSignalPlanData().values().iterator().next();
 				int offset = solution.getProgramIdOffsetMap().get(programId);
