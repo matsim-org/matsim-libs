@@ -47,11 +47,12 @@ public class PtRouteFPLAN {
 	private static Set<Id<TransitStopFacility>> facilitiesNotFound = new HashSet<>();
 
 	public static final String BUS = "bus";
-	private static enum allBusses {
+
+	private enum allBusses {
 		BUS, NFB, TX, KB, NFO, EXB, NB
 	}
 	public final static String TRAM = "tram";
-	private static enum allTrams {
+	private enum allTrams {
 		T, NFT
 	}
 	public final static String PT = "pt";
@@ -61,13 +62,23 @@ public class PtRouteFPLAN {
 	private final int numberOfDepartures;
 	private final int cycleTime; // [sec]
 	private final List<TransitRouteStop> stops = new ArrayList<>();
+	private String lineDescription;
 
 	public Id<TransitLine> getLineId() {
 		return Id.create(idOwnerLine.toString(), TransitLine.class);
 	}
 
 	public Id<TransitRoute> getRouteId() {
-		return Id.create(routeId.toString(), TransitRoute.class);
+		if (lineDescription == null) {
+			return Id.create(routeId.toString(), TransitRoute.class);
+		}
+		return Id.create(lineDescription, TransitRoute.class);
+	}
+
+	public void setLineDescription(String lineDescription) {
+		if (this.lineDescription == null) {
+			this.lineDescription = "line" + lineDescription + "_" + routeId.toString();
+		}
 	}
 
 	// First departure time:
@@ -84,7 +95,7 @@ public class PtRouteFPLAN {
 	private String usedMode = PT;
 	public void setUsedVehicle(Id<VehicleType> typeId, VehicleType type) {
 		usedVehicleType = type;
-		usedVehicleID = typeId.toString() + "_" + idOwnerLine.toString() + "_" + routeId.toString();
+		usedVehicleID = typeId.toString();
 		if (usedVehicleType != null) {
 			if (isTypeOf(allBusses.class, usedVehicleType.getId().toString())) {
 				usedMode = BUS;
@@ -96,11 +107,16 @@ public class PtRouteFPLAN {
 		}
 	}
 
+	public String getUsedVehicleId() {
+		return usedVehicleID + "_" + idOwnerLine.toString() + "_" + getRouteId().toString();
+	}
+
 	public PtRouteFPLAN(Id<TransitLine> idOwnerLine, Id<TransitRoute> routeId, int numberOfDepartures, int cycleTime) {
 		this.idOwnerLine = idOwnerLine;
 		this.routeId = routeId;
 		this.numberOfDepartures = numberOfDepartures + 1; // Number gives all occurrences of route additionally to first... => +1
 		this.cycleTime = cycleTime * 60; // Cycle time is given in minutes in HAFAS -> Have to change it here...
+		this.lineDescription = null;
 	}
 
 	/**
@@ -110,7 +126,7 @@ public class PtRouteFPLAN {
 	public TransitRoute getRoute() {
 		List<Departure> departures = this.getDepartures();
 		if (departures != null) {
-			TransitRoute transitRoute = scheduleBuilder.createTransitRoute(routeId, null, stops, usedMode);
+			TransitRoute transitRoute = scheduleBuilder.createTransitRoute(getRouteId(), null, stops, usedMode);
 			for (Departure departure : departures) {
 				transitRoute.addDeparture(departure);
 			}
@@ -129,7 +145,7 @@ public class PtRouteFPLAN {
 		if (stopFacility == null) {
 			if (!facilitiesNotFound.contains(stopId)) {
 				facilitiesNotFound.add(stopId);
-				log.error(idOwnerLine.toString() + "-" + routeId.toString() + ": " + "Stop facility " + stopId.toString() + " not found in facilities. Stops connected to this facility will not be added to routes. Please check.");
+				log.error(idOwnerLine.toString() + "-" + getRouteId().toString() + ": " + "Stop facility " + stopId.toString() + " not found in facilities. Stops connected to this facility will not be added to routes. Please check.");
 			}
 			return;
 		}
@@ -152,7 +168,7 @@ public class PtRouteFPLAN {
 	 * If vehicleType is not set, the vehicle is not in the list and entry will not be created.
 	 */
 	private List<Departure> getDepartures() {
-		if (firstDepartureTime < 0 || usedVehicleID == null) {
+		if (firstDepartureTime < 0 || getUsedVehicleId() == null) {
 			log.error("getDepartures before first departureTime and usedVehicleId set.");
 			return null;
 		}
@@ -164,11 +180,11 @@ public class PtRouteFPLAN {
 		List<Departure> departures = new ArrayList<>();
 		for (int i = 0; i < numberOfDepartures; i++) {
 			// Departure ID
-			Id<Departure> departureId = Id.create(idOwnerLine.toString() + "_" + routeId.toString() + "_" + String.format("%04d", i + 1), Departure.class);
+			Id<Departure> departureId = Id.create(idOwnerLine.toString() + "_" + getRouteId().toString() + "_" + String.format("%04d", i + 1), Departure.class);
 			// Departure time
 			double departureTime = firstDepartureTime + (i * cycleTime) - initialDelay;
 			// Departure vehicle
-			Id<Vehicle> vehicleId = Id.create(usedVehicleID + "_" + String.format("%04d", i + 1), Vehicle.class);
+			Id<Vehicle> vehicleId = Id.create(getUsedVehicleId() + "_" + String.format("%04d", i + 1), Vehicle.class);
 			// Departure
 			departures.add(createDeparture(departureId, departureTime, vehicleId));
 		}

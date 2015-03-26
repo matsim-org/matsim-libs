@@ -86,7 +86,7 @@ public class OSM2MixedV2 {
 		final String networkPath = outbase + "Network.xml.gz";
 
 		// **************** Prepare Subscenarios ****************
-		convertOSMNetwork(osmFile, networkPath);
+		//convertOSMNetwork(osmFile, networkPath);
 		final Scenario onlyPTScenario = createOnlyPT(hafasFolder, vehicleFile_OnlyPT);
 		final Scenario mixedScenario = createMixed(hafasFolder, vehicleFile_Mixed, networkPath);
 

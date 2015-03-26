@@ -47,6 +47,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 	private CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
 	protected final Map<String, Integer> vehiclesUndefined = new HashMap<>();
 	private final Set<Integer> bitfeldNummern = new HashSet<>();
+	private final Map<String, String> operators = new HashMap<>();
 
 	public PTScheduleCreatorDefaultV2(TransitSchedule schedule, Vehicles vehicles) {
 		super(schedule, vehicles);
@@ -60,13 +61,15 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		readVehicles(vehicleFile);
 		// 2. Read all stops from HAFAS-BFKOORD_GEO
 		readStops(hafasFolder + "/BFKOORD_GEO");
-		// 3. Read all ids for work-day-routes from HAFAS-BITFELD
+		// 3. Read all operators from BETRIEB_DE
+		readOperators(hafasFolder + "/BETRIEB_DE");
+		// 4. Read all ids for work-day-routes from HAFAS-BITFELD
 		readDays(hafasFolder + "/FPLAN", hafasFolder + "/BITFELD");
-		// 4. Create all lines from HAFAS-Schedule
+		// 5. Create all lines from HAFAS-Schedule
 		readLines(hafasFolder + "/FPLAN");
-		// 5. Print undefined vehicles
+		// 6. Print undefined vehicles
 		printVehiclesUndefined();
-		// 6. Clean schedule
+		// 7. Clean schedule
 		removeNonUsedStopFacilities();
 		uniteSameRoutesWithJustDifferentDepartures();
 		cleanDepartures();
@@ -158,6 +161,25 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		stopFacility.setName(stopName);
 		this.schedule.addStopFacility(stopFacility);
 		//log.info("Added " + schedule.getFacilities().get(stopId).toString());
+	}
+
+	private void readOperators(String BETRIEB_DE) {
+		log.info("  Read operators...");
+		try {
+			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(BETRIEB_DE), "latin1"));
+			String newLine = readsLines.readLine();
+			while (newLine != null) {
+				String abbrevationOperator = newLine.split("\"")[1].replace(" ","");
+				newLine = readsLines.readLine();
+				if (newLine == null) break;
+				String operatorId = newLine.substring(8, 14).trim();
+				operators.put(operatorId, abbrevationOperator);
+				// read the next operator:
+				newLine = readsLines.readLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected void readDays(String FPLAN, String BITFELD) {
@@ -297,7 +319,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 						an.
 						27−29 INT16 Taktzeit in Minuten (Abstand zwischen zwei Fahrten).*/
 						// Get the appropriate transit line...
-						Id<TransitLine> lineId = Id.create(newLine.substring(9, 15).trim(), TransitLine.class);
+						Id<TransitLine> lineId = Id.create(operators.get(newLine.substring(9, 15).trim()), TransitLine.class);
 						PtLineFPLAN lineFPLAN;
 						if (linesFPLAN.containsKey(lineId)) {
 							lineFPLAN = linesFPLAN.get(lineId);
@@ -320,28 +342,6 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 						} catch (Exception e) {	}
 						currentRouteFPLAN = new PtRouteFPLAN(lineId, routeId, numberOfDepartures, cycleTime);
 						lineFPLAN.addPtRouteFPLAN(currentRouteFPLAN);
-					} else if (newLine.charAt(1) == 'T') {
-						// Initialzeile neue freie Fahrt (Linien welche nicht nach Taktfahrplan fahren...)
-						log.error("*T-Line in HAFAS discovered. Please implement appropriate read out.");
-					} else if (newLine.charAt(1) == 'A' && newLine.charAt(3) == 'V' && newLine.charAt(4) == 'E') {
-						/*Spalte Typ Bedeutung
-						1-5 CHAR *A VE
-						7-13 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer, ab der die Verkehrstage im Laufweg gelten.
-						15-21 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer, bis zu der die Verkehrstage im Laufweg gelten.
-						23-28 INT16 (optional) Verkehrstagenummer für die Tage, an denen die Fahrt stattfindet. Fehlt diese Angabe, so verkehrt diese Fahrt täglich (entspricht dann 000000).
-						30-35 [#]INT32 (optional) Index für das x. Auftreten oder Abfahrtszeitpunkt.
-						37-42 [#]INT32 (optional) Index für das x. Auftreten oder Ankunftszeitpunkt.*/
-						if (currentRouteFPLAN != null) {
-							int localBitfeldnr = 0;
-							if (newLine.substring(22, 28).trim().length() > 0) {
-								localBitfeldnr = Integer.parseInt(newLine.substring(22, 28));
-							}
-							if (!this.bitfeldNummern.contains(localBitfeldnr)) {
-								// Linie gefunden, die nicht werk-täglich verkehrt... => Ignorieren wir...
-								linesFPLAN.get(currentRouteFPLAN.getLineId()).removePtRouteFPLAN(currentRouteFPLAN);
-								currentRouteFPLAN = null;
-							}
-						}
 					} else if (newLine.charAt(1) == 'G') {
 						// Verkehrsmittelzeile
 						/*Spalte Typ Bedeutung
@@ -375,6 +375,35 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 						} /*else {
 							log.error("*G-Line before appropriate *Z-Line.");
 						}*/
+					} else if (newLine.charAt(1) == 'A' && newLine.charAt(3) == 'V' && newLine.charAt(4) == 'E') {
+						/*Spalte Typ Bedeutung
+						1-5 CHAR *A VE
+						7-13 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer, ab der die Verkehrstage im Laufweg gelten.
+						15-21 [#]INT32 (optional) Laufwegsindex oder Haltestellennummer, bis zu der die Verkehrstage im Laufweg gelten.
+						23-28 INT16 (optional) Verkehrstagenummer für die Tage, an denen die Fahrt stattfindet. Fehlt diese Angabe, so verkehrt diese Fahrt täglich (entspricht dann 000000).
+						30-35 [#]INT32 (optional) Index für das x. Auftreten oder Abfahrtszeitpunkt.
+						37-42 [#]INT32 (optional) Index für das x. Auftreten oder Ankunftszeitpunkt.*/
+						if (currentRouteFPLAN != null) {
+							int localBitfeldnr = 0;
+							if (newLine.substring(22, 28).trim().length() > 0) {
+								localBitfeldnr = Integer.parseInt(newLine.substring(22, 28));
+							}
+							if (!this.bitfeldNummern.contains(localBitfeldnr)) {
+								// Linie gefunden, die nicht werk-täglich verkehrt... => Ignorieren wir...
+								linesFPLAN.get(currentRouteFPLAN.getLineId()).removePtRouteFPLAN(currentRouteFPLAN);
+								currentRouteFPLAN = null;
+							}
+						}
+					} else if (newLine.charAt(1) == 'L') {
+						/*Spalte Typ Bedeutung
+						1-2 CHAR *L
+						4-11 CHAR Liniennummer*/
+						if (currentRouteFPLAN != null) {
+							currentRouteFPLAN.setLineDescription(newLine.substring(3, 11).trim());
+						}
+					} else if (newLine.charAt(1) == 'T') {
+						// Initialzeile neue freie Fahrt (Linien welche nicht nach Taktfahrplan fahren...)
+						log.error("*T-Line in HAFAS discovered. Please implement appropriate read out.");
 					}
 				} else if (newLine.charAt(0) == '+') { // Regionszeile (Bedarfsfahrten)
 					// We don't have this transport mode in  MATSim (yet). => Delete Route and if Line now empty, delete Line.
