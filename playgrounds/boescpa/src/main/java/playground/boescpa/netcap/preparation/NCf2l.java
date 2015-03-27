@@ -42,8 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * If there are no intentions to use location choice this file reduces all facilities to the only used ones.
- * For the creation of the f2l, the network should only contain the car-links...
+ * Links facilities to links...
  *
  * @author boescpa
  */
@@ -65,7 +64,7 @@ public class NCf2l {
 	}
 
 	/**
-	 * Links facilities to a network.
+	 * Links facilities to a network (the network should only contain the car-links).
 	 *
 	 * @param scenario	A MATSim scenario that at least contains ActivityFacilities and Network.
 	 * @param path2File	Path (incl. filename) to where the f2l-file will be written.
@@ -75,7 +74,7 @@ public class NCf2l {
 	}
 
 	/**
-	 * Links facilities to a network.
+	 * Links facilities to a network (the network should only contain the car-links).
 	 *
 	 * @param facilities Facilities which will be linked.
 	 * @param network	To which facilities will be linked.
