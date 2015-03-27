@@ -71,6 +71,12 @@ public class LinkOccupancyCalculator implements LinkLeaveEventHandler, PersonDep
 		rates.put("private", 1.5);
 		rates.put("leisure", 1.9);
 		rates.put("pickdrop", 1.9);
+		/*
+		 * for foreign traffic
+		 */
+		rates.put("buisiness", 1.1);
+		rates.put("vacations_short", 1.9);
+		rates.put("vacations_long", 1.9);
 
 	}
 

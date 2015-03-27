@@ -19,6 +19,9 @@
 
 package playground.johannes.gsv.zones;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,6 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 
 import com.vividsolutions.jts.algorithm.locate.IndexedPointInAreaLocator;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -145,5 +150,13 @@ public class ZoneCollection {
 			else
 				return false;
 		}
+	}
+	
+	public static ZoneCollection readFromGeoJSON(String file, String primaryKey) throws IOException {
+		ZoneCollection zones = new ZoneCollection();
+		String data = new String(Files.readAllBytes(Paths.get(file)));
+		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
+		zones.setPrimaryKey(primaryKey);
+		return zones;
 	}
 }

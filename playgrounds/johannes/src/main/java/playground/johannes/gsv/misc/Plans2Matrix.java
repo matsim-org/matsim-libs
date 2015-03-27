@@ -22,7 +22,6 @@ package playground.johannes.gsv.misc;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -41,20 +40,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
-import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrix;
-import org.matsim.visum.VisumMatrixWriter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 
-import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.Zone;
+import playground.johannes.gsv.zones.ZoneCollection;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * @author johannes
@@ -64,22 +60,23 @@ public class Plans2Matrix {
 	
 	private static final Logger logger = Logger.getLogger(Plans2Matrix.class);
 
-	public Matrix run(Collection<Plan> plans, ZoneLayer<?> zones, ActivityFacilities facilities) {
-		Matrix m = new Matrix("1", null);
-
-		for (Zone<?> zone1 : zones.getZones()) {
-			String isocode1 = ((Map<String, Object>) zone1.getAttribute()).get("ISO_CODE").toString();
-			if ("DE".equalsIgnoreCase(isocode1)) {
-				for (Zone<?> zone2 : zones.getZones()) {
-					String isocode2 = ((Map<String, Object>) zone2.getAttribute()).get("ISO_CODE").toString();
-					if ("DE".equalsIgnoreCase(isocode2)) {
-						String id1 = ((Map<String, Object>) zone1.getAttribute()).get("NO").toString();
-						String id2 = ((Map<String, Object>) zone2.getAttribute()).get("NO").toString();
-						m.createEntry(id1, id2, 0);
-					}
-				}
-			}
-		}
+	public KeyMatrix run(Collection<Plan> plans, ZoneCollection zones, ActivityFacilities facilities, String zoneIdKey) {
+		KeyMatrix m = new KeyMatrix();
+//		Set<Zone> zoneSet = zones.zoneSet();
+//		for(Zone zone1 : zoneSet) {
+//			String isocode1 = zone1.getAttribute("ISO_CODE");
+//			if ("DE".equalsIgnoreCase(isocode1)) {
+//				for (Zone zone2 : zoneSet) {
+//					String isocode2 = zone2.getAttribute("ISO_CODE");
+//					if ("DE".equalsIgnoreCase(isocode2)) {
+//						String id1 = zone1.getAttribute("NO");
+//						String id2 = zone2.getAttribute("NO");
+//						
+////						m.createEntry(id1, id2, 0);
+//					}
+//				}
+//			}
+//		}
 
 		MathTransform transform = null;
 		try {
@@ -109,20 +106,18 @@ public class Plans2Matrix {
 					Id<ActivityFacility> destId = Id.create(dest.getFacilityId(), ActivityFacility.class);
 					ActivityFacility destFac = facilities.getFacilities().get(destId);
 
-					Point origPoint = CRSUtils.transformPoint(MatsimCoordUtils.coordToPoint(origFac.getCoord()), transform);
-					Point destPoint = CRSUtils.transformPoint(MatsimCoordUtils.coordToPoint(destFac.getCoord()), transform);
-					Zone<?> origZone = zones.getZone(origPoint);
-					Zone<?> destZone = zones.getZone(destPoint);
+//					Point origPoint = CRSUtils.transformPoint(MatsimCoordUtils.coordToPoint(origFac.getCoord()), transform);
+//					Point destPoint = CRSUtils.transformPoint(MatsimCoordUtils.coordToPoint(destFac.getCoord()), transform);
+					Zone origZone = zones.get(new Coordinate(origFac.getCoord().getX(), origFac.getCoord().getY()));
+					Zone destZone = zones.get(new Coordinate(destFac.getCoord().getX(), destFac.getCoord().getY()));
 
 					if (origZone != null && destZone != null) {
-						String origZoneId = ((Map<String, Object>) origZone.getAttribute()).get("NO").toString();
-						String destZoneId = ((Map<String, Object>) destZone.getAttribute()).get("NO").toString();
-						Entry e = m.getEntry(origZoneId, destZoneId);
-						if (e == null) {
-//							e = m.createEntry(origZoneId, destZoneId, 0);
-							nullEntries++;
-						}
-						e.setValue(e.getValue() + 1);
+						String origZoneId = origZone.getAttribute(zoneIdKey);
+						String destZoneId = destZone.getAttribute(zoneIdKey);
+						Double val = m.get(origZoneId, destZoneId);
+						if (val == null) val = 0.0;
+						val++;
+						m.set(origZoneId, destZoneId, val);
 					} else {
 						noZones++;
 					}
@@ -150,16 +145,16 @@ public class Plans2Matrix {
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
 		facReader.readFile(args[1]);
 
-		ZoneLayer<Map<String, Object>> zones = ZoneLayerSHP.read(args[2]);
+		ZoneCollection zones = ZoneCollection.readFromGeoJSON(args[2], args[3]);
 
 		Set<Plan> plans = new HashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			plans.add(person.getPlans().get(0));
 		}
 
-		Matrix m = new Plans2Matrix().run(plans, zones, scenario.getActivityFacilities());
+		KeyMatrix m = new Plans2Matrix().run(plans, zones, scenario.getActivityFacilities(), args[3]);
 
-		VisumMatrixWriter writer = new VisumMatrixWriter(m);
-		writer.writeFile(args[3]);
+		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+		writer.write(m, args[4]);
 	}
 }

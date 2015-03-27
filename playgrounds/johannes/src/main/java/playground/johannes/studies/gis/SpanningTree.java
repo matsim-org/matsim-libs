@@ -22,6 +22,7 @@ package playground.johannes.studies.gis;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -53,7 +54,7 @@ public class SpanningTree {
 
 	private final TravelTime ttFunction;
 	private final TravelDisutility tcFunction;
-	private HashMap<Id<Node>,NodeData> nodeData;
+	private Map<Node, NodeData> nodeData;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -86,8 +87,8 @@ public class SpanningTree {
 	}
 
 	static class ComparatorCost implements Comparator<Node> {
-		protected Map<Id<Node>, ? extends NodeData> nodeData;
-		ComparatorCost(final Map<Id<Node>, ? extends NodeData> nodeData) { this.nodeData = nodeData; }
+		protected Map<Node, ? extends NodeData> nodeData;
+		ComparatorCost(final Map<Node, ? extends NodeData> nodeData) { this.nodeData = nodeData; }
 		@Override
 		public int compare(final Node n1, final Node n2) {
 			double c1 = getCost(n1);
@@ -96,7 +97,7 @@ public class SpanningTree {
 			if (c1 > c2) return +1;
 			return n1.getId().compareTo(n2.getId());
 		}
-		protected double getCost(final Node node) { return this.nodeData.get(node.getId()).getCost(); }
+		protected double getCost(final Node node) { return this.nodeData.get(node).getCost(); }
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -115,7 +116,7 @@ public class SpanningTree {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final HashMap<Id<Node>,NodeData> getTree() {
+	public final Map<Node,NodeData> getTree() {
 		return this.nodeData;
 	}
 
@@ -140,13 +141,13 @@ public class SpanningTree {
 	//////////////////////////////////////////////////////////////////////
 
 	private void relaxNode(final Node n, PriorityQueue<Node> pendingNodes) {
-		NodeData nData = nodeData.get(n.getId());
+		NodeData nData = nodeData.get(n);
 		double currTime = nData.getTime();
 		double currCost = nData.getCost();
 		for (Link l : n.getOutLinks().values()) {
 			Node nn = l.getToNode();
-			NodeData nnData = nodeData.get(nn.getId());
-			if (nnData == null) { nnData = new NodeData(); this.nodeData.put(nn.getId(),nnData); }
+			NodeData nnData = nodeData.get(nn);
+			if (nnData == null) { nnData = new NodeData(); this.nodeData.put(nn, nnData); }
 			double visitCost = currCost+tcFunction.getLinkTravelDisutility(l,currTime, null, null);
 			double visitTime = currTime+ttFunction.getLinkTravelTime(l,currTime, null, null);
 			if (visitCost < nnData.getCost()) {
@@ -164,11 +165,11 @@ public class SpanningTree {
 	public void run(final Network network) {
 //		log.info("running " + this.getClass().getName() + " module...");
 
-		nodeData = new HashMap<>((int)(network.getNodes().size()*1.1),0.95f);
+		nodeData = new IdentityHashMap<>(network.getNodes().size());//new HashMap<>((int)(network.getNodes().size()*1.1),0.95f);
 		NodeData d = new NodeData();
 		d.time = dTime;
 		d.cost = 0;
-		nodeData.put(origin.getId(),d);
+		nodeData.put(origin, d);
 
 		ComparatorCost comparator = new ComparatorCost(nodeData);
 		PriorityQueue<Node> pendingNodes = new PriorityQueue<Node>(500,comparator);
@@ -196,8 +197,8 @@ public class SpanningTree {
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);
 		st.run(network);
-		HashMap<Id<Node>,NodeData> tree = st.getTree();
-		for (Id<Node> id : tree.keySet()) {
+		Map<Node,NodeData> tree = st.getTree();
+		for (Node id : tree.keySet()) {
 			NodeData d = tree.get(id);
 			if (d.getPrevNode() != null) {
 				System.out.println(id+"\t"+d.getTime()+"\t"+d.getCost()+"\t"+d.getPrevNode().getId());

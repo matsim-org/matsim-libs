@@ -1,99 +1,103 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <parent>
-    <groupId>org.matsim</groupId>
-    <artifactId>playgrounds</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
-  </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>playground</groupId>
-  <artifactId>johannes</artifactId>
-  <name>johannes</name>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<parent>
+		<groupId>org.matsim</groupId>
+		<artifactId>playgrounds</artifactId>
+		<version>0.7.0-SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>playground</groupId>
+	<artifactId>johannes</artifactId>
+	<name>johannes</name>
 
-  <build>
-  	<plugins>
-  		<plugin>
-  			<groupId>org.apache.maven.plugins</groupId>
-  			<artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>playground/johannes/gis/ZoneLayerSHPTest.java</exclude>
-            <!--  <exclude>playground/johannes/graph/CentralityTest.java</exclude>-->
-            <exclude>playground/johannes/graph/GraphAnalyzerTest.java</exclude>
-          </excludes>
-        </configuration>
-  		</plugin>
-  	</plugins>
-  </build>
-  <repositories>
-  	<!-- <repository>
-  		<id>geogoogle</id>
-  		<name>geogoogle repo</name>
-  		<url>http://www.cs.drexel.edu/~zl25/maven2/repo</url>
-  		<releases>
-  			<updatePolicy>never</updatePolicy>
-  			<checksumPolicy>warn</checksumPolicy>
-  		</releases>
-  		<snapshots>
-  			<enabled>false</enabled>
-  		</snapshots>
-  	</repository> -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>playground/johannes/gis/ZoneLayerSHPTest.java</exclude>
+						<!-- <exclude>playground/johannes/graph/CentralityTest.java</exclude> -->
+						<exclude>playground/johannes/graph/GraphAnalyzerTest.java</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<repositories>
+		<repository>
+			<id>basex</id>
+			<name>BaseX Maven Repository</name>
+			<url>http://files.basex.org/maven</url>
+		</repository>
 		<repository>
 			<id>geotools</id>
 			<name>Geotools repository</name>
 			<url>http://download.osgeo.org/webdav/geotools</url>
 		</repository>
-  </repositories>
-  <dependencies>
-  
-  <dependency>
-    <groupId>com.google.code.geocoder-java</groupId>
-    <artifactId>geocoder-java</artifactId>
-    <version>0.16</version>
-  </dependency>
-  
-  	<dependency>
-      <groupId>trove</groupId>
-      <artifactId>trove</artifactId>
-      <version>2.0.3</version>
-    </dependency>
-    <dependency>
+	</repositories>
+	<dependencies>
+
+		<dependency>
+			<groupId>com.google.code.geocoder-java</groupId>
+			<artifactId>geocoder-java</artifactId>
+			<version>0.16</version>
+		</dependency>
+
+		<dependency>
+			<groupId>trove</groupId>
+			<artifactId>trove</artifactId>
+			<version>2.0.3</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math</artifactId>
 		</dependency>
-    <dependency>
+		<dependency>
 			<groupId>commons-collections</groupId>
 			<artifactId>commons-collections</artifactId>
 			<version>3.2</version>
 		</dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>2.3</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-      <version>3.1-beta1</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.matsim.contrib</groupId>
-    	<artifactId>cadytsIntegration</artifactId>
-    	<version>0.7.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-    	<groupId>joda-time</groupId>
-    	<artifactId>joda-time</artifactId>
-    	<version>2.4</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.wololo</groupId>
-    	<artifactId>jts2geojson</artifactId>
-    	<version>0.4.0</version>
-    </dependency>
-  </dependencies>
-  
-  <profiles>
-  		<profile>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<version>3.1-beta1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>cadytsIntegration</artifactId>
+			<version>0.7.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.wololo</groupId>
+			<artifactId>jts2geojson</artifactId>
+			<version>0.4.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.basex</groupId>
+			<artifactId>basex</artifactId>
+			<version>7.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.basex</groupId>
+			<artifactId>basex-api</artifactId>
+			<version>7.6</version>
+		</dependency>
+	</dependencies>
+
+	<profiles>
+		<profile>
 			<id>release</id>
 			<build>
 				<defaultGoal>assembly:assembly</defaultGoal>

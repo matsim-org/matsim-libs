@@ -34,14 +34,7 @@ import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
  */
 public class Visum2KeyMatrix {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Matrix visumMatrix = new Matrix("1", null);
-		VisumMatrixReader reader = new VisumMatrixReader(visumMatrix);
-		reader.readFile("/home/johannes/gsv/matrices/analysis/marketShares/Split_IV_Modell.mtx");
-		
+	public static KeyMatrix convert(Matrix visumMatrix) {
 		KeyMatrix keyMatrix = new KeyMatrix();
 		
 		for(List<Entry> entries : visumMatrix.getFromLocations().values()) {
@@ -49,15 +42,19 @@ public class Visum2KeyMatrix {
 				keyMatrix.add(entry.getFromLocation(), entry.getToLocation(), entry.getValue());
 			}
 		}
+
+		return keyMatrix;
+	}
+	
+	public static void main(String[] args) {
+		Matrix visumMatrix = new Matrix("1", null);
+		VisumMatrixReader reader = new VisumMatrixReader(visumMatrix);
+		reader.readFile("/mnt/vboxsf/B_USER/Bahn_ESK_A.mtx");
 		
-//		for(List<Entry> entries : visumMatrix.getToLocations().values()) {
-//			for(Entry entry : entries) {
-//				keyMatrix.add(entry.getFromLocation(), entry.getToLocation(), entry.getValue());
-//			}
-//		}
+		KeyMatrix keyMatrix = convert(visumMatrix);
 		
 		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(keyMatrix, "/home/johannes/gsv/matrices/analysis/marketShares/car.share.xml");
+		writer.write(keyMatrix, "/home/johannes/gsv/matrices/analysis/marketShares/railTT.xml");
 	}
 
 }

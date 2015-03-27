@@ -44,7 +44,7 @@ public class TraveTimeCostFunction implements SpatialCostFunction {
 	
 	private Node lastNode;
 	
-	private Map<Id<Node>, NodeData> nodeData;
+	private Map<Node, NodeData> nodeData;
 	
 //	private Discretizer discretizer;
 	
@@ -70,7 +70,7 @@ public class TraveTimeCostFunction implements SpatialCostFunction {
 			lastNode = start;
 		}
 
-		double cost = nodeData.get(target.getId()).getCost();
+		double cost = nodeData.get(target).getCost();
 		return cost;
 //		return discretizer.index(cost);
 	}
