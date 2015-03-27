@@ -21,5 +21,4 @@ package playground.gregor.casim.simulation.physics;
 
 //marker interface
 public interface MultiLaneDensityEstimator extends CADensityEstimatorKernel {
-
 }

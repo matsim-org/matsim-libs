@@ -102,7 +102,7 @@ public class RingRoadBiMultiLane {
 		List<Setting> settings = new ArrayList<>();
 	
 
-		settings.add(new Setting(1.5,1.5,16,20,100));
+		settings.add(new Setting(1.75,1.75,8,20,100));
 
 
 		AbstractCANetwork.EMIT_VIS_EVENTS = true;
@@ -138,8 +138,9 @@ public class RingRoadBiMultiLane {
 
 				Network net = sc.getNetwork();
 				((NetworkImpl) net).setCapacityPeriod(1);
-				NetworkFactory fac = net.getFactory();
 
+				
+				NetworkFactory fac = net.getFactory();
 				double l = s.sideLength;
 				Node n0 = fac.createNode(Id.createNodeId("0"), new CoordImpl(
 						0, 0));
@@ -238,9 +239,9 @@ public class RingRoadBiMultiLane {
 
 
 		double rho = s.rho1+s.rho2;
-		if (rho > AbstractCANetwork.RHO_HAT) {
-			throw new RuntimeException("total density must not exceed RHO_HAT");
-		}
+//		if (rho > AbstractCANetwork.RHO_HAT) {
+//			throw new RuntimeException("total density must not exceed RHO_HAT");
+//		}
 
 
 
@@ -323,6 +324,7 @@ public class RingRoadBiMultiLane {
 				List<Link> links = linksRL;
 				String prefix = "r";
 				if (MatsimRandom.getRandom().nextDouble() <= pLR) {
+//				if (lane % 2 == 0) {
 					dir = 1;
 					next = nextLR;
 					links= linksLR;

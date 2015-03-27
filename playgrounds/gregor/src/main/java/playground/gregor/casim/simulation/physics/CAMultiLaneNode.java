@@ -258,29 +258,16 @@ public class CAMultiLaneNode implements CANode {
 		double z = CAMultiLaneLink.getZ(a);
 		z *= this.ratio;
 		z -= this.epsilon;
-		int dir = 1;
 		int intendedLane = CAMultiLaneLink.getIntendedLane(a.getLane(), this.lanes, nextLink.getNrLanes());
 		int newLane = nextLink.getParticles(intendedLane)[0] == null && nextLink.getLastLeftDsTimes(intendedLane)[0] < time -z ? intendedLane : -1;
-		int currentHeadway = CAMultiLaneLink.getHeadway(nextLink,a,intendedLane,dir,-1);
-
-		if (newLane > -1 && a.getRho() >= CAMultiLaneLink.LANESWITCH_TS_TTA && currentHeadway < CAMultiLaneLink.LANESWITCH_HEADWAY_TS) {
-			boolean found = false;
-			if (intendedLane > 0) {
-				if (nextLink.getParticles(intendedLane-1)[0] == null && nextLink.getLastLeftDsTimes(intendedLane-1)[0] < time -z) {
-					int headway = CAMultiLaneLink.getHeadway(nextLink,a,intendedLane-1,dir,-1);
-					if (headway > currentHeadway) {
-						newLane = intendedLane-1;
-						currentHeadway = headway;
-						found = true;
-					}
-				}
-			}
-			if (intendedLane < nextLink.getNrLanes()-1) {
-				if (nextLink.getParticles(intendedLane+1)[0] == null && nextLink.getLastLeftDsTimes(intendedLane+1)[0] < time -z) {
-					int headway = CAMultiLaneLink.getHeadway(nextLink,a,intendedLane+1,dir,-1);
-					if (headway > currentHeadway || found && headway >= (currentHeadway+MatsimRandom.getRandom().nextDouble()-0.5)) {
-						newLane = intendedLane+1;
-						currentHeadway = headway;
+		if (newLane > -1 && a.getRho() >= CAMultiLaneLink.LANESWITCH_TS_TTA && MatsimRandom.getRandom().nextDouble() < CAMultiLaneLink.LANESWITCH_PROB) {
+			double bestLaneScore = nextLink.getLaneScore(a, a.getLane());
+			for (int i = 0; i < this.lanes; i++) {
+				double laneScore = nextLink.getLaneScore(a, i);
+				if (nextLink.getParticles(i)[0] == null && nextLink.getLastLeftDsTimes(i)[0] < time -z) {
+					if (laneScore > bestLaneScore) {
+						bestLaneScore = laneScore;
+						newLane = i;
 					}
 				}
 			}
@@ -356,29 +343,17 @@ public class CAMultiLaneNode implements CANode {
 		z *= this.ratio;
 		z -= this.epsilon;
 
-		int dir = -1;
 		int intendedLane = CAMultiLaneLink.getIntendedLane(a.getLane(), this.lanes, nextLink.getNrLanes());
 		int newLane = nextLink.getParticles(intendedLane)[idxLastCell] == null && nextLink.getLastLeftUsTimes(intendedLane)[idxLastCell] < time -z ? intendedLane : -1;
-		int currentHeadway = CAMultiLaneLink.getHeadway(nextLink,a,intendedLane,dir,nextLink.getNumOfCells());
 
-		if (newLane > -1 && a.getRho() >= CAMultiLaneLink.LANESWITCH_TS_TTA && currentHeadway < CAMultiLaneLink.LANESWITCH_HEADWAY_TS) {
-			boolean found = false;
-			if (intendedLane > 0) {
-				if (nextLink.getParticles(intendedLane-1)[idxLastCell] == null && nextLink.getLastLeftUsTimes(intendedLane-1)[idxLastCell] < time -z) {
-					int headway = CAMultiLaneLink.getHeadway(nextLink,a,intendedLane-1,dir,nextLink.getNumOfCells());
-					if (headway > currentHeadway) {
-						newLane = intendedLane-1;
-						currentHeadway = headway;
-						found = true;
-					}
-				}
-			}
-			if (intendedLane < nextLink.getNrLanes()-1) {
-				if (nextLink.getParticles(intendedLane+1)[idxLastCell] == null && nextLink.getLastLeftUsTimes(intendedLane+1)[idxLastCell] < time -z) {
-					int headway = CAMultiLaneLink.getHeadway(nextLink,a,intendedLane+1,dir,nextLink.getNumOfCells());
-					if (headway > currentHeadway || found && headway >= (currentHeadway+MatsimRandom.getRandom().nextDouble()-0.5)) {
-						newLane = intendedLane+1;
-						currentHeadway = headway;
+		if (newLane > -1 && a.getRho() >= CAMultiLaneLink.LANESWITCH_TS_TTA && MatsimRandom.getRandom().nextDouble() < CAMultiLaneLink.LANESWITCH_PROB) {
+			double bestLaneScore = nextLink.getLaneScore(a, a.getLane());
+			for (int i = 0; i < this.lanes; i++) {
+				double laneScore = nextLink.getLaneScore(a, i);
+				if (nextLink.getParticles(i)[idxLastCell] == null && nextLink.getLastLeftDsTimes(i)[idxLastCell] < time -z) {
+					if (laneScore > bestLaneScore) {
+						bestLaneScore = laneScore;
+						newLane = i;
 					}
 				}
 			}
@@ -558,8 +533,8 @@ public class CAMultiLaneNode implements CANode {
 			}
 		}
 		if (cands.size() == 0) {
-			 log.info("situation at link's upstream end for agent: " + a
-			 + " has changed, dropping event.");
+			log.info("situation at link's upstream end for agent: " + a
+					+ " has changed, dropping event.");
 			return;
 		}
 		int lane = cands.get(MatsimRandom.getRandom().nextInt(cands.size()));
@@ -621,37 +596,37 @@ public class CAMultiLaneNode implements CANode {
 			d *= this.ratio;
 			triggerSWAP(swapA, this, time + d + this.tFree);
 		} 
-//		// count options (SWAP and TTA) and make choice
-//		// according to the shares of SWAP and TTA
-//		int optSwap = 0;
-//		int optTTA = 0;
-//		for (int lane = 0; lane < nextLink.getNrLanes(); lane++) {
-//			CAMoveableEntity cand = nextLink.getParticles(lane)[cellIdx];
-//			if (cand == null) {
-//				optTTA++;
-//			} else if (cand.getDir() == -1) {
-//				optSwap++;
-//			}
-//		}
-//		int options = optSwap + optTTA;
-//		if (options == 0) {
-//			return; // all occupied nothing we can do here :-(
-//		}
-//
-//		// There are likely situations where TTA and SWAP are possible. The
-//		// action should be chosen so that the overall flow composition gets not
-//		// disturbed. For now the option with most opportunities is chosen to
-//		// increase the likelihood that it is still valid when the create event
-//		// will be executed. If this does not work out well we could try making
-//		// this probabilistic. [GL Nov '14]
-//
-//		if (optSwap >= optTTA) {
-//			double d = CAMultiLaneLink.getD(swapA);
-//			d *= this.ratio;
-//			triggerSWAP(swapA, this, time + d + this.tFree);
-//		} else {
-//			triggerTTA(swapA, this, time + this.tFree);
-//		}
+		//		// count options (SWAP and TTA) and make choice
+		//		// according to the shares of SWAP and TTA
+		//		int optSwap = 0;
+		//		int optTTA = 0;
+		//		for (int lane = 0; lane < nextLink.getNrLanes(); lane++) {
+		//			CAMoveableEntity cand = nextLink.getParticles(lane)[cellIdx];
+		//			if (cand == null) {
+		//				optTTA++;
+		//			} else if (cand.getDir() == -1) {
+		//				optSwap++;
+		//			}
+		//		}
+		//		int options = optSwap + optTTA;
+		//		if (options == 0) {
+		//			return; // all occupied nothing we can do here :-(
+		//		}
+		//
+		//		// There are likely situations where TTA and SWAP are possible. The
+		//		// action should be chosen so that the overall flow composition gets not
+		//		// disturbed. For now the option with most opportunities is chosen to
+		//		// increase the likelihood that it is still valid when the create event
+		//		// will be executed. If this does not work out well we could try making
+		//		// this probabilistic. [GL Nov '14]
+		//
+		//		if (optSwap >= optTTA) {
+		//			double d = CAMultiLaneLink.getD(swapA);
+		//			d *= this.ratio;
+		//			triggerSWAP(swapA, this, time + d + this.tFree);
+		//		} else {
+		//			triggerTTA(swapA, this, time + this.tFree);
+		//		}
 
 	}
 
@@ -668,38 +643,38 @@ public class CAMultiLaneNode implements CANode {
 			d *= this.ratio;
 			triggerSWAP(swapA, this, time + d + this.tFree);
 		}
-		
-//		// count options (SWAP and TTA) and make choice
-//		// according to the shares of SWAP and TTA
-//		int optSwap = 0;
-//		int optTTA = 0;
-//		for (int lane = 0; lane < nextLink.getNrLanes(); lane++) {
-//			CAMoveableEntity cand = nextLink.getParticles(lane)[cellIdx];
-//			if (cand == null) {
-//				optTTA++;
-//			} else if (cand.getDir() == 1) {
-//				optSwap++;
-//			}
-//		}
-//		int options = optSwap + optTTA;
-//		if (options == 0) {
-//			return; // all occupied nothing we can do here :-(
-//		}
-//
-//		// There are likely situations where TTA and SWAP are possible. The
-//		// action should be chosen so that the overall flow composition gets not
-//		// disturbed. For now the option with most opportunities is chosen to
-//		// increase the likelihood that it is still valid when the create event
-//		// will be executed. If this does not work out well we could try making
-//		// this probabilistic. [GL Nov '14]
-//
-//		if (optSwap >= optTTA) {
-//			double d = CAMultiLaneLink.getD(swapA);
-//			d *= this.ratio;
-//			triggerSWAP(swapA, this, time + d + this.tFree);
-//		} else {
-//			triggerTTA(swapA, this, time + this.tFree);
-//		}
+
+		//		// count options (SWAP and TTA) and make choice
+		//		// according to the shares of SWAP and TTA
+		//		int optSwap = 0;
+		//		int optTTA = 0;
+		//		for (int lane = 0; lane < nextLink.getNrLanes(); lane++) {
+		//			CAMoveableEntity cand = nextLink.getParticles(lane)[cellIdx];
+		//			if (cand == null) {
+		//				optTTA++;
+		//			} else if (cand.getDir() == 1) {
+		//				optSwap++;
+		//			}
+		//		}
+		//		int options = optSwap + optTTA;
+		//		if (options == 0) {
+		//			return; // all occupied nothing we can do here :-(
+		//		}
+		//
+		//		// There are likely situations where TTA and SWAP are possible. The
+		//		// action should be chosen so that the overall flow composition gets not
+		//		// disturbed. For now the option with most opportunities is chosen to
+		//		// increase the likelihood that it is still valid when the create event
+		//		// will be executed. If this does not work out well we could try making
+		//		// this probabilistic. [GL Nov '14]
+		//
+		//		if (optSwap >= optTTA) {
+		//			double d = CAMultiLaneLink.getD(swapA);
+		//			d *= this.ratio;
+		//			triggerSWAP(swapA, this, time + d + this.tFree);
+		//		} else {
+		//			triggerTTA(swapA, this, time + this.tFree);
+		//		}
 
 	}
 
@@ -719,8 +694,8 @@ public class CAMultiLaneNode implements CANode {
 			}
 		}
 		if (cands.size() == 0) {
-			 log.info("situation at link's downstream end for agent: " + a
-			 + " has changed, dropping event.");
+			log.info("situation at link's downstream end for agent: " + a
+					+ " has changed, dropping event.");
 			return;
 		}
 

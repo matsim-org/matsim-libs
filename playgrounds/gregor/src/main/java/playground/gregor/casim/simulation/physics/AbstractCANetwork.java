@@ -111,11 +111,14 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 	private double time2;
 
+	public static CAMultiLaneFlowAnalyzer f;
+	
 	public AbstractCANetwork(Network net, EventsManager em,
 			CANetsimEngine engine, CASimDensityEstimatorFactory fac) {
 		this.net = net;
 		this.em = em;
 		this.engine = engine;
+		f = new CAMultiLaneFlowAnalyzer(this);
 		init();
 
 	}
@@ -247,6 +250,11 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 			}
 
+			if (time > 300) {
+				CAMultiLaneDensityEstimatorSPHII.ACTIVATED = true;
+				CAMultiLaneLink.LANESWITCH = true;
+			}
+			
 			if (time > endTime) {
 				break;
 			}
@@ -285,6 +293,9 @@ abstract public class AbstractCANetwork implements CANetwork {
 //			}
 //		}
 		for (CALink ll : this.caLinks.values()) {
+//			if (!ll.getLink().getId().toString().equals("0")){
+//				continue;
+//			}
 			if (ll instanceof CASingleLaneLink) {
 				drawCALinkDynamic((CASingleLaneLink) ll, time);
 			} else if (ll instanceof CAMultiLaneLink) {

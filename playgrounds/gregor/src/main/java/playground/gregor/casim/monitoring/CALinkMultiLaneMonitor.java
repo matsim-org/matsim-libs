@@ -37,42 +37,41 @@ import playground.gregor.utils.Variance;
 
 public class CALinkMultiLaneMonitor implements Monitor {
 
-	private double cellsize;
-	private int from;
-	private int to;
-	private double w;
-	private double range;
-	private double a;
-	private int lanes;
-	private CAMultiLaneLink l;
+	private final double cellsize;
+	private final int from;
+	private final int to;
+	private final double w;
+	private final double range;
+	private final double a;
+	private final int lanes;
+	private final CAMultiLaneLink l;
 
 	private final List<Measure> ms = new ArrayList<Measure>();
 
-	private Map<Id, AgentInfo> ais = new HashMap<>();
+	private final Map<Id, AgentInfo> ais = new HashMap<>();
 	private int dsIn;
 	private int usOut;
 	private int dsOut;
 	private int usIn;
-	private int cellRange;
-	private int h;
+	private final int cellRange;
+	private final int h;
 
 	public CALinkMultiLaneMonitor(CAMultiLaneLink l, double range) {
 		this.cellsize = l.getLink().getLength() / l.getNumOfCells();
-		int cells = (int) (range / cellsize);
+		int cells = (int) (range / this.cellsize);
 		this.from = (int) (l.getNumOfCells() / 2. - cells / 2.);
 		this.to = (int) (l.getNumOfCells() / 2. + cells / 2.);
 		this.w = l.getLink().getCapacity();
-		this.range = (to - from + 1) * this.cellsize;
+		this.range = (this.to - this.from + 1) * this.cellsize;
 		this.a = this.w * this.range;
 		this.lanes = l.getNrLanes();
 		this.l = l;
-		this.cellRange = to - from + 1;
-		this.h = cellRange;
+		this.cellRange = this.to - this.from + 1;
+		this.h = this.cellRange;
 	}
 
 	@Override
 	public void trigger(double time) {
-
 		Measure m = new Measure();
 		m.time = time;
 		int cnt = 0;
@@ -99,11 +98,11 @@ public class CALinkMultiLaneMonitor implements Monitor {
 				}
 			}
 		}
-		double rho = cnt / a;
+		double rho = cnt / this.a;
 
 		m.rho = rho;
-		m.dsRho = dsCnt / a;
-		m.usRho = usCnt / a;
+		m.dsRho = dsCnt / this.a;
+		m.usRho = usCnt / this.a;
 		// m.dsRho = dsRho / dsCnt;
 		// m.usRho = usRho / usCnt;
 
@@ -338,7 +337,7 @@ public class CALinkMultiLaneMonitor implements Monitor {
 
 	private static final class AgentInfo {
 
-		private int dir;
+		private final int dir;
 
 		public AgentInfo(int dir) {
 			this.dir = dir;

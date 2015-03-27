@@ -78,10 +78,10 @@ public class Long1DChannelBiMultiLane_ts {
 	private static boolean USE_SPH;
 
 	public static final class Setting {
-		private int pR;
-		private int pL;
-		private double bexR;
-		private double bexL;
+		private final int pR;
+		private final int pL;
+		private final double bexR;
+		private final double bexL;
 
 		public Setting(double bl, double bCor, double br, int pL, int pR,
 				double bexR, double bexL) {
@@ -102,16 +102,17 @@ public class Long1DChannelBiMultiLane_ts {
 		@Override
 		public String toString() {
 
-			return "bl: " + bL + " cor:" + bCor + " br:" + bR + " bexL:" + bexL
-					+ " bexR:" + bexR;
+			return "bl: " + this.bL + " cor:" + this.bCor + " br:" + this.bR + " bexL:" + this.bexL
+					+ " bexR:" + this.bexR;
 		}
 	}
 
 	public static void main(String[] args) throws IOException {
+		long start = System.currentTimeMillis();
 		List<Setting> settings = new ArrayList<>();
 		settings.add(new Setting(2, 3.6, 2, 143, 166, 3.6, 3.6));
 
-		AbstractCANetwork.EMIT_VIS_EVENTS = true;
+		AbstractCANetwork.EMIT_VIS_EVENTS = false;
 		USE_SPH = true;
 		for (int R = 12; R <= 12; R++) {
 			CASingleLaneDensityEstimatorSPH.H = R;
@@ -263,6 +264,8 @@ public class Long1DChannelBiMultiLane_ts {
 			}
 			bw.close();
 		}
+		long stop = System.currentTimeMillis();
+		System.out.println(stop-start);
 	}
 
 	private static void runIt(Network net, List<Link> linksLR,
@@ -385,7 +388,10 @@ public class Long1DChannelBiMultiLane_ts {
 		// .getLink().getCapacity());
 		caNet.addMonitor(monitor);
 		monitor.init();
+		long start = System.currentTimeMillis();
 		caNet.run(3600);
+		long stop = System.currentTimeMillis();
+		System.out.println(stop-start);
 		try {
 			monitor.report(bw);
 			bw.flush();

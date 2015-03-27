@@ -25,7 +25,8 @@ public class CAMultiLaneDensityEstimatorSPHFactory implements
 	@Override
 	public CADensityEstimatorKernel createCASimDensityEstimator(
 			AbstractCANetwork net) {
-		return new CAMultiLaneDensityEstimatorSPH(net);
+		return new CAMultiLaneDensityEstimatorSPHII(net);
+//		return new CAConstantDensityEstimator();
 	}
 
 }

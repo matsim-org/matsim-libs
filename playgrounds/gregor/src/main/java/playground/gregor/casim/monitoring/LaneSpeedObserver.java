@@ -95,13 +95,16 @@ public class LaneSpeedObserver implements LinkEnterEventHandler, LinkLeaveEventH
 		if (this.cnt++ % 100 == 0) {
 			for (int i = 0; i < this.lanesCnt.length; i++) {
 				cnt = this.lanesCnt[i];
-				avgTT = this.lanesTT[i] * cnt/(1+cnt) + this.ll/AbstractCANetwork.V_HAT * 1/(1+cnt);
+				avgTT = this.lanesTT[i] * cnt/(1+cnt);//+this.ll/AbstractCANetwork.V_HAT * 1/(1+cnt);
 //				avgTT = this.lanesTT[i] * 0.99;// + 20 * 0.01;
 				this.lanesCnt[i]++;
 				this.lanesTT[i] = avgTT;
-				System.out.print(((int)(100*this.lanesFlow[lane]))/100.0 + " ");
+//				System.out.print(((int)(100*this.lanesFlow[lane]))/100.0 + " ");
+//				rho = this.lanesAgents[i]/this.ringLaneArea;
+//				spd = this.ll/this.lanesTT[i];
+//				this.lanesFlow[i] = rho*spd;
 			}
-			System.out.println();
+//			System.out.println();
 			
 		}
 	}
