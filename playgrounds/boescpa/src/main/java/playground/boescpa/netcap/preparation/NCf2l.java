@@ -23,6 +23,7 @@ package playground.boescpa.netcap.preparation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -32,11 +33,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.*;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -50,47 +47,68 @@ import java.util.Map;
  *
  * @author boescpa
  */
-public class NCFacilities {
+public class NCf2l {
 
 	public static void main(String[] args) {
-		if (args.length < 2 || args.length > 3) {
+		if (args.length < 2 || args.length > 2) {
 			System.out.println("Wrong number of arguments. Will abort.");
 			return;
 		}
 
 		// Load scenario:
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
-		new MatsimPopulationReader(scenario).readFile(scenario.getConfig().plans().getInputFile());
 		new FacilitiesReaderMatsimV1(scenario).parse(scenario.getConfig().facilities().getInputFile());
 		new MatsimNetworkReader(scenario).parse(scenario.getConfig().network().getInputFile());
 
-		// Used facilities:
-		ActivityFacilities usedActivityFacilities = getUsedFacilities(scenario.getPopulation(), scenario.getActivityFacilities());
-		new FacilitiesWriter(usedActivityFacilities).writeV1(args[1]);
-
 		// Link facilities to network:
-		if (args.length > 2) {
-			NCf2l.createF2L(usedActivityFacilities, scenario.getNetwork(), args[2]);
+		createF2L(scenario, args[1]);
+	}
+
+	/**
+	 * Links facilities to a network.
+	 *
+	 * @param scenario	A MATSim scenario that at least contains ActivityFacilities and Network.
+	 * @param path2File	Path (incl. filename) to where the f2l-file will be written.
+	 */
+	public static void createF2L(Scenario scenario, String path2File) {
+		createF2L(scenario.getActivityFacilities(), scenario.getNetwork(), path2File);
+	}
+
+	/**
+	 * Links facilities to a network.
+	 *
+	 * @param facilities Facilities which will be linked.
+	 * @param network	To which facilities will be linked.
+	 * @param path2File	Path (incl. filename) to where the f2l-file will be written.
+	 */
+	public static void createF2L(ActivityFacilities facilities, Network network, String path2File) {
+		writeF2L(getF2L(facilities, network), path2File);
+	}
+
+	private static void writeF2L(Map<String, String> f2l, String path2File) {
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(path2File));
+			bw.write("fid\tlid\n");
+			for (String fid : f2l.keySet()) {
+				bw.write(fid + "\t" + f2l.get(fid) + "\n");
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Error while writing given outputF2LFile.", e);
+		} finally {
+			if (bw != null) {
+				try { bw.close(); }
+				catch (IOException e) { System.out.print("Could not close stream."); }
+			}
 		}
 	}
 
-	private static ActivityFacilities getUsedFacilities(Population population, ActivityFacilities activityFacilities) {
-		final ActivityFacilities usedActFacilities = new ActivityFacilitiesImpl(activityFacilities.getName());
-
-		for (Person person : population.getPersons().values()) {
-			for (PlanElement planElement : person.getSelectedPlan().getPlanElements()) {
-				if (planElement instanceof Activity) {
-					Activity activity = (Activity) planElement;
-					if (!usedActFacilities.getFacilities().containsKey(activity.getFacilityId())) {
-						ActivityFacility usedFacility = activityFacilities.getFacilities().get(activity.getFacilityId());
-						if (usedFacility != null) {
-							usedActFacilities.addActivityFacility(activityFacilities.getFacilities().get(activity.getFacilityId()));
-						}
-					}
-				}
-			}
+	protected static Map<String, String> getF2L(ActivityFacilities facilities, Network network) {
+		Map<String, String> f2l = new HashMap<>();
+		for (ActivityFacility facility : facilities.getFacilities().values()) {
+			Link nearestLink = NetworkUtils.getNearestRightEntryLink(network, facility.getCoord());
+			f2l.put(facility.getId().toString(), nearestLink.getId().toString());
 		}
-
-		return usedActFacilities;
+		return f2l;
 	}
 }
