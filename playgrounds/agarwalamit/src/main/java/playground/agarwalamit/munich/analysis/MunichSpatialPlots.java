@@ -56,7 +56,7 @@ public class MunichSpatialPlots {
 
 	String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";
 	String bau = runDir+"/bau";
-	String policyName = "ci";
+	String policyName = "eci";
 	String policyCase = runDir+"/"+policyName;
 	private final double countScaleFactor = 100;
 	private final double gridSize = 500;
@@ -64,11 +64,11 @@ public class MunichSpatialPlots {
 	public static void main(String[] args) {
 		MunichSpatialPlots plots = new MunichSpatialPlots();
 		//		plots.writeCongestionToCells();
-		//				plots.writeEmissionToCells();
+						plots.writeEmissionToCells();
 		//		plots.writeUserWelfareToCells();
 		//				plots.writePopulationDensityCountToCells();
 //		plots.writePersonTollToCells();
-		plots.writeLinkTollToCells();
+//		plots.writeLinkTollToCells();
 	}
 
 	public void writePopulationDensityCountToCells(){
@@ -310,7 +310,7 @@ public class MunichSpatialPlots {
 		Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsPolicy = new HashMap<>();
 
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
+		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,policyCase);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 

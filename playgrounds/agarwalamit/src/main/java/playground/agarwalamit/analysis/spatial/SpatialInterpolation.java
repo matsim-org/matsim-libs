@@ -64,6 +64,7 @@ public class SpatialInterpolation {
 
 	private Map<Point, Double> cellWeights;
 	private String outputFolder ;
+	private final boolean writingGGPLOTData = true;
 
 	/**
 	 * @return general grid of cells from pre defined bounding box
@@ -121,7 +122,7 @@ public class SpatialInterpolation {
 			this.cellWeights.put(p, weightNow+weightSoFar);
 		}
 	}
-	
+
 	/**
 	 * @param act actType
 	 * @param intensityOfPoint (userWelfare, personToll etc) intensity for 100% sample.
@@ -130,7 +131,7 @@ public class SpatialInterpolation {
 
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
 		Point actLocation = gf.createPoint(actCoordinate);
-		
+
 		if(!boundingBoxPolygon.covers(actLocation)) return;
 
 		for(Point p: this.cellWeights.keySet()){
@@ -153,7 +154,7 @@ public class SpatialInterpolation {
 			this.cellWeights.put(p, weightNow+weightSoFar);
 		}
 	}
-	
+
 	/**
 	 * @param point
 	 * <p> No normalization, simple count in each cell, made specially for population density count.
@@ -162,7 +163,7 @@ public class SpatialInterpolation {
 
 		Coordinate actCoordinate = new Coordinate (act.getCoord().getX(),act.getCoord().getY());
 		Point actLocation = gf.createPoint(actCoordinate);
-		
+
 		if(!boundingBoxPolygon.covers(actLocation)) return;
 
 		for(Point p: this.cellWeights.keySet()){
@@ -236,7 +237,7 @@ public class SpatialInterpolation {
 		SpatialDataInputs.LOG.info("====Writing data to plot polygon surface in R.====");
 
 		GridType type = inputs.gridType;
-		
+
 		String fileName;
 		if(inputs.isComparing){
 			String scenarioCase = inputs.compareToCase.split("/") [inputs.compareToCase.split("/").length-1];
@@ -245,7 +246,7 @@ public class SpatialInterpolation {
 			String scenarioCase = inputs.initialCase.split("/") [inputs.initialCase.split("/").length-1];
 			fileName= outputFolder+"/rData"+"_"+fileNamePrefix+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+".txt";	
 		}
-		
+
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 
 		int noOfSidesOfPolygon = 0;
@@ -254,19 +255,32 @@ public class SpatialInterpolation {
 		else throw new RuntimeException(type +" is not a valid grid type.");
 
 		try {
-			for(int i=0;i<noOfSidesOfPolygon;i++){
-				writer.write("polyX"+i+"\t"+"polyY"+i+"\t");
-			}
-			writer.write("centroidX \t centroidY \t weight \n ");
-
-			for(Point p : this.cellWeights.keySet()){
-				Geometry g = this.grid.getCellGeometry(p);
-				Coordinate[] ca = g.getCoordinates();
-				for(int i = 0; i < ca.length-1; i++){ // a square polygon have 5 coordinate, first and last is same. 
-					writer.write(ca[i].x+"\t"+ca[i].y+"\t");
+			if(writingGGPLOTData){
+				writer.write("polyNr \t x \t y \t centroidX \t centroidY \t weight \n");
+				int polyNr = 1;
+				for(Point p : this.cellWeights.keySet()){
+					Geometry g = this.grid.getCellGeometry(p);
+					Coordinate[] ca = g.getCoordinates();
+					for(int i = 0; i < ca.length-1; i++){ // a square polygon have 5 coordinate, first and last is same. 
+						writer.write(polyNr+"\t"+ca[i].x+"\t"+ca[i].y+"\t"+p.getX()+"\t"+p.getY()+"\t"+this.cellWeights.get(p)+"\n");
+					}
+					polyNr++;
 				}
-				double thisWeight = this.cellWeights.get(p);
-				writer.write(p.getX()+"\t"+p.getY()+"\t"+thisWeight+"\n");
+			} else {
+				for(int i=0;i<noOfSidesOfPolygon;i++){
+					writer.write("polyX"+i+"\t"+"polyY"+i+"\t");
+				}
+				writer.write("centroidX \t centroidY \t weight \n ");
+
+				for(Point p : this.cellWeights.keySet()){
+					Geometry g = this.grid.getCellGeometry(p);
+					Coordinate[] ca = g.getCoordinates();
+					for(int i = 0; i < ca.length-1; i++){ // a square polygon have 5 coordinate, first and last is same. 
+						writer.write(ca[i].x+"\t"+ca[i].y+"\t");
+					}
+					double thisWeight = this.cellWeights.get(p);
+					writer.write(p.getX()+"\t"+p.getY()+"\t"+thisWeight+"\n");
+				}
 			}
 			writer.close();
 			SpatialDataInputs.LOG.info("Data is written to file "+fileName);
