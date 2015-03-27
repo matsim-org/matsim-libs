@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,14 +40,9 @@ import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 public class WelfareAnalysisMain {
+	private static final Logger log = Logger.getLogger(WelfareAnalysisMain.class);
 	
-	private String runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/bln2/output/noise_int_1a_rndSeed2/";
-	
-	private String configFile = runDirectory + "output_config.xml.gz";
-	private String populationFile = runDirectory + "output_plans.xml.gz";
-	private String networkFile = runDirectory + "output_network.xml.gz";
-
-	private int iteration; // final iteration given in the config file
+	private static String runDirectory;
 	
 	private Map<Integer, Double> it2userBenefits_logsum = new TreeMap<Integer, Double>();
 	private Map<Integer, Integer> it2invalidPersons_logsum = new TreeMap<Integer, Integer>();
@@ -66,17 +62,53 @@ public class WelfareAnalysisMain {
 	private Map<Integer, Double> it2walkLegs = new TreeMap<Integer, Double>();
 	
 	public static void main(String[] args) {
+		
+		if (args.length > 0) {
+			runDirectory = args[0];		
+			log.info("run directory: " + runDirectory);
+			
+		} else {
+			runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/bln2/output/noise_int_2a_2/";
+		}
+		
+		
 		WelfareAnalysisMain analysis = new WelfareAnalysisMain();
-		analysis.run();
+		analysis.run();		
 	}
 
 	private void run() {
+		
+		// config and scenario
+		
+		String configFile = runDirectory + "output_config.xml.gz";
+		String populationFile = runDirectory + "output_plans.xml.gz";
+		String networkFile = runDirectory + "output_network.xml.gz";
 	
 		Config config = ConfigUtils.loadConfig(configFile);		
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		int iteration = config.controler().getLastIteration();
+				
+		// plans analysis
+		
+		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(scenario.getConfig(), WelfareMeasure.SELECTED, true);
+        this.it2userBenefits_selected.put(iteration, userBenefitsCalculator_selected.calculateUtility_money(scenario.getPopulation()));
+		this.it2invalidPersons_selected.put(iteration, userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
+		this.it2invalidPlans_selected.put(iteration, userBenefitsCalculator_selected.getInvalidPlans());
+		System.out.println("user benefits (selected):" + userBenefitsCalculator_selected.calculateUtility_money(scenario.getPopulation()));
+		System.out.println("invalid persons (selected):" + userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
+		
+		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(scenario.getConfig(), WelfareMeasure.LOGSUM, true);
+		this.it2userBenefits_logsum.put(iteration, userBenefitsCalculator_logsum.calculateUtility_money(scenario.getPopulation()));
+		this.it2invalidPersons_logsum.put(iteration, userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
+		this.it2invalidPlans_logsum.put(iteration, userBenefitsCalculator_logsum.getInvalidPlans());
+
+		String eventsFile = runDirectory + "ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
+		
+		// events analysis
+		
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		MoneyEventHandler moneyHandler = new MoneyEventHandler();
@@ -85,34 +117,21 @@ public class WelfareAnalysisMain {
 		TripAnalysisHandler tripAnalysisHandler = new TripAnalysisHandler();
 		events.addHandler(tripAnalysisHandler);
 		
-		this.iteration = config.controler().getLastIteration();
-		String eventsFile = this.runDirectory + "ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
-				
-		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(scenario.getConfig(), WelfareMeasure.SELECTED, true);
-        this.it2userBenefits_selected.put(this.iteration, userBenefitsCalculator_selected.calculateUtility_money(scenario.getPopulation()));
-		this.it2invalidPersons_selected.put(this.iteration, userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
-		this.it2invalidPlans_selected.put(this.iteration, userBenefitsCalculator_selected.getInvalidPlans());
-		System.out.println("user benefits (selected):" + userBenefitsCalculator_selected.calculateUtility_money(scenario.getPopulation()));
-		System.out.println("invalid persons (selected):" + userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
-		
-		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(scenario.getConfig(), WelfareMeasure.LOGSUM, true);
-		this.it2userBenefits_logsum.put(this.iteration, userBenefitsCalculator_logsum.calculateUtility_money(scenario.getPopulation()));
-		this.it2invalidPersons_logsum.put(this.iteration, userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
-		this.it2invalidPlans_logsum.put(this.iteration, userBenefitsCalculator_logsum.getInvalidPlans());
-
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
+		// results
+		
 		double tollSum = moneyHandler.getSumOfMonetaryAmounts();
-		this.it2tollSum.put(this.iteration, (-1) * tollSum);
-		this.it2stuckEvents.put(this.iteration, tripAnalysisHandler.getAgentStuckEvents());
-		this.it2totalTravelTimeAllModes.put(this.iteration, tripAnalysisHandler.getTotalTravelTimeAllModes());
-		this.it2totalTravelTimeCarMode.put(this.iteration, tripAnalysisHandler.getTotalTravelTimeCarMode());
-		this.it2carLegs.put(this.iteration, (double) tripAnalysisHandler.getCarLegs());
-		this.it2ptLegs.put(this.iteration, (double) tripAnalysisHandler.getPtLegs());
-		this.it2walkLegs.put(this.iteration, (double) tripAnalysisHandler.getWalkLegs());
+		this.it2tollSum.put(iteration, (-1) * tollSum);
+		this.it2stuckEvents.put(iteration, tripAnalysisHandler.getAgentStuckEvents());
+		this.it2totalTravelTimeAllModes.put(iteration, tripAnalysisHandler.getTotalTravelTimeAllModes());
+		this.it2totalTravelTimeCarMode.put(iteration, tripAnalysisHandler.getTotalTravelTimeCarMode());
+		this.it2carLegs.put(iteration, (double) tripAnalysisHandler.getCarLegs());
+		this.it2ptLegs.put(iteration, (double) tripAnalysisHandler.getPtLegs());
+		this.it2walkLegs.put(iteration, (double) tripAnalysisHandler.getWalkLegs());
 						
-		String fileName = this.runDirectory + "analysis_welfare.csv";
+		String fileName = runDirectory + "analysis_welfare.csv";
 		File file = new File(fileName);
 			
 		try {
