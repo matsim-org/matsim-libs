@@ -12,27 +12,27 @@ import playground.dgrether.koehlerstrehlersignal.conversion.TtMatsim2KS2015;
  * 
  * @author tthunig 
  */
-public class TtBraess2KS2015 {
+public class ConvertBraess2KS2015 {
 
 	public static void main(String[] args) throws Exception {
 		// input files
 		String signalSystemsFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/braess_scenario/signalSystems_v2.0.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalSystems_v2.0.xml";
 		String signalGroupsFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/braess_scenario/signalGroups_v2.0.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalGroups_v2.0.xml";
 		String signalControlFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/braess_scenario/signalControl_v2.0.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalControl_v2.0.xml";
 		String networkFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/braess_scenario/network.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/network.xml";
 		String lanesFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/braess_scenario/laneDefinitions_v2.0.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/laneDefinitions_v2.0.xml";
 		String populationFilename = DgPaths.REPOS
 				+ "runs-svn/cottbus/braess/2015-02-23_base_case/output_plans.xml";
 
 		// output files
 		String outputDirectory = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/braess_scenario/";
-		String dateFormat = "2015-02-24";
+				+ "shared-svn/projects/cottbus/data/optimization/braess2ks/";
+		String dateFormat = "2015-03-27";
 
 		/* parameters for the time interval */
 		double startTime = 7.5 * 3600.0;

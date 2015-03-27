@@ -534,12 +534,13 @@ public class M2KS2010NetworkConverter {
 		// }
 		// create program if not existing...
 		DgProgram program = null;
-		if (!crossing.getPrograms().containsKey(system.getId())) {
-			program = new DgProgram(Id.create(system.getId(), DgProgram.class));
+		Id<DgProgram> programId = idConverter.convertSignalSystemId2ProgramId(system.getId());
+		if (!crossing.getPrograms().containsKey(programId)) {
+			program = new DgProgram(programId);
 			program.setCycle(this.cycle);
 			crossing.addProgram(program);
 		} else {
-			program = crossing.getPrograms().get(system.getId());
+			program = crossing.getPrograms().get(programId);
 		}
 
 		List<SignalData> signals4Link = this.getSignals4LinkId(system,

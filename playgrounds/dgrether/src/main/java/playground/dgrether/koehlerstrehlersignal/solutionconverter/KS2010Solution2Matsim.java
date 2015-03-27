@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.model.SignalSystem;
 
-import playground.dgrether.koehlerstrehlersignal.conversion.M2KS2010NetworkConverter;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
@@ -39,17 +39,20 @@ import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
 public class KS2010Solution2Matsim {
 	
 	private static final Logger log = Logger.getLogger(KS2010Solution2Matsim.class);
 	private DgIdPool idPool;
+	private DgIdConverter idConverter;
 	private int scale = 1;
 	
 	
 	public KS2010Solution2Matsim(DgIdPool idPool){
 		this.idPool = idPool;
+		this.idConverter = new DgIdConverter(idPool);
 	}
 	
 	
@@ -72,9 +75,12 @@ public class KS2010Solution2Matsim {
 	 * @param signalControl
 	 * @param solutionCrossings
 	 */
-	public void convertSolution(SignalControlData signalControl, List<KS2010CrossingSolution> solutionCrossings){
+	public void convertSolution(SignalControlData signalControl, 
+			List<KS2010CrossingSolution> solutionCrossings){
+		
 		// reset all offsets to zero (solutions are only specified for nonzero offsets)
-		for (SignalSystemControllerData controllerData : signalControl.getSignalSystemControllerDataBySystemId().values()){
+		for (SignalSystemControllerData controllerData : signalControl.
+				getSignalSystemControllerDataBySystemId().values()){
 			SignalPlanData plan = controllerData.getSignalPlanData().values().iterator().next();
 			plan.setOffset(0);
 		}
@@ -83,10 +89,13 @@ public class KS2010Solution2Matsim {
 		for (KS2010CrossingSolution solution : solutionCrossings) {
 //			if (! solution.getProgramIdOffsetMap().containsKey(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID)) {
 				Id<DgProgram> programId = solution.getProgramIdOffsetMap().keySet().iterator().next();
-				if (! signalControl.getSignalSystemControllerDataBySystemId().containsKey(programId)) {
-					throw new IllegalStateException("something's wrong with program id " + programId);
+				Id<SignalSystem> signalSystemId = this.idConverter.convertProgramId2SignalSystemId(programId);
+				if (! signalControl.getSignalSystemControllerDataBySystemId().containsKey(signalSystemId)) {
+					throw new IllegalStateException("something's wrong with program id " + programId 
+							+ " = signal system id " + signalSystemId);
 				}
-				SignalSystemControllerData controllerData = signalControl.getSignalSystemControllerDataBySystemId().get(programId);
+				SignalSystemControllerData controllerData = signalControl.
+						getSignalSystemControllerDataBySystemId().get(signalSystemId);
 				if (! (controllerData.getSignalPlanData().size() == 1)) {
 					throw new IllegalStateException("something's wrong");
 				}

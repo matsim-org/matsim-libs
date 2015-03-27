@@ -26,11 +26,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.lanes.data.v20.Lane;
+import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
+import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 import playground.dgrether.koehlerstrehlersignal.data.TtPath;
 
@@ -191,7 +193,8 @@ public class DgIdConverter {
 		Integer ksIntStreetId = Integer.parseInt(streetId.toString());
 		String matsimStringStreetId = this.idPool.getStringId(ksIntStreetId);
 		if (matsimStringStreetId.endsWith("88")){
-			Id<Link>  id = Id.create(matsimStringStreetId.substring(0, matsimStringStreetId.length() - 2), Link.class);
+			Id<Link>  id = Id.create(matsimStringStreetId.substring(0, 
+					matsimStringStreetId.length() - 2), Link.class);
 			return id;
 		}
 		throw new IllegalStateException("Can not convert " + matsimStringStreetId + " to link id");
@@ -209,7 +212,16 @@ public class DgIdConverter {
 		return idPool.createId(idString, DgCommodity.class);
 	}
 
-	public Id<TtPath> convertPathInfo2PathId(List<Id<DgStreet>> ksPath, Id<DgCrossingNode> ksSourceNodeId, Id<DgCrossingNode> ksDrainNodeId) {
+	/**
+	 * Creates an id for a path in the ks model
+	 * 
+	 * @param ksPath the path, i.e. a list of street ids in the ks model 
+	 * @param ksSourceNodeId the source node id in the ks model
+	 * @param ksDrainNodeId the drain node id in the ks model
+	 * @return the path id in the ks model
+	 */
+	public Id<TtPath> convertPathInfo2PathId(List<Id<DgStreet>> ksPath, 
+			Id<DgCrossingNode> ksSourceNodeId, Id<DgCrossingNode> ksDrainNodeId) {
 		// add source node id
 		String idString = ksSourceNodeId.toString() + "22";
 		// add street ids
@@ -221,6 +233,37 @@ public class DgIdConverter {
 		// add drain node id
 		idString += "22" + ksDrainNodeId.toString();
 		return idPool.createId(idString, TtPath.class);
+	}
+
+	/**
+	 * Creates a program id for the ks model corresponding to the signal system id
+	 * in the matsim network
+	 * 
+	 * @param signalSystemId the signal system id in the matsim network
+	 * @return the program id in the ks model
+	 */
+	public Id<DgProgram> convertSignalSystemId2ProgramId(Id<SignalSystem> signalSystemId) {
+		String idString = signalSystemId.toString() + "00";
+		return idPool.createId(idString, DgProgram.class);
+	}
+
+	/**
+	 * Converts back. See convertSignalSystemId2ProgramId(...)
+	 * 
+	 * @param programId the program id in the ks model
+	 * @return the corresponding signal system id in the matsim network
+	 */
+	public Id<SignalSystem> convertProgramId2SignalSystemId(
+			Id<DgProgram> programId) {
+		Integer ksIntProgramId = Integer.parseInt(programId.toString());
+		String matsimStringProgramId = this.idPool.getStringId(ksIntProgramId);
+		if (matsimStringProgramId.endsWith("00")){
+			Id<SignalSystem> id = Id.create(matsimStringProgramId.substring(0, 
+					matsimStringProgramId.length() - 2), SignalSystem.class);
+			return id;
+		}
+		throw new IllegalStateException("Can not convert " + matsimStringProgramId 
+				+ " to signal system id");
 	}
 	
 }
