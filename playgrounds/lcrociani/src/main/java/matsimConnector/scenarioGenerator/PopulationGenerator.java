@@ -23,7 +23,8 @@ public class PopulationGenerator {
 		for (Node node : network.getNodes().values()){
 			if (isOriginNode(node)){
 				initLinks.add(node.getOutLinks().values().iterator().next());
-			}else{
+			}
+			if(isDestinationNode(node)){
 				destinationLinks.add(node.getOutLinks().values().iterator().next());
 			}
 		}
@@ -32,7 +33,7 @@ public class PopulationGenerator {
 		population.getPersons().clear();
 		PopulationFactory factory = population.getFactory();
 		double t = 0;
-		double flowProportion = .5;///initLinks.size();
+		double flowProportion = initLinks.size();
 		int generated = 0;
 		for (Link link : initLinks){			
 			int linkLimit = (int)(populationSize*flowProportion);
@@ -76,8 +77,12 @@ public class PopulationGenerator {
 	}
 
 	private static boolean isOriginNode(Node node) {
-		return node.getId().toString().endsWith("w")||node.getId().toString().endsWith("s");
+		return node.getId().toString().endsWith("s")||node.getId().toString().endsWith("w");
 		//return node.getId().toString().endsWith("n")||node.getId().toString().endsWith("s")||node.getId().toString().endsWith("w")||node.getId().toString().endsWith("e");
+	}
+	
+	private static boolean isDestinationNode(Node node) {
+		return node.getId().toString().endsWith("n")||node.getId().toString().endsWith("s")||node.getId().toString().endsWith("w")||node.getId().toString().endsWith("e");
 	}
 
 	protected static void createCorridorPopulation(Scenario sc, int populationSize){
