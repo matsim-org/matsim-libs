@@ -34,6 +34,16 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.FIFOVehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassingVehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
 import org.matsim.vehicles.VehicleType;
 
 import java.util.HashMap;

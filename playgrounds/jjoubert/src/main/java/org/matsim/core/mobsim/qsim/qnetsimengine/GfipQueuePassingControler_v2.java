@@ -66,6 +66,8 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.GfipQueuePassingQSimFactory.QueueType;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -130,12 +132,13 @@ public class GfipQueuePassingControler_v2 extends Controler{
 		Config config  = ConfigUtils.createConfig();
 
 		/* Set all the defaults we want. */
-		config.controler().setLastIteration(0);
-		config.controler().setWriteEventsInterval(1);
+		config.controler().setLastIteration(100);
+		config.controler().setWriteEventsInterval(10);
 		config.controler().setOutputDirectory(outputDirectory + (outputDirectory.endsWith("/") ? "" : "/") + "output");
 
 		switch (queueType) {
 		case FIFO:
+		case GFIP_FIFO:
 			config.qsim().setLinkDynamics("FIFO");
 			break;
 		case BASIC_PASSING:
