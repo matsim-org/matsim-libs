@@ -89,13 +89,8 @@ import org.matsim.vehicles.VehiclesFactory;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
-public class GfipQueuePassingControler_v2 extends Controler{
-
-	public GfipQueuePassingControler_v2(Scenario scenario, QueueType queueType) {
-		super(scenario);
-		this.setMobsimFactory(new GfipQueuePassingQSimFactory(queueType));
-	}
-
+public class GfipQueuePassingControler_v2 {
+	
 	public static void main(String[] args){
 		Header.printHeader(GfipQueuePassingControler_v1.class.toString(), args);
 
@@ -111,16 +106,22 @@ public class GfipQueuePassingControler_v2 extends Controler{
 
 		Config config = getDefaultConfig(outputDirectory, queueType);
 		config.parallelEventHandling().setNumberOfThreads(1);
-		Scenario sc = ScenarioUtils.loadScenario(config);
-		GfipQueuePassingControler_v2 controler = new GfipQueuePassingControler_v2(sc, queueType);
+		config.global().setNumberOfThreads(1);
 		
-		/* Set number of threads to ONE. */
-		controler.config.global().setNumberOfThreads(1);
+		// ---
+		
+		Scenario sc = ScenarioUtils.loadScenario(config);
+		
+		// ---
 
-		LinkCounter linkCounter = controler.new LinkCounter(sc, queueType);
+		Controler controler = new Controler(sc) ;
+		
+		controler.setMobsimFactory(new GfipQueuePassingQSimFactory(queueType));
+		
+		LinkCounter linkCounter = new LinkCounter(sc, queueType);
 		controler.getEvents().addHandler(linkCounter);
 		controler.addControlerListener(linkCounter);
-		controler.addControlerListener(controler.new AssignVehiclesToAllRoutes());
+		controler.addControlerListener(new AssignVehiclesToAllRoutes());
 		controler.getMobsimListeners().add(linkCounter);
 		controler.run();
 
@@ -339,7 +340,7 @@ public class GfipQueuePassingControler_v2 extends Controler{
 	}
 	
 
-	private class LinkCounter implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+	private static class LinkCounter implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 	Wait2LinkEventHandler, PersonArrivalEventHandler,
 	IterationEndsListener, MobsimInitializedListener, MobsimBeforeCleanupListener{
 		private final Logger log = Logger.getLogger(LinkCounter.class);
@@ -499,7 +500,7 @@ public class GfipQueuePassingControler_v2 extends Controler{
 
 			/* Write the load for each link. */
 			for(Id<Link> linkId : this.countMap.keySet()){
-				String filename = getControlerIO().getIterationFilename(event.getIteration(), "link_" + linkId.toString() + ".csv");
+				String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "link_" + linkId.toString() + ".csv");
 				log.info("Writing link counts to " + filename);
 
 				BufferedWriter bw = IOUtils.getBufferedWriter(filename);
@@ -539,7 +540,7 @@ public class GfipQueuePassingControler_v2 extends Controler{
 			}
 
 			/* Write the space-time observations. */
-			String spaceTimeFilename = getControlerIO().getIterationFilename(event.getIteration(), "spaceTime.csv");
+			String spaceTimeFilename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "spaceTime.csv");
 			log.info("Writing space-time observations to " + spaceTimeFilename);
 
 			BufferedWriter bw = IOUtils.getBufferedWriter(spaceTimeFilename);
@@ -564,7 +565,7 @@ public class GfipQueuePassingControler_v2 extends Controler{
 			}
 
 			/* Write the rho observations. */
-			String rhoFilename = getControlerIO().getIterationFilename(event.getIteration(), "rho.csv");
+			String rhoFilename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "rho.csv");
 			log.info("Writing space-time observations to " + rhoFilename);
 
 			BufferedWriter bwRho = IOUtils.getBufferedWriter(rhoFilename);
@@ -589,7 +590,7 @@ public class GfipQueuePassingControler_v2 extends Controler{
 			}
 			
 			/* Write the estimated versus actual times to file. */
-			String timeFilename = getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancy.csv");
+			String timeFilename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "timeDiscrepancy.csv");
 			log.info("Writing space-time observations to " + timeFilename);
 			
 			BufferedWriter bwTime = IOUtils.getBufferedWriter(timeFilename);
@@ -637,14 +638,14 @@ public class GfipQueuePassingControler_v2 extends Controler{
 		}
 	}
 
-	private final class AssignVehiclesToAllRoutes implements IterationStartsListener{
+	private static final class AssignVehiclesToAllRoutes implements IterationStartsListener{
 		private final Logger log = Logger.getLogger(AssignVehiclesToAllRoutes.class);
 
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
 			log.info(" ====> Assigning vehicles to routes.");
-			if(event.getIteration() == getConfig().controler().getFirstIteration()){
-				for(Person p : getScenario().getPopulation().getPersons().values()){
+			if(event.getIteration() ==  event.getControler().getConfig().controler().getFirstIteration()){
+				for(Person p : event.getControler().getScenario().getPopulation().getPersons().values()){
 					for(Plan plan : p. getPlans()){
 						new SetVehicleInAllNetworkRoutes().handlePlan(plan);
 					}
@@ -653,7 +654,7 @@ public class GfipQueuePassingControler_v2 extends Controler{
 		}	
 	}
 
-	private final class SetVehicleInAllNetworkRoutes implements PlanStrategyModule {
+	private static final class SetVehicleInAllNetworkRoutes implements PlanStrategyModule {
 		private final String VEH_ID = "TransportModeToVehicleIdMap" ;
 
 		private SetVehicleInAllNetworkRoutes() {
@@ -678,6 +679,7 @@ public class GfipQueuePassingControler_v2 extends Controler{
 	public enum GfipMode{
 		GFIP_A1, GFIP_A2, GFIP_B, GFIP_C;
 
+		@Override
 		public String toString(){
 			return this.name().toLowerCase();
 		}

@@ -41,6 +41,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -178,7 +179,10 @@ public class OnTheFlyServer extends PlayPauseSimulation implements OTFLiveServer
 
 	@Override
 	public int getLocalTime() {
-		return getLocalTime();
+		return (int) ((QSim)this.visMobsim).getSimTimer().getTimeOfDay() ;
+		// I changed something here with the extraction of the play/pause functionality, and since the result did not work, I put the above line
+		// in as a fix.  It could not work for playback ... but then
+		// I think that this class is only used for live simulation, and cannnot be used for playback. kai, mar'15
 	}
 
 	@Override
