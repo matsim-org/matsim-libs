@@ -22,13 +22,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
+import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03Plus;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -169,14 +168,32 @@ public class PTRoutingClaude {
 		vehiclesTrain.add("TGV");
 		vehiclesTrain.add("D");
 		vehiclesTrain.add("VAE");
-		
+		vehiclesTrain.add("RJ");
+		vehiclesTrain.add("CNL");
+		vehiclesTrain.add("EN");
+		vehiclesTrain.add("SN");
+		vehiclesTrain.add("EXT");
+		vehiclesTrain.add("NZ");
+		vehiclesTrain.add("GEX");
+		vehiclesTrain.add("BEX");
+		vehiclesTrain.add("ZUG");
+		vehiclesTrain.add("AG");
+
 		Set<String> vehiclesBus = new TreeSet<String>();
 		vehiclesBus.add("NFB");
 		vehiclesBus.add("BUS");
 		vehiclesBus.add("KB");
-		vehiclesBus.add("NFO");
+		vehiclesBus.add("NFO");	
+		vehiclesBus.add("EXB");
+		vehiclesBus.add("TX");
+		vehiclesBus.add("NB");
+
 		Set<String> vehiclesFun = new TreeSet<String>();
 		vehiclesFun.add("FUN");
+		vehiclesFun.add("LB");
+		vehiclesFun.add("BAT");
+		vehiclesFun.add("BAV");
+		vehiclesFun.add("FAV");
 
 		Set<String> vehiclesTram = new TreeSet<String>();
 		vehiclesTram.add("T");
@@ -218,12 +235,9 @@ public class PTRoutingClaude {
                 DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(), 
 				        routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ) ));
 		
-		int i =1;
 		System.out.println("starting to parse the input file");
 		
-		WGS84toCH1903LV03 transformation = new WGS84toCH1903LV03();
-		
-		TimeConversion timeConv = new TimeConversion();
+		WGS84toCH1903LV03Plus transformation = new WGS84toCH1903LV03Plus();
 		
 		ReadSBBData sbbData = new ReadSBBData(args[1], args[2]);
 		sbbData.read();
@@ -331,8 +345,6 @@ public class PTRoutingClaude {
 			
 			double accessTime = 0.0;
 			
-			double departureTIme = 0.0;
-			
 			double firstWaitingTime = 0.0;
 
 			for(PlanElement pe1: route) {
@@ -384,7 +396,12 @@ public class PTRoutingClaude {
 					
 					String transitNumber = "";
 					if (departure != null) {
-						 transitNumber = departure.getId().toString().split("_")[1];
+						String[] bla = departure.getId().toString().split("_");
+						if (bla.length == 5)
+						  transitNumber = departure.getId().toString().split("_")[2];
+						else
+						  transitNumber = departure.getId().toString().split("_")[1];
+
 						 
 					}
 					else {
@@ -409,7 +426,6 @@ public class PTRoutingClaude {
 						}
 						else {
 							for (TrainDataPerSegment segment : trainData) {
-								double x = Double.parseDouble(segment.getDidokTo());
 								if ((int)Double.parseDouble(segment.getDidokFrom()) == (int)(Double.parseDouble(tr1.getAccessStopId().toString().substring(0, 7)))) {
 									countDidokFrom = true;
 									//System.out.println(countDidokFrom);
@@ -464,7 +480,7 @@ public class PTRoutingClaude {
 							outLinkOccupancy.write("BUS ");
 							outLinkOccupancy.write(d.getVehicleId().toString() + " ");
 							outLinkOccupancy.write(temp + " " +Double.toString(temp + ((Leg)pe1).getTravelTime() - transfertTimePart) + " ");
-							outLinkOccupancy.write(Double.toString(((Leg) pe1).getRoute().getDistance()));
+							outLinkOccupancy.write(Double.toString(((Leg) pe1).getRoute().getDistance()) + " ");
 
 							outLinkOccupancy.write("-1.0 -1.0");
 							outLinkOccupancy.newLine();

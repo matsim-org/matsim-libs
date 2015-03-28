@@ -8,7 +8,6 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWithFreeFloatingCarSharing;
@@ -32,29 +31,10 @@ import playground.balac.freefloating.routerparkingmodule.FreeFloatingRoutingModu
 import playground.balac.freefloating.scoring.FreeFloatingScoringFunctionFactory;
 
 
-public class FreeFloatingWithParkingControler extends Controler{
+public class FreeFloatingWithParkingControler {
 	
 	
-	public FreeFloatingWithParkingControler(Scenario scenario) {
-		super(scenario);
-	}
-
-
-	public void init(Config config, Network network, Scenario sc) {
-		FreeFloatingScoringFunctionFactory ffScoringFunctionFactory = new FreeFloatingScoringFunctionFactory(
-				      config, 
-				      network, sc);
-	    this.setScoringFunctionFactory(ffScoringFunctionFactory); 	
-				
-		}
-	
-	@Override
-	  protected void loadControlerListeners() {  
-		  
-	    super.loadControlerListeners();   
-	    this.addControlerListener(new FFListener( this.getConfig().getModule("FreeFloating").getValue("statsFileName")));
-	  }
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws IOException {
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
     	FreeFloatingConfigGroup configGroup = new FreeFloatingConfigGroup();
@@ -62,9 +42,10 @@ public class FreeFloatingWithParkingControler extends Controler{
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		
-		final FreeFloatingWithParkingControler controler = new FreeFloatingWithParkingControler( sc );
-		try {		
+		final Controler controler = new Controler( sc );
+					
 		DummyParkingModuleWithFreeFloatingCarSharing parkingModule;
+		
 		final FreeFloatingConfigGroup configGroupff = (FreeFloatingConfigGroup)
 				sc.getConfig().getModule( FreeFloatingConfigGroup.GROUP_NAME );
 		
@@ -72,7 +53,7 @@ public class FreeFloatingWithParkingControler extends Controler{
 		BufferedReader reader;
 		String s;
 		
-		
+		//read in all the free-floating cars for the parking module
 		if (configGroupff.useFeeFreeFloating()) {
 		 reader = IOUtils.getBufferedReader(configGroupff.getvehiclelocations());
 		    s = reader.readLine();
@@ -144,13 +125,12 @@ public class FreeFloatingWithParkingControler extends Controler{
 
 					
 				});
-      controler.init(config, sc.getNetwork(), sc);		
-		
-		controler.run();
-} catch (IOException e) {
-			
-			e.printStackTrace();
-		}
+		FreeFloatingScoringFunctionFactory ffScoringFunctionFactory = new FreeFloatingScoringFunctionFactory(
+			      config, 
+			      sc.getNetwork(), sc);
+  controler.setScoringFunctionFactory(ffScoringFunctionFactory); 
+  controler.addControlerListener(new FFListener(controler));
+  controler.run();
 	}
 
 }

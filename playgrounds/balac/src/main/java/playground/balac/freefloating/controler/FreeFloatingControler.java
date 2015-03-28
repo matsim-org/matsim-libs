@@ -44,7 +44,7 @@ public class FreeFloatingControler extends Controler{
 	  protected void loadControlerListeners() {  
 		  
 	    super.loadControlerListeners();   
-	    this.addControlerListener(new FFListener( this.getConfig().getModule("FreeFloating").getValue("statsFileName")));
+	    this.addControlerListener(new FFListener( this));
 	  }
 	public static void main(final String[] args) {
 		

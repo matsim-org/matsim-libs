@@ -13,9 +13,11 @@ import java.util.Set;
 
 import org.matsim.core.utils.io.IOUtils;
 
-public class NonusedVehiclesDetection {
+public class GeneratingFleetFromDemand {
 
 	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		
 		Set<String> usedCars = new HashSet<String>();
 		Set<String> unusedCars = new HashSet<String>();
 		Map<String, ArrayList<Integer>> vehicles = new HashMap<String, ArrayList<Integer>>();
@@ -48,7 +50,6 @@ public class NonusedVehiclesDetection {
 	    s = reader.readLine();
 	    s = reader.readLine();
 	    int i = 1;
-	    int count = 0;
 	    while(s != null) {
 	    	
 	    	String[] arr = s.split("\t", -1);
@@ -73,11 +74,10 @@ public class NonusedVehiclesDetection {
 	    			used++;
 	    		i++;
 	    	}
-    		numberOfVehicles.put(arr[0], used);
+    		//numberOfVehicles.put(arr[0], used);
 
 	    	ids.put(arr[0], vehIDs);
-	    	if (unused != 0)
-	    		count+= unused;
+	    	
 	    	dataPoint.add(used);
 	    	dataPoint.add(unused);
 	    	dataPoint.add(0);
@@ -86,8 +86,6 @@ public class NonusedVehiclesDetection {
 	    	s = reader.readLine();
 	    	
 	    }
-	    
-	    
 	    
 	    reader = IOUtils.getBufferedReader(args[0]);
 	    s = reader.readLine();
@@ -136,40 +134,66 @@ public class NonusedVehiclesDetection {
 		    		connection[l] = b;
 		    	}
 		    }
-	    while (count !=0)
 	    
-	    for (int k = 0; k < vehicles.keySet().size(); k++) {
-	    	
-	    	if (vehicles.get(connection[k]).get(1) == 0) {
-	    		
-	    		numberOfVehicles.put(connection[k], numberOfVehicles.get(connection[k]) + 1);
-	    		count--;
-	    	}
-	    	
-	    	
-	    	if (count == 0)
-	    		break;
-	    	
-	    }
 
-		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_changed_v6.txt")));
+		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand.txt")));
 
- reader = IOUtils.getBufferedReader(args[1]);
+		reader = IOUtils.getBufferedReader(args[1]);
 	    
 	    s = reader.readLine();
 	    s = reader.readLine();
 	    int co = 0;
-	    while(s != null) {
+	    
+	    
+	    for (int k = 0; k < ratios.length; k++) {
+	    	if (co + vehicles.get(connection[k]).get(1) < 911)
+	    	numberOfVehicles.put(connection[k], vehicles.get(connection[k]).get(1));
+	    	else {
+		    	numberOfVehicles.put(connection[k], 911 - co);
+		    	break;
+	    	}
+	    	co += vehicles.get(connection[k]).get(1);
+	    	
+	    }
+	    while(s != null ) {
 	    	
 	    	String[] arr = s.split("\t", -1);
 	    
-	    	if (numberOfVehicles.get(arr[0]) != 0) {
+	    	
+	    	
 	    	for (int h = 0; h < 6; h++  )
 	    		output.write(arr[h] + "\t");
 	    	
-	    	output.write((Integer.toString(numberOfVehicles.get(arr[0]))));
-	    	co += numberOfVehicles.get(arr[0]);
+	    	if (numberOfVehicles.containsKey(arr[0])) 
+	    		output.write(numberOfVehicles.get(arr[0]));
+	    	else
+	    		output.write(0);
 	    	output.newLine();
+	    	
+	    	
+	    	s = reader.readLine();
+	    	
+	    }
+	    
+	    output.flush();
+	    output.close();
+	    
+	    reader = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand.txt");
+	    output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_v2.txt")));
+	    
+	    while(s != null ) {
+	    	
+	    	String[] arr = s.split("\t", -1);
+	    
+	    	if (!arr[6].equals("0")){
+	    	
+		    	for (int h = 0; h < 6; h++  )
+		    		output.write(arr[h] + "\t");
+		    	
+		    	
+		    	output.write(arr[6]);
+		    	
+		    	output.newLine();
 	    	}
 	    	
 	    	s = reader.readLine();
@@ -180,10 +204,8 @@ public class NonusedVehiclesDetection {
 	    output.close();
 	    
 	    
+	    
 	    System.out.println(co);
-	    
-	    
-		
 
 	}
 

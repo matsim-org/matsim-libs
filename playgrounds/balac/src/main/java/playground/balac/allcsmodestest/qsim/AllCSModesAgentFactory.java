@@ -45,7 +45,7 @@ public class AllCSModesAgentFactory implements AgentFactory{
 		//if we want to simulate all agents then we have a normal AllCSModesPersonDriverAgentImpl agent 
 		//if we want to simulate only carsharing members we would have PersonDriverAgentOnlyMembersImpl agent here
 		
-		AllCSModesPersonDriverAgentImpl agent = new AllCSModesPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation, this.scenario, this.controler, this.ffvehiclesLocation, this.owvehiclesLocation, this.twvehiclesLocation, this.tripRouter); 
+		PersonDriverAgentOnlyMembersImpl agent = new PersonDriverAgentOnlyMembersImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation, this.scenario, this.controler, this.ffvehiclesLocation, this.owvehiclesLocation, this.twvehiclesLocation, this.tripRouter); 
 		return agent;
 	}
 }

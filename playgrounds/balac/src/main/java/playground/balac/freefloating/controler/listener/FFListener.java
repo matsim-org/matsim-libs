@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -17,11 +18,11 @@ import playground.balac.freefloating.controler.listener.FFParkingEventsHandler.R
 
 public class FFListener implements StartupListener, IterationEndsListener, IterationStartsListener{
 	FFParkingEventsHandler ffhandler;
-	String inputFileff;
+	Controler controler;	
 	
-	public FFListener( String inputFileff) {
+	public FFListener( Controler controler) {
 		
-		this.inputFileff = inputFileff;
+		this.controler = controler;
 		
 	}
 	
@@ -29,12 +30,9 @@ public class FFListener implements StartupListener, IterationEndsListener, Itera
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		// TODO Auto-generated method stub
 		
-		if (event.getIteration() % 2 == 0) {
-		
-	
 		ArrayList<RentalInfoFF> infoff = ffhandler.rentals();
 		
-		final BufferedWriter outLinkff = IOUtils.getBufferedWriter(inputFileff);
+		final BufferedWriter outLinkff = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "FF_CS"));
 		try {
 			outLinkff.write("personID   startTime   endTIme   startLink   endLink   distance   accessTime");
 			outLinkff.newLine();
@@ -52,36 +50,23 @@ public class FFListener implements StartupListener, IterationEndsListener, Itera
 			e.printStackTrace();
 		}
 		
-		
-		
-		
-		
+				
 		event.getControler().getEvents().removeHandler(ffhandler);
 
-		
-		}
-		
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		// TODO Auto-generated method stub
-
-
-        ffhandler = new FFParkingEventsHandler(event.getControler().getScenario().getNetwork());
-		
-
+        
+		ffhandler = new FFParkingEventsHandler(event.getControler().getScenario().getNetwork());
 		
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		// TODO Auto-generated method stub
-		if (event.getIteration() % 2 == 0) {
-			event.getControler().getEvents().addHandler(ffhandler);
 			
-		}
-		
+		event.getControler().getEvents().addHandler(ffhandler);
+			
 	}
 	
 		

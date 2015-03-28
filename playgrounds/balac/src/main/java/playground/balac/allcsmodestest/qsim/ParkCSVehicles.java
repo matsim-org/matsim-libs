@@ -42,6 +42,12 @@ public class ParkCSVehicles implements AgentSource {
 		for (String mode : mainModes) {
 			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
 		}
+		
+		modeVehicleTypes.put("twowaycarsharing", VehicleUtils.getDefaultVehicleType());
+		modeVehicleTypes.put("freefloating", VehicleUtils.getDefaultVehicleType());
+
+		modeVehicleTypes.put("onewaycarsharing", VehicleUtils.getDefaultVehicleType());
+
 	}
 	
 	@Override

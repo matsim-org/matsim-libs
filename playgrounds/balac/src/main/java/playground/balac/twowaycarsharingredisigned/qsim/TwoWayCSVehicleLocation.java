@@ -99,7 +99,7 @@ public class TwoWayCSVehicleLocation {
 			
 			ArrayList<String> vehIDs = new ArrayList<String>();
 			
-			vehIDs.add((id));
+			vehIDs.add(id);
 			
 			TwoWayCSStation fNew = new TwoWayCSStation(link, 1, vehIDs);		
 			
@@ -113,7 +113,7 @@ public class TwoWayCSVehicleLocation {
 			for (String s : vehIDs) {
 				newvehIDs.add(s);
 			}
-			newvehIDs.add(id);
+			newvehIDs.add(0, id);
 			TwoWayCSStation fNew = new TwoWayCSStation(link, f.getNumberOfVehicles() + 1, newvehIDs);		
 			vehicleLocationQuadTree.remove(link.getCoord().getX(), link.getCoord().getY(), f);
 			vehicleLocationQuadTree.put(link.getCoord().getX(), link.getCoord().getY(), fNew);
