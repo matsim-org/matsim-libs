@@ -548,7 +548,7 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 		
 		List<Id<Person>> personIds = new ArrayList<Id<Person>>();
 		if (this.scenario.getPopulation().getPersons().isEmpty()) {
-			log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis (total: " + personIds.size() +").");
+			log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis.");
 			personIds.addAll(this.persons);
 		} else {
 			log.info("Scenario contains a Population. Using the person IDs from the population for the person-based analysis.");
@@ -564,15 +564,22 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 			}
 			personId2amountSumAllAgents.put(id, amountSum);
 		}
+		log.warn("Number of person Ids: " + personIds.size());
 		return personId2amountSumAllAgents;
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
+				
+		Map<Integer, Double> tripNumber2travelTime;
+		if (this.personId2tripNumber2travelTime.containsKey(event.getPersonId())) {
+			tripNumber2travelTime = this.personId2tripNumber2travelTime.get(event.getPersonId());
+
+		} else {
+			tripNumber2travelTime = new HashMap<Integer, Double>();
+		}
 		
 		int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());
-		
-		Map<Integer, Double> tripNumber2travelTime = new HashMap<Integer, Double>();
 		tripNumber2travelTime.put(currentTripNumber, event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber));
 		this.personId2tripNumber2travelTime.put(event.getPersonId(), tripNumber2travelTime);
 	}

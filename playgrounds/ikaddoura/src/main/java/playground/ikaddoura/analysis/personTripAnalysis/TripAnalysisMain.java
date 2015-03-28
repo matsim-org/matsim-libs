@@ -41,7 +41,8 @@ public class TripAnalysisMain {
 			log.info("run directory: " + runDirectory);
 			
 		} else {
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
+//			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
+			runDirectory = "/Users/ihab/Desktop/test/output/";
 		}
 		
 		TripAnalysisMain analysis = new TripAnalysisMain();
@@ -51,7 +52,8 @@ public class TripAnalysisMain {
 	private void run() {
 		
 		String configFile = runDirectory + "output_config.xml.gz";
-		String populationFile = runDirectory + "output_plans.xml.gz";
+		String populationFile = null;
+//		String populationFile = runDirectory + "output_plans.xml.gz";
 		String networkFile = runDirectory + "output_network.xml.gz";
 		
 		Config config = ConfigUtils.loadConfig(configFile);		

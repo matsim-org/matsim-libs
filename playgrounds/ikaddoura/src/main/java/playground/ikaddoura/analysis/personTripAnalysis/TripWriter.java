@@ -156,7 +156,7 @@ public class TripWriter {
 	
 	public void writePersonId2totalAmount() {
 		
-		String fileName = this.outputFolder + "causingAgentId2totalAmount.csv";
+		String fileName = this.outputFolder + "personId2totalAmount.csv";
 		File file = new File(fileName);
 			
 		try {
