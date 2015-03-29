@@ -25,6 +25,8 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 
+import tutorial.programming.example16customscoring.RunCustomScoringExample;
+
 /**
  * A scoring function calculates the score for one plan of an agent.  The score
  * usually depends on how much time an agent is traveling and how much time an
@@ -32,6 +34,8 @@ import org.matsim.api.core.v01.population.Leg;
  * activities start and end as well as when legs start and end.<br>
  * Note that one ScoringFunction calculates the score for exactly one agent.
  * Thus every agents must have its own instance of a scoring function!
+ * <p/>
+ * See {@link RunCustomScoringExample} for an example.
  *
  * @author mrieser
  */
