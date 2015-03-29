@@ -46,10 +46,11 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.GfipQueuePassingControler_v2.GfipMode;
+import org.matsim.core.mobsim.qsim.qnetsimengine.GfipQueuePassingControler.GfipMode;
 import org.matsim.core.mobsim.qsim.qnetsimengine.GfipQueuePassingQSimFactory.QueueType;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * Class to implement the vehicle and density-dependent travel time estimation
@@ -60,11 +61,13 @@ import org.matsim.vehicles.VehicleType;
  */
 public class GfipLinkSpeedCalculator implements LinkSpeedCalculator {
 	final private Logger log = Logger.getLogger(GfipLinkSpeedCalculator.class);
+	final private Vehicles vehicles;
 	final private QSim qsim;
 	final private QueueType queueType;
 	private int infoCount = 0;
 	
-	public GfipLinkSpeedCalculator(final QSim qsim, final QueueType queueType) {
+	public GfipLinkSpeedCalculator(final Vehicles vehicles, final QSim qsim, final QueueType queueType) {
+		this.vehicles = vehicles;
 		this.qsim = qsim;
 		this.queueType = queueType;
 	}
@@ -98,7 +101,8 @@ public class GfipLinkSpeedCalculator implements LinkSpeedCalculator {
 		
 		double rho = (pcuEquivalents + vehicle.getSizeInEquivalents()) / ( (link.getLength()/1000)*link.getNumberOfLanes());
 		
-		GfipMode mode = GfipMode.valueOf(vehicle.getVehicle().getType().getId().toString().toUpperCase());
+//		GfipMode mode = GfipMode.valueOf(vehicle.getVehicle().getType().getId().toString().toUpperCase());
+		GfipMode mode = GfipMode.valueOf(vehicles.getVehicles().get(vehicle.getId()).getType().getId().toString().toUpperCase());
 		
 		switch (this.queueType) {
 		case BASIC_PASSING:

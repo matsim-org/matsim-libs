@@ -20,7 +20,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -34,20 +33,6 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultLinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.FIFOVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.PassingVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
-import org.matsim.vehicles.VehicleType;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class GfipQueuePassingQSimFactory implements MobsimFactory{
 	final private Logger log = Logger.getLogger(GfipQueuePassingQSimFactory.class);
@@ -130,17 +115,17 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 			log.info("------------------------------------------------------------------------------");
 			log.info("  Using basic passing link speed calculator. "); 
 			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(qsim, queueType));
+			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(sc.getVehicles(), qsim, queueType));
 		} else if(queueType == QueueType.GFIP_PASSING){
 			log.info("------------------------------------------------------------------------------");
 			log.info("  Using custom GFIP-link-density-based link speed calculator with passing. "); 
 			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(qsim, queueType));
+			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(sc.getVehicles(), qsim, queueType));
 		} else if(queueType == QueueType.GFIP_FIFO){
 			log.info("------------------------------------------------------------------------------");
 			log.info("  Using custom GFIP-link-density-based link speed calculator without passing."); 
 			log.info("------------------------------------------------------------------------------");
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(qsim, queueType));
+			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(sc.getVehicles(), qsim, queueType));
 		}
 		
 		qsim.addMobsimEngine(netsimEngine);
@@ -152,11 +137,11 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 		/* ..Update the PopulationAgentSource to ensure the correct vehicle is 
 		 * passed to the mobsim, not some default-per-mode vehicle. */		
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qsim);
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-		for(Id<VehicleType> id : sc.getVehicles().getVehicleTypes().keySet()){
-			modeVehicleTypes.put(id.toString(), sc.getVehicles().getVehicleTypes().get(id));
-		}
-		agentSource.setModeVehicleTypes(modeVehicleTypes);
+//		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+//		for(Id<VehicleType> id : sc.getVehicles().getVehicleTypes().keySet()){
+//			modeVehicleTypes.put(id.toString(), sc.getVehicles().getVehicleTypes().get(id));
+//		}
+//		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qsim.addAgentSource(agentSource);
 
 		return qsim;		
