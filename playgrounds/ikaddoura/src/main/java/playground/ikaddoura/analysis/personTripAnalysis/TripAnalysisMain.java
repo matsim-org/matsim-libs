@@ -41,8 +41,7 @@ public class TripAnalysisMain {
 			log.info("run directory: " + runDirectory);
 			
 		} else {
-//			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
-			runDirectory = "/Users/ihab/Desktop/test/output/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_2a/";
 		}
 		
 		TripAnalysisMain analysis = new TripAnalysisMain();
@@ -65,13 +64,15 @@ public class TripAnalysisMain {
 		
 		TripEventHandler tripHandler = new TripEventHandler(scenario);
 		events.addHandler(tripHandler);
-		
+				
 		int iteration = config.controler().getLastIteration();
 		String eventsFile = runDirectory + "ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
 		
+		log.info("Reading the event file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
-		
+		log.info("Reading the event file... Done.");
+				
 		TripWriter tripWriter = new TripWriter(tripHandler, runDirectory);
 		tripWriter.writeDetailedResults(TransportMode.car);
 		tripWriter.writeAvgTollPerDistance(TransportMode.car);

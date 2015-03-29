@@ -65,25 +65,36 @@ public class TripWriter {
 			bw.write("____________________________________________________________________________");
 			bw.newLine();
 
-			bw.write("amount per trip;departure time [sec];person Id;distance [m];travel time [sec]");
+			bw.write("departure time [sec];person Id;amount per trip [monetary units];distance [m];travel time [sec]");
 			bw.newLine();
-			
+
 			Map<Id<Person>,List<Double>> personId2listOfAmounts = this.handler.getPersonId2listOfAmounts(mode);
 			Map<Id<Person>,List<Double>> personId2listOfDepartureTimes = this.handler.getPersonId2listOfDepartureTimes(mode);
 			Map<Id<Person>,List<Double>> personId2listOfDistances = this.handler.getPersonId2listOfDistances(mode);
 			Map<Id<Person>,List<Double>> personId2listOfTravelTimes = this.handler.getPersonId2listOfTravelTimes(mode);
 			
-			for (Id<Person> id : personId2listOfAmounts.keySet()) {
+			for (Id<Person> id : personId2listOfDepartureTimes.keySet()) {
 				List<Double> amounts = personId2listOfAmounts.get(id);
 				List<Double> departureTimes = personId2listOfDepartureTimes.get(id);
 				List<Double> distances = personId2listOfDistances.get(id);
 				List<Double> travelTimes = personId2listOfTravelTimes.get(id);
-				for(int i = 0 ; i < amounts.size() ; i++){
+				
+				for (int i = 0 ; i < departureTimes.size() ; i++) {
 					double price = amounts.get(i);
 					double departureTime = departureTimes.get(i);
 					double distance = distances.get(i);
+					
+//					String travelTime = null;
+//					if (travelTimes.size() < i) {
+//						log.warn("A trip without a travel time probably due to stucking. person ID: " + id + " // departure time: " + departureTime + " // trip number: " + i);
+//						travelTime = "stuck";
+//					} else {
+//						travelTime = String.valueOf(travelTimes.get(i));
+//					}
+					
 					double travelTime = travelTimes.get(i);
-					bw.write(price + ";" + departureTime + ";" + id + ";" + distance + ";" + travelTime);
+					
+					bw.write(departureTime + ";" + id + ";" + price + ";" + distance + ";" + travelTime);
 					bw.newLine();
 				}
 			}

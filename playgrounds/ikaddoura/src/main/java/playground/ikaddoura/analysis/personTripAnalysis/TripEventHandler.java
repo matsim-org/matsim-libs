@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
@@ -47,6 +48,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
@@ -56,7 +58,8 @@ import org.matsim.api.core.v01.population.Person;
  *
  */
 public class TripEventHandler implements PersonMoneyEventHandler, TransitDriverStartsEventHandler , ActivityEndEventHandler ,
-PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler , PersonLeavesVehicleEventHandler {
+PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler, PersonEntersVehicleEventHandler ,
+PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	
 	private final static Logger log = Logger.getLogger(TripEventHandler.class);
 	
@@ -70,7 +73,6 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 	private Map<Id<Person>,Double> driverId2totalDistance = new HashMap<Id<Person>,Double>();
 	
 	private Map<Id<Person>, Double> personId2amountSum = new HashMap <Id<Person>, Double>();
-	private List<Id<Person>> persons = new ArrayList<Id<Person>>();
 	
 	// for pt-distance calculation
 	private Map<Id<Person>,Double> personId2distanceEnterValue = new HashMap<Id<Person>,Double>();
@@ -96,9 +98,8 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 		personId2tripNumber2legMode.clear();
 		driverId2totalDistance.clear();
 		personId2distanceEnterValue.clear();
-		ptDrivers.clear(); // not really necessary
+		ptDrivers.clear();
 		personId2amountSum.clear();
-		this.persons.clear();
 	}
 	
 	@Override
@@ -304,12 +305,23 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 			for(int tripNumber : personId2tripNumber2departureTime.get(personId).keySet()){
 				if (personId2tripNumber2legMode.get(personId).get(tripNumber).toString().equals(mode)) {
 					double departureTime = personId2tripNumber2departureTime.get(personId).get(tripNumber);
-					double belongingTravelTime = personId2tripNumber2travelTime.get(personId).get(tripNumber);
-					double[] departureTimeAndTravelTime = new double[2];
-					departureTimeAndTravelTime[0] = departureTime;
-					departureTimeAndTravelTime[1] = belongingTravelTime;				
-					counter2allDepartureTimesAndTravelTimes.put(i, departureTimeAndTravelTime);
-					i++;
+					
+					if (personId2tripNumber2travelTime.get(personId).get(tripNumber) == null) {
+						log.warn("A trip without a travel time probably due to stucking. person ID: " + personId + " // departure time: " + departureTime + " // trip number: " + tripNumber);
+						throw new RuntimeException("Oups...");
+					
+					} else if (personId2tripNumber2travelTime.get(personId).get(tripNumber) == Double.POSITIVE_INFINITY) {
+						log.warn("An infinite travel time probably due to stucking. Ignoring this trip.");
+						log.warn("A trip without a travel time probably due to stucking. person ID: " + personId + " // departure time: " + departureTime + " // trip number: " + tripNumber);
+						
+					} else {
+						double belongingTravelTime = personId2tripNumber2travelTime.get(personId).get(tripNumber);
+						double[] departureTimeAndTravelTime = new double[2];
+						departureTimeAndTravelTime[0] = departureTime;
+						departureTimeAndTravelTime[1] = belongingTravelTime;				
+						counter2allDepartureTimesAndTravelTimes.put(i, departureTimeAndTravelTime);
+						i++;
+					}
 				} else {
 					// other mode
 				}
@@ -340,7 +352,7 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 			
 			double avgTravelTime = 0.;
 			if (counter!=0.){
-				avgTravelTime = (-1) * travelTimeSum / counter;
+				avgTravelTime = travelTimeSum / counter;
 			}
 			tripDepTime2avgTravelTime.put(time, avgTravelTime);
 		}
@@ -411,23 +423,20 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		
-		if (this.persons.contains(event.getPersonId())){
-			// do nothing
-		} else {
-			this.persons.add(event.getPersonId());
-		}
-		
 		if(event.getActType().toString().equals("pt interaction")){
 			// pseudo activities are excluded
 			
 		} else {
+			// a "real" activity is ended
 			
-			if (personId2currentTripNumber.containsKey(event.getPersonId())){
-				// The trip which starts immediately is at least the second trip of the person
-				personId2currentTripNumber.put(event.getPersonId(), personId2currentTripNumber.get(event.getPersonId())+1);
+			if (personId2currentTripNumber.containsKey(event.getPersonId())) {
+				// the following trip is at least the person's second trip
+				personId2currentTripNumber.put(event.getPersonId(), personId2currentTripNumber.get(event.getPersonId()) + 1);
+				
 				Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getPersonId());
 				tripNumber2departureTime.put(personId2currentTripNumber.get(event.getPersonId()), event.getTime());
 				personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
+				
 				Map<Integer,Double> tripNumber2tripDistance = personId2tripNumber2tripDistance.get(event.getPersonId());
 				tripNumber2tripDistance.put(personId2currentTripNumber.get(event.getPersonId()), 0.0);
 				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
@@ -437,11 +446,13 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 				personId2tripNumber2amount.put(event.getPersonId(), tripNumber2amount);
 		
 			} else {
-				// The trip which starts immediately is the first trip of the person
+				// the following trip is the person's first trip
 				personId2currentTripNumber.put(event.getPersonId(), 1);
+				
 				Map<Integer,Double> tripNumber2departureTime = new HashMap<Integer, Double>();
 				tripNumber2departureTime.put(1, event.getTime());
 				personId2tripNumber2departureTime.put(event.getPersonId(), tripNumber2departureTime);
+				
 				Map<Integer,Double> tripNumber2tripDistance = new HashMap<Integer, Double>();
 				tripNumber2tripDistance.put(1, 0.0);
 				personId2tripNumber2tripDistance.put(event.getPersonId(), tripNumber2tripDistance);
@@ -455,38 +466,34 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 	
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if(ptDrivers.contains(event.getPersonId())){
-			// ptDrivers are not considered
-		}else{
-			// The leg mode has to be saved here.
-			// The actual trip number has just been adapted before
-			if(personId2tripNumber2legMode.containsKey(event.getPersonId())){
-				// This is at least the second trip.
+		if (ptDrivers.contains(event.getPersonId())){
+			// pt drivers are not considered
+			
+		} else {
+			
+			if (personId2tripNumber2legMode.containsKey(event.getPersonId())) {
+				// at least the person's second trip
 				int tripNumber = personId2currentTripNumber.get(event.getPersonId());
 				Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
-				if(tripNumber2legMode.containsKey(tripNumber)){
-					// legMode already listed, possible for pt trips
-					if(tripNumber2legMode.get(tripNumber).toString().equals("pt")){	
-					} else{
+				if (tripNumber2legMode.containsKey(tripNumber)){
+					if (!tripNumber2legMode.get(tripNumber).toString().equals("pt")){
 						throw new RuntimeException("A leg mode has already been listed.");
 					}
 				} else {
-					// the leg mode has to be saved.
 					String legMode = event.getLegMode();
 					if((event.getLegMode().toString().equals(TransportMode.transit_walk))){
 						legMode = "pt";
-					} else {
 					}
 					tripNumber2legMode.put(personId2currentTripNumber.get(event.getPersonId()), legMode);
 					personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);
 				}
+				
 			} else {
-				// This is the first trip of the person
+				// the person's first trip
 				Map<Integer,String> tripNumber2legMode = new HashMap<Integer,String>();
 				String legMode = event.getLegMode();
 				if((event.getLegMode().toString().equals(TransportMode.transit_walk))){
 					legMode = "pt";
-				} else {
 				}
 				tripNumber2legMode.put(1, legMode);
 				personId2tripNumber2legMode.put(event.getPersonId(), tripNumber2legMode);
@@ -506,13 +513,17 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(ptDrivers.contains(event.getPersonId())){
+		if (ptDrivers.contains(event.getPersonId())){
 			// ptDrivers are not considered
+		
 		} else {
+			
 			int tripNumber = personId2currentTripNumber.get(event.getPersonId());
 			Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
-			if((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)){
-			// car drivers not considered here
+			
+			if ((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)) {
+				// car drivers not considered here
+				
 			} else {
 				double distanceTravelled = (driverId2totalDistance.get(event.getVehicleId()) - personId2distanceEnterValue.get(event.getPersonId())); 
 				
@@ -526,13 +537,17 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if(ptDrivers.contains(event.getPersonId())){
+		
+		if (ptDrivers.contains(event.getPersonId())) {
 			// ptDrivers are not considered
+		
 		} else {
 			int tripNumber = personId2currentTripNumber.get(event.getPersonId());
 			Map<Integer,String> tripNumber2legMode = personId2tripNumber2legMode.get(event.getPersonId());
-			if((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)){
+			
+			if ((tripNumber2legMode.get(tripNumber)).equals(TransportMode.car)){
 			// car drivers not considered here
+			
 			} else {
 				personId2distanceEnterValue.put(event.getPersonId(), driverId2totalDistance.get(event.getVehicleId()));
 			}
@@ -548,8 +563,8 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 		
 		List<Id<Person>> personIds = new ArrayList<Id<Person>>();
 		if (this.scenario.getPopulation().getPersons().isEmpty()) {
-			log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis.");
-			personIds.addAll(this.persons);
+			log.warn("Scenario does not contain a Population. Using the person IDs from the events file for the person-based analysis. Attention, persons without any trip will not be considered.");
+			personIds.addAll(this.personId2tripNumber2legMode.keySet());
 		} else {
 			log.info("Scenario contains a Population. Using the person IDs from the population for the person-based analysis.");
 			personIds.addAll(this.scenario.getPopulation().getPersons().keySet());
@@ -570,7 +585,7 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-				
+		
 		Map<Integer, Double> tripNumber2travelTime;
 		if (this.personId2tripNumber2travelTime.containsKey(event.getPersonId())) {
 			tripNumber2travelTime = this.personId2tripNumber2travelTime.get(event.getPersonId());
@@ -582,6 +597,28 @@ PersonDepartureEventHandler , PersonArrivalEventHandler , LinkEnterEventHandler,
 		int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());
 		tripNumber2travelTime.put(currentTripNumber, event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber));
 		this.personId2tripNumber2travelTime.put(event.getPersonId(), tripNumber2travelTime);
+	}
+
+	@Override
+	public void handleEvent(PersonStuckEvent event) {
+		
+		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles()) {
+			
+			Map<Integer, Double> tripNumber2travelTime;
+			if (this.personId2tripNumber2travelTime.containsKey(event.getPersonId())) {
+				tripNumber2travelTime = this.personId2tripNumber2travelTime.get(event.getPersonId());
+
+			} else {
+				tripNumber2travelTime = new HashMap<Integer, Double>();
+			}
+			
+			int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());
+			tripNumber2travelTime.put(currentTripNumber, Double.POSITIVE_INFINITY);
+			this.personId2tripNumber2travelTime.put(event.getPersonId(), tripNumber2travelTime);
+			
+		} else {
+			// The agent should arrive and a travel time can be calculated.
+		}
 	}
 
 }
