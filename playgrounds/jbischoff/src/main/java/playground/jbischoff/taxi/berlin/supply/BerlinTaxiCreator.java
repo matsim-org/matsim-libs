@@ -83,6 +83,7 @@ public class BerlinTaxiCreator
 
         Link link = getRandomLinkInLor(lorId);
         Vehicle v = new VehicleImpl(vehId, link, PAXPERCAR, Math.round(t0), Math.round(t1));
+        currentVehicleId++;
         return v;
     }
 

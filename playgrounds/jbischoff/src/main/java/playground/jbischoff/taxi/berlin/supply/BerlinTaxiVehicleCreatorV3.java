@@ -84,7 +84,7 @@ public class BerlinTaxiVehicleCreatorV3
         
         BerlinTaxiVehicleCreatorV3 btv = new BerlinTaxiVehicleCreatorV3();
         btv.evShare = 0.0;
-        btv.minTime = 14.0 * 3600;
+        btv.minTime = 4.0 * 3600;
         btv.maxTime = 17.0 * 3600;
         btv.readTaxisOverTime(taxisOverTimeFile);
 //        btv.createAverages(SDF.parse("2014-10-15 03:30:00"), 1);
