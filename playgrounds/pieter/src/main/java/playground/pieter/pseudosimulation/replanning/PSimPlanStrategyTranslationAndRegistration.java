@@ -1,7 +1,6 @@
 package playground.pieter.pseudosimulation.replanning;
 
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
-import org.matsim.core.replanning.PlanStrategyRegistrar;
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.replanning.factories.*;
 import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModule;
@@ -27,9 +26,7 @@ import java.util.ArrayList;
  *         PSim equivalents in the controler's substituteStrategies() method.
  * 
  *         <P>
- *         Each strategy name is taken from the enum in the
- *         {@link PlanStrategyRegistrar} to ensure future consistency
- * 
+ *
  *         <P>
  *         <B>NOTE:</B> to save processing overhead, selector strategies are set
  *         up to always return the person's current selected plan during

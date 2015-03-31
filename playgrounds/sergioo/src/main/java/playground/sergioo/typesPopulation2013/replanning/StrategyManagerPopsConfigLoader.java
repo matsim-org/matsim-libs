@@ -28,8 +28,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.*;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.*;
 import playground.sergioo.typesPopulation2013.config.groups.StrategyPopsConfigGroup;
@@ -54,12 +56,6 @@ public final class StrategyManagerPopsConfigLoader {
 	private static int externalCounter = 0;
 
 	public static void load(final Controler controler, final StrategyManagerPops manager) {
-		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
-		PlanStrategyFactoryRegister planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
-		load(controler, manager, planStrategyFactoryRegister);
-	}
-
-	public static void load(final Controler controler, final StrategyManagerPops manager, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
 		Config config = controler.getConfig();
 		StrategyPopsConfigGroup strategyPops = (StrategyPopsConfigGroup) config.getModule(StrategyPopsConfigGroup.GROUP_NAME);
 		for(String populationId:strategyPops.getPopulationIds()) {
@@ -80,7 +76,7 @@ public final class StrategyManagerPopsConfigLoader {
 					moduleName = moduleName.replace("org.matsim.demandmodeling.plans.strategies.", "");
 				}
 	
-				PlanStrategy strategy = loadStrategy(controler, moduleName, settings, planStrategyFactoryRegister);
+				PlanStrategy strategy = loadStrategy(controler, moduleName, settings);
 	
 				if (strategy == null) {
 					throw new RuntimeException("Could not initialize strategy named " + moduleName);
@@ -146,7 +142,7 @@ public final class StrategyManagerPopsConfigLoader {
 		}
 	}
 
-	private static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
+	private static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategySettings settings) {
 		// Special cases, scheduled to go away.
 		if (name.equals(LOCATION_CHOICE)) {
 			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
@@ -162,8 +158,7 @@ public final class StrategyManagerPopsConfigLoader {
 			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, name);
 			return strategy;
 		} else {
-			PlanStrategyFactory planStrategyFactory = planStrategyFactoryRegister.getInstance(name);
-			PlanStrategy strategy = planStrategyFactory.get();
+			PlanStrategy strategy = controler.getInjector().getPlanStrategiesDeclaredByModules().get(name);
 			return strategy;
 		} 
 	} 

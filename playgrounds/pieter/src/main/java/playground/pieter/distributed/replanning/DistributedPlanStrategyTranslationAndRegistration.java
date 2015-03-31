@@ -32,8 +32,6 @@ import java.util.Map;
  *         PSim equivalents in the controler's substituteStrategies() method.
  *         <p/>
  *         <p/>
- *         Each strategy name is taken from the enum in the
- *         {@link org.matsim.core.replanning.PlanStrategyRegistrar} to ensure future consistency
  *         <p/>
  *         <p/>
  *         <B>NOTE:</B> to save processing overhead, selector strategies are set
