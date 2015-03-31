@@ -32,7 +32,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 
 import java.util.ArrayList;
@@ -157,7 +156,7 @@ public abstract class AbstractModule {
         planStrategyMultibinder.addBinding(strategyName).toProvider(factory);
     }
 
-    protected final void addPlanStrategyBindingToFactory(String strategyName, final Class<? extends PlanStrategyFactory> factory) {
+    protected final void addPlanStrategyBindingToFactory(String strategyName, final Class<? extends Provider<? extends PlanStrategy>> factory) {
         planStrategyMultibinder.addBinding(strategyName).toProvider(factory);
     }
 

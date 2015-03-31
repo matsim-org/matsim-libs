@@ -48,7 +48,6 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelectorFactory;
 import org.matsim.core.router.PlanRouter;
@@ -675,7 +674,7 @@ public class Controler extends AbstractController {
         });
 	}
 
-    public final void addPlanStrategyFactory(final String planStrategyFactoryName, final Class<? extends PlanStrategyFactory> planStrategyFactory) {
+    public final void addPlanStrategyFactory(final String planStrategyFactoryName, final Class<? extends com.google.inject.Provider<? extends PlanStrategy>> planStrategyFactory) {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
