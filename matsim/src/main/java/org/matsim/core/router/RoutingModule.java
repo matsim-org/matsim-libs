@@ -26,14 +26,12 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 
-import tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouterExample;
-
 /**
  * Defines classes responsible for routing for a given
  * (main)-mode.
  * It does not modify the plan.  
  * <p/>
- * See {@link RunPluggableTripRouterExample} for an example how to use this interface.
+ * See {@link tutorial.programming.example12PluggableTripRouter.RunPluggableTripRouterExample} for an example how to use this interface.
  * 
  * @author thibautd
  */
