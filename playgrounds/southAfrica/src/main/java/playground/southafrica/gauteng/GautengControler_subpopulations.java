@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
@@ -58,7 +57,6 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
 import org.matsim.vehicles.*;
-
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopulation;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.utilities.Header;
@@ -238,10 +236,10 @@ public class GautengControler_subpopulations {
 		// ... during replanning (this also needs to be registered as strategy in the config):
 		controler.addPlanStrategyFactory(RE_ROUTE_AND_SET_VEHICLE, new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(final Scenario scenario, EventsManager eventsManager) {
+			public PlanStrategy get() {
 				PlanStrategyImpl planStrategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() ) ; 
-				planStrategy.addStrategyModule( new ReRoute( scenario ) ); 
-				planStrategy.addStrategyModule( new SetVehicleInAllNetworkRoutes(scenario));
+				planStrategy.addStrategyModule( new ReRoute( sc ) );
+				planStrategy.addStrategyModule( new SetVehicleInAllNetworkRoutes(sc));
 				return planStrategy ;
 			}
 		});

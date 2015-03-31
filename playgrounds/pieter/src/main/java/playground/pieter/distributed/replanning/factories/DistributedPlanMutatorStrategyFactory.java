@@ -19,8 +19,6 @@
 
 package playground.pieter.distributed.replanning.factories;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
@@ -50,8 +48,8 @@ public class DistributedPlanMutatorStrategyFactory<T extends PlanStrategyFactory
     }
 
 	@Override
-	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-        PlanStrategyImpl planStrategy = (PlanStrategyImpl) delegate.createPlanStrategy(scenario, eventsManager);
+	public PlanStrategy get() {
+        PlanStrategyImpl planStrategy = (PlanStrategyImpl) delegate.get();
         planStrategy.addStrategyModule(new RegisterMutatedPlanForPSim(slave,gene,trackGenome,controler));
         return planStrategy;
 	}

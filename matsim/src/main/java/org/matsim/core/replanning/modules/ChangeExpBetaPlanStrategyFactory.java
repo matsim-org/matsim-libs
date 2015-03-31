@@ -19,18 +19,26 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 
+import javax.inject.Inject;
+
 public class ChangeExpBetaPlanStrategyFactory implements PlanStrategyFactory {
 
-	@Override
-	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-		PlanStrategy strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(scenario.getConfig().planCalcScore().getBrainExpBeta()));
+    private Config config;
+
+    @Inject
+    ChangeExpBetaPlanStrategyFactory(Config config) {
+        this.config = config;
+    }
+
+    @Override
+	public PlanStrategy get() {
+		PlanStrategy strategy = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
 		return strategy;
 	}
 

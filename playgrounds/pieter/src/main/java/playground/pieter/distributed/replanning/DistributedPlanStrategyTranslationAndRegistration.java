@@ -94,7 +94,7 @@ public class DistributedPlanStrategyTranslationAndRegistration {
             try {
                 controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
                         new DistributedPlanSelectorStrategyFactory<>( slave,
-                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance(), quickReplanning, selectionInflationFactor));
+                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance(), quickReplanning, selectionInflationFactor, controler.getScenario(), controler.getEvents()));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
                 e1.printStackTrace();
             }

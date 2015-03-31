@@ -26,10 +26,8 @@ import com.google.inject.*;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.util.Modules;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
@@ -156,14 +154,11 @@ public abstract class AbstractModule {
     }
 
     protected final void addPlanStrategyBindingToFactory(String strategyName, final PlanStrategyFactory factory) {
-        final Provider<Scenario> scenarioProvider = binder.getProvider(Scenario.class);
-        final Provider<EventsManager> eventsManagerProvider = binder.getProvider(EventsManager.class);
-        planStrategyMultibinder.addBinding(strategyName).toProvider(new Provider<PlanStrategy>() {
-            @Override
-            public PlanStrategy get() {
-                return factory.createPlanStrategy(scenarioProvider.get(), eventsManagerProvider.get());
-            }
-        });
+        planStrategyMultibinder.addBinding(strategyName).toProvider(factory);
+    }
+
+    protected final void addPlanStrategyBindingToFactory(String strategyName, final Class<? extends PlanStrategyFactory> factory) {
+        planStrategyMultibinder.addBinding(strategyName).toProvider(factory);
     }
 
     protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> addPlanSelectorForRemovalBinding(String selectorName) {

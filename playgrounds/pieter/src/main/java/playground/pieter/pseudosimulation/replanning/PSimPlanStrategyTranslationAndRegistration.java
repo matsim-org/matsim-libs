@@ -55,11 +55,11 @@ public class PSimPlanStrategyTranslationAndRegistration {
 		strategyName = DefaultPlanStrategiesModule.DefaultSelector.SelectExpBeta.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
-				new PSimSelectExpBetaPlanStrategyFactory());
+				PSimSelectExpBetaPlanStrategyFactory.class);
 		strategyName = DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
-				new PSimChangeExpBetaPlanStrategyFactory());
+				new PSimChangeExpBetaPlanStrategyFactory(controler.getMATSimControler().getScenario()));
 		strategyName = DefaultPlanStrategiesModule.DefaultSelector.SelectRandom.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
@@ -68,12 +68,12 @@ public class PSimPlanStrategyTranslationAndRegistration {
 				.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
-				new PSimSelectPathSizeLogitStrategyFactory());
+				new PSimSelectPathSizeLogitStrategyFactory(controler.getMATSimControler().getScenario()));
 
 		strategyName = DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString();
 		compatibleStrategies.add(strategyName);
 		controler.getMATSimControler().addPlanStrategyFactory(strategyName + "PSim",
-				new PSimReRoutePlanStrategyFactory(controler));
+				new PSimReRoutePlanStrategyFactory(controler, controler.getMATSimControler().getScenario()));
 		compatibleStrategies.add("LocationChoice");
 		controler.getMATSimControler().addPlanStrategyFactory("LocationChoicePSim",
 				new PSimLocationChoicePlanStrategyFactory(controler));

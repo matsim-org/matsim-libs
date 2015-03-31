@@ -1,24 +1,25 @@
 package playground.pieter.pseudosimulation.replanning.factories;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoutePlanStrategyFactory;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.replanning.modules.PSimReRoute;
 
 public class PSimReRoutePlanStrategyFactory extends ReRoutePlanStrategyFactory {
 
-    public PSimReRoutePlanStrategyFactory(PSimControler controler) {
-		super();
+    private Scenario scenario;
+
+    public PSimReRoutePlanStrategyFactory(PSimControler controler, Scenario scenario) {
+		super(scenario);
+        this.scenario = scenario;
         PSimControler controler1 = controler;
 	}
 
     @Override
-	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager ) {
+	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new PSimReRoute(scenario));
 //		we don't need to execute the plan, cos it never gets handled

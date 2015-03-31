@@ -1,13 +1,11 @@
 package playground.singapore.run;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -39,7 +37,7 @@ public class ControlerSingapore {
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(args[0], new DestinationChoiceConfigGroup());
-		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
         Logger logger = Logger.getLogger("SINGAPORECONTROLER");
         logger.warn("Doing the workaround to associate facilities with car links...");
 		for(Link link:controler.getScenario().getNetwork().getLinks().values()) {
@@ -72,8 +70,8 @@ public class ControlerSingapore {
 		// kai, sep'13
 		controler.addPlanStrategyFactory("TransitLocationChoice",new PlanStrategyFactory() {
             @Override
-            public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-                return new TransitLocationChoiceStrategy(scenario);
+            public PlanStrategy get() {
+                return new TransitLocationChoiceStrategy(controler.getScenario());
             }
         });
 		controler.setMobsimFactory(new PTQSimFactory());

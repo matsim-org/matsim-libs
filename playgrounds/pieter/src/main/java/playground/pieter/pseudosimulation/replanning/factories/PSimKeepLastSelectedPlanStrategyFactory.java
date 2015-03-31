@@ -19,19 +19,16 @@
 
 package playground.pieter.pseudosimulation.replanning.factories;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-
 import playground.pieter.pseudosimulation.replanning.selectors.PSimKeepSelected;
 
 public class PSimKeepLastSelectedPlanStrategyFactory implements
 		PlanStrategyFactory {
 
 	@Override
-	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+	public PlanStrategy get() {
 		return new PlanStrategyImpl(new PSimKeepSelected());
 	}
 

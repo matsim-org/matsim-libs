@@ -19,13 +19,11 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.MatsimFactory;
 
+import com.google.inject.Provider;
 
-public interface PlanStrategyFactory extends MatsimFactory {
+public interface PlanStrategyFactory extends Provider<PlanStrategy> {
   
-  public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager);
+  public PlanStrategy get();
 
 }

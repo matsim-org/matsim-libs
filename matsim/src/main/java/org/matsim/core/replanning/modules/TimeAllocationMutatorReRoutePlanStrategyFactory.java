@@ -20,20 +20,26 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import javax.inject.Inject;
+
 /**
  * @author thibautd
  */
 public class TimeAllocationMutatorReRoutePlanStrategyFactory implements PlanStrategyFactory {
-	@Override
-	public PlanStrategy createPlanStrategy(
-			final Scenario scenario,
-			final EventsManager eventsManager) {
+    private Scenario scenario;
+
+    @Inject
+    TimeAllocationMutatorReRoutePlanStrategyFactory(Scenario scenario) {
+        this.scenario = scenario;
+    }
+
+    @Override
+	public PlanStrategy get() {
 		final PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule( new TimeAllocationMutator(scenario.getConfig()) );
 		strategy.addStrategyModule( new ReRoute( scenario ) );

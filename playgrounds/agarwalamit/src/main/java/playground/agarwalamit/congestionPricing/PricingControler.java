@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -35,8 +34,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
-import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -73,7 +70,7 @@ public class PricingControler {
 		sc.getConfig().controler().setWriteEventsInterval(100);
 		sc.getConfig().controler().setWritePlansInterval(100);
 		
-		Controler controler = new Controler(sc);
+		final Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
         controler.setDumpDataAtEnd(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
@@ -125,11 +122,10 @@ public class PricingControler {
 				String [] availableModes = {"car","pt_COMMUTER_REV_COMMUTER"};
 				String [] chainBasedModes = {"car","bike"};
 				@Override
-				public PlanStrategy createPlanStrategy(Scenario scenario,
-						EventsManager eventsManager) {
+				public PlanStrategy get() {
 					PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-					builder.addStrategyModule(new SubtourModeChoice(scenario.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-					builder.addStrategyModule(new ReRoute(scenario));
+					builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+					builder.addStrategyModule(new ReRoute(controler.getScenario()));
 					return builder.build();
 				}
 			});
@@ -138,10 +134,9 @@ public class PricingControler {
 			controler.addPlanStrategyFactory("ReRoute_".concat("COMMUTER_REV_COMMUTER"), new PlanStrategyFactory() {
 
 				@Override
-				public PlanStrategy createPlanStrategy(Scenario scenario,
-						EventsManager eventsManager) {
+				public PlanStrategy get() {
 					PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-					builder.addStrategyModule(new ReRoute(scenario));
+					builder.addStrategyModule(new ReRoute(controler.getScenario()));
 					return builder.build();
 				}
 			});

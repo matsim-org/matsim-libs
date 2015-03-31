@@ -674,6 +674,15 @@ public class Controler extends AbstractController {
         });
 	}
 
+    public final void addPlanStrategyFactory(final String planStrategyFactoryName, final Class<? extends PlanStrategyFactory> planStrategyFactory) {
+        this.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addPlanStrategyBindingToFactory(planStrategyFactoryName, planStrategyFactory);
+            }
+        });
+    }
+
     public final void addPlanSelectorFactory(final String planSelectorFactoryName, final PlanSelectorFactory<Plan, Person> planSelectorFactory) {
         this.addOverridingModule(new AbstractModule() {
             @Override

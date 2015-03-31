@@ -21,10 +21,8 @@
 package playground.christoph.burgdorf;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -35,7 +33,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 public class CadytsRunner {
 
 	public static void main(String[] args) {
-		Controler controler = new Controler(args);
+		final Controler controler = new Controler(args);
 		
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
 		controler.addControlerListener(cContext);
@@ -47,8 +45,8 @@ public class CadytsRunner {
 		
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2,cContext);
+			public PlanStrategy get() {
+				final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(),cContext);
 				return new PlanStrategyImpl(planSelector);
 			}
 		});

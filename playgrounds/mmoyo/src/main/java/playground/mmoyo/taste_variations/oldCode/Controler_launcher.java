@@ -20,14 +20,12 @@
 package playground.mmoyo.taste_variations.oldCode;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.pt.CadytsPtContext;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -66,7 +64,7 @@ public class Controler_launcher {
 		}
 
 		final Config config = ConfigUtils.loadConfig(configFile);
-		Controler controler = new Controler(config);
+		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
         final Network net = controler.getScenario().getNetwork();
 		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
@@ -95,8 +93,8 @@ public class Controler_launcher {
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
 			
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, cContext);
+			public PlanStrategy get() {
+				final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(), cContext);
 				//planSelector.setCadytsWeight(0.0) ;
 				return new PlanStrategyImpl(planSelector);
 			}

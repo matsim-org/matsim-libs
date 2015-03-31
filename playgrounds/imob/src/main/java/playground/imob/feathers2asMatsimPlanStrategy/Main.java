@@ -18,15 +18,11 @@
  * *********************************************************************** */
 package playground.imob.feathers2asMatsimPlanStrategy;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -38,6 +34,9 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author nagel
@@ -78,7 +77,7 @@ class Main {
 		// add it as a PlanStrategy:
 		ctrl.addPlanStrategyFactory( FEATHERS2, new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(final Scenario scenario, EventsManager eventsManager) {
+			public PlanStrategy get() {
 				GenericPlanSelector<Plan, Person> planSelector = new RandomPlanSelector<>() ;
 				PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(planSelector) ;
 				PlanStrategyModule module = new PlanStrategyModule() {

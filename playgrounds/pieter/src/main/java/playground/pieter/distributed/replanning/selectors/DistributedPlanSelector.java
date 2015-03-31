@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -42,7 +41,7 @@ public class DistributedPlanSelector<T extends PlanStrategyFactory>implements Pl
 
     public DistributedPlanSelector(Scenario scenario, EventsManager events,T delegateFactory, PlanCatcher slave,boolean quickReplanning, int selectionInflationFactor) {
         this.slave = slave;
-        this.delegate = ((PlanStrategyImpl) delegateFactory.createPlanStrategy(scenario,events)).getPlanSelector();
+        this.delegate = ((PlanStrategyImpl) delegateFactory.get()).getPlanSelector();
 //        when doing quicckReplanning, the weight of the selection strategy is inflated by selectionInflationFactor, so it needs to be deflated by that much to prevent repeated execution
         this.selectionFrequency=1/(selectionInflationFactor * (quickReplanning?selectionInflationFactor:1));
     }

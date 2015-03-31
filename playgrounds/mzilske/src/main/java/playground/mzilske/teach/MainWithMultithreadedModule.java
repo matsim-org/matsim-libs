@@ -22,14 +22,9 @@
 
 package playground.mzilske.teach;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -41,13 +36,16 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainWithMultithreadedModule {
 
     public static void main(String[] args) {
-        Controler controler = new Controler(ConfigUtils.createConfig());
+        final Controler controler = new Controler(ConfigUtils.createConfig());
         controler.addPlanStrategyFactory("myStrategy", new PlanStrategyFactory() {
             @Override
-            public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+            public PlanStrategy get() {
 
                 // This method is called exactly once by the framework. The PlanStrategy
                 // which we return here will live as long as the Controler.
@@ -55,7 +53,7 @@ public class MainWithMultithreadedModule {
                 // Adding an EventHandler which observes the simulation. In this example,
                 // it simply collects the Events.
                 final List<Event> collectedInformationAboutSimulation = new ArrayList<Event>();
-                eventsManager.addHandler(new BasicEventHandler() {
+                controler.getEvents().addHandler(new BasicEventHandler() {
                     @Override
                     public void handleEvent(Event event) {
                         // Events don't arrive in parallel, so my observer can use
@@ -75,7 +73,7 @@ public class MainWithMultithreadedModule {
                 });
 
                 PlanStrategyImpl myStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
-                myStrategy.addStrategyModule(new AbstractMultithreadedModule(scenario.getConfig().global()) {
+                myStrategy.addStrategyModule(new AbstractMultithreadedModule(controler.getConfig().global()) {
                     @Override
                     public PlanAlgorithm getPlanAlgoInstance() {
                         return new PlanAlgorithm() {

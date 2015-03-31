@@ -6,11 +6,22 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 
+import javax.inject.Inject;
+
 
 class MyPlanStrategyFactory implements PlanStrategyFactory {
 
-	@Override
-	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+    private EventsManager eventsManager;
+    private Scenario scenario;
+
+    @Inject
+    MyPlanStrategyFactory(EventsManager eventsManager, Scenario scenario) {
+        this.eventsManager = eventsManager;
+        this.scenario = scenario;
+    }
+
+    @Override
+	public PlanStrategy get() {
         // A PlanStrategy is something that can be applied to a Person (not a Plan).
         // It first selects one of the plans:
         MyPlanSelector planSelector = new MyPlanSelector();

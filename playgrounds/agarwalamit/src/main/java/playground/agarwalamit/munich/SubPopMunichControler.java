@@ -18,13 +18,11 @@
  * *********************************************************************** */
 package playground.agarwalamit.munich;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -37,7 +35,6 @@ import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
 import playground.agarwalamit.InternalizationEmissionAndCongestion.InternalizeEmissionsCongestionControlerListener;
 import playground.agarwalamit.munich.controlerListner.MyEmissionCongestionMoneyEventControlerListner;
@@ -91,17 +88,16 @@ public class SubPopMunichControler {
 			config.counts().setCountsFileName("../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
 		}
 
-		Controler controler = new Controler(config);
+		final Controler controler = new Controler(config);
 
 		controler.addPlanStrategyFactory("SubtourModeChoice_".concat("COMMUTER_REV_COMMUTER"), new PlanStrategyFactory() {
 			String [] availableModes = {"car","pt_COMMUTER_REV_COMMUTER"};
 			String [] chainBasedModes = {"car","bike"};
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario,
-					EventsManager eventsManager) {
+			public PlanStrategy get() {
 				PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-				builder.addStrategyModule(new SubtourModeChoice(scenario.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-				builder.addStrategyModule(new ReRoute(scenario));
+				builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+				builder.addStrategyModule(new ReRoute(controler.getScenario()));
 				return builder.build();
 			}
 		});
@@ -110,10 +106,9 @@ public class SubPopMunichControler {
 		controler.addPlanStrategyFactory("ReRoute_".concat("COMMUTER_REV_COMMUTER"), new PlanStrategyFactory() {
 
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario,
-					EventsManager eventsManager) {
+			public PlanStrategy get() {
 				PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-				builder.addStrategyModule(new ReRoute(scenario));
+				builder.addStrategyModule(new ReRoute(controler.getScenario()));
 				return builder.build();
 			}
 		});

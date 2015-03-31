@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -165,8 +164,7 @@ public class RunNationalFreight {
 		
 		PlanStrategyFactory newPlanStrategyFactory = new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario,
-					EventsManager eventsManager) {
+			public PlanStrategy get() {
 				PlanStrategyImpl strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 				strategy.addStrategyModule(new NewDigicorePlanStrategyModule());
 				return strategy;

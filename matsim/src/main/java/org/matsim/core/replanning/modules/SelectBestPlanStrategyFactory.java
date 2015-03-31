@@ -19,8 +19,6 @@
 
 package org.matsim.core.replanning.modules;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -29,7 +27,7 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 public class SelectBestPlanStrategyFactory implements PlanStrategyFactory {
 
 	@Override
-	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+	public PlanStrategy get() {
 		PlanStrategy strategy = new PlanStrategyImpl(new BestPlanSelector());
 		return strategy;
 	}

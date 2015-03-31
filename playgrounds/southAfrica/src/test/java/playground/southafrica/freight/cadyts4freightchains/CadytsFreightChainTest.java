@@ -20,10 +20,8 @@
 
 package playground.southafrica.freight.cadyts4freightchains;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
+import cadyts.utilities.io.tabularFileParser.TabularFileParser;
+import cadyts.utilities.misc.DynamicData;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -37,12 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
@@ -66,8 +59,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import cadyts.utilities.io.tabularFileParser.TabularFileParser;
-import cadyts.utilities.misc.DynamicData;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author nagel
@@ -121,13 +115,13 @@ public class CadytsFreightChainTest {
 
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario sc, EventsManager eventsManager) {
+			public PlanStrategy get() {
 //				return new PlanStrategyImpl(new ExpBetaPlanSelectorWithCadytsPlanRegistration<Item>(
 //						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 //				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Item>(
 //						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 				return new PlanStrategyImpl( new PlanSelectionByCadyts<Item>(
-						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext) ) ;
+						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext) ) ;
 			}
 		} ) ;
 

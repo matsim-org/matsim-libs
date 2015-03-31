@@ -22,23 +22,15 @@
  */
 package playground.johannes.gsv.sim;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -51,7 +43,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -69,25 +60,21 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
-import playground.johannes.coopsim.analysis.PkmRouteTask;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TripCountTask;
-import playground.johannes.coopsim.analysis.TripDurationTask;
-import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
-import playground.johannes.coopsim.analysis.TripPurposeShareTask;
+import playground.johannes.coopsim.analysis.*;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
 import playground.johannes.gsv.analysis.CountsCompareAnalyzer;
 import playground.johannes.gsv.analysis.PkmGeoTask;
-import playground.johannes.gsv.analysis.ScoreTask;
-import playground.johannes.gsv.analysis.SpeedFactorTask;
 import playground.johannes.gsv.sim.cadyts.CadytsContext;
 import playground.johannes.gsv.sim.cadyts.CadytsScoring;
 import playground.johannes.gsv.sim.cadyts.ODAdjustorListener;
 import playground.johannes.gsv.synPop.Proxy2Matsim;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -128,7 +115,7 @@ public class Simulator {
 		controler.addPlanStrategyFactory("doNothing", new PlanStrategyFactory() {
 
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+			public PlanStrategy get() {
 				return new PlanStrategy() {
 
 					@Override

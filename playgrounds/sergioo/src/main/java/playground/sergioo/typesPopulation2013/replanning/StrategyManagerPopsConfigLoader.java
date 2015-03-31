@@ -163,7 +163,7 @@ public final class StrategyManagerPopsConfigLoader {
 			return strategy;
 		} else {
 			PlanStrategyFactory planStrategyFactory = planStrategyFactoryRegister.getInstance(name);
-			PlanStrategy strategy = planStrategyFactory.createPlanStrategy(controler.getScenario(), controler.getEvents());
+			PlanStrategy strategy = planStrategyFactory.get();
 			return strategy;
 		} 
 	} 

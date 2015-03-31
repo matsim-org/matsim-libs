@@ -105,8 +105,8 @@ public class CadytsCarIntegrationTest {
 				
 		controler.addPlanStrategyFactory(CADYTS_STRATEGY_NAME, new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				return new PlanStrategyImpl(new CadytsPlanChanger(scenario2,context));
+			public PlanStrategy get() {
+				return new PlanStrategyImpl(new CadytsPlanChanger(controler.getScenario(), context));
 			}} ) ;
 
         controler.getConfig().controler().setCreateGraphs(false);
@@ -162,9 +162,9 @@ public class CadytsCarIntegrationTest {
 		// new PlanStrategy which does the same as above, but cleaner (getting rid of the weight which needs to be set to "0")
 		controler.addPlanStrategyFactory(CADYTS_STRATEGY_NAME, new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+			public PlanStrategy get() {
 				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(
-						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext));
+						config.planCalcScore().getBrainExpBeta(), cContext));
 			}
 		} ) ;
 		

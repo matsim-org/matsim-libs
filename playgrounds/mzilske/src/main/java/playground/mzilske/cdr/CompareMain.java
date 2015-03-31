@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -223,7 +222,7 @@ public class CompareMain {
 		controler.addControlerListener(context);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
+			public PlanStrategy get() {
 				CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2,context);
 				planSelector.setCadytsWeight(10000000);
 				return new PlanStrategyImpl(planSelector);

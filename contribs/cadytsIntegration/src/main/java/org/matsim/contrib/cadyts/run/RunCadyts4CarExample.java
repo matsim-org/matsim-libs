@@ -25,7 +25,6 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -65,7 +64,7 @@ public class RunCadyts4CarExample {
 
 		// ---
 		
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
 		// ---
 
@@ -79,7 +78,7 @@ public class RunCadyts4CarExample {
 		// haven't found an easy way)
 		controler.addPlanStrategyFactory(CADYTS_STRATEGY_NAME, new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(@SuppressWarnings("hiding") Scenario scenario, EventsManager eventsManager) {
+			public PlanStrategy get() {
 				PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(
 						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext)) ;
 				return builder.build() ;

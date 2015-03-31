@@ -21,7 +21,6 @@ package playground.pieter.distributed.replanning.factories;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -39,16 +38,20 @@ public class DistributedPlanSelectorStrategyFactory<T extends PlanStrategyFactor
     T delegate;
     PlanCatcher slave;
     boolean quickReplanning; int selectionInflationFactor;
+    private Scenario scenario;
+    private EventsManager eventsManager;
 
-    public DistributedPlanSelectorStrategyFactory(PlanCatcher slave,T  planStrategyFactory, boolean quickReplanning, int selectionInflationFactor) {
+    public DistributedPlanSelectorStrategyFactory(PlanCatcher slave, T planStrategyFactory, boolean quickReplanning, int selectionInflationFactor, Scenario scenario, EventsManager eventsManager) {
         this.delegate = planStrategyFactory;
         this.slave = slave;
         this.quickReplanning = quickReplanning;
         this.selectionInflationFactor = selectionInflationFactor;
+        this.scenario = scenario;
+        this.eventsManager = eventsManager;
     }
 
     @Override
-	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+	public PlanStrategy get() {
 		return new PlanStrategyImpl(new DistributedPlanSelector(scenario, eventsManager,delegate ,slave, quickReplanning, selectionInflationFactor));
 	}
 

@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.pt.CadytsPtContext;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -33,14 +32,8 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility.DataCollection;
@@ -114,8 +107,8 @@ public class RndPtRouterLauncher {
 		controler.addControlerListener(context) ;
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, context);
+			public PlanStrategy get() {
+				final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(), context);
 ///				planSelector.setCadytsWeight(beta*cadytsWeight) ;   
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;

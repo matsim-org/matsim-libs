@@ -26,7 +26,6 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.pt.CadytsPtContext;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -43,7 +42,6 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 import playground.mmoyo.randomizerPtRouter.RndPtRouterFactory;
 
@@ -76,7 +74,7 @@ public class SolutionsSearch {
 		}
 
 		final Config config = ConfigUtils.loadConfig(configFile);
-		Scenario scn = ScenarioUtils.loadScenario(config);
+		final Scenario scn = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scn);
 		controler.setOverwriteFiles(true);
 		final TransitSchedule schedule = scn.getTransitSchedule();
@@ -125,8 +123,8 @@ public class SolutionsSearch {
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
 			
 			@Override   
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, cContext);
+			public PlanStrategy get() {
+				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scn, cContext);
 				// planSelector.setCadytsWeight(0.0) ;    // <-set it to zero if only cadyts scores are desired
 				return new PlanStrategyImpl(planSelector);
 			}

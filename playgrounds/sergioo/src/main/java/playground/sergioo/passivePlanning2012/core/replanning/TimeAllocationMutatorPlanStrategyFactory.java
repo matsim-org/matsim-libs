@@ -20,16 +20,24 @@
 package playground.sergioo.passivePlanning2012.core.replanning;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 
+import javax.inject.Inject;
+
 public class TimeAllocationMutatorPlanStrategyFactory implements
 		PlanStrategyFactory {
 
-	@Override
-	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+    private Scenario scenario;
+
+    @Inject
+    public TimeAllocationMutatorPlanStrategyFactory(Scenario scenario) {
+        this.scenario = scenario;
+    }
+
+    @Override
+	public PlanStrategy get() {
 		BasePlanModulesStrategy strategy = new BasePlanModulesStrategy(scenario);
 		strategy.addStrategyModule(new TimeAllocationMutator(scenario.getConfig()));
 		return strategy;

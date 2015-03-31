@@ -83,14 +83,14 @@ public class CadytsIntegrationTest {
 		stratSets.setWeight(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		final Controler controler = new Controler(scenario);
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				return new PlanStrategyImpl(new CadytsPlanChanger<TransitStopFacility>(scenario2, context));
+			public PlanStrategy get() {
+				return new PlanStrategyImpl(new CadytsPlanChanger<TransitStopFacility>(scenario, context));
 			}} ) ;
 
         controler.getConfig().controler().setCreateGraphs(false);
@@ -142,8 +142,8 @@ public class CadytsIntegrationTest {
 
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario, cContext);
+			public PlanStrategy get() {
+				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(controler.getScenario(), cContext);
 				planSelector.setCadytsWeight(0.) ;
 				// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
 				// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
@@ -294,7 +294,7 @@ public class CadytsIntegrationTest {
 		stratSets.setWeight(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 
-		Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
 		final Controler controler = new Controler( scenario );
         controler.getConfig().controler().setCreateGraphs(false);
@@ -305,8 +305,8 @@ public class CadytsIntegrationTest {
 
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>( scenario2, context);
+			public PlanStrategy get() {
+				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>( scenario, context);
 				planSelector.setCadytsWeight(beta*30.) ;
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;
@@ -452,8 +452,8 @@ public class CadytsIntegrationTest {
 //		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario2, context);
+			public PlanStrategy get() {
+				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(controler.getScenario(), context);
 				planSelector.setCadytsWeight(beta*30.) ;
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;

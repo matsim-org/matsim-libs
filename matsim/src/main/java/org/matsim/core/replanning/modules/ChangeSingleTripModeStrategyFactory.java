@@ -20,16 +20,24 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
+import javax.inject.Inject;
+
 public class ChangeSingleTripModeStrategyFactory implements PlanStrategyFactory {
 
-	@Override
-	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+    private Scenario scenario;
+
+    @Inject
+    ChangeSingleTripModeStrategyFactory(Scenario scenario) {
+        this.scenario = scenario;
+    }
+
+    @Override
+	public PlanStrategy get() {
 		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
 		strategy.addStrategyModule(new ChangeSingleLegMode(scenario.getConfig()));

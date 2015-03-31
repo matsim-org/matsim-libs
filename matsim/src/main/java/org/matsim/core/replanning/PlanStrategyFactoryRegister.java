@@ -19,8 +19,7 @@
 
 package org.matsim.core.replanning;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 
@@ -33,13 +32,11 @@ public class PlanStrategyFactoryRegister {
 	public static PlanStrategyFactory getInstance(final String strategyType) {
 	    return new PlanStrategyFactory() {
             @Override
-            public PlanStrategy createPlanStrategy(final Scenario scenario, final EventsManager eventsManager) {
-                Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+            public PlanStrategy get() {
+                Injector injector = Injector.createInjector(ConfigUtils.createConfig(), new AbstractModule() {
                     @Override
                     public void install() {
                         include(new DefaultPlanStrategiesModule());
-                        bindToInstance(Scenario.class, scenario);
-                        bindToInstance(EventsManager.class, eventsManager);
                     }
                 });
                 return injector.getPlanStrategiesDeclaredByModules().get(strategyType);

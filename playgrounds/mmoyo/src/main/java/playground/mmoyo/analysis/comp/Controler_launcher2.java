@@ -27,7 +27,6 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.pt.CadytsPtContext;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -41,7 +40,6 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 
 /**
@@ -98,8 +96,8 @@ public class Controler_launcher2 {
 		//set cadyts as strategy for plan selector
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, cContext);
+			public PlanStrategy get() {
+				final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(), cContext);
 				// planSelector.setCadytsWeight(0.0) ;   // <-set it to zero if only cadyts scores are desired
 				return new PlanStrategyImpl(planSelector);
 			}

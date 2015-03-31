@@ -1,11 +1,8 @@
 package playground.pieter.pseudosimulation.replanning.factories;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.TimeAllocationMutatorPlanStrategyFactory;
-
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModule;
 
@@ -16,14 +13,13 @@ class PSimTripTimeAllocationMutatorStrategyFactory extends
 
 	public PSimTripTimeAllocationMutatorStrategyFactory(
 			PSimControler controler) {
-		super();
+		super(controler.getScenario());
 		this.controler = controler;
 	}
 
 	@Override
-	public PlanStrategy createPlanStrategy(Scenario scenario,
-			EventsManager eventsManager) {
-		PlanStrategyImpl strategy = (PlanStrategyImpl) super.createPlanStrategy(scenario, eventsManager) ;
+	public PlanStrategy get() {
+		PlanStrategyImpl strategy = (PlanStrategyImpl) super.get() ;
 		strategy.addStrategyModule(new PSimPlanMarkerModule(controler));
 		return strategy;
 	}

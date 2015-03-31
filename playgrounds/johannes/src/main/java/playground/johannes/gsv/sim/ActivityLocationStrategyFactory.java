@@ -19,33 +19,25 @@
 
 package playground.johannes.gsv.sim;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
 import playground.johannes.gsv.synPop.CommonKeys;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author johannes
@@ -82,10 +74,10 @@ public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
 	}
 
 	@Override
-	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+	public PlanStrategy get() {
 		if (strategy == null) {
-			ActivityFacilities facilities = scenario.getActivityFacilities();
-			Population pop = scenario.getPopulation();
+			ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
+			Population pop = controler.getScenario().getPopulation();
 			ActivityLocationStrategy delegate = new ActivityLocationStrategy(facilities, pop, random, numThreads, blacklist, mutationError);
 			strategy = new Strategy(delegate);
 			controler.addControlerListener(strategy);

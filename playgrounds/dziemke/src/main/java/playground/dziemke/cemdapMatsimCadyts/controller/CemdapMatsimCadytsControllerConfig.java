@@ -20,13 +20,11 @@
 
 package playground.dziemke.cemdapMatsimCadyts.controller;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -58,9 +56,9 @@ public class CemdapMatsimCadytsControllerConfig {
 		// plan strategy
 		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+			public PlanStrategy get() {
 				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(
-						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext));
+						controler.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 			}
 		});
 		

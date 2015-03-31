@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -136,7 +135,7 @@ public class SubPopControler {
 			sc.getVehicles().addVehicle(vehicle);
 		}
 
-		Controler controler = new Controler(sc);
+		final Controler controler = new Controler(sc);
 		
 //		IOUtils.deleteDirectory(new File(controler.getConfig().controler().getOutputDirectory()));
 		controler.setOverwriteFiles(true);
@@ -146,11 +145,10 @@ public class SubPopControler {
         controler.addPlanStrategyFactory("ChangeLegMode_slum", new PlanStrategyFactory() {
 			String [] availableModes_slum = {"slum_bike","slum_motorbike","slum_pt","slum_walk"};
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario,
-					EventsManager eventsManager) {
+			public PlanStrategy get() {
 				PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-				builder.addStrategyModule(new ChangeLegMode(scenario.getConfig().global().getNumberOfThreads(),availableModes_slum,true));
-				builder.addStrategyModule(new ReRoute(scenario));
+				builder.addStrategyModule(new ChangeLegMode(controler.getConfig().global().getNumberOfThreads(),availableModes_slum,true));
+				builder.addStrategyModule(new ReRoute(controler.getScenario()));
 				return builder.build();
 			}
 		});
@@ -158,11 +156,10 @@ public class SubPopControler {
 		controler.addPlanStrategyFactory("ChangeLegMode_nonSlum", new PlanStrategyFactory() {
 			String [] availableModes_nonSlum = {"nonSlum_car","nonSlum_bike","nonSlum_motorbike","nonSlum_pt","nonSlum_walk"};
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario,
-					EventsManager eventsManager) {
+			public PlanStrategy get() {
 				PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-				builder.addStrategyModule(new ChangeLegMode(scenario.getConfig().global().getNumberOfThreads(), availableModes_nonSlum, true));
-				builder.addStrategyModule(new ReRoute(scenario));
+				builder.addStrategyModule(new ChangeLegMode(controler.getConfig().global().getNumberOfThreads(), availableModes_nonSlum, true));
+				builder.addStrategyModule(new ReRoute(controler.getScenario()));
 				return builder.build();
 			}
 		});

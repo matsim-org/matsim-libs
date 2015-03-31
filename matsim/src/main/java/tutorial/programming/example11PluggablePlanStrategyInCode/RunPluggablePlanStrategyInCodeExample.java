@@ -43,7 +43,7 @@ public class RunPluggablePlanStrategyInCodeExample {
 		config.strategy().addStrategySettings(stratSets);
 		
 		final Controler controler = new Controler(config);
-		controler.addPlanStrategyFactory("doSomethingSpecial", new MyPlanStrategyFactory());
+		controler.addPlanStrategyFactory("doSomethingSpecial", MyPlanStrategyFactory.class);
 		controler.run();
 
 	}

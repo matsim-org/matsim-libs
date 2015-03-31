@@ -129,7 +129,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// add locachoice strategy factory:
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
+			public PlanStrategy get() {
 				return new BestReplyLocationChoicePlanStrategy(scenario) ;
 			}
 		});
@@ -195,7 +195,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// set locachoice strategy:
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
+			public PlanStrategy get() {
 				return new BestReplyLocationChoicePlanStrategy(scenario) ;
 			}
 		});
@@ -270,7 +270,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 	public void testLocationChoice() {
 		final Config config = localCreateConfig();
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		// setup network
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
@@ -291,8 +291,8 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// set locachoice strategy:
 		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
-				return new LocationChoicePlanStrategy(scenario2) ;
+			public PlanStrategy get() {
+				return new LocationChoicePlanStrategy(scenario) ;
 			}
 		});
 		// (this is now only necessary since the config for all three tests sets MyLocationChoice instead of LocationChoice. Probably

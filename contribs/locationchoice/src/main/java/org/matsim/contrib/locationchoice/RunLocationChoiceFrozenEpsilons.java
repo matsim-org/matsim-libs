@@ -27,7 +27,6 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
 import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -61,7 +60,7 @@ public class RunLocationChoiceFrozenEpsilons {
         controler.setScoringFunctionFactory(scoringFunctionFactory);
         controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
             @Override
-            public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+            public PlanStrategy get() {
                 return new BestReplyLocationChoicePlanStrategy(scenario) ;
             }
         });

@@ -42,7 +42,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.pt.router.TransitRouterFactory;
-
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningAgendaFactory;
 import playground.sergioo.passivePlanning2012.core.population.AgendaBasePersonImpl;
 import playground.sergioo.passivePlanning2012.core.population.socialNetwork.SocialNetworkReader;
@@ -147,9 +146,9 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		controler.setScoringFunctionFactory(new CharyparNagelWeekScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.addControlerListener(new LegHistogramListener(controler.getEvents()));
 		controler.addControlerListener(new WeeklyControlerAgendaListener(new Boolean(args[2])));
-		controler.addPlanStrategyFactory("ReRouteBase", new ReRoutePlanStrategyFactory());
-		controler.addPlanStrategyFactory("TimeAllocationBase", new TimeAllocationMutatorPlanStrategyFactory());
-		controler.addPlanStrategyFactory("TripSubtourModeChoiceBase", new TripSubtourModeChoiceStrategyFactory());
+		controler.addPlanStrategyFactory("ReRouteBase", new ReRoutePlanStrategyFactory(scenario));
+		controler.addPlanStrategyFactory("TimeAllocationBase", new TimeAllocationMutatorPlanStrategyFactory(scenario));
+		controler.addPlanStrategyFactory("TripSubtourModeChoiceBase", new TripSubtourModeChoiceStrategyFactory(scenario));
 		controler.run();
 	}
 
