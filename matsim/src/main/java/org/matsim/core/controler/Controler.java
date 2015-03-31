@@ -47,6 +47,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.selectors.PlanSelectorFactory;
@@ -665,7 +666,7 @@ public class Controler extends AbstractController {
 		this.snapshotWriterRegister.register(snapshotWriterName, snapshotWriterFactory);
 	}
 
-	public final void addPlanStrategyFactory(final String planStrategyFactoryName, final PlanStrategyFactory planStrategyFactory) {
+	public final void addPlanStrategyFactory(final String planStrategyFactoryName, final com.google.inject.Provider<? extends PlanStrategy> planStrategyFactory) {
 		this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

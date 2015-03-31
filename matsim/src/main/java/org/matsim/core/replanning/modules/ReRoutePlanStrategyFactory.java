@@ -32,7 +32,7 @@ public class ReRoutePlanStrategyFactory implements PlanStrategyFactory {
     private Scenario scenario;
 
     @Inject
-    ReRoutePlanStrategyFactory(Scenario scenario) {
+    protected ReRoutePlanStrategyFactory(Scenario scenario) {
         this.scenario = scenario;
     }
 

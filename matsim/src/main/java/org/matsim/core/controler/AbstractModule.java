@@ -153,7 +153,7 @@ public abstract class AbstractModule {
         controlerListenerMultibinder.addBinding().toInstance(instance);
     }
 
-    protected final void addPlanStrategyBindingToFactory(String strategyName, final PlanStrategyFactory factory) {
+    protected final void addPlanStrategyBindingToFactory(String strategyName, final Provider<? extends PlanStrategy> factory) {
         planStrategyMultibinder.addBinding(strategyName).toProvider(factory);
     }
 
