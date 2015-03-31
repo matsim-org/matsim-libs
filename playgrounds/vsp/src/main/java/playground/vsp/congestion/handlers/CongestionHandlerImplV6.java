@@ -25,15 +25,19 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
@@ -45,6 +49,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -59,7 +64,7 @@ import playground.vsp.congestion.events.CongestionEvent;
  */
 
 public class CongestionHandlerImplV6 implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
-PersonStuckEventHandler
+PersonStuckEventHandler, ActivityEndEventHandler
 {
 
 	public static final Logger  log = Logger.getLogger(CongestionHandlerImplV6.class);
@@ -70,6 +75,7 @@ PersonStuckEventHandler
 	private final List<String> congestedModes = new ArrayList<String>();
 	private final Map<Id<Link>, LinkCongestionInfo> 	linkId2congestionInfo = new HashMap<>();
 	private final Map<Id<Person>, String> personId2LegMode = new HashMap<>();
+	private Map<Id<Person>, List<Tuple<String, Double>>> personId2ActType2ActEntTime = new HashMap<>();
 	private double totalDelay = 0;
 	private double roundingErrors =0;
 
@@ -100,10 +106,24 @@ PersonStuckEventHandler
 	public void reset(int iteration) {
 		this.personId2LegMode.clear();
 		this.linkId2congestionInfo.clear();
+		this.personId2ActType2ActEntTime.clear();
 
 		storeLinkInfo();
 	}
-
+	
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		//require for the multiple next link in route of the same person
+		if(personId2ActType2ActEntTime.containsKey(event.getPersonId())){
+			List<Tuple<String, Double>> listSoFar = personId2ActType2ActEntTime.get(event.getPersonId());
+			listSoFar.add(new Tuple<String, Double>(event.getActType(), event.getTime()));
+		} else {
+			List<Tuple<String, Double>> listNow = new ArrayList<Tuple<String,Double>>();
+			listNow.add(new Tuple<String, Double>(event.getActType(), event.getTime()));
+			personId2ActType2ActEntTime.put(event.getPersonId(), listNow);
+		}
+	}
+	
 	private void storeLinkInfo(){
 		for(Link link : scenario.getNetwork().getLinks().values()){
 			LinkCongestionInfo linkInfo = new LinkCongestionInfo();
@@ -182,7 +202,6 @@ PersonStuckEventHandler
 
 			CongestionEvent congestionEvent = new CongestionEvent(linkLeaveTime, congestionType, causingAgent, 
 					personId, delay, causingLink, linkId2congestionInfo.get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
-						System.out.println(congestionEvent);
 			this.events.processEvent(congestionEvent);
 		}
 		linkInfo.setLastLeavingAgent(personId);
@@ -212,53 +231,56 @@ PersonStuckEventHandler
 	private Id<Link> getNextLinkInRoute(Id<Person> personId, Id<Link> linkId, double time){
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
 
-		Map<NetworkRoute, List<Id<Link>>> nRoutesAndLinkIds = new LinkedHashMap<NetworkRoute, List<Id<Link>>>(); // save all routes and links in each route
-		List<Double> activityEndTimes = new ArrayList<Double>();
+		List<Tuple<String, Double>> personActInfos = personId2ActType2ActEntTime.get(personId);
+		int numberOfActEnded = personActInfos.size();
+
+		String currentAct = personId2ActType2ActEntTime.get(personId).get(numberOfActEnded-1).getFirst();
+		int noOfOccuranceOfCurrentAct = 0;
+
+		SortedSet<Double> actEndTimes = new TreeSet<Double>();
+
+		for(int i =0;i<numberOfActEnded;i++){ // last stored act is currentAct
+			Tuple<String, Double> actInfo = personId2ActType2ActEntTime.get(personId).get(i);
+			if(currentAct.equals(actInfo.getFirst())) {
+				actEndTimes.add(actInfo.getSecond());
+				noOfOccuranceOfCurrentAct++;
+			}
+		}
+
+		List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
+
+		int actIndex = 0;
+
 		for(PlanElement pe :planElements){
-			if(pe instanceof Leg){
+			if(pe instanceof Activity && actIndex < noOfOccuranceOfCurrentAct){
+				if(((Activity)pe).getType().equals(currentAct)) actIndex ++;	
+			}
+
+			if(pe instanceof Leg && actIndex == noOfOccuranceOfCurrentAct){
+				//				The following is necessary where a person makes several trips with different modes and thus non car trips are not instance of NetworkRoute.
+				if(!((Leg)pe).getMode().equals(TransportMode.car)) continue; 
+
 				NetworkRoute nRoute = ((NetworkRoute)((Leg)pe).getRoute()); 
-				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-				linkIds.add(nRoute.getStartLinkId());
-				linkIds.addAll(nRoute.getLinkIds());  
-				linkIds.add(nRoute.getEndLinkId());
-				nRoutesAndLinkIds.put(nRoute, linkIds);
-			} else if(pe instanceof Activity){
-				double actEndTime = ((Activity)pe).getEndTime();
-				activityEndTimes.add(actEndTime);
+				routeLinks.add(nRoute.getStartLinkId());
+				routeLinks.addAll(nRoute.getLinkIds());  
+				routeLinks.add(nRoute.getEndLinkId());
+				break;
 			}
 		}
 
 		Id<Link> nextLinkInRoute =  Id.create("NA",Link.class);
-		List<Id<Link>> nextLinksInRoutes = new ArrayList<Id<Link>>();
-
-		for(NetworkRoute nr:nRoutesAndLinkIds.keySet()){
-			List<Id<Link>>linkIds = nRoutesAndLinkIds.get(nr);
-			Iterator<Id<Link>> it = linkIds.iterator();
-			do{
-				if(it.next().equals(linkId)&&it.hasNext()){
-					nextLinksInRoutes.add(it.next());
-					break;
-				}
-			}while(it.hasNext());
-		}
-
-		if(nextLinksInRoutes.size()==0) throw new RuntimeException("There is no next link in the route of person "+personId+". Check!!!");
-		else if(nextLinksInRoutes.size()==1) nextLinkInRoute = nextLinksInRoutes.get(0);
-		else {
-			for(int i=0; i < (activityEndTimes.size()-1);){
-				if(activityEndTimes.get(i)<time && activityEndTimes.get(i+1)>0){
-					nextLinkInRoute =  nextLinksInRoutes.get(i);
-					break;
-				} else {
-					throw new RuntimeException("There are more than one links which come next to link"+linkId+" for perosn "+personId+
-							". To check activity end times are used but condition is not satisfied. Aborting... ");
-				}
+		Iterator<Id<Link>> it = routeLinks.iterator();
+		do{
+			if(it.next().equals(linkId) && it.hasNext()){
+				nextLinkInRoute = it.next();
+				break;
 			}
-		}
-		if(nextLinkInRoute==null || nextLinkInRoute.equals(Id.create("NA",Link.class))){
-			log.warn("Next link in route of person "+personId+ " on link "+linkId+" at time "+time+" is null. Routes are \n"+nRoutesAndLinkIds.toString());
-		}
-		return nextLinkInRoute;
+		} while(it.hasNext());
+
+		if (nextLinkInRoute.equals(Id.create("NA",Link.class))){ 
+			throw new RuntimeException("Next link in the route of person "+personId+" is not found. At time "+time+" person is on the link "+linkId+". Aborting ...");
+		} else return nextLinkInRoute;
+
 	}
 
 	public double getTotalDelay() {

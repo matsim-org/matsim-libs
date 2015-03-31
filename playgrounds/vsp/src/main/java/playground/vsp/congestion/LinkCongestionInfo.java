@@ -56,6 +56,8 @@ public class LinkCongestionInfo {
 	private Id<Person> lastEnteredAgent;
 	private double lastLeaveTime;
 	
+	private List<Id<Link>> spillBackCausingLink = new ArrayList<Id<Link>>();
+	
 	public Id<Link> getLinkId() {
 		return linkId;
 	}
@@ -141,6 +143,9 @@ public class LinkCongestionInfo {
 		if(time > earliestLeaveTime){
 			return true;
 		} else return false; 
+	}
+	public List<Id<Link>> getSpillBackCausingLinks() {
+		return spillBackCausingLink;
 	}
 		
 }
