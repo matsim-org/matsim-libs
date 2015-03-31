@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author jbischoff
- *
+ *	Maps road type for emissions calculation. Road categories are based solely on freespeed.
  */
 public class RoadTypeMapper {
 	private final static String dir = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_10_basic_scenario_v4/emissions/";

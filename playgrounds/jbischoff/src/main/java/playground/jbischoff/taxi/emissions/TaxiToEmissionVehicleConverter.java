@@ -40,7 +40,7 @@ import org.matsim.vehicles.Vehicles;
 
 /**
  * @author jbischoff
- *
+ * Creates a emissions vehicle file for a taxi vehicles file
  */
 public class TaxiToEmissionVehicleConverter {
 	public static void main(String[] args) {
