@@ -539,10 +539,17 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 	}
 
 	protected void uniteSameRoutesWithJustDifferentDepartures() {
+		long totalNumberOfDepartures = 0;
+		long departuresWithChangedSchedules = 0;
+		long totalNumberOfStops = 0;
+		long stopsWithChangedTimes = 0;
+		double changedTotalTimeAtStops = 0.;
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			// Collect all route profiles
 			final Map<String, List<TransitRoute>> routeProfiles = new HashMap<>();
 			for (TransitRoute route : line.getRoutes().values()) {
+				totalNumberOfDepartures += route.getDepartures().size();
+				totalNumberOfStops += route.getDepartures().size() * route.getStops().size();
 				String routeProfile = route.getStops().get(0).getStopFacility().getId().toString();
 				for (int i = 1; i < route.getStops().size(); i++) {
 					//routeProfile = routeProfile + "-" + route.getStops().get(i).toString() + ":" + route.getStops().get(i).getDepartureOffset();
@@ -560,13 +567,37 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 				TransitRoute finalRoute = routesToUnite.get(0);
 				for (int i = 1; i < routesToUnite.size(); i++) {
 					TransitRoute routeToAdd = routesToUnite.get(i);
+					// unite departures
 					for (Departure departure : routeToAdd.getDepartures().values()) {
 						finalRoute.addDeparture(departure);
 					}
 					line.removeRoute(routeToAdd);
+					// make analysis
+					int numberOfDepartures = routeToAdd.getDepartures().size();
+					boolean departureWithChangedDepartureTimes = false;
+					for (int j = 0; j < finalRoute.getStops().size(); j++) {
+						double changedTotalTimeAtStop =
+								Math.abs(finalRoute.getStops().get(j).getArrivalOffset() - routeToAdd.getStops().get(j).getArrivalOffset())
+								+ Math.abs(finalRoute.getStops().get(j).getDepartureOffset() - routeToAdd.getStops().get(j).getDepartureOffset());
+						if (changedTotalTimeAtStop > 0) {
+							stopsWithChangedTimes += numberOfDepartures;
+							changedTotalTimeAtStops += changedTotalTimeAtStop*numberOfDepartures;
+							departureWithChangedDepartureTimes = true;
+						}
+					}
+					if (departureWithChangedDepartureTimes) {
+						departuresWithChangedSchedules += numberOfDepartures;
+					}
 				}
 			}
 		}
+		log.info("Total Number of Departures: " + totalNumberOfDepartures);
+		log.info("Number of Departures with changed schedule: " + departuresWithChangedSchedules);
+		log.info("Total Number of Stops: " + totalNumberOfStops);
+		log.info("Number of Stops with changed departure or arrival times: " + stopsWithChangedTimes);
+		log.info("Total time difference caused by changed departure or arrival times: " + changedTotalTimeAtStops);
+		log.info("Average time difference caused by changed times: " + (changedTotalTimeAtStops/stopsWithChangedTimes));
+		log.info("Average time difference over all stops caused by changed times: " + (changedTotalTimeAtStops/totalNumberOfStops));
 	}
 
 }
