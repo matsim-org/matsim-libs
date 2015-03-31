@@ -29,6 +29,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -43,7 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class TaxiOfflineEmissionTool {
 	
 	private final static String dir = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_10_basic_scenario_v4/emissions/";
-	private static final String configFile = dir + "config.xml";
+	private static final String networkFile = dir + "berlin_brb_t.xml";
 	
 	private static final String eventsFile = dir + "events.out.xml.gz";
 	private static final String emissionEventOutputFile = dir + "emission.events.offline.xml.gz";
@@ -51,9 +52,19 @@ public class TaxiOfflineEmissionTool {
 	// =======================================================================================================		
 	
 	public static void main (String[] args) throws Exception{
-		Config config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
+
+		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
+		ecg.setUsingDetailedEmissionCalculation(false);
+		ecg.setAverageColdEmissionFactorsFile(dir+"hbefa/EFA_ColdStart_vehcat_2005average.txt");
+		ecg.setAverageWarmEmissionFactorsFile(dir+"hbefa/EFA_HOT_vehcat_2005average.txt");
+		ecg.setDetailedWarmEmissionFactorsFile(dir+"hbefa/EFA_HOT_SubSegm_2005detailed.txt");
+		ecg.setDetailedColdEmissionFactorsFile(dir+"hbefa/EFA_ColdStart_SubSegm_2005detailed.txt");
+		ecg.setEmissionRoadTypeMappingFile(dir+"roadTypeMapping.txt");
+		ecg.setEmissionVehicleFile(dir+"emissionVehicles.xml");
 		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Config config = ConfigUtils.createConfig(ecg);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario).readFile(networkFile);
 		
 		EmissionModule emissionModule = new EmissionModule(scenario);
 		emissionModule.createLookupTables();

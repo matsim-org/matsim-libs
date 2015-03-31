@@ -60,7 +60,8 @@ public class TaxiToEmissionVehicleConverter {
 
 		HbefaVehicleCategory vehicleCategory;
 		HbefaVehicleAttributes vehicleAttributes;
-
+		//We are using passenger car fleet average for Germany. May or may not true for taxis, but considering HBEFA has neither hybrids nor natural gas vehicles, 
+		//it might be the way to go 
 		for(org.matsim.contrib.dvrp.data.Vehicle vrpVeh : vrpData.getVehicles()){
 			
 			Id<org.matsim.contrib.dvrp.data.Vehicle> personId = vrpVeh.getId();
