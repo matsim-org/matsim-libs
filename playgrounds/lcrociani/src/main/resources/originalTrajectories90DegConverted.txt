@@ -1,8 +1,18 @@
+# trajectories 90deg crossing experiment
+# data is on average 15 fps
 # Created by Octave 3.8.0, Fri Mar 20 13:12:19 2015 CET <laemmel@zam597>
 # name: jps
 # type: matrix
 # rows: 50507
 # columns: 5
+#Human Crowd Experiment for Analysis of Multi-Destination Pedestrian Flows (Ver. 2012-6-20)
+#
+#Location: Department of Mathematics building, Technische Universität Berlin
+#Date: December 13, 2010 sd
+#Project webpage: http://www.math.tu-berlin.de/projekte/smdpc/
+#
+#When using the data for your own work, please reference the following publication:
+#M. Plaue, M. Chen, G. Bärwolff and H. Schwandt: Multi-view extraction of dynamic pedestrian density fields, to appear in Photogrammetrie, Fernerkundung, Geoinformation (2012)
 
 0 157 -3.6053331 -2.2697038 1.7
 0 158 -3.5462069 -2.2450651 1.7

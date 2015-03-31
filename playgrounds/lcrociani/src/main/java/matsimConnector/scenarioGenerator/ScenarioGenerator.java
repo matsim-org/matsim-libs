@@ -92,7 +92,8 @@ public class ScenarioGenerator {
 		c.qsim().setEndTime(60*10);
 
 //		PopulationGenerator.createPopulation(scenario, POPULATION_SIZE);
-		MyPopulationGenerator.createPopulation(scenario);
+//		MyPopulationGenerator90deg.createPopulation(scenario);
+		MyPopulationGenerator180deg.createPopulation(scenario);
 		
 		new ConfigWriter(c).write(inputDir+ "/config.xml");
 		new NetworkWriter(scenario.getNetwork()).write(c.network().getInputFile());

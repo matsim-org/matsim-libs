@@ -25,9 +25,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.utils.misc.StringUtils;
 
-public class MyPopulationGenerator {
+public class MyPopulationGenerator90deg {
 
-	private static final Logger log = Logger.getLogger(MyPopulationGenerator.class);
+	private static final Logger log = Logger.getLogger(MyPopulationGenerator90deg.class);
 	
 	protected static void createPopulation(Scenario sc) {
 		Network network = sc.getNetwork();
@@ -36,7 +36,8 @@ public class MyPopulationGenerator {
 		for (Node node : network.getNodes().values()){
 			if (isOriginNode(node)){
 				initLinks.add(node.getOutLinks().values().iterator().next());
-			}else{
+			}
+			else{
 				destinationLinks.add(node.getOutLinks().values().iterator().next());
 			}
 		}
@@ -97,11 +98,11 @@ public class MyPopulationGenerator {
 		Set<String> handled = new HashSet<>();
 		while (l != null) {
 			String[] expl = StringUtils.explode(l, ' ');
-			if (expl.length == 5) {
+			if (expl.length == 5 && !l.startsWith("#")) {
 				String id = expl[0];
 				if (!handled.contains(id)) {
 					handled.add(id);
-					double time = Double.parseDouble(expl[1])/16; //16 fps
+					double time = Double.parseDouble(expl[1])/15; //15 fps
 					double x = Double.parseDouble(expl[2]);
 					if (x < -2) { //left-to-right
 						leftRightDepartureTimes.add(time);

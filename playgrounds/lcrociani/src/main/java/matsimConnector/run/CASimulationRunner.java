@@ -16,7 +16,6 @@ import matsimConnector.scenario.CAEnvironment;
 import matsimConnector.scenario.CAScenario;
 import matsimConnector.utility.Constants;
 import matsimConnector.visualizer.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
-import matsimConnector.visualizer.debugger.eventsbaseddebugger.InfoBox;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,10 +32,6 @@ import pedCA.output.AgentTracker;
 import pedCA.output.FundamentalDiagramWriter;
 import pedCA.output.TrajectoryCleaner;
 import pedCA.output.TrajectoryFlipTranslate;
-import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
-import playground.vsp.congestion.handlers.TollHandler;
-import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 public class CASimulationRunner implements IterationStartsListener{
 
@@ -71,14 +66,14 @@ public class CASimulationRunner implements IterationStartsListener{
 		Controler controller = new Controler(scenario);
 
 
-		//////////////------------THIS IS FOR THE SYSTEM OPTIMUM SEARCH
-		TollHandler tollHandler = new TollHandler(controller.getScenario());
-		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
-		controller.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-		// Define the pricing approach and the congestion implementation.
-		//		controler.addControlerListener(new AverageCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
-		controller.addControlerListener(new MarginalCongestionPricingContolerListener(controller.getScenario(), tollHandler, new CongestionHandlerImplV6(controller.getEvents(), controller.getScenario())));
-		//////////////------------
+//		//////////////------------THIS IS FOR THE SYSTEM OPTIMUM SEARCH
+//		TollHandler tollHandler = new TollHandler(controller.getScenario());
+//		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+//		controller.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+//		// Define the pricing approach and the congestion implementation.
+//		//		controler.addControlerListener(new AverageCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
+//		controller.addControlerListener(new MarginalCongestionPricingContolerListener(controller.getScenario(), tollHandler, new CongestionHandlerImplV6(controller.getEvents(), controller.getScenario())));
+//		//////////////------------
 
 
 		controller.setOverwriteFiles(true);
@@ -90,10 +85,10 @@ public class CASimulationRunner implements IterationStartsListener{
 		controller.addMobsimFactory(Constants.CA_MOBSIM_MODE, factoryCA);
 
 		if (args.length==0){
-			dbg = new EventBasedVisDebuggerEngine(scenario);
-			InfoBox iBox = new InfoBox(dbg, scenario);
-			dbg.addAdditionalDrawer(iBox);
-			controller.getEvents().addHandler(dbg);
+//			dbg = new EventBasedVisDebuggerEngine(scenario);
+//			InfoBox iBox = new InfoBox(dbg, scenario);
+//			dbg.addAdditionalDrawer(iBox);
+//			controller.getEvents().addHandler(dbg);
 			EnvironmentGrid environmentGrid = scenarioCA.getEnvironments().get(Id.create("0",CAEnvironment.class)).getContext().getEnvironmentGrid();
 			AgentTracker tracker = new AgentTracker(Constants.OUTPUT_PATH+"/agentTrajectories.txt",environmentGrid.getRows(),environmentGrid.getColumns());
 			controller.getEvents().addHandler(tracker);
@@ -141,8 +136,8 @@ public class CASimulationRunner implements IterationStartsListener{
 			Process p1 = new ProcessBuilder(pathToJPSReport, Constants.OUTPUT_PATH+"/90deg.xml").start();
 			logToLog(p1);
 			p1.waitFor();
-			Process p2 = new ProcessBuilder(pathToGnuplot,"-e",gnuplotDataFile, Constants.OUTPUT_PATH+"/plotFlowAndSpeed.p").start();
-			logToLog(p2);
+//			Process p2 = new ProcessBuilder(pathToGnuplot,"-e",gnuplotDataFile, Constants.OUTPUT_PATH+"/plotFlowAndSpeed.p").start();
+//			logToLog(p2);
 		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException(e);
 		}		

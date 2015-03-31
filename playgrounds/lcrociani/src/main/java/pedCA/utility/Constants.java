@@ -5,7 +5,7 @@ public class Constants {
 	public static final double SQRT2 = Math.sqrt(2);
 	
 	//Constant for the random seed
-	public static final long RANDOM_SEED = 42;
+	public static long RANDOM_SEED = 42;
 	
 	//Constants for environment
 	public static final int ENV_OBSTACLE = -1;
@@ -25,7 +25,7 @@ public class Constants {
 
 	public static final int STEP_FOR_BIDIRECTIONAL_SWAPPING = 2;
 
-	public static final double DENSITY_GRID_RADIUS = 0.4;
+	public static final double DENSITY_GRID_RADIUS = 0.6;
 
 	
 	//Constants for Pedestrian Model
