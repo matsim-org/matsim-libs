@@ -214,7 +214,8 @@ public class TtMatsim2KS2015 {
 	private void init(){
 		spCost = "tt";
 		if (!useFreeSpeedTravelTime) spCost = "dist";
-		outputDirectory += dateFormat + "_minflow_" + minCommodityFlow + "_morning_peak_speedFilter" + freeSpeedFilter + "_SP_" + spCost 
+		outputDirectory += dateFormat + "_minflow_" + minCommodityFlow + "_time" 
+				+ startTime + "-" + endTime + "_speedFilter" + freeSpeedFilter + "_SP_" + spCost 
 				+ "_cBB" + cuttingBoundingBoxOffset + "_sBB" + signalsBoundingBoxOffset + "/";
 		ksModelOutputFilename = "ks2010_model_" + Double.toString(minCommodityFlow) + "_"
 				+ Double.toString(startTime) + "_" + Double.toString(cuttingBoundingBoxOffset) + ".xml";
