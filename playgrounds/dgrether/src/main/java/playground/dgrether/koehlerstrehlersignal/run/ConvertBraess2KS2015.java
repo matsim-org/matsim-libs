@@ -23,20 +23,20 @@ public class ConvertBraess2KS2015 {
 		String signalControlFilename = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalControl_v2.0.xml";
 		String networkFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/network.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/network_mixSoft_0s.xml";
 		String lanesFilename = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/laneDefinitions_v2.0.xml";
 		String populationFilename = DgPaths.REPOS
-				+ "runs-svn/cottbus/braess/2015-02-23_base_case/output_plans.xml";
+				+ "runs-svn/cottbus/braess/2015-03-31_tbs1_netmixSoft-0s_basecase/output_plans.xml";
 
 		// output files
 		String outputDirectory = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/data/optimization/braess2ks/";
-		String dateFormat = "2015-03-27";
+		String dateFormat = "2015-04-01";
 
 		/* parameters for the time interval */
-		double startTime = 7.5 * 3600.0;
-		double endTime = 8.5 * 3600.0;
+		double startTime = 8 * 3600.0;
+		double endTime = 8 * 3600.0 + 1 * 60;
 		/* parameters for the network area */
 		double signalsBoundingBoxOffset = 500;
 		double cuttingBoundingBoxOffset = 100;
@@ -51,7 +51,7 @@ public class ConvertBraess2KS2015 {
 		int cellsX = 5; // = default value
 		int cellsY = 5; // = default value
 		/* other parameters */
-		String scenarioDescription = "run braess output plans between 07:30 and 08:30";
+		String scenarioDescription = "run braess output plans between 08:00 and 08:01";
 
 		TtMatsim2KS2015 converter = new TtMatsim2KS2015(signalSystemsFilename,
 				signalGroupsFilename, signalControlFilename, networkFilename,
