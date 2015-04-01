@@ -41,7 +41,7 @@ public class TripAnalysisMain {
 			log.info("run directory: " + runDirectory);
 			
 		} else {
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_2a/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
 		}
 		
 		TripAnalysisMain analysis = new TripAnalysisMain();

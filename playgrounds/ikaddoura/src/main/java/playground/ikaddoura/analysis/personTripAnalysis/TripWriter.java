@@ -83,15 +83,6 @@ public class TripWriter {
 					double price = amounts.get(i);
 					double departureTime = departureTimes.get(i);
 					double distance = distances.get(i);
-					
-//					String travelTime = null;
-//					if (travelTimes.size() < i) {
-//						log.warn("A trip without a travel time probably due to stucking. person ID: " + id + " // departure time: " + departureTime + " // trip number: " + i);
-//						travelTime = "stuck";
-//					} else {
-//						travelTime = String.valueOf(travelTimes.get(i));
-//					}
-					
 					double travelTime = travelTimes.get(i);
 					
 					bw.write(departureTime + ";" + id + ";" + price + ";" + distance + ";" + travelTime);

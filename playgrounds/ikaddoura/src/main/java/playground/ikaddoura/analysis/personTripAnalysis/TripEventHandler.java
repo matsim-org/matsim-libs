@@ -307,12 +307,10 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 					double departureTime = personId2tripNumber2departureTime.get(personId).get(tripNumber);
 					
 					if (personId2tripNumber2travelTime.get(personId).get(tripNumber) == null) {
-						log.warn("A trip without a travel time probably due to stucking. person ID: " + personId + " // departure time: " + departureTime + " // trip number: " + tripNumber);
-						throw new RuntimeException("Oups...");
+						throw new RuntimeException("A trip without any travel time. Person ID: " + personId + " // Departure Time: " + departureTime + " // Trip Number: " + tripNumber);
 					
 					} else if (personId2tripNumber2travelTime.get(personId).get(tripNumber) == Double.POSITIVE_INFINITY) {
-						log.warn("An infinite travel time probably due to stucking. Ignoring this trip.");
-						log.warn("A trip without a travel time probably due to stucking. person ID: " + personId + " // departure time: " + departureTime + " // trip number: " + tripNumber);
+						log.warn("An infinite travel time probably due to stucking. Ignoring this trip for the calculation of an average travel time. Person ID: " + personId + " // Departure Time: " + departureTime + " // Trip Number: " + tripNumber);
 						
 					} else {
 						double belongingTravelTime = personId2tripNumber2travelTime.get(personId).get(tripNumber);
@@ -602,7 +600,12 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
 		
-		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles()) {
+		log.info("### Person is stucking. ###");
+		log.info(event.toString());
+		
+		if (this.scenario.getConfig().qsim().isRemoveStuckVehicles() || event.getTime() == 30 * 3600.) {
+			
+			log.warn("Stucking vehicles will either be removed or the stuck event is thrown at the end of the simulation.");
 			
 			Map<Integer, Double> tripNumber2travelTime;
 			if (this.personId2tripNumber2travelTime.containsKey(event.getPersonId())) {
@@ -613,11 +616,20 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 			}
 			
 			int currentTripNumber = this.personId2currentTripNumber.get(event.getPersonId());
-			tripNumber2travelTime.put(currentTripNumber, Double.POSITIVE_INFINITY);
-			this.personId2tripNumber2travelTime.put(event.getPersonId(), tripNumber2travelTime);
 			
+			double traveltime = 0.;
+			if (event.getTime() == 30 * 3600.) {
+				traveltime = event.getTime() - this.personId2tripNumber2departureTime.get(event.getPersonId()).get(currentTripNumber);
+			} else {
+				traveltime = Double.POSITIVE_INFINITY;
+			}
+			
+			log.warn("The travel time is set to " + traveltime);
+			tripNumber2travelTime.put(currentTripNumber, traveltime);
+			this.personId2tripNumber2travelTime.put(event.getPersonId(), tripNumber2travelTime);
+				
 		} else {
-			// The agent should arrive and a travel time can be calculated.
+				// The agent should arrive and a travel time can be calculated.
 		}
 	}
 
