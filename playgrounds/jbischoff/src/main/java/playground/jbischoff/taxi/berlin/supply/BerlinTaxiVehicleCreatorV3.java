@@ -74,7 +74,8 @@ public class BerlinTaxiVehicleCreatorV3
     {
         String dir = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/";
 //        String taxisOverTimeFile = dir + "taxi_berlin/2014_10_bahnstreik/VEH_IDs_2014-10/oct/oct_taxis.txt";
-        String taxisOverTimeFile = dir + "/taxi_berlin/2013/status/taxisovertime.csv";
+//        String taxisOverTimeFile = dir + "/taxi_berlin/2013/status/taxisovertime.csv";
+        String taxisOverTimeFile = dir + "/taxi_berlin/2013/vehicles/taxisweekly.csv";
         String networkFile = dir + "scenarios/2015_02_basic_scenario_v6/berlin_brb.xml";
         String zoneShpFile = dir + "shp_merged/zones.shp";
         String zoneXmlFile = dir + "shp_merged/zones.xml";
@@ -117,7 +118,7 @@ public class BerlinTaxiVehicleCreatorV3
             public void startRow(String[] row)
             {
                 try {
-                    taxisOverTime.put(ORG.parse(row[0]), (int) Double.parseDouble(row[1]));
+                    taxisOverTime.put(SDF.parse(row[0]), (int) Double.parseDouble(row[1]));
                 }
                 catch (Exception e) {
                     throw new RuntimeException(e);
