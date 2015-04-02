@@ -15,8 +15,7 @@ public class PSimReRoutePlanStrategyFactory extends ReRoutePlanStrategyFactory {
     public PSimReRoutePlanStrategyFactory(PSimControler controler, Scenario scenario) {
 		super(scenario);
         this.scenario = scenario;
-        PSimControler controler1 = controler;
-	}
+    }
 
     @Override
 	public PlanStrategy get() {

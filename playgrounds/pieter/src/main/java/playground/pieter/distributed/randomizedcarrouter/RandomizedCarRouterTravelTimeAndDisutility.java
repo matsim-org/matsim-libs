@@ -143,9 +143,9 @@ public class RandomizedCarRouterTravelTimeAndDisutility implements TravelDisutil
             if (this.dataCollectionConfig.get(DataCollection.randomizedParameters)) {
 //				StringBuffer strb = this.dataCollectionStrings.get(DataCollection.randomizedParameters) ;
 //				strb.append
-                System.out.println("personId: " + person.getId() +
-                        "; marginalCostOfTime_h: " + this.localMarginalCostOfTime_s * 3600. +
-                        "; marginalCostOfDistance_m: " + this.localMarginalCostOfDistance_m);
+//                System.out.println("personId: " + person.getId() +
+//                        "; marginalCostOfTime_h: " + this.localMarginalCostOfTime_s * 3600. +
+//                        "; marginalCostOfDistance_m: " + this.localMarginalCostOfDistance_m);
             }
         }
     }

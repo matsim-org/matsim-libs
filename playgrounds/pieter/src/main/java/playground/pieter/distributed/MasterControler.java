@@ -51,6 +51,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private static Options options;
     private static StringBuilder masterInitialLogString;
     private static boolean DiversityGeneratingPlanSelection;
+    private static String appendString;
     private final HashMap<String, Plan> newPlans = new HashMap<>();
     private final long startMillis;
     private final Hydra hydra;
@@ -143,6 +144,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 .hasArg(true)
                 .withArgName("iters")
                 .create("l"));
+        options.addOption(OptionBuilder.withLongOpt("appendString")
+                .withDescription("Optional string without spaces to append to end of output directory name.")
+                .hasArg(true)
+                .withArgName("STRING")
+                .create("a"));
 
         options.addOption("m", "mode", false, "A switch to change SimulationMode from PARALLEL (PSim execution during QSim execution) " +
                 "to SERIAL (PSim waits for QSim to finish and vice-versa.)");
@@ -163,6 +169,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             printHelp();
             System.exit(1);
         }
+        appendString=(commandLine.hasOption("appendString")||commandLine.hasOption("a"))?commandLine.getOptionValue("a"):"";
         DiversityGeneratingPlanSelection = commandLine.hasOption("Diversify") || commandLine.hasOption("D");
         masterInitialLogString = new StringBuilder();
         if (commandLine.hasOption("f")||commandLine.hasOption("fullTransit")) {
@@ -260,8 +267,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
 
         this.writeFullPlansInterval = config.controler().getWritePlansInterval();
-        if (commandLine.hasOption("w")) {
-            writeFullPlansInterval = Integer.parseInt(commandLine.getOptionValue("w"));
+        if (commandLine.hasOption("d")) {
+            writeFullPlansInterval = Integer.parseInt(commandLine.getOptionValue("d"));
             masterInitialLogString.append("Will dump all plans from all slaves every  " + writeFullPlansInterval + " cycles.\n");
         } else {
             masterInitialLogString.append("No interval defined for writing all plans from all slaves to disk.\n");
@@ -361,9 +368,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                 (SelectedSimulationMode.equals(SimulationMode.SERIAL) ? "_m" : "") +
                 (SingaporeScenario ? "_s" : "") +
                 (FullTransitPerformanceTransmission ? "_f" : "") +
+                (TrackGenome ? "_g" : "") +
                 (QuickReplanning ? "_q" : "") +
                 (IntelligentRouters? "_I" : "")+
-                (DiversityGeneratingPlanSelection? "_D" : "");
+                (DiversityGeneratingPlanSelection? "_D" : "") + appendString;
         config.controler().setOutputDirectory(outputDirectory);
         if (TrackGenome) {
             matsimControler.addControlerListener(new GenomeAnalysis(true, false, true));

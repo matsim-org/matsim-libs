@@ -32,10 +32,16 @@ public class ControlerReference {
         options.addOption("g", "genomeTracking", false, "Track plan genomes");
         options.addOption("I", "IntelligentRouters", false, "Intelligent routers");
         options.addOption("D", "Diversify", false, "Use the DiversityGeneratingPlansRemover");
+        options.addOption(OptionBuilder.withLongOpt("appendString")
+                .withDescription("Optional string without spaces to append to end of output directory name.")
+                .hasArg(true)
+                .withArgName("STRING")
+                .create("a"));
 //        CommandLineParser parser = new BasicParser();
         CommandLineParser parser = new GnuParser();
         CommandLine commandLine = parser.parse(options, args);
 
+        String appendString=commandLine.hasOption("appendString")||commandLine.hasOption("a")?commandLine.getOptionValue("a"):"";
 
         Config config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"), new DestinationChoiceConfigGroup());
 
@@ -120,8 +126,8 @@ public class ControlerReference {
                 (trackGenome ? "_g" : "") +
                 (singapore ? "_s" : "") +
                 (intelligentRouters ? "_I" : "") +
-                (diversityGeneratingPlanSelection ? "_D" : "")
-        ;
+                (diversityGeneratingPlanSelection ? "_D" : "") +
+                appendString;
         config.controler().setOutputDirectory(outputDirectory);
     }
 
