@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal.run;
+package playground.dgrether.koehlerstrehlersignal.figure9scenario;
 
 import java.io.IOException;
 import java.util.List;

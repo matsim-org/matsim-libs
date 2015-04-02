@@ -1,4 +1,4 @@
-package playground.dgrether.koehlerstrehlersignal.run;
+package playground.dgrether.koehlerstrehlersignal.braessscenario;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,6 @@ import playground.dgrether.koehlerstrehlersignal.analysis.AnalyzeBraessSimulatio
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010Solution2Matsim;
-import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2015BraessSolutionOffsetsXMLParser;
 
 /**
  * Class to start the conversion of BTU solutions for the braess scenario into MATSim signal format.

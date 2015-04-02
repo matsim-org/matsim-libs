@@ -1,4 +1,4 @@
-package playground.dgrether.koehlerstrehlersignal.solutionconverter;
+package playground.dgrether.koehlerstrehlersignal.braessscenario;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +12,7 @@ import org.xml.sax.Attributes;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
+import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package playground.dgrether.koehlerstrehlersignal.run;
+package playground.dgrether.koehlerstrehlersignal.braessscenario;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,10 +6,13 @@ import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
@@ -112,6 +115,15 @@ public class RunBraessScenario {
 		config.planCalcScore().setTraveling_utils_hr(-6.0); //-6.0 default
 		config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(0.0); //0.0 default
 		
+		// TODO try to use random router
+//		TravelTime timeCalculator = config.travelTimeCalculator().get;
+//		PlanCalcScoreConfigGroup cnScoringGroup = config.planCalcScore();
+//		RandomizingTimeDistanceTravelDisutility rTDTD = (RandomizingTimeDistanceTravelDisutility)
+//				(new RandomizingTimeDistanceTravelDisutility.Builder()).createTravelDisutility(
+//						timeCalculator, cnScoringGroup);
+//		config.planCalcScore().		
+				
+		
 		ActivityParams dummyParam = new ActivityParams("dummy");
 		dummyParam.setTypicalDuration(12*3600);
 		dummyParam.setLatestStartTime(11*3600);
@@ -183,9 +195,9 @@ public class RunBraessScenario {
 		
 		List<String> ttZs = new ArrayList<>(); // travel time on the middle link
 		ttZs.add("0s");
-		ttZs.add("5s");
-		ttZs.add("10s");
-		ttZs.add("200s");
+//		ttZs.add("5s");
+//		ttZs.add("10s");
+//		ttZs.add("200s");
 		
 		for (String ttZ : ttZs){
 			

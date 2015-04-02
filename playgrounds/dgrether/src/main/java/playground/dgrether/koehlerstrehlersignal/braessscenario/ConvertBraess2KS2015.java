@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.dgrether.koehlerstrehlersignal.run;
+package playground.dgrether.koehlerstrehlersignal.braessscenario;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.conversion.TtMatsim2KS2015;
