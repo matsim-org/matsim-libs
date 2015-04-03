@@ -544,6 +544,7 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		long totalNumberOfStops = 0;
 		long stopsWithChangedTimes = 0;
 		double changedTotalTimeAtStops = 0.;
+		List<Double> timeChanges = new ArrayList<>();
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			// Collect all route profiles
 			final Map<String, List<TransitRoute>> routeProfiles = new HashMap<>();
@@ -582,6 +583,9 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 						if (changedTotalTimeAtStop > 0) {
 							stopsWithChangedTimes += numberOfDepartures;
 							changedTotalTimeAtStops += changedTotalTimeAtStop*numberOfDepartures;
+							for (int k = 0; k < numberOfDepartures; k++) {
+								timeChanges.add(changedTotalTimeAtStop);
+							}
 							departureWithChangedDepartureTimes = true;
 						}
 					}
@@ -598,6 +602,25 @@ public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 		log.info("Total time difference caused by changed departure or arrival times: " + changedTotalTimeAtStops);
 		log.info("Average time difference caused by changed times: " + (changedTotalTimeAtStops/stopsWithChangedTimes));
 		log.info("Average time difference over all stops caused by changed times: " + (changedTotalTimeAtStops/totalNumberOfStops));
+		//writeChangedTimes(timeChanges);
+	}
+
+	private void writeChangedTimes(List<Double> timeChanges) {
+		BufferedWriter bw = null;
+		try {
+			// here absolute path hard-coded (not very elegant but as it is only for analysis purposes...)
+			bw = new BufferedWriter(new FileWriter("c:\\changedTimes.csv"));
+			for (double timeDelta : timeChanges) {
+				bw.write(timeDelta + "\n");
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Error while writing changedTimes.csv", e);
+		} finally {
+			if (bw != null) {
+				try { bw.close(); }
+				catch (IOException e) { System.out.print("Could not close stream."); }
+			}
+		}
 	}
 
 }
