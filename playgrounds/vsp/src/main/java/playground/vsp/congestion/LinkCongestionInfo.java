@@ -56,7 +56,8 @@ public class LinkCongestionInfo {
 	private Id<Person> lastEnteredAgent;
 	private double lastLeaveTime;
 	
-	private List<Id<Link>> spillBackCausingLink = new ArrayList<Id<Link>>();
+	private List<Id<Link>> spillBackCausingLinks = new ArrayList<Id<Link>>();
+	private List<Id<Person>> agentsCausingFlowDelays = new ArrayList<Id<Person>>();
 	
 	public Id<Link> getLinkId() {
 		return linkId;
@@ -145,7 +146,10 @@ public class LinkCongestionInfo {
 		} else return false; 
 	}
 	public List<Id<Link>> getSpillBackCausingLinks() {
-		return spillBackCausingLink;
+		return spillBackCausingLinks;
+	}
+	public List<Id<Person>> getAgentsCausingFlowDelays() {
+		return agentsCausingFlowDelays;
 	}
 		
 }

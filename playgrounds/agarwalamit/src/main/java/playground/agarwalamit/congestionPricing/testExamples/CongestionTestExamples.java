@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -67,7 +68,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 public class CongestionTestExamples {
 	
-	private final boolean useOTFVis = true;
+	private final boolean useOTFVis = false;
 	
 	public static void main(String[] args) {
 		new CongestionTestExamples().run();
@@ -81,7 +82,7 @@ public class CongestionTestExamples {
 		corridorInputs.createNetwork();
 		corridorInputs.createPopulation(numberOfPersonInPlan);
 		Scenario sc = corridorInputs.getDesiredScenario();
-		new CongestionTestExamples().compareV3AndV4(sc,testNetwork);
+		new CongestionTestExamples().getDelayDataForPricingImpls(sc,testNetwork);
 		
 		// merging network
 		numberOfPersonInPlan = 5;
@@ -90,7 +91,8 @@ public class CongestionTestExamples {
 		mergeInputs.createNetwork();
 		mergeInputs.createPopulation(numberOfPersonInPlan);
 		sc = mergeInputs.getDesiredScenario();
-		new CongestionTestExamples().compareV3AndV4(sc,testNetwork);
+		Logger.getLogger(CongestionTestExamples.class).warn("During implV3, agent 4 leave node first whereas in other two impls agent 5 leave first.");
+		new CongestionTestExamples().getDelayDataForPricingImpls(sc,testNetwork);
 		
 		//diverging network 
 		numberOfPersonInPlan = 6;
@@ -99,14 +101,15 @@ public class CongestionTestExamples {
 		divergeInputs.createNetwork();
 		divergeInputs.createPopulation(numberOfPersonInPlan);
 		sc=divergeInputs.getDesiredScenario();
-		new CongestionTestExamples().compareV3AndV4(sc,testNetwork);
+		new CongestionTestExamples().getDelayDataForPricingImpls(sc,testNetwork);
 	}
 	
-	public void compareV3AndV4(Scenario sc, String networkExampleName){
-		List<CongestionEvent> congestionEvents_v6 = getCongestionEvents("v6",sc); 
+	public void getDelayDataForPricingImpls(Scenario sc, String networkExampleName){
 		List<CongestionEvent> congestionEvents_v3 = getCongestionEvents("v3",sc);
 		List<CongestionEvent> congestionEvents_v4 = getCongestionEvents("v4",sc); 
-		 
+		List<CongestionEvent> congestionEvents_v6 = getCongestionEvents("v6",sc);
+		
+		System.out.println("v3");
 		 SortedMap<String,Tuple<Double, Double>> tab_v3 = getId2CausedAndAffectedDelays(congestionEvents_v3,sc);
 		 System.out.println("v4");
 		 SortedMap<String,Tuple<Double, Double>> tab_v4 = getId2CausedAndAffectedDelays(congestionEvents_v4,sc);
@@ -136,14 +139,13 @@ public class CongestionTestExamples {
 		
 		for(CongestionEvent e : events){
 			System.out.println(e.toString());
-			String causingPerson = e.getCausingAgentId().toString();
-			Tuple<Double, Double> causingPerson_tup = id2CausingAffectedDelays.get(causingPerson);
+			Tuple<Double, Double> causingPerson_tup = id2CausingAffectedDelays.get(e.getCausingAgentId().toString());
 			causingPerson_tup = new Tuple<Double, Double>(causingPerson_tup.getFirst()+e.getDelay(), causingPerson_tup.getSecond());
-			id2CausingAffectedDelays.put(causingPerson, causingPerson_tup);
+			id2CausingAffectedDelays.put(e.getCausingAgentId().toString(), causingPerson_tup);
 			
-			Tuple<Double, Double> affectedPerson = id2CausingAffectedDelays.get(e.getAffectedAgentId().toString());
-			affectedPerson = new Tuple<Double, Double>(affectedPerson.getFirst(), affectedPerson.getSecond()+e.getDelay());
-			id2CausingAffectedDelays.put(e.getAffectedAgentId().toString(), affectedPerson);
+			Tuple<Double, Double> affectedPerson_tup = id2CausingAffectedDelays.get(e.getAffectedAgentId().toString());
+			affectedPerson_tup = new Tuple<Double, Double>(affectedPerson_tup.getFirst(), affectedPerson_tup.getSecond()+e.getDelay());
+			id2CausingAffectedDelays.put(e.getAffectedAgentId().toString(), affectedPerson_tup);
 		}
 		return id2CausingAffectedDelays;
 	}
@@ -169,7 +171,10 @@ public class CongestionTestExamples {
 
 		});
 		
-		if(congestionPricingImpl.equalsIgnoreCase("v3")) events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl)sc));
+		if(congestionPricingImpl.equalsIgnoreCase("v3")) {
+			events.addHandler(new CongestionHandlerImplV3(events, (ScenarioImpl)sc));
+			Logger.getLogger(CongestionTestExamples.class).warn("The analysis table is generated using events and thus there are some delays unaccounted in implV3.");
+		}
 		else if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
 		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
 

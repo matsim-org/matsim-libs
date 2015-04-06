@@ -16,13 +16,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.congestionPricing;
+package playground.vsp.congestion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -35,7 +36,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -62,24 +62,46 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
-import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 /**
+ * Accounting for flow delays even if leaving agents list is empty.
+ * 
  * @author amit
  */
 
-public class MultipleSpillbackCausingLinksTestV4 {
+public class CombinedFlowAndStorageDelayTestV4 {
+	
+	private final boolean usingOTFVis = false;
+	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
+	/**
+	 * Basically agent first delay due to flow cap and then when agent can leave the link, it is delayed due to storage cap
+	 * on the next link in the route. Since, it is waiting for storage delay, causing agent(s) for flow delay is not captured by leaving agents list.
+	 * Thus, such agents are caught by comparing the free speed link time of each agent. If time headway is less than minimum time headway of the link,
+	 * agents are stored to charge later if required.
+	 */
 	@Test
-	public final void multipleSpillBackTest(){
-
-	List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays("v4");
-	//yet to check the values.
+	public final void combinationOfFlowAndStorageDelay(){
+		/*
+		 * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on 
+		 * other route. After agent 1 leave the link 2 (marginal flow delay =100), agent 2 is delayed. Mean while, before agent 2 can move to next link,
+		 * link 3 is blocked by agent 3 (departed on link 5). Thus, agent 2 on link 2 is delayed. Causing agents should be 1 (flow cap), 4 (storage cap).
+		 */
+		List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays();
+		
+		for(CongestionEvent e : congestionEvents){
+			if(e.getAffectedAgentId().equals(Id.createPersonId("2")) && e.getCausingAgentId().equals(Id.createPersonId("1"))){
+				Assert.assertEquals("Delay caused by agent 2 is not correct.", 100, e.getDelay(), MatsimTestUtils.EPSILON);
+				// this is not captured by only leaving agents list.
+			} 
+		}
+		
+		Assert.assertEquals("Number of congestion events are not correct.", 4, congestionEvents.size(), MatsimTestUtils.EPSILON);
 	}
 
-	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){
+	private List<CongestionEvent> getAffectedPersonId2Delays(){
 
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
 		pseudoInputs.createNetwork();
@@ -103,8 +125,7 @@ public class MultipleSpillbackCausingLinksTestV4 {
 
 		});
 
-		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
-		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
+		events.addHandler(new CongestionHandlerImplV4(events, sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();
@@ -136,20 +157,17 @@ public class MultipleSpillbackCausingLinksTestV4 {
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qSim.addAgentSource(agentSource);
 
-		// otfvis configuration.  There is more you can do here than via file!
-		final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
-		otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
-		//				otfVisConfig.setShowParking(true) ; // this does not really work
+		if(usingOTFVis){
+			// otfvis configuration.  There is more you can do here than via file!
+			final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
+			otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
+			//				otfVisConfig.setShowParking(true) ; // this does not really work
 
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, manager, qSim);
-		OTFClientLive.run(sc.getConfig(), server);
-
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, manager, qSim);
+			OTFClientLive.run(sc.getConfig(), server);
+		}
 		return qSim;
 	}
-
-	/**
-	 * generates network with 7 links.
-	 */
 
 	private class createPseudoInputs {
 		Scenario scenario;
@@ -161,8 +179,6 @@ public class MultipleSpillbackCausingLinksTestV4 {
 		Link link3;
 		Link link4;
 		Link link5;
-		Link link6;
-		Link link7;
 
 		public createPseudoInputs(){
 			config=ConfigUtils.createConfig();
@@ -178,79 +194,64 @@ public class MultipleSpillbackCausingLinksTestV4 {
 			Node node3 = network.createAndAddNode(Id.createNodeId("3"), this.scenario.createCoord(500, 150));
 			Node node4 = network.createAndAddNode(Id.createNodeId("4"), this.scenario.createCoord(1000, 100));
 			Node node5 = network.createAndAddNode(Id.createNodeId("5"), this.scenario.createCoord(1000, 0));
-			Node node6 = network.createAndAddNode(Id.createNodeId("6"), this.scenario.createCoord(500, 50));
 
 			link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node1, node2,100.0,20.0,3600,1,null,"7");
-			link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,7.0,20.0,360,1,null,"7");
-			link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node3, node4,100.0,20.0,3600,1,null,"7");
+			link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node2, node3,100.0,20.0,36,1,null,"7");
+			link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node3, node4,1.0,20.0,360,1,null,"7");
 			link4 = network.createAndAddLink(Id.createLinkId(String.valueOf("4")), node4, node5,100.0,20.0,3600,1,null,"7");
-			link5 = network.createAndAddLink(Id.createLinkId(String.valueOf("5")), node5, node1,100.0,20.0,3600,1,null,"7");
-			link6 = network.createAndAddLink(Id.createLinkId(String.valueOf("6")), node2, node6,7.0,20.0,360,1,null,"7");
-			link7 = network.createAndAddLink(Id.createLinkId(String.valueOf("7")), node6, node4,100.0,20.0,3600,1,null,"7");
-
+			
+			link5 = network.createAndAddLink(Id.createLinkId(String.valueOf("5")), node1, node3,100.0,20.0,3600,1,null,"7");
 		}
 
 		private void createPopulation(){
 
-			for(int i=1;i<10;i++){
+			for(int i=1;i<3;i++){
 
 				Id<Person> id = Id.createPersonId(i);
 				Person p = population.getFactory().createPerson(id);
 				Plan plan = population.getFactory().createPlan();
 				p.addPlan(plan);
 
-				{
-					//home-work route 1
-					Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
-					a1.setEndTime(0+i);
-					Leg leg = population.getFactory().createLeg(TransportMode.car);
-					plan.addActivity(a1);
-					plan.addLeg(leg);
-					LinkNetworkRouteFactory factory1 = new LinkNetworkRouteFactory();
-					NetworkRoute route1;
-					List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-					route1= (NetworkRoute) factory1.createRoute(link1.getId(), link4.getId());
-					linkIds.add(link2.getId());
-					linkIds.add(link3.getId());
-					route1.setLinkIds(link1.getId(), linkIds, link4.getId());
-					leg.setRoute(route1);
-					Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
-					a2.setEndTime(0+50-i);
-					plan.addActivity(a2);
-				}
-				
-				{
-					//work-home
-					Leg leg = population.getFactory().createLeg(TransportMode.car);
-					plan.addLeg(leg);
-					LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-					NetworkRoute route = (NetworkRoute) factory.createRoute(link4.getId(), link1.getId());
-					List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-					linkIds.add(link5.getId());
-					route.setLinkIds(link4.getId(), linkIds, link1.getId());
-					leg.setRoute(route);
-					Activity a3 = population.getFactory().createActivityFromLinkId("h", link1.getId());
-					plan.addActivity(a3);
-					a3.setEndTime(0+60-5*i);
-				}
-
-				{//home-work route 2
-					Leg leg = population.getFactory().createLeg(TransportMode.car);
-					plan.addLeg(leg);
-					LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-					NetworkRoute route = (NetworkRoute) factory.createRoute(link1.getId(), link4.getId());
-					List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-					linkIds.add(link6.getId());
-					linkIds.add(link7.getId());
-					route.setLinkIds(link1.getId(), linkIds, link4.getId());
-					leg.setRoute(route);
-					Activity a4 = population.getFactory().createActivityFromLinkId("w", link4.getId());
-					plan.addActivity(a4);
-				}
-				population.addPerson(p);	
+				Activity a1 = population.getFactory().createActivityFromLinkId("h", link1.getId());
+				a1.setEndTime(0+i);
+				Leg leg = population.getFactory().createLeg(TransportMode.car);
+				plan.addActivity(a1);
+				plan.addLeg(leg);
+				LinkNetworkRouteFactory factory1 = new LinkNetworkRouteFactory();
+				NetworkRoute route1;
+				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+				route1= (NetworkRoute) factory1.createRoute(link1.getId(), link4.getId());
+				linkIds.add(link2.getId());
+				linkIds.add(link3.getId());
+				route1.setLinkIds(link1.getId(), linkIds, link4.getId());
+				leg.setRoute(route1);
+				Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
+				plan.addActivity(a2);
+				population.addPerson(p);
 			}
-			
-			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write("./output/testPop.xml");
+
+			for(int i=3;i<5;i++) {
+				Id<Person> id = Id.createPersonId(i);
+				Person p = population.getFactory().createPerson(id);
+				Plan plan = population.getFactory().createPlan();
+				p.addPlan(plan);
+
+				Activity a1 = population.getFactory().createActivityFromLinkId("h", link5.getId());
+				a1.setEndTime(100+i);
+				Leg leg = population.getFactory().createLeg(TransportMode.car);
+				plan.addActivity(a1);
+				plan.addLeg(leg);
+				LinkNetworkRouteFactory factory1 = new LinkNetworkRouteFactory();
+				NetworkRoute route1;
+				List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+				route1= (NetworkRoute) factory1.createRoute(link5.getId(), link4.getId());
+				linkIds.add(link3.getId());
+				route1.setLinkIds(link5.getId(), linkIds, link4.getId());
+				leg.setRoute(route1);
+				Activity a2 = population.getFactory().createActivityFromLinkId("w", link4.getId());
+				plan.addActivity(a2);
+				population.addPerson(p);
+			}
 		}
 
 	}
