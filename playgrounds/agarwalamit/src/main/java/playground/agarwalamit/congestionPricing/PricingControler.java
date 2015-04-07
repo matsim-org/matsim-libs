@@ -34,6 +34,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
+
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -48,7 +49,7 @@ import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 public class PricingControler {
 	
-	private static final boolean usingMunich = true;
+	private static boolean usingMunich = false;
 
 	public static void main(String[] args) {
 
@@ -56,16 +57,22 @@ public class PricingControler {
 		String outputDir = args[1];
 		String congestionPricing = args[2];
 		
+		usingMunich = Boolean.valueOf(args[3]);
+		
 		Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		
-//		String configFile = "../../../repos/runs-svn/siouxFalls/run204/baseCase/config_congestionPricing_baseCaseCtd.xml";//args[0];
-//		String outputDir = "../../../repos/runs-svn/siouxFalls/run204/policies/v4/";//args[1];
+//		String configFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/bau/output_config.xml.gz";//args[0];
+//		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/";//args[1];
 //		String congestionPricing = "implV4";//args[2];
-//		String networkFile = "../../../repos/runs-svn/siouxFalls/run204/baseCase/output_network.xml.gz";
-//		String plansFIle = "../../../repos/runs-svn/siouxFalls/run204/baseCase/output_plans.xml.gz";
+//		String networkFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/bau/output_network.xml.gz";
+//		String plansFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/bau/output_plans.xml.gz";
+//		String personAttributeFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/bau/output_personAttributes.xml.gz";
 //		
-//		Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFIle, networkFile, configFile);
-		
+//		Config config = LoadMyScenarios.getConfigFromPlansNetworkAndConfigFiles(plansFile, networkFile, configFile);
+//		config.plans().setInputPersonAttributeFile(personAttributeFile);
+//		Scenario sc = ScenarioUtils.loadScenario(config);
+//		sc.getConfig().counts().setCountsFileName("../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/counts-2008-01-10_correctedSums_manuallyChanged_strongLinkMerge.xml");
+
 		sc.getConfig().controler().setOutputDirectory(outputDir);
 		sc.getConfig().controler().setWriteEventsInterval(100);
 		sc.getConfig().controler().setWritePlansInterval(100);
@@ -92,16 +99,7 @@ public class PricingControler {
 				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV4(controler.getEvents(), sc)));
 				Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 4.");
 			}
-			break;
-		
-		case "implV5":
-		{
-			controler.setTravelDisutilityFactory(fact);
-			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new MarginalCongestionHandlerImplV5(controler.getEvents(), sc)));
-			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 5.");
-		}
 		break;
-		
 		case "implV6":
 		{
 			controler.setTravelDisutilityFactory(fact);
@@ -109,7 +107,6 @@ public class PricingControler {
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 6.");
 		}
 		break;
-		
 		case "none":
 		default:
 			Logger.getLogger(PricingControler.class).info("Congestion pricing implementation does not match. No pricing implementation is introduced.");
@@ -141,9 +138,6 @@ public class PricingControler {
 				}
 			});
 		}
-		
 		controler.run();
-		
 	}
-
 }

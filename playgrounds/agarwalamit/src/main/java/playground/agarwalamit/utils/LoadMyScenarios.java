@@ -145,4 +145,18 @@ public class LoadMyScenarios {
 		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
 		return endTime;
 	}
+	
+	/**
+	 * Returns config by storing network and plans file locations and reading config files.
+	 */
+	public static Config getConfigFromPlansNetworkAndConfigFiles(String populationFile, String networkFile, String configFile) {
+		Config config = new Config();
+		config.addCoreModules();
+		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		configReader.readFile(configFile);
+		config.plans().setInputFile(populationFile);
+		config.plans().setInputPersonAttributeFile(null);
+		config.network().setInputFile(networkFile);
+		return config;
+	}
 }
