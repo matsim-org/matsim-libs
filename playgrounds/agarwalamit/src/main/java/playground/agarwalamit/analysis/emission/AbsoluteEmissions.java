@@ -52,11 +52,13 @@ public class AbsoluteEmissions {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/absoluteEmissions.txt");
 
 		SortedMap<String, SortedMap<String, Double>> emissions = new TreeMap<>();
+		SortedMap<String, Double> emissionCost = new TreeMap<>();
 		Set<String> pollutants = new HashSet<String>();
 
 		for(String runCase:runCases){
 			SortedMap<String, Double> em = calculateTotalEmissions(runCase);
 			emissions.put(runCase, em);
+			emissionCost.put(runCase, getEmissionCost(em));
 			pollutants.addAll(em.keySet());
 		}
 		try {
@@ -64,6 +66,7 @@ public class AbsoluteEmissions {
 			for(String runCase:pollutants){
 				writer.write(runCase+"\t");
 			}
+			writer.write("emissionCost");
 			writer.newLine();
 
 			for(String runCase:emissions.keySet()){
@@ -71,14 +74,22 @@ public class AbsoluteEmissions {
 				for(String pollutant : pollutants){
 					writer.write(emissions.get(runCase).get(pollutant)+"\t");
 				}
-				writer.newLine();
+				writer.write(emissionCost.get(runCase)+"\n");
 			}
 			writer.close();
 		} catch (IOException e1) {
 			throw new RuntimeException("Data is not written in file. Reason : "+e1);
 		}
 	}
-
+	
+	public double getEmissionCost(SortedMap<String, Double> em){
+		double cost = 0;
+		for (EmissionCostFactors ecf : EmissionCostFactors.values()){
+			cost += em.get(ecf.toString()) * ecf.getCostFactor();
+		}
+		return cost;
+	}
+	
 	private SortedMap<String,Double> calculateTotalEmissions (String runCase){
 		String configFile = outputDir+runCase+"/output_config.xml";
 		int lastIt = LoadMyScenarios.getLastIteration(configFile);
