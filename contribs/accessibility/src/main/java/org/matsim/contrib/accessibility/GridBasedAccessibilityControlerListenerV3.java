@@ -193,14 +193,18 @@ implements ShutdownListener, StartupListener {
 		// dedicated for as input for UrbanSim, but for analysis purposes
 		
 		// in case multiple AccessibilityControlerListeners are added to the controller, e.g. if various calculations are done for
-		// different activity types or different modes (or both) subdirectories are required in order not to confuse the output
+		// different activity types subdirectories are required in order not to confuse the output. dz, '14
 		if (outputSubdirectory == null) {
-			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
+			if ( this.urbansimMode ) {
+				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
+			}
 		} else {
 			File file = new File(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
 			file.mkdirs();
-			urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(
-					config.controler().getOutputDirectory() + "/" + outputSubdirectory);
+			if ( this.urbansimMode ) {
+				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(
+						config.controler().getOutputDirectory() + "/" + outputSubdirectory);
+			}
 		}
 	}
 
@@ -301,8 +305,10 @@ implements ShutdownListener, StartupListener {
 		String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
 			
 
-		urbansimAccessibilityWriter.close();
-		
+		if ( this.urbansimMode ) {
+			urbansimAccessibilityWriter.close();
+		}
+			
 		
 		// as for the other writer above: In case multiple AccessibilityControlerListeners are added to the controller, e.g. if 
 		// various calculations are done for different activity types or different modes (or both) subdirectories are required
@@ -326,6 +332,8 @@ implements ShutdownListener, StartupListener {
 	/**
 	 * Writes the measured accessibility for the current measurePoint instantly
 	 * to disc in csv format.
+	 * 
+	 * THis is only done when urbansimMode in AccessibilityControlerListenerImpl is set to true
 	 * 
 	 * @param measurePoint
 	 * @param fromNode

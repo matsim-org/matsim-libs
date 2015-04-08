@@ -129,7 +129,7 @@ abstract class AccessibilityControlerListenerImpl {
 
 	RoadPricingScheme scheme;
 
-	private boolean urbansimMode = true;
+	protected boolean urbansimMode = true;
 
 	AccessibilityControlerListenerImpl() {
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
@@ -618,7 +618,7 @@ abstract class AccessibilityControlerListenerImpl {
 		this.urbansimMode = urbansimMode;
 	}
 
-	Map<Modes4Accessibility,SpatialGrid> getAccessibilityGrids() {
+	public Map<Modes4Accessibility,SpatialGrid> getAccessibilityGrids() {
 		return accessibilityGrids;
 	}
 
@@ -645,5 +645,11 @@ abstract class AccessibilityControlerListenerImpl {
 			return this.sum;
 		}
 	}
+	
+	// new
+	public void addPtMatrix(PtMatrix ptMatrix) {
+		this.ptMatrix = ptMatrix;
+	}
+	// end new
 
 }
