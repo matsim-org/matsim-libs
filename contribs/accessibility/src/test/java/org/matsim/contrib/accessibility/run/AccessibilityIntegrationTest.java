@@ -22,10 +22,13 @@
  */
 package org.matsim.contrib.accessibility.run;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -47,7 +50,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -56,11 +58,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * @author nagel
@@ -115,7 +112,7 @@ public class AccessibilityIntegrationTest {
 		// test values to define bounding box.
 		// these values usually come from a config file
 		double min = 0.;
-		double max = 100.;
+		double max = 200.;
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm);
@@ -399,22 +396,57 @@ public class AccessibilityIntegrationTest {
 				}
 			}
 			
-			double expectedFreespeed = 2.20583781881484;
-			double accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freeSpeed).getValue(new CoordImpl(50, 50));
-			double expectedCar = 2.14860942375311;
-			double accessibilityCar = spatialGrids.get(Modes4Accessibility.car).getValue(new CoordImpl(50, 50));
-			double expectedBike = 2.2257398663221;
-			double accessibilityBike = spatialGrids.get(Modes4Accessibility.bike).getValue(new CoordImpl(50, 50));
-			double expectedWalk = 1.70054725728361; 
-			double accessibilityWalk = spatialGrids.get(Modes4Accessibility.walk).getValue(new CoordImpl(50, 50));
-			double expectedPt = 0.461863556339195;
-			double accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new CoordImpl(50, 50));
-			
-			Assert.assertEquals("Freespeed accessibilities do not match!", expectedFreespeed, accessibilityFreespeed, MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Car accessibilities do not match!", expectedCar, accessibilityCar, MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Bike accessibilities do not match!", expectedBike, accessibilityBike, MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Walk accessibilities do not match!", expectedWalk, accessibilityWalk, MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Pt accessibilities do not match!", expectedPt, accessibilityPt, MatsimTestUtils.EPSILON);
+			for(double x = 50; x < 200; x += 100){
+				
+				for(double y = 50; y < 200; y += 100){
+					
+					double expectedFreespeed = 0.;
+					double expectedCar = 0.;
+					double expectedBike = 0.;
+					double expectedWalk = 0.;
+					double expectedPt = 0.;
+					
+					if( (x == 50 || x == 150) && y == 50){
+						
+						expectedFreespeed = 2.20583781881484;
+						expectedCar = 2.14860942375311;
+						expectedBike = 2.2257398663221;
+						expectedWalk = 1.70054725728361;
+						expectedPt = 0.461863556339195;
+						
+					} else if(x == 50 && y == 150){
+						
+						expectedFreespeed = 2.1555292541877;
+						expectedCar = 2.1555292541877;
+						expectedBike = 2.20170415738971;
+						expectedWalk = 1.88907197432798;
+						expectedPt = 0.461863556339195;
+						
+					} else if(x == 150 && y == 150){
+						
+						expectedFreespeed = 2.18445595855523;
+						expectedCar = 2.18445595855523;
+						expectedBike = 2.22089493905874;
+						expectedWalk = 1.9683225787191;
+						expectedPt = 0.624928280738513;
+						
+					}
+					
+					double accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freeSpeed).getValue(new CoordImpl(x, y));
+					double accessibilityCar = spatialGrids.get(Modes4Accessibility.car).getValue(new CoordImpl(x, y));
+					double accessibilityBike = spatialGrids.get(Modes4Accessibility.bike).getValue(new CoordImpl(x, y));
+					double accessibilityWalk = spatialGrids.get(Modes4Accessibility.walk).getValue(new CoordImpl(x, y));
+					double accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new CoordImpl(x, y));
+					
+					Assert.assertEquals("Freespeed accessibility at coord " + x + "," + y +" does not match!", expectedFreespeed, accessibilityFreespeed, MatsimTestUtils.EPSILON);
+					Assert.assertEquals("Car accessibility at coord " + x + "," + y +" does not match!", expectedCar, accessibilityCar, MatsimTestUtils.EPSILON);
+					Assert.assertEquals("Bike accessibility at coord " + x + "," + y +" does not match!", expectedBike, accessibilityBike, MatsimTestUtils.EPSILON);
+					Assert.assertEquals("Walk accessibility at coord " + x + "," + y +" does not match!", expectedWalk, accessibilityWalk, MatsimTestUtils.EPSILON);
+					Assert.assertEquals("Pt accessibility at coord " + x + "," + y +" does not match!", expectedPt, accessibilityPt, MatsimTestUtils.EPSILON);
+					
+				}
+				
+			}
 			
 			log.info("... done!");
 		}
