@@ -25,6 +25,7 @@ package org.matsim.contrib.accessibility.run;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -38,14 +39,18 @@ import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -55,6 +60,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author nagel
@@ -124,7 +130,15 @@ public class AccessibilityIntegrationTest {
 		String networkFile = utils.getOutputDirectory() +"network.xml";
 		new NetworkWriter(network).write(networkFile);
 		config.network().setInputFile( networkFile);
-
+		
+		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
+		mbConfig.setPtStopsInputFile(utils.getClassInputDirectory() + "ptStops.csv");
+		mbConfig.setPtTravelDistancesInputFile(utils.getClassInputDirectory() + "ptTravelInfo.csv");
+		mbConfig.setPtTravelTimesInputFile(utils.getClassInputDirectory() + "ptTravelInfo.csv");
+		mbConfig.setUsingPtStops(true);
+		mbConfig.setUsingTravelTimesAndDistances(true);
+		config.addModule(mbConfig);
+		
 		Controler controler = new Controler(config);
 		ControlerConfigGroup controlerCG = config.controler();
 		controlerCG.setLastIteration( 10);
@@ -133,8 +147,6 @@ public class AccessibilityIntegrationTest {
 		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config);
 		ScenarioUtils.loadScenario(sc);
 
-		
-		
 		// creating test opportunities (facilities)
 		ActivityFacilities opportunities = sc.getActivityFacilities();
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
@@ -144,7 +156,7 @@ public class AccessibilityIntegrationTest {
 			opportunities.addActivityFacility(facility);
 		}
 		
-		PtMatrix ptMatrix = null ;
+		PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(network), mbConfig) ;
 		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
 		double cellSize = 100. ;
 
@@ -153,12 +165,12 @@ public class AccessibilityIntegrationTest {
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			gacl.setComputingAccessibilityForMode(mode, true);
 		}
-		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false ); 
+//		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false ); 
 		// not sure why this is "false"; presumably, the test is not configured. kai, feb'14
 		
 		// this will be called by the accessibility listener after the accessibility calculations are finished
 		// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
-		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
+		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, true);
 		gacl.addSpatialGridDataExchangeListener(etr);
 		
 		// generating measuring points and SpatialGrids by using the bounding box
@@ -190,6 +202,14 @@ public class AccessibilityIntegrationTest {
 		String networkFile = utils.getOutputDirectory() +"network.xml";
 		new NetworkWriter(network).write(networkFile);
 		config.network().setInputFile( networkFile);
+		
+		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
+		mbConfig.setPtStopsInputFile(utils.getClassInputDirectory() + "ptStops.csv");
+		mbConfig.setPtTravelDistancesInputFile(utils.getClassInputDirectory() + "ptTravelInfo.csv");
+		mbConfig.setPtTravelTimesInputFile(utils.getClassInputDirectory() + "ptTravelInfo.csv");
+		mbConfig.setUsingPtStops(true);
+		mbConfig.setUsingTravelTimesAndDistances(true);
+		config.addModule(mbConfig);
 
 		Controler controler = new Controler(config);
 		ControlerConfigGroup controlerCG = config.controler();
@@ -211,7 +231,7 @@ public class AccessibilityIntegrationTest {
 		
 //		controler.addControlerListener(new GridBasedAccessibilityControlerListener(...)); 
 		// (purely grid based controler listener does not yet exist)
-		PtMatrix ptMatrix = null ;
+		PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(network), mbConfig) ;
 		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
 		double cellSize = 100. ;
 
@@ -220,25 +240,26 @@ public class AccessibilityIntegrationTest {
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			gacl.setComputingAccessibilityForMode(mode, true);
 		}
-		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false ); 
+//		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false ); 
 		// not sure why this is "false"; presumably, the test is not configured. kai, feb'14
 		
 		// this will be called by the accessibility listener after the accessibility calculations are finished
 		// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
-		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
+		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, true);
 		gacl.addSpatialGridDataExchangeListener(etr);
 		
 		// generating measuring points and SpatialGrids by using the bounding box
 		gacl.generateGridsAndMeasuringPointsByNetwork(cellSize);
 
+		controler.addControlerListener(gacl);
+		
 		controler.setOverwriteFiles(true);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 		
 		// compare some results -> done in EvaluateTestResults 
-		
+        
 	}
-	
 	
 	@Test
 	public void testWithExtentDeterminedShapeFile() {
@@ -247,7 +268,7 @@ public class AccessibilityIntegrationTest {
 
 //		URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(new File(this.utils.getInputDirectory()).getAbsolutePath() + "shapeFile2.shp");
 
-		File f = new File(this.utils.getInputDirectory() + "shapeFile2.shp"); // shape file completely covers the road network
+		File f = new File(this.utils.getInputDirectory() + "shapeFile3.shp"); // shape file completely covers the road network
 
 		if(!f.exists()){
 			log.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
@@ -265,6 +286,14 @@ public class AccessibilityIntegrationTest {
 		String networkFile = utils.getOutputDirectory() +"network.xml";
 		new NetworkWriter(network).write(networkFile);
 		config.network().setInputFile( networkFile);
+		
+		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
+		mbConfig.setPtStopsInputFile(utils.getClassInputDirectory() + "ptStops.csv");
+		mbConfig.setPtTravelDistancesInputFile(utils.getClassInputDirectory() + "ptTravelInfo.csv");
+		mbConfig.setPtTravelTimesInputFile(utils.getClassInputDirectory() + "ptTravelInfo.csv");
+		mbConfig.setUsingPtStops(true);
+		mbConfig.setUsingTravelTimesAndDistances(true);
+		config.addModule(mbConfig);
 
 		Controler controler = new Controler(config);
 		ControlerConfigGroup controlerCG = config.controler();
@@ -284,32 +313,36 @@ public class AccessibilityIntegrationTest {
 			opportunities.addActivityFacility(facility);
 		}
 		
+		PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(network), mbConfig) ;
 //		controler.addControlerListener(new GridBasedAccessibilityControlerListener(...)); 
 		// (purely grid based controler listener does not yet exist)
 		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
 		double cellSize = 100. ;
 
-		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, config, sc.getNetwork());
+		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, sc.getNetwork());
 		// activating transport modes of interest
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			gacl.setComputingAccessibilityForMode(mode, true);
 		}
-		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false ); 
+//		gacl.setComputingAccessibilityForMode( Modes4Accessibility.pt, false ); 
 		// not sure why this is "false"; presumably, the test is not configured. kai, feb'14
 		
 		// this will be called by the accessibility listener after the accessibility calculations are finished
 		// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
-		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
+		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, true);
 		gacl.addSpatialGridDataExchangeListener(etr);
 		
 		// generating measuring points and SpatialGrids by using the bounding box
 		gacl.generateGridsAndMeasuringPointsByShapeFile(acm.getShapeFileCellBasedAccessibility(), cellSize);
 
+		controler.addControlerListener(gacl);
+		
 		controler.setOverwriteFiles(true);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
-		
+        
 		// compare some results -> done in EvaluateTestResults 
+        
 	}
 	
 	/**
@@ -366,7 +399,25 @@ public class AccessibilityIntegrationTest {
 				}
 			}
 			
+			double expectedFreespeed = 2.20583781881484;
+			double accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freeSpeed).getValue(new CoordImpl(50, 50));
+			double expectedCar = 2.14860942375311;
+			double accessibilityCar = spatialGrids.get(Modes4Accessibility.car).getValue(new CoordImpl(50, 50));
+			double expectedBike = 2.2257398663221;
+			double accessibilityBike = spatialGrids.get(Modes4Accessibility.bike).getValue(new CoordImpl(50, 50));
+			double expectedWalk = 1.70054725728361; 
+			double accessibilityWalk = spatialGrids.get(Modes4Accessibility.walk).getValue(new CoordImpl(50, 50));
+			double expectedPt = 0.461863556339195;
+			double accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new CoordImpl(50, 50));
+			
+			Assert.assertEquals("Freespeed accessibilities do not match!", expectedFreespeed, accessibilityFreespeed, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Car accessibilities do not match!", expectedCar, accessibilityCar, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Bike accessibilities do not match!", expectedBike, accessibilityBike, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Walk accessibilities do not match!", expectedWalk, accessibilityWalk, MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Pt accessibilities do not match!", expectedPt, accessibilityPt, MatsimTestUtils.EPSILON);
+			
 			log.info("... done!");
 		}
 	}
+	
 }
