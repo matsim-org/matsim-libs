@@ -20,6 +20,7 @@
 
 package org.matsim.core.scoring.functions;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 
@@ -36,7 +37,34 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
  * @author nagel
  *
  */
-public class ActivityUtilityParameters implements MatsimParameters {
+public final class ActivityUtilityParameters implements MatsimParameters {
+	
+	public static interface ZeroUtilityComputation {
+		double computeZeroUtilityDuration_s( final double priority, final double typicalDuration_s ) ;
+	}
+	public static final class SameAbsoluteScore implements ZeroUtilityComputation {
+		@Override
+		public double computeZeroUtilityDuration_s(double priority, double typicalDuration_s) {
+			final double priority1 = priority;
+			final double typicalDuration_s1 = typicalDuration_s;
+			final double zeroUtilityDuration = typicalDuration_s1 * Math.exp( -10.0 / (typicalDuration_s1 / 3600.0) / priority1 );
+			// ( the 3600s are in there because the original formulation was in "hours".  So the values in seconds are first
+			// translated into hours.  kai, sep'12 )
+			
+			return zeroUtilityDuration;
+		}
+	}
+	public static final class SameRelativeScore implements ZeroUtilityComputation {
+		@Override
+		public double computeZeroUtilityDuration_s(double priority, double typicalDuration_s) {
+			final double priority1 = priority;
+			final double typicalDuration_s1 = typicalDuration_s;
+			final double zeroUtilityDuration = typicalDuration_s1 * Math.exp( -10.0 / priority1 );
+			
+			return zeroUtilityDuration;
+		}
+	}
+
 
 	/**
 	 * This is now deliberately an unmodifiable object which can only instantiated by a builder.  If you want/need to modify
@@ -44,7 +72,7 @@ public class ActivityUtilityParameters implements MatsimParameters {
 	 * 
 	 * @author nagel
 	 */
-	public static class Builder {
+	public final static class Builder {
 		private String type;
 		private double priority = 1. ;
 		private double typicalDuration_s;
@@ -54,6 +82,7 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		private double minimalDuration;
 		private double openingTime;
 		private boolean scoreAtAll;
+		private ZeroUtilityComputation zeroUtilityComputation ;
 
 		/**
 		 * empty constructor; deliberately permitted
@@ -74,6 +103,18 @@ public class ActivityUtilityParameters implements MatsimParameters {
 			this.minimalDuration = ppp.getMinimalDuration() ;
 			this.openingTime = ppp.getOpeningTime() ;
 			this.scoreAtAll = ppp.isScoringThisActivityAtAll() ;
+			switch( ppp.getTypicalDurationScoreComputation() ) {
+			case relative:
+				this.zeroUtilityComputation = new SameRelativeScore() ;
+				break;
+			case uniform:
+				this.zeroUtilityComputation = new SameAbsoluteScore() ;
+				break;
+			default:
+				throw new RuntimeException("not defined");
+			}
+			// seems to be somewhat overkill to set a computation method that is only used in the builder ... but the builder has a method to
+			// (re)set the 
 		}
 
 		public void setType(String type) {
@@ -115,13 +156,19 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		public ActivityUtilityParameters create() {
 			ActivityUtilityParameters params = new ActivityUtilityParameters(this.type) ;
 			params.setScoreAtAll(this.scoreAtAll) ;
-			params.setPriorityAndTypicalDuration(this.priority, this.typicalDuration_s) ;
+			params.setTypicalDuration( this.typicalDuration_s) ;
+			params.setZeroUtilityDuration_s( this.zeroUtilityComputation.computeZeroUtilityDuration_s(priority, typicalDuration_s)) ;
 			params.setClosingTime(this.closingTime) ;
 			params.setEarliestEndTime(this.earliestEndTime) ;
 			params.setLatestStartTime(this.latestStartTime) ;
 			params.setMinimalDuration(this.minimalDuration) ;
 			params.setOpeningTime(this.openingTime) ;
+			params.checkConsistency();
 			return params ;
+		}
+
+		public final void setZeroUtilityComputation(ZeroUtilityComputation zeroUtilityComputation) {
+			this.zeroUtilityComputation = zeroUtilityComputation;
 		}
 	}
 
@@ -146,30 +193,31 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		this.type = type;	
 	}
 
+	/*package!*/ final void checkConsistency() {
+		//if typical duration is <=48 seconds (and priority=1) then zeroUtilityDuration becomes 0.0 because of the double precision. This means it is not possible
+		// to have activities with a typical duration <=48 seconds (GL/June2011)
+		if (this.scoreAtAll && this.zeroUtilityDuration_h == 0.0) {
+			throw new RuntimeException("zeroUtilityDuration of type " + type + " must be greater than 0.0. Did you forget to specify the typicalDuration?");
+		}
+	}
+	
 	/*package!*/ final void setScoreAtAll(boolean scoreAtAll) {
 		this.scoreAtAll = scoreAtAll;
 	}
 
-	/*package!*/ final void setPriorityAndTypicalDuration(final double priority, final double typicalDuration_s) {
-		//if typical duration is <=48 seconds (and priority=1) then zeroUtilityDuration becomes 0.0 because of the double precision. This means it is not possible
-		// to have activities with a typical duration <=48 seconds (GL/June2011)
-
+	/*package!*/ final void setTypicalDuration(final double typicalDuration_s) {
 		this.typicalDuration_s = typicalDuration_s;
+	}
 
-		//		this.zeroUtilityDuration_h = (typicalDuration_s / 3600.0)
-		//		* Math.exp( -10.0 / (typicalDuration_s / 3600.0) / priority );
-		// replacing the above two lines with the two lines below causes the test failure of ReRoutingTest.  kai, nov'12
+	/*package!*/ final void setZeroUtilityDuration_s(final double val) {
 
-		this.zeroUtilityDuration_h = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority,
-				typicalDuration_s) / 3600. ;
+
+		this.zeroUtilityDuration_h = val / 3600. ;
 
 		// example: pt interaction activity with typical duration = 120sec.
 		// 120/3600 * exp( -10 / (120 / 3600) ) =  1.7 x 10^(-132)  (!!!!!!!!!!)
 		// In consequence, even a pt interaction of one seconds causes a fairly large utility.
 
-		if (this.scoreAtAll && this.zeroUtilityDuration_h <= 0.0) {
-			throw new RuntimeException("zeroUtilityDuration of type " + type + " must be greater than 0.0. Did you forget to specify the typicalDuration?");
-		}
 	}
 	
 	/*package!*/ final void setMinimalDuration(final double dur) {

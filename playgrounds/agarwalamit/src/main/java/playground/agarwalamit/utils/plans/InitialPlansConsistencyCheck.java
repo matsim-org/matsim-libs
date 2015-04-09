@@ -36,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.functions.CharyparNagelScoringUtils;
+import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -186,7 +186,11 @@ public class InitialPlansConsistencyCheck {
 		for(String actType : params.getActivityTypes()){
 			double priority = params.getActivityParams(actType).getPriority();
 			double typicalDuration_s = params.getActivityParams(actType).getTypicalDuration();
-			double zeroUtilDur_sec = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority, typicalDuration_s);
+//			double zeroUtilDur_sec = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
+			ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( params.getActivityParams( actType ) ) ;
+			ActivityUtilityParameters ppp = builder.create() ;
+			double zeroUtilDur_sec = ppp.getZeroUtilityDuration_h() * 3600. ;
+			
 			actType2ZeroUtilDuration.put(actType, zeroUtilDur_sec);
 		}
 		return actType2ZeroUtilDuration;

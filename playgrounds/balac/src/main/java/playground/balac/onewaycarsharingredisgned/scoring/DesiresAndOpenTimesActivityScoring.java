@@ -27,7 +27,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.Desires;
 
@@ -148,7 +147,9 @@ public class DesiresAndOpenTimesActivityScoring extends CharyparNagelOpenTimesAc
 //						* Math.log((duration / 3600.0) / actParams.getZeroUtilityDuration_h());
 				// the next four lines have also been inserted - copied and adapted them from ActivityUtilityParameters class
 				double priority = 1.0;
-				double zeroUtilityDuration_h = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority, typicalDuration) / 3600;
+//				double zeroUtilityDuration_h = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration) / 3600;
+				double zeroUtilityDuration_h = actParams.getZeroUtilityDuration_h() ;
+
 				double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
 						* Math.log((duration / 3600.0) / zeroUtilityDuration_h);
 				

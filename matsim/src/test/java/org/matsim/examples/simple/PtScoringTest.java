@@ -22,7 +22,10 @@
  */
 package org.matsim.examples.simple;
 
+import java.util.List;
+
 import junit.framework.Assert;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -32,11 +35,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.functions.CharyparNagelScoringUtils;
+import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
-
-import java.util.List;
 
 /**
  * @author nagel
@@ -72,8 +73,12 @@ public class PtScoringTest {
 
 		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
 		double priority = 1. ;
+		
+//		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
+		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
+		ActivityUtilityParameters params = builder.create() ;
+		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
 
-		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority, typicalDuration_s);
 
 		double homeAct1End = 18060. ;
 		double stop1Arr = 18076. ;
@@ -207,7 +212,10 @@ public class PtScoringTest {
 		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
 		double priority = 1. ;
 
-		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority, typicalDuration_s);
+//		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
+		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
+		ActivityUtilityParameters params = builder.create() ;
+		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
 
 		double homeAct1End = 18060. ;
 		double stop1Arr = 18076. ;
@@ -346,7 +354,11 @@ public class PtScoringTest {
 		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
 		double priority = 1. ;
 
-		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority, typicalDuration_s);
+//		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
+		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
+		ActivityUtilityParameters params = builder.create() ;
+		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
+
 
 		double timeTransitWalk = 18089.-18060. ;
 		double timeTransitWait = 18302.-18089. ;
@@ -415,7 +427,11 @@ public class PtScoringTest {
 		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
 		double priority = 1. ;
 
-		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority, typicalDuration_s);
+//		double zeroUtilityDurationHome_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
+		ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( pcs.getActivityParams("home") ) ;
+		ActivityUtilityParameters params = builder.create() ;
+		double zeroUtilityDurationHome_s = params.getZeroUtilityDuration_h() * 3600. ;
+
 
 		double timeTransitWalk = 18089.-18060. ;
 		double timeTransitWait = 18302.-18089. ;

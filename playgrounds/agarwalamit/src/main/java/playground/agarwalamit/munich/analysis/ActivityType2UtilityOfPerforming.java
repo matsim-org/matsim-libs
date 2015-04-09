@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scoring.functions.CharyparNagelScoringUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.activity.ActivityType2ActDurationsAnalyzer;
@@ -225,8 +225,12 @@ public class ActivityType2UtilityOfPerforming {
 	 */
 	private double getUtilityOfPerforming(double typicalDuration_s, double duration_s, double priority){
 		double utilPerf;
-		double zeroUtilDuration_s = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority, typicalDuration_s);
-		
+//		double zeroUtilDuration_s = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
+		double zeroUtilDuration_s = -1 ;
+		Logger.getLogger( this.getClass() ).fatal("If you want to mirror what matsim does, you need to do something else, since matsim "
+				+ "keeps changing. kai, apr'15");
+		System.exit(-1);
+
 		if ( duration_s >= zeroUtilDuration_s ) {
 			 utilPerf = marginalUtil_performing * typicalDuration_s
 					* Math.log((duration_s/zeroUtilDuration_s));

@@ -513,10 +513,12 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 		
 		super.addParameterSet( params );
 	}
+	
+	public static enum TypicalDurationScoreComputation { uniform, relative } ;
 
 	/* complex classes */
-
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {
+		private static final String TYPICAL_DURATION_SCORE_COMPUTATION = "typicalDurationScoreComputation";
 		final static String SET_TYPE = "activityParams";
 		private String type;
 		private double priority = 1.0;
@@ -527,6 +529,9 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private double earliestEndTime = Time.UNDEFINED_TIME;
 		private double closingTime = Time.UNDEFINED_TIME;
 		private boolean scoringThisActivityAtAll = true ;
+		
+		private TypicalDurationScoreComputation typicalDurationScoreComputation = TypicalDurationScoreComputation.uniform ;
+		
 
 		public ActivityParams() {
 			super( SET_TYPE );
@@ -536,7 +541,24 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 			super( SET_TYPE );
 			this.type = type;
 		}
+		
+		@Override
+		public Map<String, String> getComments() {
+			final Map<String, String> map = super.getComments();
+			map.put( TYPICAL_DURATION_SCORE_COMPUTATION,  "method to compute score at typical duration.  Use " 
+					+ TypicalDurationScoreComputation.uniform + " for backwards compatibility (all activities same score; higher proba to drop long acts).") ;
+			return map ;
+		}
 
+		@StringGetter(TYPICAL_DURATION_SCORE_COMPUTATION)
+		public TypicalDurationScoreComputation getTypicalDurationScoreComputation() {
+			return this.typicalDurationScoreComputation ;
+		}
+		@StringSetter(TYPICAL_DURATION_SCORE_COMPUTATION)
+		public void setTypicalDurationScoreComputation( final String str ) {
+			this.typicalDurationScoreComputation = TypicalDurationScoreComputation.valueOf(str) ;
+		}
+		
 		@StringGetter( "activityType" )
 		public String getActivityType() {
 			return this.type;

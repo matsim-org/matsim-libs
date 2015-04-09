@@ -30,6 +30,7 @@ import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.pt.PtConstants;
 
 public class PersonalScoringParameters implements MatsimParameters {
@@ -80,7 +81,7 @@ public class PersonalScoringParameters implements MatsimParameters {
 
 		SortedMap<String,ActivityUtilityParameters> tmpUtlParams = new TreeMap<String, ActivityUtilityParameters>() ;
 		for (ActivityParams params : config.getActivityParams()) {
-			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory(params) ;
+			ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
 			// the following was introduced in nov'12.  Also see setupTransitSimulation in Controler.  kai, nov'12
 			if (params.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				factory.setScoreAtAll(false) ;

@@ -170,6 +170,7 @@ public class CharyparNagelScoringFunctionTest {
 			factory.setType("w");
 			factory.setPriority(1.0);
 			factory.setTypicalDuration_s(8.0 * 3600);
+			factory.setZeroUtilityComputation( new ActivityUtilityParameters.SameAbsoluteScore() );
 			ActivityUtilityParameters params = factory.create();
 			assertEquals(zeroUtilDurW, params.getZeroUtilityDuration_h(), EPSILON);
 
@@ -180,6 +181,7 @@ public class CharyparNagelScoringFunctionTest {
 			factory.setType("h");
 			factory.setPriority(1.0);
 			factory.setTypicalDuration_s(16.0 * 3600);
+			factory.setZeroUtilityComputation( new ActivityUtilityParameters.SameAbsoluteScore() );
 			ActivityUtilityParameters params = factory.create();
 			assertEquals(zeroUtilDurH, params.getZeroUtilityDuration_h(), EPSILON);
 		}
@@ -190,6 +192,7 @@ public class CharyparNagelScoringFunctionTest {
 			// test that the priority is respected as well
 			factory.setPriority(2.0);
 			factory.setTypicalDuration_s(8.0 * 3600);
+			factory.setZeroUtilityComputation( new ActivityUtilityParameters.SameAbsoluteScore() );
 			ActivityUtilityParameters params = factory.create();
 			assertEquals(zeroUtilDurW2, params.getZeroUtilityDuration_h(), EPSILON);
 		}
