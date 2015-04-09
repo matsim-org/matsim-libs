@@ -25,26 +25,38 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
 
-public class EventHandlerAtStartupAdder implements StartupListener {
+/**
+ * This class does not carry documentation by its author.  I suspect that Rashid programmed it because the EventsManager
+ * (i.e. controler.getEvents()) used to be unavailable between new Controler and controler.run().  This is, however,
+ * no longer the case, and so the present class should be deprecated. 
+ * 
+ * @author (of javadoc) nagel
+  */
+@Deprecated // see javadoc of class
+public final class EventHandlerAtStartupAdder implements StartupListener {
 
-	LinkedList<EventHandler> eventHandler = new LinkedList<EventHandler>();
+	LinkedList<EventHandler> eventHandlers = new LinkedList<EventHandler>();
 
+	@Deprecated // see javadoc of class
 	public EventHandlerAtStartupAdder(){
 		
 	}
 	
+	@Deprecated // see javadoc of class
 	public EventHandlerAtStartupAdder(EventHandler eventHandler){
 		addEventHandler(eventHandler);
 	}
 	
+	@Deprecated // see javadoc of class
 	public void addEventHandler(EventHandler eventHandler) {
-		this.eventHandler.add(eventHandler);
+		this.eventHandlers.add(eventHandler);
 	}
 
+	@Override
 	public void notifyStartup(StartupEvent event) {
 		// add handlers
-		for (int i = 0; i < eventHandler.size(); i++) {
-			event.getControler().getEvents().addHandler(eventHandler.get(i));
+		for (int i = 0; i < eventHandlers.size(); i++) {
+			event.getControler().getEvents().addHandler(eventHandlers.get(i));
 		}
 	}
 

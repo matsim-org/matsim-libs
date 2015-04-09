@@ -1,15 +1,9 @@
 package org.matsim.contrib.parking.PC2;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.PC2.scoring.ParkingBetas;
 import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
-import org.matsim.contrib.parking.PC2.scoring.ParkingScoringFunctionFactory;
 import org.matsim.contrib.parking.PC2.simulation.ParkingChoiceSimulation;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -19,7 +13,6 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PersonImpl;
 
 public class GeneralParkingModule implements StartupListener, IterationStartsListener,BeforeMobsimListener, IterationEndsListener {
 
@@ -38,7 +31,7 @@ public class GeneralParkingModule implements StartupListener, IterationStartsLis
 	private ParkingChoiceSimulation parkingSimulation;
 
 	public GeneralParkingModule(Controler controler){
-		this.setControler(controler);
+		this.controler = controler ;
 		
 		controler.addControlerListener(this);
 	}
@@ -71,9 +64,11 @@ public class GeneralParkingModule implements StartupListener, IterationStartsLis
 		return controler;
 	}
 
-	public void setControler(Controler controler) {
-		this.controler = controler;
-	}
+//	public void setControler(Controler controler) {
+//		this.controler = controler;
+//	}
+	// lower level objects may keep back pointers to higher level objects if they have to, but we prefer that they do not provide them
+	// as a service. kai, apr'15
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {

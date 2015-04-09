@@ -1,6 +1,7 @@
 package playground.wrashid.parkingChoice.util;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
@@ -51,16 +52,16 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Per
 
 			this.actDurationEstimationContainer.registerNewActivity();
 			if (this.actDurationEstimationContainer.isCurrentParkingTimeOver()){
-				double estimatedActduration = getEstimatedActDuration(event, this.controler, this.actDurationEstimationContainer);
+				double estimatedActduration = getEstimatedActDuration(event, this.controler.getScenario(), this.actDurationEstimationContainer);
 				this.activityDurationEstimations.add(estimatedActduration);
 			}
 		}
 	}
 
-	public static double getEstimatedActDuration(final ActivityStartEvent event, final Controler controler,
+	public static double getEstimatedActDuration(final ActivityStartEvent event, final Scenario scenario,
 			final ActDurationEstimationContainer actDurationEstimationContainer) {
 
-        Plan selectedPlan = controler.getScenario().getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
+        Plan selectedPlan = scenario.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
 
 		List<PlanElement> planElement = selectedPlan.getPlanElements();
 
@@ -93,7 +94,7 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Per
 				ActivityImpl prevAct = (ActivityImpl) planElement.get(i - 1);
 				ActivityImpl nextAct = (ActivityImpl) planElement.get(i + 1);
 				double distance = GeneralLib.getDistance(prevAct.getCoord(), nextAct.getCoord());
-				PlansCalcRouteConfigGroup plansCalcRoute = controler.getConfig().plansCalcRoute();
+				PlansCalcRouteConfigGroup plansCalcRoute = scenario.getConfig().plansCalcRoute();
 				if (leg.getMode().equalsIgnoreCase("walk") || leg.getMode().equalsIgnoreCase("transit_walk")) {
 					estimatedActduration += GeneralLib.getWalkingTravelDuration(distance);
 				} else if (leg.getMode().equalsIgnoreCase("bike")) {

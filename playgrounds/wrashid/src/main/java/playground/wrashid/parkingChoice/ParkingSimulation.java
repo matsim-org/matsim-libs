@@ -121,7 +121,7 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 			double estimatedActduration = 0;
 
 			if (actDurEstContainer.isCurrentParkingTimeOver()) {
-				estimatedActduration = ActivityDurationEstimator.getEstimatedActDuration(event, controler, actDurEstContainer);
+				estimatedActduration = ActivityDurationEstimator.getEstimatedActDuration(event, controler.getScenario(), actDurEstContainer);
 			} else {
 				DebugLib.stopSystemAndReportInconsistency("there might be some inconsitency???");
 			}
