@@ -43,8 +43,8 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class AccessibilityRuns {
-	public static final Logger log = Logger.getLogger( AccessibilityRuns.class ) ;
+public class AccessibilityRunTest {
+	public static final Logger log = Logger.getLogger( AccessibilityRunTest.class ) ;
 
 	public static final Boolean doPopulationWeightedPlot = null;
 
