@@ -49,6 +49,7 @@ public class ConvEvents2Anm extends ConvEvents {
 		// path2EventsFile = args[3];
 		// path2VissimRoutesFile = args[4];
 		// path2NewVissimRoutesFile = args[5];
+		// scaleFactor = Integer.parseInt(args[6]);
 
 		ConvEvents convEvents = createDefaultConvEvents2Anm();
 		convEvents.convert(args);

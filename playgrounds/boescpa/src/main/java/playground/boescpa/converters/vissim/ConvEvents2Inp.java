@@ -60,6 +60,7 @@ public class ConvEvents2Inp extends ConvEvents {
 		// path2EventsFile = args[3];
 		// path2VissimInpFile = args[4];
 		// path2NewVissimInpFile = args[5];
+		// scaleFactor = Integer.parseInt(args[6]);
 
 		ConvEvents convEvents = createDefaultConvEvents();
 		convEvents.convert(args);

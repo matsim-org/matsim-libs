@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
+import playground.boescpa.converters.vissim.tools.AbstractRouteConverter;
 import playground.boescpa.converters.vissim.tools.AbstractRouteConverter.Trip;
 
 /**
@@ -65,12 +66,17 @@ public abstract class ConvEvents {
 	}
 
 	public void convert(String[] args) {
+		if (args.length != 7) {
+			throw new IllegalArgumentException("Wrong number of input arguments.");
+		}
+
 		String path2VissimZoneShp = args[0];
 		String path2MATSimNetwork = args[1];
 		String path2VissimNetwork = args[2];
 		String path2EventsFile = args[3];
 		String path2VissimRoutesFile = args[4];
 		String path2NewVissimRoutesFile = args[5];
+		int scaleFactor = Integer.parseInt(args[6]);
 
 		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
 		HashMap<Id<Link>, Id<Node>[]> keyMsNetwork = this.matsimNetworkMapper.mapNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
@@ -82,11 +88,20 @@ public abstract class ConvEvents {
 		for (HashMap<Id<Trip>, Long[]> msTrips : msTripsCol) {
 			for (HashMap<Id<Trip>, Long[]> amTrips : amTripsCol) {
 				HashMap<Id<Trip>, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
+				demandPerAnmTrip = scaleDemandByFactor(demandPerAnmTrip, scaleFactor);
 				String newPath2NewVissimRoutesFile = insertVersNumInFilepath(path2NewVissimRoutesFile, hourCounter);
 				writeRoutes(demandPerAnmTrip, path2VissimRoutesFile, newPath2NewVissimRoutesFile);
 				hourCounter++;
 			}
 		}
+	}
+
+	private HashMap<Id<Trip>, Integer> scaleDemandByFactor(HashMap<Id<Trip>, Integer> demandPerAnmTrip, int scaleFactor) {
+		HashMap<Id<Trip>, Integer> scaledDemandPerAnmTrip = new HashMap<>();
+		for (Id<Trip> tripId : demandPerAnmTrip.keySet()) {
+			scaledDemandPerAnmTrip.put(tripId, demandPerAnmTrip.get(tripId)*scaleFactor);
+		}
+		return scaledDemandPerAnmTrip;
 	}
 
 	public static String insertVersNumInFilepath(String path2File, int versNum) {
@@ -118,7 +133,7 @@ public abstract class ConvEvents {
 		 * @param path2VissimZoneShp
 		 * @return A new data set (nodes) which represents both input networks jointly.
 		 */
-		public Network createMutualBaseGrid(String path2VissimZoneShp);
+		Network createMutualBaseGrid(String path2VissimZoneShp);
 
 	}
 
@@ -149,7 +164,7 @@ public abstract class ConvEvents {
 		 * @return	List of trip collections. Each entry of the list represents one hour simulation time. If there is
 		 * 			only one entry, no time was provided for the trips (e.g. the case for vissim trips).
 		 */
-		public List<HashMap<Id<Trip>, Long[]>> convert(HashMap<Id<Link>, Id<Node>[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp);
+		List<HashMap<Id<Trip>, Long[]>> convert(HashMap<Id<Link>, Id<Node>[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp);
 	}
 
 	public interface TripMatcher {
