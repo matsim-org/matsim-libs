@@ -1,7 +1,5 @@
 package org.matsim.integration.daily.accessibility;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,11 +8,12 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisMapnikFileCreator;
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
@@ -23,18 +22,20 @@ import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityDensitiesRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
+import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -55,8 +56,12 @@ public class AccessibilityRuns {
 
 	@Test
 	public void doAccessibilityTest() {
+		
+		// TODO substitute this by a proper path
+		String ptStopsFile = "/Users/dominik/Workspace/data/nmbm/transit/minibusStops.csv";
 
-		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
+//		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
+		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
 		
 		AccessibilityConfigGroup acg = (AccessibilityConfigGroup) config.getModule( AccessibilityConfigGroup.GROUP_NAME ) ;
 		
@@ -79,9 +84,46 @@ public class AccessibilityRuns {
 			stratSets.setWeight(1.);
 			config.strategy().addStrategySettings(stratSets);
 		}
-
+		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		
+		
+		// new adding pt matrix
+		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+		mbpcg.setPtStopsInputFile(ptStopsFile);
 
+        PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
+        
+        System.out.println("teleported mode speed for pt: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt));
+        System.out.println("teleported mode speed for bike: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.bike));
+        System.out.println("teleported mode speed for ride: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.ride));
+        System.out.println("teleported mode speed for car: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.car));
+        System.out.println("teleported mode speed for walk: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk));
+        
+        System.out.println("beeline distance factors: " + plansCalcRoute.getBeelineDistanceFactors());
+        System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
+        System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
+        
+        ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
+//        ptParameters.setTeleportedModeSpeed(50./3.6);
+
+        ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
+        
+        System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
+        System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
+
+		plansCalcRoute.addModeRoutingParams(ptParameters );
+		plansCalcRoute.addModeRoutingParams(walkParameters );
+		
+		System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
+		System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
+
+        BoundingBox nbb = BoundingBox.createBoundingBox(scenario.getNetwork());
+			
+		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, mbpcg);
+		// end adding pt matrix
+
+		
 		List<String> activityTypes = new ArrayList<String>() ;
 		ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
 		for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
@@ -97,11 +139,9 @@ public class AccessibilityRuns {
 			}
 		}
 
-		// new
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		Controler controler = new Controler(scenario) ;
 		controler.setOverwriteFiles(true);
-		// end new
 
 		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
@@ -139,6 +179,24 @@ public class AccessibilityRuns {
 //				listener.setComputingAccessibilityForMode(mode, true);
 				listener.addAdditionalFacilityData(homes) ;
 				listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+				
+				// new
+				SpatialGrid ptGrid = listener.getAccessibilityGrids().get(TransportMode.pt);
+				for (double x = ptGrid.getXmin(); x < ptGrid.getXmax(); ptGrid.getResolution()) {
+					for (double y = ptGrid.getYmin(); y < ptGrid.getYmax(); ptGrid.getResolution()) {
+						if (!ptGrid.isInBounds(x, y)) {
+							new RuntimeException("Coordinate should not be outside bounds!");
+						} else {
+							// TODO perform routing as done in "Extract..." class with x,y coords as input
+							// instead of transitstops
+						}
+					}
+				}
+				
+				// TODO add ptMATrix here, after MeasuringPoints had been used f
+				
+				listener.addPtMatrix(ptMatrix);
+				// end new
 
 //				listener.writeToSubdirectoryWithName(actType + "/" + mode);
 				listener.writeToSubdirectoryWithName(actType);
@@ -276,47 +334,61 @@ public class AccessibilityRuns {
 					log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
 					continue ;
 				}
-					
-					
-				// if OS is Windows
-				// example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
-				if ( System.getProperty("os.name").contains("Win") || System.getProperty("os.name").contains("win")) {
-					// On Windows, the PATH variables need to be set correctly to be able to call "qgis.bat" on the command line
-					// This needs to be done manually. It does not seem to be set automatically when installing QGis
-					String cmd = "qgis.bat " + workingDirectory + "QGisProjectFile.qgs" +
-							" --snapshot " + workingDirectory + "snapshot.png";
-
-					String stdoutFileName = workingDirectory + "snapshot.log";
-					int timeout = 99999;
-
-					ExeRunner.run(cmd, stdoutFileName, timeout);
 				
-					
-				// if OS is Macintosh
-				// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
-				//} else if ( System.getProperty("os.arch").contains("mac")) {
-				} else if ( System.getProperty("os.name").contains("Mac") || System.getProperty("os.name").contains("mac") ) {
-					
-					String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile.qgs" +
+				String osName = System.getProperty("os.name");
+				
+				createSnapshot(workingDirectory, mode, osName);
+			}
+		}		
+	}
+
+	
+	/**
+	 * This method creates a snapshot of the accessibility map that is held in the created QGis file.
+	 * The syntax within the method is different dependent on the operating system.
+	 * 
+	 * @param workingDirectory The directory where the QGisProjectFile (the data source of the to-be-created snapshot) is stored
+	 * @param mode
+	 * @param osName
+	 */
+	private static void createSnapshot(String workingDirectory, Modes4Accessibility mode, String osName) {
+		
+		//TODO adapt this mehtod so that maps for different modes are created.
+		
+		// if OS is Windows
+		// example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
+		if ( osName.contains("Win") || osName.contains("win")) {
+			// On Windows, the PATH variables need to be set correctly to be able to call "qgis.bat" on the command line
+			// This needs to be done manually. It does not seem to be set automatically when installing QGis
+			String cmd = "qgis.bat " + workingDirectory + "QGisProjectFile.qgs" +
 					" --snapshot " + workingDirectory + "snapshot.png";
 
-					String stdoutFileName = workingDirectory + "snapshot.log";
-					
-					int timeout = 99999;
+			String stdoutFileName = workingDirectory + "snapshot.log";
+			int timeout = 99999;
 
-					ExeRunner.run(cmd, stdoutFileName, timeout);
-				
-					
-				// if OS is Linux
-				// example (benjamin) // os.arch=amd64 // os.name=Linux	// os.version=3.13.0-45-generic
-				//} else if ( System.getProperty("os.name").contains("Lin") || System.getProperty("os.name").contains("lin") ) {
-					// TODO for linux
-					
-				// if OS is other
-				} else {
-					log.warn("generating png files not implemented for os.arch=" + System.getProperty("os.arch") );
-				}
-			}	
-		}		
+			ExeRunner.run(cmd, stdoutFileName, timeout);
+		
+		// if OS is Macintosh
+		// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
+		} else if ( osName.contains("Mac") || osName.contains("mac") ) {
+			
+			String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile.qgs" +
+			" --snapshot " + workingDirectory + "snapshot.png";
+
+			String stdoutFileName = workingDirectory + "snapshot.log";
+			
+			int timeout = 99999;
+
+			ExeRunner.run(cmd, stdoutFileName, timeout);
+		
+		// if OS is Linux
+		// example (benjamin) // os.arch=amd64 // os.name=Linux	// os.version=3.13.0-45-generic
+		//} else if ( osName.contains("Lin") || osName.contains("lin") ) {
+			// TODO for linux
+			
+		// if OS is other
+		} else {
+			log.warn("generating png files not implemented for os.arch=" + System.getProperty("os.arch") );
+		}
 	}
 }
