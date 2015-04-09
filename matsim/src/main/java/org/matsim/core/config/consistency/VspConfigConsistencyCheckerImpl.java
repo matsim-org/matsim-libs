@@ -58,7 +58,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			case relative:
 				break;
 			case uniform:
-				problem = true ;
+//				problem = true ;
 				log.warn( "found `typicalDurationScoreComputation == uniform'; vsp should try out `relative'. ") ;
 				break;
 			default:
