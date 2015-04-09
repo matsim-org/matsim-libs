@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
@@ -50,6 +51,20 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		log.info("running checkConsistency ...");
 		
 		boolean problem = false ; // ini
+		
+		// added apr'15:
+		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
+			switch( params.getTypicalDurationScoreComputation() ) {
+			case relative:
+				break;
+			case uniform:
+				problem = true ;
+				log.error( "found `typicalDurationScoreComputation == uniform'; vsp should try out `relative'. ") ;
+				break;
+			default:
+				throw new RuntimeException("unexpected setting; aborting ... ") ;
+			}
+		}
 
 		if ( config.planCalcScore().getMonetaryDistanceCostRateCar() > 0 ) {
 			problem = true ;
