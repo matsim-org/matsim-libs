@@ -265,7 +265,7 @@ public class AccessibilityIntegrationTest {
 
 //		URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(new File(this.utils.getInputDirectory()).getAbsolutePath() + "shapeFile2.shp");
 
-		File f = new File(this.utils.getInputDirectory() + "shapeFile3.shp"); // shape file completely covers the road network
+		File f = new File(this.utils.getInputDirectory() + "shapefile.shp"); // shape file completely covers the road network
 
 		if(!f.exists()){
 			log.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
