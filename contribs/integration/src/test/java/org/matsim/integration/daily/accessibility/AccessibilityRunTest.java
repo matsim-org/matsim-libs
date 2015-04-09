@@ -1,5 +1,7 @@
 package org.matsim.integration.daily.accessibility;
 
+import static org.junit.Assert.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,40 +89,42 @@ public class AccessibilityRunTest {
 		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
+		assertNotNull(config);
+		
 		
 		// new adding pt matrix
-		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME);
-		mbpcg.setPtStopsInputFile(ptStopsFile);
-
-        PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
-        
-        System.out.println("teleported mode speed for pt: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt));
-        System.out.println("teleported mode speed for bike: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.bike));
-        System.out.println("teleported mode speed for ride: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.ride));
-        System.out.println("teleported mode speed for car: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.car));
-        System.out.println("teleported mode speed for walk: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk));
-        
-        System.out.println("beeline distance factors: " + plansCalcRoute.getBeelineDistanceFactors());
-        System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-        System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
-        
-        ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
-//        ptParameters.setTeleportedModeSpeed(50./3.6);
-
-        ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
-        
-        System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-        System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
-
-		plansCalcRoute.addModeRoutingParams(ptParameters );
-		plansCalcRoute.addModeRoutingParams(walkParameters );
-		
-		System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-		System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
-
-        BoundingBox nbb = BoundingBox.createBoundingBox(scenario.getNetwork());
-			
-		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, mbpcg);
+//		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+//		mbpcg.setPtStopsInputFile(ptStopsFile);
+//
+//        PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
+//        
+//        System.out.println("teleported mode speed for pt: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt));
+//        System.out.println("teleported mode speed for bike: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.bike));
+//        System.out.println("teleported mode speed for ride: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.ride));
+//        System.out.println("teleported mode speed for car: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.car));
+//        System.out.println("teleported mode speed for walk: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk));
+//        
+//        System.out.println("beeline distance factors: " + plansCalcRoute.getBeelineDistanceFactors());
+//        System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
+//        System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
+//        
+//        ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
+////        ptParameters.setTeleportedModeSpeed(50./3.6);
+//
+//        ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
+//        
+//        System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
+//        System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
+//
+//		plansCalcRoute.addModeRoutingParams(ptParameters );
+//		plansCalcRoute.addModeRoutingParams(walkParameters );
+//		
+//		System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
+//		System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
+//
+//        BoundingBox nbb = BoundingBox.createBoundingBox(scenario.getNetwork());
+//			
+//		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, nbb, mbpcg);
 		// end adding pt matrix
 
 		
@@ -181,21 +185,21 @@ public class AccessibilityRunTest {
 				listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 				
 				// new
-				SpatialGrid ptGrid = listener.getAccessibilityGrids().get(TransportMode.pt);
-				for (double x = ptGrid.getXmin(); x < ptGrid.getXmax(); ptGrid.getResolution()) {
-					for (double y = ptGrid.getYmin(); y < ptGrid.getYmax(); ptGrid.getResolution()) {
-						if (!ptGrid.isInBounds(x, y)) {
-							new RuntimeException("Coordinate should not be outside bounds!");
-						} else {
-							// TODO perform routing as done in "Extract..." class with x,y coords as input
-							// instead of transitstops
-						}
-					}
-				}
-				
-				// TODO add ptMATrix here, after MeasuringPoints had been used f
-				
-				listener.addPtMatrix(ptMatrix);
+//				SpatialGrid ptGrid = listener.getAccessibilityGrids().get(TransportMode.pt);
+//				for (double x = ptGrid.getXmin(); x < ptGrid.getXmax(); ptGrid.getResolution()) {
+//					for (double y = ptGrid.getYmin(); y < ptGrid.getYmax(); ptGrid.getResolution()) {
+//						if (!ptGrid.isInBounds(x, y)) {
+//							new RuntimeException("Coordinate should not be outside bounds!");
+//						} else {
+//							// TODO perform routing as done in "Extract..." class with x,y coords as input
+//							// instead of transitstops
+//						}
+//					}
+//				}
+//				
+//				// TODO add ptMATrix here, after MeasuringPoints had been used f
+//				
+//				listener.addPtMatrix(ptMatrix);
 				// end new
 
 //				listener.writeToSubdirectoryWithName(actType + "/" + mode);
