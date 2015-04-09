@@ -41,8 +41,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.DefaultRoutingModules;
-import org.matsim.core.router.old.LegRouter;
-import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -124,6 +122,8 @@ public class DefaultDelegateFactory implements TripRouterFactory {
 			/*
 			 * TODO: discuss whether travel time and travel disutility should be taken from
 			 * the routing context object.
+			 * : In all our papers, we write that "pseudo" with "freespeed factor" is x times the freespeed travel times.  So at least according to
+			 * that description, it should be uncongested, i.e. not from the routing context. kai, apr'15
 			 */
     		FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
     		LeastCostPathCalculator routeAlgoPtFreeFlow = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, ptTimeCostCalc, ptTimeCostCalc);
