@@ -30,6 +30,8 @@ public class ScenarioGenerator {
 
 	
 	public static void main(String [] args) {
+		inputDir = Constants.INPUT_PATH;
+		outputDir = Constants.OUTPUT_PATH;
 		boolean calcFundDiag = args.length>0;
 		if (calcFundDiag){
 			TOTAL_DENSITY = Double.parseDouble(args[0]);
@@ -46,14 +48,20 @@ public class ScenarioGenerator {
 		Context contextCA = createCAScenario(calcFundDiag);
 		NetworkGenerator.createNetwork(scenario, contextCA);
 		
+
+		
 		c.network().setInputFile(inputDir + "/network.xml.gz");
 
 		//c.strategy().addParam("Module_1", "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
 		c.strategy().addParam("Module_1", "ReRoute");
-		c.strategy().addParam("ModuleProbability_1", ".1");
-		c.strategy().addParam("ModuleDisableAfterIteration_1", "30");
+		c.strategy().addParam("ModuleProbability_1", ".05");
+		c.strategy().addParam("ModuleDisableAfterIteration_1", "75");
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", ".9");
+		c.strategy().addParam("Module_3", "ReRoute");
+		c.strategy().addParam("ModuleProbability_3", ".05");
+		c.strategy().addParam("ModuleDisableAfterIteration_3", "125");
+		c.strategy().setMaxAgentPlanMemorySize(5);
 
 		c.controler().setOutputDirectory(outputDir);
 		c.controler().setLastIteration(200);
@@ -90,10 +98,14 @@ public class ScenarioGenerator {
 		c.controler().setMobsim(Constants.CA_MOBSIM_MODE);
 		c.global().setCoordinateSystem(Constants.COORDINATE_SYSTEM);
 		c.qsim().setEndTime(60*10);
+		
+		c.travelTimeCalculator().setTraveltimeBinSize(900);
+		c.planCalcScore().setBrainExpBeta(1);
+		
 
-//		PopulationGenerator.createPopulation(scenario, POPULATION_SIZE);
+		PopulationGenerator.createPopulation(scenario, POPULATION_SIZE);
 //		MyPopulationGenerator90deg.createPopulation(scenario);
-		MyPopulationGenerator180deg.createPopulation(scenario);
+//		MyPopulationGenerator180deg.createPopulation(scenario);
 		
 		new ConfigWriter(c).write(inputDir+ "/config.xml");
 		new NetworkWriter(scenario.getNetwork()).write(c.network().getInputFile());

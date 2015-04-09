@@ -18,7 +18,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.CAQLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QCALink;
 
 import pedCA.engine.SimulationEngine;
-import pedCA.output.Log;
 
 
 public class CAEngine implements MobsimEngine{
@@ -26,8 +25,8 @@ public class CAEngine implements MobsimEngine{
 	private final QSim qSim;
 	private final Scenario scenario;
 	private final CAScenario scenarioCA;
-	private Map<Id<CAEnvironment>, SimulationEngine> enginesCA;
-	private CAAgentFactory agentFactoryCA;
+	private final Map<Id<CAEnvironment>, SimulationEngine> enginesCA;
+	private final CAAgentFactory agentFactoryCA;
 	
 	private final Map<Id<Link>,QCALink> linkToQCALink = new HashMap<Id<Link>,QCALink>();
 	private final Map<Id<Link>,CAQLink> linkToCAQLink = new HashMap<Id<Link>,CAQLink>();
@@ -38,34 +37,34 @@ public class CAEngine implements MobsimEngine{
 		this.qSim = qSim;
 		this.simCATime = 0.0;
 		this.scenario = qSim.getScenario();
-		this.scenarioCA = (CAScenario) scenario.getScenarioElement(Constants.CASCENARIO_NAME);
+		this.scenarioCA = (CAScenario) this.scenario.getScenarioElement(Constants.CASCENARIO_NAME);
 		this.enginesCA = new HashMap <Id<CAEnvironment>, SimulationEngine>();
 		this.agentFactoryCA = agentFactoryCA;
 	}
 		
 	private void initGenerators(CAAgentFactory agentFactoryCA) {
-		for (Id<CAEnvironment> key : enginesCA.keySet())
-			agentFactoryCA.addAgentsGenerator(key, enginesCA.get(key).getAgentGenerator());		
+		for (Id<CAEnvironment> key : this.enginesCA.keySet())
+			agentFactoryCA.addAgentsGenerator(key, this.enginesCA.get(key).getAgentGenerator());		
 	}
 
 	private void generateCAEngines() {
-		for(CAEnvironment environmentCA : scenarioCA.getEnvironments().values())
+		for(CAEnvironment environmentCA : this.scenarioCA.getEnvironments().values())
 			createAndAddEngine(environmentCA);
 	}
 
 	@Override
 	public void doSimStep(double time) {
 		double stepDuration = Constants.CA_STEP_DURATION;
-		Log.log("------> BEGINNING STEPS AT "+time);
-		for (; simCATime < time; simCATime+=stepDuration) 
-			for (SimulationEngine engine : enginesCA.values()) 
-				engine.doSimStep(simCATime);		
+//		Log.log("------> BEGINNING STEPS AT "+time);
+		for (; this.simCATime < time; this.simCATime+=stepDuration) 
+			for (SimulationEngine engine : this.enginesCA.values()) 
+				engine.doSimStep(this.simCATime);		
 	}
 
 	@Override
 	public void onPrepareSim() {
 		generateCAEngines();
-		initGenerators(agentFactoryCA);
+		initGenerators(this.agentFactoryCA);
 	}
 
 	@Override
@@ -82,33 +81,33 @@ public class CAEngine implements MobsimEngine{
 	
 	private void createAndAddEngine(CAEnvironment environmentCA){
 		SimulationEngine engine = new SimulationEngine(environmentCA.getContext());
-		engine.setAgentMover(new CAAgentMover(this, environmentCA.getContext(),qSim.getEventsManager()));
-		enginesCA.put(environmentCA.getId(), engine);
+		engine.setAgentMover(new CAAgentMover(this, environmentCA.getContext(),this.qSim.getEventsManager()));
+		this.enginesCA.put(environmentCA.getId(), engine);
 	}
 
 	public void registerHiResLink(QCALink hiResLink) {
-		linkToQCALink.put(hiResLink.getLink().getId(),hiResLink);
+		this.linkToQCALink.put(hiResLink.getLink().getId(),hiResLink);
 	}
 
 	public void registerLowResLink(CAQLink lowResLink) {
-		linkToCAQLink.put(lowResLink.getLink().getId(), lowResLink);
+		this.linkToCAQLink.put(lowResLink.getLink().getId(), lowResLink);
 		//lowResLinks.add(lowResLink);
 	}
 
 	public void registerCALink(CALink linkCA) {
-		linkToCALink.put(linkCA.getLink().getId(), linkCA);
+		this.linkToCALink.put(linkCA.getLink().getId(), linkCA);
 	}
 	
 	public QCALink getQCALink(Id<Link> linkId){
-		return linkToQCALink.get(linkId);
+		return this.linkToQCALink.get(linkId);
 	}
 	
 	public CAQLink getCAQLink(Id<Link> linkId){
-		return linkToCAQLink.get(linkId); 
+		return this.linkToCAQLink.get(linkId); 
 	}
 
 	public CALink getCALink(Id<Link> linkId) {
-		return linkToCALink.get(linkId);
+		return this.linkToCALink.get(linkId);
 	}
 	
 }

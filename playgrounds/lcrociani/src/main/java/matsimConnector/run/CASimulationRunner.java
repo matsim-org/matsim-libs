@@ -1,14 +1,14 @@
 package matsimConnector.run;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
+import matsimConnector.congestionpricing.MSACongestionHandler;
+import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
+import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
+import matsimConnector.congestionpricing.MSATollHandler;
 import matsimConnector.engine.CAMobsimFactory;
 import matsimConnector.engine.CATripRouterFactory;
 import matsimConnector.network.HybridNetworkBuilder;
@@ -20,6 +20,7 @@ import matsimConnector.visualizer.debugger.eventsbaseddebugger.EventBasedVisDebu
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -27,16 +28,14 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import pedCA.environment.grid.EnvironmentGrid;
-import pedCA.output.AgentTracker;
 import pedCA.output.FundamentalDiagramWriter;
-import pedCA.output.TrajectoryCleaner;
-import pedCA.output.TrajectoryFlipTranslate;
 
 public class CASimulationRunner implements IterationStartsListener{
 
 	//MATSim Logger
 	private static final Logger log = Logger.getLogger(CASimulationRunner.class);
+
+
 
 
 	//private Controler controller;
@@ -57,6 +56,12 @@ public class CASimulationRunner implements IterationStartsListener{
 		HybridNetworkBuilder.buildNetwork(scenarioCA.getCAEnvironment(Id.create("0", CAEnvironment.class)), scenarioCA);
 		scenarioCA.connect(scenario);
 
+		Network net = scenario.getNetwork();
+		
+		if (Constants.BRAESS_WL) {
+			//Breass experiment
+			net.removeLink(Id.createLinkId("HybridNode_53-->HybridNode_12"));
+		}
 		//new NetworkWriter(scenario.getNetwork()).write(c.network().getInputFile());
 
 		c.controler().setWriteEventsInterval(1);
@@ -66,14 +71,14 @@ public class CASimulationRunner implements IterationStartsListener{
 		Controler controller = new Controler(scenario);
 
 
-//		//////////////------------THIS IS FOR THE SYSTEM OPTIMUM SEARCH
-//		TollHandler tollHandler = new TollHandler(controller.getScenario());
-//		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
-//		controller.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-//		// Define the pricing approach and the congestion implementation.
-//		//		controler.addControlerListener(new AverageCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
-//		controller.addControlerListener(new MarginalCongestionPricingContolerListener(controller.getScenario(), tollHandler, new CongestionHandlerImplV6(controller.getEvents(), controller.getScenario())));
-//		//////////////------------
+		if (Constants.MARGINAL_SOCIAL_COST_OPTIMIZATION) {
+			//////////////------------THIS IS FOR THE SYSTEM OPTIMUM SEARCH
+			MSATollHandler tollHandler = new MSATollHandler(controller.getScenario());
+			MSATollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new MSATollDisutilityCalculatorFactory(tollHandler);
+			controller.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+			controller.addControlerListener(new MSAMarginalCongestionPricingContolerListener(controller.getScenario(), tollHandler, new MSACongestionHandler(controller.getEvents(), controller.getScenario())));
+			//////////////------------
+		}
 
 
 		controller.setOverwriteFiles(true);
@@ -85,14 +90,14 @@ public class CASimulationRunner implements IterationStartsListener{
 		controller.addMobsimFactory(Constants.CA_MOBSIM_MODE, factoryCA);
 
 		if (args.length==0){
-//			dbg = new EventBasedVisDebuggerEngine(scenario);
-//			InfoBox iBox = new InfoBox(dbg, scenario);
-//			dbg.addAdditionalDrawer(iBox);
-//			controller.getEvents().addHandler(dbg);
-			EnvironmentGrid environmentGrid = scenarioCA.getEnvironments().get(Id.create("0",CAEnvironment.class)).getContext().getEnvironmentGrid();
-			AgentTracker tracker = new AgentTracker(Constants.OUTPUT_PATH+"/agentTrajectories.txt",environmentGrid.getRows(),environmentGrid.getColumns());
-			controller.getEvents().addHandler(tracker);
-			controller.addControlerListener(tracker);
+//						dbg = new EventBasedVisDebuggerEngine(scenario);
+//						InfoBox iBox = new InfoBox(dbg, scenario);
+//						dbg.addAdditionalDrawer(iBox);
+//						controller.getEvents().addHandler(dbg);
+			//			EnvironmentGrid environmentGrid = scenarioCA.getEnvironments().get(Id.create("0",CAEnvironment.class)).getContext().getEnvironmentGrid();
+			//			AgentTracker tracker = new AgentTracker(Constants.OUTPUT_PATH+"/agentTrajectories.txt",environmentGrid.getRows(),environmentGrid.getColumns());
+			//			controller.getEvents().addHandler(tracker);
+			//			controller.addControlerListener(tracker);
 		}else{
 			controller.getEvents().addHandler(new FundamentalDiagramWriter(Double.parseDouble(args[0]),scenario.getPopulation().getPersons().size(), Constants.FD_TEST_PATH+"fd_data.csv"));
 		}
@@ -101,46 +106,46 @@ public class CASimulationRunner implements IterationStartsListener{
 		controller.addControlerListener(runner);
 		controller.run();
 
-		new TrajectoryFlipTranslate(Constants.OUTPUT_PATH+"/agentTrajectories.txt", 
-				Constants.OUTPUT_PATH+"/agentTrajectoriesFlippedTranslated.txt", -2.41, 2.79).run();
-		new TrajectoryCleaner(Constants.OUTPUT_PATH+"/agentTrajectoriesFlippedTranslated.txt", 
-				Constants.OUTPUT_PATH+"/agentTrajectoriesFlippedTranslatedCleaned.txt", 
-				Constants.RESOURCE_PATH +"/simpleGeo.shp").run();
-
-		//if the referenced external binaries are available the following should work
-		String pathToJPSReport = "/Users/laemmel/svn/jpsreport/bin/jpsreport";
-		String pathToGnuplot = "/usr/local/bin/gnuplot";
-
-		String gnuplotDataFile = "datafile='"+Constants.OUTPUT_PATH+ "/Output/Fundamental_Diagram/Classical_Voronoi/rho_v_Voronoi_agentTrajectoriesFlippedTranslatedCleaned.txt_id_1.dat'";
-		
-		File newPwd = new File(Constants.OUTPUT_PATH).getAbsoluteFile();
-		if (System.setProperty("user.dir", newPwd.getAbsolutePath()) == null) {
-			throw new RuntimeException("could not change working directory");
-		}
-
-		try {
-			Files.copy(Paths.get(Constants.RESOURCE_PATH+"/90deg.xml"), 
-					Paths.get(Constants.OUTPUT_PATH+"/90deg.xml"),
-					StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(Paths.get(Constants.RESOURCE_PATH+"/jpsGeo.xml"), 
-					Paths.get(Constants.OUTPUT_PATH+"/jpsGeo.xml"),
-					StandardCopyOption.REPLACE_EXISTING);
-			Files.copy(Paths.get(Constants.RESOURCE_PATH+"/plotFlowAndSpeed.p"), 
-					Paths.get(Constants.OUTPUT_PATH+"/plotFlowAndSpeed.p"),
-					StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e1) {
-			throw new RuntimeException(e1);
-		}
-
-		try {
-			Process p1 = new ProcessBuilder(pathToJPSReport, Constants.OUTPUT_PATH+"/90deg.xml").start();
-			logToLog(p1);
-			p1.waitFor();
-//			Process p2 = new ProcessBuilder(pathToGnuplot,"-e",gnuplotDataFile, Constants.OUTPUT_PATH+"/plotFlowAndSpeed.p").start();
-//			logToLog(p2);
-		} catch (IOException | InterruptedException e) {
-			throw new RuntimeException(e);
-		}		
+		//		new TrajectoryFlipTranslate(Constants.OUTPUT_PATH+"/agentTrajectories.txt", 
+		//				Constants.OUTPUT_PATH+"/agentTrajectoriesFlippedTranslated.txt", -2.41, 2.79).run();
+		//		new TrajectoryCleaner(Constants.OUTPUT_PATH+"/agentTrajectoriesFlippedTranslated.txt", 
+		//				Constants.OUTPUT_PATH+"/agentTrajectoriesFlippedTranslatedCleaned.txt", 
+		//				Constants.RESOURCE_PATH +"/simpleGeo.shp").run();
+		//
+		//		//if the referenced external binaries are available the following should work
+		//		String pathToJPSReport = "/Users/laemmel/svn/jpsreport/bin/jpsreport";
+		//		String pathToGnuplot = "/usr/local/bin/gnuplot";
+		//
+		//		String gnuplotDataFile = "datafile='"+Constants.OUTPUT_PATH+ "/Output/Fundamental_Diagram/Classical_Voronoi/rho_v_Voronoi_agentTrajectoriesFlippedTranslatedCleaned.txt_id_1.dat'";
+		//		
+		//		File newPwd = new File(Constants.OUTPUT_PATH).getAbsoluteFile();
+		//		if (System.setProperty("user.dir", newPwd.getAbsolutePath()) == null) {
+		//			throw new RuntimeException("could not change working directory");
+		//		}
+		//
+		//		try {
+		//			Files.copy(Paths.get(Constants.RESOURCE_PATH+"/90deg.xml"), 
+		//					Paths.get(Constants.OUTPUT_PATH+"/90deg.xml"),
+		//					StandardCopyOption.REPLACE_EXISTING);
+		//			Files.copy(Paths.get(Constants.RESOURCE_PATH+"/jpsGeo.xml"), 
+		//					Paths.get(Constants.OUTPUT_PATH+"/jpsGeo.xml"),
+		//					StandardCopyOption.REPLACE_EXISTING);
+		//			Files.copy(Paths.get(Constants.RESOURCE_PATH+"/plotFlowAndSpeed.p"), 
+		//					Paths.get(Constants.OUTPUT_PATH+"/plotFlowAndSpeed.p"),
+		//					StandardCopyOption.REPLACE_EXISTING);
+		//		} catch (IOException e1) {
+		//			throw new RuntimeException(e1);
+		//		}
+		//
+		//		try {
+		//			Process p1 = new ProcessBuilder(pathToJPSReport, Constants.OUTPUT_PATH+"/90deg.xml").start();
+		//			logToLog(p1);
+		//			p1.waitFor();
+		////			Process p2 = new ProcessBuilder(pathToGnuplot,"-e",gnuplotDataFile, Constants.OUTPUT_PATH+"/plotFlowAndSpeed.p").start();
+		////			logToLog(p2);
+		//		} catch (IOException | InterruptedException e) {
+		//			throw new RuntimeException(e);
+		//		}		
 	}
 
 	private static void logToLog(Process p1) throws IOException {

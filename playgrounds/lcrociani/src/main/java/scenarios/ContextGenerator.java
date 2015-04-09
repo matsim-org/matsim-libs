@@ -16,7 +16,9 @@ public class ContextGenerator {
 		EnvironmentGrid environmentGrid = null;
 		MarkerConfiguration markerConfiguration = null;
 		try {
-			File environmentFile = new File(Constants.RESOURCE_PATH+"/environmentGrid.csv");
+//			File environmentFile = new File(Constants.RESOURCE_PATH+"/environmentGrid_Braess.csv");
+//			File environmentFile = new File(Constants.RESOURCE_PATH+"/environmentGrid_Braess_WL.csv");
+			File environmentFile = new File(Constants.RESOURCE_PATH+"/"+Constants.ENVIRONMENT_FILE);
 			environmentGrid = new EnvironmentGrid(environmentFile);
 		} catch (IOException e) {
 			e.printStackTrace();
