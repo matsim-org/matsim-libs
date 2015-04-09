@@ -29,7 +29,7 @@ import org.matsim.facilities.ActivityFacility;
 // people performing activities at facilities, which are mentioned in HashSet facility Ids, can use this parking.
 public class PPRestrictedToFacilities extends PublicParking implements PrivateParking {
 
-	public PPRestrictedToFacilities(Id<Parking> id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName, HashSet<Id<ActivityFacility>> facilityIds) {
+	public PPRestrictedToFacilities(Id<PC2Parking> id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName, HashSet<Id<ActivityFacility>> facilityIds) {
 		super(id, capacity, coord, parkingCostModel, groupName);
 		this.setFacilityIds(facilityIds);
 	}

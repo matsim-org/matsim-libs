@@ -32,7 +32,7 @@ import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacility;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
@@ -71,7 +71,7 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 
 				if (isInvalidParking(aem, parkingId)) {
 					double distance = 300;
-					Collection<Parking> parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),
+					Collection<PParking> parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),
 							1000);
 					Dummy_RandomSelection.removeInvalidParkings(aem, parkings);
 					while (parkings.size() == 0) {
@@ -81,9 +81,9 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 						Dummy_RandomSelection.removeInvalidParkings(aem, parkings);
 					}
 
-					PriorityQueue<SortableMapObject<Parking>> priorityQueue = new PriorityQueue<SortableMapObject<Parking>>();
+					PriorityQueue<SortableMapObject<PParking>> priorityQueue = new PriorityQueue<SortableMapObject<PParking>>();
 
-					for (Parking parking : parkings) {
+					for (PParking parking : parkings) {
 						ParkingActivityAttributes parkingAttributes = new ParkingActivityAttributes(aem.getPerson().getId());
 
 						double activityDuration = getActivityDuration(aem);
@@ -96,7 +96,7 @@ public class Dummy_OptimalScore extends Dummy_TakeClosestParking {
 						parkingAttributes.setToParkWalkDuration(walkDuration);
 
 						double parkingScore = ZHScenarioGlobal.parkingScoreEvaluator.getParkingScore(parkingAttributes);
-						priorityQueue.add(new SortableMapObject<Parking>(parking, scoreFactor*parkingScore));
+						priorityQueue.add(new SortableMapObject<PParking>(parking, scoreFactor*parkingScore));
 					}
 
 					parkingId = priorityQueue.poll().getKey().getId();

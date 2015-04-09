@@ -40,6 +40,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
  * @author mrieser
  */
 public class PlansCalcRouteConfigGroup extends ConfigGroup {
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( PlansCalcRouteConfigGroup.class ) ;
 
 	public static final String GROUP_NAME = "planscalcroute";

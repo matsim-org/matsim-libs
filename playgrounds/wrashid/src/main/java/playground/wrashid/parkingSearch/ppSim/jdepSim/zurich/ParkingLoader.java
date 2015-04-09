@@ -32,7 +32,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.PublicParking;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
@@ -47,15 +47,15 @@ public class ParkingLoader {
 	public static double privateParkingCalibrationFactorZHCity = 1.0;
 	public static double populationScalingFactor = 1.0;
 
-	public static LinkedList<Parking> getParkingsForScenario(String parkingDataBase) {
+	public static LinkedList<PParking> getParkingsForScenario(String parkingDataBase) {
 
-		LinkedList<Parking> parkingCollection = getParkingCollectionZHCity(parkingDataBase);
+		LinkedList<PParking> parkingCollection = getParkingCollectionZHCity(parkingDataBase);
 		String parkingsFile = parkingDataBase + "publicParkingsOutsideZHCity.xml";
 
 		readParkings(parkingsOutsideZHCityScaling, parkingsFile, parkingCollection);
 
-		LinkedList<Parking> parkingWithNonPositveCapacity = new LinkedList<Parking>();
-		for (Parking parking : parkingCollection) {
+		LinkedList<PParking> parkingWithNonPositveCapacity = new LinkedList<PParking>();
+		for (PParking parking : parkingCollection) {
 			if (parking.getIntCapacity() <= 0) {
 				parkingWithNonPositveCapacity.add(parking);
 			}
@@ -66,7 +66,7 @@ public class ParkingLoader {
 		int numberOfGarageParking = 0;
 		int numberOfPrivateParking = 0;
 
-		for (Parking parking : parkingCollection) {
+		for (PParking parking : parkingCollection) {
 			if (parking.getId().toString().contains("stp")) {
 				numberOfStreetParking += parking.getIntCapacity();
 			} else if (parking.getId().toString().contains("gp")) {
@@ -93,13 +93,13 @@ public class ParkingLoader {
 		return parkingCollection;
 	}
 
-	private static LinkedList<Parking> getParkingCollectionZHCity(String parkingDataBase) {
+	private static LinkedList<PParking> getParkingCollectionZHCity(String parkingDataBase) {
 
 		// double
 		// privateParkingsOutdoorCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking",
 		// "privateParkingsOutdoorCalibrationFactorZHCity"));
 
-		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
+		LinkedList<PParking> parkingCollection = new LinkedList<PParking>();
 
 		String streetParkingsFile = parkingDataBase + "streetParkings_teleAtlast_ivtch.xml";
 		readParkings(streetParkingCalibrationFactor, streetParkingsFile, parkingCollection);
@@ -114,25 +114,25 @@ public class ParkingLoader {
 		return parkingCollection;
 	}
 
-	private static void readParkings(double parkingCalibrationFactor, String parkingsFile, LinkedList<Parking> parkingCollection) {
+	private static void readParkings(double parkingCalibrationFactor, String parkingsFile, LinkedList<PParking> parkingCollection) {
 		ParkingHerbieControler.readParkings(parkingCalibrationFactor, parkingsFile, parkingCollection);
 	}
 
-	public static ParkingManagerZH getParkingManagerZH(LinkedList<Parking> parkings, Network network, TTMatrix ttMatrix) {
+	public static ParkingManagerZH getParkingManagerZH(LinkedList<PParking> parkings, Network network, TTMatrix ttMatrix) {
 		String cityZonesFilePath = ZHScenarioGlobal.loadStringParam("ParkingLoader.parkingZones");
 
 		ParkingCostCalculator parkingCostCalculator = new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), parkings);
 
-		HashMap<String, HashSet<Id<Parking>>> parkingTypes = new HashMap<>();
+		HashMap<String, HashSet<Id<PParking>>> parkingTypes = new HashMap<>();
 
-		HashSet<Id<Parking>> streetParking = new HashSet<>();
-		HashSet<Id<Parking>> garageParking = new HashSet<>();
-		HashSet<Id<Parking>> illegalParking = new HashSet<>();
+		HashSet<Id<PParking>> streetParking = new HashSet<>();
+		HashSet<Id<PParking>> garageParking = new HashSet<>();
+		HashSet<Id<PParking>> illegalParking = new HashSet<>();
 		parkingTypes.put("streetParking", streetParking);
 		parkingTypes.put("garageParking", garageParking);
 		parkingTypes.put("illeagalParking", illegalParking);
 
-		for (Parking parking : parkings) {
+		for (PParking parking : parkings) {
 			if (parking.getId().toString().contains("stp-")) {
 				streetParking.add(parking.getId());
 			}
@@ -155,11 +155,11 @@ public class ParkingLoader {
 		return new ParkingManagerZH(parkingTypes, parkingCostCalculator, parkings, network, ttMatrix);
 	}
 
-	private static void logAllParkingToTextFile(LinkedList<Parking> parkings) {
+	private static void logAllParkingToTextFile(LinkedList<PParking> parkings) {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add("parkingFacilityId\tcapacity\tx-coord\ty-coord");
 
-		for (Parking p : parkings) {
+		for (PParking p : parkings) {
 			list.add(p.getId().toString() + "\t" + p.getIntCapacity() + "\t" + p.getCoord().getX() + "\t" + p.getCoord().getY());
 		}
 
@@ -167,29 +167,29 @@ public class ParkingLoader {
 	}
 
 	public static ParkingManagerZH getParkingManagerZH(Network network, TTMatrix ttMatrix) {
-		LinkedList<Parking> parkings = getParkingsForScenario(ZHScenarioGlobal.loadStringParam("ParkingLoader.parkingDataBase"));
+		LinkedList<PParking> parkings = getParkingsForScenario(ZHScenarioGlobal.loadStringParam("ParkingLoader.parkingDataBase"));
 		addIllegalParking(network, parkings);
 		addDummyParking(parkings);
 
 		return getParkingManagerZH(parkings, network, ttMatrix);
 	}
 
-	private static void addDummyParking(LinkedList<Parking> parkings) {
+	private static void addDummyParking(LinkedList<PParking> parkings) {
 		PublicParking parking = new PublicParking(new CoordImpl(100000000,100000000));
 		parking.setMaxCapacity(100000000000.0);
-		parking.setParkingId(Id.create("backupParking", Parking.class));
+		parking.setParkingId(Id.create("backupParking", PParking.class));
 		parking.setType("public");
 		parkings.add(parking);
 		
 		
 		parking = new PublicParking(new CoordImpl(100000000,100000000));
 		parking.setMaxCapacity(100000000000.0);
-		parking.setParkingId(Id.create("gp-bkp", Parking.class));
+		parking.setParkingId(Id.create("gp-bkp", PParking.class));
 		parking.setType("public");
 		parkings.add(parking);
 	}
 
-	private static void addIllegalParking(Network network, LinkedList<Parking> parkings) {
+	private static void addIllegalParking(Network network, LinkedList<PParking> parkings) {
 		double shareOfLinksWithIllegalParking=ZHScenarioGlobal.loadDoubleParam("ParkingLoader.shareOfLinksWithIllegalParking");
 		Coord coordinatesLindenhofZH = ParkingHerbieControler.getCoordinatesLindenhofZH();
 		Random rand=new Random(19873); // fixing seed (scenarios with different simulation seeds should still have same illegal parking infrastructure)
@@ -199,7 +199,7 @@ public class ParkingLoader {
 			if (GeneralLib.getDistance(coordinatesLindenhofZH, link.getCoord()) < 7000 && rand.nextDouble()<shareOfLinksWithIllegalParking) {
 				PublicParking parking = new PublicParking(link.getCoord());
 				parking.setMaxCapacity(1.0);
-				parking.setParkingId(Id.create("illegal-" + i, Parking.class));
+				parking.setParkingId(Id.create("illegal-" + i, PParking.class));
 				parking.setType("public");
 				parkings.add(parking);
 				i++;

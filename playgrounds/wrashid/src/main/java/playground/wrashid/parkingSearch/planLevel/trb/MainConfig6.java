@@ -7,7 +7,7 @@ import org.matsim.core.controler.Controler;
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.lib.obj.plan.PersonGroups;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
-import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
+import playground.wrashid.parkingSearch.planLevel.scenario.ParkingUtils;
 
 /**
  * 
@@ -20,7 +20,7 @@ public class MainConfig6 {
 		String configFilePath = "test/input/playground/wrashid/parkingSearch/planLevel/chessConfig6.xml";
 		controler = new Controler(configFilePath);
 
-		new BaseControlerScenario(controler);
+		ParkingUtils.initializeParking(controler);
 
 		initPersonGroupsForStatistics();
 		GlobalRegistry.doPrintGraficDataToConsole=true;

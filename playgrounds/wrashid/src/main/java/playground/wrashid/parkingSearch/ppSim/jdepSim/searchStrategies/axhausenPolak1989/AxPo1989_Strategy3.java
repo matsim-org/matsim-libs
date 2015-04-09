@@ -28,7 +28,7 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
@@ -209,7 +209,7 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 			//System.out.println(AgentWithParking.parkingManager.getParkingsOnLink(getCurrentLinkId(aem)));
             Id<Link> currentLinkId = getCurrentLinkId(aem);
             for (Id parkingId : AgentWithParking.parkingManager.getParkingsOnLink(currentLinkId)) {
-				Parking parking = AgentWithParking.parkingManager.getParkingsHashMap().get(parkingId);
+				PParking parking = AgentWithParking.parkingManager.getParkingsHashMap().get(parkingId);
 				int freeCapacity = AgentWithParking.parkingManager.getFreeCapacity(parkingId);
 
 				if (freeCapacity > 0 && parking.getId().toString().contains("gp")) {

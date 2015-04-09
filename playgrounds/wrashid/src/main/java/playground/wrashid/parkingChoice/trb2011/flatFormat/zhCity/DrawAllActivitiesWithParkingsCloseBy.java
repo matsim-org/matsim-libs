@@ -13,7 +13,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
 public class DrawAllActivitiesWithParkingsCloseBy {
@@ -29,7 +29,7 @@ public class DrawAllActivitiesWithParkingsCloseBy {
 		
 		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile, inputFacilities);
 		
-		QuadTree<Parking> parkingsQuadTree = getParkingsQuadTreeZHCity();
+		QuadTree<PParking> parkingsQuadTree = getParkingsQuadTreeZHCity();
 		
 		Population population = scenario.getPopulation();
 		
@@ -42,7 +42,7 @@ public class DrawAllActivitiesWithParkingsCloseBy {
 				if (pe instanceof ActivityImpl){
 					ActivityImpl activity=(ActivityImpl) pe;
 					Coord actCoord = activity.getCoord();
-					Parking parking = parkingsQuadTree.get(actCoord.getX(), actCoord.getY());
+					PParking parking = parkingsQuadTree.get(actCoord.getX(), actCoord.getY());
 					
 					if (GeneralLib.getDistance(actCoord, parking.getCoord())>300){
 						basicPointVisualizer.addPointCoordinate(actCoord, activity.getType() ,Color.GREEN);
@@ -60,15 +60,15 @@ public class DrawAllActivitiesWithParkingsCloseBy {
 	}
 	
 	
-	public static QuadTree<Parking> getParkingsQuadTreeZHCity() {
-		LinkedList<Parking> parkingCollection = ParkingHerbieControler.getParkingCollectionZHCity();
+	public static QuadTree<PParking> getParkingsQuadTreeZHCity() {
+		LinkedList<PParking> parkingCollection = ParkingHerbieControler.getParkingCollectionZHCity();
 		
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
 		double maxX = Double.MIN_VALUE;
 		double maxY = Double.MIN_VALUE;
 		
-		for (Parking parking : parkingCollection) {
+		for (PParking parking : parkingCollection) {
 			if (parking.getCoord().getX() < minX) {
 				minX = parking.getCoord().getX();
 			}
@@ -86,9 +86,9 @@ public class DrawAllActivitiesWithParkingsCloseBy {
 			}
 		}
 
-		QuadTree<Parking> quadTree = new QuadTree<Parking>(minX - 1.0, minY - 1.0, maxX + 1.0, maxY + 1.0);
+		QuadTree<PParking> quadTree = new QuadTree<PParking>(minX - 1.0, minY - 1.0, maxX + 1.0, maxY + 1.0);
 	
-		for (Parking parking : parkingCollection) {
+		for (PParking parking : parkingCollection) {
 			quadTree.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 		}
 	

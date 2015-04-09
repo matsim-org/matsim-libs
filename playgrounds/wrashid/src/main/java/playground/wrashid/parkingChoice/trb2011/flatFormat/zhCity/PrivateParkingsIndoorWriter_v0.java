@@ -21,7 +21,7 @@ import org.matsim.facilities.ActivityOption;
 
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
 public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
@@ -92,7 +92,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 
 	private static void checkNumberOfParkingsConsistency(double totalDistributedCapacity) {
 		double totalCapacity=0;
-		for (Parking parking:privateParkings){
+		for (PParking parking:privateParkings){
 			totalCapacity+=parking.getCapacity();
 		}
 		

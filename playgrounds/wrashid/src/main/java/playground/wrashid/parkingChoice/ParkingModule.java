@@ -8,7 +8,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import playground.wrashid.parkingChoice.api.ParkingSelectionManager;
 import playground.wrashid.parkingChoice.api.PreferredParkingManager;
 import playground.wrashid.parkingChoice.api.ReservedParkingManager;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreAccumulator;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreCollector;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
@@ -26,7 +26,7 @@ public class ParkingModule {
 		return parkingManager;
 	}
 	
-	public ParkingModule(Controler controler, LinkedList<Parking> parkingCollection){
+	public ParkingModule(Controler controler, LinkedList<PParking> parkingCollection){
 		this.controler = controler;
 		
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
@@ -42,7 +42,7 @@ public class ParkingModule {
 		parkingSimulation.addParkingArrivalEventHandler(parkingScoreCollector);
 		parkingSimulation.addParkingDepartureEventHandler(parkingScoreCollector);
 		controler.addControlerListener(parkingManager);
-		parkingScoreAccumulator = new ParkingScoreAccumulator(parkingScoreCollector, parkingManager);
+		parkingScoreAccumulator = new ParkingScoreAccumulator(parkingScoreCollector, parkingManager, controler);
 		controler.addControlerListener(parkingScoreAccumulator);
 		PlanUpdater planUpdater=new PlanUpdater(parkingManager);
 		controler.addControlerListener(planUpdater);

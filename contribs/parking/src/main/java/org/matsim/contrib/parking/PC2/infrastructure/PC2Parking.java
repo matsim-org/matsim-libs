@@ -22,9 +22,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
-public interface Parking {
+public interface PC2Parking {
 
-	public Id<Parking> getId();
+	public Id<PC2Parking> getId();
 
 	public int getMaximumParkingCapacity();
 

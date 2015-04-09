@@ -21,7 +21,7 @@ import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.lib.tools.facility.FacilityLib;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
 /**
@@ -45,7 +45,7 @@ public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 		String outputFilePath = "C:/data/My Dropbox/ETH/static data/parking/zürich city/flat/privateParkings_v1_kti_allFacilities.xml";
 		facilitiesQuadTree = PrivateParkingsIndoorWriter_v0.getFacilitiesQuadTree(facilitiesPath);
 		
-		LinkedList<Parking> privateParkings = getPrivateParkings();
+		LinkedList<PParking> privateParkings = getPrivateParkings();
 		//checkParking(privateParkings,"p1");
 		int clusterSideLengthInMeters=50;
 		HashMap<Coord,Double>  clusteredParkingCapacities =clusterParkings(clusterSideLengthInMeters, privateParkings);
@@ -69,7 +69,7 @@ public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 	private static void checkParking(LinkedList privateParkings, String point){
 		double totalCapacity=0;
 		for (Object obj:privateParkings){
-			Parking parking=(Parking) obj;
+			PParking parking=(PParking) obj;
 			totalCapacity+=parking.getCapacity();
 		}
 		
@@ -141,10 +141,10 @@ public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 		return privateParkings;
 	}
 
-	private static HashMap<Coord,Double> clusterParkings(int clusterSideLengthInMeters, LinkedList<Parking> privateParkings) {
+	private static HashMap<Coord,Double> clusterParkings(int clusterSideLengthInMeters, LinkedList<PParking> privateParkings) {
 		DoubleValueHashMap<String> parkingCapacities=new DoubleValueHashMap<String>();
 		
-		for (Parking parking:privateParkings){
+		for (PParking parking:privateParkings){
 			String id= Math.round(parking.getCoord().getX()/clusterSideLengthInMeters)*clusterSideLengthInMeters + "," + Math.round(parking.getCoord().getY()/clusterSideLengthInMeters*clusterSideLengthInMeters);
 			parkingCapacities.incrementBy(id, parking.getCapacity());
 		}		
@@ -159,8 +159,8 @@ public class PrivateParkingsWriter_v1 extends MatsimXmlWriter {
 		return clusteredCapacities;
 	}
 
-	public static LinkedList<Parking> getPrivateParkings(){
-		LinkedList<Parking> parkingCollection=new LinkedList<Parking>();
+	public static LinkedList<PParking> getPrivateParkings(){
+		LinkedList<PParking> parkingCollection=new LinkedList<PParking>();
 		String baseFolder="C:/data/My Dropbox/ETH/static data/parking/zürich city/flat/";
 		ParkingHerbieControler.readParkings(1.0, baseFolder + "privateParkingsIndoor_v0.xml", parkingCollection);
 		ParkingHerbieControler.readParkings(1.0, baseFolder + "privateParkingsOutdoor_v0.xml", parkingCollection);

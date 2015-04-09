@@ -40,7 +40,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
@@ -185,7 +185,7 @@ public class ComparisonGarageCounts {
 				measuredOccupancySum += countsScalingFactor *occupancyBins[i];
 			}
 			
-			Id<Parking> parkingId = Id.create( mappingOfParkingNameToParkingId.get(parkingName), Parking.class);
+			Id<PParking> parkingId = Id.create( mappingOfParkingNameToParkingId.get(parkingName), PParking.class);
 			ParkingOccupancyBins pob=parkingOccupancyBins.get(parkingId);
 			
 			double simulatedOccupancySum=0;

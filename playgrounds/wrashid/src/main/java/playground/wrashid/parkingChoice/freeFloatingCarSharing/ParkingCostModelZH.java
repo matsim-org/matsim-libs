@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 import org.matsim.core.config.Config;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingCostCalculatorZH;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
@@ -34,7 +34,7 @@ public class ParkingCostModelZH implements ParkingCostModel {
 
 	private ParkingCostCalculatorZH parkingCostCalculator;
 
-	public ParkingCostModelZH(Config config, LinkedList<Parking> parkings){
+	public ParkingCostModelZH(Config config, LinkedList<PParking> parkings){
 		String cityZonesFilePath = config.getParam("parkingChoice.ZH", "cityZonesFile");
 		
 		parkingCostCalculator = new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), parkings);

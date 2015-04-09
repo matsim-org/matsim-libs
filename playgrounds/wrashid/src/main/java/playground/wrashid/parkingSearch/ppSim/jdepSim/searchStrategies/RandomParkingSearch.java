@@ -33,7 +33,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskDuringSim;
@@ -111,7 +111,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 				String filterParkingType = getParkingFilterType(personId);
 
-				Id<Parking> parkingId = getParkingLinkId(aem, filterParkingType);
+				Id<PParking> parkingId = getParkingLinkId(aem, filterParkingType);
 
 			//	boolean isInvalidLink = aem.isLastLinkOfRouteInvalidLinkForParking();
 
@@ -194,7 +194,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		return parkingId;
 	}
 
-	public Id injectBackupGarageParkingIfNeeded(AgentWithParking aem, Id<Person> personId, Id<Parking> parkingId) {
+	public Id injectBackupGarageParkingIfNeeded(AgentWithParking aem, Id<Person> personId, Id<PParking> parkingId) {
 		if (getSearchTime(aem)>maxSearchDuration){
 			ActivityImpl nextNonParkAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(aem.getPlanElementIndex() + 3);
@@ -219,7 +219,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 					}
 				}
 			} else {
-				parkingId=Id.create("backupParking", Parking.class);
+				parkingId=Id.create("backupParking", PParking.class);
 			}
 			
 			//startSearchTime.put(personId, -1.0);

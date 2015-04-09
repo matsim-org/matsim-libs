@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
-import org.matsim.contrib.parking.PC2.infrastructure.Parking;
+import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.PC2.infrastructure.PrivateParking;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
@@ -46,7 +46,7 @@ public class ParkingInfrastructureManager {
 
 	private ParkingScoreManager parkingScoreManager;
 
-	private HashMap<Id<Parking>, Parking> allParkings;
+	private HashMap<Id<PC2Parking>, PC2Parking> allParkings;
 
 	// personId, parkingFacilityId
 	private HashMap<Id<Person>, Id> parkedVehicles;
@@ -58,8 +58,8 @@ public class ParkingInfrastructureManager {
 
 	// TODO: later - to improve parformance, a second variable could be added,
 	// where full parking are put.
-	private QuadTree<Parking> publicParkingsQuadTree;
-	private HashMap<String, QuadTree<Parking>> publicParkingGroupQuadTrees;
+	private QuadTree<PC2Parking> publicParkingsQuadTree;
+	private HashMap<String, QuadTree<PC2Parking>> publicParkingGroupQuadTrees;
 
 	// TODO: make private parking (attached to facility)
 	// + also private parking, which is attached to activity
@@ -69,12 +69,12 @@ public class ParkingInfrastructureManager {
 		this.parkingScoreManager = parkingScoreManager;
 		this.eventsManager = eventsManager;
 		parkedVehicles = new HashMap<>();
-		setAllParkings(new HashMap<Id<Parking>, Parking>());
+		setAllParkings(new HashMap<Id<PC2Parking>, PC2Parking>());
 		privateParkingsRestrictedToFacilities = new LinkedListValueHashMap<Id, PPRestrictedToFacilities>();
 	}
 
 	public synchronized void setPublicParkings(LinkedList<PublicParking> publicParkings) {
-		publicParkingGroupQuadTrees = new HashMap<String, QuadTree<Parking>>();
+		publicParkingGroupQuadTrees = new HashMap<String, QuadTree<PC2Parking>>();
 		EnclosingRectangle allPublicParkingRect = new EnclosingRectangle();
 		HashMap<String, EnclosingRectangle> groupRects = new HashMap<String, EnclosingRectangle>();
 
@@ -92,11 +92,11 @@ public class ParkingInfrastructureManager {
 			EnclosingRectangle groupRect = groupRects.get(parking.getGroupName());
 			groupRect.registerCoord(parking.getCoordinate());
 		}
-		this.publicParkingsQuadTree = (new QuadTreeInitializer<Parking>()).getQuadTree(allPublicParkingRect);
+		this.publicParkingsQuadTree = (new QuadTreeInitializer<PC2Parking>()).getQuadTree(allPublicParkingRect);
 
 		for (String groupNames : groupRects.keySet()) {
 			publicParkingGroupQuadTrees.put(groupNames,
-					(new QuadTreeInitializer<Parking>()).getQuadTree(groupRects.get(groupNames)));
+					(new QuadTreeInitializer<PC2Parking>()).getQuadTree(groupRects.get(groupNames)));
 		}
 
 		for (PublicParking parking : publicParkings) {
@@ -105,7 +105,7 @@ public class ParkingInfrastructureManager {
 		}
 	}
 
-	public static void addParkingToQuadTree(QuadTree<Parking> quadTree, Parking parking) {
+	public static void addParkingToQuadTree(QuadTree<PC2Parking> quadTree, PC2Parking parking) {
 		quadTree.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
 	}
 
@@ -122,7 +122,7 @@ public class ParkingInfrastructureManager {
 		parkedVehicles.clear();
 
 		for (Id parkingFacilityId : getAllParkings().keySet()) {
-			Parking parking = getAllParkings().get(parkingFacilityId);
+			PC2Parking parking = getAllParkings().get(parkingFacilityId);
 			if (parking.getAvailableParkingCapacity() == 0) {
 				if (!(parking instanceof PrivateParking)) {
 					addParkingToQuadTree(publicParkingsQuadTree, parking);
@@ -139,16 +139,16 @@ public class ParkingInfrastructureManager {
 		// availablePublicParkingAtCityCentre();
 	}
 
-	protected synchronized QuadTree<Parking> getPublicParkingQuadTree() {
+	protected synchronized QuadTree<PC2Parking> getPublicParkingQuadTree() {
 		return publicParkingsQuadTree;
 	}
 
-	public synchronized Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName) {
-		Parking parking = null;
+	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName) {
+		PC2Parking parking = null;
 		if (groupName == null) {
 			parking = publicParkingsQuadTree.get(destCoordinate.getX(), destCoordinate.getY());
 		} else {
-			QuadTree<Parking> quadTree = publicParkingGroupQuadTrees.get(groupName);
+			QuadTree<PC2Parking> quadTree = publicParkingGroupQuadTrees.get(groupName);
 			parking = quadTree.get(destCoordinate.getX(), destCoordinate.getY());
 
 			if (parking == null) {
@@ -160,13 +160,13 @@ public class ParkingInfrastructureManager {
 		return parking;
 	}
 
-	public synchronized void logArrivalEventAtTimeZero(Parking parking) {
+	public synchronized void logArrivalEventAtTimeZero(PC2Parking parking) {
 		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId(), null, null, 0));
 	}
 
-	public synchronized Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id personId,
+	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id personId,
 			double parkingDurationInSeconds, double arrivalTime) {
-		Parking parking = parkAtClosestPublicParkingNonPersonalVehicle(destCoordinate, groupName);
+		PC2Parking parking = parkAtClosestPublicParkingNonPersonalVehicle(destCoordinate, groupName);
 
 		double walkScore = parkingScoreManager.calcWalkScore(destCoordinate, parking, personId, parkingDurationInSeconds);
 		parkingScoreManager.addScore(personId, walkScore);
@@ -179,12 +179,12 @@ public class ParkingInfrastructureManager {
 	// TODO: make this method abstract
 	// when person/vehicleId is clearly distinct, then I can change this to
 	// vehicleId - check, if this is the case now.
-	public synchronized Parking parkVehicle(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
+	public synchronized PC2Parking parkVehicle(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
 		// availablePublicParkingAtCityCentre();
 
 		double finalScore = 0;
 
-		Parking selectedParking = null;
+		PC2Parking selectedParking = null;
 		boolean parkingFound = false;
 		for (PPRestrictedToFacilities pp : privateParkingsRestrictedToFacilities.get(parkingOperationRequestAttributes.facilityId)) {
 			if (pp.getAvailableParkingCapacity() > 0) {
@@ -195,14 +195,14 @@ public class ParkingInfrastructureManager {
 			}
 		}
 
-		Parking closestParking = getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
+		PC2Parking closestParking = getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
 				parkingOperationRequestAttributes.destCoordinate.getY());
 		double distanceClosestParking = GeneralLib.getDistance(closestParking.getCoordinate(),
 				parkingOperationRequestAttributes.destCoordinate);
 
 		double distance = 300;
 		if (!parkingFound) {
-			Collection<Parking> collection = getPublicParkingQuadTree().get(
+			Collection<PC2Parking> collection = getPublicParkingQuadTree().get(
 					parkingOperationRequestAttributes.destCoordinate.getX(),
 					parkingOperationRequestAttributes.destCoordinate.getY(), distance);
 
@@ -219,19 +219,19 @@ public class ParkingInfrastructureManager {
 
 				}
 
-				PriorityQueue<SortableMapObject<Parking>> queue = new PriorityQueue<SortableMapObject<Parking>>();
+				PriorityQueue<SortableMapObject<PC2Parking>> queue = new PriorityQueue<SortableMapObject<PC2Parking>>();
 
-				for (Parking parking : collection) {
+				for (PC2Parking parking : collection) {
 					double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
 							parkingOperationRequestAttributes.arrivalTime,
 							parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
 							parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex);
-					queue.add(new SortableMapObject<Parking>(parking, -1.0 * score));
+					queue.add(new SortableMapObject<PC2Parking>(parking, -1.0 * score));
 				}
 
 				// TODO: should I make MNL only on top 5 here?
 
-				SortableMapObject<Parking> poll = queue.peek();
+				SortableMapObject<PC2Parking> poll = queue.peek();
 				finalScore = poll.getScore();
 				selectedParking = poll.getKey();
 				parkedVehicles.put(parkingOperationRequestAttributes.personId, selectedParking.getId());
@@ -286,7 +286,7 @@ public class ParkingInfrastructureManager {
 
 	private synchronized void availablePublicParkingAtCityCentre() {
 		CoordImpl lindenHof = new CoordImpl(683235.0, 247497.0);
-		Collection<Parking> collection2 = getPublicParkingQuadTree().get(lindenHof.getX(), lindenHof.getY(), 1000);
+		Collection<PC2Parking> collection2 = getPublicParkingQuadTree().get(lindenHof.getX(), lindenHof.getY(), 1000);
 
 		if (collection2.size() > 0) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
@@ -302,7 +302,7 @@ public class ParkingInfrastructureManager {
 		}
 	}
 
-	private synchronized void parkVehicle(Parking parking) {
+	private synchronized void parkVehicle(PC2Parking parking) {
 		int startAvailability = parking.getAvailableParkingCapacity();
 
 		parking.parkVehicle();
@@ -321,10 +321,10 @@ public class ParkingInfrastructureManager {
 				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
 			}
 
-			Collection<Parking> collection = publicParkingsQuadTree.get(parking.getCoordinate().getX(), parking.getCoordinate()
+			Collection<PC2Parking> collection = publicParkingsQuadTree.get(parking.getCoordinate().getX(), parking.getCoordinate()
 					.getY(), 1);
 			if (collection.size() == 1) {
-				for (Parking p : collection) {
+				for (PC2Parking p : collection) {
 					if (p.getId().toString().equalsIgnoreCase(parking.getId().toString())) {
 						DebugLib.stopSystemAndReportInconsistency();
 					}
@@ -338,10 +338,10 @@ public class ParkingInfrastructureManager {
 
 	}
 
-	public synchronized LinkedList<Parking> getNonFullParking(Collection<Parking> parkings) {
-		LinkedList<Parking> result = new LinkedList<Parking>();
+	public synchronized LinkedList<PC2Parking> getNonFullParking(Collection<PC2Parking> parkings) {
+		LinkedList<PC2Parking> result = new LinkedList<PC2Parking>();
 
-		for (Parking p : parkings) {
+		for (PC2Parking p : parkings) {
 			if (p.getAvailableParkingCapacity() > 0) {
 				result.add(p);
 			}
@@ -350,9 +350,9 @@ public class ParkingInfrastructureManager {
 	}
 
 	// TODO: make this method abstract
-	public synchronized Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
+	public synchronized PC2Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
 		Id parkingFacilityId = parkedVehicles.get(parkingOperationRequestAttributes.personId);
-		Parking parking = getAllParkings().get(parkingFacilityId);
+		PC2Parking parking = getAllParkings().get(parkingFacilityId);
 		parkedVehicles.remove(parkingOperationRequestAttributes.personId);
 		unParkVehicle(parking, parkingOperationRequestAttributes.arrivalTime
 				+ parkingOperationRequestAttributes.parkingDurationInSeconds, parkingOperationRequestAttributes.personId);
@@ -360,14 +360,14 @@ public class ParkingInfrastructureManager {
 	}
 
 	public synchronized void scoreParkingOperation(ParkingOperationRequestAttributes parkingOperationRequestAttributes,
-			Parking parking) {
+			PC2Parking parking) {
 		double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
 				parkingOperationRequestAttributes.arrivalTime, parkingOperationRequestAttributes.parkingDurationInSeconds, parking,
 				parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.legIndex);
 		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
 	}
 
-	public synchronized void unParkVehicle(Parking parking, double departureTime, Id<Person> personId) {
+	public synchronized void unParkVehicle(PC2Parking parking, double departureTime, Id<Person> personId) {
 		if (parking == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
@@ -402,11 +402,11 @@ public class ParkingInfrastructureManager {
 		this.eventsManager = eventsManager;
 	}
 
-	public HashMap<Id<Parking>, Parking> getAllParkings() {
+	public HashMap<Id<PC2Parking>, PC2Parking> getAllParkings() {
 		return allParkings;
 	}
 
-	public void setAllParkings(HashMap<Id<Parking>, Parking> allParkings) {
+	public void setAllParkings(HashMap<Id<PC2Parking>, PC2Parking> allParkings) {
 		this.allParkings = allParkings;
 	}
 

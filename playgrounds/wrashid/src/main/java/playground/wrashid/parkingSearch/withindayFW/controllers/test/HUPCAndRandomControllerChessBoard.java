@@ -90,7 +90,7 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
 				this.scenarioData, parkingAgentsTracker, tripRouterFactory, routingContext);
-		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure);
+		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure, this.scenarioData );
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);
 		ParkingStrategy parkingStrategy = new ParkingStrategy(hupcSearchIdentifier);
@@ -144,7 +144,6 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		final HUPCAndRandomControllerChessBoard controller = new HUPCAndRandomControllerChessBoard(args);
 
 		controller.setOverwriteFiles(true);
-		GeneralLib.controler=controller;
 
 		controller.run();
 

@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.population.ActivityImpl;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.RandomNumbers;
 
@@ -54,7 +54,7 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 			
 			if (isInvalidParking(aem, parkingId)) {
 				double distance=300;
-				Collection<Parking> parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),1000);
+				Collection<PParking> parkings = AgentWithParking.parkingManager.getParkingWithinDistance(nextAct.getCoord(),1000);
 				removeInvalidParkings(aem, parkings);
 				
 				while (parkings.size()==0){
@@ -67,7 +67,7 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 				random = RandomNumbers.getRandomNumber(personId, aem.getPlanElementIndex(), getName());
 				int randomInt = random.nextInt(parkings.size());
 				int i=0;
-				for (Parking parking:parkings){
+				for (PParking parking:parkings){
 					if (i==randomInt){
 						parkingId=parking.getId();
 						break;
@@ -83,10 +83,10 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 		
 	}
 
-	public static void removeInvalidParkings(AgentWithParking aem, Collection<Parking> parkings) {
-		LinkedList<Parking> removeList=new LinkedList<Parking>();
+	public static void removeInvalidParkings(AgentWithParking aem, Collection<PParking> parkings) {
+		LinkedList<PParking> removeList=new LinkedList<PParking>();
 		removePrivateParkings(parkings);
-		for (Parking parking:parkings){
+		for (PParking parking:parkings){
 			if (isInvalidParking(aem, parking.getId())) {
 				removeList.add(parking);
 			}
@@ -94,10 +94,10 @@ public class Dummy_RandomSelection extends Dummy_TakeClosestParking {
 		parkings.removeAll(removeList);
 	}
 	
-	public static void removePrivateParkings(Collection<Parking> parkings){
-		LinkedList<Parking> removeList=new LinkedList<Parking>();
+	public static void removePrivateParkings(Collection<PParking> parkings){
+		LinkedList<PParking> removeList=new LinkedList<PParking>();
 		
-		for (Parking parking:parkings){
+		for (PParking parking:parkings){
 			if (parking.getType().equalsIgnoreCase("private")){
 				removeList.add(parking);
 			}

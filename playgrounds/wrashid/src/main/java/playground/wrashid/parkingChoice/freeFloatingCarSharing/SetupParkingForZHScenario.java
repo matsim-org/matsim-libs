@@ -40,7 +40,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
 
 import java.util.HashMap;
@@ -58,7 +58,7 @@ public class SetupParkingForZHScenario {
 		
 		String baseDir = config.getParam("parkingChoice.ZH", "parkingDataDirectory");
 		
-		LinkedList<Parking> parkings = getParking(config, baseDir);
+		LinkedList<PParking> parkings = getParking(config, baseDir);
 	
 		ParkingScoreManager parkingScoreManager = prepareParkingScoreManager(parkingModule, parkings);
 		
@@ -74,7 +74,7 @@ public class SetupParkingForZHScenario {
 		ParkingCostModel pcm=new ParkingCostModelZH(config,parkings);
 		LinkedList<PublicParking> publicParkings=new LinkedList<PublicParking>();
 		LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities=new LinkedList<PPRestrictedToFacilities>();
-		for (Parking parking: parkings){
+		for (PParking parking: parkings){
 			String groupName=null;
 			if (parking.getId().toString().contains("stp")){
 				groupName="streetParking";
@@ -84,14 +84,14 @@ public class SetupParkingForZHScenario {
 				groupName="publicPOutsideCity";
 			}
 			if (groupName!=null){
-				PublicParking publicParking=new PublicParking(Id.create(parking.getId(), org.matsim.contrib.parking.PC2.infrastructure.Parking.class),parking.getIntCapacity(),parking.getCoord(),pcm,groupName);
+				PublicParking publicParking=new PublicParking(Id.create(parking.getId(), org.matsim.contrib.parking.PC2.infrastructure.PC2Parking.class),parking.getIntCapacity(),parking.getCoord(),pcm,groupName);
 				publicParkings.add(publicParking);
 			} else {
 				PrivateParking pp=(PrivateParking) parking;
 				HashSet<Id<ActivityFacility>> hs=new HashSet<>();
 				hs.add(pp.getActInfo().getFacilityId());
 				groupName="privateParking";
-				PPRestrictedToFacilities PPRestrictedToFacilitiesTmp=new PPRestrictedToFacilities(Id.create(parking.getId(), org.matsim.contrib.parking.PC2.infrastructure.Parking.class), parking.getIntCapacity(),parking.getCoord(),pcm,groupName,hs);
+				PPRestrictedToFacilities PPRestrictedToFacilitiesTmp=new PPRestrictedToFacilities(Id.create(parking.getId(), org.matsim.contrib.parking.PC2.infrastructure.PC2Parking.class), parking.getIntCapacity(),parking.getCoord(),pcm,groupName,hs);
 				ppRestrictedToFacilities.add(PPRestrictedToFacilitiesTmp);
 			}
 		}
@@ -104,14 +104,14 @@ public class SetupParkingForZHScenario {
 		appendScoringFactory(parkingModule);
 	}
 
-	private static LinkedList<Parking> getParking(Config config, String baseDir) {
+	private static LinkedList<PParking> getParking(Config config, String baseDir) {
 		ParkingLoader.garageParkingCalibrationFactor=Double.parseDouble(config.getParam("parkingChoice.ZH", "parkingGroupCapacityScalingFactor_garageParking"));
 		ParkingLoader.parkingsOutsideZHCityScaling =Double.parseDouble(config.getParam("parkingChoice.ZH", "parkingGroupCapacityScalingFactor_publicPOutsideCity"));
 		ParkingLoader.populationScalingFactor =Double.parseDouble(config.getParam("parkingChoice.ZH", "populationScalingFactor"));
 		ParkingLoader.privateParkingCalibrationFactorZHCity  =Double.parseDouble(config.getParam("parkingChoice.ZH", "parkingGroupCapacityScalingFactor_privateParking"));
 		ParkingLoader.streetParkingCalibrationFactor  =Double.parseDouble(config.getParam("parkingChoice.ZH", "parkingGroupCapacityScalingFactor_streetParking"));
 		
-		LinkedList<Parking> parkings = ParkingLoader.getParkingsForScenario(baseDir);
+		LinkedList<PParking> parkings = ParkingLoader.getParkingsForScenario(baseDir);
 		return parkings;
 	}
 	
@@ -119,7 +119,7 @@ public class SetupParkingForZHScenario {
 		parkingModule.getControler().setScoringFunctionFactory(new ParkingScoringFunctionFactory (parkingModule.getControler().getScoringFunctionFactory(),parkingModule.getParkingScoreManager()));
 	}
 	
-	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule, LinkedList<Parking> parkings) {
+	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule, LinkedList<PParking> parkings) {
 		Controler controler=parkingModule.getControler();
 		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(parkingModule.getControler()), parkingModule.getControler());
 
@@ -137,7 +137,7 @@ public class SetupParkingForZHScenario {
 		String epsilonDistribution=controler.getConfig().findParam("parkingChoice.ZH", "randomErrorTermEpsilonDistribution");
 		if (epsilonDistribution!=null){
 			LinkedList<Id> parkingIds=new LinkedList<Id>();
-			for (Parking parking:parkings){
+			for (PParking parking:parkings){
 				parkingIds.add(parking.getId());
 			}
 			

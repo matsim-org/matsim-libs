@@ -1,5 +1,8 @@
 package playground.wrashid.parkingChoice.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -12,26 +15,24 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
 import org.matsim.core.population.ActivityImpl;
-
-import java.util.LinkedList;
-import java.util.List;
 
 
 public class ActivityDurationEstimator implements ActivityStartEventHandler, PersonDepartureEventHandler {
 
-	private final Controler controler;
 	private final LinkedList<Double> activityDurationEstimations = new LinkedList<Double>();
 	private final Id<Person> selectedPersonId;
 	//private int indexOfActivity = 0;
 	//private Double startTimeFirstAct = null;
 	private final ActDurationEstimationContainer actDurationEstimationContainer=new ActDurationEstimationContainer();
+	private Scenario scenario;
 
-	public ActivityDurationEstimator(final Controler controler, final Id<Person> selectedPersonId) {
-		this.controler = controler;
+	public ActivityDurationEstimator(final Scenario scenario, final Id<Person> selectedPersonId) {
 		this.selectedPersonId = selectedPersonId;
+		this.scenario = scenario ;
 	}
 
 	@Override
@@ -48,63 +49,60 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Per
 	public void handleEvent(final ActivityStartEvent event) {
 		if (event.getPersonId().equals(this.selectedPersonId)) {
 
-			GeneralLib.controler=this.controler;
-
 			this.actDurationEstimationContainer.registerNewActivity();
 			if (this.actDurationEstimationContainer.isCurrentParkingTimeOver()){
-				double estimatedActduration = getEstimatedActDuration(event, this.controler.getScenario(), this.actDurationEstimationContainer);
+				Plan plan = scenario.getPopulation().getPersons().get( selectedPersonId ).getSelectedPlan() ;
+				double estimatedActduration = getEstimatedActDuration(event, plan, this.actDurationEstimationContainer, this.scenario.getConfig() );
 				this.activityDurationEstimations.add(estimatedActduration);
 			}
 		}
 	}
 
-	public static double getEstimatedActDuration(final ActivityStartEvent event, final Scenario scenario,
-			final ActDurationEstimationContainer actDurationEstimationContainer) {
+	public static double getEstimatedActDuration(final ActivityStartEvent event, final Plan plan,
+			final ActDurationEstimationContainer actDurationEstimationContainer, Config config) {
+		PlansCalcRouteConfigGroup pcrConfig = config.plansCalcRoute() ;
 
-        Plan selectedPlan = scenario.getPopulation().getPersons().get(event.getPersonId()).getSelectedPlan();
-
-		List<PlanElement> planElement = selectedPlan.getPlanElements();
-
-		int indexOfActivity=actDurationEstimationContainer.indexOfCurrentActivity;
-		double endTimeOfFirstAct=actDurationEstimationContainer.endTimeOfFirstAct;
-		if (isLastAct(indexOfActivity, planElement)) {
-
+		int indexOfActivity=actDurationEstimationContainer.getIndexOfCurrentActivity();
+		double endTimeOfFirstAct=actDurationEstimationContainer.getEndTimeOfFirstAct();
+		
+		// if this is the last activity ...
+		if (isLastAct(indexOfActivity, plan.getPlanElements())) {
+			// ... then return the ``wrap around'' time from now to the beginning of the first activity "tomorrow":
 			return GeneralLib.getIntervalDuration(event.getTime(), endTimeOfFirstAct);
 		}
 
-		int indexOfFirstCarLegAfterCurrentAct = getIndexOfFirstCarLegAfterCurrentAct(indexOfActivity, planElement);
+		int indexOfFirstCarLegAfterCurrentAct = getIndexOfFirstCarLegAfterCurrentAct(indexOfActivity, plan.getPlanElements());
+		// (seems to do what it say)
 
-		actDurationEstimationContainer.skipAllPlanElementsTillIndex=indexOfFirstCarLegAfterCurrentAct;
+		actDurationEstimationContainer.setSkipAllPlanElementsTillIndex(indexOfFirstCarLegAfterCurrentAct);
 
 		double estimatedActduration = 0;
 
 		for (int i = indexOfActivity; i < indexOfFirstCarLegAfterCurrentAct; i++) {
-			if (planElement.get(i) instanceof ActivityImpl) {
-				ActivityImpl act = (ActivityImpl) planElement.get(i);
-				double endTime = act.getEndTime();
-				double maximumDuration = act.getMaximumDuration();
-				if (endTime != Double.NEGATIVE_INFINITY) {
-					estimatedActduration += GeneralLib.getIntervalDuration(event.getTime(), endTime);
+			if (plan.getPlanElements().get(i) instanceof ActivityImpl) {
+				ActivityImpl act = (ActivityImpl) plan.getPlanElements().get(i);
+				// this is hard-coded "tryEndtimeThenDuration":
+				if (act.getEndTime() != Double.NEGATIVE_INFINITY) {
+					estimatedActduration += GeneralLib.getIntervalDuration(event.getTime(), act.getEndTime());
 				} else {
-					estimatedActduration += maximumDuration;
+					estimatedActduration += act.getMaximumDuration();
 				}
 			} else {
 				// TODO: estimate travel time according to mode of travel...
-				Leg leg = (Leg) planElement.get(i);
-				ActivityImpl prevAct = (ActivityImpl) planElement.get(i - 1);
-				ActivityImpl nextAct = (ActivityImpl) planElement.get(i + 1);
+				Leg leg = (Leg) plan.getPlanElements().get(i);
+				ActivityImpl prevAct = (ActivityImpl) plan.getPlanElements().get(i - 1);
+				ActivityImpl nextAct = (ActivityImpl) plan.getPlanElements().get(i + 1);
 				double distance = GeneralLib.getDistance(prevAct.getCoord(), nextAct.getCoord());
-				PlansCalcRouteConfigGroup plansCalcRoute = scenario.getConfig().plansCalcRoute();
 				if (leg.getMode().equalsIgnoreCase("walk") || leg.getMode().equalsIgnoreCase("transit_walk")) {
-					estimatedActduration += GeneralLib.getWalkingTravelDuration(distance);
+					estimatedActduration += GeneralLib.getWalkingTravelDuration(distance, pcrConfig );
 				} else if (leg.getMode().equalsIgnoreCase("bike")) {
-					estimatedActduration += GeneralLib.getBikeTravelDuration(distance);
+					estimatedActduration += GeneralLib.getBikeTravelDuration(distance, pcrConfig );
 				} else if (leg.getMode().equalsIgnoreCase("pt")) {
-					estimatedActduration += GeneralLib.getPtTravelDuration(distance);
+					estimatedActduration += GeneralLib.getPtTravelDuration(distance, pcrConfig );
 				} else if (leg.getMode().equalsIgnoreCase("ride")) {
 					//as ride should disappear anyway, this the closest simple estimation,
 					// which must not be correct for the algorithm to work.
-					estimatedActduration += GeneralLib.getPtTravelDuration(distance);
+					estimatedActduration += GeneralLib.getPtTravelDuration(distance, pcrConfig );
 				} else {
 					// estimatedActduration +=
 					// distance/plansCalcRoute.getUndefinedModeSpeed();
@@ -139,8 +137,8 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Per
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
 		if (event.getPersonId().equals(this.selectedPersonId)) {
-			if (this.actDurationEstimationContainer.endTimeOfFirstAct == null) {
-				this.actDurationEstimationContainer.endTimeOfFirstAct = event.getTime();
+			if (this.actDurationEstimationContainer.getEndTimeOfFirstAct() == null) {
+				this.actDurationEstimationContainer.setEndTimeOfFirstAct(event.getTime());
 			}
 		}
 	}

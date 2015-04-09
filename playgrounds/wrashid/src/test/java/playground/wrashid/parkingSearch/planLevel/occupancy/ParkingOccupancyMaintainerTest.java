@@ -27,7 +27,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestCase;
 
-import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
+import playground.wrashid.parkingSearch.planLevel.scenario.ParkingUtils;
 
 public class ParkingOccupancyMaintainerTest extends MatsimTestCase implements ShutdownListener{
 
@@ -38,8 +38,7 @@ public class ParkingOccupancyMaintainerTest extends MatsimTestCase implements Sh
 		String configFilePath="test/input/playground/wrashid/parkingSearch/planLevel/chessConfig3.xml";
 		controler = new Controler(this.loadConfig(configFilePath));
 
-		BaseControlerScenario bs= new BaseControlerScenario(controler);
-		parkingBookKeeper=bs.parkingBookKeeper;
+		parkingBookKeeper = ParkingUtils.initializeParking(controler);
 
 		controler.addControlerListener(this);
 

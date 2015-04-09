@@ -15,7 +15,7 @@ import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.lib.GlobalRegistry;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
-import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
+import playground.wrashid.parkingSearch.planLevel.scenario.ParkingUtils;
 
 public class ParkingPlanAlgorithmTest extends MatsimTestCase implements IterationStartsListener {
 
@@ -26,8 +26,7 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase implements Iteratio
 		String configFilePath = "test/input/playground/wrashid/parkingSearch/planLevel/chessConfig3.xml";
 		controler = new Controler(this.loadConfig(configFilePath));
 
-		BaseControlerScenario bs = new BaseControlerScenario(controler);
-		parkingBookKeeper = bs.parkingBookKeeper;
+		parkingBookKeeper = ParkingUtils.initializeParking(controler) ;
 
 		controler.addControlerListener(this);
 

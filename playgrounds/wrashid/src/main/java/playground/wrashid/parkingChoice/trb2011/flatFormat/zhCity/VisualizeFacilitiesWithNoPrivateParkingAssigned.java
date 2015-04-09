@@ -12,7 +12,7 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
 public class VisualizeFacilitiesWithNoPrivateParkingAssigned {
@@ -21,7 +21,7 @@ public class VisualizeFacilitiesWithNoPrivateParkingAssigned {
 		QuadTree<ActivityFacilityImpl> facilitiesQuadTree = PrivateParkingsIndoorWriter_v0.getFacilitiesQuadTree();
 		HashMap<String, ActivityFacilityImpl> facilities = new HashMap<String, ActivityFacilityImpl>();
 
-		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
+		LinkedList<PParking> parkingCollection = new LinkedList<PParking>();
 		ParkingHerbieControler.readParkings(1.0, "H:/data/experiments/TRBAug2011/parkings/flat/privateParkingsIndoor.xml",
 				parkingCollection);
 		ParkingHerbieControler.readParkings(1.0, "H:/data/experiments/TRBAug2011/parkings/flat/privateParkingsOutdoor.xml",
@@ -37,7 +37,7 @@ public class VisualizeFacilitiesWithNoPrivateParkingAssigned {
 			}
 		}
 
-		for (Parking parking : parkingCollection) {
+		for (PParking parking : parkingCollection) {
 			if (GeneralLib.isInZHCityRectangle(parking.getCoord())) {
 				PrivateParking privateParking = (PrivateParking) parking;
 				Id facilityId = privateParking.getActInfo().getFacilityId();

@@ -29,6 +29,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -55,13 +56,16 @@ public class HUPCIdentifier extends DuringLegAgentSelector implements MobsimInit
 	private final ParkingInfrastructure parkingInfrastructure;
 	private final Map<Id, MobsimAgent> agents;
 	private final WithinDayAgentUtils withinDayAgentUtils;
+	private Scenario scenario;
 	
-	public HUPCIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure) {
+	public HUPCIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure, Scenario scenario) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
 		this.parkingInfrastructure = parkingInfrastructure;
 		
 		this.withinDayAgentUtils = new WithinDayAgentUtils();
 		this.agents = new HashMap<Id, MobsimAgent>();
+		
+		this.scenario = scenario ;
 	}
 	
 	
@@ -133,11 +137,14 @@ public class HUPCIdentifier extends DuringLegAgentSelector implements MobsimInit
 					if (isLastParkingOfDay(personId)){
 						parkingDuration=ActivityDurationEstimator.estimateActivityDurationLastParkingOfDay(time, parkingAgentsTracker.getFirstCarDepartureTimeOfDay().getTime(agentId));
 					} else {
-						parkingDuration=ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time, planElements, currentPlanElementIndex);
+						parkingDuration=ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time, planElements, currentPlanElementIndex, 
+								this.scenario.getConfig().plansCalcRoute() );
 					}
 					
-					double activityDuration=ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time, planElements, currentPlanElementIndex);
-					double walkScore = parkingAgentsTracker.getWalkScore(personId, activityDuration, GeneralLib.getWalkingTravelDuration(walkingDistance));
+					double activityDuration=ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time, planElements, currentPlanElementIndex, 
+							this.scenario.getConfig().plansCalcRoute() );
+					double walkScore = parkingAgentsTracker.getWalkScore(personId, activityDuration, GeneralLib.getWalkingTravelDuration(walkingDistance, 
+							this.scenario.getConfig().plansCalcRoute() ));
 					double costScore = parkingAgentsTracker.getParkingCostScore(personId,time , parkingDuration, parkingFacility.getId());
 					
 					priorityQueue.add(new SortableMapObject<ActivityFacility>(parkingFacility, walkScore+costScore));

@@ -21,7 +21,7 @@ import playground.wrashid.parkingChoice.apiDefImpl.PriceAndDistanceParkingSelect
 import playground.wrashid.parkingChoice.apiDefImpl.ShortestWalkingDistanceParkingSelectionManager;
 import playground.wrashid.parkingChoice.infrastructure.FlatParkingFormatReaderV1;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreAccumulator;
 
 public class ParkingHerbieControler {
@@ -39,7 +39,6 @@ public class ParkingHerbieControler {
 		} else {
 			controler = new HerbieControler(args);
 		}
-		GeneralLib.controler = controler;
 
 		parkingModule = new ParkingModule(controler, null);
 
@@ -65,7 +64,7 @@ public class ParkingHerbieControler {
 					ParkingHerbieControler.isRunningOnServer = false;
 				}
 
-				LinkedList<Parking> parkingCollection = getParkingsForScenario(event.getControler());
+				LinkedList<PParking> parkingCollection = getParkingsForScenario(event.getControler());
 				modifyParkingCollectionIfMainExperimentForTRB2011(event.getControler(), parkingCollection);
 				parkingModule.getParkingManager().setParkingCollection(parkingCollection);
 
@@ -75,16 +74,16 @@ public class ParkingHerbieControler {
 			}
 
 			private void modifyParkingCollectionIfMainExperimentForTRB2011(Controler controler,
-					LinkedList<Parking> parkingCollection) {
+					LinkedList<PParking> parkingCollection) {
 					
 				Random rand=new Random();
 				
 				if (controler.getConfig().findParam("parking", "isMainTRB2011Experiment") != null) {
 					double percentagePublicParkingsToKeep=Double.parseDouble(controler.getConfig().findParam("parking", "mainExperimentTRB2011.percentagePublicParkingsToKeep"));
-					LinkedList<Parking> tmpList = new LinkedList<Parking>();
+					LinkedList<PParking> tmpList = new LinkedList<PParking>();
 					log.info("mainExperimentTRB2011 - initNumberOfParkings:" + parkingCollection.size());
 					double clusterRadius = 500.0;
-					for (Parking parking : parkingCollection) {
+					for (PParking parking : parkingCollection) {
 						Coord clusterCenter1 = new CoordImpl(684149.1, 246562.3);
 						Coord clusterCenter2 = new CoordImpl(682361.4, 248520.4);
 						Coord clusterCenter3 = new CoordImpl(681551.2, 247606.6);
@@ -123,7 +122,7 @@ public class ParkingHerbieControler {
 							.getParkingManager()));
 				} else if (parkingSelectionManager.equalsIgnoreCase("PriceAndDistance_v1")) {
 					parkingModule.setParkingSelectionManager(new PriceAndDistanceParkingSelectionManager(parkingModule
-							.getParkingManager(), new ParkingScoringFunctionZhScenario_v1()));
+							.getParkingManager(), new ParkingScoringFunctionZhScenario_v1(controler.getConfig())));
 					ParkingScoringFunctionZhScenario_v1.disutilityOfWalkingPerMeterShorterThanhresholdDistance = Double
 							.parseDouble(controler.getConfig().findParam("parking",
 									"disutilityOfWalkingPerMeterShorterThanhresholdDistance"));
@@ -148,11 +147,11 @@ public class ParkingHerbieControler {
 
 	}
 
-	public static LinkedList<Parking> getParkingsForScenario(Controler controler) {
+	public static LinkedList<PParking> getParkingsForScenario(Controler controler) {
 		double parkingsOutsideZHCityScaling = Double.parseDouble(controler.getConfig().findParam("parking",
 				"publicParkingsCalibrationFactorOutsideZHCity"));
 
-		LinkedList<Parking> parkingCollection = getParkingCollectionZHCity(controler);
+		LinkedList<PParking> parkingCollection = getParkingCollectionZHCity(controler);
 		String streetParkingsFile = null;
 		if (isKTIMode) {
 			streetParkingsFile = parkingDataBase + "publicParkingsOutsideZHCity_v0_dilZh30km_10pct.xml";
@@ -165,7 +164,7 @@ public class ParkingHerbieControler {
 		return parkingCollection;
 	}
 
-	public static LinkedList<Parking> getParkingCollectionZHCity(Controler controler) {
+	public static LinkedList<PParking> getParkingCollectionZHCity(Controler controler) {
 		double streetParkingCalibrationFactor = Double.parseDouble(controler.getConfig().findParam("parking",
 				"streetParkingCalibrationFactorZHCity"));
 		double garageParkingCalibrationFactor = Double.parseDouble(controler.getConfig().findParam("parking",
@@ -176,7 +175,7 @@ public class ParkingHerbieControler {
 		// privateParkingsOutdoorCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking",
 		// "privateParkingsOutdoorCalibrationFactorZHCity"));
 
-		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
+		LinkedList<PParking> parkingCollection = new LinkedList<PParking>();
 
 		String streetParkingsFile = parkingDataBase + "streetParkings.xml";
 		readParkings(streetParkingCalibrationFactor, streetParkingsFile, parkingCollection);
@@ -201,8 +200,8 @@ public class ParkingHerbieControler {
 		return parkingCollection;
 	}
 
-	public static LinkedList<Parking> getParkingCollectionZHCity() {
-		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
+	public static LinkedList<PParking> getParkingCollectionZHCity() {
+		LinkedList<PParking> parkingCollection = new LinkedList<PParking>();
 
 		String streetParkingsFile = parkingDataBase + "streetParkings.xml";
 		readParkings(1.0, streetParkingsFile, parkingCollection);
@@ -219,20 +218,20 @@ public class ParkingHerbieControler {
 		return parkingCollection;
 	}
 
-	public static void readParkings(double parkingCalibrationFactor, String parkingsFile, LinkedList<Parking> parkingCollection) {
+	public static void readParkings(double parkingCalibrationFactor, String parkingsFile, LinkedList<PParking> parkingCollection) {
 		FlatParkingFormatReaderV1 flatParkingFormatReaderV1 = new FlatParkingFormatReaderV1();
 		flatParkingFormatReaderV1.parse(parkingsFile);
 
-		LinkedList<Parking> parkings = flatParkingFormatReaderV1.getParkings();
+		LinkedList<PParking> parkings = flatParkingFormatReaderV1.getParkings();
 		calibarteParkings(parkings, parkingCalibrationFactor);
 
 		parkingCollection.addAll(parkings);
 	}
 
-	private static void calibarteParkings(LinkedList<Parking> parkingCollection, double calibrationFactor) {
-		LinkedList<Parking> emptyParking=new LinkedList<Parking>();
+	private static void calibarteParkings(LinkedList<PParking> parkingCollection, double calibrationFactor) {
+		LinkedList<PParking> emptyParking=new LinkedList<PParking>();
 		
-		for (Parking parking : parkingCollection) {
+		for (PParking parking : parkingCollection) {
 			double capacity = parking.getCapacity();
 			parking.setCapacity(capacity * calibrationFactor);
 			

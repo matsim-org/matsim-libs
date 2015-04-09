@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.PC2.infrastructure.Parking;
+import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.PC2.simulation.ParkingArrivalEvent;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
@@ -37,7 +37,7 @@ public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 
 	private static final Logger log = Logger.getLogger(AverageWalkDistanceStats.class);
 
-	private HashMap<Id<Parking>, Parking> parking;
+	private HashMap<Id<PC2Parking>, PC2Parking> parking;
 
 	private HashMap<String, LinkedList<Double>> walkDistances;
 
@@ -46,7 +46,7 @@ public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 		walkDistances=new HashMap<String, LinkedList<Double>>();
 	}
 
-	public AverageWalkDistanceStats(HashMap<Id<Parking>, Parking> parking) {
+	public AverageWalkDistanceStats(HashMap<Id<PC2Parking>, PC2Parking> parking) {
 		this.parking = parking;
 	}
 
@@ -56,7 +56,7 @@ public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 				) {
 			Id<Person> personId=ParkingArrivalEvent.getPersonId(event.getAttributes());
 			if (personId != null) {
-				Id<Parking> parkingId = ParkingArrivalEvent.getParkingId(event.getAttributes());
+				Id<PC2Parking> parkingId = ParkingArrivalEvent.getParkingId(event.getAttributes());
 
 				Coord destCoord = ParkingArrivalEvent.getDestCoord(event.getAttributes());
 				
@@ -82,6 +82,6 @@ public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 		}
 	}
 
-	public abstract String getGroupName(Id<Parking> parkingId);
+	public abstract String getGroupName(Id<PC2Parking> parkingId);
 
 }

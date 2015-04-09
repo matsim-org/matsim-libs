@@ -24,16 +24,16 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 import org.matsim.contrib.parking.lib.DebugLib;
 
-public class PublicParking implements Parking {
+public class PublicParking implements PC2Parking {
 
-	private Id<Parking> id = null;
+	private Id<PC2Parking> id = null;
 	private int capacity =0;
 	private int availableParking=0;
 	private Coord coord=null;
 	private ParkingCostModel parkingCostModel=null;
 	private String groupName;
 	
-	public PublicParking(Id<Parking> id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName){
+	public PublicParking(Id<PC2Parking> id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName){
 		this.id=id;
 		this.capacity=capacity;
 		resetAvailability();
@@ -43,7 +43,7 @@ public class PublicParking implements Parking {
 	}
 	
 	@Override
-	public Id<Parking> getId(){
+	public Id<PC2Parking> getId(){
 		return id;
 	}
 	

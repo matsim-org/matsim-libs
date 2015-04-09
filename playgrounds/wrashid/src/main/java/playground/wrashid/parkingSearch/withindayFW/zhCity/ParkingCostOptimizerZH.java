@@ -34,7 +34,7 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.lib.obj.Collections;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 import playground.wrashid.parkingSearch.withindayFW.parkingOccupancy.ParkingOccupancyStats;
 import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
@@ -43,7 +43,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 
 	protected static final Logger log = Logger.getLogger(ParkingCostOptimizerZH.class);
 
-	private final LinkedList<Parking> parkings;
+	private final LinkedList<PParking> parkings;
 	private DoubleValueHashMap<Id> publicParkingPricePerHourInTheMorning;
 	private DoubleValueHashMap<Id> publicParkingPricePerHourInTheAfternoon;
 	double priceIncValue;
@@ -63,7 +63,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 
 		HashMap<Id, Double> originalTwoHourParkingCost = outputOriginalParkingCost(parkingCostCalculatorZH, controler);
 
-		for (Parking parking : parkings) {
+		for (PParking parking : parkings) {
 			Id parkingId = parking.getId();
 			if (parkingId.toString().contains("stp") || parkingId.toString().contains("gp")) {
 				
@@ -89,7 +89,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 	private HashMap<Id, Double> outputOriginalParkingCost(ParkingCostCalculatorZH parkingCostCalculatorZH, Controler controler) {
 		HashMap<Id, Double> twoHourParkingCost = new HashMap<Id, Double>();
 
-		for (Parking parking : parkings) {
+		for (PParking parking : parkings) {
 			Id parkingId = parking.getId();
 			if (parkingId.toString().contains("stp") || parkingId.toString().contains("gp")) {
 				twoHourParkingCost.put(parkingId, parkingCostCalculatorZH.getParkingCost(parkingId, 0.0, 7200));
@@ -229,7 +229,7 @@ public class ParkingCostOptimizerZH implements ParkingCostCalculator {
 
 	public void updatePrices(ParkingOccupancyStats parkingOccupancy) {
 
-		for (Parking parking : parkings) {
+		for (PParking parking : parkings) {
 			
 			if (parking.getId().toString().contains("stp") || parking.getId().toString().contains("gp")) {
 				if (parkingOccupancy.parkingOccupancies.get(parking.getId()) == null) {

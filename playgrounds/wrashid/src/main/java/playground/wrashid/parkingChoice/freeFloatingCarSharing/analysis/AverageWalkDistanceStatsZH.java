@@ -22,16 +22,16 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.analysis.AverageWalkDistanceStats;
-import org.matsim.contrib.parking.PC2.infrastructure.Parking;
+import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 
 public class AverageWalkDistanceStatsZH extends AverageWalkDistanceStats {
 
-	public AverageWalkDistanceStatsZH(HashMap<Id<Parking>, Parking> parking) {
+	public AverageWalkDistanceStatsZH(HashMap<Id<PC2Parking>, PC2Parking> parking) {
 		super(parking);
 	}
 
 	@Override
-	public String getGroupName(Id<Parking> parkingId) {
+	public String getGroupName(Id<PC2Parking> parkingId) {
 		return ParkingGroupOccupanciesZH.getGroup(parkingId);
 	}
 	

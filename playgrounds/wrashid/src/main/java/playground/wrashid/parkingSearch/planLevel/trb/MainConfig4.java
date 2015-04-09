@@ -2,7 +2,7 @@ package playground.wrashid.parkingSearch.planLevel.trb;
 
 import org.matsim.core.controler.Controler;
 
-import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
+import playground.wrashid.parkingSearch.planLevel.scenario.ParkingUtils;
 
 public class MainConfig4 {
 	public static void main(String[] args) {
@@ -10,7 +10,7 @@ public class MainConfig4 {
 		String configFilePath="test/input/playground/wrashid/parkingSearch/planLevel/chessConfig4.xml";
 		controler = new Controler(configFilePath);
 		
-		new BaseControlerScenario(controler);
+		ParkingUtils.initializeParking(controler);
 		
 		controler.run();
 	}

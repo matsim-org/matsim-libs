@@ -29,6 +29,7 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -58,6 +59,7 @@ public class HUPCIdentifier extends DuringLegAgentSelector implements MobsimInit
 	private double searchTimeEstimationConstant;
 	private double initialParkingSetRadiusInMeters;
 	private final WithinDayAgentUtils withinDayAgentUtils;
+	private Scenario scenario;
 
 	public HUPCIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructureZH parkingInfrastructure, Controler controler) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
@@ -71,6 +73,8 @@ public class HUPCIdentifier extends DuringLegAgentSelector implements MobsimInit
 		
 		this.withinDayAgentUtils = new WithinDayAgentUtils();
 		this.agents = new HashMap<Id, MobsimAgent>();
+		
+		this.scenario = controler.getScenario() ;
 	}
 
 	/*
@@ -168,12 +172,12 @@ public class HUPCIdentifier extends DuringLegAgentSelector implements MobsimInit
 							
 						} else {
 							parkingDuration = ActivityDurationEstimator.estimateActivityDurationParkingDuringDay(time,
-									planElements, currentPlanElementIndex);
+									planElements, currentPlanElementIndex, this.scenario.getConfig().plansCalcRoute() );
 						}
 
 						double activityDuration = parkingDuration;
 						double walkScore = parkingAgentsTracker.getWalkScore(personId, activityDuration,
-								GeneralLib.getWalkingTravelDuration(walkingDistance)/60);
+								GeneralLib.getWalkingTravelDuration(walkingDistance, this.scenario.getConfig().plansCalcRoute())/60);
 						double costScore = parkingAgentsTracker.getParkingCostScore(personId, time, parkingDuration,
 								parkingFacility.getId());
 						
@@ -204,7 +208,7 @@ public class HUPCIdentifier extends DuringLegAgentSelector implements MobsimInit
 						
 						double activityDuration = parkingDuration;
 						double walkScore = parkingAgentsTracker.getWalkScore(personId, activityDuration,
-								GeneralLib.getWalkingTravelDuration(walkingDistance)/60);
+								GeneralLib.getWalkingTravelDuration(walkingDistance, this.scenario.getConfig().plansCalcRoute())/60);
 						double costScore = parkingAgentsTracker.getParkingCostScore(personId, time, parkingDuration,
 								bestParkingFacility.getId());
 						

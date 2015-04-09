@@ -20,7 +20,7 @@ import playground.wrashid.parkingChoice.events.ParkingDepartureEvent;
 import playground.wrashid.parkingChoice.handler.ParkingArrivalEventHandler;
 import playground.wrashid.parkingChoice.handler.ParkingDepartureEventHandler;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.util.ActDurationEstimationContainer;
 import playground.wrashid.parkingChoice.util.ActivityDurationEstimator;
 
@@ -98,8 +98,6 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 	public void handleEvent(ActivityStartEvent event) {
 		Id personId = event.getPersonId();
 
-		GeneralLib.controler = controler;
-
 		ActDurationEstimationContainer actDurEstContainer = actDurEstimationContainer.get(event.getPersonId());
 		// if (neverDepartedWithCar(actDurEstContainer)){
 		// return;
@@ -121,12 +119,13 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 			double estimatedActduration = 0;
 
 			if (actDurEstContainer.isCurrentParkingTimeOver()) {
-				estimatedActduration = ActivityDurationEstimator.getEstimatedActDuration(event, controler.getScenario(), actDurEstContainer);
+				estimatedActduration = ActivityDurationEstimator.getEstimatedActDuration(event, selectedPlan, actDurEstContainer, 
+						this.controler.getConfig() );
 			} else {
 				DebugLib.stopSystemAndReportInconsistency("there might be some inconsitency???");
 			}
 
-			Parking selectedParking = parkingManager.getParkingSelectionManager().selectParking(
+			PParking selectedParking = parkingManager.getParkingSelectionManager().selectParking(
 					getTargetFacility(event).getCoord(), new ActInfo(event.getFacilityId(), event.getActType()),
 					event.getPersonId(), event.getTime(), estimatedActduration);
 			parkingManager.parkVehicle(personId, selectedParking);
@@ -174,7 +173,7 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 			lastTransportModeWasCar.add(event.getPersonId());
 			carIsParked.remove(event.getPersonId());
 
-			Parking lastUsedParking = parkingManager.getCurrentParkingLocation(event.getPersonId());
+			PParking lastUsedParking = parkingManager.getCurrentParkingLocation(event.getPersonId());
 			;
 			parkingManager.unParkVehicle(event.getPersonId(), lastUsedParking);
 
@@ -205,8 +204,8 @@ public class ParkingSimulation implements PersonDepartureEventHandler, ActivityS
 
 		ActDurationEstimationContainer actDurEstContainer = actDurEstimationContainer.get(event.getPersonId());
 
-		if (actDurEstContainer.endTimeOfFirstAct == null) {
-			actDurEstContainer.endTimeOfFirstAct = event.getTime();
+		if (actDurEstContainer.getEndTimeOfFirstAct() == null) {
+			actDurEstContainer.setEndTimeOfFirstAct(event.getTime());
 		}
 
 	}

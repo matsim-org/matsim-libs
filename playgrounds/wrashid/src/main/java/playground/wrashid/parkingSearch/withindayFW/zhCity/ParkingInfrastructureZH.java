@@ -32,23 +32,23 @@ import org.matsim.facilities.ActivityFacility;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 
 public class ParkingInfrastructureZH extends ParkingInfrastructure{
 
-	private HashMap<Id,Parking> parkings;
+	private HashMap<Id,PParking> parkings;
 	// activity facility Id, activityType, parking facility id
 	private TwoHashMapsConcatenated<Id, String, Id> privateParkingFacilityIdMapping;
 
 	public ParkingInfrastructureZH(Scenario scenario, HashMap<String, HashSet<Id>> parkingTypes,
-			ParkingCostCalculator parkingCostCalculator,LinkedList<Parking> parkings) {
+			ParkingCostCalculator parkingCostCalculator,LinkedList<PParking> parkings) {
 		super(scenario, parkingTypes, parkingCostCalculator);
 		
-		this.parkings=new HashMap<Id, Parking>();
+		this.parkings=new HashMap<Id, PParking>();
 		privateParkingFacilityIdMapping=new TwoHashMapsConcatenated<Id, String, Id>();
-		for (Parking parking:parkings){
+		for (PParking parking:parkings){
 			this.parkings.put(parking.getId(), parking);
 			if (!parking.getType().equalsIgnoreCase("public")){
 				PrivateParking privateParking=(PrivateParking) parking;

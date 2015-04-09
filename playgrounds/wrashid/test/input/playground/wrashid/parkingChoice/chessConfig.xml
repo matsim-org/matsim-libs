@@ -92,6 +92,8 @@
 		<!-- used for calibration: how important is parking compared to the other score parts -->
 		<param name="parkingPriceScoreScalingFactor" value="1.0" />
 		<param name="parkingActivityDurationPenaltyScalingFactor" value="1.0" />
+		
+		<param name="parkingSelectionManager" value="shortestWalkingDistance" />
 	</module>
 	
 	<module name="parallelEventHandling">

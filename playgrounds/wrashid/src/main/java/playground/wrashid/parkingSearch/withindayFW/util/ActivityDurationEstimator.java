@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 
 
@@ -38,7 +39,7 @@ public class ActivityDurationEstimator {
 
 
 	public static double estimateActivityDurationParkingDuringDay(double currentTime, List<PlanElement> planElements,
-			int currentCarLegPlanElementIndex) {
+			int currentCarLegPlanElementIndex, PlansCalcRouteConfigGroup pcrConfig) {
 		double estimatedActduration = 0;
 		
 		int indexOfFirstActivity = currentCarLegPlanElementIndex + 3;
@@ -64,16 +65,16 @@ public class ActivityDurationEstimator {
 				ActivityImpl nextAct = (ActivityImpl) planElements.get(i + 1);
 				double distance = GeneralLib.getDistance(prevAct.getCoord(), nextAct.getCoord());
 				if (leg.getMode().equalsIgnoreCase("walk") || leg.getMode().equalsIgnoreCase("transit_walk")) {
-					estimatedActduration += GeneralLib.getWalkingTravelDuration(distance);
+					estimatedActduration += GeneralLib.getWalkingTravelDuration(distance, pcrConfig);
 				} else if (leg.getMode().equalsIgnoreCase("bike")) {
-					estimatedActduration += GeneralLib.getBikeTravelDuration(distance);
+					estimatedActduration += GeneralLib.getBikeTravelDuration(distance, pcrConfig);
 				} else if (leg.getMode().equalsIgnoreCase("pt")) {
-					estimatedActduration += GeneralLib.getPtTravelDuration(distance);
+					estimatedActduration += GeneralLib.getPtTravelDuration(distance, pcrConfig);
 				} else if (leg.getMode().equalsIgnoreCase("ride")) {
 					// as ride should disappear anyway, this the closest
 					// estimation,
 					// which must not be correct for the algorithm to work.
-					estimatedActduration += GeneralLib.getPtTravelDuration(distance);
+					estimatedActduration += GeneralLib.getPtTravelDuration(distance, pcrConfig);
 				} else {
 					DebugLib.stopSystemAndReportInconsistency("unhandled mode:" + leg.getMode());
 				}

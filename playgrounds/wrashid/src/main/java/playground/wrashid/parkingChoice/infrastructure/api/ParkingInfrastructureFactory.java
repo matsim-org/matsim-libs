@@ -4,6 +4,6 @@ import org.matsim.core.api.internal.MatsimFactory;
 
 public interface ParkingInfrastructureFactory extends MatsimFactory {
 
-	public abstract Parking createParking();
+	public abstract PParking createParking();
 	
 }

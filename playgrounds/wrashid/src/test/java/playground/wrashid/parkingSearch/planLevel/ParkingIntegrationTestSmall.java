@@ -19,20 +19,32 @@
 
 package playground.wrashid.parkingSearch.planLevel;
 
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
-import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
+import playground.wrashid.parkingSearch.planLevel.scenario.ParkingUtils;
 
-public class ParkingIntegrationTestSmall extends MatsimTestCase {
+public class ParkingIntegrationTestSmall {
+	
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	// just to test, that the system runs without errors.
+	@Test
 	public void testScenario(){
-		Controler controler;
-		String configFilePath = super.getPackageInputDirectory() + "chessConfig2.xml";
-		controler = new Controler(super.loadConfig(configFilePath));
+		Config config = ConfigUtils.loadConfig( utils.getPackageInputDirectory() + "chessConfig2.xml" ) ;
+		
+		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		
+		Controler controler = new Controler(scenario);
 
-		new BaseControlerScenario(controler);
+		ParkingUtils.initializeParking(controler);
 
 		controler.run();
 	}

@@ -6,16 +6,16 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
 
 public class ParkingInfo {
 
-	private Id<Parking> parkingId;
+	private Id<PParking> parkingId;
 	private double arrivalTime;
 	private double departureTime;
 
-	public Id<Parking> getParkingId() {
+	public Id<PParking> getParkingId() {
 		return parkingId;
 	}
 	public double getArrivalTime() {
@@ -24,7 +24,7 @@ public class ParkingInfo {
 	public double getDepartureTime() {
 		return departureTime;
 	}
-	public ParkingInfo( Id<Parking> parkingId, double arrivalTime, double departureTime) {
+	public ParkingInfo( Id<PParking> parkingId, double arrivalTime, double departureTime) {
 		super();
 		this.parkingId = parkingId;
 		this.arrivalTime = GeneralLib.projectTimeWithin24Hours(arrivalTime);
@@ -38,7 +38,7 @@ public class ParkingInfo {
 		
 		for (int i=1;i<matrix.getNumberOfRows();i++){
 			Id<Person> personId=Id.create(matrix.getString(i, 0), Person.class);
-			Id<Parking> parkingId=Id.create(matrix.getString(i, 1), Parking.class);
+			Id<PParking> parkingId=Id.create(matrix.getString(i, 1), PParking.class);
 			double arrivalTime=matrix.getDouble(i, 2);
 			double departureTime=matrix.getDouble(i, 3);
 			container.put(personId,new ParkingInfo(parkingId, arrivalTime, departureTime));

@@ -4,12 +4,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.infrastructure.api.PriceScheme;
 
 // TODO: make it also mandatory in the constructor to set the capacity
-public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
-	public void setParkingId(Id<Parking> parkingId) {
+public class ParkingImpl implements Comparable<ParkingImpl>,PParking {
+	public void setParkingId(Id<PParking> parkingId) {
 		this.parkingId = parkingId;
 	}
 
@@ -37,7 +37,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 		this.coord = coord;
 	}
 
-	Id<Parking> parkingId = null;
+	Id<PParking> parkingId = null ;
 	double maxCapacity =0;
 	int currentOccupancy = 0;
 	Double Price = null;
@@ -46,6 +46,13 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 	Coord coord = null;
 	double score = 0;
 	private String parkingType;
+	
+	@Override
+	public String toString() {
+		return "[parkingId=" + parkingId + "] [maxCapacity=" + maxCapacity + "] [currentOccupancy=" + currentOccupancy + "] [price=" + Price
+				+ "] [accessTime=" + accessTime + "] [searchTime=" + searchTime + "] [coord=" + coord + "] [score=" + score + "] [parkingType= " 
+				+ parkingType + "]" ;
+	}
 
 	public void resetParkingOccupancy(){
 		currentOccupancy=0;
@@ -120,7 +127,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 	}
 
 	@Override
-	public Id<Parking> getId() {
+	public Id<PParking> getId() {
 		return this.parkingId;
 	}
 

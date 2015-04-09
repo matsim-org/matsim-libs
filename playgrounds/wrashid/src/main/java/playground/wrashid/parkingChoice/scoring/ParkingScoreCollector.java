@@ -17,7 +17,7 @@ import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;
 import playground.wrashid.parkingChoice.events.ParkingDepartureEvent;
 import playground.wrashid.parkingChoice.handler.ParkingArrivalEventHandler;
 import playground.wrashid.parkingChoice.handler.ParkingDepartureEventHandler;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 
 import java.util.HashMap;
@@ -36,11 +36,11 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 
 	private HashMap<Id<Person>, Double> currentArrivalTime;
 
-	private HashMap<Id<Person>, Parking> currentParking;
+	private HashMap<Id<Person>, PParking> currentParking;
 
 	private DoubleValueHashMap<Id> sumOfParkingDurations;
 
-	public HashMap<Id<Parking>, ParkingOccupancyBins> parkingOccupancies = new HashMap<Id<Parking>, ParkingOccupancyBins>();
+	public HashMap<Id<PParking>, ParkingOccupancyBins> parkingOccupancies = new HashMap<Id<PParking>, ParkingOccupancyBins>();
 
 	private boolean finishHandlingCalled;
 
@@ -86,7 +86,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 	}
 
 	private void updateParkingOccupanciesParkingArrival(ParkingDepartureEvent event) {
-		Parking parking = event.getParking();
+		PParking parking = event.getParking();
 		if (!parkingOccupancies.containsKey(parking.getId())) {
 			parkingOccupancies.put(parking.getId(), new ParkingOccupancyBins());
 		}
@@ -170,7 +170,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 	}
 
 	private void updateParkingOccupancy(Id<Person> personId, Double arrivalTime, Double departureTime) {
-		Parking parking = currentParking.get(personId);
+		PParking parking = currentParking.get(personId);
 		if (!parkingOccupancies.containsKey(parking.getId())) {
 			parkingOccupancies.put(parking.getId(), new ParkingOccupancyBins());
 		}

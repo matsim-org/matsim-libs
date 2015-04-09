@@ -27,7 +27,7 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.facilities.ActivityFacility;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 
 
@@ -39,9 +39,9 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 		private final Scenario scenario;
 		private HighStreetTariffZonesZHCity highTariffParkingZone;
 		private HashSet<Id> paidStreetParking;
-		private final LinkedList<Parking> parkings;
+		private final LinkedList<PParking> parkings;
 
-		public ParkingCostCalculatorZH(CityZones zones, Scenario scenario, LinkedList<Parking> parkings) {
+		public ParkingCostCalculatorZH(CityZones zones, Scenario scenario, LinkedList<PParking> parkings) {
 			this.zones = zones;
 			this.scenario = scenario;
 			this.parkings = parkings;
@@ -50,7 +50,7 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 			this.paidStreetParking=new HashSet<Id>();
 			
 			// define for steet parking, if it is paid parking or not.
-			for (Parking parking:parkings){
+			for (PParking parking:parkings){
 				if (parking.getId().toString().contains("stp")){
 					//TODO: to be more precise, I should weight the parking according to their capacity
 					// but this could also work fine, because there are quite a lot of street parking facilities.
@@ -98,7 +98,7 @@ import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalcul
 			return null;
 		}
 
-		public LinkedList<Parking> getParkings() {
+		public LinkedList<PParking> getParkings() {
 			return parkings;
 		}
 

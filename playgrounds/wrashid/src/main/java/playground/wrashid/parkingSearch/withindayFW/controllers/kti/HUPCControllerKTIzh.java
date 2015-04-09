@@ -42,7 +42,7 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTimeImpl;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategyManager;
@@ -57,7 +57,7 @@ import playground.wrashid.parkingSearch.withindayFW.zhCity.HUPC.HUPCReplannerFac
 import java.util.*;
 
 public class HUPCControllerKTIzh extends KTIWithinDayControler  {
-	private LinkedList<Parking> parkings;
+	private LinkedList<PParking> parkings;
 
 	protected static final Logger log = Logger.getLogger(HUPCControllerKTIzh.class);
 	
@@ -242,7 +242,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		IntegerValueHashMap<Id> facilityCapacities=new IntegerValueHashMap<Id>();
 		parkingInfrastructure.setFacilityCapacities(facilityCapacities);
 		
-		for (Parking parking:parkings){
+		for (PParking parking:parkings){
 			facilityCapacities.incrementBy(parking.getId(),(int) Math.round(parking.getCapacity()));
 		}
 	}
@@ -263,7 +263,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		
 		ActivityFacilities facilities = this.scenarioData.getActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		for (Parking parking:parkings){
+		for (PParking parking:parkings){
 			
 			ActivityFacility parkingFacility = factory.createActivityFacility(Id.create(parking.getId(), ActivityFacility.class), parking.getCoord());
 			facilities.addActivityFacility(parkingFacility);
@@ -280,7 +280,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 
 	}
 
-	public static LinkedList<Parking> getParkingsForScenario(Controler controler) {
+	public static LinkedList<PParking> getParkingsForScenario(Controler controler) {
 		String parkingDataBase;
 		String isRunningOnServer = controler.getConfig().findParam("parking", "isRunningOnServer");
 		if (Boolean.parseBoolean(isRunningOnServer)) {
@@ -295,7 +295,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		double parkingsOutsideZHCityScaling = Double.parseDouble(controler.getConfig().findParam("parking",
 				"publicParkingsCalibrationFactorOutsideZHCity"));
 
-		LinkedList<Parking> parkingCollection = getParkingCollectionZHCity(controler,parkingDataBase);
+		LinkedList<PParking> parkingCollection = getParkingCollectionZHCity(controler,parkingDataBase);
 		String parkingsFile = null;
 		//if (isKTIMode) {
 			parkingsFile = parkingDataBase + "publicParkingsOutsideZHCity_v0_dilZh30km_10pct.xml";
@@ -309,7 +309,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		int numberOfGarageParking=0;
 		int numberOfPrivateParking=0;
 		
-		for (Parking parking:parkingCollection){
+		for (PParking parking:parkingCollection){
 			if (parking.getId().toString().contains("stp")){
 				numberOfStreetParking+=parking.getCapacity();
 			} else if (parking.getId().toString().contains("gp")){
@@ -333,7 +333,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		return parkingCollection;
 	}
 	
-	public static LinkedList<Parking> getParkingCollectionZHCity(Controler controler,String parkingDataBase) {
+	public static LinkedList<PParking> getParkingCollectionZHCity(Controler controler,String parkingDataBase) {
 		double streetParkingCalibrationFactor = Double.parseDouble(controler.getConfig().findParam("parking",
 				"streetParkingCalibrationFactorZHCity"));
 		double garageParkingCalibrationFactor = Double.parseDouble(controler.getConfig().findParam("parking",
@@ -344,7 +344,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		// privateParkingsOutdoorCalibrationFactor=Double.parseDouble(controler.getConfig().findParam("parking",
 		// "privateParkingsOutdoorCalibrationFactorZHCity"));
 
-		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
+		LinkedList<PParking> parkingCollection = new LinkedList<PParking>();
 
 		String streetParkingsFile = parkingDataBase + "streetParkings.xml";
 		readParkings(streetParkingCalibrationFactor, streetParkingsFile, parkingCollection);
@@ -365,7 +365,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 	}
 	
 	
-	public static void readParkings(double parkingCalibrationFactor, String parkingsFile, LinkedList<Parking> parkingCollection) {
+	public static void readParkings(double parkingCalibrationFactor, String parkingsFile, LinkedList<PParking> parkingCollection) {
 		ParkingHerbieControler.readParkings(parkingCalibrationFactor, parkingsFile, parkingCollection);
 	}
 	
@@ -390,7 +390,6 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		final HUPCControllerKTIzh controller = new HUPCControllerKTIzh(args);
 
 		controller.setOverwriteFiles(true);
-		GeneralLib.controler=controller;
 
 		controller.run();
 

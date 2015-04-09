@@ -31,7 +31,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.IncomeRelevantForParking;
 import playground.wrashid.parkingSearch.planLevel.parkingPrice.ParkingPriceMapping1;
-import playground.wrashid.parkingSearch.planLevel.scenario.BaseControlerScenario;
+import playground.wrashid.parkingSearch.planLevel.scenario.ParkingUtils;
 
 public class ParkingScoreListenerTest extends MatsimTestCase implements IterationEndsListener {
 
@@ -40,7 +40,7 @@ public class ParkingScoreListenerTest extends MatsimTestCase implements Iteratio
 		String configFilePath = "test/input/playground/wrashid/parkingSearch/planLevel/chessConfig3.xml";
 		controler = new Controler(this.loadConfig(configFilePath));
 
-		new BaseControlerScenario(controler);
+		ParkingUtils.initializeParking(controler) ;
 
 		ParkingRoot.setParkingScoringFunction(new ParkingScoringFunctionTestNumberOfParkings(new ParkingPriceMapping1(),
 				new IncomeRelevantForParking(), null));

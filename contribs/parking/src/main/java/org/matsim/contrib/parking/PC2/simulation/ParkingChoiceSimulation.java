@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.parking.PC2.infrastructure.Parking;
+import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
@@ -154,7 +154,7 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 					parkingAttributes.parkingDurationInSeconds=1; // not zero, because this might lead to NaN
 				}
 				
-				Parking parking = parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
+				PC2Parking parking = parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
 				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes,parking);
 			}
 			
@@ -207,7 +207,7 @@ public class ParkingChoiceSimulation implements PersonDepartureEventHandler, Act
 			
 			parkingAttributes.legIndex=currentPlanElementIndex.get(personId);
 			
-			Parking parking = parkingInfrastructureManager.parkVehicle(parkingAttributes);
+			PC2Parking parking = parkingInfrastructureManager.parkVehicle(parkingAttributes);
 			
 			if (isLastCarLegOfDay(personId)){
 				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes,parking);

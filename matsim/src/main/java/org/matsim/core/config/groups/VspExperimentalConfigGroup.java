@@ -33,7 +33,6 @@ interface ConfigKey {}
  */
 public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	
-	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);
 
 	public static final String GROUP_NAME = "vspExperimental";

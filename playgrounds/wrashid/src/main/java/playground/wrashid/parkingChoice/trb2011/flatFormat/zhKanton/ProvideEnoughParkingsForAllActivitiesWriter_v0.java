@@ -20,7 +20,7 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
 import playground.wrashid.parkingChoice.infrastructure.PublicParking;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity.DrawAllActivitiesWithParkingsCloseBy;
 import playground.wrashid.parkingChoice.trb2011.flatFormat.zhCity.PrivateParkingsIndoorWriter_v0;
 
@@ -34,7 +34,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 
 	private static BasicPointVisualizer basicPointVisualizer = new BasicPointVisualizer();
 
-	private static QuadTree<Parking> parkingsQuadTreeOutsideCityZH=null;
+	private static QuadTree<PParking> parkingsQuadTreeOutsideCityZH=null;
 	
 	public static void main(String[] args) {
 		//String inputPlansFile = "K:/Projekte/herbie/output/demandCreation/plans.xml.gz";
@@ -50,7 +50,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 
 		Scenario scenario = GeneralLib.readScenario(inputPlansFile, inputNetworkFile, inputFacilities);
 
-		QuadTree<Parking> parkingsQuadTreeZHCity = DrawAllActivitiesWithParkingsCloseBy.getParkingsQuadTreeZHCity();
+		QuadTree<PParking> parkingsQuadTreeZHCity = DrawAllActivitiesWithParkingsCloseBy.getParkingsQuadTreeZHCity();
 
 		parkingsQuadTreeOutsideCityZH = initializeQuadTreeForOutsideZHCity(scenario.getPopulation());
 
@@ -59,10 +59,10 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 				if (pe instanceof ActivityImpl) {
 					ActivityImpl activity = (ActivityImpl) pe;
 					Coord actCoord = activity.getCoord();
-					Parking closestParkingZHCity = parkingsQuadTreeZHCity.get(actCoord.getX(), actCoord.getY());
+					PParking closestParkingZHCity = parkingsQuadTreeZHCity.get(actCoord.getX(), actCoord.getY());
 
 					if (isActivityOutsideOfCity(actCoord, closestParkingZHCity)) {
-						Parking closestParkingOutsideZHCity = parkingsQuadTreeOutsideCityZH.get(actCoord.getX(), actCoord.getY());
+						PParking closestParkingOutsideZHCity = parkingsQuadTreeOutsideCityZH.get(actCoord.getX(), actCoord.getY());
 						if (parkingsQuadTreeOutsideCityZH.size() < 1) {
 							createPublicParkingAtActivityLocation(parkingsQuadTreeOutsideCityZH, activity);
 						} else if (GeneralLib.getDistance(actCoord, closestParkingOutsideZHCity.getCoord()) > 200) {
@@ -85,7 +85,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 
 	}
 
-	private static QuadTree<Parking> initializeQuadTreeForOutsideZHCity(Population population) {
+	private static QuadTree<PParking> initializeQuadTreeForOutsideZHCity(Population population) {
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
 		double maxX = Double.MIN_VALUE;
@@ -116,12 +116,12 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 
 			}
 		}
-		QuadTree<Parking> quadTree = new QuadTree<Parking>(minX - 1.0, minY - 1.0, maxX + 1.0, maxY + 1.0);
+		QuadTree<PParking> quadTree = new QuadTree<PParking>(minX - 1.0, minY - 1.0, maxX + 1.0, maxY + 1.0);
 
 		return quadTree;
 	}
 
-	private static void createPublicParkingAtActivityLocation(QuadTree<Parking> parkingsQuadTreeOutsideCityZH, ActivityImpl activity) {
+	private static void createPublicParkingAtActivityLocation(QuadTree<PParking> parkingsQuadTreeOutsideCityZH, ActivityImpl activity) {
 		PublicParking publicParking = new PublicParking(activity.getCoord());
 		publicParking.setCapacity(5000);
 		parkingsQuadTreeOutsideCityZH.put(activity.getCoord().getX(), activity.getCoord().getY(), publicParking);
@@ -129,7 +129,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 		basicPointVisualizer.addPointCoordinate(activity.getCoord(), activity.getType(), Color.GREEN);
 	}
 
-	private static boolean isActivityOutsideOfCity(Coord actCoord, Parking closestParkingZHCity) {
+	private static boolean isActivityOutsideOfCity(Coord actCoord, PParking closestParkingZHCity) {
 		return GeneralLib.getDistance(actCoord, closestParkingZHCity.getCoord()) > 300;
 	}
 	
@@ -158,7 +158,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 	
 	private void writeFacilities(Matrix garageParkingData, BufferedWriter writer) throws IOException {
 		int i=1;
-		for (Parking parking:parkingsQuadTreeOutsideCityZH.values()){
+		for (PParking parking:parkingsQuadTreeOutsideCityZH.values()){
 			writer.write("\t<parking type=\"public\"");
 			writer.write(" id=\"publicPOutsideCityZH-" + i++ +"\"");
 			writer.write(" x=\""+ parking.getCoord().getX() +"\"");

@@ -26,7 +26,7 @@ import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 
 import java.util.LinkedList;
@@ -38,10 +38,10 @@ public class NumberOfParkingsPerLinkAndHub {
 		NetworkImpl network = (NetworkImpl) GeneralLib.readNetwork("H:/data/experiments/TRBAug2011/runs/ktiRun45/output/output_network.xml.gz");
 		String parkingBasePath =	"H:/data/experiments/TRBAug2011/parkings/flat/";
 		
-		LinkedList<Parking> privateParkingCityZH=getParkingCollection(parkingBasePath + "privateParkings_v1_kti.xml");
-		LinkedList<Parking> streetParkings=getParkingCollection(parkingBasePath + "streetParkings.xml");
-		LinkedList<Parking> garageParkings=getParkingCollection(parkingBasePath + "garageParkings.xml");
-		LinkedList<Parking> publicParkingsOutsideZH=getParkingCollection(parkingBasePath + "publicParkingsOutsideZHCity_v0_dilZh30km_10pct.xml");
+		LinkedList<PParking> privateParkingCityZH=getParkingCollection(parkingBasePath + "privateParkings_v1_kti.xml");
+		LinkedList<PParking> streetParkings=getParkingCollection(parkingBasePath + "streetParkings.xml");
+		LinkedList<PParking> garageParkings=getParkingCollection(parkingBasePath + "garageParkings.xml");
+		LinkedList<PParking> publicParkingsOutsideZH=getParkingCollection(parkingBasePath + "publicParkingsOutsideZHCity_v0_dilZh30km_10pct.xml");
 		
 		stringMatrix.putString(0, 2, "privatParkings");
 		stringMatrix.putString(0, 3, "streetParkings");
@@ -71,18 +71,18 @@ public class NumberOfParkingsPerLinkAndHub {
 	}
 
 	private static IntegerValueHashMap<Id> getNumberOfParkingsPerLink(NetworkImpl network,
-			LinkedList<Parking> privateParkingCityZH) {
+			LinkedList<PParking> privateParkingCityZH) {
 		IntegerValueHashMap<Id> numberOfParkingsAttachedToLinks=new IntegerValueHashMap<Id>();
 		
-		for (Parking parking:privateParkingCityZH){
+		for (PParking parking:privateParkingCityZH){
 			Id closestLinkId = NetworkUtils.getNearestLink(network, parking.getCoord()).getId();
 			numberOfParkingsAttachedToLinks.incrementBy(closestLinkId, (int) Math.round(parking.getCapacity()));
 		}
 		return numberOfParkingsAttachedToLinks;
 	}
 	
-	private static LinkedList<Parking> getParkingCollection(String path){
-		LinkedList<Parking> parkingCollection=new LinkedList<Parking>();
+	private static LinkedList<PParking> getParkingCollection(String path){
+		LinkedList<PParking> parkingCollection=new LinkedList<PParking>();
 		ParkingHerbieControler.readParkings(1.0, path, parkingCollection);
 		return parkingCollection;
 	}

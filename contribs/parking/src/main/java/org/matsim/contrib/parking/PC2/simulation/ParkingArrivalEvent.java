@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.parking.PC2.infrastructure.Parking;
+import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -102,12 +102,12 @@ public class ParkingArrivalEvent extends Event {
 		}
 	}
 	
-	public static Id<Parking> getParkingId(Map<String, String> attributes){
+	public static Id<PC2Parking> getParkingId(Map<String, String> attributes){
 		String parkingIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PARKING_ID);
 		if (parkingIdString==null){
 			return null;
 		} else {
-			return Id.create(parkingIdString, Parking.class);
+			return Id.create(parkingIdString, PC2Parking.class);
 		}
 	}
 

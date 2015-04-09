@@ -26,11 +26,10 @@ import playground.wrashid.parkingSearch.planLevel.init.InitializeParkings;
 import playground.wrashid.parkingSearch.planLevel.occupancy.FinishParkingOccupancyMaintainer;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingBookKeeper;
 
-public class BaseControlerScenario {
+public class ParkingUtils {
+	private ParkingUtils(){} // do not instantiate
 
-	public ParkingBookKeeper parkingBookKeeper;
-
-	public BaseControlerScenario(Controler controler) {
+	public static ParkingBookKeeper initializeParking(Controler controler) {
 		controler.setOverwriteFiles(true);
 
 		// add controler for initialization
@@ -38,13 +37,13 @@ public class BaseControlerScenario {
 
 		// add handlers (e.g. parking book keeping)
 		EventHandlerAtStartupAdder eventHandlerAdder = new EventHandlerAtStartupAdder();
-		this.parkingBookKeeper = new ParkingBookKeeper(controler);
+		ParkingBookKeeper parkingBookKeeper = new ParkingBookKeeper(controler);
 		eventHandlerAdder.addEventHandler(parkingBookKeeper);
 		controler.addControlerListener(eventHandlerAdder);
 
 		controler.addControlerListener(new FinishParkingOccupancyMaintainer());
 
-
+		return parkingBookKeeper ;
 	}
 
 }

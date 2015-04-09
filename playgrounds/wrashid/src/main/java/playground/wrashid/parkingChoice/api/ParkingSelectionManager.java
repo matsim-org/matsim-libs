@@ -5,11 +5,11 @@ import org.matsim.api.core.v01.Id;
 
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
 public interface ParkingSelectionManager {
 
 	// arrivalTime and estimatedParkingDuration can be both null, if not know at time of execution
-	public Parking selectParking(Coord targtLocationCoord, ActInfo targetActInfo, Id personId, Double arrivalTime, Double estimatedParkingDuration);
+	public PParking selectParking(Coord targtLocationCoord, ActInfo targetActInfo, Id personId, Double arrivalTime, Double estimatedParkingDuration);
 
 }

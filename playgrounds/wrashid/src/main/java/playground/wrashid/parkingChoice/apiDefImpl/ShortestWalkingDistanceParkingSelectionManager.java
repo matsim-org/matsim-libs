@@ -17,7 +17,7 @@ import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.PreferredParking;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.ReservedParking;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
 public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSelectionManager {
 
@@ -29,16 +29,16 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 	}
 	
 	@Override
-	public Parking selectParking(Coord targtLocationCoord, ActInfo targetActInfo, Id personId, Double arrivalTime,
+	public PParking selectParking(Coord targtLocationCoord, ActInfo targetActInfo, Id personId, Double arrivalTime,
 			Double estimatedParkingDuration) {
 		// TODO Auto-generated method stub
 		return getParkingWithShortestWalkingDistance(targtLocationCoord,targetActInfo,personId);
 	}
 	
 
-	public Parking getParkingWithShortestWalkingDistance(Coord destCoord, ActInfo targetActInfo, Id personId) {
+	public PParking getParkingWithShortestWalkingDistance(Coord destCoord, ActInfo targetActInfo, Id personId) {
 
-		Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(destCoord,
+		Collection<PParking> parkingsInSurroundings = getParkingsInSurroundings(destCoord,
 				ParkingConfigModule.getStartParkingSearchDistanceInMeters(), personId, 0, targetActInfo,parkingManager.getParkings());
 
 		
@@ -46,11 +46,11 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 		return getParkingWithShortestWalkingDistance(destCoord, parkingsInSurroundings);
 	}
 
-	private static Parking getParkingWithShortestWalkingDistance(Coord destCoord, Collection<Parking> parkingsInSurroundings) {
-		Parking bestParking = null;
+	private static PParking getParkingWithShortestWalkingDistance(Coord destCoord, Collection<PParking> parkingsInSurroundings) {
+		PParking bestParking = null;
 		double currentBestDistance = Double.MAX_VALUE;
 
-		for (Parking parking : parkingsInSurroundings) {
+		for (PParking parking : parkingsInSurroundings) {
 			double distance = GeneralLib.getDistance(destCoord, parking.getCoord());
 			if (distance < currentBestDistance) {
 				bestParking = parking;
@@ -62,8 +62,8 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 	}
 	
 	// TODO: probably remove OPTIONALtimeOfDayInSeconds parameter...
-	public Collection<Parking> getParkingsInSurroundings(Coord coord, double minSearchDistance, Id personId,
-			double OPTIONALtimeOfDayInSeconds, ActInfo targetActInfo, QuadTree<Parking> parkings) {
+	public Collection<PParking> getParkingsInSurroundings(Coord coord, double minSearchDistance, Id personId,
+			double OPTIONALtimeOfDayInSeconds, ActInfo targetActInfo, QuadTree<PParking> parkings) {
 		double maxWalkingDistanceSearchSpaceInMeters = 1000000; // TODO: add this
 																// parameter in
 																// the
@@ -76,9 +76,9 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 		// aber dies factor is wichtig, weil parking far away could still be relevant due to the price
 		// so this parameter needs to be chosen in a way keeping this in mind.
 		
-		Collection<Parking> collection = parkings.get(coord.getX(), coord.getY(), minSearchDistance);
+		Collection<PParking> collection = parkings.get(coord.getX(), coord.getY(), minSearchDistance);
 
-		Collection<Parking> resultCollection = filterReservedAndFullParkings(personId, OPTIONALtimeOfDayInSeconds, targetActInfo,
+		Collection<PParking> resultCollection = filterReservedAndFullParkings(personId, OPTIONALtimeOfDayInSeconds, targetActInfo,
 				collection);
 
 		// widen search space, if no parking found
@@ -100,9 +100,9 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 		return resultCollection;
 	}
 	
-	private Collection<Parking> filterReservedAndFullParkings(Id personId, double OPTIONALtimeOfDayInSeconds,
-			ActInfo targetActInfo, Collection<Parking> collection) {
-		Collection<Parking> resultCollection = new LinkedList<Parking>();
+	private Collection<PParking> filterReservedAndFullParkings(Id personId, double OPTIONALtimeOfDayInSeconds,
+			ActInfo targetActInfo, Collection<PParking> collection) {
+		Collection<PParking> resultCollection = new LinkedList<PParking>();
 
 		boolean isPersonLookingForCertainTypeOfParking = false;
 
@@ -110,7 +110,7 @@ public class ShortestWalkingDistanceParkingSelectionManager implements ParkingSe
 			isPersonLookingForCertainTypeOfParking = parkingManager.getPreferredParkingManager().isPersonLookingForCertainTypeOfParking(personId, OPTIONALtimeOfDayInSeconds, targetActInfo);
 		}
 
-		for (Parking parking : collection) {
+		for (PParking parking : collection) {
 
 			if (!((ParkingImpl)parking).hasFreeCapacity()) {
 				continue;

@@ -33,7 +33,7 @@ import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.controler.Controler;
 import playground.wrashid.lib.obj.Collections;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
@@ -107,7 +107,7 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		int[] sumRealParkingCapacities = new int[96];
 		int numberOfColumns = 4;
 		for (String parkingName : selectedParkings) {
-			Id<Parking> parkingId = Id.create(mappingOfParkingNameToParkingId.get(parkingName), Parking.class);
+			Id<PParking> parkingId = Id.create(mappingOfParkingNameToParkingId.get(parkingName), PParking.class);
 			ParkingOccupancyBins parkingOccupancyBins = parkingOccupancy.parkingOccupancies.get(parkingId);
 
 			if (parkingOccupancyBins == null) {

@@ -21,7 +21,7 @@ import playground.wrashid.parkingChoice.api.ReservedParkingManager;
 import playground.wrashid.parkingChoice.apiDefImpl.ShortestWalkingDistanceParkingSelectionManager;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,15 +34,15 @@ public class ParkingManager implements StartupListener {
 	//private HashMap<Parking,int[]> parkingOccupancy=new HashMap<Parking, int[]>();
 	
 	
-	private QuadTree<Parking> parkings;
+	private QuadTree<PParking> parkings;
 	//key: parkingId
-	private HashMap<Id,Parking> parkingsHashMap=new HashMap<Id, Parking>();
+	private HashMap<Id,PParking> parkingsHashMap=new HashMap<Id, PParking>();
 	
-	public HashMap<Id, Parking> getParkingsHashMap() {
+	public HashMap<Id, PParking> getParkingsHashMap() {
 		return parkingsHashMap;
 	}
 
-	public QuadTree<Parking> getParkings() {
+	public QuadTree<PParking> getParkings() {
 		return parkings;
 	}
 
@@ -66,9 +66,9 @@ public class ParkingManager implements StartupListener {
 	private final Controler controler;
 
 	
-	private Collection<Parking> parkingCollection;
+	private Collection<PParking> parkingCollection;
 	// key: personId
-	private HashMap<Id, Parking> currentParkingLocation;
+	private HashMap<Id, PParking> currentParkingLocation;
 
 	public ParkingSelectionManager getParkingSelectionManager() {
 		return parkingSelectionManager;
@@ -80,14 +80,14 @@ public class ParkingManager implements StartupListener {
 
 	
 	public void resetAllParkingOccupancies() {
-		for (Parking parking : parkings.values()) {
+		for (PParking parking : parkings.values()) {
 			ParkingImpl parkingImpl=(ParkingImpl) parking;
 			parkingImpl.resetParkingOccupancy();
 		//	currentParkingLocation.clear();
 		}
 	}
 
-	public Parking getCurrentParkingLocation(Id personId) {
+	public PParking getCurrentParkingLocation(Id personId) {
 		return currentParkingLocation.get(personId);
 	}
 
@@ -95,10 +95,10 @@ public class ParkingManager implements StartupListener {
 		this.reservedParkingManager = reservedParkingManager;
 	}
 
-	public void addParkings(Collection<Parking> parkingCollection) {
+	public void addParkings(Collection<PParking> parkingCollection) {
 		RectangularArea rectangularArea=new RectangularArea(new CoordImpl(parkings.getMinEasting(),parkings.getMinNorthing()), new CoordImpl(parkings.getMaxEasting(),parkings.getMaxNorthing()));
 		
-		for (Parking parking : parkingCollection) {
+		for (PParking parking : parkingCollection) {
 			
 			if (rectangularArea.isInArea(parking.getCoord())){
 				addParking(parking);
@@ -112,24 +112,24 @@ public class ParkingManager implements StartupListener {
 		
 	}
 
-	public void setParkingCollection(Collection<Parking> parkingCollection) {
+	public void setParkingCollection(Collection<PParking> parkingCollection) {
 		this.parkingCollection = parkingCollection;
 	}
 
-	private void addParking(Parking parking) {
+	private void addParking(PParking parking) {
 		
 		parkings.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
 		parkingsHashMap.put(parking.getId(), parking);
 	}
 
-	public ParkingManager(Controler controler, Collection<Parking> parkingCollection) {
+	public ParkingManager(Controler controler, Collection<PParking> parkingCollection) {
 		this.controler = controler;
 		this.parkingCollection = parkingCollection;
-		currentParkingLocation = new HashMap<Id, Parking>();
+		currentParkingLocation = new HashMap<Id, PParking>();
 		
 	}
 
-	private void initializeQuadTree(Collection<Parking> parkingColl) {
+	private void initializeQuadTree(Collection<PParking> parkingColl) {
 		//parkings=(new QuadTreeInitializer<Parking>()).getLinkQuadTree(network);
 		// double minX = Double.MAX_VALUE;
 		// double minY = Double.MAX_VALUE;
@@ -162,10 +162,10 @@ public class ParkingManager implements StartupListener {
 		
 		EnclosingRectangle rect=new EnclosingRectangle();
 		
-		for (Parking parking:parkingColl){
+		for (PParking parking:parkingColl){
 			rect.registerCoord(parking.getCoord());
 		}
-		parkings=(new QuadTreeInitializer<Parking>()).getQuadTree(rect);
+		parkings=(new QuadTreeInitializer<PParking>()).getQuadTree(rect);
 	}
 
 	@Override
@@ -200,7 +200,7 @@ public class ParkingManager implements StartupListener {
 		Coord activityCoord = activityFacility.getCoord();
 
 		//TODO: change estimated home parking duration + home arrival time (this could be made more precise)
-		Parking bestParking = parkingSelectionManager.selectParking(activityCoord, lastActivityInfo, person.getId(), 19*3600.0, 8*3600.0);
+		PParking bestParking = parkingSelectionManager.selectParking(activityCoord, lastActivityInfo, person.getId(), 19*3600.0, 8*3600.0);
 		parkVehicle(person.getId(), bestParking);
 	}
 	
@@ -226,13 +226,13 @@ public class ParkingManager implements StartupListener {
 		return lastActivityInfo==null;
 	}
 	
-	public void parkVehicle(Id personId, Parking parking) {
+	public void parkVehicle(Id personId, PParking parking) {
 		
 		((ParkingImpl) parking).parkVehicle();
 		currentParkingLocation.put(personId, parking);
 	}
 
-	public void unParkVehicle(Id personId, Parking parking) {
+	public void unParkVehicle(Id personId, PParking parking) {
 		if (parking==null){
 			System.out.println();
 		}

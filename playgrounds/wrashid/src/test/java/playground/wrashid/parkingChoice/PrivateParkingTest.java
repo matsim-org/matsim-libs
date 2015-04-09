@@ -31,7 +31,7 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
 public class PrivateParkingTest extends MatsimTestCase {
 
@@ -53,7 +53,7 @@ public class PrivateParkingTest extends MatsimTestCase {
 		Controler controler=new Controler(config);
 		
 		// setup parking infrastructure
-		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
+		LinkedList<PParking> parkingCollection = new LinkedList<PParking>();
 
 		for (int i=0;i<10;i++){
 			for (int j=0;j<10;j++){
@@ -82,7 +82,7 @@ public class PrivateParkingTest extends MatsimTestCase {
 		Controler controler=new Controler(config);
 		
 		// setup parking infrastructure
-		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
+		LinkedList<PParking> parkingCollection = new LinkedList<PParking>();
 
 		for (int i=0;i<10;i++){
 			for (int j=0;j<10;j++){

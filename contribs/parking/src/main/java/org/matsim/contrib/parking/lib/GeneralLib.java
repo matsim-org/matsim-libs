@@ -48,6 +48,7 @@ import org.matsim.contrib.parking.lib.obj.list.Lists;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -82,8 +83,6 @@ public class GeneralLib {
 	@Deprecated // matsim standard is to not use global nonfinal variables
 	public static String eclipseLocalTempPath = "C:/eTmp";
 
-	@Deprecated // matsim standard is to not use global nonfinal variables
-	public static Controler controler;
 
 	/*
 	 * Reads the population from the plans file.
@@ -915,32 +914,32 @@ public class GeneralLib {
 		return false;
 	}
 
-	public static double getWalkingTravelDuration(double distance) {
+	public static double getWalkingTravelDuration(double distance, PlansCalcRouteConfigGroup pcrConfig) {
 		return distance
-				* controler.getConfig().plansCalcRoute().getModeRoutingParams().get( TransportMode.walk )
+				* pcrConfig.getModeRoutingParams().get( TransportMode.walk )
 						.getBeelineDistanceFactor()
-				/ controler.getConfig().plansCalcRoute()
+				/ pcrConfig
 						.getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
 
-	public static double getWalkingSpeed() {
-		return controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds()
+	public static double getWalkingSpeed(PlansCalcRouteConfigGroup pcrConfig) {
+		return pcrConfig.getTeleportedModeSpeeds()
 				.get(TransportMode.walk);
 	}
 
-	public static double getPtTravelDuration(double distance) {
+	public static double getPtTravelDuration(double distance, PlansCalcRouteConfigGroup pcrConfig) {
 		return distance
-				* controler.getConfig().plansCalcRoute()
+				*pcrConfig
 						.getModeRoutingParams().get( TransportMode.pt ).getBeelineDistanceFactor()
-				/ controler.getConfig().plansCalcRoute()
+				/ pcrConfig
 						.getTeleportedModeSpeeds().get(TransportMode.pt);
 	}
 
-	public static double getBikeTravelDuration(double distance) {
+	public static double getBikeTravelDuration(double distance, PlansCalcRouteConfigGroup pcrConfig) {
 		return distance
-				* controler.getConfig().plansCalcRoute()
+				* pcrConfig
 						.getModeRoutingParams().get( TransportMode.bike ).getBeelineDistanceFactor()
-				/ controler.getConfig().plansCalcRoute()
+				/ pcrConfig
 						.getTeleportedModeSpeeds().get(TransportMode.bike);
 	}
 

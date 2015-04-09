@@ -3,7 +3,7 @@ package playground.wrashid.parkingChoice.infrastructure.api;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Identifiable;
 
-public interface Parking  extends Identifiable<Parking> {
+public interface PParking  extends Identifiable<PParking> {
 
 	public abstract String getType();
 	

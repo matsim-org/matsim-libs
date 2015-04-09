@@ -28,7 +28,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacility;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZone;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
@@ -42,19 +42,19 @@ import playground.wrashid.parkingSearch.withindayFW.zhCity.HighStreetTariffZones
 		private final CityZones zones;
 		private HighStreetTariffZonesZHCity highTariffParkingZone;
 		private HashSet<Id> paidStreetParking;
-		private final LinkedList<Parking> parkings;
-		private HashMap<Id, Parking> parkingHM;
+		private final LinkedList<PParking> parkings;
+		private HashMap<Id, PParking> parkingHM;
 		
 
-		public ParkingCostCalculatorZH(CityZones zones, LinkedList<Parking> parkings) {
+		public ParkingCostCalculatorZH(CityZones zones, LinkedList<PParking> parkings) {
 			this.zones = zones;
 			this.parkings = parkings;
 			this.highTariffParkingZone=new HighStreetTariffZonesZHCity();
 			this.paidStreetParking=new HashSet<Id>();
-			this.parkingHM=new HashMap<Id,Parking>();
+			this.parkingHM=new HashMap<Id,PParking>();
 			
 			// define for steet parking, if it is paid parking or not.
-			for (Parking parking:parkings){
+			for (PParking parking:parkings){
 				parkingHM.put(parking.getId(), parking);
 				
 				if (parking.getId().toString().contains("stp")){
@@ -77,7 +77,7 @@ import playground.wrashid.parkingSearch.withindayFW.zhCity.HighStreetTariffZones
 			}
 			
 			
-			Parking parking = parkingHM.get(parkingId);
+			PParking parking = parkingHM.get(parkingId);
 			if (parkingId.toString().contains("private") || parkingId.toString().contains("OutsideCity")){
 				return 0.0;
 			} else if(parkingId.toString().contains("gp")){
@@ -106,7 +106,7 @@ import playground.wrashid.parkingSearch.withindayFW.zhCity.HighStreetTariffZones
 			return null;
 		}
 
-		public LinkedList<Parking> getParkings() {
+		public LinkedList<PParking> getParkings() {
 			return parkings;
 		}
 

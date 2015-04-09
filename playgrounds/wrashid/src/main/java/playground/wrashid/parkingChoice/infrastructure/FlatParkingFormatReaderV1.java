@@ -12,26 +12,26 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.facilities.ActivityFacility;
 import org.xml.sax.Attributes;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
 public class FlatParkingFormatReaderV1 extends MatsimXmlParser implements MatsimSomeReader {
 
-	LinkedList<Parking> parkings=new LinkedList<Parking>();
+	LinkedList<PParking> parkings=new LinkedList<PParking>();
 	
 	
-	public LinkedList<Parking> getParkings() {
+	public LinkedList<PParking> getParkings() {
 		return parkings;
 	}
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equalsIgnoreCase("parking")){
-			Parking parking=createParking(atts);
+			PParking parking=createParking(atts);
 			parkings.add(parking);
 		}
 	}
 	
-	private Parking createParking(Attributes atts){
+	private PParking createParking(Attributes atts){
 		String parkingType=atts.getValue("type");
 		String parkingId=atts.getValue("id");
 		double x=new Double(atts.getValue("x"));
@@ -41,7 +41,7 @@ public class FlatParkingFormatReaderV1 extends MatsimXmlParser implements Matsim
 		
 		if (parkingType.equalsIgnoreCase("public")){
 			PublicParking publicParking=new PublicParking(coord);
-			publicParking.setParkingId(Id.create(parkingId, Parking.class));
+			publicParking.setParkingId(Id.create(parkingId, PParking.class));
 			publicParking.setType(parkingType);
 			publicParking.setGeneralAttributes(atts.getValue("generalAttributs"));
 			publicParking.setMaxCapacity(capacity);
@@ -56,7 +56,7 @@ public class FlatParkingFormatReaderV1 extends MatsimXmlParser implements Matsim
 			PrivateParking privateParking=new PrivateParking(coord,actInfo);
 			privateParking.setType(parkingType);
 			privateParking.setMaxCapacity(capacity);
-			privateParking.setParkingId(Id.create(parkingId, Parking.class));
+			privateParking.setParkingId(Id.create(parkingId, PParking.class));
 			return privateParking;
 		}
 		
@@ -64,7 +64,7 @@ public class FlatParkingFormatReaderV1 extends MatsimXmlParser implements Matsim
 			ReservedParking reservedParking=new ReservedParking(coord, atts.getValue("generalAttributs"));
 			reservedParking.setType(parkingType);
 			reservedParking.setMaxCapacity(capacity);
-			reservedParking.setParkingId(Id.create(parkingId, Parking.class));
+			reservedParking.setParkingId(Id.create(parkingId, PParking.class));
 			return reservedParking;
 		}
 		
@@ -72,7 +72,7 @@ public class FlatParkingFormatReaderV1 extends MatsimXmlParser implements Matsim
 			PreferredParking preferredParking=new PreferredParking(coord, atts.getValue("generalAttributs"));
 			preferredParking.setType(parkingType);
 			preferredParking.setMaxCapacity(capacity);
-			preferredParking.setParkingId(Id.create(parkingId, Parking.class));
+			preferredParking.setParkingId(Id.create(parkingId, PParking.class));
 			return preferredParking;
 		}
 		

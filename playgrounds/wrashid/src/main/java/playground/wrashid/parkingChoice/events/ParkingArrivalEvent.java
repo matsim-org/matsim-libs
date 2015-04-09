@@ -2,7 +2,7 @@ package playground.wrashid.parkingChoice.events;
 
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
 public class ParkingArrivalEvent {
 
@@ -10,14 +10,14 @@ public class ParkingArrivalEvent {
 		return actStartEvent;
 	}
 
-	public Parking getParking() {
+	public PParking getParking() {
 		return parking;
 	}
 
 	private ActivityStartEvent actStartEvent;
-	private Parking parking;
+	private PParking parking;
 
-	public ParkingArrivalEvent(final ActivityStartEvent actStartEvent, final Parking parking) {
+	public ParkingArrivalEvent(final ActivityStartEvent actStartEvent, final PParking parking) {
 		this.actStartEvent=actStartEvent;
 		this.parking=parking;
 	}

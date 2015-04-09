@@ -243,7 +243,8 @@ public class EventsToScore implements BasicEventHandler {
 					// when integrated, so MSA should still converge to the
 					// correct result. kai, oct'12
 					// The above argument may be theoretically correct.  But something 9/10*old+1/10*new is too slow in practice.  Now
-					// multiplying with number of plans (**) in hope that it is better.  (Where is the theory department?) kai, nov'13 
+					// multiplying with number of plans (**) in hope that it is better.  (Where is the theory department?) kai, nov'13
+					 * Looks to me like this is now truly MSA. kai, apr'15 
 					// yyyy this has never been tested with scenarios :-(  .  At least there is a test case.  kai, oct'12
 					// (In the meantime, I have used it in certain of my own 1% runs, e.g. Ivory Coast.)
 					 */

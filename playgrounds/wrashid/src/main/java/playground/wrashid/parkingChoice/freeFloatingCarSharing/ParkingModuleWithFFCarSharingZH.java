@@ -3,7 +3,7 @@ package playground.wrashid.parkingChoice.freeFloatingCarSharing;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.PC2.GeneralParkingModule;
-import org.matsim.contrib.parking.PC2.infrastructure.Parking;
+import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
@@ -33,7 +33,7 @@ import java.util.HashMap;
 public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implements ParkingModuleWithFreeFloatingCarSharing {
 
 	private Collection<ParkingCoordInfo> initialDesiredVehicleCoordinates;
-	private HashMap<Id, Parking> currentVehicleLocation;
+	private HashMap<Id, PC2Parking> currentVehicleLocation;
 	private QuadTree<Id> vehicleLocations;
 	private AverageWalkDistanceStatsZH averageWalkDistanceStatsZH;
 	private ParkingGroupOccupanciesZH parkingGroupOccupanciesZH;
@@ -65,7 +65,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		}
 		
 		
-		Parking parking=currentVehicleLocation.get(vehicleId);
+		PC2Parking parking=currentVehicleLocation.get(vehicleId);
 		parkingInfrastructureManager.unParkVehicle(parking, departureTime, personId);
 		
 		vehicleLocations.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
@@ -96,7 +96,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		
 		String groupName = getAcceptableParkingGroupName();
 		
-		Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration(), arrivalTime);
+		PC2Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration(), arrivalTime);
 		currentVehicleLocation.put(vehicleId, parking);
 		vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
 		
@@ -110,10 +110,10 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
 		
 		String groupName = getAcceptableParkingGroupName();
 		
-		currentVehicleLocation=new HashMap<Id, Parking>();
+		currentVehicleLocation=new HashMap<Id, PC2Parking>();
 		
 		for (ParkingCoordInfo parkInfo : initialDesiredVehicleCoordinates) {
-			Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(parkInfo.getParkingCoordinate(), groupName);
+			PC2Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(parkInfo.getParkingCoordinate(), groupName);
 			parkingInfrastructureManager.logArrivalEventAtTimeZero(parking);
 			currentVehicleLocation.put(parkInfo.getVehicleId(), parking);
 			vehicleLocationsRect.registerCoord(parking.getCoordinate());
@@ -122,7 +122,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
         vehicleLocations = (new QuadTreeInitializer<Id>()).getLinkQuadTree((NetworkImpl) getControler().getScenario().getNetwork());
 		
 		for (ParkingCoordInfo parkInfo : initialDesiredVehicleCoordinates) {
-			Parking parking=currentVehicleLocation.get(parkInfo.getVehicleId());
+			PC2Parking parking=currentVehicleLocation.get(parkInfo.getVehicleId());
 			vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parkInfo.getVehicleId());
 		}
 	}

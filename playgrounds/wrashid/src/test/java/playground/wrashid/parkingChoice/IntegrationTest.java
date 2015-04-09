@@ -11,7 +11,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 
 import java.util.LinkedList;
 
@@ -24,7 +24,7 @@ public class IntegrationTest  extends TestCase {
 		ParkingChoiceLib.isTestCaseRun=true;
 		Controler controler=new Controler("test/input/playground/wrashid/parkingChoice/utils/chessConfig5.xml");
 		
-		LinkedList<Parking> parkingCollection= new LinkedList<Parking>();
+		LinkedList<PParking> parkingCollection= new LinkedList<PParking>();
 		
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {

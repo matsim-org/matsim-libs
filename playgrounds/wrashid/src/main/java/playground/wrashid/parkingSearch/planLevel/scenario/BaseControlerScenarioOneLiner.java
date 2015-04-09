@@ -10,7 +10,7 @@ public class BaseControlerScenarioOneLiner {
 		controler = new Controler(configPath);
 		
 		
-		new BaseControlerScenario(controler);
+		ParkingUtils.initializeParking(controler);
 		
 		return controler;
 	}

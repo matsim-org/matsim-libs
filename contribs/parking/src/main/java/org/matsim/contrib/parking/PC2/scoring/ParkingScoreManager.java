@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
-import org.matsim.contrib.parking.PC2.infrastructure.Parking;
+import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
@@ -50,7 +50,7 @@ public class ParkingScoreManager {
 		this.controler = controler;
 	}
 
-	public double calcWalkScore(Coord destCoord, Parking parking, Id personId, double parkingDurationInSeconds) {
+	public double calcWalkScore(Coord destCoord, PC2Parking parking, Id personId, double parkingDurationInSeconds) {
         Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();
 		PersonImpl person = (PersonImpl) persons.get(personId);
 
@@ -75,7 +75,7 @@ public class ParkingScoreManager {
 		return (parkingWalkBeta * walkingTimeTotalInMinutes) * parkingScoreScalingFactor;
 	}
 
-	public double calcCostScore(double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId) {
+	public double calcCostScore(double arrivalTime, double parkingDurationInSeconds, PC2Parking parking, Id personId) {
         Map<Id<Person>, ? extends Person> persons = controler.getScenario().getPopulation().getPersons();
 		PersonImpl person = (PersonImpl) persons.get(personId);
 		double parkingCostBeta = getParkingBetas().getParkingCostBeta(person);
@@ -85,7 +85,7 @@ public class ParkingScoreManager {
 		return (parkingCostBeta * parkingCost) * parkingScoreScalingFactor;
 	}
 
-	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId, int legIndex) {
+	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, PC2Parking parking, Id personId, int legIndex) {
 		double walkScore = calcWalkScore(destCoord, parking, personId, parkingDurationInSeconds);
 		double costScore = calcCostScore(arrivalTime, parkingDurationInSeconds, parking, personId);
 		double randomError=0;

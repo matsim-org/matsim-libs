@@ -59,7 +59,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 				break;
 			case uniform:
 				problem = true ;
-				log.error( "found `typicalDurationScoreComputation == uniform'; vsp should try out `relative'. ") ;
+				log.warn( "found `typicalDurationScoreComputation == uniform'; vsp should try out `relative'. ") ;
 				break;
 			default:
 				throw new RuntimeException("unexpected setting; aborting ... ") ;
@@ -189,7 +189,8 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		}
 		
 		if ( usingLocationChoice ) {
-			if ( !config.findParam("locationchoice", "destinationSamplePercent").equals("100.") ) {
+			final String samplePercent = config.findParam("locationchoice", "destinationSamplePercent");
+			if ( samplePercent!=null && !samplePercent.equals("100.") ) {
 				problem = true ;
 				System.out.flush() ;
 				log.error("vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in " +

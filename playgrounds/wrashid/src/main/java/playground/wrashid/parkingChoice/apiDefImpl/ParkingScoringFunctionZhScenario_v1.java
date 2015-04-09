@@ -3,8 +3,8 @@ package playground.wrashid.parkingChoice.apiDefImpl;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 
 import playground.wrashid.parkingChoice.api.ParkingScoringFunction;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
@@ -22,7 +22,10 @@ public class ParkingScoringFunctionZhScenario_v1 implements ParkingScoringFuncti
 	public static double disutilityOfWalkingPerMeterLongerThanThresholdDistance;
 	public static double boardingDurationInSeconds;
 
-	public ParkingScoringFunctionZhScenario_v1(){
+	private Config config;
+
+	public ParkingScoringFunctionZhScenario_v1(Config config){
+		this.config = config ;
 	}
 	
 	// TODO: income auch noch hier einfliessen lassen für weitere experimente
@@ -61,8 +64,9 @@ public class ParkingScoringFunctionZhScenario_v1 implements ParkingScoringFuncti
 			
 		}
 		
+		PlansCalcRouteConfigGroup pcrConfig = this.config.plansCalcRoute() ;
 		// TODO: convert this perhaps to opportunity loss of activity performance again.
-		double bordingScore=GeneralLib.getWalkingSpeed()*boardingDurationInSeconds*disutilityOfWalkingPerMeterShorterThanhresholdDistance;
+		double bordingScore=GeneralLib.getWalkingSpeed(pcrConfig)*boardingDurationInSeconds*disutilityOfWalkingPerMeterShorterThanhresholdDistance;
 		
 		//TODO: perhaps also add explict loss of activity performance due to walking here,
 		// or should it be assumed, that the walking term already contains that?

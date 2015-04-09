@@ -11,7 +11,7 @@ import playground.wrashid.parkingChoice.ParkingManager;
 import playground.wrashid.parkingChoice.api.ParkingScoringFunction;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
-import playground.wrashid.parkingChoice.infrastructure.api.Parking;
+import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingChoice.scoring.ParkingScoreAccumulator;
 
 public class PriceAndDistanceParkingSelectionManager extends ShortestWalkingDistanceParkingSelectionManager {
@@ -23,14 +23,14 @@ public class PriceAndDistanceParkingSelectionManager extends ShortestWalkingDist
 		PriceAndDistanceParkingSelectionManager.parkingScoringFunction = parkingScoringFunction;
 	}
 
-	public Parking selectParking(Coord targtLocationCoord, ActInfo targetActInfo, Id personId, Double arrivalTime,
+	public PParking selectParking(Coord targtLocationCoord, ActInfo targetActInfo, Id personId, Double arrivalTime,
 			Double estimatedParkingDuration) {
 
-		Collection<Parking> parkingsInSurroundings = getParkingsInSurroundings(targtLocationCoord, 200.0, personId, 0.0,
+		Collection<PParking> parkingsInSurroundings = getParkingsInSurroundings(targtLocationCoord, 200.0, personId, 0.0,
 				targetActInfo, parkingManager.getParkings());
 
 		PriorityQueue<ParkingImpl> priorityQueue = new PriorityQueue<ParkingImpl>();
-		for (Parking parking : parkingsInSurroundings) {
+		for (PParking parking : parkingsInSurroundings) {
 			ParkingImpl parkingImpl = (ParkingImpl) parking;
 			parkingScoringFunction.assignScore(parkingImpl, targtLocationCoord, targetActInfo, personId, arrivalTime,
 					estimatedParkingDuration);
