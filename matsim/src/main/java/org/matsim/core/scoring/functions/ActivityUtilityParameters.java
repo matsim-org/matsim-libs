@@ -39,12 +39,12 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 public class ActivityUtilityParameters implements MatsimParameters {
 
 	/**
-	 * This is now deliberately an unmodifiable object which can only instantiated by a factory.  If you want/need to modify
+	 * This is now deliberately an unmodifiable object which can only instantiated by a builder.  If you want/need to modify
 	 * this design, please talk to kai nagel or michael zilske or marcel rieser.  kai, nov'12
 	 * 
 	 * @author nagel
 	 */
-	public static class Factory {
+	public static class Builder {
 		private String type;
 		private double priority = 1. ;
 		private double typicalDuration_s;
@@ -58,13 +58,13 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		/**
 		 * empty constructor; deliberately permitted
 		 */
-		public Factory() {
+		public Builder() {
 		}
 
 		/**
 		 * Convenience constructor for main use case
 		 */
-		public Factory(ActivityParams ppp ) {
+		public Builder(ActivityParams ppp ) {
 			this.type = ppp.getActivityType() ;
 			this.priority = ppp.getPriority() ;
 			this.typicalDuration_s = ppp.getTypicalDuration() ;

@@ -166,7 +166,7 @@ public class CharyparNagelScoringFunctionTest {
 		double zeroUtilDurW2 = getZeroUtilDuration_hrs(8.0, 2.0);
 
 		{
-			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory();
+			ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder();
 			factory.setType("w");
 			factory.setPriority(1.0);
 			factory.setTypicalDuration_s(8.0 * 3600);
@@ -176,7 +176,7 @@ public class CharyparNagelScoringFunctionTest {
 		}
 
 		{
-			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory();
+			ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder();
 			factory.setType("h");
 			factory.setPriority(1.0);
 			factory.setTypicalDuration_s(16.0 * 3600);
@@ -185,7 +185,7 @@ public class CharyparNagelScoringFunctionTest {
 		}
 
 		{
-			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory();
+			ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder();
 			factory.setType("w2");
 			// test that the priority is respected as well
 			factory.setPriority(2.0);

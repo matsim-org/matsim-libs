@@ -127,7 +127,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 //				actParams.setScoreAtAll(false);
 //			utilParams.put(type, actParams);
 
-			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory(params) ;
+			ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
 			if (params.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				factory.setScoreAtAll(false) ;
 			}
