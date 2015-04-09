@@ -124,7 +124,7 @@ public class EventsToFacilityLoad implements ActivityStartEventHandler, Activity
 		return facilityPenalties;
 	}
 
-	public void setFacilityPenalties(TreeMap<Id, FacilityPenalty> facilityPenalties) {
-		this.facilityPenalties = facilityPenalties;
-	}
+//	public void setFacilityPenalties(TreeMap<Id, FacilityPenalty> facilityPenalties) {
+//		this.facilityPenalties = facilityPenalties;
+//	}
 }

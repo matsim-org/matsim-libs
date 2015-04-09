@@ -93,7 +93,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
         ActivityFacilities facilities = controler.getScenario().getActivityFacilities();
 
 		if (event.getIteration() % 2 == 0) {
-			this.printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration(),
+			printStatistics(facilities, event.getControler().getControlerIO().getIterationPath(event.getIteration()), event.getIteration(),
 					this.eventsToFacilityLoad.getFacilityPenalties());
 		}
 	}
@@ -101,7 +101,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 	/*
 	 * Print daily load of every facility and aggregated hourly load
 	 */
-	private void printStatistics(ActivityFacilities facilities, String iterationPath, int iteration,
+	private static void printStatistics(ActivityFacilities facilities, String iterationPath, int iteration,
 			TreeMap<Id, FacilityPenalty> facilityPenalties) {
 
 		try {

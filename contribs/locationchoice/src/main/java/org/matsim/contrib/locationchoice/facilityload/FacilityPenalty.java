@@ -98,9 +98,9 @@ public class FacilityPenalty {
 		return facilityLoad;
 	}
 
-	public void setFacilityLoad(FacilityLoad facilityLoad) {
-		this.facilityLoad = facilityLoad;
-	}
+//	public void setFacilityLoad(FacilityLoad facilityLoad) {
+//		this.facilityLoad = facilityLoad;
+//	}
 
 	public double getCapacity() {
 		return capacity;
