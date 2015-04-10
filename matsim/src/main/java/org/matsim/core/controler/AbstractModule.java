@@ -152,14 +152,6 @@ public abstract class AbstractModule {
         controlerListenerMultibinder.addBinding().toInstance(instance);
     }
 
-    protected final void addPlanStrategyBindingToFactory(String strategyName, final Provider<? extends PlanStrategy> factory) {
-        planStrategyMultibinder.addBinding(strategyName).toProvider(factory);
-    }
-
-    protected final void addPlanStrategyBindingToFactory(String strategyName, final Class<? extends Provider<? extends PlanStrategy>> factory) {
-        planStrategyMultibinder.addBinding(strategyName).toProvider(factory);
-    }
-
     protected final com.google.inject.binder.LinkedBindingBuilder<GenericPlanSelector<Plan, Person>> addPlanSelectorForRemovalBinding(String selectorName) {
         return planSelectorForRemovalMultibinder.addBinding(selectorName);
     }

@@ -50,24 +50,24 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         addPlanSelectorForRemovalBinding(DefaultPlansRemover.PathSizeLogitSelectorForRemoval.toString()).toProvider(PathSizeLogitSelectorForRemoval.class);
 
         // strategy packages that only select:
-		addPlanStrategyBindingToFactory(DefaultSelector.KeepLastSelected.toString(), KeepLastSelectedPlanStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultSelector.BestScore.toString(), SelectBestPlanStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultSelector.SelectExpBeta.toString(), SelectExpBetaPlanStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultSelector.ChangeExpBeta.toString(), ChangeExpBetaPlanStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultSelector.SelectRandom.toString(), SelectRandomStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultSelector.SelectPathSizeLogit.toString(), SelectPathSizeLogitStrategyFactory.class);
+        addPlanStrategyBinding(DefaultSelector.KeepLastSelected.toString()).toProvider(KeepLastSelectedPlanStrategyFactory.class);
+        addPlanStrategyBinding(DefaultSelector.BestScore.toString()).toProvider(SelectBestPlanStrategyFactory.class);
+        addPlanStrategyBinding(DefaultSelector.SelectExpBeta.toString()).toProvider(SelectExpBetaPlanStrategyFactory.class);
+        addPlanStrategyBinding(DefaultSelector.ChangeExpBeta.toString()).toProvider(ChangeExpBetaPlanStrategyFactory.class);
+        addPlanStrategyBinding(DefaultSelector.SelectRandom.toString()).toProvider(SelectRandomStrategyFactory.class);
+        addPlanStrategyBinding(DefaultSelector.SelectPathSizeLogit.toString()).toProvider(SelectPathSizeLogitStrategyFactory.class);
 
         // strategy packages that select, copy, and modify.  (The copying is done implicitly as soon as "addStrategyModule" is called
         // at least once).
-        addPlanStrategyBindingToFactory(DefaultStrategy.ReRoute.toString(), ReRoutePlanStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultStrategy.TimeAllocationMutator.toString(), TimeAllocationMutatorPlanStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultStrategy.TimeAllocationMutator_ReRoute.toString(), TimeAllocationMutatorReRoutePlanStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultStrategy.ChangeLegMode.toString(), ChangeLegModeStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultStrategy.ChangeSingleLegMode.toString(), ChangeSingleLegModeStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultStrategy.ChangeSingleTripMode.toString(), ChangeSingleTripModeStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultStrategy.SubtourModeChoice.toString(), SubtourModeChoiceStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultStrategy.ChangeTripMode.toString(), ChangeTripModeStrategyFactory.class);
-        addPlanStrategyBindingToFactory(DefaultStrategy.TripSubtourModeChoice.toString(), TripSubtourModeChoiceStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.ReRoute.toString()).toProvider(ReRoutePlanStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator.toString()).toProvider(TimeAllocationMutatorPlanStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator_ReRoute.toString()).toProvider(TimeAllocationMutatorReRoutePlanStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.ChangeLegMode.toString()).toProvider(ChangeLegModeStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.ChangeSingleLegMode.toString()).toProvider(ChangeSingleLegModeStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripModeStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.toString()).toProvider(SubtourModeChoiceStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.ChangeTripMode.toString()).toProvider(ChangeTripModeStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.TripSubtourModeChoice.toString()).toProvider(TripSubtourModeChoiceStrategyFactory.class);
     }
 
     public static enum DefaultSelector { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit }

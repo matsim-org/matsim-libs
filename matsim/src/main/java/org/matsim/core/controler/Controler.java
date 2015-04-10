@@ -667,7 +667,7 @@ public class Controler extends AbstractController {
 		this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                addPlanStrategyBindingToFactory(planStrategyFactoryName, planStrategyFactory);
+                addPlanStrategyBinding(planStrategyFactoryName).toProvider(planStrategyFactory);
             }
         });
 	}
@@ -676,7 +676,7 @@ public class Controler extends AbstractController {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                addPlanStrategyBindingToFactory(planStrategyFactoryName, planStrategyFactory);
+                addPlanStrategyBinding(planStrategyFactoryName).toProvider(planStrategyFactory);
             }
         });
     }
