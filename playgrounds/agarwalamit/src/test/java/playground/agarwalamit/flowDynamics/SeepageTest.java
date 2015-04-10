@@ -54,6 +54,7 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -135,7 +136,7 @@ public class SeepageTest {
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
 
-		SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory();
+		SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory(QueueWithBufferType.seep);
 
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1,seepNetFactory);
 		qSim1.addMobsimEngine(netsimEngine);
