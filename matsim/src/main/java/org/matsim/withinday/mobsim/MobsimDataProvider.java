@@ -43,7 +43,41 @@ import org.matsim.vehicles.Vehicle;
  * @author cdobler
  */
 public final class MobsimDataProvider implements MobsimInitializedListener {
+	/*
+	Hallo Kai,
 
+	ja, das kann man sicherlich auch einfach durchschleifen (oder gleich in die QSim einbauen? Sind ja doch recht "typische" Methoden).
+
+	Das Design kommt einfach daher, dass die QSim die Daten nicht oder nur in recht ungünstiger Form bereit hält:
+	- Agents nur in einer Collection, nicht in einer Map
+	- Vehicles nur in den jeweiligen Links aber nicht an einer zentralen Stelle
+
+	Viele Grüße,
+	Christoph
+
+
+	-----Ursprüngliche Nachricht-----
+	Von: Nagel, Kai, Prof. Dr. [mailto:nagel@vsp.tu-berlin.de] 
+	Gesendet: Dienstag, 17. März 2015 13:50
+	An: Christoph Dobler
+	Cc: Zilske, Michael
+	Betreff: MobsimDataProvider
+
+	Hallo Christoph,
+
+	Bin gerade über Deinen MobsimDataProvider gestolpert.  Die Gruppe von Lin Padham verwendet den.  
+
+	Ich würde es aber für ein Problem halten, dass er mit der QSim nicht automatisch konsistent ist.  Z.B. kann man in der QSim nachträglich Agenten und Fahrzeuge einfügen; der MobsimDataProvider würde das aber nicht mitbekommen.
+
+	Ich würde von der Tendenz her das "Durchschleifen", also die Information im MobsimDataProvider nicht mehr separat sammeln, sondern die entsprechenden Methoden aus der QSim verwenden.  Falls die nicht schnell genug sind, könnten wir sie ja optimieren.
+
+	Oder?
+
+	Danke & vG
+
+	Kai
+	*/
+	
 	private final Map<Id<Vehicle>, MobsimVehicle> vehicles = new HashMap<Id<Vehicle>, MobsimVehicle>();
 
 	private NetsimNetwork netsimNetwork;
