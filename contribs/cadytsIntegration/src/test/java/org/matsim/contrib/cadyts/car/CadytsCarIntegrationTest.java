@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -158,17 +157,7 @@ public class CadytsCarIntegrationTest {
 		
 		final CadytsContext cContext = new CadytsContext(config);
 		controler.addControlerListener(cContext);
-		
-		// new PlanStrategy which does the same as above, but cleaner (getting rid of the weight which needs to be set to "0")
-		controler.addPlanStrategyFactory(CADYTS_STRATEGY_NAME, new PlanStrategyFactory() {
-			@Override
-			public PlanStrategy get() {
-				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(
-						config.planCalcScore().getBrainExpBeta(), cContext));
-			}
-		} ) ;
-		
-		
+
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {

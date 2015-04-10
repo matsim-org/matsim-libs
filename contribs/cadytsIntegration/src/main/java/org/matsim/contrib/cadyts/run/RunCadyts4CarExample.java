@@ -24,14 +24,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
-import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -52,18 +47,8 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 public class RunCadyts4CarExample {
 
 	public static void main(String[] args) {
-		final String CADYTS_STRATEGY_NAME = "CadytsAsScoring";
-
 		final Config config = ConfigUtils.loadConfig( args[0], new CadytsConfigGroup() ) ;
-		
-		// tell the config to use cadyts-as-strategy (can also be done in config file):
-		StrategySettings strategySettings = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-		strategySettings.setStrategyName(CADYTS_STRATEGY_NAME);
-		strategySettings.setWeight(1.0);
-		config.strategy().addStrategySettings(strategySettings);
 
-		// ---
-		
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
 		// ---
@@ -74,17 +59,6 @@ public class RunCadyts4CarExample {
 		final CadytsContext cContext = new CadytsContext(config);
 		controler.addControlerListener(cContext);
 
-		// the following is a standard ExpBetaPlanChanger with cadyts plans registration added (would be nice to get rid of this but
-		// haven't found an easy way)
-		controler.addPlanStrategyFactory(CADYTS_STRATEGY_NAME, new PlanStrategyFactory() {
-			@Override
-			public PlanStrategy get() {
-				PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(
-						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext)) ;
-				return builder.build() ;
-			}
-		} ) ;
-		
 		// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override

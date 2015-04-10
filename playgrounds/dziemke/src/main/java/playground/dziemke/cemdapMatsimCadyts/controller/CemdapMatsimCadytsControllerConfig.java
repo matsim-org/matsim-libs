@@ -24,13 +24,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
-import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
-import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -54,13 +50,15 @@ public class CemdapMatsimCadytsControllerConfig {
 		controler.addControlerListener(cContext);
 				
 		// plan strategy
-		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
-			@Override
-			public PlanStrategy get() {
-				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(
-						controler.getConfig().planCalcScore().getBrainExpBeta(), cContext));
-			}
-		});
+        // not necessary anymore, just use normal ChangeExpBeta
+
+//		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
+//			@Override
+//			public PlanStrategy get() {
+//				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Link>(
+//						controler.getConfig().planCalcScore().getBrainExpBeta(), cContext));
+//			}
+//		});
 		
 		// scoring function
 				final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());

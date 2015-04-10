@@ -20,39 +20,37 @@
 
 package org.matsim.contrib.cadyts.car;
 
-import java.io.IOException;
-import java.util.Set;
-import java.util.TreeSet;
-
+import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.cadyts.general.CadytsBuilder;
-import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
-import org.matsim.contrib.cadyts.general.CadytsContextI;
-import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
-import org.matsim.contrib.cadyts.general.PlansTranslator;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.general.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 
-import cadyts.calibrators.analytical.AnalyticalCalibrator;
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
+import java.io.IOException;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
  * select plans that better match to given occupancy counts.
  */
-public class CadytsContext implements CadytsContextI<Link>, StartupListener, IterationEndsListener {
+public class CadytsContext implements CadytsContextI<Link>, StartupListener, IterationEndsListener, BeforeMobsimListener {
 
 	private final static Logger log = Logger.getLogger(CadytsContext.class);
 
@@ -117,10 +115,16 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.ptStep = new PlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedItems());
 		event.getControler().getEvents().addHandler(ptStep);
 
-		// build the calibrator. This is a static method, and in consequence has no side effects
 		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
 	}
-	
+
+    @Override
+    public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+        for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
+            this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
+        }
+    }
+
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (this.writeAnalysisFile) {
@@ -136,7 +140,6 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		// write some output
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-//			new CadytsLinkCostOffsetsXMLFileIO(event.getControler().getScenario().getNetwork())
 			new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(event.getControler().getScenario()), Link.class)
    			   .write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
