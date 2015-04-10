@@ -44,6 +44,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -129,7 +130,6 @@ public class CadytsCarIntegrationTest {
 	//--------------------------------------------------------------
 	@Test
 	public final void testCalibrationAsScoring() throws IOException {
-		final String CADYTS_STRATEGY_NAME = "ccc";
 
 		final double beta=30. ;
 		final int lastIteration = 20 ;
@@ -144,7 +144,7 @@ public class CadytsCarIntegrationTest {
 		config.planCalcScore().setBrainExpBeta(beta);
 		
 		StrategySettings strategySettings = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
-		strategySettings.setStrategyName(CADYTS_STRATEGY_NAME);
+		strategySettings.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta.toString());
 		strategySettings.setWeight(1.0);
 		config.strategy().addStrategySettings(strategySettings);
 
