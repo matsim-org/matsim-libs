@@ -19,14 +19,27 @@
 
 package playground.yu.changeLegModeWithParkLocation;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+
+import playground.yu.tests.ChangeLegModeWithParkLocation;
+
+import com.google.inject.Provider;
 
 /**
  * @author yu
@@ -252,9 +265,39 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 
 	public void testLegChainModes3() {
 		// the agent in the initial plan has only "pt" legs.
-		Config config = loadConfig(getInputDirectory() + "config3.xml");
+		final Config config = loadConfig(getInputDirectory() + "config3.xml");
 		config.controler().setWritePlansInterval(0);
-		Controler ctl = new ChangeLegModeWithParkLocationControler(config);
+		
+		config.strategy().setMaxAgentPlanMemorySize(5);
+		{
+			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.toString() ) ;
+			stratSets.setWeight(0.1);
+			config.strategy().addStrategySettings(stratSets);
+		}{
+			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+			stratSets.setStrategyName("abc");
+			stratSets.setWeight(0.5);
+			config.strategy().addStrategySettings(stratSets);
+		}{
+			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+			stratSets.setStrategyName( DefaultStrategy.ReRoute.toString() );
+			stratSets.setWeight(0.4);
+			config.strategy().addStrategySettings(stratSets);
+		}
+		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
+		
+		Controler ctl = new Controler(config);
+		
+		ctl.addPlanStrategyFactory("abc", new Provider<PlanStrategy>(){
+			@Override
+			public PlanStrategy get() {
+				PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector() ) ;
+				builder.addStrategyModule( new ChangeLegModeWithParkLocation( config, scenario.getNetwork() ) );
+				return builder.build() ;
+			}
+		} ) ;
+		
 		ctl.addControlerListener(new LegChainModesListener3());
         ctl.getConfig().controler().setCreateGraphs(false);
         ctl.getConfig().controler().setWriteEventsInterval(0);
