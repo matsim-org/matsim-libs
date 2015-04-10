@@ -32,14 +32,12 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
-
 import playground.yu.tests.ChangeLegModeWithParkLocation;
-
-import com.google.inject.Provider;
 
 /**
  * @author yu
@@ -289,7 +287,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		
 		Controler ctl = new Controler(config);
 		
-		ctl.addPlanStrategyFactory("abc", new Provider<PlanStrategy>(){
+		ctl.addPlanStrategyFactory("abc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy get() {
 				PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector() ) ;
