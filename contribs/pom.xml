@@ -115,6 +115,7 @@
 		<module>pseudosimulation</module>
 		<module>eventsBasedTransitRouter</module>
 		<module>common</module>
+		<module>eventsBasedPTRouter</module>
 	</modules>
 	<repositories>
 		<repository>
