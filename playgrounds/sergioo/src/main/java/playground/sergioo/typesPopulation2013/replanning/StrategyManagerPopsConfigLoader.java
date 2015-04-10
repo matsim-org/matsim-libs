@@ -158,7 +158,7 @@ public final class StrategyManagerPopsConfigLoader {
 			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, name);
 			return strategy;
 		} else {
-			PlanStrategy strategy = controler.getInjector().getPlanStrategiesDeclaredByModules().get(name);
+			PlanStrategy strategy = controler.getInjector().getPlanStrategies().get(name);
 			return strategy;
 		} 
 	} 

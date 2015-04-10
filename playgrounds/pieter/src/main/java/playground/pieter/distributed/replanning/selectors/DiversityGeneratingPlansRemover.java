@@ -24,11 +24,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelectorFactory;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.PtConstants;
@@ -58,7 +56,7 @@ import java.util.Map;
  */
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
 	
-	public static final class Builder implements PlanSelectorFactory<Plan, Person>, Provider<DiversityGeneratingPlansRemover> {
+	public static final class Builder implements Provider<DiversityGeneratingPlansRemover> {
         private final Scenario scenario;
         private double actTypeWeight = 1.;
 		private double locationWeight = 1.;
@@ -97,7 +95,7 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 			this.stageActivities = val;
 		}
 		@Override
-		public final DiversityGeneratingPlansRemover createPlanSelector(Scenario scenario) {
+		public final DiversityGeneratingPlansRemover get() {
 			return new DiversityGeneratingPlansRemover(
 					scenario.getNetwork(),
 					this.actTypeWeight,
@@ -108,10 +106,6 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 					this.stageActivities);
 		}
 
-        @Override
-        public DiversityGeneratingPlansRemover get() {
-            return createPlanSelector(scenario);
-        }
     }
 	
 	private DiversityGeneratingPlansRemover(Network network,

@@ -49,10 +49,10 @@ public final class StrategyManagerConfigLoader {
 	private static int externalCounter = 0;
 
 	public static void load(final Controler controler, final StrategyManager manager) {
-		load(controler.getInjector(), controler.getInjector().getPlanStrategiesDeclaredByModules(), controler.getInjector().getPlanSelectorsDeclaredByModules(), manager);
+		load(controler.getInjector(), controler.getInjector().getPlanStrategies(), controler.getInjector().getPlanSelectorsForRemoval(), manager);
 	}
 
-    public static void load(Injector injector, Map<String, PlanStrategy> planStrategyFactoryRegister, Map<String, GenericPlanSelector<Plan, Person>> planSelectorFactoryRegister, StrategyManager manager) {
+    public static void load(Injector injector, Map<String, PlanStrategy> planStrategies, Map<String, GenericPlanSelector<Plan, Person>> planSelectorsForRemoval, StrategyManager manager) {
         Config config = injector.getInstance(Config.class);
         manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 
@@ -63,12 +63,12 @@ public final class StrategyManagerConfigLoader {
         manager.setSubpopulationAttributeName(
                 config.plans().getSubpopulationAttributeName());
         for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
-            String moduleName = settings.getStrategyName();
+            String strategyName = settings.getStrategyName();
 
-            PlanStrategy strategy = loadStrategy(moduleName, settings, planStrategyFactoryRegister, injector);
+            PlanStrategy strategy = loadStrategy(strategyName, settings, planStrategies, injector);
 
             if (strategy == null) {
-                throw new RuntimeException("Could not initialize strategy named " + moduleName);
+                throw new RuntimeException("Strategy named " + strategyName + " not found.");
             }
 
             manager.addStrategy(strategy, settings.getSubpopulation(), settings.getWeight());
@@ -94,8 +94,11 @@ public final class StrategyManagerConfigLoader {
         String name = config.strategy().getPlanSelectorForRemoval();
         if ( name != null ) {
             // ``manager'' has a default setting.
-            GenericPlanSelector<Plan, Person> planSelector = planSelectorFactoryRegister.get(name);
-            manager.setPlanSelectorForRemoval(planSelector) ;
+            GenericPlanSelector<Plan, Person> planSelectorForRemoval = planSelectorsForRemoval.get(name);
+            if (planSelectorForRemoval == null) {
+                throw new RuntimeException("Plan selector for removal named " + name + " not found.");
+            }
+            manager.setPlanSelectorForRemoval(planSelectorForRemoval) ;
         }
     }
 

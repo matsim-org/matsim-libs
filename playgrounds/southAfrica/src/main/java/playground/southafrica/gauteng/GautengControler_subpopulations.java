@@ -260,7 +260,7 @@ public class GautengControler_subpopulations {
 		builder.setSameModePenalty(5.);
 		builder.setSameRoutePenalty(5.);
 		builder.setActTimeParameter(0.);
-		controler.addPlanSelectorFactory(DIVERSITY_GENERATING_PLANS_REMOVER, builder );
+		controler.addPlanSelectorForRemovalFactory(DIVERSITY_GENERATING_PLANS_REMOVER, builder);
 		// yyyy needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13
 		
 		// ADDITIONAL ANALYSIS:

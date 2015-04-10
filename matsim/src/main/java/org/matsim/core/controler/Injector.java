@@ -119,14 +119,14 @@ public class Injector {
         ));
     }
 
-    public Map<String, PlanStrategy> getPlanStrategiesDeclaredByModules() {
+    public Map<String, PlanStrategy> getPlanStrategies() {
         return injector.getInstance(Key.get(
                 new TypeLiteral<Map<String, PlanStrategy>>() {
                 }
         ));
     }
 
-    public Map<String, GenericPlanSelector<Plan, Person>> getPlanSelectorsDeclaredByModules() {
+    public Map<String, GenericPlanSelector<Plan, Person>> getPlanSelectorsForRemoval() {
         return injector.getInstance(Key.get(
                 new TypeLiteral<Map<String, GenericPlanSelector<Plan, Person>>>() {
                 }

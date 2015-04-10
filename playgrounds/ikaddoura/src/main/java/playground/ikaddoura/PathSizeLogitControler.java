@@ -82,17 +82,8 @@ public class PathSizeLogitControler {
 			builder.setActTimeParameter(actTimeParam);
 
 			// this is the new syntax; not yet extensively tested: kai, aug'14
-			controler.addPlanSelectorFactory("divGenPlansRemover", builder ) ;
+			controler.addPlanSelectorForRemovalFactory("divGenPlansRemover", builder) ;
 			controler.getConfig().strategy().setPlanSelectorForRemoval("divGenPlansRemover");
-			
-//			final AbstractPlanSelector remover = builder.createPlanSelector(controler.getScenario()) ;
-//			
-//			controler.addControlerListener(new StartupListener(){
-//				@Override
-//				public void notifyStartup(StartupEvent event) {
-//					event.getControler().getStrategyManager().setPlanSelectorForRemoval(remover);
-//				}
-//			});
 
 		}
 		

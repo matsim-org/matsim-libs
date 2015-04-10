@@ -18,12 +18,8 @@
  * *********************************************************************** */
 package playground.vsp.planselectors;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -31,10 +27,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelectorFactory;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.PtConstants;
+
+import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The idea, as the name says, is to not remove the worst plan, but remove plans such that diversity is maintained.
@@ -56,8 +57,10 @@ import org.matsim.pt.PtConstants;
  */
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
 	
-	public static final class Builder implements PlanSelectorFactory<Plan, Person> {
-		private double actTypeWeight = 1.;
+	public static final class Builder implements Provider<GenericPlanSelector<Plan, Person>> {
+
+        private Network network;
+        private double actTypeWeight = 1.;
 		private double locationWeight = 1.;
 		private double actTimeParameter = 1.;
 		private double sameRoutePenalty = 1.;
@@ -70,7 +73,11 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 				return activityType.equals(PtConstants.TRANSIT_ACTIVITY_TYPE);
 			}
 		};
-	
+
+        @Inject
+        final void setNetwork(Network network) {
+            this.network = network;
+        }
 		public final void setActTypeWeight ( double val ) {
 			this.actTypeWeight = val ;
 		}
@@ -90,9 +97,9 @@ public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector 
 			this.stageActivities = val;
 		}
 		@Override
-		public final DiversityGeneratingPlansRemover createPlanSelector( Scenario scenario ) {
+		public final DiversityGeneratingPlansRemover get() {
 			return new DiversityGeneratingPlansRemover(
-					scenario.getNetwork(),
+					this.network,
 					this.actTypeWeight,
 					this.locationWeight,
 					this.actTimeParameter,

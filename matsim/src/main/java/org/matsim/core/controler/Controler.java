@@ -49,7 +49,7 @@ import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.selectors.PlanSelectorFactory;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
@@ -683,11 +683,11 @@ public class Controler extends AbstractController {
         });
     }
 
-    public final void addPlanSelectorFactory(final String planSelectorFactoryName, final PlanSelectorFactory<Plan, Person> planSelectorFactory) {
+    public final void addPlanSelectorForRemovalFactory(final String planSelectorFactoryName, final com.google.inject.Provider<? extends GenericPlanSelector<Plan, Person>> planSelectorFactory) {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                addPlanSelectorFactory(planSelectorFactoryName, planSelectorFactory);
+                addPlanSelectorForRemovalBinding(planSelectorFactoryName).toProvider(planSelectorFactory);
             }
         });
     }
