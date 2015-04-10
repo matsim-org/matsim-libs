@@ -477,7 +477,7 @@ public class GenerateFundamentalDiagramData {
 
 		if(SEEP_NETWORK_FACTORY){
 			log.warn("Using modified \"QueueWithBuffer\". Keep eyes open.");
-			SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory(queueWithBufferType);
+			SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory();
 			netsimEngine = new QNetsimEngine(qSim,seepNetFactory);
 		} else {
 			netsimEngine = new QNetsimEngine(qSim);

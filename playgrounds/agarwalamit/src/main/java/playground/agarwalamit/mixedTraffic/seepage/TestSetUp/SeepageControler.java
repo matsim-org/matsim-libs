@@ -91,7 +91,7 @@ public class SeepageControler {
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
 
-		SeepageNetworkFactory netsimNetworkFactory = new SeepageNetworkFactory(queueWithBufferType);
+		SeepageNetworkFactory netsimNetworkFactory = new SeepageNetworkFactory();
 		
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1,netsimNetworkFactory);
 		qSim1.addMobsimEngine(netsimEngine);
