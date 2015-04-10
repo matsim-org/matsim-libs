@@ -21,9 +21,11 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.LaneFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepQLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
 
 /**
  * Design thoughts:<ul>
@@ -31,10 +33,32 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
  * "package" to protected.  Worse, the interfaces are not sorted out.  So I remain here for the time being.  kai, jan'11
  */
 public final class SeepageNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+	
+	private QueueWithBufferType type;
+
+	public SeepageNetworkFactory(){
+		this( QueueWithBufferType.standard ) ;
+	}
+	public SeepageNetworkFactory(QueueWithBufferType queueWithBufferType){
+		type = queueWithBufferType ;
+	}
 
 	@Override
 	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+		switch( type ){
+		case amit:
+			LaneFactory laneFactory = new LaneFactory(){
+				@Override
+				public QLaneI createLane(QLinkImpl qLinkImpl) {
+					AAQueueWithBuffer.Builder builder = new AAQueueWithBuffer.Builder(qLinkImpl) ;
+					return builder.build() ;
+				}} ;
+			return new QLinkImpl( link, network, toQueueNode, laneFactory ) ;
+		case seep:
 			return new SeepQLinkImpl(link, network, toQueueNode, new PassingVehicleQ());
+		default:
+			throw new RuntimeException("not implemented") ;
+		}
 	}
 
 	@Override

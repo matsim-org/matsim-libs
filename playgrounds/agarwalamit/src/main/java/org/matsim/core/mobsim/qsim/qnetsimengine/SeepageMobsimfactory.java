@@ -51,9 +51,20 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  */
 
 public class SeepageMobsimfactory  implements MobsimFactory{
+	public static enum QueueWithBufferType { standard, amit, seep }
+
+	private QueueWithBufferType queueWithBufferType; ;
+	
+	public SeepageMobsimfactory() {
+		this.queueWithBufferType = QueueWithBufferType.standard ;
+	} ;
+	
+	public SeepageMobsimfactory( QueueWithBufferType type ) {
+		this.queueWithBufferType = type ;
+	}
 
 	static final List<String> mainModes = Arrays.asList(TransportMode.car,TransportMode.bike);
-
+	
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager events) {
 		//From QSimFactory inspired code
@@ -67,7 +78,7 @@ public class SeepageMobsimfactory  implements MobsimFactory{
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		SeepageNetworkFactory netsimNetworkFactory = new SeepageNetworkFactory();
+		SeepageNetworkFactory netsimNetworkFactory = new SeepageNetworkFactory(queueWithBufferType);
 
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, netsimNetworkFactory);
 

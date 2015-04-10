@@ -87,12 +87,21 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 * 
 	 */
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final VehicleQ<QVehicle> vehicleQueue) {
+		// yy get rid of this c'tor (since the one with queueWithBuffer is more flexible)?
 		super(link2, network) ;
 		//--
 		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this) ;
 		builder.setVehicleQueue(vehicleQueue);
 		this.road = builder.build() ;
 		//--
+		this.toQueueNode = toNode;
+		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
+	  super.transitQLink = new TransitQLink(this.road);
+	}
+	
+	public QLinkImpl( final Link link2, QNetwork network, final QNode toNode, final QLaneI queueWithBuffer ) {
+		super(link2, network) ;
+		this.road = queueWithBuffer ;
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 	  super.transitQLink = new TransitQLink(this.road);

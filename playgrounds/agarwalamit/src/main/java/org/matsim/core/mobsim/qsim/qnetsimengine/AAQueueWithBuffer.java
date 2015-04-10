@@ -65,8 +65,8 @@ import org.matsim.vis.snapshotwriters.VisData;
  *
  * @author nagel
  */
-final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
-	private static final Logger log = Logger.getLogger( QueueWithBuffer.class ) ;
+final class AAQueueWithBuffer extends QLaneI implements SignalizeableItem {
+	private static final Logger log = Logger.getLogger( AAQueueWithBuffer.class ) ;
 
 	/**
 	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
@@ -116,7 +116,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private double usedBufferStorageCapacity = 0.0 ;
 	private double remainingHolesStorageCapacity = 0.0 ;
 
-	private final Queue<QueueWithBuffer.Hole> holes = new LinkedList<QueueWithBuffer.Hole>();
+	private final Queue<AAQueueWithBuffer.Hole> holes = new LinkedList<AAQueueWithBuffer.Hole>();
 
 	private double freespeedTravelTime = Double.NaN;
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
@@ -164,7 +164,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final VisData visData = new VisDataImpl() ;
 	private final double timeStepSize;
 
-	private boolean accumulatingFlowToZero;
+	private boolean newCapacityUpdate;
 
 	static class Builder {
 		private VehicleQ<QVehicle> vehicleQueue = null ;
@@ -179,7 +179,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		Builder( AbstractQLink qLink ) {
 			this.qLink = qLink ;
 		}
-		QueueWithBuffer build() {
+		AAQueueWithBuffer build() {
 			if ( vehicleQueue == null ) {
 				vehicleQueue = new FIFOVehicleQ() ;
 			}
@@ -195,7 +195,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			if ( flowCapacity_s==null ) {
 				flowCapacity_s = ((LinkImpl)qLink.getLink()).getFlowCapacity() ;
 			}
-			return new QueueWithBuffer( qLink, vehicleQueue, id, length, effectiveNumberOfLanes, flowCapacity_s ) ;
+			return new AAQueueWithBuffer( qLink, vehicleQueue, id, length, effectiveNumberOfLanes, flowCapacity_s ) ;
 		}
 		/**
 		 * @param vehicleQueue -- may be set away from its default.
@@ -231,7 +231,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
-	private QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> id, 
+	private AAQueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> id, 
 			double length, double effectiveNumberOfLanes, double flowCapacity_s) {
 		this.id = id;
 		this.qLink = qLinkImpl;
@@ -246,7 +246,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		final QSimConfigGroup qsimConfig = this.network.simEngine.getMobsim().getScenario().getConfig().qsim();
 
 		this.timeStepSize = qsimConfig.getTimeStepSize() ;
-		this.accumulatingFlowToZero = qsimConfig.isAccumulatingFlowToZero() ;
+		this.newCapacityUpdate = qsimConfig.isAccumulatingFlowToZero() ;
 		
 		String isSeeping = this.network.simEngine.getMobsim().getScenario().getConfig().findParam("seepage", "isSeepageAllowed");
 
@@ -261,18 +261,18 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		//following are copied part from QNetSimEngine instead of copying the whole class.
 		QSimConfigGroup qsimConfigGroup = qsimConfig;
 		if ( QSimConfigGroup.TRAFF_DYN_QUEUE.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
-			QueueWithBuffer.HOLES=false ;
+			AAQueueWithBuffer.HOLES=false ;
 		} else if ( QSimConfigGroup.TRAFF_DYN_W_HOLES.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
-			QueueWithBuffer.HOLES = true ;
+			AAQueueWithBuffer.HOLES = true ;
 		} else {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ qsimConfigGroup.getTrafficDynamics() ) ;
 		}
 		if ( QSimConfigGroup.SNAPSHOT_WITH_HOLES.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
-			QueueWithBuffer.VIS_HOLES = true ;
+			AAQueueWithBuffer.VIS_HOLES = true ;
 		}
 
-		if(QueueWithBuffer.HOLES && this.network.simEngine.getMobsim().getScenario().getConfig().getModule("WITH_HOLE")!=null){
+		if(AAQueueWithBuffer.HOLES && this.network.simEngine.getMobsim().getScenario().getConfig().getModule("WITH_HOLE")!=null){
 			hole_speed = Double.valueOf(this.network.simEngine.getMobsim().getScenario().getConfig().getParam("WITH_HOLE", "HOLE_SPEED"));
 			if (hole_speed!=15) {
 				log.warn("Hole speed is set to "+hole_speed+". Default hardcoded value is 15.");
@@ -286,7 +286,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.calculateFlowCapacity();
 		this.calculateStorageCapacity();
 
-		if(!this.accumulatingFlowToZero){
+		if(!this.newCapacityUpdate){
 			flowcap_accumulate.setValue((flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0) );
 		}
 		
@@ -307,7 +307,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
 		
-		if(this.accumulatingFlowToZero){
+		if(this.newCapacityUpdate){
 			updateFlowAccumulation(now);
 			if (flowcap_accumulate.getValue() >= 0.0  ) {
 				flowcap_accumulate.addValue(-veh.getSizeInEquivalents(), now);
@@ -350,7 +350,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 		updateFlowAccumulation(now);
 		
-		if(this.accumulatingFlowToZero){
+		if(this.newCapacityUpdate){
 
 			return (
 					usedBufferStorageCapacity < bufferStorageCapacity
@@ -368,7 +368,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	private void updateFlowAccumulation(final double now){
 		
-		if(this.accumulatingFlowToZero && this.flowcap_accumulate.getValue() < 0 && this.flowcap_accumulate.getTimeStep() < now){
+		if(this.newCapacityUpdate && this.flowcap_accumulate.getValue() < 0 && this.flowcap_accumulate.getTimeStep() < now){
 			
 			double flowCapSoFar = flowcap_accumulate.getValue();
 			double newStoredFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
@@ -385,7 +385,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	
 	@Override
 	public final void updateRemainingFlowCapacity() {
-		if(!this.accumulatingFlowToZero){
+		if(!this.newCapacityUpdate){
 			remainingflowCap = flowCapacityPerTimeStep;
 			if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
 				final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
@@ -428,25 +428,25 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
 
 		if (storageCapacity < tempStorageCapacity) {
-			if (QueueWithBuffer.spaceCapWarningCount <= 10) {
+			if (AAQueueWithBuffer.spaceCapWarningCount <= 10) {
 				log.warn("Link " + this.id + " too small: enlarge storage capacity from: " + storageCapacity
 						+ " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
-				if (QueueWithBuffer.spaceCapWarningCount == 10) {
+				if (AAQueueWithBuffer.spaceCapWarningCount == 10) {
 					log.warn("Additional warnings of this type are suppressed.");
 				}
-				QueueWithBuffer.spaceCapWarningCount++;
+				AAQueueWithBuffer.spaceCapWarningCount++;
 			}
 			storageCapacity = tempStorageCapacity;
 		}
 
-		if ( QueueWithBuffer.HOLES ) {
+		if ( AAQueueWithBuffer.HOLES ) {
 			remainingHolesStorageCapacity = this.storageCapacity;
 		}
 	}
 
 	@Override
 	public boolean doSimStep(final double now ) {
-		if(QueueWithBuffer.HOLES) this.processArrivalOfHoles( now ) ;
+		if(AAQueueWithBuffer.HOLES) this.processArrivalOfHoles( now ) ;
 		this.moveQueueToBuffer(now);
 		return true ;
 	}
@@ -522,8 +522,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
 		}
 
-		if ( QueueWithBuffer.HOLES ) {
-			QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
+		if ( AAQueueWithBuffer.HOLES ) {
+			AAQueueWithBuffer.Hole hole = new AAQueueWithBuffer.Hole() ;
 			double offset = length*3600./hole_speed/1000. ;
 			hole.setEarliestLinkExitTime( now + 1.0*offset + 0.0*MatsimRandom.getRandom().nextDouble()*offset ) ;
 			hole.setSizeInEquivalents(veh2Remove.getSizeInEquivalents());
@@ -547,7 +547,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	public final boolean isActive() {
-		if(this.accumulatingFlowToZero){
+		if(this.newCapacityUpdate){
 			double 	now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 			updateFlowAccumulation(now);
 			
@@ -575,7 +575,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	@Override
 	public final boolean isAcceptingFromUpstream() {
 		boolean storageOk = usedStorageCapacity < storageCapacity ;
-		if ( !QueueWithBuffer.HOLES ) {
+		if ( !AAQueueWithBuffer.HOLES ) {
 			return storageOk ;
 		}
 		// (continue only if HOLES)
@@ -736,7 +736,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		veh.setCurrentLink(link);
 		vehQueue.add(veh);
 
-		if ( QueueWithBuffer.HOLES ) {
+		if ( AAQueueWithBuffer.HOLES ) {
 			remainingHolesStorageCapacity = remainingHolesStorageCapacity - veh.getSizeInEquivalents();
 		}
 	}
@@ -850,17 +850,17 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				double spacing, double freespeedTraveltime, Hole veh)
 		{
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
-			double distanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(QueueWithBuffer.this.length, spacing,
+			double distanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(AAQueueWithBuffer.this.length, spacing,
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
 			Integer lane = 10 ;
 			double speedValue = 1. ;
 			if (this.upstreamCoord != null){
 				snapshotInfoBuilder.positionQItem(positions, this.upstreamCoord, this.downsteamCoord,
-						QueueWithBuffer.this.length, this.euklideanDistance, veh,
+						AAQueueWithBuffer.this.length, this.euklideanDistance, veh,
 						distanceFromFromNode, lane, speedValue);
 			} else {
 				snapshotInfoBuilder.positionQItem(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(),
-						QueueWithBuffer.this.length, ((LinkImpl)link).getEuklideanDistance() , veh, 
+						AAQueueWithBuffer.this.length, ((LinkImpl)link).getEuklideanDistance() , veh, 
 						distanceFromFromNode, lane, speedValue);
 			}
 			return distanceFromFromNode;
