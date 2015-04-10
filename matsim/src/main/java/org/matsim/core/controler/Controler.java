@@ -29,8 +29,6 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -47,9 +45,9 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.core.replanning.selectors.PlanSelectorFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
@@ -665,7 +663,7 @@ public class Controler extends AbstractController {
 		this.snapshotWriterRegister.register(snapshotWriterName, snapshotWriterFactory);
 	}
 
-	public final void addPlanStrategyFactory(final String planStrategyFactoryName, final com.google.inject.Provider<? extends PlanStrategy> planStrategyFactory) {
+	public final void addPlanStrategyFactory(final String planStrategyFactoryName, final PlanStrategyFactory planStrategyFactory) {
 		this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -674,7 +672,7 @@ public class Controler extends AbstractController {
         });
 	}
 
-    public final void addPlanStrategyFactory(final String planStrategyFactoryName, final Class<? extends com.google.inject.Provider<? extends PlanStrategy>> planStrategyFactory) {
+    public final void addPlanStrategyFactory(final String planStrategyFactoryName, final Class<? extends PlanStrategyFactory> planStrategyFactory) {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -683,7 +681,7 @@ public class Controler extends AbstractController {
         });
     }
 
-    public final void addPlanSelectorForRemovalFactory(final String planSelectorFactoryName, final com.google.inject.Provider<? extends GenericPlanSelector<Plan, Person>> planSelectorFactory) {
+    public final void addPlanSelectorForRemovalFactory(final String planSelectorFactoryName, final PlanSelectorFactory planSelectorFactory) {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
