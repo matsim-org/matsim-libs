@@ -114,6 +114,7 @@
 		<module>wagonSim</module>
 		<module>pseudosimulation</module>
 		<module>eventsBasedTransitRouter</module>
+		<module>common</module>
 	</modules>
 	<repositories>
 		<repository>
