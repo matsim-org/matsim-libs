@@ -112,6 +112,8 @@
 		<module>multimodal</module>
 		<module>integration</module>
 		<module>wagonSim</module>
+		<module>pseudosimulation</module>
+		<module>eventsBasedTransitRouter</module>
 	</modules>
 	<repositories>
 		<repository>
