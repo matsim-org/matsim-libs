@@ -348,10 +348,9 @@ final class AAQueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
 		final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
-		updateFlowAccumulation(now);
-		
-		if(this.newCapacityUpdate){
 
+		if(this.newCapacityUpdate){
+			updateFlowAccumulation(now);
 			return (
 					usedBufferStorageCapacity < bufferStorageCapacity
 					&&
@@ -368,7 +367,7 @@ final class AAQueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	private void updateFlowAccumulation(final double now){
 		
-		if(this.newCapacityUpdate && this.flowcap_accumulate.getValue() < 0 && this.flowcap_accumulate.getTimeStep() < now){
+		if(this.newCapacityUpdate && this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() < 0 ){
 			
 			double flowCapSoFar = flowcap_accumulate.getValue();
 			double newStoredFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
@@ -551,8 +550,8 @@ final class AAQueueWithBuffer extends QLaneI implements SignalizeableItem {
 			double 	now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 			updateFlowAccumulation(now);
 			
-		return (this.flowcap_accumulate.getValue() < 0.0) // still accumulating, thus active
-				|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
+		return /*(this.flowcap_accumulate.getValue() < 0.0) // still accumulating, thus active
+				|| */ (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
 		} else {
 			return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
 					|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
