@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageNetworkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
@@ -48,7 +49,7 @@ import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
  * @author amit
  */
 public class SeepageControler {
-	 public static final String outputDir = "/Users/amit/Documents/repos/shared-svn/projects/mixedTraffic/seepage/xt_1Link/seepage/";
+	 public static final String outputDir = "../../../repos/shared-svn/projects/mixedTraffic/seepage/xt_1Link/seepage/";
 	 static final List<String> mainModes = Arrays.asList(TransportMode.car,TransportMode.bike);
 	 static final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	 static final String seepMode = "bike";
@@ -91,7 +92,7 @@ public class SeepageControler {
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
 
-		SeepageNetworkFactory netsimNetworkFactory = new SeepageNetworkFactory();
+		SeepageNetworkFactory netsimNetworkFactory = new SeepageNetworkFactory(QueueWithBufferType.seep);
 		
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1,netsimNetworkFactory);
 		qSim1.addMobsimEngine(netsimEngine);

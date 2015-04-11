@@ -46,13 +46,15 @@ public final class SeepageNetworkFactory implements NetsimNetworkFactory<QNode, 
 	@Override
 	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
 		switch( type ){
+		case standard:
+			return new QLinkImpl( link, network, toQueueNode, new PassingVehicleQ()) ;
 		case amit:
 			LaneFactory laneFactory = new LaneFactory(){
 				@Override
 				public QLaneI createLane(QLinkImpl qLinkImpl) {
 					AAQueueWithBuffer.Builder builder = new AAQueueWithBuffer.Builder(qLinkImpl) ;
 					return builder.build() ;
-				}} ;
+				}};
 			return new QLinkImpl( link, network, toQueueNode, laneFactory ) ;
 		case seep:
 			return new SeepQLinkImpl(link, network, toQueueNode, new PassingVehicleQ());
