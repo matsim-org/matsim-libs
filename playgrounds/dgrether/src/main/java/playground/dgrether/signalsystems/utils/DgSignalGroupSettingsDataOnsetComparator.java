@@ -21,7 +21,7 @@ package playground.dgrether.signalsystems.utils;
 
 import java.util.Comparator;
 
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.signals.data.signalcontrol.v20.SignalGroupSettingsData;
 
 
 /**

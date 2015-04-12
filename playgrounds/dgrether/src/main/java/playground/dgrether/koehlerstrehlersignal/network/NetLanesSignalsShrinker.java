@@ -34,10 +34,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioWriter;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signals.data.SignalsData;
+import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.lanes.LanesConsistencyChecker;

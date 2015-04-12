@@ -19,6 +19,11 @@
  * *********************************************************************** */
 package playground.pieter.distributed.plans.router.old;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,19 +40,21 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
+import org.matsim.core.router.util.NetworkInverter;
+import org.matsim.core.router.util.NetworkTurnInfoBuilder;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTimesInvertedNetProxy;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.utils.LanesTurnInfoBuilder;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.utils.SignalsTurnInfoBuilder;
-import playground.pieter.distributed.plans.PopulationFactoryForPlanGenomes;
+import org.matsim.signals.SignalsTurnInfoBuilder;
+import org.matsim.signals.data.SignalsData;
+import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import playground.pieter.distributed.plans.PopulationFactoryForPlanGenomes;
 
 /**
  * This leg router takes travel times needed for turning moves into account. This is done by a routing on an inverted

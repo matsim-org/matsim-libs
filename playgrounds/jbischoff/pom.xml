@@ -36,6 +36,12 @@
 			<artifactId>michalm</artifactId>
 			<version>0.7.0-SNAPSHOT</version>
 		</dependency>
+				<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>signals</artifactId>
+			<version>0.7.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 <dependency>
    <groupId>org.apache.tuscany.sca.aggregation</groupId>
    <artifactId>tuscany-binding-ws-runtime-axis2-aggregation</artifactId>

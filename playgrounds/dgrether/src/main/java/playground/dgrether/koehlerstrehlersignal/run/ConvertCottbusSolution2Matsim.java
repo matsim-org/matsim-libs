@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioLoader;
-import org.matsim.signalsystems.data.SignalsScenarioWriter;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsScenarioWriter;
+import org.matsim.signals.data.SignalsData;
+import org.matsim.signals.model.SignalSystem;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;

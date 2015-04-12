@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signals.model.SignalSystem;
 
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 

@@ -32,8 +32,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signals.data.SignalsData;
+import org.matsim.signals.model.SignalSystem;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

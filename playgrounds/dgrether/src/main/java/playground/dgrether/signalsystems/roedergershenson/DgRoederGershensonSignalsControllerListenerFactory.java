@@ -20,8 +20,8 @@
 package playground.dgrether.signalsystems.roedergershenson;
 
 import org.apache.log4j.Logger;
-import org.matsim.signalsystems.controler.SignalsControllerListener;
-import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
+import org.matsim.contrib.signals.controler.SignalsControllerListener;
+import org.matsim.contrib.signals.controler.SignalsControllerListenerFactory;
 
 
 /**

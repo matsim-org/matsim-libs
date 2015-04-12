@@ -35,10 +35,10 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLinkWLanes;
-import org.matsim.signalsystems.model.SignalGroupState;
-import org.matsim.signalsystems.vis.VisSignal;
-import org.matsim.signalsystems.vis.VisSignalGroup;
-import org.matsim.signalsystems.vis.VisSignalSystem;
+import org.matsim.signals.model.SignalGroupState;
+import org.matsim.signals.vis.VisSignal;
+import org.matsim.signals.vis.VisSignalGroup;
+import org.matsim.signals.vis.VisSignalSystem;
 
 import playground.dgrether.xvis.control.XVisControl;
 import playground.dgrether.xvis.control.events.SignalGroupsSelectionEvent;

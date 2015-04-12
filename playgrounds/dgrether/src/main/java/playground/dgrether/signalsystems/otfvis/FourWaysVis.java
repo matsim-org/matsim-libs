@@ -28,11 +28,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
-import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.mobsim.QSimSignalEngine;
-import org.matsim.signalsystems.mobsim.SignalEngine;
-import org.matsim.signalsystems.model.SignalSystemsManager;
+import org.matsim.contrib.signals.builder.FromDataBuilder;
+import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
+import org.matsim.contrib.signals.mobsim.SignalEngine;
+import org.matsim.signals.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
@@ -75,8 +74,10 @@ public class FourWaysVis {
 //		LaneDefinitions laneDefinitions = new LaneDefinitionsImpl();
 //		LaneDefinitionsReader11 reader = new LaneDefinitionsReader11(laneDefinitions, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
 //		reader.readFile(lanesFile);
-		LaneDefinitonsV11ToV20Converter converter = new LaneDefinitonsV11ToV20Converter();
-		converter.convert(lanesFile, lanesFile20, netFile);
+		if (true)
+			throw new RuntimeException("The following lines are commented");
+//		LaneDefinitonsV11ToV20Converter converter = new LaneDefinitonsV11ToV20Converter();
+//		converter.convert(lanesFile, lanesFile20, netFile);
 
 		config.network().setLaneDefinitionsFile(lanesFile20);
 		config.scenario().setUseLanes(true);

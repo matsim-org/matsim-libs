@@ -44,8 +44,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
-import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signals.mobsim.DefaultSignalizeableItem;
+import org.matsim.signals.model.SignalGroupState;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 

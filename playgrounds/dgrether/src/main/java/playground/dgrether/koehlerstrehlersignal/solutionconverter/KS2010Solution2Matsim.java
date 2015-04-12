@@ -26,10 +26,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signals.data.signalcontrol.v20.SignalControlData;
+import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.signals.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signals.model.SignalSystem;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgProgram;

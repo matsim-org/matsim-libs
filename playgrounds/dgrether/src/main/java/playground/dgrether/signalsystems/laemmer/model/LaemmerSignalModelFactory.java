@@ -20,13 +20,13 @@
 package playground.dgrether.signalsystems.laemmer.model;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
-import org.matsim.signalsystems.builder.SignalModelFactory;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signalsystems.model.SignalController;
-import org.matsim.signalsystems.model.SignalPlan;
-import org.matsim.signalsystems.model.SignalSystem;
-import org.matsim.signalsystems.model.SignalSystemsManager;
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
+import org.matsim.contrib.signals.builder.SignalModelFactory;
+import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.signals.model.SignalController;
+import org.matsim.signals.model.SignalPlan;
+import org.matsim.signals.model.SignalSystem;
+import org.matsim.signals.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 

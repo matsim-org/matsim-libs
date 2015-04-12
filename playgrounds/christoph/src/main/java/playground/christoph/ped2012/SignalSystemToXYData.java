@@ -39,10 +39,10 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signals.data.SignalsData;
+import org.matsim.signals.data.signalsystems.v20.SignalData;
+import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signals.model.SignalGroupState;
 
 /*
  * Creates xy-data from an events file for signal systems.

@@ -38,7 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.signalsystems.CalculateAngle;
+import org.matsim.lanes.data.CalculateAngle;
 
 /**
  * based on {@code org.matsim.signalsystems.CalculateAngle}

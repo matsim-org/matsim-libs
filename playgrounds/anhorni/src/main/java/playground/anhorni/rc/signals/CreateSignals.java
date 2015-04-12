@@ -9,32 +9,27 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.SignalUtils;
+import org.matsim.contrib.signals.data.SignalsDataImpl;
+import org.matsim.contrib.signals.data.SignalsScenarioWriter;
+import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.signalsystems.SignalUtils;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsDataImpl;
-import org.matsim.signalsystems.data.SignalsScenarioWriter;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
-import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
-import org.matsim.signalsystems.model.Signal;
-import org.matsim.signalsystems.model.SignalGroup;
-import org.matsim.signalsystems.model.SignalPlan;
-import org.matsim.signalsystems.model.SignalSystem;
-
-import playground.anhorni.rc.TunnelLinksFilterFactory;
+import org.matsim.signals.data.SignalsData;
+import org.matsim.signals.data.signalcontrol.v20.SignalControlData;
+import org.matsim.signals.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.signals.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signals.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.signals.data.signalsystems.v20.SignalData;
+import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signals.model.Signal;
+import org.matsim.signals.model.SignalGroup;
+import org.matsim.signals.model.SignalPlan;
+import org.matsim.signals.model.SignalSystem;
 
 public class CreateSignals {
 	

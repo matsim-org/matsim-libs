@@ -53,10 +53,10 @@ import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfig;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemConfigurationType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemControlInfoType;
 import org.matsim.jaxb.signalsystemsconfig11.XMLSignalSystemPlanType;
-import org.matsim.signalsystems.SignalSystemConfigurationsReader11;
-import org.matsim.signalsystems.data.ambertimes.v10.AmberTimesWriter10;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlWriter20;
-import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.contrib.signals.SignalSystemConfigurationsReader11;
+import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesWriter10;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
+import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.xml.sax.SAXException;
 
 

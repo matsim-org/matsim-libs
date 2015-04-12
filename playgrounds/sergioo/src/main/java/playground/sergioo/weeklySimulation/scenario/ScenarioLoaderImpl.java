@@ -42,8 +42,8 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioLoader;
+import org.matsim.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 

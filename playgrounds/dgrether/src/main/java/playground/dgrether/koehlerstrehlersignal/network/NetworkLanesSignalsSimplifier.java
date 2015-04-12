@@ -40,10 +40,10 @@ import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signals.data.SignalsData;
+import org.matsim.signals.data.signalsystems.v20.SignalData;
+import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signals.model.SignalSystem;
 
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 

@@ -41,6 +41,11 @@
 			<artifactId>jts</artifactId>
 			<version>1.13</version>
 		</dependency>
+	<dependency>
+		<groupId>org.matsim.contrib</groupId>
+		<artifactId>signals</artifactId>
+		<version>0.7.0-SNAPSHOT</version>
+	</dependency>
 	</dependencies>
 
 </project>

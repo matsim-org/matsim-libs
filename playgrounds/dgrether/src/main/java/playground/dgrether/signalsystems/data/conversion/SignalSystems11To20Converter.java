@@ -49,10 +49,10 @@ import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.signalsystems.MatsimSignalSystemsReader;
-import org.matsim.signalsystems.SignalSystemsReader11;
-import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsWriter20;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsWriter20;
+import org.matsim.contrib.signals.MatsimSignalSystemsReader;
+import org.matsim.contrib.signals.SignalSystemsReader11;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsWriter20;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsWriter20;
 import org.xml.sax.SAXException;
 
 

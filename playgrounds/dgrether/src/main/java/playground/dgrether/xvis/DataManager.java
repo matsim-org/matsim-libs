@@ -19,7 +19,7 @@
 package playground.dgrether.xvis;
 
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signals.data.SignalsData;
 
 import playground.dgrether.xvis.vismodel.VisScenario;
 import playground.dgrether.xvis.vismodel.VisScenarioBuilder;

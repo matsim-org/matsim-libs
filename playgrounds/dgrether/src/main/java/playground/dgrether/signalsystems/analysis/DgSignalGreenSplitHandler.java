@@ -26,7 +26,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.api.experimental.events.handler.SignalGroupStateChangedEventHandler;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signals.model.SignalSystem;
 
 
 

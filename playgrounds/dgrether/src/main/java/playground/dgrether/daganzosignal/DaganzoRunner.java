@@ -34,7 +34,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signals.model.SignalSystem;
 
 import playground.dgrether.analysis.charts.DgTravelTimeCalculatorChart;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;

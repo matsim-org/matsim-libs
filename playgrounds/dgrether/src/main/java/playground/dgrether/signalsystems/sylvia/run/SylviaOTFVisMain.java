@@ -29,11 +29,11 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
-import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.mobsim.QSimSignalEngine;
-import org.matsim.signalsystems.mobsim.SignalEngine;
-import org.matsim.signalsystems.model.SignalSystemsManager;
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
+import org.matsim.contrib.signals.builder.FromDataBuilder;
+import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
+import org.matsim.contrib.signals.mobsim.SignalEngine;
+import org.matsim.signals.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 

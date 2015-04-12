@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signalsystems.model.DatabasedSignalPlan;
-import org.matsim.signalsystems.model.SignalGroup;
-import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.contrib.signals.model.DatabasedSignalPlan;
+import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.signals.model.SignalGroup;
+import org.matsim.signals.model.SignalPlan;
 
 
 /**

@@ -29,8 +29,9 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.signalsystems.model.SignalGroupState;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signals.model.SignalGroupState;
+import org.matsim.signals.model.SignalSystem;
+
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 import playground.dgrether.signalsystems.analysis.DgGreenSplitWriter;
 import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;

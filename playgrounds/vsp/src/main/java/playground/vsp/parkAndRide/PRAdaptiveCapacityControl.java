@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.signalsystems.mobsim.SignalizeableItem;
-import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signals.mobsim.SignalizeableItem;
+import org.matsim.signals.model.SignalGroupState;
 
 /**
  * An adaptive traffic light observing the number of vehicles per park-and-ride facility.

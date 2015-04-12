@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus.scripts;
 
-import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.data.conversion.SignalConfig11ToControl20Converter;
@@ -68,7 +67,7 @@ public class DgCottbusFileConverter {
 		signalControl20 = inputDir + "signalControlCottbusT90_v2.0.xml";
 		amberTimes10 = inputDir + "amberTimesCottbus_v1.0.xml";
 
-		new LaneDefinitonsV11ToV20Converter().convert(lanes, lanes20, network);
+//		new LaneDefinitonsV11ToV20Converter().convert(lanes, lanes20, network);
 		new SignalSystems11To20Converter().convert(lanes, signalSystems, signalSystems20, signalGroups20);
 		new SignalConfig11ToControl20Converter().convert(signalSystemConfigurations, signalControl20, amberTimes10);
 

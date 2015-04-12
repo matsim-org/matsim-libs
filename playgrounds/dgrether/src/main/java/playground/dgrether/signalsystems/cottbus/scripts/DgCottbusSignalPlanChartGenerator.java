@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signals.model.SignalSystem;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.utils.DgSignalEventsCollector;

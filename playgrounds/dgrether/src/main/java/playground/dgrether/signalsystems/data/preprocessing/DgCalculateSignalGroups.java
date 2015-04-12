@@ -36,14 +36,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
-import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsDataFactory;
-import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsDataImpl;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.signals.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.signals.data.signalgroups.v20.SignalGroupsDataFactory;
+import org.matsim.signals.data.signalsystems.v20.SignalData;
+import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signals.model.SignalGroup;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsDataImpl;
 
 
 /**

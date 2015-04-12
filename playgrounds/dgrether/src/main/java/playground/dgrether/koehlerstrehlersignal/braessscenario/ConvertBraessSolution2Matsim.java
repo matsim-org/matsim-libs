@@ -6,9 +6,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioLoader;
-import org.matsim.signalsystems.data.SignalsScenarioWriter;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsScenarioWriter;
+import org.matsim.signals.data.SignalsData;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.analysis.AnalyzeBraessSimulation;

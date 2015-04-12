@@ -30,17 +30,17 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesData;
-import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesDataImpl;
-import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesWriter10;
-import org.matsim.signalsystems.data.intergreens.v10.IntergreensForSignalSystemData;
-import org.matsim.signalsystems.data.intergreens.v10.IntergreensForSignalSystemDataImpl;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataImpl;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlReader20;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesDataImpl;
+import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesWriter10;
+import org.matsim.contrib.signals.data.intergreens.v10.IntergreensForSignalSystemDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlReader20;
+import org.matsim.signals.data.intergreens.v10.IntergreenTimesData;
+import org.matsim.signals.data.intergreens.v10.IntergreensForSignalSystemData;
+import org.matsim.signals.data.signalcontrol.v20.SignalControlData;
+import org.matsim.signals.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.signals.data.signalcontrol.v20.SignalSystemControllerData;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.utils.DgSignalGroupSettingsDataOnsetComparator;
