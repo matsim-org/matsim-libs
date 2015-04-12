@@ -36,7 +36,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.CountsModule;
 import org.matsim.population.VspPlansCleanerModule;
 import org.matsim.pt.counts.PtCountsModule;
-import org.matsim.signalsystems.controler.SignalsModule;
 
 public class ControlerDefaultsModule extends AbstractModule {
     @Override
@@ -55,6 +54,5 @@ public class ControlerDefaultsModule extends AbstractModule {
         include(new CountsModule());
         include(new PtCountsModule());
         include(new VspPlansCleanerModule());
-        include(new SignalsModule());
     }
 }

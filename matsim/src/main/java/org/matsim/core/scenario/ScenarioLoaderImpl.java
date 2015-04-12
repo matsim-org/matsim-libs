@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -38,12 +40,8 @@ import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
-
-import java.io.File;
 
 /**
  * Loads elements of Scenario from file. Non standardized elements
@@ -316,9 +314,10 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadSignalSystems() {
-		this.scenario.addScenarioElement(
-				SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(this.config.signalSystems()).loadSignalsData());
+		log.error("SignalsData is no longer loaded by this method. \n "
+				+ "If you do not use the default signals initialization code that is provided in the contrib, "
+				+ "make sure you add the following line after you have loaded the scenario: \n "
+		        + "  scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData()); \n ");
 	}
 
 }

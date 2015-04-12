@@ -23,9 +23,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.signalsystems.model.SignalGroup;
-import org.matsim.signalsystems.model.SignalGroupState;
-import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signals.model.SignalGroup;
+import org.matsim.signals.model.SignalGroupState;
+import org.matsim.signals.model.SignalSystem;
 
 
 /**

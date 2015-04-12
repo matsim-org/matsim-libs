@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.signalsystems.model.SignalGroupState;
-import org.matsim.signalsystems.vis.VisSignal;
+import org.matsim.signals.model.SignalGroupState;
+import org.matsim.signals.vis.VisSignal;
 
 
 /**

@@ -51,9 +51,9 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTimesInvertedNetProxy;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.utils.LanesTurnInfoBuilder;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.utils.SignalsTurnInfoBuilder;
+import org.matsim.signals.SignalsTurnInfoBuilder;
+import org.matsim.signals.data.SignalsData;
+import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
 
 /**
  * This leg router takes travel times needed for turning moves into account. This is done by a routing on an inverted
