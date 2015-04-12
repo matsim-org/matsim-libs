@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>contrib</artifactId>
@@ -48,10 +49,17 @@
 			<artifactId>jogl-all-main</artifactId>
 			<version>2.0-rc11</version>
 		</dependency>
-        <dependency>
-            <groupId>org.jdesktop.swingx</groupId>
-            <artifactId>jxmapviewer2</artifactId>
-            <version>1.3.1</version>
-        </dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>signals</artifactId>
+			<version>0.7.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jdesktop.swingx</groupId>
+			<artifactId>jxmapviewer2</artifactId>
+			<version>1.3.1</version>
+		</dependency>
 	</dependencies>
 </project>

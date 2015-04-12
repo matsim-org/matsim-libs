@@ -23,6 +23,7 @@ package org.matsim.contrib.grips.visualization;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,9 +31,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.mobsim.QSimSignalEngine;
-import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
@@ -77,7 +75,7 @@ public class OTFVisVisualization {
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
-			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
+			SignalEngine engine = new org.matsim.contrib.signals.mobsim.QSimSignalEngine(new org.matsim.contrib.signals.builder.FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
 

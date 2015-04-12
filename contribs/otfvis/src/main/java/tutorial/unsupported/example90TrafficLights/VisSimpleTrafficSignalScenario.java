@@ -21,7 +21,7 @@ package tutorial.unsupported.example90TrafficLights;
 
 import org.matsim.contrib.otfvis.OTFVis;
 
-import tutorial.programming.trafficSignals.RunCreateTrafficSignalScenarioExample;
+import tutorial.trafficsignals.RunCreateTrafficSignalScenarioExample;
 
 
 
@@ -31,7 +31,7 @@ import tutorial.programming.trafficSignals.RunCreateTrafficSignalScenarioExample
  * 
  * @author dgrether
  *
- * @see org.matsim.signalsystems
+ * @see org.matsim.signals
  * @see http://matsim.org/node/384
  *
  */

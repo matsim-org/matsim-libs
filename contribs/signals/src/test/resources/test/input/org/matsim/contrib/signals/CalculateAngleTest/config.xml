@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "./dtd/config_v1.dtd"
+	[
+		<!ENTITY INPUTBASE    "./test/input/org/matsim/contrib/signals/CalculateAngleTest">
+		<!ENTITY OUTPUTBASE   "./output/angletest">
+	]
+>
+
+<config>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="&INPUTBASE;/network.xml.gz" />
+	</module>
+
+</config>

@@ -21,14 +21,14 @@ package tutorial.unsupported.example90TrafficLights;
 
 import org.matsim.contrib.otfvis.OTFVis;
 
-import tutorial.programming.trafficSignals.RunCreateTrafficSignalScenarioWithLanesExample;
+import tutorial.trafficsignals.RunCreateTrafficSignalScenarioWithLanesExample;
 
 /**
  * This class contains a simple example how to visualize a scenario with lanes and signalized intersections.
  * 
  * @author dgrether
  * 
- * @see org.matsim.signalsystems
+ * @see org.matsim.signals
  * @see http://matsim.org/node/384
  */
 public class VisTrafficSignalScenarioWithLanes {
