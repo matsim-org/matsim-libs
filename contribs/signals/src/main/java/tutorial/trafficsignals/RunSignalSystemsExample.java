@@ -19,63 +19,64 @@
  * *********************************************************************** */
 package tutorial.trafficsignals;
 
+import java.io.File;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.controler.DefaultSignalsControllerListenerFactory;
 import org.matsim.contrib.signals.controler.SignalsControllerListenerFactory;
+import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.signals.data.SignalsData;
 
 
 /**
+ * Configures and runs MATSim with traffic signals. 
+ * 
  * @author dgrether
  *
  */
 public class RunSignalSystemsExample {
 
 	/**
-	 * @param args
+	 * @param args is ignored
 	 */
 	public static void main(String[] args) {
-		
-		// ---
-		
-		Config config = ConfigUtils.loadConfig("examples/equil-extended/config.xml") ;
+		File f = new File("t");
+		System.out.println(f.getAbsolutePath());
+		Config config = ConfigUtils.loadConfig("./../../matsim/examples/equil-extended/config.xml") ;
 		
 		config.controler().setLastIteration(0); // use higher values if you want to iterate
 		
-		config.network().setInputFile("examples/equil-extended/network.xml");
+		config.network().setInputFile("./../../matsim/examples/equil-extended/network.xml");
 		
-		config.plans().setInputFile("examples/equil-extended/plans100.xml");
+		config.plans().setInputFile("./../../matsim/examples/equil-extended/plans100.xml");
 		
-		// the following makes matsim _load_ the signalSystems files, but not to do anything with them:
+		// the following makes the contrib load  the signalSystems files, but not to do anything with them:
 		// (this switch will eventually go away)
 		config.scenario().setUseSignalSystems(true);
 		
 		// these are the paths to the signal systems definition files:
-		config.signalSystems().setSignalSystemFile("examples/equil-extended/signalSystems_v2.0.xml");
-		config.signalSystems().setSignalGroupsFile("examples/equil-extended/signalGroups_v2.0.xml");
-		config.signalSystems().setSignalControlFile("examples/equil-extended/signalControl_v2.0.xml");
+		config.signalSystems().setSignalSystemFile("./../../matsim/examples/equil-extended/signalSystems_v2.0.xml");
+		config.signalSystems().setSignalGroupsFile("./../../matsim/examples/equil-extended/signalGroups_v2.0.xml");
+		config.signalSystems().setSignalControlFile("./../../matsim/examples/equil-extended/signalControl_v2.0.xml");
 		
 //		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 //		config.controler().setLinkToLinkRoutingEnabled(true);
-		
-		
-		// ---
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
 		// ---
 
+		// add the signals module to the simulation:
 		Controler c = new Controler( scenario );
-
-		// add the signals controller to the simulation:
-		final SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory() ;
-        c.addControlerListener(signalsFactory.createSignalsControllerListener());
-
-        c.setOverwriteFiles(true);
+		c.addOverridingModule(new SignalsModule());
 		
+		//do it, do it, do it, now
+		c.setOverwriteFiles(true);
 		c.run();
 	}
 
