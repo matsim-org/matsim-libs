@@ -14,10 +14,6 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -110,16 +106,6 @@ public class BkVisLiveFromLastIteration {
 			config.network().setLaneDefinitionsFile(
 					oldConfControlerIO.getOutputFilename(Controler.FILENAME_LANES));
 		}
-		if (config.scenario().isUseSignalSystems()) {
-			config.signalSystems().setSignalSystemFile(
-					oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_SYSTEMS));
-			config.signalSystems().setSignalGroupsFile(
-					oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_GROUPS));
-			config.signalSystems().setSignalControlFile(
-					oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_CONTROL));
-			config.signalSystems().setAmberTimesFile(
-					oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_AMBER_TIMES));
-		}
 
 		log.info("Complete config dump:");
 		StringWriter writer = new StringWriter();
@@ -144,13 +130,6 @@ public class BkVisLiveFromLastIteration {
 		EventsManager events = EventsUtils.createEventsManager();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(sc.getConfig().controler().getOutputDirectory(), true);
 		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(sc, events);
-		if (sc.getConfig().scenario().isUseSignalSystems()) {
-			SignalEngine engine = new QSimSignalEngine(
-					new FromDataBuilder(sc, events)
-							.createAndInitializeSignalSystemsManager());
-			otfVisQSim.addQueueSimulationListeners(engine);
-		}
-
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, sc, events, otfVisQSim);
 		OTFClientLive.run(config, server);
