@@ -26,6 +26,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.SignalsDataImpl;
+import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.signals.data.SignalsData;
 import org.matsim.signals.data.signalgroups.v20.SignalGroupData;
