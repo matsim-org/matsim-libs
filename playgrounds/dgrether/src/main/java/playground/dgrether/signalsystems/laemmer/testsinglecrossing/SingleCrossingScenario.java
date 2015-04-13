@@ -22,7 +22,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.contrib.signals.SignalUtils;
 import org.matsim.signals.data.SignalsData;
 import org.matsim.signals.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signals.data.signalcontrol.v20.SignalControlDataFactory;
@@ -37,6 +36,7 @@ import org.matsim.signals.model.SignalGroup;
 import org.matsim.signals.model.SignalPlan;
 import org.matsim.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.dgrether.DgPaths;

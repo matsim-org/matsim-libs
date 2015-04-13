@@ -59,10 +59,10 @@ import org.matsim.signals.model.Signal;
 import org.matsim.signals.model.SignalGroup;
 import org.matsim.signals.model.SignalPlan;
 import org.matsim.signals.model.SignalSystem;
-import org.matsim.contrib.signals.SignalUtils;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.contrib.signals.utils.SignalUtils;
 
 import playground.dgrether.DgPaths;
 
