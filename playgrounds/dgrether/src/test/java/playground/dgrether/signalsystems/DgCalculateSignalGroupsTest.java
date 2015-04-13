@@ -48,6 +48,7 @@ import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
 import org.matsim.signals.data.SignalsData;
 import org.matsim.signals.data.signalgroups.v20.SignalGroupData;
@@ -242,6 +243,7 @@ public class DgCalculateSignalGroupsTest {
 
 		//load the network
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(scenario.getConfig().signalSystems()).loadSignalsData());
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 //		
 		//calculate the signal groups
