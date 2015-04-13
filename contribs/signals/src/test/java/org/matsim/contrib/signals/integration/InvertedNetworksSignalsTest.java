@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.integration.invertednetworks;
+package org.matsim.contrib.signals.integration;
 
 import junit.framework.Assert;
 
@@ -29,6 +29,7 @@ import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.integration.invertednetworks.InvertedNetworkRoutingTestEventHandler;
 import org.matsim.signals.data.SignalsData;
 import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signals.data.signalsystems.v20.SignalData;

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.integration.signalsystems;
+package org.matsim.contrib.signals.integration;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;

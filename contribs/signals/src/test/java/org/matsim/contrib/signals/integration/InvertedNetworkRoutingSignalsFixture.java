@@ -17,12 +17,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.integration.invertednetworks;
+package org.matsim.contrib.signals.integration;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.SignalsDataImpl;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.integration.invertednetworks.InvertedNetworkRoutingTestFixture;
 import org.matsim.signals.data.SignalsData;
 import org.matsim.signals.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signals.data.signalcontrol.v20.SignalControlDataFactory;
