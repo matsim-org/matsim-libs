@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<signalSystems xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/signalSystems_v2.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <signalSystem id="2">
+        <signals>
+            <signal linkIdRef="4" id="2">
+                <lane refId="2"/>
+                <lane refId="1"/>
+                <turningMoveRestrictions>
+                    <toLink refId="3"/>
+                </turningMoveRestrictions>
+            </signal>
+            <signal linkIdRef="3" id="1">
+                <lane refId="1"/>
+            </signal>
+        </signals>
+    </signalSystem>
+    <signalSystem id="1">
+        <signals>
+            <signal linkIdRef="2" id="2">
+                <turningMoveRestrictions>
+                    <toLink refId="3"/>
+                </turningMoveRestrictions>
+            </signal>
+            <signal linkIdRef="1" id="1"/>
+        </signals>
+    </signalSystem>
+</signalSystems>

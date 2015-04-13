@@ -1,0 +1,63 @@
+2015-04-12 22:37:44,197  WARN PlanCalcScoreConfigGroup$ReflectiveDelegate:956 Setting pathSizeLogitBeta different from zero is experimental.  KN, Sep'08
+2015-04-12 22:37:45,184 ERROR ScenarioLoaderImpl:317 SignalsData is no longer loaded by this method. 
+ If you do not use the default signals initialization code that is provided in the contrib, make sure you add the following line after you have loaded the scenario: 
+   scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData()); 
+ 
+2015-04-12 22:37:45,264  WARN VspConfigConsistencyCheckerImpl:62 found `typicalDurationScoreComputation == uniform'; vsp should try out `relative'. 
+2015-04-12 22:37:45,264  WARN VspConfigConsistencyCheckerImpl:62 found `typicalDurationScoreComputation == uniform'; vsp should try out `relative'. 
+2015-04-12 22:37:45,264  WARN VspConfigConsistencyCheckerImpl:109 You have no strategy configured that uses ChangeExpBeta. vsp default is to use ChangeExpBeta at least in one strategy.
+2015-04-12 22:37:45,265  WARN VspConfigConsistencyCheckerImpl:123 timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This means you have to add the following lines to your config file: 
+2015-04-12 22:37:45,265  WARN VspConfigConsistencyCheckerImpl:124 <module name="TimeAllocationMutator">
+2015-04-12 22:37:45,265  WARN VspConfigConsistencyCheckerImpl:125 	<param name="mutationRange" value="7200.0" />
+2015-04-12 22:37:45,265  WARN VspConfigConsistencyCheckerImpl:126 </module>
+2015-04-12 22:37:45,265  WARN VspConfigConsistencyCheckerImpl:132 timeAllocationMutator is affecting duration; vsp default is to not do that.  This will be more strictly enforced in the future. This means you have to add the following lines to your config file: 
+2015-04-12 22:37:45,265  WARN VspConfigConsistencyCheckerImpl:134 <module name="TimeAllocationMutator">
+2015-04-12 22:37:45,265  WARN VspConfigConsistencyCheckerImpl:135 	<param name="affectingDuration" value="false" />
+2015-04-12 22:37:45,265  WARN VspConfigConsistencyCheckerImpl:136 </module>
+2015-04-12 22:37:45,265  WARN VspConfigConsistencyCheckerImpl:143 You are not removing unnecessary plan attributes; vsp default is to do that.
+2015-04-12 22:37:45,265  WARN VspConfigConsistencyCheckerImpl:179 You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual problems during paper writing.) This means you have to add the following lines to your config file: 
+2015-04-12 22:37:45,266  WARN VspConfigConsistencyCheckerImpl:181 <module name="planCalcScore">
+2015-04-12 22:37:45,266  WARN VspConfigConsistencyCheckerImpl:182 	<param name="BrainExpBeta" value="1.0" />
+2015-04-12 22:37:45,266  WARN VspConfigConsistencyCheckerImpl:183 </module>
+2015-04-12 22:37:45,268  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:45,270  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:45,768  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:45,770  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:45,772  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:45,774  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:46,349  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:46,352  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:46,354  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:46,356  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:46,941  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:46,942  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:46,944  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:46,946  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:47,513  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:47,515  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:47,517  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:47,519  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:48,032  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:48,034  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:48,036  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:48,037  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:48,559  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:48,562  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:48,564  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:48,566  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:49,100  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:49,102  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:49,104  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:49,106  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:49,722  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:49,725  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:49,728  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:49,730  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:50,330  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:50,332  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:50,334  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:50,336  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:50,952  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:50,954  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:50,957  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.
+2015-04-12 22:37:50,959  WARN LinkToLinkTripRouterFactory:74 Link to link routing only affects car legs, which is correct if turning move costs only affect rerouting of car legs.

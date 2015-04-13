@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<amberTimes xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/amberTimes_v1.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <globalDefaults>
+        <redAmber seconds="1"/>
+        <amber seconds="4"/>
+        <amberTimeGreen proportion="0.3"/>
+    </globalDefaults>
+    <signalSystem refId="1">
+        <systemDefaults>
+            <redAmber seconds="1"/>
+            <amber seconds="4"/>
+        </systemDefaults>
+        <signal refId="1">
+            <redAmber seconds="2"/>
+            <amber seconds="4"/>
+        </signal>
+    </signalSystem>
+</amberTimes>

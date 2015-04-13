@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<intergreenTimes xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/intergreenTimes_v1.0.xsd" xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <signalSystem refId="42">
+        <endingSignalGroup refId="2">
+            <beginningSignalGroup timeSeconds="3" refId="1"/>
+        </endingSignalGroup>
+        <endingSignalGroup refId="1">
+            <beginningSignalGroup timeSeconds="5" refId="2"/>
+        </endingSignalGroup>
+    </signalSystem>
+    <signalSystem refId="23">
+        <endingSignalGroup refId="1">
+            <beginningSignalGroup timeSeconds="3" refId="3"/>
+            <beginningSignalGroup timeSeconds="5" refId="2"/>
+            <beginningSignalGroup timeSeconds="3" refId="4"/>
+        </endingSignalGroup>
+    </signalSystem>
+</intergreenTimes>
