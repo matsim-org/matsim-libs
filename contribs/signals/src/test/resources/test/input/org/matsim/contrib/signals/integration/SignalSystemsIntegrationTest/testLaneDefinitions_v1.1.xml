@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<laneDefinitions xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.matsim.org/files/dtd">
+    <lanesToLinkAssignment linkIdRef="6">
+        <lane id="1">
+            <toLink refId="9"/>
+            <representedLanes number="1"/>
+            <length meter="45.0"/>
+        </lane>
+        <lane id="2">
+            <toLink refId="3"/>
+            <representedLanes number="2"/>
+            <length meter="45.0"/>
+        </lane>
+        <lane id="3">
+            <toLink refId="5"/>
+            <representedLanes number="1"/>
+            <length meter="45.0"/>
+        </lane>
+    </lanesToLinkAssignment>
+    <lanesToLinkAssignment linkIdRef="4">
+        <lane id="4">
+            <toLink refId="7"/>
+            <representedLanes number="1"/>
+            <length meter="45.0"/>
+        </lane>
+        <lane id="56">
+            <toLink refId="9"/>
+            <toLink refId="3"/>
+            <representedLanes number="1"/>
+            <length meter="45.0"/>
+        </lane>
+    </lanesToLinkAssignment>
+    <lanesToLinkAssignment linkIdRef="2">
+        <lane id="7">
+            <toLink refId="5"/>
+            <representedLanes number="1"/>
+            <length meter="45.0"/>
+        </lane>
+        <lane id="8">
+            <toLink refId="7"/>
+            <representedLanes number="2"/>
+            <length meter="45.0"/>
+        </lane>
+        <lane id="9">
+            <toLink refId="9"/>
+            <representedLanes number="1"/>
+            <length meter="45.0"/>
+        </lane>
+    </lanesToLinkAssignment>
+    <lanesToLinkAssignment linkIdRef="8">
+        <lane id="10">
+            <toLink refId="3"/>
+            <representedLanes number="1"/>
+            <length meter="45.0"/>
+        </lane>
+        <lane id="1112">
+            <toLink refId="5"/>
+            <toLink refId="7"/>
+            <representedLanes number="1"/>
+            <length meter="45.0"/>
+        </lane>
+    </lanesToLinkAssignment>
+</laneDefinitions>
