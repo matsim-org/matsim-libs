@@ -176,33 +176,33 @@ public class RunBraessScenario {
 	 */
 	public static void main(String[] args) {
 
-		String date = "2015-04-01";
-		int simulationCase = 1; // 1 - base case, 2 - base case continued, 3 - changed signals
+		String date = "2015-04-13";
+		int simulationCase = 3; // 1 - base case, 2 - base case continued, 3 - changed signals
 		
 		// BASE CASE - Case 1
 		
 		String inputDir = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/";
-		String lanesFile = inputDir + "laneDefinitions_2100.xml"; // TODO attention depends on cap
-//		String lanesFile = inputDir + "laneDefinitions_v2.0.xml";
+		// attention: lanes depend on capacity and link length
+		String lanesFile = inputDir + "laneDefinitions_8640_firstLast5s.xml"; 
 		String signalSystemsFile = inputDir + "signalSystems_v2.0.xml";
 		String signalGroupsFile = inputDir + "signalGroups_v2.0.xml";
-		String signalControlFile = inputDir + "signalControl_green.xml"; // TODO attention
-//		String signalControlFile = inputDir + "signalControl_v2.0.xml";
+//		String signalControlFile = inputDir + "signalControl_green.xml";
+		String signalControlFile = inputDir + "signalControl_BC.xml";
 		String plansFile = inputDir + "plans60.xml";
 		
-		String cap = "mixSoft"; // link capacity in the network
+		String cap = "8640"; // link capacity in the network
 		
 		List<String> ttZs = new ArrayList<>(); // travel time on the middle link
-		ttZs.add("0s");
-//		ttZs.add("5s");
+//		ttZs.add("0s");
+		ttZs.add("5s");
 //		ttZs.add("10s");
 //		ttZs.add("200s");
 		
 		for (String ttZ : ttZs){
 			
 			String networkFile = inputDir + "network_" + cap + "_" + ttZ
-					+ ".xml";
+					+ "_firstLast5s.xml";
 
 			int firstIteration = 0;
 			int lastIteration = 100;
@@ -217,7 +217,7 @@ public class RunBraessScenario {
 
 			String outputDir = DgPaths.REPOS + "runs-svn/cottbus/braess/"
 					+ date + "_tbs" + timeBinSize + "_net" + cap + "-" + ttZ
-					+ "_green_basecase";
+					+ "_basecase";
 
 			RunBraessScenario controler = null;
 			if (simulationCase == 1) {
@@ -261,9 +261,9 @@ public class RunBraessScenario {
 			coordNames.add("minCoord");
 			coordNames.add("greenWaveZ");
 			coordNames.add("maxCoord");
-			coordNames.add("maxCoordEmptyZ");
-			coordNames.add("maxCoordFullZ");
-			coordNames.add("minCoordFullZ");
+//			coordNames.add("maxCoordEmptyZ");
+//			coordNames.add("maxCoordFullZ");
+//			coordNames.add("minCoordFullZ");
 
 			if (simulationCase == 3) {
 				for (String coordName : coordNames) {

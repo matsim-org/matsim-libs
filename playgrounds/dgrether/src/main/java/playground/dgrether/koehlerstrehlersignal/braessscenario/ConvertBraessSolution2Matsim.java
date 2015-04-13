@@ -11,7 +11,6 @@ import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.signals.data.SignalsData;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.koehlerstrehlersignal.analysis.AnalyzeBraessSimulation;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010Solution2Matsim;

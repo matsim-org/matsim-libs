@@ -107,29 +107,30 @@ public class AnalyzeBraessSimulation {
 	public static void main(String[] args) {
 		
 		List<String> coordNames = new ArrayList<>();
-//		coordNames.add("minCoord");
-//		coordNames.add("greenWaveZ");
-//		coordNames.add("maxCoord");
+		coordNames.add("minCoord");
+		coordNames.add("greenWaveZ");
+		coordNames.add("maxCoord");
 //		coordNames.add("maxCoordEmptyZ");
 //		coordNames.add("maxCoordFullZ");
 //		coordNames.add("minCoordFullZ");
 //		coordNames.add("basecaseContinued");
-		coordNames.add("basecase");
+//		coordNames.add("basecase");
 		
 		List<String> ttZs = new ArrayList<>();
-		ttZs.add("0s");
-//		ttZs.add("5s");
+//		ttZs.add("0s");
+		ttZs.add("5s");
 //		ttZs.add("10s");
 //		ttZs.add("200s");
 		
-		String cap = "mixSoftZ";
-		String date = "2015-03-31";
+		String cap = "8640";
+		String date = "2015-04-13";
+		int tbs = 1;
 		
 		for (String coordName : coordNames){
 			for (String ttZ : ttZs){
 				String runDirectory = DgPaths.REPOS
-						+ "runs-svn/cottbus/braess/" + date + "_tbs1_net" + cap
-						+ "-" + ttZ + "_green_" + coordName + "/";
+						+ "runs-svn/cottbus/braess/" + date + "_tbs" + tbs + "_net" + cap
+						+ "-" + ttZ + "_" + coordName + "/";
 				String outputDir = runDirectory + "analysis/";
 				new File(outputDir).mkdir();
 

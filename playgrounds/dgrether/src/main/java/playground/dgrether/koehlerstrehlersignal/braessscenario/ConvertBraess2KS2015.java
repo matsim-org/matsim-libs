@@ -21,18 +21,18 @@ public class ConvertBraess2KS2015 {
 		String signalGroupsFilename = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalGroups_v2.0.xml";
 		String signalControlFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalControl_v2.0.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/signalControl_BC.xml";
 		String networkFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/network_mixSoft_0s.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/network_8640_5s_firstLast5s.xml";
 		String lanesFilename = DgPaths.REPOS
-				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/laneDefinitions_v2.0.xml";
+				+ "shared-svn/projects/cottbus/data/scenarios/braess_scenario/laneDefinitions_8640_firstLast5s.xml";
 		String populationFilename = DgPaths.REPOS
-				+ "runs-svn/cottbus/braess/2015-03-31_tbs1_netmixSoft-0s_basecase/output_plans.xml";
+				+ "runs-svn/cottbus/braess/2015-04-13_tbs1_net8640-5s_basecase/output_plans.xml";
 
 		// output files
 		String outputDirectory = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/data/optimization/braess2ks/";
-		String dateFormat = "2015-04-01";
+		String dateFormat = "2015-04-13";
 
 		/* parameters for the time interval */
 		double startTime = 8 * 3600.0;
