@@ -1,5 +1,7 @@
 package org.matsim.core.mobsim.qsim;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -12,6 +14,7 @@ import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparato
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -34,6 +37,10 @@ VisData {
 
     @Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
+    	if ( agent.getExpectedTravelTime()==Time.UNDEFINED_TIME ) {
+    		throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix behind this,"
+    				+ " since otherwise mode choice will lead to all legs teleported.  kai/mz, apr'15") ;
+    	}
 		double arrivalTime = now + agent.getExpectedTravelTime();
 		this.teleportationList.add(new Tuple<>(arrivalTime,
 				agent));
