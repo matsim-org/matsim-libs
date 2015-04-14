@@ -1,10 +1,5 @@
 package playground.balac.freefloating.qsim;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -14,7 +9,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -25,13 +19,15 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class FreeFloatingQsimFactory implements MobsimFactory{
 
-	private final static Logger log = Logger.getLogger(QSimFactory.class);
 
 	private final Scenario scenario;
 	private final Controler controler;

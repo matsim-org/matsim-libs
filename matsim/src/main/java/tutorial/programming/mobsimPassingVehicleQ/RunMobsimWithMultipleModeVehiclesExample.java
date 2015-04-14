@@ -11,7 +11,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -56,7 +55,7 @@ class RunMobsimWithMultipleModeVehiclesExample {
 	}
 
 	/**
-	 * Look into {@link QSimFactory} for the default matsim qsim factory.  This is copy and paste (and somewhat reduced).
+	 * Look into {@link org.matsim.core.mobsim.qsim.QSimUtils} for the default matsim qsim factory.  This is copy and paste (and somewhat reduced).
 	 * 
 	 * @author nagel
 	 *

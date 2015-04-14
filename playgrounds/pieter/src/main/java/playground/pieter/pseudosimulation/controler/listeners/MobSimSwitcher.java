@@ -5,9 +5,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import playground.pieter.pseudosimulation.controler.PSimControler;
-import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 
 import java.util.ArrayList;
 
@@ -101,30 +99,30 @@ public class MobSimSwitcher implements ControlerListener,
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		
+		throw new RuntimeException("Tried to fix this in the contrib version...");
 
-		if (checkExpensiveIter(event.getIteration())) {
-			log.warn("Running full queue simulation");
-			String mobsim = matsimControler.getConfig().controler().getMobsim();
-
-			if (mobsim != null) {
-				if (mobsim.equals("qsim")) {
-					matsimControler.setMobsimFactory(QSimFactory.createQSimFactory());
-					// controler.setMobsimFactory(new MentalSimFactory(ttcalc));
-				} else if (mobsim.equals("jdeqsim")) {
-//					matsimControler.setMobsimFactory(new JDEQSimulationFactory());
-
-				} 
-
-			} else {
-				matsimControler.setMobsimFactory(QSimFactory.createQSimFactory());
-			}
-		} else {
-			log.info("Running PSim");
-			matsimControler.setMobsimFactory(new PSimFactory( ));
-			psimControler.clearPlansForPseudoSimulation();
-
-		}
+//		if (checkExpensiveIter(event.getIteration())) {
+//			log.warn("Running full queue simulation");
+//			String mobsim = matsimControler.getConfig().controler().getMobsim();
+//
+//			if (mobsim != null) {
+//				if (mobsim.equals("qsim")) {
+////					matsimControler.setMobsimFactory(new QSimFactory());
+//					// controler.setMobsimFactory(new MentalSimFactory(ttcalc));
+//				} else if (mobsim.equals("jdeqsim")) {
+////					matsimControler.setMobsimFactory(new JDEQSimulationFactory());
+//
+//				}
+//
+//			} else {
+////				matsimControler.setMobsimFactory(new QSimFactory());
+//			}
+//		} else {
+//			log.info("Running PSim");
+//			matsimControler.setMobsimFactory(new PSimFactory( ));
+//			psimControler.clearPlansForPseudoSimulation();
+//
+//		}
 	}
 
 	private boolean checkExpensiveIter(int iteration) {

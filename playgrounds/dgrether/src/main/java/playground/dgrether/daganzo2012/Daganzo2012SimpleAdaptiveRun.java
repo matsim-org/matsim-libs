@@ -19,11 +19,10 @@
  * *********************************************************************** */
 package playground.dgrether.daganzo2012;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -32,9 +31,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.utils.io.IOUtils;
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 
@@ -62,18 +60,14 @@ public class Daganzo2012SimpleAdaptiveRun {
         controler.getConfig().controler().setCreateGraphs(false);
         final SimpleAdaptiveControl adaptiveControl = new SimpleAdaptiveControl();
 		addControlerListener(controler, adaptiveControl);
-		final MobsimFactory mf = QSimFactory.createQSimFactory();
-		
-		controler.setMobsimFactory(new MobsimFactory() {
-			private QSim mobsim;
 
+		controler.setMobsimFactory(new Provider<Mobsim>() {
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				mobsim = (QSim) mf.createMobsim(sc, eventsManager);
+			public Mobsim get() {
+				QSim mobsim = QSimUtils.createDefaultQSim(controler.getScenario(), controler.getEvents());
 				mobsim.addMobsimEngine(adaptiveControl);
 				return mobsim;
 			}
-			
 		});
 		
 		controler.run();

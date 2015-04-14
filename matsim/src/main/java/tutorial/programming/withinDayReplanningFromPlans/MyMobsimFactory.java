@@ -19,15 +19,15 @@
  * *********************************************************************** */
 package tutorial.programming.withinDayReplanningFromPlans;
 
-import javax.inject.Provider;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.router.TripRouter;
+
+import javax.inject.Provider;
 
 /**
  * @author nagel
@@ -43,11 +43,9 @@ public class MyMobsimFactory implements MobsimFactory {
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager events) {
-		QSim qSim = (QSim) ControlerDefaults.createDefaultQSimFactory().createMobsim(sc, events) ;
-		
+		QSim qSim = QSimUtils.createDefaultQSim(sc, events);
 		qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.tripRouterFactory.get())) ;
-
-		return qSim ;
+		return qSim;
 	}
 
 }

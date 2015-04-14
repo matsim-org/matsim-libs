@@ -20,37 +20,33 @@
 
 package org.matsim.contrib.multimodal;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.router.util.TravelTime;
 
 import java.util.Map;
 
-public class MultimodalQSimFactory implements MobsimFactory {
+public class MultimodalQSimFactory implements Provider<Mobsim> {
 
+	private Scenario scenario;
+	private EventsManager eventsManager;
 	private final Map<String, TravelTime> multiModalTravelTimes;
-	private final MobsimFactory delegateFactory;
-	
-	public MultimodalQSimFactory(Map<String, TravelTime> multiModalTravelTimes) {
-		// use a QSimFactory as default delegate
-		this(multiModalTravelTimes, QSimFactory.createQSimFactory());
-	}
 
-	public MultimodalQSimFactory(Map<String, TravelTime> multiModalTravelTimes, MobsimFactory mobsimFactory) {
+	public MultimodalQSimFactory(Scenario scenario, EventsManager eventsManager, Map<String, TravelTime> multiModalTravelTimes) {
+		this.scenario = scenario;
+		this.eventsManager = eventsManager;
 		this.multiModalTravelTimes = multiModalTravelTimes;
-		this.delegateFactory = mobsimFactory;
-	}
-	
-	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		QSim qSim = (QSim) this.delegateFactory.createMobsim(sc, eventsManager);
-        new MultiModalQSimModule(sc.getConfig(), this.multiModalTravelTimes).configure(qSim);
-        return qSim;
 	}
 
+	@Override
+	public Mobsim get() {
+		QSim qSim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		new MultiModalQSimModule(scenario.getConfig(), this.multiModalTravelTimes).configure(qSim);
+		return qSim;
+	}
 }

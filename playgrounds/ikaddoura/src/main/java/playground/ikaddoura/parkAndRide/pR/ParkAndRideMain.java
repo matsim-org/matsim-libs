@@ -24,16 +24,14 @@
 package playground.ikaddoura.parkAndRide.pR;
 
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.ikaddoura.parkAndRide.pRscoring.BvgScoringFunctionConfigGroupPR;
@@ -160,7 +158,7 @@ public class ParkAndRideMain {
 	
 	private void run() {
 		
-		Controler controler = new Controler(configFile);
+		final Controler controler = new Controler(configFile);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		
@@ -189,17 +187,15 @@ public class ParkAndRideMain {
 		prControlerListener.setAddPRtimeAllocationProb(addPRtimeAllocationProb);
 		prControlerListener.setAddPRtimeAllocationDisable(addPRtimeAllocationDisable);
 		controler.addControlerListener(prControlerListener);
-		
-		final MobsimFactory mf = QSimFactory.createQSimFactory();
-		controler.setMobsimFactory(new MobsimFactory() {
-			private QSim mobsim;
 
+		controler.setMobsimFactory(new Provider<Mobsim>() {
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				mobsim = (QSim) mf.createMobsim(sc, eventsManager);
+			public Mobsim get() {
+				QSim mobsim = QSimUtils.createDefaultQSim(controler.getScenario(), controler.getEvents());
 				mobsim.addMobsimEngine(adaptiveControl);
 				return mobsim;
 			}
+
 		});
 			
 		controler.run();

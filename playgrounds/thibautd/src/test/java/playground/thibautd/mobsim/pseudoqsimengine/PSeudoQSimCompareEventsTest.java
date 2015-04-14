@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -117,7 +116,7 @@ public class PSeudoQSimCompareEventsTest {
 									travelTime.getLinkTravelTimes(),
 									scenario.getConfig().planCalcScore() ),
 								travelTime.getLinkTravelTimes() ) ) ),
-				QSimFactory.createQSimFactory(),
+				new QSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
 				new QSimWithPseudoEngineFactory(
 					travelTime.getLinkTravelTimes() ),
@@ -125,6 +124,8 @@ public class PSeudoQSimCompareEventsTest {
 				travelTime,
 				false );
 	}
+
+
 
 	private Scenario createTestScenario(final boolean useTransit) {
 		final Config config = ConfigUtils.createConfig();

@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -58,11 +58,7 @@ public class RunOwnMobsimAgentWithPerceptionExample {
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
 			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				
-				MobsimFactory factory = QSimFactory.createQSimFactory();
-				// (one can look up often-used mobsim factories in the MobsimRegistrar class)
-
-				final QSim qsim = (QSim) factory.createMobsim(sc, eventsManager) ;
+				final QSim qsim = QSimUtils.createDefaultQSim(sc, eventsManager) ;
 				
 				// Why agent source instead of inserting them directly?  Inserting agents into activities is, in fact possible just
 				// after the QSim constructor.  However, inserting vehicles or agents into links is not.  Agentsource makes

@@ -20,37 +20,29 @@
 
 package playground.christoph.parking;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Provider;
-
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.multimodal.MultimodalQSimFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
+import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -62,7 +54,6 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.controller.ExperiencedPlansWriter;
 import org.matsim.withinday.controller.WithinDayControlerListener;
-
 import playground.christoph.parking.core.ParkingCostCalculatorImpl;
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
 import playground.christoph.parking.core.mobsim.InitialParkingSelector;
@@ -75,7 +66,11 @@ import playground.christoph.parking.withinday.replanner.ParkingSearchReplannerFa
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 
-import com.google.inject.Inject;
+import javax.inject.Provider;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class WithinDayParkingControlerListener implements StartupListener, ReplanningListener, IterationEndsListener {
 
@@ -157,7 +152,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	}
 
 	@Override
-	public void notifyStartup(StartupEvent event) {
+	public void notifyStartup(final StartupEvent event) {
 		
 		// connect facilities to links
 		new WorldConnectLocations(event.getControler().getConfig()).connectFacilitiesWithLinks(scenario.getActivityFacilities(), 
@@ -244,13 +239,18 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		 * If the multi-modal simulation is used, also wrap a MultimodalQSimFactory around it 
 		 * to also use the multi-modal simulation.
 		 */
-		MobsimFactory mobsimFactory = new ParkingQSimFactory(this.parkingInfrastructure, this.parkingRouterFactory, 
-				this.withinDayControlerListener.getWithinDayEngine(), this.parkingAgentsTracker);
-		if (this.multiModalTravelTimes != null) {
-			mobsimFactory = new MultimodalQSimFactory(this.multiModalTravelTimes, mobsimFactory);
-		}
-		event.getControler().setMobsimFactory(mobsimFactory);
-		
+
+		event.getControler().setMobsimFactory(new Provider<Mobsim>() {
+			@Override
+			public Mobsim get() {
+				MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, withinDayControlerListener.getWithinDayEngine(), parkingAgentsTracker);
+				Mobsim mobsim = mobsimFactory.createMobsim(scenario, event.getControler().getEvents());
+				if (multiModalTravelTimes != null) {
+					new MultiModalQSimModule(scenario.getConfig(), multiModalTravelTimes).configure((QSim) mobsim);
+				}
+				return mobsim;
+			}
+		});
 		this.initIdentifiers();
 		this.initReplanners();
 	}

@@ -1,10 +1,5 @@
 package playground.balac.onewaycarsharingredisgned.qsim;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -16,7 +11,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -29,12 +23,14 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfigGroup;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class OneWayCarsharingRDQsimFactory implements MobsimFactory{
 
-	private final static Logger log = Logger.getLogger(QSimFactory.class);
 
 	private final Scenario scenario;
 	private final Controler controler;

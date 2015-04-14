@@ -550,6 +550,7 @@ public class Controler extends AbstractController {
 		});
 	}
 
+	@Deprecated // use other version of this method, please
 	public final void setMobsimFactory(final MobsimFactory mobsimFactory) {
 		setMobsimFactory(new Provider<Mobsim>() {
 			@Override
