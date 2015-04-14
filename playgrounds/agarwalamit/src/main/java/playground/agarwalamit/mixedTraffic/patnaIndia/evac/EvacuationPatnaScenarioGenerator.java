@@ -77,15 +77,9 @@ public class EvacuationPatnaScenarioGenerator {
 		EvacuationNetworkGenerator net = new EvacuationNetworkGenerator(sc, evavcuationArea, safeLinkId);
 		net.run();
 		
-//		//create one opposite direction link though it does not make sense.
-//		Link el2Link = sc.getNetwork().getLinks().get(Id.createLinkId("el2"));
-//		Link el2Link_reverse = sc.getNetwork().getFactory().createLink(Id.createLinkId("el2_rev"), el2Link.getToNode(), el2Link.getFromNode());
-//		sc.getNetwork().addLink(el2Link_reverse);
-		
 		new NetworkWriter(sc.getNetwork()).write(outNetworkFile);
 		
 		// population, (home - evac)
-		
 		Scenario scOut = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		Population popOut = scOut.getPopulation();
 		PopulationFactory popFact = popOut.getFactory();
@@ -93,7 +87,8 @@ public class EvacuationPatnaScenarioGenerator {
 		for(Person p : sc.getPopulation().getPersons().values()){
 			
 			PlanElement actPe = p.getSelectedPlan().getPlanElements().get(0); // first plan element is of activity
-			Activity home = popFact.createActivityFromLinkId(((Activity)actPe).getType(), ((Activity)actPe).getLinkId());
+//			Activity home = popFact.createActivityFromLinkId(((Activity)actPe).getType(), ((Activity)actPe).getLinkId());
+			Activity home = popFact.createActivityFromCoord(((Activity)actPe).getType(), ((Activity)actPe).getCoord());
 			
 			//check if the person is in the area shape, if not leave them out
 			if(! evavcuationArea.contains(MGC.coord2Point(((Activity)actPe).getCoord()))){
