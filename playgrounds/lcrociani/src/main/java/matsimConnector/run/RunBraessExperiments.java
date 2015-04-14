@@ -26,7 +26,7 @@ import matsimConnector.utility.Constants;
 
 public class RunBraessExperiments {
 	public static void main(String [] args) {
-		
+		Constants.VIS = true;
 
 		Constants.ENVIRONMENT_FILE = "environmentGrid_Braess_WL.csv";
 		Constants.BRAESS_WL = true;

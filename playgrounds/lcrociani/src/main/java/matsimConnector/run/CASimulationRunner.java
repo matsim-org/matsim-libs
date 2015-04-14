@@ -16,6 +16,7 @@ import matsimConnector.scenario.CAEnvironment;
 import matsimConnector.scenario.CAScenario;
 import matsimConnector.utility.Constants;
 import matsimConnector.visualizer.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
+import matsimConnector.visualizer.debugger.eventsbaseddebugger.InfoBox;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -89,11 +90,15 @@ public class CASimulationRunner implements IterationStartsListener{
 		CAMobsimFactory factoryCA = new CAMobsimFactory();
 		controller.addMobsimFactory(Constants.CA_MOBSIM_MODE, factoryCA);
 
+		if (Constants.VIS) {
+			dbg = new EventBasedVisDebuggerEngine(scenario);
+			InfoBox iBox = new InfoBox(dbg, scenario);
+			dbg.addAdditionalDrawer(iBox);
+			controller.getEvents().addHandler(dbg);
+		}
+		
 		if (args.length==0){
-//						dbg = new EventBasedVisDebuggerEngine(scenario);
-//						InfoBox iBox = new InfoBox(dbg, scenario);
-//						dbg.addAdditionalDrawer(iBox);
-//						controller.getEvents().addHandler(dbg);
+
 			//			EnvironmentGrid environmentGrid = scenarioCA.getEnvironments().get(Id.create("0",CAEnvironment.class)).getContext().getEnvironmentGrid();
 			//			AgentTracker tracker = new AgentTracker(Constants.OUTPUT_PATH+"/agentTrajectories.txt",environmentGrid.getRows(),environmentGrid.getColumns());
 			//			controller.getEvents().addHandler(tracker);

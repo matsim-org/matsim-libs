@@ -24,7 +24,7 @@ import matsimConnector.utility.Constants;
 
 public class RunDaganzoExperiments {
 	public static void main(String [] args) {
-		
+		Constants.VIS = true;
 
 		Constants.ENVIRONMENT_FILE = "environmentGrid_Dag04.csv";
 		Constants.MARGINAL_SOCIAL_COST_OPTIMIZATION = true;

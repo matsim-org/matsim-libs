@@ -51,4 +51,5 @@ public class Constants {
 	public static final String COORDINATE_SYSTEM = "EPSG:3395";
 	public static String ENVIRONMENT_FILE = "environmentGrid_Braess_WL.csv";
 	public static boolean BRAESS_WL = false;
+	public static boolean VIS = false;
 }
