@@ -145,8 +145,7 @@ public class TqMatsimPlansReader{
 					if (comp1.equals(comp2)){
 						map.remove(key);
 						mapKeys.remove(key);
-						Id<Person> id = null;
-						id = id.createPersonId(key.toString());
+						Id<Person> id = Id.createPersonId(key.toString());
 						sortedMap.put(id, (Integer) value);
 						break;
 					}

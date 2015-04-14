@@ -4,8 +4,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -14,7 +12,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
@@ -23,7 +20,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.*;
-import java.util.Map.Entry;
 
 
 public class TqSumoRoutesWriter extends MatsimXmlWriter{
@@ -106,7 +102,6 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 	}
 	
 	public void writeBusStops(){
-		Iterator<?> j = transitSchedule.getFacilities().entrySet().iterator();
 		for (TransitStopFacility transStop : transitSchedule.getFacilities().values()){
 			Id<TransitStopFacility> id = transStop.getId();
 			String lane = transStop.getLinkId().toString();
@@ -131,7 +126,6 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			super.writeStartTag("person", list);
 			list.clear();
 			
-			Activity firstAct = pli.getFirstActivity();
 			Activity act = pli.getFirstActivity();
 			Activity lastAct = pli.getLastActivity();
 			Leg leg = pli.getNextLeg(act);
@@ -152,10 +146,8 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 							String routeInfo = ((GenericRouteImpl) leg.getRoute()).getRouteDescription();
 							String line = routeInfo.split("===")[2];
 							String route = routeInfo.split("===")[3];
-							Id<TransitLine> lineId = null;
-							lineId = lineId.create(line, TransitLine.class);
-							Id<TransitRoute> routeId = null;
-							routeId = routeId.create(route, TransitRoute.class);
+							Id<TransitLine> lineId = Id.create(line, TransitLine.class);
+							Id<TransitRoute> routeId = Id.create(route, TransitRoute.class);
 							
 							String lines = "";
 							Collection<Departure> departures = transitSchedule.getTransitLines().get(lineId).getRoutes().get(routeId).getDepartures().values(); 
@@ -231,8 +223,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 	}
 	
 	public List<Id<Vehicle>> getVehiclesSortedByDeparture(){
-		Id<VehicleType> vehTypeIdCar = null;
-		vehTypeIdCar = vehTypeIdCar.create("car", VehicleType.class);
+		Id<VehicleType> vehTypeIdCar = Id.create("car", VehicleType.class);
 		VehicleType vehTypeCar = new VehicleTypeImpl(vehTypeIdCar);
 		
 		for (Person p : persons) {
@@ -246,8 +237,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			
 			while (act != lastAct){
 				if (leg.getMode().equals("car")){
-					Id<Vehicle> idV = null;
-					idV = idV.create("car_" + id.toString() + "_" + nextAct.getType(), Vehicle.class);
+					Id<Vehicle> idV = Id.create("car_" + id.toString() + "_" + nextAct.getType(), Vehicle.class);
 										
 					String route = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().toString();
 					if (act.getLinkId().equals(nextAct.getLinkId()))
@@ -282,6 +272,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 					VehicleType vehType = vehicles.get(vehId).getType();
 					NetworkRoute tRoute = transitRoute.getRoute();
 					String route = tRoute.getLinkIds().toString();
+					
 					if (tRoute.getStartLinkId().equals(tRoute.getEndLinkId()))
 						route = tRoute.getStartLinkId().toString();
 					else

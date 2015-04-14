@@ -8,7 +8,7 @@ public class myControler {
 
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("examples/siouxfalls-2014/config_default.xml");
+		Config config = ConfigUtils.loadConfig("E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/config_renamed.xml");
 		Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		controler.run();
