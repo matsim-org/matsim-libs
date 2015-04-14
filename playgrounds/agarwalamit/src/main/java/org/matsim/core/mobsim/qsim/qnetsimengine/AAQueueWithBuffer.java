@@ -401,7 +401,7 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
 		flowCapacityPerTimeStepFractionalPart = flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep;
 		
-		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
+		if(this.newCapacityUpdate) flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 	}
 
 	private void calculateStorageCapacity() {
@@ -505,6 +505,7 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 
 			addToBuffer(veh, now);
 			removeVehicleFromQueue(now,veh);
+			if(seepageAllowed && veh.getDriver().getMode().equals(seepMode)) noOfSeepModeBringFwd++;
 		} // end while
 	}
 
@@ -873,7 +874,9 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 	private boolean seepageAllowed = false;
 	private String seepMode = null; 
 	private boolean isSeepModeStorageFree = false;
-
+	private int maxSeepModeAllowed = 4;
+	private int noOfSeepModeBringFwd = 0;
+	
 	private QVehicle peekFromVehQueue(){
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
@@ -887,6 +890,10 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 			//driver is present in veh and driving seep mode
 			return vehQueue.peek();
 		} else {
+			if(noOfSeepModeBringFwd == maxSeepModeAllowed) {
+				noOfSeepModeBringFwd = 0;
+				return vehQueue.peek();
+			}
 			QVehicle returnVeh = null;
 			boolean foundSeepMode = false;
 			VehicleQ<QVehicle> newVehQueue = new PassingVehicleQ();

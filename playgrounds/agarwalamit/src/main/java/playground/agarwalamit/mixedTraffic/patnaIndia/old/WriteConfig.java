@@ -29,7 +29,7 @@ public class WriteConfig {
 		Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
 
 		config.plans().setInputFile("../../../repos/runs-svn/patnaIndia/inputs/selectedPlansOnly.xml");
-		config.network().setInputFile("../../../repos/runs-svn/patnaIndia/inputs/network.xml");
+		config.network().setInputFile("../../../repos/runs-svn/patnaIndia/inputs/networkUniModal.xml");
 		config.counts().setCountsFileName("../../../repos/runs-svn/patnaIndia/inputs/counts/countsCarMotorbikeBike.xml");
 
 		config.counts().setOutputFormat("all");
@@ -139,7 +139,7 @@ public class WriteConfig {
 			config.setParam("seepage", "isSeepageAllowed", "true");
 			config.setParam("seepage", "seepMode", "bike");
 			config.setParam("seepage", "isSeepModeStorageFree", "false");
-			config.controler().setOutputDirectory("../../../repos/runs-svn/patnaIndia/run103/seepage/");
+//			config.controler().setOutputDirectory("../../../repos/runs-svn/patnaIndia/run105/");
 			config.controler().setOutputDirectory(outputDir+"/seepage/");
 			new ConfigWriter(config).write(outputDir+"/seepage/configPatna_seepage.xml");
 		} else {

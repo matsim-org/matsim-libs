@@ -1,11 +1,15 @@
 package playground.agarwalamit.mixedTraffic.patnaIndia.old;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -18,23 +22,21 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class MyFirstControler {
 
-	static final String  outputDir ="../../../repos/runs-svn/patnaIndia/run103/";
+	static final String  outputDir ="../../../repos/runs-svn/patnaIndia/run105/";
 	static final boolean seepage = true;
 	
 	public static void main(String[] args) {
 
 		WriteConfig cnfg = new WriteConfig();
 		cnfg.configRun();
+		
 		Config config = cnfg.getPatnaConfig();
 		Scenario sc = ScenarioUtils.loadScenario(config);
 
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
-		((ScenarioImpl) sc).createTransitVehicleContainer();
+		((ScenarioImpl) sc).createVehicleContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
@@ -80,6 +82,8 @@ public class MyFirstControler {
 			sc.getVehicles().addVehicle(vehicle);
 		}
 
+		sc.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
+		
 		Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(true);
