@@ -22,7 +22,6 @@
 
 package org.matsim.roadpricing;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,11 +29,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-
 import java.util.Arrays;
 
 public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
@@ -67,7 +64,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
             }
         }));
 
-        this.addControlerListener(RoadPricingControlerListener.class);
+        addControlerListenerBinding().to(RoadPricingControlerListener.class);
 
         // add the events handler to calculate the tolls paid by agents
         this.bindAsSingleton(CalcPaidToll.class);

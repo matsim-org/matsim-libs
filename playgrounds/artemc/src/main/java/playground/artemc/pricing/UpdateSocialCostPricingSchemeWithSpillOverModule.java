@@ -31,7 +31,7 @@ public class UpdateSocialCostPricingSchemeWithSpillOverModule extends AbstractMo
 	@Override
 	public void install() {
 		System.out.println();
-		addControlerListener(costUpdater.class);
+		addControlerListenerBinding().to(costUpdater.class);
 	}
 
 	private static class costUpdater implements IterationStartsListener,IterationEndsListener, ControlerListener {

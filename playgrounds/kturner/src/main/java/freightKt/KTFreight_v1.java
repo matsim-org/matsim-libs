@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.CarrierControlerListener;
+import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
@@ -198,9 +198,9 @@ public class KTFreight_v1 {
 
 		CarrierScoringFunctionFactory scoringFunctionFactory = createMyScoringFunction(scenario);
 
-		CarrierControlerListener listener = new CarrierControlerListener(carriers, null, scoringFunctionFactory) ;
+		CarrierModule listener = new CarrierModule(carriers, null, scoringFunctionFactory) ;
 		listener.setPhysicallyEnforceTimeWindowBeginnings(true);
-		ctrl.addControlerListener(listener) ;
+		ctrl.addOverridingModule(listener); ;
 
 		ctrl.run();
 	}

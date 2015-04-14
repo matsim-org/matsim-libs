@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.*;
-import org.matsim.contrib.freight.controler.CarrierControlerListener;
+import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.replanning.modules.TimeAllocationMutator;
@@ -47,7 +47,6 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
 import playground.southafrica.utilities.Header;
 
 import java.util.ArrayList;
@@ -111,9 +110,9 @@ public class MyCarrierSimulation {
 
 		controler.setOverwriteFiles(true);
 
-		CarrierControlerListener carrierController = new CarrierControlerListener(carriers, stratManFactory, scoringFactory);
+		CarrierModule carrierController = new CarrierModule(carriers, stratManFactory, scoringFactory);
 		carrierController.setPhysicallyEnforceTimeWindowBeginnings(false);
-		controler.addControlerListener(carrierController);
+		controler.addOverridingModule(carrierController);
 
 		mcs.prepareFreightOutput(controler, carriers);
 

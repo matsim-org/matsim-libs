@@ -31,6 +31,6 @@ public class LegHistogramModule extends AbstractModule {
         LegHistogram legHistogram = new LegHistogram(300);
         addEventHandler(legHistogram);
         bindToInstance(LegHistogram.class, legHistogram);
-        addControlerListener(LegHistogramListener.class);
+        addControlerListenerBinding().to(LegHistogramListener.class);
     }
 }

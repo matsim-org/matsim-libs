@@ -18,11 +18,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.freight.mobsim;
+package org.matsim.contrib.freight.controler;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.controler.CarrierControlerListener;
+import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.mobsim.DistanceScoringFunctionFactoryForTests;
+import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -32,8 +34,6 @@ import org.matsim.testcases.MatsimTestCase;
 public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 	
 	Controler controler;
-	
-	CarrierControlerListener carrierControler;
 
 	private String planFile;
 	
@@ -81,16 +81,16 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 	
 	public void testScoringInMeters(){
 //		try{
-        carrierControler = new CarrierControlerListener(planFile,new StrategyManagerFactoryForTests(controler),new DistanceScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
+        CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler),new DistanceScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
 		
-		controler.addControlerListener(carrierControler);
+		controler.addOverridingModule(carrierControler);
 		controler.setOverwriteFiles(true);
 		controler.run();
 
-		Carrier carrier1 = carrierControler.getCarriers().get(Id.create("carrier1", Carrier.class));
+		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
 		assertEquals(-170000.0,carrier1.getSelectedPlan().getScore());
 
-		Carrier carrier2 = carrierControler.getCarriers().get(Id.create("carrier2", Carrier.class));
+		Carrier carrier2 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier2", Carrier.class));
 		assertEquals(-85000.0,carrier2.getSelectedPlan().getScore());
 
 //		}

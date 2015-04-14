@@ -63,7 +63,7 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
                 bindToProviderAsSingleton(TripRouterFactory.class, MultiModalTripRouterFactoryProvider.class);
             }
         }));
-        addControlerListener(MultiModalControlerListener.class);
+        addControlerListenerBinding().to(MultiModalControlerListener.class);
         binder().bind(new TypeLiteral<Map<String, TravelTime>>() {}).toProvider(MultiModalTravelTimeLoader.class).in(Singleton.class);
         binder().bind(new TypeLiteral<Map<String, TravelTimeFactory>>() {}).toInstance(additionalTravelTimeFactories);
     }

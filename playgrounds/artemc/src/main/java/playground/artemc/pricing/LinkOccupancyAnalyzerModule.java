@@ -22,7 +22,6 @@
 
 package playground.artemc.pricing;
 
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 
@@ -34,7 +33,7 @@ public class LinkOccupancyAnalyzerModule extends AbstractModule {
     public void install() {
         bindToProviderAsSingleton(LinkOccupancyAnalyzer.class, LinkOccupancyAnalyzerProvider.class);
         addEventHandler(LinkOccupancyAnalyzer.class);
-        addControlerListener(LinkOccupancyAnalyzer.class);
+        addControlerListenerBinding().to(LinkOccupancyAnalyzer.class);
     }
 
     static class LinkOccupancyAnalyzerProvider implements Provider<LinkOccupancyAnalyzer> {

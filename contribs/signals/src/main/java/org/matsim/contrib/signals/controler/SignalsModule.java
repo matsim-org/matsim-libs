@@ -29,7 +29,7 @@ public class SignalsModule extends AbstractModule {
     public void install() {
         if (getConfig().scenario().isUseSignalSystems()) {
             bindTo(SignalsControllerListener.class, DefaultSignalsControllerListener.class);
-            addControlerListener(SignalsControllerListener.class);
+            addControlerListenerBinding().to(SignalsControllerListener.class);
         }
     }
 }

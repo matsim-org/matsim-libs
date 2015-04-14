@@ -28,60 +28,52 @@
 
 package org.matsim.contrib.freight.mobsim;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.freight.CarrierConfig;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 
+import javax.inject.Inject;
 import java.util.Collection;
 
 
-public class FreightQSimFactory implements MobsimFactory {
+public class FreightQSimFactory implements Provider<Mobsim> {
 
+	private final Scenario scenario;
+	private EventsManager eventsManager;
 	private CarrierAgentTracker carrierAgentTracker;
-	
-	private boolean physicallyEnforceTimeWindowBeginnings = false;
+	private CarrierConfig carrierConfig;
 
-	public FreightQSimFactory(CarrierAgentTracker carrierAgentTracker) {
+	@Inject
+	public FreightQSimFactory(Scenario scenario, EventsManager eventsManager, CarrierAgentTracker carrierAgentTracker, CarrierConfig carrierConfig) {
+		this.scenario = scenario;
+		this.eventsManager = eventsManager;
 		this.carrierAgentTracker = carrierAgentTracker;
+		this.carrierConfig = carrierConfig;
 	}
 
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		QSimConfigGroup conf = sc.getConfig().qsim();
+	public Mobsim get() {
+		QSimConfigGroup conf = scenario.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-		final QSim sim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
+		final QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
 		Collection<MobSimVehicleRoute> vRoutes = carrierAgentTracker.createPlans();
 		FreightAgentSource agentSource = new FreightAgentSource(vRoutes, new DefaultAgentFactory(sim), sim);
 		sim.addAgentSource(agentSource);
-		if (physicallyEnforceTimeWindowBeginnings) {
+		if (carrierConfig.getPhysicallyEnforceTimeWindowBeginnings()) {
 			WithinDayActivityReScheduling withinDayActivityRescheduling = new WithinDayActivityReScheduling(agentSource, carrierAgentTracker);
 			sim.addQueueSimulationListeners(withinDayActivityRescheduling);
 			sim.addMobsimEngine(withinDayActivityRescheduling);
 		}
 		return sim;
-	}
-
-	/**
-	 * Physically enforces beginnings of time windows for freight activities, i.e. freight agents
-	 * wait before closed doors until they can deliver / pick up their goods, and then take their required duration.
-	 * 
-	 * <p>The default value is false. Time windows will be ignored by the physical simulation, leaving treatment
-	 * of early arrival to the Scoring.
-	 * 
-	 * 
-	 * @param physicallyEnforceTimeWindowBeginnings
-	 * @see WithinDayActivityReScheduling
-	 */
-	public void setPhysicallyEnforceTimeWindowBeginnings(boolean physicallyEnforceTimeWindowBeginnings) {
-		this.physicallyEnforceTimeWindowBeginnings = physicallyEnforceTimeWindowBeginnings;
 	}
 
 }

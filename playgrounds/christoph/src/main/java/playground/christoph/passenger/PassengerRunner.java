@@ -95,9 +95,9 @@ public class PassengerRunner {
                     Provider<Map<String, TravelTime>> multiModalTravelTimes = getProvider(new TypeLiteral<Map<String, TravelTime>>(){});
                     WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
                     PassengerControlerHandler passengerControlerHandler = new PassengerControlerHandler(withinDayControlerListener, multiModalTravelTimes);
-                    addControlerListener(passengerControlerHandler);
-                    addControlerListener(withinDayControlerListener);
-                }
+					addControlerListenerBinding().toInstance(passengerControlerHandler);
+					addControlerListenerBinding().toInstance(withinDayControlerListener);
+				}
             });
 			
 			controler.setOverwriteFiles(true);

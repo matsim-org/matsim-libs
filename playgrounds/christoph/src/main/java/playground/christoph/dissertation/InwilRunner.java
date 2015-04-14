@@ -183,19 +183,19 @@ public class InwilRunner {
                             EvacuationControlerListener evacuationControlerListener = new EvacuationControlerListener(withinDayControlerListener,
                                     multiModalTravelTimes);
                             // Analysis stuff
-                            addControlerListener(new ActivitiesAnalyzer());
-                            addControlerListener(new TripsAnalyzer());
+							addControlerListenerBinding().toInstance(new ActivitiesAnalyzer());
+							addControlerListenerBinding().toInstance(new TripsAnalyzer());
 
-                            // Evacuation stuff
-                            addControlerListener(evacuationControlerListener);
+							// Evacuation stuff
+							addControlerListenerBinding().toInstance(evacuationControlerListener);
 
-                            // Within-day Replanning
+							// Within-day Replanning
                             withinDayControlerListener.setModesAnalyzedByTravelTimeCollector(CollectionUtils.stringToSet(TransportMode.car));
-                            addControlerListener(withinDayControlerListener);
+							addControlerListenerBinding().toInstance(withinDayControlerListener);
 
-                            // pre-configure within-day controler listener with outcomes from the multi-modal controler listener
-                            addControlerListener(preconfigureWithinDayControlerListener);
-                        }
+							// pre-configure within-day controler listener with outcomes from the multi-modal controler listener
+							addControlerListenerBinding().toInstance(preconfigureWithinDayControlerListener);
+						}
                     });
 			controler.setOverwriteFiles(true);
 			controler.run();

@@ -36,7 +36,7 @@ public class CollectSightingsModule extends AbstractModule {
         bindAsSingleton(ZoneTracker.class);
         bindToProviderAsSingleton(CallProcessTicker.class, CallProcessTickerProvider.class);
         addEventHandler(CallProcessTicker.class);
-        addControlerListener(CallControlerListener.class);
+        addControlerListenerBinding().to(CallControlerListener.class);
     }
 
     private static class CallProcessTickerProvider implements Provider<CallProcessTicker> {

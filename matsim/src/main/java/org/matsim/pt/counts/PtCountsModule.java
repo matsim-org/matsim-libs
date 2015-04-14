@@ -30,7 +30,7 @@ public class PtCountsModule extends AbstractModule {
         if (getConfig().scenario().isUseTransit()) {
             if (getConfig().ptCounts().getAlightCountsFileName() != null) {
                 // only works when all three files are defined! kai, oct'10
-                addControlerListener(new PtCountControlerListener(getConfig()));
+                addControlerListenerBinding().toInstance(new PtCountControlerListener(getConfig()));
             }
         }
     }

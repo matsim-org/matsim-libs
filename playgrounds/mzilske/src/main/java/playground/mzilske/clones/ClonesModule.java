@@ -30,7 +30,7 @@ public class ClonesModule extends AbstractModule {
     @Override
     public void install() {
         bindAsSingleton(CloneService.class, CloneServiceImpl.class);
-        addControlerListenerByProvider(ClonesControlerListener.class);
-        addControlerListenerByProvider(CloneHistogramControlerListener.class);
+        addControlerListenerBinding().toProvider(ClonesControlerListener.class);
+        addControlerListenerBinding().toProvider(CloneHistogramControlerListener.class);
     }
 }

@@ -178,7 +178,7 @@ public class CadytsRandomTrips {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        addControlerListener(LegTimesHistogramControlerListener.class);
+                        addControlerListenerBinding().to(LegTimesHistogramControlerListener.class);
                         addPlanStrategyBinding("NewRandomTrip").toProvider(RandomTripProvider.class);
                     }
                 });

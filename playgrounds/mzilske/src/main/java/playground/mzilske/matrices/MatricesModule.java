@@ -33,8 +33,8 @@ public class MatricesModule extends AbstractModule {
     public void install() {
         bindAsSingleton(Sightings.class, SightingsImpl.class);
         bindAsSingleton(ZoneTracker.LinkToZoneResolver.class, LinkIsZone.class);
-        addControlerListenerByProvider(MatrixPopulationGenerationControlerListener.class);
-        addControlerListener(MatrixResetControlerListener.class);
+        addControlerListenerBinding().toProvider(MatrixPopulationGenerationControlerListener.class);
+        addControlerListenerBinding().to(MatrixResetControlerListener.class);
         addEventHandler(IncrementMatrixCellEventHandler.class);
     }
 }

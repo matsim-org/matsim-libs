@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.contrib.freight.controler.CarrierControlerListener;
+import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.replanning.modules.ReRouteVehicles;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
@@ -98,10 +98,10 @@ final class RunFreight {
 			}
 		};
 
-		CarrierControlerListener carrierControlerListener = new CarrierControlerListener(carriers, strategyManagerFactory, scoringFunctionFactory);
+		CarrierModule carrierControlerListener = new CarrierModule(carriers, strategyManagerFactory, scoringFunctionFactory);
 		carrierControlerListener.setPhysicallyEnforceTimeWindowBeginnings(false);
 
-		controler.addControlerListener(carrierControlerListener);
+		controler.addOverridingModule(carrierControlerListener);
 		controler.run();
 	}
 

@@ -4,6 +4,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.contrib.freight.CarrierConfig;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.mobsim.CarrierAgentTracker;
@@ -48,12 +49,15 @@ public class Visualiser {
 			}
 			
 		});
-		
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
-		mobsimFactory.setPhysicallyEnforceTimeWindowBeginnings(true);
-		
+
 		EventsManager events = EventsUtils.createEventsManager();
-		Mobsim mobsim = mobsimFactory.createMobsim(scenario, events);
+
+		CarrierConfig carrierConfig = new CarrierConfig();
+		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
+
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
+
+		Mobsim mobsim = mobsimFactory.get();
 		
 		SnapshotGenerator visualizer = new SnapshotGenerator(scenario.getNetwork(), snapshotInterval, scenario.getConfig().qsim());
 		visualizer.addSnapshotWriter(otfFileWriter);
@@ -74,13 +78,16 @@ public class Visualiser {
 			}
 			
 		});
-		
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
-		mobsimFactory.setPhysicallyEnforceTimeWindowBeginnings(true);
-		
+
 		EventsManager events = EventsUtils.createEventsManager();
+
+		CarrierConfig carrierConfig = new CarrierConfig();
+		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
+
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
+
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-		Mobsim mobsim = mobsimFactory.createMobsim(scenario, events);
+		Mobsim mobsim = mobsimFactory.get();
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, (QSim) mobsim);
 		OTFClientLive.run(config, server);

@@ -25,13 +25,10 @@ package playground.artemc.pricing;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.roadpricing.*;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.Arrays;
 
 public class RoadPricingWithoutTravelDisutilityModule extends AbstractModule {
 
@@ -55,7 +52,7 @@ public class RoadPricingWithoutTravelDisutilityModule extends AbstractModule {
             bindToProviderAsSingleton(RoadPricingScheme.class, RoadPricingSchemeProvider.class);
         }
 
-        addControlerListener(RoadPricingControlerListener.class);
+        addControlerListenerBinding().to(RoadPricingControlerListener.class);
 
         // add the events handler to calculate the tolls paid by agents
         bindAsSingleton(CalcPaidToll.class);

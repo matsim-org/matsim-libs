@@ -41,7 +41,7 @@ public class LinkStatsModule extends AbstractModule {
             // says the original comment on the getter in the Controler.
             // I assume this is still true.
             bindToProviderAsSingleton(CalcLinkStats.class, CalcLinkStatsProvider.class);
-            addControlerListener(LinkStatsControlerListener.class);
+            addControlerListenerBinding().to(LinkStatsControlerListener.class);
         }
     }
 

@@ -15,7 +15,6 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -32,7 +31,7 @@ public class UpdateSocialCostPricingSchemeModule extends AbstractModule {
 	@Override
 	public void install() {
 		System.out.println();
-		addControlerListener(costUpdater.class);
+		addControlerListenerBinding().to(costUpdater.class);
 	}
 
 	private static class costUpdater implements IterationStartsListener,IterationEndsListener, ControlerListener {

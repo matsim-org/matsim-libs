@@ -29,6 +29,6 @@ public class LegTimesModule extends AbstractModule {
     public void install() {
         bindAsSingleton(CalcLegTimes.class);
         addEventHandler(CalcLegTimes.class);
-        addControlerListener(LegTimesControlerListener.class);
+        addControlerListenerBinding().to(LegTimesControlerListener.class);
     }
 }
