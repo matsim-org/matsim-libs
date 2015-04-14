@@ -63,5 +63,12 @@ public class ControlerDefaultsModule extends AbstractModule {
         include(new CountsModule());
         include(new PtCountsModule());
         include(new VspPlansCleanerModule());
+        include(new SignalsModule());
+
+    	/* Comment by kai (mz thinks it is not helpful): The framework eventually calls the above method, which calls the include 
+        * methods , which (fairly quickly) call their own install methods, etc.  Eventually, everything is resolved down to the
+        * "bindTo..." methods, which are the leaves.
+    	*/
+
     }
 }
