@@ -156,11 +156,11 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		if(handled){
 			this.agentTracker.removeAgentFromStop(passenger, fromStopFacilityId);
 			MobsimAgent planAgent = (MobsimAgent) passenger;
-//			if (planAgent instanceof PersonDriverAgentImpl) { 
+			if (planAgent instanceof PersonDriverAgentImpl) { 
 				Id<Person> agentId = planAgent.getId();
 				Id<Link> linkId = planAgent.getCurrentLinkId();
 				this.internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId) ;
-//			}
+			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
 			events.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
