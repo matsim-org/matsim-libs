@@ -44,8 +44,14 @@ import java.util.List;
  * "Designed for inheritance."
  * Extend this class, overwrite configure, and use the methods of this class to
  * install your module.
- *
+ * <p/>
  * See comments in subclasses.
+ * <p/>
+ * AbstractModule is a custom version of com.google.inject.Module, with the following differences:<ul>
+ * <li> AbstractModule is a bit more restrictive.
+ * <li> AbstractModule already has the config (as getConfig() ), which is helpful since the config contains material that
+ * has to be used to configure the controler.
+ * </ul>
  *
  * @author michaz
  */
