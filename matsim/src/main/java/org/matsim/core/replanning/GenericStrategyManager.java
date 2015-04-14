@@ -189,7 +189,7 @@ public class GenericStrategyManager<T extends BasicPlan, I> implements MatsimMan
 			GenericPlanStrategy<T, I> strategy = this.chooseStrategy(subpopName);
 
 			if (strategy==null) {
-				throw new RuntimeException("No strategy found!");
+				throw new RuntimeException("No strategy found! Have you defined at least one replanning strategy per subpopulation?");
 			}
 
 			// ... and run the strategy:
