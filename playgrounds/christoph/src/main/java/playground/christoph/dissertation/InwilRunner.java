@@ -171,7 +171,7 @@ public class InwilRunner {
                         public void install() {
                             ControlerDefaultsWithMultiModalModule controlerDefaultsWithMultiModalModule = new ControlerDefaultsWithMultiModalModule();
                             controlerDefaultsWithMultiModalModule.addAdditionalTravelTimeFactory(TransportMode.pt, new EvacuationPTTravelTimeFactory(TransportMode.pt, controler.getConfig().plansCalcRoute()));
-                            include(controlerDefaultsWithMultiModalModule);
+                            install(controlerDefaultsWithMultiModalModule);
 
                             // Get a Provider for multi-modal travel times from the Controler
                             // The multi-modal travel times object itself is created by the multi-modal module when the controler is run.

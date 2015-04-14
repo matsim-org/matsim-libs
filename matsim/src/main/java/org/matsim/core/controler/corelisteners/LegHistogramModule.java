@@ -29,8 +29,8 @@ public class LegHistogramModule extends AbstractModule {
     @Override
     public void install() {
         LegHistogram legHistogram = new LegHistogram(300);
-        addEventHandler(legHistogram);
-        bindToInstance(LegHistogram.class, legHistogram);
+        addEventHandlerBinding().toInstance(legHistogram);
+        bind(LegHistogram.class).toInstance(legHistogram);
         addControlerListenerBinding().to(LegHistogramListener.class);
     }
 }

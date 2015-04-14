@@ -20,11 +20,11 @@ import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.heterogeneity.HeterogeneityConfigGroup;
 import playground.artemc.heterogeneity.IncomeHeterogeneityWithoutTravelDisutilityModule;
 import playground.artemc.heterogeneity.TravelDisutilityIncomeHeterogeneityProviderWrapper;
+import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
+import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillOverModule;
-import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
-import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 import playground.artemc.transitRouter.TransitRouterEventsHeteroWSModule;
 import playground.artemc.transitRouter.stopStopTimes.StopStopTimeCalculator;
@@ -91,7 +91,7 @@ public class ControlerWithHeteroAndToll {
 			controler.addOverridingModule( new AbstractModule() {
 				@Override
 				public void install() {
-					bindToProvider(TravelDisutilityFactory.class, TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
+					bind(TravelDisutilityFactory.class).toProvider(TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
 				}});
 		}else{
 			log.info("No roadpricing!");
@@ -99,7 +99,7 @@ public class ControlerWithHeteroAndToll {
 			controler.addOverridingModule( new AbstractModule() {
 				@Override
 				public void install() {
-					bindToProvider(TravelDisutilityFactory.class, TravelDisutilityIncomeHeterogeneityProviderWrapper.TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider.class);
+					bind(TravelDisutilityFactory.class).toProvider(TravelDisutilityIncomeHeterogeneityProviderWrapper.TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider.class);
 				}});
 		}
 

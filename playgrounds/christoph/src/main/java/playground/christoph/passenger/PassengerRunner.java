@@ -91,7 +91,7 @@ public class PassengerRunner {
             controler.setModules(new AbstractModule() {
                 @Override
                 public void install() {
-                    include(new ControlerDefaultsWithMultiModalModule());
+                    install(new ControlerDefaultsWithMultiModalModule());
                     Provider<Map<String, TravelTime>> multiModalTravelTimes = getProvider(new TypeLiteral<Map<String, TravelTime>>(){});
                     WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
                     PassengerControlerHandler passengerControlerHandler = new PassengerControlerHandler(withinDayControlerListener, multiModalTravelTimes);

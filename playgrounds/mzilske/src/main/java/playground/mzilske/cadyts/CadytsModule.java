@@ -24,6 +24,7 @@ package playground.mzilske.cadyts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import com.google.inject.Binder;
+import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
 import org.matsim.analysis.VolumesAnalyzer;
@@ -58,12 +59,12 @@ public class CadytsModule extends AbstractModule {
     @Override
     public void install() {
         Multibinder<MeasurementLoader<Link>> measurementLoaderBinder = Multibinder.newSetBinder((Binder) binder(), new TypeLiteral<MeasurementLoader<Link>>(){});
-        bindToProviderAsSingleton(AnalyticalCalibrator.class, CalibratorProvider.class);
-        bindAsSingleton(PlanToPlanStepBasedOnEvents.class);
-        bindAsSingleton(PlansTranslator.class, PlanToPlanStepBasedOnEvents.class);
+        bind(AnalyticalCalibrator.class).toProvider(CalibratorProvider.class).in(Singleton.class);
+        bind(PlanToPlanStepBasedOnEvents.class).in(Singleton.class);
+        bind(PlansTranslator.class).to(PlanToPlanStepBasedOnEvents.class).in(Singleton.class);
         addControlerListenerBinding().to(CadytsControlerListener.class);
         addControlerListenerBinding().toProvider(MyControlerListenerProvider.class);
-        addEventHandler(PlanToPlanStepBasedOnEvents.class);
+        addEventHandlerBinding().to(PlanToPlanStepBasedOnEvents.class);
     }
 
     static class CalibratorProvider implements Provider<AnalyticalCalibrator<Link>> {

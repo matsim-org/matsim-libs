@@ -33,8 +33,8 @@ public class TripRouterModule extends AbstractModule {
 
     @Override
     public void install() {
-        include(new TripRouterFactoryModule());
-        bindToProvider(TripRouter.class, RealTripRouterProvider.class);
+        install(new TripRouterFactoryModule());
+        bind(TripRouter.class).toProvider(RealTripRouterProvider.class);
     }
 
     private static class RealTripRouterProvider implements Provider<TripRouter> {

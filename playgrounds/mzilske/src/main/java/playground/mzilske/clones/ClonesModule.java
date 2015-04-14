@@ -23,13 +23,14 @@
 package playground.mzilske.clones;
 
 
+import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
 public class ClonesModule extends AbstractModule {
 
     @Override
     public void install() {
-        bindAsSingleton(CloneService.class, CloneServiceImpl.class);
+        bind(CloneService.class).to(CloneServiceImpl.class).in(Singleton.class);
         addControlerListenerBinding().toProvider(ClonesControlerListener.class);
         addControlerListenerBinding().toProvider(CloneHistogramControlerListener.class);
     }

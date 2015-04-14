@@ -22,6 +22,7 @@
 
 package org.matsim.core.replanning;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.AbstractModule;
@@ -35,9 +36,9 @@ import java.util.Map;
 public class StrategyManagerModule extends AbstractModule {
     @Override
     public void install() {
-        include(new DefaultPlanStrategiesModule());
-        bindToProviderAsSingleton(StrategyManager.class, StrategyManagerProvider.class);
-        bindTo(ReplanningContext.class, ReplanningContextImpl.class);
+        install(new DefaultPlanStrategiesModule());
+        bind(StrategyManager.class).toProvider(StrategyManagerProvider.class).in(Singleton.class);
+        bind(ReplanningContext.class).to(ReplanningContextImpl.class);
     }
 
     private static class StrategyManagerProvider implements Provider<StrategyManager> {

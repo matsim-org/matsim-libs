@@ -22,6 +22,7 @@
 
 package org.matsim.core.controler.corelisteners;
 
+import com.google.inject.Singleton;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -40,7 +41,7 @@ public class LinkStatsModule extends AbstractModule {
             // "Do not use this, as it may not contain values in every iteration."
             // says the original comment on the getter in the Controler.
             // I assume this is still true.
-            bindToProviderAsSingleton(CalcLinkStats.class, CalcLinkStatsProvider.class);
+            bind(CalcLinkStats.class).toProvider(CalcLinkStatsProvider.class).in(Singleton.class);
             addControlerListenerBinding().to(LinkStatsControlerListener.class);
         }
     }

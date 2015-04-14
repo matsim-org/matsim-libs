@@ -26,6 +26,6 @@ import org.matsim.pt.router.TransitRouterFactory;
 public class RandomizedTransitRouterModule extends AbstractModule {
     @Override
     public void install() {
-        bindTo(TransitRouterFactory.class, RandomizedTransitRouterFactory.class);
+        bind(TransitRouterFactory.class).to(RandomizedTransitRouterFactory.class);
     }
 }

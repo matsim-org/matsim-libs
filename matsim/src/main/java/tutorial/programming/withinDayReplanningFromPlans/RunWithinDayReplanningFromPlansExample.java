@@ -19,6 +19,7 @@
 
 package tutorial.programming.withinDayReplanningFromPlans;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -31,7 +32,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
-import javax.inject.Provider;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -46,7 +46,7 @@ public class RunWithinDayReplanningFromPlansExample {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindToProvider(Mobsim.class, new Provider<Mobsim>() {
+				bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
 
 					private MyMobsimFactory myMobsimFactory = new MyMobsimFactory(new WithinDayTripRouterFactory(controler, travelTime));
 

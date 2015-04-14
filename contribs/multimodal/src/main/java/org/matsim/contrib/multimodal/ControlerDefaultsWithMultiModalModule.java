@@ -57,15 +57,17 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
     @Override
     public void install() {
         // use ControlerDefaults configuration, replacing the TripRouter with a multi-modal one
-        include(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
+        install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
             @Override
             public void install() {
-                bindToProviderAsSingleton(TripRouterFactory.class, MultiModalTripRouterFactoryProvider.class);
+                bind(TripRouterFactory.class).toProvider(MultiModalTripRouterFactoryProvider.class).in(Singleton.class);
             }
         }));
         addControlerListenerBinding().to(MultiModalControlerListener.class);
-        bind(new TypeLiteral<Map<String, TravelTime>>() {}).toProvider(MultiModalTravelTimeLoader.class).in(Singleton.class);
-        bind(new TypeLiteral<Map<String, TravelTimeFactory>>() {}).toInstance(additionalTravelTimeFactories);
+        bind(new TypeLiteral<Map<String, TravelTime>>() {
+        }).toProvider(MultiModalTravelTimeLoader.class).in(Singleton.class);
+        bind(new TypeLiteral<Map<String, TravelTimeFactory>>() {
+        }).toInstance(additionalTravelTimeFactories);
         bindMobsim().toProvider(MultimodalQSimFactory.class);
     }
 

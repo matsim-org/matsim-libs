@@ -20,6 +20,7 @@
 
 package org.matsim.integration.replanning;
 
+import com.google.inject.Singleton;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -249,13 +250,18 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
             addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    bindToProviderAsSingleton(StrategyManager.class, new Provider<StrategyManager>() {
+					bind(StrategyManager.class).toProvider(new com.google.inject.Provider<StrategyManager>() {
                         @Override
                         public StrategyManager get() {
-                            return myLoadStrategyManager();
+                            return new Provider<StrategyManager>() {
+                                    @Override
+                                    public StrategyManager get() {
+                                        return myLoadStrategyManager();
+                                    }
+                                }.get();
                         }
-                    });
-                }
+                    }).in(Singleton.class);
+				}
             });
 		}
 

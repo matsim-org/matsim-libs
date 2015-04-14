@@ -22,13 +22,14 @@
 
 package org.matsim.analysis;
 
+import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
 public class LegTimesModule extends AbstractModule {
     @Override
     public void install() {
-        bindAsSingleton(CalcLegTimes.class);
-        addEventHandler(CalcLegTimes.class);
+        bind(CalcLegTimes.class).in(Singleton.class);
+        addEventHandlerBinding().to(CalcLegTimes.class);
         addControlerListenerBinding().to(LegTimesControlerListener.class);
     }
 }

@@ -22,6 +22,7 @@
 
 package playground.mzilske.matrices;
 
+import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 import playground.mzilske.cdr.LinkIsZone;
 import playground.mzilske.cdr.Sightings;
@@ -31,10 +32,10 @@ import playground.mzilske.cdr.ZoneTracker;
 public class MatricesModule extends AbstractModule {
     @Override
     public void install() {
-        bindAsSingleton(Sightings.class, SightingsImpl.class);
-        bindAsSingleton(ZoneTracker.LinkToZoneResolver.class, LinkIsZone.class);
+        bind(Sightings.class).to(SightingsImpl.class).in(Singleton.class);
+        bind(ZoneTracker.LinkToZoneResolver.class).to(LinkIsZone.class).in(Singleton.class);
         addControlerListenerBinding().toProvider(MatrixPopulationGenerationControlerListener.class);
         addControlerListenerBinding().to(MatrixResetControlerListener.class);
-        addEventHandler(IncrementMatrixCellEventHandler.class);
+        addEventHandlerBinding().to(IncrementMatrixCellEventHandler.class);
     }
 }

@@ -297,14 +297,14 @@ public class Controler extends AbstractController {
                     public void install() {
                         // Use all the modules set with setModules, but overriding them with things set with
                         // other setters on this Controler.
-                        include(AbstractModule.override(modules, overrides));
+                        install(AbstractModule.override(modules, overrides));
 
                         // Bootstrap it with the Scenario and some controler context.
-                        bindToInstance(OutputDirectoryHierarchy.class, getControlerIO());
-                        bindToInstance(IterationStopWatch.class, stopwatch);
-                        bindToInstance(Scenario.class, scenarioData);
-                        bindToInstance(EventsManager.class, events);
-                        binder().bind(Integer.class).annotatedWith(Names.named("iteration")).toProvider(new com.google.inject.Provider<Integer>() {
+						bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
+						bind(IterationStopWatch.class).toInstance(stopwatch);
+						bind(Scenario.class).toInstance(scenarioData);
+						bind(EventsManager.class).toInstance(events);
+						binder().bind(Integer.class).annotatedWith(Names.named("iteration")).toProvider(new com.google.inject.Provider<Integer>() {
                             @Override
                             public Integer get() {
                                 return getIterationNumber();
@@ -527,7 +527,7 @@ public class Controler extends AbstractController {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindToInstance(TravelDisutilityFactory.class, travelCostCalculatorFactory);
+				bind(TravelDisutilityFactory.class).toInstance(travelCostCalculatorFactory);
 			}
 		});
 	}
@@ -536,7 +536,7 @@ public class Controler extends AbstractController {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindToProvider(Mobsim.class, mobsimProvider);
+				bind(Mobsim.class).toProvider((com.google.inject.Provider<? extends Mobsim>) mobsimProvider);
 			}
 		});
 	}
@@ -545,7 +545,7 @@ public class Controler extends AbstractController {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindToProvider(Mobsim.class, mobsimProvider);
+				bind(Mobsim.class).toProvider(mobsimProvider);
 			}
 		});
 	}
@@ -565,8 +565,8 @@ public class Controler extends AbstractController {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                bindToInstance(ScoringFunctionFactory.class, scoringFunctionFactory);
-            }
+				bind(ScoringFunctionFactory.class).toInstance(scoringFunctionFactory);
+			}
         });
 	}
 
@@ -579,8 +579,8 @@ public class Controler extends AbstractController {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                bindToInstance(TransitRouterFactory.class, transitRouterFactory);
-            }
+				bind(TransitRouterFactory.class).toInstance(transitRouterFactory);
+			}
         });
 	}
 
@@ -594,8 +594,8 @@ public class Controler extends AbstractController {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                bindToInstance(TripRouterFactory.class, factory);
-            }
+				bind(TripRouterFactory.class).toInstance(factory);
+			}
         });
 	}
 
@@ -674,7 +674,7 @@ public class Controler extends AbstractController {
 			@Override
 			public void install() {
 				if (getConfig().controler().getMobsim().equals(mobsimName)) {
-					bindToProvider(Mobsim.class, mobsimProvider);
+					bind(Mobsim.class).toProvider((com.google.inject.Provider<? extends Mobsim>) mobsimProvider);
 				}
 			}
 		});

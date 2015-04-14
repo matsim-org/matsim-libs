@@ -9,6 +9,6 @@ import org.matsim.core.router.TripRouterFactory;
 public class DefaultTripRouterFactoryForPlanGenomesModule extends AbstractModule {
     @Override
     public void install() {
-        bindTo(TripRouterFactory.class,DefaultTripRouterFactoryForPlanGenomes.class);
+        bind(TripRouterFactory.class).to(DefaultTripRouterFactoryForPlanGenomes.class);
     }
 }

@@ -173,8 +173,8 @@ public class MultiRateRunResource {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        bindToInstance(ZoneTracker.LinkToZoneResolver.class, linkToZoneResolver);
-                        bindToInstance(Sightings.class, allSightings);
+                        bind(ZoneTracker.LinkToZoneResolver.class).toInstance(linkToZoneResolver);
+                        bind(Sightings.class).toInstance(allSightings);
                     }
                 });
         CadytsAndCloneScoringFunctionFactory factory = new CadytsAndCloneScoringFunctionFactory();

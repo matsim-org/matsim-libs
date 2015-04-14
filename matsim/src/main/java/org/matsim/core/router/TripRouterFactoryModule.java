@@ -22,18 +22,19 @@
 
 package org.matsim.core.router;
 
+import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.pt.router.TransitRouterModule;
 
 public class TripRouterFactoryModule extends AbstractModule {
     @Override
     public void install() {
-        include(new LeastCostPathCalculatorModule());
-        include(new TransitRouterModule());
+        install(new LeastCostPathCalculatorModule());
+        install(new TransitRouterModule());
         if (getConfig().controler().isLinkToLinkRoutingEnabled()) {
-            bindAsSingleton(TripRouterFactory.class, LinkToLinkTripRouterFactory.class);
+            bind(TripRouterFactory.class).to(LinkToLinkTripRouterFactory.class).in(Singleton.class);
         } else {
-            bindAsSingleton(TripRouterFactory.class, DefaultTripRouterFactoryImpl.class);
+            bind(TripRouterFactory.class).to(DefaultTripRouterFactoryImpl.class).in(Singleton.class);
         }
     }
 }

@@ -164,12 +164,12 @@ public class Simulator {
 			@Override
 			public void install() {
 			
-				include(new ScenarioElementsModule());
-                include(new CharyparNagelScoringFunctionModule());
+				install(new ScenarioElementsModule());
+                install(new CharyparNagelScoringFunctionModule());
 				// include(new TravelTimeCalculatorModule());
-				include(new TravelDisutilityModule());
-				include(new TripRouterModule());
-				include(new StrategyManagerModule());
+				install(new TravelDisutilityModule());
+				install(new TripRouterModule());
+				install(new StrategyManagerModule());
 				// include(new LinkStatsModule());
 				// include(new VolumesAnalyzerModule());
 				// include(new LegHistogramModule());
@@ -180,7 +180,7 @@ public class Simulator {
 				// include(new VspPlansCleanerModule());
 				// include(new SignalsModule());
 
-				bindToInstance(TravelTime.class, MobsimConnectorFactory.getTravelTimeCalculator(1.5));
+				bind(TravelTime.class).toInstance(MobsimConnectorFactory.getTravelTimeCalculator(1.5));
 
 			}
 		});

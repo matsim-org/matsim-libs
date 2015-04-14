@@ -81,7 +81,7 @@ public class EvacuationRunner {
                     // create Controler Listeners; add them afterwards in a meaningful order
                     ControlerDefaultsWithMultiModalModule controlerDefaultsWithMultiModalModule = new ControlerDefaultsWithMultiModalModule();
                     controlerDefaultsWithMultiModalModule.addAdditionalTravelTimeFactory(TransportMode.pt, new EvacuationPTTravelTimeFactory(TransportMode.pt, controler.getConfig().plansCalcRoute()));
-                    include(controlerDefaultsWithMultiModalModule);
+                    install(controlerDefaultsWithMultiModalModule);
                     WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
                     Provider<Map<String, TravelTime>> multiModalTravelTimes = getProvider(new TypeLiteral<Map<String, TravelTime>>(){});
 

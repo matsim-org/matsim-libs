@@ -55,8 +55,8 @@ public class Main {
         AbstractModule phoneModule = new AbstractModule() {
             @Override
             public void install() {
-                bindTo(ZoneTracker.LinkToZoneResolver.class, MyLinkToZoneResolver.class);
-                bindTo(CallBehavior.class, MyCallBehavior.class);
+                bind(ZoneTracker.LinkToZoneResolver.class).to(MyLinkToZoneResolver.class);
+                bind(CallBehavior.class).to(MyCallBehavior.class);
             }
         };
 

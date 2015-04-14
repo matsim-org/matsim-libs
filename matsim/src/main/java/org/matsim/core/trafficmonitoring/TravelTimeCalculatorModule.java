@@ -22,6 +22,7 @@
 
 package org.matsim.core.trafficmonitoring;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
@@ -48,19 +49,19 @@ public class TravelTimeCalculatorModule extends AbstractModule {
         //  - will come out of the Provider below.
         // If I was in a script, I could also pass an instance directly which I created myself, but
         // here, the Scenario is not available yet, so I defer construction.
-        bindToProviderAsSingleton(TravelTimeCalculator.class, TravelTimeCalculatorProvider.class);
+        bind(TravelTimeCalculator.class).toProvider(TravelTimeCalculatorProvider.class).in(Singleton.class);
         // I declare that my single TravelTimeCalculator is an EventHandler.
         // The Controler will wire it into the EventsManager later.
         // (Again, there is a second method to add an instance directly.)
-        addEventHandler(TravelTimeCalculator.class);
+        addEventHandlerBinding().to(TravelTimeCalculator.class);
         // I export interfaces TravelTime and LinkToLinkTravelTime, and I say
         // what is behind them, see below. The Providers
         // are just getters which access the TravelTimeCalculator.
         // I don't say "asSingleton" here, because I don't need to care -
         // The TravelTimeCalculator is the singleton, and the TravelTime reference can be
         // fetched from it as often as the framework wants.
-        bindToProvider(TravelTime.class, TravelTimeProvider.class);
-        bindToProvider(LinkToLinkTravelTime.class, LinkToLinkTravelTimeProvider.class);
+        bind(TravelTime.class).toProvider(TravelTimeProvider.class);
+        bind(LinkToLinkTravelTime.class).toProvider(LinkToLinkTravelTimeProvider.class);
     }
 
     static class TravelTimeProvider implements Provider<TravelTime> {

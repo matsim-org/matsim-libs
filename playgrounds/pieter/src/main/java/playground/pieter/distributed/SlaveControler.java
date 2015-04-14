@@ -37,17 +37,13 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.vehicles.Vehicle;
-
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
-import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
-import playground.pieter.distributed.plans.PlanGenome;
-import playground.pieter.distributed.randomizedcarrouter.RandomizedCarRouterTravelTimeAndDisutilityModule;
 import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
+import playground.pieter.distributed.randomizedcarrouter.RandomizedCarRouterTravelTimeAndDisutilityModule;
 import playground.pieter.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.distributed.replanning.selectors.DiversityGeneratingPlansRemover;
-import playground.pieter.distributed.scoring.CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterEventsWSFactory;
@@ -236,15 +232,15 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             @Override
             public void install() {
 //                include(new ScoreStatsModule());
-                include(new TripRouterModule());
-                include(new CharyparNagelScoringFunctionModule());
-                include(new ScenarioElementsModule());
-                include(new StrategyManagerModule());
+                install(new TripRouterModule());
+                install(new CharyparNagelScoringFunctionModule());
+                install(new ScenarioElementsModule());
+                install(new StrategyManagerModule());
                 if (IntelligentRouters)
-                    include(new TravelDisutilityModule());
+                    install(new TravelDisutilityModule());
                 else
-                    include(new RandomizedCarRouterTravelTimeAndDisutilityModule());
-                bindToInstance(TravelTime.class, travelTime);
+                    install(new RandomizedCarRouterTravelTimeAndDisutilityModule());
+                bind(TravelTime.class).toInstance(travelTime);
                 addPlanSelectorForRemovalBinding("DiversityGeneratingPlansRemover").toProvider(DiversityGeneratingPlansRemover.Builder.class);
             }
         });

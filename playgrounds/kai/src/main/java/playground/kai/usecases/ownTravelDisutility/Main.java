@@ -22,8 +22,6 @@
  */
 package playground.kai.usecases.ownTravelDisutility;
 
-import java.util.Arrays;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -32,6 +30,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.Arrays;
 
 /**
  * @author nagel
@@ -58,7 +58,7 @@ public class Main {
 		final AbstractModule abstractModule = new AbstractModule() {
 			@Override
 			public void install() {
-				this.bindToInstance(TravelDisutility.class, travelDisutility);
+				bind(TravelDisutility.class).toInstance(travelDisutility);
 			}
 		};
 		

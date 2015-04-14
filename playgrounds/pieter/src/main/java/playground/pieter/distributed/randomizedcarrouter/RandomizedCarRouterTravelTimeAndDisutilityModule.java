@@ -15,8 +15,8 @@ import javax.inject.Provider;
 public class RandomizedCarRouterTravelTimeAndDisutilityModule extends AbstractModule {
     @Override
     public void install() {
-        bindTo(TravelDisutilityFactory.class,RandomizedCarRouterTravelTimeAndDisutilityFactory.class);
-        bindToProvider(TravelDisutility.class, TravelDisutilityProvider.class);
+        bind(TravelDisutilityFactory.class).to(RandomizedCarRouterTravelTimeAndDisutilityFactory.class);
+        bind(TravelDisutility.class).toProvider(TravelDisutilityProvider.class);
     }
 
     private static class TravelDisutilityProvider implements Provider<TravelDisutility> {

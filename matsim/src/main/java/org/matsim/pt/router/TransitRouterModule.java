@@ -22,6 +22,7 @@
 
 package org.matsim.pt.router;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
@@ -34,9 +35,9 @@ public class TransitRouterModule extends AbstractModule {
     @Override
     public void install() {
         if (getConfig().scenario().isUseTransit()) {
-            bindToProviderAsSingleton(TransitRouterFactory.class, TransitRouterFactoryProvider.class);
+            bind(TransitRouterFactory.class).toProvider(TransitRouterFactoryProvider.class).in(Singleton.class);
         } else {
-            bindTo(TransitRouterFactory.class, DummyTransitRouterFactory.class);
+            bind(TransitRouterFactory.class).to(DummyTransitRouterFactory.class);
         }
     }
 

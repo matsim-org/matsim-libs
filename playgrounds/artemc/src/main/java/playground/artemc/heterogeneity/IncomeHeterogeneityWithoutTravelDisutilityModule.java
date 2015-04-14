@@ -1,5 +1,6 @@
 package playground.artemc.heterogeneity;
 
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,9 +36,9 @@ public class IncomeHeterogeneityWithoutTravelDisutilityModule extends AbstractMo
 		// Passing parameters directly to the module until alternative solution is found. artemc
 
 		if (this.incomeHeterogeneityImpl != null) {
-			bindToInstance(IncomeHeterogeneity.class, this.incomeHeterogeneityImpl);
+			bind(IncomeHeterogeneity.class).toInstance(this.incomeHeterogeneityImpl);
 		} else {
-			bindToProviderAsSingleton(IncomeHeterogeneity.class, IncomeHeterogeneityProvider.class);
+			bind(IncomeHeterogeneity.class).toProvider(IncomeHeterogeneityProvider.class).in(Singleton.class);
 		}
 	}
 

@@ -22,6 +22,7 @@
 
 package org.matsim.core.router;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -36,7 +37,7 @@ public class LeastCostPathCalculatorModule extends AbstractModule {
 
     @Override
     public void install() {
-        bindToProviderAsSingleton(LeastCostPathCalculatorFactory.class, DefaultLeastCostPathCalculatorFactoryProvider.class);
+        bind(LeastCostPathCalculatorFactory.class).toProvider(DefaultLeastCostPathCalculatorFactoryProvider.class).in(Singleton.class);
     }
 
     static class DefaultLeastCostPathCalculatorFactoryProvider implements Provider<LeastCostPathCalculatorFactory> {

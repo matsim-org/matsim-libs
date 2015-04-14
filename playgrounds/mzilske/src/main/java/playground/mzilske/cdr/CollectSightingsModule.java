@@ -23,6 +23,7 @@
 package playground.mzilske.cdr;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 
@@ -31,11 +32,11 @@ import javax.inject.Provider;
 public class CollectSightingsModule extends AbstractModule {
     @Override
     public void install() {
-        bindTo(Sightings.class, SightingsImpl.class);
-        bindAsSingleton(CallProcess.class);
-        bindAsSingleton(ZoneTracker.class);
-        bindToProviderAsSingleton(CallProcessTicker.class, CallProcessTickerProvider.class);
-        addEventHandler(CallProcessTicker.class);
+        bind(Sightings.class).to(SightingsImpl.class);
+        bind(CallProcess.class).in(Singleton.class);
+        bind(ZoneTracker.class).in(Singleton.class);
+        bind(CallProcessTicker.class).toProvider(CallProcessTickerProvider.class).in(Singleton.class);
+        addEventHandlerBinding().to(CallProcessTicker.class);
         addControlerListenerBinding().to(CallControlerListener.class);
     }
 

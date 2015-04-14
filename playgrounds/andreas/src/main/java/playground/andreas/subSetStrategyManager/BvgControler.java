@@ -131,8 +131,8 @@ public class BvgControler extends Controler {
 
             @Override
             public void install() {
-                bindToInstance(StrategyManager.class, c.myLoadStrategyManager());
-            }
+				bind(StrategyManager.class).toInstance(c.myLoadStrategyManager());
+			}
         };
         c.addOverridingModule(myStrategyManagerModule);
         c.run();

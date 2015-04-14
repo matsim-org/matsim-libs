@@ -34,7 +34,7 @@ public class CallBehaviorModule extends org.matsim.core.controler.AbstractModule
 
     @Override
     public void install() {
-        bindToInstance(CallBehavior.class, phonerate);
-        bindToInstance(ZoneTracker.LinkToZoneResolver.class, linkToZoneResolver);
+        bind(CallBehavior.class).toInstance(phonerate);
+        bind(ZoneTracker.LinkToZoneResolver.class).toInstance(linkToZoneResolver);
     }
 }

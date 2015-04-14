@@ -61,7 +61,7 @@ public class TripRouterFactoryBuilderWithDefaults {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        bindToInstance(Scenario.class, scenario);
+                        bind(Scenario.class).toInstance(scenario);
                     }
                 })
         .getInstance(TransitRouterFactory.class);
@@ -73,7 +73,7 @@ public class TripRouterFactoryBuilderWithDefaults {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        bindToInstance(Scenario.class, scenario);
+                        bind(Scenario.class).toInstance(scenario);
                     }
                 })
         .getInstance(LeastCostPathCalculatorFactory.class);

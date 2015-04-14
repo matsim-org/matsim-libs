@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.herbie;
 
+import com.google.inject.Singleton;
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
@@ -60,13 +61,18 @@ public class HHHerbieControler extends HitchHikingControler {
         addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                bindToProviderAsSingleton(StrategyManager.class, new Provider<StrategyManager>() {
+				bind(StrategyManager.class).toProvider(new com.google.inject.Provider<StrategyManager>() {
                     @Override
                     public StrategyManager get() {
-                        return myLoadStrategyManager();
+                        return new Provider<StrategyManager>() {
+                            @Override
+                            public StrategyManager get() {
+                                return myLoadStrategyManager();
+                            }
+                        }.get();
                     }
-                });
-            }
+                }).in(Singleton.class);
+			}
         });
 	}
 

@@ -1,5 +1,6 @@
 package playground.artemc.heterogeneity;
 
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,18 +41,18 @@ public class IncomeHeterogeneityModule extends AbstractModule {
 		// Passing parameters directly to the module until alternative solution is found. artemc
 
 		if (this.incomeHeterogeneityImpl != null) {
-			bindToInstance(IncomeHeterogeneity.class, this.incomeHeterogeneityImpl);
+			bind(IncomeHeterogeneity.class).toInstance(this.incomeHeterogeneityImpl);
 		} else {
-			bindToProviderAsSingleton(IncomeHeterogeneity.class, IncomeHeterogeneityProvider.class);
+			bind(IncomeHeterogeneity.class).toProvider(IncomeHeterogeneityProvider.class).in(Singleton.class);
 		}
 
 		// use ControlerDefaults configuration, replacing the TravelDisutility with a income-dependent one
-				include(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
+				install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
 					@Override
 					public void install() {
-				bindToProvider(TravelDisutilityFactory.class, TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider.class);
-			}
-		}));
+						bind(TravelDisutilityFactory.class).toProvider(TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider.class);
+					}
+				}));
 	}
 
 	private static class IncomeHeterogeneityProvider implements Provider<IncomeHeterogeneity> {

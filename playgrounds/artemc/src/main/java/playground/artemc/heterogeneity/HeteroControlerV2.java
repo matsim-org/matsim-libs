@@ -18,11 +18,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
-import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
-import playground.artemc.heterogeneityWithToll.TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper;
-import playground.artemc.pricing.UpdateSocialCostPricingSchemeModule;
-import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
+import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
+import playground.artemc.heterogeneityWithToll.TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper;
+import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
+import playground.artemc.pricing.UpdateSocialCostPricingSchemeModule;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 import playground.artemc.transitRouter.TransitRouterEventsHeteroWSModule;
 import playground.artemc.transitRouter.stopStopTimes.StopStopTimeCalculator;
@@ -91,7 +91,7 @@ public class HeteroControlerV2 {
 		controler.addOverridingModule( new AbstractModule() {
 			@Override
 			public void install() {
-				bindToProvider(TravelDisutilityFactory.class, TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
+				bind(TravelDisutilityFactory.class).toProvider(TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
 			}});
 
 		log.info("Simulation type: "+simulationType);

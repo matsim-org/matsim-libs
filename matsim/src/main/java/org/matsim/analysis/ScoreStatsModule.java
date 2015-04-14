@@ -22,13 +22,14 @@
 
 package org.matsim.analysis;
 
+import com.google.inject.Singleton;
 import org.matsim.core.controler.AbstractModule;
 
 public class ScoreStatsModule extends AbstractModule {
     @Override
     public void install() {
-        bindAsSingleton(ScoreStatsControlerListener.class);
+        bind(ScoreStatsControlerListener.class).in(Singleton.class);
         addControlerListenerBinding().to(ScoreStatsControlerListener.class);
-        bindTo(ScoreStats.class, ScoreStatsControlerListener.class);
+        bind(ScoreStats.class).to(ScoreStatsControlerListener.class);
     }
 }

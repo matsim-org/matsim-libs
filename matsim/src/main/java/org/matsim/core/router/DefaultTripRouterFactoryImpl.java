@@ -1,9 +1,5 @@
 package org.matsim.core.router;
 
-import java.util.Collections;
-
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -11,13 +7,14 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.DefaultRoutingModules;
-import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.router.TransitRouterFactory;
+
+import javax.inject.Inject;
+import java.util.Collections;
 
 public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 
@@ -29,7 +26,7 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        bindToInstance(Scenario.class, scenario);
+                        bind(Scenario.class).toInstance(scenario);
                     }
                 })
                 .getInstance(TripRouterFactory.class);

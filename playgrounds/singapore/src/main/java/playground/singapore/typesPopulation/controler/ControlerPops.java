@@ -59,8 +59,8 @@ public class ControlerPops extends Controler {
 
             @Override
             public void install() {
-                bindToInstance(StrategyManager.class, controler.myLoadStrategyManager());
-            }
+				bind(StrategyManager.class).toInstance(controler.myLoadStrategyManager());
+			}
         };
         controler.addOverridingModule(myStrategyManagerModule);
         controler.run();

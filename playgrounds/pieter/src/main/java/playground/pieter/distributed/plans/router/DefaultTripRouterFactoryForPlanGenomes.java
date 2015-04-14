@@ -1,9 +1,5 @@
 package playground.pieter.distributed.plans.router;
 
-import java.util.Collections;
-
-import javax.inject.Inject;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -11,20 +7,15 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryModule;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.router.TransitRouterFactory;
-
-import playground.pieter.distributed.plans.PopulationFactoryForPlanGenomes;
 import playground.pieter.distributed.plans.router.old.DefaultRoutingModules;
+
+import javax.inject.Inject;
+import java.util.Collections;
 
 public class DefaultTripRouterFactoryForPlanGenomes implements TripRouterFactory {
 
@@ -36,7 +27,7 @@ public class DefaultTripRouterFactoryForPlanGenomes implements TripRouterFactory
                 new AbstractModule() {
                     @Override
                     public void install() {
-                        bindToInstance(Scenario.class, scenario);
+                        bind(Scenario.class).toInstance(scenario);
                     }
                 })
                 .getInstance(TripRouterFactory.class);

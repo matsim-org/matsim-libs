@@ -93,60 +93,14 @@ public abstract class AbstractModule {
         return bootstrapInjector.getInstance(Config.class);
     }
 
-    protected final void include(AbstractModule module) {
+    protected final void install(AbstractModule module) {
         bootstrapInjector.injectMembers(module);
         Module guiceModule = toGuiceModule(module);
         binder.install(guiceModule);
     }
 
-    protected final <T> void bindTo(Class<T> type, Class<? extends T> implementation) {
-        binder.bind(type).to(implementation);
-    }
-
-    protected final <T> void bindToInstance(Class<T> type, T instance) {
-        binder.bind(type).toInstance(instance);
-    }
-
-    protected final <T> void bindAsSingleton(Class<T> type) {
-        binder.bind(type).in(Singleton.class);
-    }
-
-    protected final <T> void bindAsSingleton(Class<T> type, Class<? extends T> implementation) {
-        binder.bind(type).to(implementation).in(Singleton.class);
-    }
-
-    protected final <T> void bindToProviderAsSingleton(Class<T> type, Class<? extends javax.inject.Provider<? extends T>> providerType) {
-        binder.bind(type).toProvider(providerType).in(Singleton.class);
-    }
-
-    protected final <T> void bindToProviderAsSingleton(Class<T> type, final javax.inject.Provider<? extends T> provider) {
-        binder.bind(type).toProvider(new com.google.inject.Provider<T>() {
-            @Override
-            public T get() {
-                return provider.get();
-            }
-        }).in(Singleton.class);
-    }
-
-    protected final <T> void bindToProvider(Class<T> type, Class<? extends javax.inject.Provider<? extends T>> providerType) {
-        binder.bind(type).toProvider(providerType);
-    }
-
-    protected final <T> void bindToProvider(Class<T> type, final javax.inject.Provider<? extends T> provider) {
-        binder.bind(type).toProvider(new com.google.inject.Provider<T>() {
-            @Override
-            public T get() {
-                return provider.get();
-            }
-        });
-    }
-
-    protected final void addEventHandler(Class<? extends EventHandler> type) {
-        eventHandlerMultibinder.addBinding().to(type);
-    }
-
-    protected final void addEventHandler(EventHandler instance) {
-        eventHandlerMultibinder.addBinding().toInstance(instance);
+    protected LinkedBindingBuilder<EventHandler> addEventHandlerBinding() {
+        return eventHandlerMultibinder.addBinding();
     }
 
     protected LinkedBindingBuilder<ControlerListener> addControlerListenerBinding() {
@@ -162,7 +116,7 @@ public abstract class AbstractModule {
     }
 
     protected final com.google.inject.binder.LinkedBindingBuilder<Mobsim> bindMobsim() {
-        return binder().bind(Mobsim.class);
+        return bind(Mobsim.class);
     }
 
     protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {

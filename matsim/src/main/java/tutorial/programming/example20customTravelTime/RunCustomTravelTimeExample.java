@@ -54,20 +54,20 @@ public class RunCustomTravelTimeExample {
                 // but leave out TravelTimeCalculator.
                 // You can just comment out these lines if you don't want them,
                 // these modules are optional.
-                include(new CharyparNagelScoringFunctionModule());
-                include(new TripRouterModule());
-                include(new StrategyManagerModule());
-                include(new LinkStatsModule());
-                include(new VolumesAnalyzerModule());
-                include(new LegHistogramModule());
-                include(new TravelDisutilityModule());
+                install(new CharyparNagelScoringFunctionModule());
+                install(new TripRouterModule());
+                install(new StrategyManagerModule());
+                install(new LinkStatsModule());
+                install(new VolumesAnalyzerModule());
+                install(new LegHistogramModule());
+                install(new TravelDisutilityModule());
 
                 // Because TravelTimeCalculatorModule is left out,
                 // we have to provide a TravelTime.
                 // This line says: Use this thing here as the TravelTime implementation.
                 // Try removing this line: You will get an error because there is no
                 // TravelTime and someone needs it.
-                bindToInstance(TravelTime.class, new FreeSpeedTravelTime());
+                bind(TravelTime.class).toInstance(new FreeSpeedTravelTime());
             }
         });
         controler.run();

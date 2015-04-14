@@ -22,19 +22,19 @@
 
 package org.matsim.core.scoring.functions;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import javax.inject.Provider;
 
 public class CharyparNagelScoringFunctionModule extends AbstractModule {
     @Override
     public void install() {
         final Provider<Config> config = binder().getProvider(Config.class);
         final Provider<Network> network = binder().getProvider(Network.class);
-        bindToProvider(ScoringFunctionFactory.class, new Provider<ScoringFunctionFactory>() {
+        bind(ScoringFunctionFactory.class).toProvider(new Provider<ScoringFunctionFactory>() {
             @Override
             public ScoringFunctionFactory get() {
                 return new CharyparNagelScoringFunctionFactory(config.get().planCalcScore(), network.get());

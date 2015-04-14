@@ -22,6 +22,7 @@
 
 package playground.artemc.pricing;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 
@@ -31,8 +32,8 @@ import javax.inject.Provider;
 public class LinkOccupancyAnalyzerModule extends AbstractModule {
     @Override
     public void install() {
-        bindToProviderAsSingleton(LinkOccupancyAnalyzer.class, LinkOccupancyAnalyzerProvider.class);
-        addEventHandler(LinkOccupancyAnalyzer.class);
+        bind(LinkOccupancyAnalyzer.class).toProvider(LinkOccupancyAnalyzerProvider.class).in(Singleton.class);
+        addEventHandlerBinding().to(LinkOccupancyAnalyzer.class);
         addControlerListenerBinding().to(LinkOccupancyAnalyzer.class);
     }
 

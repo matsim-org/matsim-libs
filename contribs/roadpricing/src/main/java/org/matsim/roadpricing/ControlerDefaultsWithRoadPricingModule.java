@@ -22,6 +22,7 @@
 
 package org.matsim.roadpricing;
 
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -51,27 +52,27 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
         // This is not optimal yet. Modules should not need to have parameters.
         // But I am not quite sure yet how to best handle custom scenario elements. mz
         if (this.roadPricingScheme != null) {
-            this.bindToInstance(RoadPricingScheme.class, this.roadPricingScheme);
+            bind(RoadPricingScheme.class).toInstance(this.roadPricingScheme);
         } else {
-            this.bindToProviderAsSingleton(RoadPricingScheme.class, RoadPricingSchemeProvider.class);
+            bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
         }
 
         // use ControlerDefaults configuration, replacing the TravelDisutility with a toll-dependent one
-        include(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
+        install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
             @Override
             public void install() {
-            	this.bindToProvider(TravelDisutilityFactory.class, TravelDisutilityIncludingTollFactoryProvider.class);
+                bind(TravelDisutilityFactory.class).toProvider(TravelDisutilityIncludingTollFactoryProvider.class);
             }
         }));
 
         addControlerListenerBinding().to(RoadPricingControlerListener.class);
 
         // add the events handler to calculate the tolls paid by agents
-        this.bindAsSingleton(CalcPaidToll.class);
-        this.addEventHandler(CalcPaidToll.class);
+        bind(CalcPaidToll.class).in(Singleton.class);
+        addEventHandlerBinding().to(CalcPaidToll.class);
 
-        this.bindAsSingleton(CalcAverageTolledTripLength.class);
-        this.addEventHandler(CalcAverageTolledTripLength.class);
+        bind(CalcAverageTolledTripLength.class).in(Singleton.class);
+        addEventHandlerBinding().to(CalcAverageTolledTripLength.class);
     }
 
     private static class RoadPricingSchemeProvider implements Provider<RoadPricingScheme> {

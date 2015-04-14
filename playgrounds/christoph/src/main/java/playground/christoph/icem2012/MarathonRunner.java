@@ -213,7 +213,7 @@ public final class MarathonRunner implements StartupListener,
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bindToProvider(Mobsim.class, CombiMobsimFactory.class);
+				bind(Mobsim.class).toProvider(CombiMobsimFactory.class);
 			}
 		});
 

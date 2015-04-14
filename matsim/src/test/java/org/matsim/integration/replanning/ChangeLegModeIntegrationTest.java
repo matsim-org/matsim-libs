@@ -93,13 +93,13 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
         Injector injector = Injector.createInjector(config, new AbstractModule() {
             @Override
             public void install() {
-                bindToInstance(Scenario.class, scenario);
-                bindToInstance(EventsManager.class, EventsUtils.createEventsManager());
-                include(AbstractModule.override(Arrays.asList(new StrategyManagerModule()), new AbstractModule() {
+                bind(Scenario.class).toInstance(scenario);
+                bind(EventsManager.class).toInstance(EventsUtils.createEventsManager());
+                install(AbstractModule.override(Arrays.asList(new StrategyManagerModule()), new AbstractModule() {
 
                     @Override
                     public void install() {
-                        bindToInstance(ReplanningContext.class, new ReplanningContext() {
+                        bind(ReplanningContext.class).toInstance(new ReplanningContext() {
 
                             @Override
                             public TravelDisutility getTravelDisutility() {
@@ -123,7 +123,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
                             @Override
                             public TripRouter getTripRouter() {
-                                return new TripRouterProviderImpl( scenario, new OnlyTimeDependentTravelDisutilityFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null ).get();
+                                return new TripRouterProviderImpl(scenario, new OnlyTimeDependentTravelDisutilityFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null).get();
                             }
 
                         });

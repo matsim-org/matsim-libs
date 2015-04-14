@@ -34,8 +34,8 @@ public class TravelDisutilityModule extends AbstractModule {
 
     @Override
     public void install() {
-        bindTo(TravelDisutilityFactory.class, TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
-        bindToProvider(TravelDisutility.class, TravelDisutilityProvider.class);
+        bind(TravelDisutilityFactory.class).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
+        bind(TravelDisutility.class).toProvider(TravelDisutilityProvider.class);
     }
 
     private static class TravelDisutilityProvider implements Provider<TravelDisutility> {

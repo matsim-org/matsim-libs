@@ -55,9 +55,9 @@ public class ReplayEvents {
                     @Override
                     public void install() {
                         for (AbstractModule module : modules) {
-                            include(module);
+                            install(module);
                         }
-                        bindToInstance(Scenario.class, scenario);
+                        bind(Scenario.class).toInstance(scenario);
                     }
                 });
         final EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());

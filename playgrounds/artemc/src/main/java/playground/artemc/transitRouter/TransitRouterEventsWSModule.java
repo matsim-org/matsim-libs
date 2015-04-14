@@ -41,8 +41,8 @@ public class TransitRouterEventsWSModule extends AbstractModule {
 
 	@Override
     public void install() {
-		bindToInstance(WaitTime.class, waitTimes);
-		bindToInstance(StopStopTime.class, stopStopTimes);
-        bindTo(TransitRouterFactory.class, TransitRouterEventsWSFactory.class);
-    }
+		bind(WaitTime.class).toInstance(waitTimes);
+		bind(StopStopTime.class).toInstance(stopStopTimes);
+		bind(TransitRouterFactory.class).to(TransitRouterEventsWSFactory.class);
+	}
 }

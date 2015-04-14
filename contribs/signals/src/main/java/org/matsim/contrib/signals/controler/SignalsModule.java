@@ -28,7 +28,7 @@ public class SignalsModule extends AbstractModule {
     @Override
     public void install() {
         if (getConfig().scenario().isUseSignalSystems()) {
-            bindTo(SignalsControllerListener.class, DefaultSignalsControllerListener.class);
+            bind(SignalsControllerListener.class).to(DefaultSignalsControllerListener.class);
             addControlerListenerBinding().to(SignalsControllerListener.class);
         }
     }

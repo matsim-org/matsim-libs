@@ -31,6 +31,6 @@ public class WithinDayModule extends AbstractModule {
     @Override
     public void install() {
         binder().bind(WithinDayEngine.class);
-        bindToProvider(Mobsim.class, WithinDayQSimFactory.class);
+        bind(Mobsim.class).toProvider(WithinDayQSimFactory.class);
     }
 }

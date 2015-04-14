@@ -35,10 +35,10 @@ public class ScenarioElementsModule extends AbstractModule {
     
     @Override
     public void install() {
-        bindToProvider(Network.class, NetworkProvider.class);
-        bindToProvider(Population.class, PopulationProvider.class);
+        bind(Network.class).toProvider(NetworkProvider.class);
+        bind(Population.class).toProvider(PopulationProvider.class);
         if (getConfig().scenario().isUseTransit()) {
-            bindToProvider(TransitSchedule.class, TransitScheduleProvider.class);
+            bind(TransitSchedule.class).toProvider(TransitScheduleProvider.class);
         }
     }
 

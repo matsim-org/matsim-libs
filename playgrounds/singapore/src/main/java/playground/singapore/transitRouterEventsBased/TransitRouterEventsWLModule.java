@@ -28,6 +28,6 @@ import org.matsim.pt.router.TransitRouterFactory;
 public class TransitRouterEventsWLModule extends AbstractModule {
     @Override
     public void install() {
-        bindTo(TransitRouterFactory.class, TransitRouterEventsWLFactory.class);
+        bind(TransitRouterFactory.class).to(TransitRouterEventsWLFactory.class);
     }
 }

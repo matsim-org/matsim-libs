@@ -20,6 +20,7 @@
 
 package org.matsim.integration.daily;
 
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -275,13 +276,18 @@ public class BetaTravelTest extends MatsimTestCase {
             addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
-                    bindToProviderAsSingleton(StrategyManager.class, new Provider<StrategyManager>() {
+					bind(StrategyManager.class).toProvider(new com.google.inject.Provider<StrategyManager>() {
                         @Override
                         public StrategyManager get() {
-                            return myLoadStrategyManager();
+                            return new Provider<StrategyManager>() {
+                                    @Override
+                                    public StrategyManager get() {
+                                        return myLoadStrategyManager();
+                                    }
+                                }.get();
                         }
-                    });
-                }
+                    }).in(Singleton.class);
+				}
             });
 		}
 

@@ -8,15 +8,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
-import org.matsim.contrib.pseudosimulation.distributed.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
+import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
 import org.matsim.contrib.pseudosimulation.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
+import org.matsim.contrib.pseudosimulation.distributed.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -41,9 +43,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.Vehicle;
-
-import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
-import org.matsim.contrib.eventsBasedPTRouter.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -217,12 +216,12 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             @Override
             public void install() {
 //                include(new ScoreStatsModule());
-                include(new TripRouterModule());
-                include(new CharyparNagelScoringFunctionModule());
-                include(new ScenarioElementsModule());
-                include(new StrategyManagerModule());
+                install(new TripRouterModule());
+                install(new CharyparNagelScoringFunctionModule());
+                install(new ScenarioElementsModule());
+                install(new StrategyManagerModule());
                 if (IntelligentRouters)
-                    include(new TravelDisutilityModule());
+                    install(new TravelDisutilityModule());
                 else{
                     TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
                             new TravelTimeAndDistanceBasedTravelDisutilityFactory();
@@ -230,7 +229,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                     disutilityFactory.setSigma(0.1);
 
                 }
-                bindToInstance(TravelTime.class, travelTime);
+                bind(TravelTime.class).toInstance(travelTime);
                 addPlanSelectorForRemovalBinding("DiversityGeneratingPlansRemover").toProvider(DiversityGeneratingPlansRemover.Builder.class);
             }
         });
