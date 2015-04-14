@@ -88,8 +88,8 @@ public class TransitControler {
 				final OTFVisConfigGroup otfVisConfig = ConfigUtils.addOrGetModule(qSim.getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
 				otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
 				//				otfVisConfig.setShowParking(true) ; // this does not really work
-				otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg) ;
-//				otfVisConfig.setShowTeleportedAgents(false) ;
+//				otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg) ;
+//				otfVisConfig.setShowTeleportedAgents(true) ;
 
 				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
 				OTFClientLive.run(sc.getConfig(), server);
