@@ -1,19 +1,20 @@
 package org.matsim.contrib.pseudosimulation.controler;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.contrib.pseudosimulation.controler.listeners.AfterScoringSelectedPlanScoreRestoreListener;
+import org.matsim.contrib.pseudosimulation.controler.listeners.BeforePSimSelectedPlanScoreRecorder;
+import org.matsim.contrib.pseudosimulation.controler.listeners.MobSimSwitcher;
 import org.matsim.contrib.pseudosimulation.controler.listeners.QSimScoreWriter;
+import org.matsim.contrib.pseudosimulation.mobsim.SwitchingMobsimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.PSimPlanStrategyTranslationAndRegistration;
 import org.matsim.contrib.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
 import org.matsim.contrib.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
 import org.matsim.contrib.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
-import org.matsim.contrib.pseudosimulation.controler.listeners.MobSimSwitcher;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -21,9 +22,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.pt.router.TransitRouterFactory;
 
-import org.matsim.contrib.pseudosimulation.controler.listeners.BeforePSimSelectedPlanScoreRecorder;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 
 /**
  * @author fouriep
@@ -62,6 +62,7 @@ public class PSimControler {
 		this.psimStrategies = new PSimPlanStrategyTranslationAndRegistration(this);
 		//substitute qualifying plan strategies with their PSim equivalents
 		this.substituteStrategies();
+		matsimControler.setMobsimFactory(SwitchingMobsimProvider.class);
 		matsimControler.addControlerListener(new MobSimSwitcher(this));
 		matsimControler.addControlerListener(new QSimScoreWriter(this));
 		matsimControler.addControlerListener(new BeforePSimSelectedPlanScoreRecorder(this));

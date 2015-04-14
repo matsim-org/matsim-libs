@@ -2,13 +2,10 @@ package org.matsim.contrib.pseudosimulation.controler.listeners;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.pseudosimulation.controler.PSimControler;
-import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 
 import java.util.ArrayList;
 
@@ -102,29 +99,11 @@ public class MobSimSwitcher implements ControlerListener,
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		
-
 		if (checkExpensiveIter(event.getIteration())) {
 			log.warn("Running full queue simulation");
-			String mobsim = matsimControler.getConfig().controler().getMobsim();
-
-			if (mobsim != null) {
-				if (mobsim.equals("qsim")) {
-					matsimControler.setMobsimFactory(QSimFactory.createQSimFactory());
-					// controler.setMobsimFactory(new MentalSimFactory(ttcalc));
-				} else if (mobsim.equals("jdeqsim")) {
-					matsimControler.setMobsimFactory(new JDEQSimulationFactory());
-
-				} 
-
-			} else {
-				matsimControler.setMobsimFactory(QSimFactory.createQSimFactory());
-			}
 		} else {
 			log.info("Running PSim");
-			matsimControler.setMobsimFactory(new PSimFactory( ));
 			psimControler.clearPlansForPseudoSimulation();
-
 		}
 	}
 

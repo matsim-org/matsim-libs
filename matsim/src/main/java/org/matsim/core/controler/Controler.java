@@ -541,6 +541,15 @@ public class Controler extends AbstractController {
 		});
 	}
 
+	public final void setMobsimFactory(final Class<? extends Provider<Mobsim>> mobsimProvider) {
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindToProvider(Mobsim.class, mobsimProvider);
+			}
+		});
+	}
+
 	public final void setMobsimFactory(final MobsimFactory mobsimFactory) {
 		setMobsimFactory(new Provider<Mobsim>() {
 			@Override
