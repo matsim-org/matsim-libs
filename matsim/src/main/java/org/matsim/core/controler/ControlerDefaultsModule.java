@@ -25,11 +25,9 @@ package org.matsim.core.controler;
 import org.matsim.analysis.LegTimesModule;
 import org.matsim.analysis.ScoreStatsModule;
 import org.matsim.analysis.VolumesAnalyzerModule;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.corelisteners.LegHistogramModule;
 import org.matsim.core.controler.corelisteners.LinkStatsModule;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
-import org.matsim.core.mobsim.qsim.QSimProvider;
+import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
@@ -43,11 +41,7 @@ import org.matsim.pt.counts.PtCountsModule;
 public class ControlerDefaultsModule extends AbstractModule {
     @Override
     public void install() {
-        if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.qsim.toString())) {
-            bindMobsim().toProvider(QSimProvider.class);
-        } else if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.JDEQSim.toString())) {
-            bindMobsim().to(JDEQSimulation.class);
-        }
+        install(new DefaultMobsimModule());
         install(new ScenarioElementsModule());
         install(new TravelTimeCalculatorModule());
         install(new TravelDisutilityModule());
@@ -62,7 +56,7 @@ public class ControlerDefaultsModule extends AbstractModule {
         install(new CountsModule());
         install(new PtCountsModule());
         install(new VspPlansCleanerModule());
-        install(new SignalsModule());
+//        install(new SignalsModule());
 
     	/* Comment by kai (mz thinks it is not helpful): The framework eventually calls the above method, which calls the include 
         * methods , which (fairly quickly) call their own install methods, etc.  Eventually, everything is resolved down to the

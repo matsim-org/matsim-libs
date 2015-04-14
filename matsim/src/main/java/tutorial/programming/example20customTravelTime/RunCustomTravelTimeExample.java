@@ -27,6 +27,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.corelisteners.LegHistogramModule;
 import org.matsim.core.controler.corelisteners.LinkStatsModule;
+import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
@@ -54,6 +55,7 @@ public class RunCustomTravelTimeExample {
                 // but leave out TravelTimeCalculator.
                 // You can just comment out these lines if you don't want them,
                 // these modules are optional.
+                install(new DefaultMobsimModule());
                 install(new CharyparNagelScoringFunctionModule());
                 install(new TripRouterModule());
                 install(new StrategyManagerModule());

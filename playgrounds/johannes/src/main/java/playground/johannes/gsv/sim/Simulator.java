@@ -43,6 +43,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -163,7 +164,7 @@ public class Simulator {
 		controler.setModules(new AbstractModule() {
 			@Override
 			public void install() {
-			
+			    install(new DefaultMobsimModule());
 				install(new ScenarioElementsModule());
                 install(new CharyparNagelScoringFunctionModule());
 				// include(new TravelTimeCalculatorModule());

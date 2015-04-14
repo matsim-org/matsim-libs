@@ -10,7 +10,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
@@ -67,7 +69,13 @@ public class CDREquilTest {
                 new StrategyManagerModule(),
                 new VolumesAnalyzerModule(),
                 new CollectSightingsModule(),
-                new CallBehaviorModule(new AtStartOrEnd(), linkIsZone));
+                new CallBehaviorModule(new AtStartOrEnd(), linkIsZone),
+                new AbstractModule() {
+                    @Override
+                    public void install() {
+                        bindMobsim().toProvider(QSimProvider.class);
+                    }
+                });
         controler.run();
         Scenario scenario = controler.getScenario();
         VolumesAnalyzer groundTruthVolumes = controler.getVolumes();
@@ -90,7 +98,13 @@ public class CDREquilTest {
                 new VolumesAnalyzerModule(),
                 new CollectSightingsModule(),
                 new StrategyManagerModule(),
-                new CallBehaviorModule(new AtStartOrEnd(), linkIsZone));
+                new CallBehaviorModule(new AtStartOrEnd(), linkIsZone),
+                new AbstractModule() {
+                    @Override
+                    public void install() {
+                        bindMobsim().toProvider(QSimProvider.class);
+                    }
+                });
         controler.run();
         Scenario scenario = controler.getScenario();
         VolumesAnalyzer groundTruthVolumes = controler.getVolumes();

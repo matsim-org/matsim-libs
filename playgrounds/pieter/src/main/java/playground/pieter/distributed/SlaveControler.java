@@ -22,6 +22,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
@@ -231,7 +232,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         matsimControler.setModules(new AbstractModule() {
             @Override
             public void install() {
+
 //                include(new ScoreStatsModule());
+                install(new DefaultMobsimModule());
                 install(new TripRouterModule());
                 install(new CharyparNagelScoringFunctionModule());
                 install(new ScenarioElementsModule());
