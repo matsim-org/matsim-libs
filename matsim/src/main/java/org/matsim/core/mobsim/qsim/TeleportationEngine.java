@@ -1,7 +1,10 @@
 package org.matsim.core.mobsim.qsim;
 
-import org.apache.log4j.Logger;
-import org.jfree.util.Log;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -19,12 +22,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.PriorityQueue;
-import java.util.Queue;
-
-public class TeleportationEngine implements DepartureHandler, MobsimEngine,
+public final class TeleportationEngine implements DepartureHandler, MobsimEngine,
 VisData {
 	/**
 	 * Includes all agents that have transportation modes unknown to the
@@ -37,9 +35,9 @@ VisData {
 
     @Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-    	if ( agent.getExpectedTravelTime()==Time.UNDEFINED_TIME ) {
-    		throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix behind this,"
-    				+ " since otherwise mode choice will lead to all legs teleported.  kai/mz, apr'15") ;
+    	if ( agent.getExpectedTravelTime()==null || agent.getExpectedTravelTime()==Time.UNDEFINED_TIME ) {
+    		throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
+    				+ " since otherwise mode choice optimization will eventually lead to all legs teleported.  kai/mz, apr'15") ;
     	}
 		double arrivalTime = now + agent.getExpectedTravelTime();
 		this.teleportationList.add(new Tuple<>(arrivalTime,

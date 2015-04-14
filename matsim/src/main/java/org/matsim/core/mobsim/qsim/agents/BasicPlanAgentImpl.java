@@ -216,7 +216,14 @@ final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<P
 		if (!(currentPlanElement instanceof Leg)) {
 			return null;
 		}
-		return ((Leg) currentPlanElement).getRoute().getTravelTime();
+		final double travelTimeFromRoute = ((Leg) currentPlanElement).getRoute().getTravelTime();
+		if (  travelTimeFromRoute != Time.UNDEFINED_TIME ) {
+			return travelTimeFromRoute ;
+		} else if ( ((Leg) currentPlanElement).getTravelTime() != Time.UNDEFINED_TIME ) {
+			return ((Leg) currentPlanElement).getTravelTime()  ;
+		} else {
+			return null ;
+		}
 	}
 
     @Override

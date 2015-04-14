@@ -117,12 +117,15 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Leg leg1 = pf.createLeg("transit_walk");
 		leg1.setRoute(new GenericRouteImpl(Id.create(1, Link.class), Id.create(14, Link.class)));
+		leg1.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Leg leg2 = pf.createLeg("pt");
 		leg2.setRoute(new LinkNetworkRouteImpl(Id.create(14, Link.class), new Id[] {Id.create(20, Link.class)}, Id.create(21, Link.class)));
+		leg2.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Leg leg3 = pf.createLeg("transit_walk");
 		leg3.setRoute(new LinkNetworkRouteImpl(Id.create(14, Link.class), new Id[0], Id.create(14, Link.class)));
+		leg3.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Activity work = pf.createActivityFromLinkId("w", Id.create(21, Link.class));
 		work.setEndTime(17.0 * 3600);
@@ -130,6 +133,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Leg leg4 = pf.createLeg("car");
 		leg4.setRoute(new LinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
+		leg4.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
@@ -156,6 +160,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Leg leg1 = pf.createLeg("walk");
 		leg1.setRoute(new GenericRouteImpl(Id.create(1, Link.class), Id.create(21, Link.class)));
+		leg1.getRoute().setTravelTime(0.); // retrofitting failing test. kai, apr'15
 
 		Activity work = pf.createActivityFromLinkId("w", Id.create(21, Link.class));
 		work.setEndTime(17.0 * 3600);
@@ -167,6 +172,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 		Leg leg2 = pf.createLeg("car");
 		leg2.setRoute(new LinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
+		leg2.getRoute().setTravelTime(0.); // retrofitting failing test. kai, apr'15
 
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));

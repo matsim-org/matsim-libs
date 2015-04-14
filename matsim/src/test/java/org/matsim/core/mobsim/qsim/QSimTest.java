@@ -477,6 +477,7 @@ public class QSimTest {
 		act.setEndTime(6.0 * 3600);
 		LegImpl leg = plan.createAndAddLeg(TransportMode.walk);
 		leg.setRoute(new GenericRouteImpl(f.link1.getId(), f.link2.getId()));
+		leg.getRoute().setTravelTime(0.); // retrofitting to repair failing test.  kai, apr'15
 		act = plan.createAndAddActivity("work", f.link2.getId());
 		act.setEndTime(6.0 * 3600 + 60);
 		f.plans.addPerson(person);
