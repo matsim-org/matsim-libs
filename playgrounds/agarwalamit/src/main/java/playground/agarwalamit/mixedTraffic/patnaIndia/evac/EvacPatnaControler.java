@@ -183,10 +183,12 @@ public class EvacPatnaControler {
 		
 		ModeRoutingParams walk = new ModeRoutingParams("walk");
 		walk.setTeleportedModeSpeed(4/3.6);
+		walk.setBeelineDistanceFactor(1.);
 		config.plansCalcRoute().addModeRoutingParams(walk);
 		
 		ModeRoutingParams pt = new ModeRoutingParams("pt");
 		pt.setTeleportedModeSpeed(20/3.6);
+		pt.setBeelineDistanceFactor(1.);
 		config.plansCalcRoute().addModeRoutingParams(pt);
 		
 		
