@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.signals.data.SignalsData;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.dgrether.DgPaths;
@@ -147,12 +147,14 @@ public class RunBraessScenario {
 				this.travelTimeCalculator.toString());
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
 		
 		// create controler
 		Controler controler = new Controler(scenario);
 		controler
 				.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-
+		controler.addOverridingModule(new SignalsModule());
+		
 		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
 		final DgSylviaControlerListenerFactory signalsFactory = 
 				new DgSylviaControlerListenerFactory(sylviaConfig);
@@ -176,8 +178,8 @@ public class RunBraessScenario {
 	 */
 	public static void main(String[] args) {
 
-		String date = "2015-04-13";
-		int simulationCase = 3; // 1 - base case, 2 - base case continued, 3 - changed signals
+		String date = "2015-04-14";
+		int simulationCase = 1; // 1 - base case, 2 - base case continued, 3 - changed signals
 		
 		// BASE CASE - Case 1
 		
