@@ -31,8 +31,8 @@ public class PickupDeliveryRequestImpl
     private final Link fromLink;
     private final Link toLink;
 
-    private PickupTask pickupTask;
-    private DeliveryTask deliveryTask;
+    private PickupDeliveryTask pickupTask;
+    private PickupDeliveryTask deliveryTask;
 
 
     public PickupDeliveryRequestImpl(Id<Request> id, double quantity, double t0, double t1,
@@ -41,13 +41,6 @@ public class PickupDeliveryRequestImpl
         super(id, quantity, t0, t1, submissionTime);
         this.fromLink = fromLink;
         this.toLink = toLink;
-    }
-
-
-    @Override
-    public RequestType getRequestType()
-    {
-        return RequestType.PICKUP_DELIVERY;
     }
 
 
@@ -66,28 +59,27 @@ public class PickupDeliveryRequestImpl
 
 
     @Override
-    public PickupTask getPickupTask()
+    public PickupDeliveryTask getPickupTask()
     {
         return pickupTask;
     }
 
 
-    public void setPickupTask(PickupTask pickupTask)
+    public void setPickupTask(PickupDeliveryTask pickupTask)
     {
         this.pickupTask = pickupTask;
     }
 
 
     @Override
-    public DeliveryTask getDeliveryTask()
+    public PickupDeliveryTask getDeliveryTask()
     {
         return deliveryTask;
     }
 
 
-    public void setDeliveryTask(DeliveryTask deliveryTask)
+    public void setDeliveryTask(PickupDeliveryTask deliveryTask)
     {
         this.deliveryTask = deliveryTask;
     }
-
 }

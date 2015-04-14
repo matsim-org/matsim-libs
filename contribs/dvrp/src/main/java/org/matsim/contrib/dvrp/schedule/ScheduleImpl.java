@@ -31,23 +31,16 @@ public class ScheduleImpl<T extends AbstractTask>
 {
     private final Vehicle vehicle;
 
-    private final List<T> tasks;
-    private final List<T> unmodifiableTasks;
+    private final List<T> tasks = new ArrayList<>();
+    private final List<T> unmodifiableTasks = Collections.unmodifiableList(tasks);
 
-    private ScheduleStatus status;
-    private T currentTask;
+    private ScheduleStatus status = ScheduleStatus.UNPLANNED;
+    private T currentTask = null;
 
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public ScheduleImpl(Vehicle vehicle)
     {
         this.vehicle = vehicle;
-
-        tasks = new ArrayList<>();
-        unmodifiableTasks = (List)Collections.unmodifiableList(tasks);
-
-        status = ScheduleStatus.UNPLANNED;
-        currentTask = null;
     }
 
 
@@ -204,19 +197,6 @@ public class ScheduleImpl<T extends AbstractTask>
         failIfCompleted();
 
         nextTaskImpl();
-
-        return currentTask;
-    }
-
-
-    @Override
-    public T cancelTaskAndNextTask()
-    {
-        failIfNotStarted();
-
-        T cancelledTask = currentTask;
-        nextTaskImpl();
-        cancelledTask.status = TaskStatus.CANCELLED;
 
         return currentTask;
     }

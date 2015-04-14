@@ -39,7 +39,7 @@ public class VrpPathImpl
     public VrpPathImpl(double departureTime, double travelTime, double travelCost, Link[] links,
             double[] linkTT)
     {
-        if (links.length != linkTT.length) {
+        if (links.length == 0 || links.length != linkTT.length) {
             throw new IllegalArgumentException();
         }
 

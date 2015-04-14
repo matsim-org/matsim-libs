@@ -67,8 +67,5 @@ public interface Schedule<T extends Task>
     void removeTask(T task);
 
 
-    T nextTask();
-
-
-    T cancelTaskAndNextTask();
+    T nextTask();//this one seems synchronous (will be executed when switching between DynActions)
 }

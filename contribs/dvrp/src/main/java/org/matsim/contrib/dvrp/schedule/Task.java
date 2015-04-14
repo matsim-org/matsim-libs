@@ -32,8 +32,7 @@ public interface Task
 
     public enum TaskStatus
     {
-        PLANNED, STARTED, PERFORMED, //
-        CANCELLED;//used for ongoing tasks (DriveTask)
+        PLANNED, STARTED, PERFORMED;
     }
 
 

@@ -36,9 +36,4 @@ public interface DriveTask
      * - ...
      */
     void divertPath(DivertedVrpPath divertedPath, double newEndTime);
-
-    /**
-     * Cancels DriveTask on the fly. The next task must be also DriveTask.
-     */
-    //void cancel(double now);
 }

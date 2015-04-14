@@ -19,9 +19,25 @@
 
 package org.matsim.contrib.dvrp.extensions.vrppd;
 
-public interface DeliveryTask
-    extends VRPPDTask
+import java.util.List;
+
+import org.matsim.contrib.dvrp.schedule.StayTask;
+
+
+public interface PickupDeliveryTask
+    extends StayTask
 {
-    @Override
-    DeliveryRequest getRequest();
+    boolean isPickup();
+
+
+    List<PickupDeliveryRequest> getRequests();
+
+
+    void addRequest(PickupDeliveryRequest request);
+
+
+    void removeRequest(PickupDeliveryRequest request);
+
+
+    void removeAllRequests();
 }
