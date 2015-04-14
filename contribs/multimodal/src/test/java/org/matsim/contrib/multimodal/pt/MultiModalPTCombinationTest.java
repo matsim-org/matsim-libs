@@ -85,6 +85,10 @@ public class MultiModalPTCombinationTest {
 		config.qsim().setEndTime(24*3600);
 		
 		config.controler().setLastIteration(0);
+		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
+		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
+		config.controler().setMobsim("myMobsim");
+
 
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);

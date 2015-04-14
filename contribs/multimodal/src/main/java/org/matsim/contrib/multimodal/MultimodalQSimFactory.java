@@ -29,6 +29,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.router.util.TravelTime;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 public class MultimodalQSimFactory implements Provider<Mobsim> {
@@ -37,7 +38,8 @@ public class MultimodalQSimFactory implements Provider<Mobsim> {
 	private EventsManager eventsManager;
 	private final Map<String, TravelTime> multiModalTravelTimes;
 
-	public MultimodalQSimFactory(Scenario scenario, EventsManager eventsManager, Map<String, TravelTime> multiModalTravelTimes) {
+	@Inject
+	MultimodalQSimFactory(Scenario scenario, EventsManager eventsManager, Map<String, TravelTime> multiModalTravelTimes) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.multiModalTravelTimes = multiModalTravelTimes;

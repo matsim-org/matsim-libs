@@ -58,9 +58,6 @@ public class MultiModalControlerListener implements StartupListener {
 
 		MultiModalConfigGroup multiModalConfigGroup = ConfigUtils.addOrGetModule(config, MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
 
-        MultimodalQSimFactory qSimFactory = new MultimodalQSimFactory(event.getControler().getScenario(), event.getControler().getEvents(), multiModalTravelTimes);
-		event.getControler().setMobsimFactory(qSimFactory);
-		
 		// ensure that NetworkRoutes are created for legs using one of the simulated modes
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 		for (String mode : CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes())) {

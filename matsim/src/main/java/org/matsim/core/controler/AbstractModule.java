@@ -159,8 +159,16 @@ public abstract class AbstractModule {
         return binder().bind(Mobsim.class);
     }
 
-    public <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {
+    protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {
         return binder.bind(aClass);
+    }
+
+    protected <T> AnnotatedBindingBuilder<T> bind(TypeLiteral<T> typeLiteral) {
+        return binder.bind(typeLiteral);
+    }
+
+    protected <T> LinkedBindingBuilder<T> bind(Key<T> key) {
+        return binder.bind(key);
     }
 
     protected final Binder binder() {

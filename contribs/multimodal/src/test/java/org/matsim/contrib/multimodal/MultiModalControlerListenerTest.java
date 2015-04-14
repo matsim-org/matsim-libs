@@ -74,9 +74,12 @@ public class MultiModalControlerListenerTest {
 
 		Config config = ConfigUtils.createConfig();
 
-		config.qsim().setEndTime(24*3600);
+		config.qsim().setEndTime(24 * 3600);
 
 		config.controler().setLastIteration(0);
+		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
+		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
+		config.controler().setMobsim("myMobsim");
 
 		MultiModalConfigGroup multiModalConfigGroup = new MultiModalConfigGroup();
 		multiModalConfigGroup.setMultiModalSimulationEnabled(true);
@@ -191,6 +194,10 @@ public class MultiModalControlerListenerTest {
 
 		Config config = ConfigUtils.loadConfig(inputDir + "config_berlin_multimodal.xml", new MultiModalConfigGroup());
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+
+		// doesn't matter - MultiModalModule sets the mobsim unconditionally. it just can't be something
+		// which the ControlerDefaultsModule knows about. Try it, you will get an error. Quite safe.
+		config.controler().setMobsim("myMobsim");
 
 		config.qsim().setRemoveStuckVehicles(true);
 		config.qsim().setStuckTime(100.0);
