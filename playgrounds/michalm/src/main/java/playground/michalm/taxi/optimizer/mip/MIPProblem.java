@@ -81,7 +81,7 @@ public class MIPProblem
     private MIPSolution initialSolution;
     private MIPSolution finalSolution;
 
-    static final Mode mode = Mode.OFFLINE_INIT_OPTIM;
+    static final Mode MODE = Mode.OFFLINE_INIT_OPTIM;
 
 
     public MIPProblem(TaxiOptimizerConfiguration optimConfig,
@@ -101,17 +101,17 @@ public class MIPProblem
             return;
         }
 
-        if (mode.init) {
+        if (MODE.init) {
             findInitialSolution();
         }
 
-        if (mode.optim) {
+        if (MODE.optim) {
             solveProblem();
         }
-        else if (mode.load) {
+        else if (MODE.load) {
             loadSolution(optimConfig.workingDirectory + "gurobi_solution.sol");
         }
-        else if (mode.init) {
+        else if (MODE.init) {
             finalSolution = initialSolution;
         }
         else {
@@ -125,7 +125,7 @@ public class MIPProblem
     private void initData()
     {
         List<TaxiRequest> removedRequests = optimConfig.scheduler
-                .removePlannedRequestsFromAllSchedules();
+                .removeAwaitingRequestsFromAllSchedules();
         unplannedRequests.addAll(removedRequests);
 
         vData = new VehicleData(optimConfig);
@@ -133,7 +133,7 @@ public class MIPProblem
             return;
         }
 
-        int maxReqCount = mode.reqsPerVeh * vData.dimension;
+        int maxReqCount = getPlanningHorizon();
         rData = new MIPRequestData(optimConfig, unplannedRequests, maxReqCount);
         if (rData.dimension == 0) {
             return;
@@ -151,7 +151,7 @@ public class MIPProblem
         stats = new MIPTaxiStats(optimConfig.context.getVrpData());
         stats.calcInitial();
 
-        optimConfig.scheduler.removePlannedRequestsFromAllSchedules();
+        optimConfig.scheduler.removeAwaitingRequestsFromAllSchedules();
     }
 
 
@@ -221,14 +221,20 @@ public class MIPProblem
     }
 
 
-    int getPlanningHorizon()
+    private int getPlanningHorizon()
     {
-        return vData.dimension * mode.reqsPerVeh;
+        return vData.dimension * MODE.reqsPerVeh;
     }
 
 
-    int getPlannedRequestCount()
+    private int getPlannedRequestCount()
     {
         return rData.dimension;
+    }
+    
+    
+    boolean isPlanningHorizonFull()
+    {
+        return getPlanningHorizon() == getPlannedRequestCount();
     }
 }

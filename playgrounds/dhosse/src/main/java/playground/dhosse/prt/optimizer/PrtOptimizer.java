@@ -27,9 +27,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import playground.jbischoff.taxi.optimizer.rank.IdleRankVehicleFinder;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.schedule.TaxiCruiseDriveTask;
-import playground.michalm.taxi.schedule.TaxiTask;
-import playground.michalm.taxi.schedule.TaxiWaitStayTask;
+import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
@@ -94,7 +92,7 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
         TaxiTask newCurrentTask = prtSchedule.nextTask();
 
         if (newCurrentTask != null // schedule != COMPLETED
-                && newCurrentTask.getTaxiTaskType() == TaxiTask.TaxiTaskType.WAIT_STAY) {
+                && newCurrentTask.getTaxiTaskType() == TaxiTask.TaxiTaskType.STAY) {
             requiresReoptimization = true;
         }
 
@@ -152,7 +150,7 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
     {
         @SuppressWarnings("unchecked")
         Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
-        TaxiWaitStayTask last = (TaxiWaitStayTask)Schedules.getLastTask(veh.getSchedule());
+        TaxiStayTask last = (TaxiStayTask)Schedules.getLastTask(veh.getSchedule());
         if (last.getStatus() != TaskStatus.STARTED)
             throw new IllegalStateException();
 
@@ -164,8 +162,8 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
                 .calcPath(currentLink, nearestRank, time);
         if (path.getArrivalTime() > veh.getT1())
             return; // no rank return if vehicle is going out of service anyway
-        sched.addTask(new TaxiCruiseDriveTask(path));
-        sched.addTask(new TaxiWaitStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
+        sched.addTask(new TaxiDriveTask(path));
+        sched.addTask(new TaxiStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
 
     }
 

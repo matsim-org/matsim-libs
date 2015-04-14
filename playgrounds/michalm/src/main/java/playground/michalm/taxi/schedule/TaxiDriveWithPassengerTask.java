@@ -19,38 +19,43 @@
 
 package playground.michalm.taxi.schedule;
 
-import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
 import playground.michalm.taxi.data.TaxiRequest;
 
 
-public class TaxiDropoffStayTask
-    extends StayTaskImpl
+public class TaxiDriveWithPassengerTask
+    extends DriveTaskImpl
     implements TaxiTaskWithRequest
 {
-    private final TaxiRequest request;
+    private TaxiRequest request;//non-final due to vehicle diversion
 
 
-    public TaxiDropoffStayTask(double beginTime, double endTime, TaxiRequest request)
+    public TaxiDriveWithPassengerTask(VrpPathWithTravelData path, TaxiRequest request)
     {
-        super(beginTime, endTime, request.getToLink());
+        super(path);
+
+        if (request.getFromLink() != path.getFromLink() && request.getToLink() != path.getToLink()) {
+            throw new IllegalArgumentException();
+        }
 
         this.request = request;
-        request.setDropoffStayTask(this);
+        request.setDriveWithPassengerTask(this);
     }
 
 
     @Override
     public void removeFromRequest()
     {
-        request.setDropoffStayTask(null);
+        request.setDriveWithPassengerTask(null);
     }
 
 
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DROPOFF_STAY;
+        return TaxiTaskType.DRIVE_WITH_PASSENGER;
     }
 
 

@@ -5,9 +5,9 @@ import java.util.List;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.schedule.TaxiDropoffDriveTask;
+import playground.michalm.taxi.schedule.TaxiDriveWithPassengerTask;
 
-public class NPersonsDropoffDriveTask extends TaxiDropoffDriveTask {
+public class NPersonsDropoffDriveTask extends TaxiDriveWithPassengerTask {
 
 	private List<TaxiRequest> requests;
 	
@@ -17,7 +17,7 @@ public class NPersonsDropoffDriveTask extends TaxiDropoffDriveTask {
 		this.requests = requests;
 		
 		for(TaxiRequest request : requests){
-			request.setDropoffDriveTask(this);
+			request.setDriveWithPassengerTask(this);
 		}
 		
 	}
@@ -26,7 +26,7 @@ public class NPersonsDropoffDriveTask extends TaxiDropoffDriveTask {
     public void removeFromRequest()
     {
 		for(TaxiRequest request : this.requests){
-			request.setDropoffDriveTask(null);
+			request.setDriveWithPassengerTask(null);
 		}
     }
 
@@ -34,7 +34,7 @@ public class NPersonsDropoffDriveTask extends TaxiDropoffDriveTask {
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DROPOFF_DRIVE;
+        return TaxiTaskType.DRIVE_WITH_PASSENGER;
     }
 
 

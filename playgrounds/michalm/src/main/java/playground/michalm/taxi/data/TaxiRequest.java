@@ -23,9 +23,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 
 public class TaxiRequest
@@ -39,10 +41,10 @@ public class TaxiRequest
         PLANNED, // planned - included into one of the routes
 
         //we have started serving the request but we may still divert the cab
-        PICKUP_DRIVE,
+        TAXI_DISPATCHED,
 
         //we have to carry out the request
-        PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY,
+        PICKUP, RIDE, DROPOFF,
 
         PERFORMED, //
         //REJECTED, // rejected by the DISPATCHER
@@ -55,10 +57,9 @@ public class TaxiRequest
     private final Link fromLink;
     private final Link toLink;
 
-    private TaxiPickupDriveTask pickupDriveTask;
-    private TaxiPickupStayTask pickupStayTask;
-    private TaxiDropoffDriveTask dropoffDriveTask;
-    private TaxiDropoffStayTask dropoffStayTask;
+    private TaxiPickupTask pickupTask;
+    private TaxiDriveWithPassengerTask driveWithPassengerTask;
+    private TaxiDropoffTask dropoffTask;
 
 
     public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
@@ -92,115 +93,70 @@ public class TaxiRequest
     }
 
 
-    public TaxiPickupDriveTask getPickupDriveTask()
+    public TaxiPickupTask getPickupTask()
     {
-        return pickupDriveTask;
+        return pickupTask;
     }
 
 
-    public void setPickupDriveTask(TaxiPickupDriveTask pickupDriveTask)
+    public void setPickupTask(TaxiPickupTask pickupTask)
     {
-        this.pickupDriveTask = pickupDriveTask;
+        this.pickupTask = pickupTask;
     }
 
 
-    public TaxiPickupStayTask getPickupStayTask()
+    public TaxiDriveWithPassengerTask getDriveWithPassengerTask()
     {
-        return pickupStayTask;
+        return driveWithPassengerTask;
     }
 
 
-    public void setPickupStayTask(TaxiPickupStayTask pickupStayTask)
+    public void setDriveWithPassengerTask(TaxiDriveWithPassengerTask driveWithPassengerTask)
     {
-        this.pickupStayTask = pickupStayTask;
+        this.driveWithPassengerTask = driveWithPassengerTask;
     }
 
 
-    public TaxiDropoffDriveTask getDropoffDriveTask()
+    public TaxiDropoffTask getDropoffTask()
     {
-        return dropoffDriveTask;
+        return dropoffTask;
     }
 
 
-    public void setDropoffDriveTask(TaxiDropoffDriveTask dropoffDriveTask)
+    public void setDropoffTask(TaxiDropoffTask dropoffTask)
     {
-        this.dropoffDriveTask = dropoffDriveTask;
+        this.dropoffTask = dropoffTask;
     }
 
 
-    public TaxiDropoffStayTask getDropoffStayTask()
-    {
-        return dropoffStayTask;
-    }
-
-
-    public void setDropoffStayTask(TaxiDropoffStayTask dropoffStayTask)
-    {
-        this.dropoffStayTask = dropoffStayTask;
-    }
-
-
+    //@SuppressWarnings("incomplete-switch")
     public TaxiRequestStatus getStatus()
     {
-        if (pickupDriveTask == null) {
+        if (pickupTask == null) {
             return TaxiRequestStatus.UNPLANNED;
         }
 
-        switch (pickupDriveTask.getStatus()) {
+        switch (pickupTask.getStatus()) {
             case PLANNED:
+                TaxiTask currentTask = (TaxiTask)pickupTask.getSchedule().getCurrentTask();
+                if (currentTask.getTaxiTaskType() == TaxiTaskType.DRIVE && //
+                        pickupTask.getTaskIdx() == currentTask.getTaskIdx() + 1) {
+                    return TaxiRequestStatus.TAXI_DISPATCHED;
+                }
+
                 return TaxiRequestStatus.PLANNED;
 
             case STARTED:
-                return TaxiRequestStatus.PICKUP_DRIVE;
-
-            case CANCELLED:
-                //may happen after diverting vehicles or cancellation by the customer
-                throw new IllegalStateException(
-                        "Request.pickupDriveTask should not point to a cancelled task");
-
-            case PERFORMED:
-                //at some later stage...
+                return TaxiRequestStatus.PICKUP;
         }
 
-        switch (pickupStayTask.getStatus()) {
-            case PLANNED:
-                throw new IllegalStateException("Unreachable code");
-
-            case STARTED:
-                return TaxiRequestStatus.PICKUP_STAY;
-
-            case CANCELLED:
-                //may happen only after cancellation by the customer
-                throw new IllegalStateException(
-                        "Request.pickupStayTask should not point to a cancelled task");
-
-            case PERFORMED:
-                break;//at some later stage...
+        if (driveWithPassengerTask.getStatus() == TaskStatus.STARTED) {
+            return TaxiRequestStatus.RIDE;
         }
 
-        switch (dropoffDriveTask.getStatus()) {
-            case PLANNED:
-                throw new IllegalStateException("Unreachable code");
-
+        switch (dropoffTask.getStatus()) {
             case STARTED:
-                return TaxiRequestStatus.DROPOFF_DRIVE;
-
-            case CANCELLED:
-                throw new IllegalStateException("Cannot cancel at this stage");
-
-            case PERFORMED:
-                break;//at some later stage...
-        }
-
-        switch (dropoffStayTask.getStatus()) {
-            case PLANNED:
-                throw new IllegalStateException("Unreachable code");
-
-            case STARTED:
-                return TaxiRequestStatus.DROPOFF_STAY;
-
-            case CANCELLED:
-                throw new IllegalStateException("Cannot cancel at this stage");
+                return TaxiRequestStatus.DROPOFF;
 
             case PERFORMED:
                 return TaxiRequestStatus.PERFORMED;

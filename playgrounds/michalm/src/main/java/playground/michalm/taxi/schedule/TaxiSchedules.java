@@ -31,10 +31,10 @@ import com.google.common.collect.Iterables;
 
 public class TaxiSchedules
 {
-    public static final Predicate<TaxiTask> IS_PICKUP_STAY = new Predicate<TaxiTask>() {
+    public static final Predicate<TaxiTask> IS_PICKUP = new Predicate<TaxiTask>() {
         public boolean apply(TaxiTask t)
         {
-            return t.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY;
+            return t.getTaxiTaskType() == TaxiTaskType.PICKUP;
         };
     };
 
@@ -60,7 +60,7 @@ public class TaxiSchedules
 
     public static Iterable<TaxiRequest> getTaxiRequests(Schedule<TaxiTask> schedule)
     {
-        Iterable<TaxiTask> pickupTasks = Iterables.filter(schedule.getTasks(), IS_PICKUP_STAY);
+        Iterable<TaxiTask> pickupTasks = Iterables.filter(schedule.getTasks(), IS_PICKUP);
         return Iterables.transform(pickupTasks, TAXI_TASK_TO_REQUEST);
     }
 }

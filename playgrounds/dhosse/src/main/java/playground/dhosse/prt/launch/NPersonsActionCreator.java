@@ -13,7 +13,7 @@ import playground.dhosse.prt.scheduler.NPersonsDropoffStayTask;
 import playground.dhosse.prt.scheduler.NPersonsPickupStayTask;
 import playground.michalm.taxi.TaxiActionCreator;
 import playground.michalm.taxi.schedule.TaxiTask;
-import playground.michalm.taxi.schedule.TaxiWaitStayTask;
+import playground.michalm.taxi.schedule.TaxiStayTask;
 
 public class NPersonsActionCreator extends TaxiActionCreator{
 
@@ -35,22 +35,21 @@ public class NPersonsActionCreator extends TaxiActionCreator{
         TaxiTask tt = (TaxiTask)task;
 
         switch (tt.getTaxiTaskType()) {
-            case PICKUP_DRIVE:
-            case DROPOFF_DRIVE:
-            case CRUISE_DRIVE:
+            case DRIVE:
+            case DRIVE_WITH_PASSENGER:
                 return legCreator.createLeg((DriveTask)task);
 
-            case PICKUP_STAY:
+            case PICKUP:
                 final NPersonsPickupStayTask pst = (NPersonsPickupStayTask)task;
                 return new NPersonsPickupActivity(passengerEngine, pst, pst.getRequests(),
                         pickupDuration);
 
-            case DROPOFF_STAY:
+            case DROPOFF:
                 final NPersonsDropoffStayTask dst = (NPersonsDropoffStayTask)task;
                 return new NPersonsDropoffActivity(passengerEngine, dst, dst.getRequests());
 
-            case WAIT_STAY:
-                return new VrpActivity("Waiting", (TaxiWaitStayTask)task);
+            case STAY:
+                return new VrpActivity("Waiting", (TaxiStayTask)task);
 
             default:
                 throw new IllegalStateException();

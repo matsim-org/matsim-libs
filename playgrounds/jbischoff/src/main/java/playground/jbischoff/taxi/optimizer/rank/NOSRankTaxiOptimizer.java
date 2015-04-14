@@ -135,7 +135,7 @@ public class NOSRankTaxiOptimizer
         public void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
         {
             if (rankmode) {
-                TaxiDropoffStayTask dropoffStayTask = (TaxiDropoffStayTask)Schedules
+                TaxiDropoffTask dropoffStayTask = (TaxiDropoffTask)Schedules
                         .getLastTask(schedule);
 
                 Link link = dropoffStayTask.getLink();
@@ -144,11 +144,11 @@ public class NOSRankTaxiOptimizer
                 if (link != startLink) {
                     double t5 = dropoffStayTask.getEndTime();
                     VrpPathWithTravelData path = calculator.calcPath(link, startLink, t5);
-                    schedule.addTask(new TaxiCruiseDriveTask(path));
+                    schedule.addTask(new TaxiDriveTask(path));
 
                     double t6 = path.getArrivalTime();
                     double tEnd = Math.max(t6, schedule.getVehicle().getT1());
-                    schedule.addTask(new TaxiWaitStayTask(t6, tEnd, schedule.getVehicle()
+                    schedule.addTask(new TaxiStayTask(t6, tEnd, schedule.getVehicle()
                             .getStartLink()));
                 }
                 else {
@@ -209,7 +209,7 @@ public class NOSRankTaxiOptimizer
 
             if (veh.getSchedule().getCurrentTask().getType().equals(TaskType.STAY)) {
 
-                TaxiWaitStayTask twst = (TaxiWaitStayTask)veh.getSchedule().getCurrentTask();
+                TaxiStayTask twst = (TaxiStayTask)veh.getSchedule().getCurrentTask();
 
                 if (!this.ecabhandler.isAtCharger(twst.getLink().getId())) {
                     if (this.needsToCharge(veh.getId())) {
@@ -229,7 +229,7 @@ public class NOSRankTaxiOptimizer
     {
         @SuppressWarnings("unchecked")
         Schedule<Task> sched = (Schedule<Task>)veh.getSchedule();
-        TaxiWaitStayTask last = (TaxiWaitStayTask)Schedules.getLastTask(veh.getSchedule());
+        TaxiStayTask last = (TaxiStayTask)Schedules.getLastTask(veh.getSchedule());
         if (last.getStatus() != TaskStatus.STARTED)
             throw new IllegalStateException();
 
@@ -254,8 +254,8 @@ public class NOSRankTaxiOptimizer
                 .calcPath(currentLink, nearestRank, time);
         if (path.getArrivalTime() > veh.getT1())
             return; // no rank return if vehicle is going out of service anyway
-        sched.addTask(new TaxiCruiseDriveTask(path));
-        sched.addTask(new TaxiWaitStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
+        sched.addTask(new TaxiDriveTask(path));
+        sched.addTask(new TaxiStayTask(path.getArrivalTime(), veh.getT1(), nearestRank));
 
     }
 
@@ -381,7 +381,7 @@ public class NOSRankTaxiOptimizer
 
             if (veh.getSchedule().getCurrentTask().getType().equals(TaskType.STAY)) {
 
-                TaxiWaitStayTask twst = (TaxiWaitStayTask)veh.getSchedule().getCurrentTask();
+                TaxiStayTask twst = (TaxiStayTask)veh.getSchedule().getCurrentTask();
                 if (!this.rankHandler.isRankLocation(twst.getLink().getId())) {
                     if (time - twst.getBeginTime() > 60.) {
                         scheduleRankReturn(veh, time, false, false);

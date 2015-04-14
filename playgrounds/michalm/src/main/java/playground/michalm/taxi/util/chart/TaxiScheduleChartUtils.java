@@ -43,29 +43,28 @@ public class TaxiScheduleChartUtils
         }
     };
 
-    private static final Color DRIVE_NON_IDLE_COLOR = new Color(200, 0, 0);
-    private static final Color STAY_NON_IDLE_COLOR = new Color(0, 0, 200);
+    private static final Color DRIVE_WITH_PASSENGER_COLOR = new Color(200, 0, 0);
+    private static final Color PICKUP_DROPOFF_COLOR = new Color(0, 0, 200);
 
-    private static final Color CRUISE_COLOR = new Color(100, 0, 0);
-    private static final Color WAIT_COLOR = new Color(0, 0, 100);
+    private static final Color DRIVE_COLOR = new Color(100, 0, 0);
+    private static final Color STAY_COLOR = new Color(0, 0, 100);
 
     public static final PaintSelector<TaxiTask> TAXI_PAINT_SELECTOR = new PaintSelector<TaxiTask>() {
         public Paint select(TaxiTask task)
         {
             switch (task.getTaxiTaskType()) {
-                case PICKUP_DRIVE:
-                case DROPOFF_DRIVE:
-                    return DRIVE_NON_IDLE_COLOR;
+                case PICKUP:
+                case DROPOFF:
+                    return PICKUP_DROPOFF_COLOR;
 
-                case PICKUP_STAY:
-                case DROPOFF_STAY:
-                    return STAY_NON_IDLE_COLOR;
+                case DRIVE_WITH_PASSENGER:
+                    return DRIVE_WITH_PASSENGER_COLOR;
 
-                case CRUISE_DRIVE:
-                    return CRUISE_COLOR;
+                case DRIVE:
+                    return DRIVE_COLOR;
 
-                case WAIT_STAY:
-                    return WAIT_COLOR;
+                case STAY:
+                    return STAY_COLOR;
 
                 default:
                     throw new IllegalStateException();

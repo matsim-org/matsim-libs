@@ -16,7 +16,7 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.data.TaxiRequest.TaxiRequestStatus;
 import playground.michalm.taxi.schedule.TaxiSchedules;
 import playground.michalm.taxi.schedule.TaxiTask;
-import playground.michalm.taxi.schedule.TaxiWaitStayTask;
+import playground.michalm.taxi.schedule.TaxiStayTask;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
@@ -44,7 +44,7 @@ public class PrtScheduler extends TaxiScheduler {
       if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
           TaxiTask lastTask = Schedules.getLastTask(bestSched);// only WAIT
           
-          if(lastTask.getTaxiTaskType().equals(TaxiTask.TaxiTaskType.PICKUP_STAY)){
+          if(lastTask.getTaxiTaskType().equals(TaxiTask.TaxiTaskType.PICKUP)){
         	  appendRequestToExistingScheduleTasks(best, requests);
         	  return;
           }
@@ -97,12 +97,6 @@ public class PrtScheduler extends TaxiScheduler {
 		
 		for(TaxiTask task : sched.getTasks()){
 			
-			if(task instanceof NPersonsPickupDriveTask){
-				for(VehicleRequestPath vrp : requests){
-					if(vrp.path.getDepartureTime() < task.getBeginTime() && !task.getStatus().equals(TaskStatus.PERFORMED))
-						((NPersonsPickupDriveTask)task).appendRequest(vrp.request);
-				}
-			}
 			if(task instanceof NPersonsPickupStayTask){
 				for(VehicleRequestPath vrp : requests){
 					if(vrp.path.getDepartureTime() < task.getBeginTime() && !task.getStatus().equals(TaskStatus.PERFORMED)){
@@ -145,7 +139,7 @@ public class PrtScheduler extends TaxiScheduler {
         double tEnd = Math.max(t5, schedule.getVehicle().getT1());
         Link link = dropoffStayTask.getLink();
 
-        schedule.addTask(new TaxiWaitStayTask(t5, tEnd, link));
+        schedule.addTask(new TaxiStayTask(t5, tEnd, link));
     }
 	
 }

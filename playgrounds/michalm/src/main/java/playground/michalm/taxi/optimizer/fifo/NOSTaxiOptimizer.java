@@ -95,6 +95,7 @@ public class NOSTaxiOptimizer
     }
 
 
+    //request-initiated scheduling
     private void scheduleUnplannedRequestsImpl()
     {
         Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
@@ -115,6 +116,7 @@ public class NOSTaxiOptimizer
     }
 
 
+    //vehicle-initiated scheduling
     private void scheduleIdleVehiclesImpl()
     {
         Iterator<Vehicle> vehIter = idleVehicles.iterator();
@@ -146,7 +148,7 @@ public class NOSTaxiOptimizer
         TaxiTask newCurrentTask = taxiSchedule.nextTask();
 
         if (newCurrentTask != null // schedule != COMPLETED
-                && newCurrentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY) {
+                && newCurrentTask.getTaxiTaskType() == TaxiTaskType.STAY) {
             requiresReoptimization = true;
         }
     }

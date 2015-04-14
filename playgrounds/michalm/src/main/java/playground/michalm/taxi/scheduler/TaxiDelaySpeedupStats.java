@@ -30,14 +30,12 @@ import playground.michalm.taxi.schedule.TaxiTask;
 
 public class TaxiDelaySpeedupStats
 {
-    private final SummaryStatistics pickupDriveDelayStats = new SummaryStatistics();
-    private final SummaryStatistics pickupDriveSpeedupStats = new SummaryStatistics();
-    private final SummaryStatistics dropoffDriveDelayStats = new SummaryStatistics();
-    private final SummaryStatistics dropoffDriveSpeedupStats = new SummaryStatistics();
-    private final SummaryStatistics cruiseDelayStats = new SummaryStatistics();
-    private final SummaryStatistics cruiseSpeedupStats = new SummaryStatistics();
-    private final SummaryStatistics waitDelayStats = new SummaryStatistics();
-    private final SummaryStatistics waitSpeedupStats = new SummaryStatistics();
+    private final SummaryStatistics driveDelayStats = new SummaryStatistics();
+    private final SummaryStatistics driveSpeedupStats = new SummaryStatistics();
+    private final SummaryStatistics driveWithPassengerDelayStats = new SummaryStatistics();
+    private final SummaryStatistics driveWithPassengerSpeedupStats = new SummaryStatistics();
+    private final SummaryStatistics stayDelayStats = new SummaryStatistics();
+    private final SummaryStatistics staySpeedupStats = new SummaryStatistics();
     private final SummaryStatistics pickupDelayStats = new SummaryStatistics();
     private final SummaryStatistics pickupSpeedupStats = new SummaryStatistics();
     private final SummaryStatistics dropoffDelayStats = new SummaryStatistics();
@@ -62,27 +60,23 @@ public class TaxiDelaySpeedupStats
         }
 
         switch (currentTask.getTaxiTaskType()) {
-            case PICKUP_DRIVE:
-                updateStats(delay, pickupDriveDelayStats, pickupDriveSpeedupStats);
+            case DRIVE:
+                updateStats(delay, driveDelayStats, driveSpeedupStats);
                 break;
 
-            case DROPOFF_DRIVE:
-                updateStats(delay, dropoffDriveDelayStats, dropoffDriveSpeedupStats);
+            case DRIVE_WITH_PASSENGER:
+                updateStats(delay, driveWithPassengerDelayStats, driveWithPassengerSpeedupStats);
                 break;
 
-            case CRUISE_DRIVE:
-                updateStats(delay, cruiseDelayStats, cruiseSpeedupStats);
+            case STAY:
+                updateStats(delay, stayDelayStats, staySpeedupStats);
                 break;
 
-            case WAIT_STAY:
-                updateStats(delay, waitDelayStats, waitSpeedupStats);
-                break;
-
-            case PICKUP_STAY:
+            case PICKUP:
                 updateStats(delay, pickupDelayStats, pickupSpeedupStats);
                 break;
 
-            case DROPOFF_STAY:
+            case DROPOFF:
                 updateStats(delay, dropoffDelayStats, dropoffSpeedupStats);
         }
     }
@@ -112,14 +106,12 @@ public class TaxiDelaySpeedupStats
     {
         pw.println(id + " ==============================");
 
-        printSingleStats(pw, pickupDriveDelayStats, "pickup drive delay");
-        printSingleStats(pw, pickupDriveSpeedupStats, "pickup drive speedup");
-        printSingleStats(pw, dropoffDriveDelayStats, "delivery drive delay");
-        printSingleStats(pw, dropoffDriveSpeedupStats, "delivery drive speedup");
-        printSingleStats(pw, cruiseDelayStats, "cruise delay");
-        printSingleStats(pw, cruiseSpeedupStats, "cruise speedup");
-        printSingleStats(pw, waitDelayStats, "wait delay");
-        printSingleStats(pw, waitSpeedupStats, "wait speedup");
+        printSingleStats(pw, driveDelayStats, "drive delay");
+        printSingleStats(pw, driveSpeedupStats, "drive speedup");
+        printSingleStats(pw, driveWithPassengerDelayStats, "drive with passenger delay");
+        printSingleStats(pw, driveWithPassengerSpeedupStats, "drive with passenger speedup");
+        printSingleStats(pw, stayDelayStats, "stay delay");
+        printSingleStats(pw, staySpeedupStats, "stay speedup");
         printSingleStats(pw, pickupDelayStats, "pickup delay");
         printSingleStats(pw, pickupSpeedupStats, "pickup speedup");
         printSingleStats(pw, dropoffDelayStats, "dropoff delay");
@@ -131,14 +123,12 @@ public class TaxiDelaySpeedupStats
 
     public void clearStats()
     {
-        pickupDriveDelayStats.clear();
-        pickupDriveSpeedupStats.clear();
-        dropoffDriveDelayStats.clear();
-        dropoffDriveSpeedupStats.clear();
-        cruiseDelayStats.clear();
-        cruiseSpeedupStats.clear();
-        waitDelayStats.clear();
-        waitSpeedupStats.clear();
+        driveDelayStats.clear();
+        driveSpeedupStats.clear();
+        driveWithPassengerDelayStats.clear();
+        driveWithPassengerSpeedupStats.clear();
+        stayDelayStats.clear();
+        staySpeedupStats.clear();
         pickupDelayStats.clear();
         pickupSpeedupStats.clear();
         dropoffDelayStats.clear();

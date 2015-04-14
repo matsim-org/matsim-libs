@@ -50,22 +50,21 @@ public class TaxiActionCreator
         TaxiTask tt = (TaxiTask)task;
 
         switch (tt.getTaxiTaskType()) {
-            case PICKUP_DRIVE:
-            case DROPOFF_DRIVE:
-            case CRUISE_DRIVE:
+            case DRIVE:
+            case DRIVE_WITH_PASSENGER:
                 return legCreator.createLeg((DriveTask)task);
 
-            case PICKUP_STAY:
-                final TaxiPickupStayTask pst = (TaxiPickupStayTask)task;
+            case PICKUP:
+                final TaxiPickupTask pst = (TaxiPickupTask)task;
                 return new SinglePassengerPickupActivity(passengerEngine, pst, pst.getRequest(),
                         pickupDuration);
 
-            case DROPOFF_STAY:
-                final TaxiDropoffStayTask dst = (TaxiDropoffStayTask)task;
+            case DROPOFF:
+                final TaxiDropoffTask dst = (TaxiDropoffTask)task;
                 return new SinglePassengerDropoffActivity(passengerEngine, dst, dst.getRequest());
 
-            case WAIT_STAY:
-                return new VrpActivity("Waiting", (TaxiWaitStayTask)task);
+            case STAY:
+                return new VrpActivity("Stay", (TaxiStayTask)task);
 
             default:
                 throw new IllegalStateException();

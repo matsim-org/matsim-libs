@@ -36,9 +36,8 @@ public class MIPTaxiOptimizer
 {
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
 
-    private int lastPlanningHorizon = -1;//cannot be 0 in order to run optimization for the first request
-    private int lastPlannedReqs = 0;
-    private int recentlyStartedReqs = 0;
+    private boolean isLastPlanningHorizonFull = false;//in order to run optimization for the first request
+    private boolean hasPickedUpReqsRecently = false;
 
     private int optimCounter = 0;
 
@@ -56,6 +55,7 @@ public class MIPTaxiOptimizer
     }
 
 
+    @Override
     protected void scheduleUnplannedRequests()
     {
         if (unplannedRequests.size() == 0) {
@@ -64,8 +64,8 @@ public class MIPTaxiOptimizer
             return;
         }
 
-        if (lastPlanningHorizon == lastPlannedReqs && //last time we planned as many requests as possible, and...
-                recentlyStartedReqs == 0) {//...since then no empty space has appeared in the planning horizon 
+        if (isLastPlanningHorizonFull && //last time we planned as many requests as possible, and...
+                !hasPickedUpReqsRecently) {//...since then no empty space has appeared in the planning horizon 
             return;
         }
 
@@ -77,9 +77,8 @@ public class MIPTaxiOptimizer
             System.err.println(optimCounter + "; time=" + optimConfig.context.getTime());
         }
 
-        lastPlanningHorizon = mipProblem.getPlanningHorizon();
-        lastPlannedReqs = mipProblem.getPlannedRequestCount();
-        recentlyStartedReqs = 0;
+        isLastPlanningHorizonFull = mipProblem.isPlanningHorizonFull();
+        hasPickedUpReqsRecently = false;
     }
 
 
@@ -98,8 +97,8 @@ public class MIPTaxiOptimizer
         }
 
         TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
-        if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_DRIVE) {
-            recentlyStartedReqs++;
+        if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP) {
+            hasPickedUpReqsRecently = true;
             requiresReoptimization = true;
         }
     }

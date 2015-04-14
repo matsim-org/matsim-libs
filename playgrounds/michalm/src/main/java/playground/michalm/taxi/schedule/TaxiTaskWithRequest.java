@@ -28,6 +28,6 @@ public interface TaxiTaskWithRequest
     TaxiRequest getRequest();
 
 
-    //called (when removing a task) in order to update the request-2-task assignment 
+    //called (when removing a task) in order to update the request2task assignment 
     void removeFromRequest();
 }

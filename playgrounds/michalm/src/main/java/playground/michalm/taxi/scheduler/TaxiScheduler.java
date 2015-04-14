@@ -55,7 +55,7 @@ public class TaxiScheduler
 
         for (Vehicle veh : context.getVrpData().getVehicles()) {
             Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
-            schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+            schedule.addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
     }
 
@@ -87,7 +87,7 @@ public class TaxiScheduler
         TaxiTask currentTask = schedule.getCurrentTask();
 
         return Schedules.isLastTask(currentTask)
-                && currentTask.getTaxiTaskType() == TaxiTaskType.WAIT_STAY;
+                && currentTask.getTaxiTaskType() == TaxiTaskType.STAY;
     }
 
 
@@ -108,18 +108,16 @@ public class TaxiScheduler
                 TaxiTask lastTask = Schedules.getLastTask(schedule);
 
                 switch (lastTask.getTaxiTaskType()) {
-                    case WAIT_STAY:
+                    case STAY:
                         link = ((StayTask)lastTask).getLink();
                         time = Math.max(lastTask.getBeginTime(), currentTime);//TODO very optimistic!!!
                         return createValidLinkTimePair(link, time, veh);
 
-                    case PICKUP_STAY:
+                    case PICKUP:
                         if (!params.destinationKnown) {
                             return null;
                         }
-                        else {
-                            throw new IllegalStateException();
-                        }
+                        //otherwise the schedule should and with WAIT
 
                     default:
                         throw new IllegalStateException();
@@ -145,7 +143,6 @@ public class TaxiScheduler
         Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
         Link link;
         double time;
-        TaxiDropoffStayTask dropoffStayTask;
 
         switch (schedule.getStatus()) {
             case PLANNED:
@@ -157,45 +154,43 @@ public class TaxiScheduler
                 TaxiTask currentTask = schedule.getCurrentTask();
 
                 switch (currentTask.getTaxiTaskType()) {
-                    case WAIT_STAY:
+                    case STAY:
                         link = ((StayTask)currentTask).getLink();
                         time = currentTime;
                         return createValidLinkTimePair(link, time, veh);
 
-                    case PICKUP_DRIVE:
+                    case DRIVE:
                         TaskTracker tracker = currentTask.getTaskTracker();
 
                         if (tracker instanceof OnlineDriveTaskTracker) {
-                            OnlineDriveTaskTracker onlineTracker = (OnlineDriveTaskTracker)tracker;
-                            LinkTimePair lt = onlineTracker.getDiversionPoint(currentTime);
+                            LinkTimePair lt = ((OnlineDriveTaskTracker)tracker)
+                                    .getDiversionPoint(currentTime);
                             return filterValidLinkTimePair(lt, veh);
                         }
+                        else {
+                            link = ((DriveTask)currentTask).getPath().getToLink();
+                            time = currentTask.getEndTime();
+                            return createValidLinkTimePair(link, time, veh);
+                        }
 
-                        //no "break" here!!!
-
-                    case PICKUP_STAY:
+                    case PICKUP:
                         if (!params.destinationKnown) {
                             return null;
                         }
 
                         //no "break" here!!!
 
-                    case DROPOFF_DRIVE:
-                        dropoffStayTask = ((TaxiTaskWithRequest)currentTask).getRequest()
-                                .getDropoffStayTask();
-                        break;
-
-                    case DROPOFF_STAY:
-                        dropoffStayTask = (TaxiDropoffStayTask)currentTask;
-                        break;
+                    case DRIVE_WITH_PASSENGER:
+                    case DROPOFF:
+                        TaxiDropoffTask dropoffTask = ((TaxiTaskWithRequest)currentTask)
+                                .getRequest().getDropoffTask();
+                        link = dropoffTask.getLink();
+                        time = dropoffTask.getEndTime();
+                        return createValidLinkTimePair(link, time, veh);
 
                     default:
                         throw new IllegalStateException();
                 }
-
-                link = dropoffStayTask.getLink();
-                time = dropoffStayTask.getEndTime();
-                return createValidLinkTimePair(link, time, veh);
 
             case COMPLETED:
                 return null;
@@ -228,7 +223,7 @@ public class TaxiScheduler
         Schedule<TaxiTask> bestSched = TaxiSchedules.getSchedule(best.vehicle);
 
         if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
-            TaxiWaitStayTask lastTask = (TaxiWaitStayTask)Schedules.getLastTask(bestSched);// only WAIT
+            TaxiStayTask lastTask = (TaxiStayTask)Schedules.getLastTask(bestSched);// only WAIT
 
             switch (lastTask.getStatus()) {
                 case PLANNED:
@@ -238,7 +233,6 @@ public class TaxiScheduler
                     else {
                         // actually this WAIT task will not be performed
                         lastTask.setEndTime(best.path.getDepartureTime());// shortening the WAIT task
-
                     }
                     break;
 
@@ -252,11 +246,13 @@ public class TaxiScheduler
             }
         }
 
-        bestSched.addTask(new TaxiPickupDriveTask(best.path, best.request));
+        if (best.path.getLinkCount() > 1) {
+            bestSched.addTask(new TaxiDriveTask(best.path));
+        }
 
         double t3 = Math.max(best.path.getArrivalTime(), best.request.getT0())
                 + params.pickupDuration;
-        bestSched.addTask(new TaxiPickupStayTask(best.path.getArrivalTime(), t3, best.request));
+        bestSched.addTask(new TaxiPickupTask(best.path.getArrivalTime(), t3, best.request));
 
         if (params.destinationKnown) {
             appendDropoffAfterPickup(bestSched);
@@ -286,7 +282,7 @@ public class TaxiScheduler
         updateCurrentAndPlannedTasks(schedule, endTime);
 
         if (!params.destinationKnown) {
-            if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP_STAY) {
+            if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP) {
                 appendDropoffAfterPickup(schedule);
                 appendWaitAfterDropoff(schedule);
             }
@@ -296,33 +292,33 @@ public class TaxiScheduler
 
     public void appendDropoffAfterPickup(Schedule<TaxiTask> schedule)
     {
-        TaxiPickupStayTask pickupStayTask = (TaxiPickupStayTask)Schedules.getLastTask(schedule);
+        TaxiPickupTask pickupStayTask = (TaxiPickupTask)Schedules.getLastTask(schedule);
 
         // add DELIVERY after SERVE
-        TaxiRequest req = ((TaxiPickupStayTask)pickupStayTask).getRequest();
+        TaxiRequest req = ((TaxiPickupTask)pickupStayTask).getRequest();
         Link reqFromLink = req.getFromLink();
         Link reqToLink = req.getToLink();
         double t3 = pickupStayTask.getEndTime();
 
         VrpPathWithTravelData path = calculator.calcPath(reqFromLink, reqToLink, t3);
-        schedule.addTask(new TaxiDropoffDriveTask(path, req));
+        schedule.addTask(new TaxiDriveWithPassengerTask(path, req));
 
         double t4 = path.getArrivalTime();
         double t5 = t4 + params.dropoffDuration;
-        schedule.addTask(new TaxiDropoffStayTask(t4, t5, req));
+        schedule.addTask(new TaxiDropoffTask(t4, t5, req));
     }
 
 
     public void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
     {
-        TaxiDropoffStayTask dropoffStayTask = (TaxiDropoffStayTask)Schedules.getLastTask(schedule);
+        TaxiDropoffTask dropoffStayTask = (TaxiDropoffTask)Schedules.getLastTask(schedule);
 
         // addWaitTime at the end (even 0-second WAIT)
         double t5 = dropoffStayTask.getEndTime();
         double tEnd = Math.max(t5, schedule.getVehicle().getT1());
         Link link = dropoffStayTask.getLink();
 
-        schedule.addTask(new TaxiWaitStayTask(t5, tEnd, link));
+        schedule.addTask(new TaxiStayTask(t5, tEnd, link));
     }
 
 
@@ -348,7 +344,7 @@ public class TaxiScheduler
             TaxiTask task = tasks.get(i);
 
             switch (task.getTaxiTaskType()) {
-                case WAIT_STAY: {
+                case STAY: {
                     if (i == tasks.size() - 1) {// last task
                         task.setBeginTime(t);
 
@@ -357,37 +353,24 @@ public class TaxiScheduler
                         }
                     }
                     else {
-                        // if this is not the last task then some other task must have been added
-                        // at time submissionTime <= t
-
-                        TaxiTask nextTask = tasks.get(i + 1);
-                        switch (nextTask.getTaxiTaskType()) {
-                            case PICKUP_DRIVE:
-                            case CRUISE_DRIVE:
-                                double endTime = task.getEndTime();
-
-                                if (endTime <= t) {// may happen if the previous task is delayed
-                                    schedule.removeTask(task);
-                                    i--;
-                                }
-                                else {
-                                    task.setBeginTime(t);
-                                    t = endTime;
-                                }
-
-                                break;
-
-                            default:
-                                throw new RuntimeException();
+                        // if this is not the last task then some other task (e.g. DRIVE or PICKUP)
+                        // must have been added at time submissionTime <= t
+                        double endTime = task.getEndTime();
+                        if (endTime <= t) {// may happen if the previous task is delayed
+                            schedule.removeTask(task);
+                            i--;
+                        }
+                        else {
+                            task.setBeginTime(t);
+                            t = endTime;
                         }
                     }
 
                     break;
                 }
 
-                case PICKUP_DRIVE:
-                case DROPOFF_DRIVE:
-                case CRUISE_DRIVE: {
+                case DRIVE:
+                case DRIVE_WITH_PASSENGER: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
                     VrpPathWithTravelData path = (VrpPathWithTravelData) ((DriveTask)task)
@@ -397,15 +380,16 @@ public class TaxiScheduler
 
                     break;
                 }
-                case PICKUP_STAY: {
+            
+                case PICKUP: {
                     task.setBeginTime(t);// t == taxi's arrival time
-                    double t0 = ((TaxiPickupStayTask)task).getRequest().getT0();// t0 == passenger's departure time
+                    double t0 = ((TaxiPickupTask)task).getRequest().getT0();// t0 == passenger's departure time
                     t = Math.max(t, t0) + params.pickupDuration; // the true pickup starts at max(t, t0)
                     task.setEndTime(t);
 
                     break;
                 }
-                case DROPOFF_STAY: {
+                case DROPOFF: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
                     t += params.dropoffDuration;
@@ -413,9 +397,6 @@ public class TaxiScheduler
 
                     break;
                 }
-
-                default:
-                    throw new IllegalStateException();
             }
         }
     }
@@ -424,27 +405,31 @@ public class TaxiScheduler
     private List<TaxiRequest> removedRequests;
 
 
-    public List<TaxiRequest> removePlannedRequestsFromAllSchedules()
+    /**
+     * Awaiting == unpicked-up, i.e. requests with status PLANNED or TAXI_DISPATCHED See
+     * {@link TaxiRequestStatus}
+     */
+    public List<TaxiRequest> removeAwaitingRequestsFromAllSchedules()
     {
         removedRequests = new ArrayList<>();
 
         for (Vehicle veh : context.getVrpData().getVehicles()) {
-            removePlannedRequestsImpl(TaxiSchedules.getSchedule(veh));
+            removeAwaitingRequestsImpl(TaxiSchedules.getSchedule(veh));
         }
 
         return removedRequests;
     }
 
 
-    public List<TaxiRequest> removePlannedRequests(Schedule<TaxiTask> schedule)
+    public List<TaxiRequest> removeAwaitingRequests(Schedule<TaxiTask> schedule)
     {
         removedRequests = new ArrayList<>();
-        removePlannedRequestsImpl(schedule);
+        removeAwaitingRequestsImpl(schedule);
         return removedRequests;
     }
 
 
-    private void removePlannedRequestsImpl(Schedule<TaxiTask> schedule)
+    private void removeAwaitingRequestsImpl(Schedule<TaxiTask> schedule)
     {
         switch (schedule.getStatus()) {
             case STARTED:
@@ -457,31 +442,20 @@ public class TaxiScheduler
                 int obligatoryTasks = 0;// remove all planned tasks
 
                 switch (task.getTaxiTaskType()) {
-                    case PICKUP_DRIVE:
-                        if (!params.destinationKnown) {
-                            return;
-                        }
-
-                        obligatoryTasks = 3;
-                        break;
-
-                    case PICKUP_STAY:
+                    case PICKUP:
                         if (!params.destinationKnown) {
                             return;
                         }
                         obligatoryTasks = 2;
                         break;
 
-                    case DROPOFF_DRIVE:
+                    case DRIVE_WITH_PASSENGER:
                         obligatoryTasks = 1;
                         break;
 
-                    case DROPOFF_STAY:
-                        obligatoryTasks = 0;
-                        break;
-
-                    case CRUISE_DRIVE:
-                    case WAIT_STAY:
+                    case DROPOFF:
+                    case DRIVE:
+                    case STAY:
                         obligatoryTasks = 0;
                         break;
                 }
@@ -493,12 +467,12 @@ public class TaxiScheduler
                 double tBegin = schedule.getEndTime();
                 double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());
 
-                if (task.getTaxiTaskType() == TaxiTaskType.WAIT_STAY) {
+                if (task.getTaxiTaskType() == TaxiTaskType.STAY) {
                     task.setEndTime(tEnd);//extend WaitTask
                 }
                 else {
                     Link link = Schedules.getLastLinkInSchedule(schedule);
-                    schedule.addTask(new TaxiWaitStayTask(tBegin, tEnd, link));
+                    schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
                 }
 
                 break;
@@ -506,7 +480,7 @@ public class TaxiScheduler
             case PLANNED:
                 removePlannedTasks(schedule, -1);
                 Vehicle veh = schedule.getVehicle();
-                schedule.addTask(new TaxiWaitStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
+                schedule.addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
 
                 break;
 
@@ -533,7 +507,7 @@ public class TaxiScheduler
                 TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
                 taskWithReq.removeFromRequest();
 
-                if (task.getTaxiTaskType() == TaxiTaskType.PICKUP_DRIVE) {
+                if (task.getTaxiTaskType() == TaxiTaskType.PICKUP) {
                     removedRequests.add(taskWithReq.getRequest());
                 }
             }

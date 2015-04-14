@@ -22,46 +22,21 @@ package playground.michalm.taxi.schedule;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
 
-import playground.michalm.taxi.data.TaxiRequest;
 
-
-public class TaxiDropoffDriveTask
+public class TaxiDriveTask
     extends DriveTaskImpl
-    implements TaxiTaskWithRequest
+    implements TaxiTask
 {
-    private TaxiRequest request;//non-final due to vehicle diversion
-
-
-    public TaxiDropoffDriveTask(VrpPathWithTravelData path, TaxiRequest request)
+    public TaxiDriveTask(VrpPathWithTravelData path)
     {
         super(path);
-
-        if (request.getFromLink() != path.getFromLink() && request.getToLink() != path.getToLink()) {
-            throw new IllegalArgumentException();
-        }
-
-        this.request = request;
-        request.setDropoffDriveTask(this);
-    }
-
-
-    @Override
-    public void removeFromRequest()
-    {
-        request.setDropoffDriveTask(null);
     }
 
 
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DROPOFF_DRIVE;
-    }
-
-
-    public TaxiRequest getRequest()
-    {
-        return request;
+        return TaxiTaskType.DRIVE;
     }
 
 

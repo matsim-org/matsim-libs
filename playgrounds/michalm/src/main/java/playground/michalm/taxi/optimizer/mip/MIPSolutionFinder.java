@@ -76,7 +76,7 @@ class MIPSolutionFinder
 
                 x[u][v] = true;
 
-                double w_i = r.getPickupStayTask().getEndTime() - t_P;
+                double w_i = r.getPickupTask().getEndTime() - t_P;
                 w[i] = w_i;
 
                 u = v;

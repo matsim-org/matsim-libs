@@ -5,35 +5,22 @@ import java.util.List;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.schedule.TaxiPickupDriveTask;
+import playground.michalm.taxi.schedule.*;
 
-public class NPersonsPickupDriveTask extends TaxiPickupDriveTask{
+public class NPersonsPickupDriveTask extends TaxiDriveTask{
 
 	List<TaxiRequest> requests;
 	
 	public NPersonsPickupDriveTask(VrpPathWithTravelData path, List<TaxiRequest> requests) {
 		
-		super(path, requests.get(0));
+		super(path);
 		this.requests = requests;
-		
-		for(TaxiRequest request : requests){
-			request.setPickupDriveTask(this);
-		}
 	}
 	
-	@Override
-    public void removeFromRequest()
-    {
-    	for(TaxiRequest request : this.requests){
-    		request.setPickupDriveTask(null);
-    	}
-    }
-
-
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.PICKUP_DRIVE;
+        return TaxiTaskType.DRIVE;
     }
 
     public List<TaxiRequest> getRequests()
@@ -47,14 +34,4 @@ public class NPersonsPickupDriveTask extends TaxiPickupDriveTask{
     {
         return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
     }
-
-	@Override
-	public TaxiRequest getRequest() {
-		return this.requests.get(0);
-	}
-	
-	public void appendRequest(TaxiRequest request){
-		request.setPickupDriveTask(this);
-	}
-
 }

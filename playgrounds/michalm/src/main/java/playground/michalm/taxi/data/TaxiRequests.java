@@ -33,17 +33,17 @@ public class TaxiRequests
     public static final Predicate<TaxiRequest> IS_PLANNED = new TaxiRequestStatusPredicate(
             TaxiRequestStatus.PLANNED);
 
-    public static final Predicate<TaxiRequest> IS_PICKUP_DRIVE = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.PICKUP_DRIVE);
+    public static final Predicate<TaxiRequest> IS_TAXI_DISPATCHED = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.TAXI_DISPATCHED);
 
-    public static final Predicate<TaxiRequest> IS_PICKUP_STAY = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.PICKUP_STAY);
+    public static final Predicate<TaxiRequest> IS_PICKUP = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.PICKUP);
 
-    public static final Predicate<TaxiRequest> IS_DROPOFF_DRIVE = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.DROPOFF_DRIVE);
+    public static final Predicate<TaxiRequest> IS_RIDE = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.RIDE);
 
-    public static final Predicate<TaxiRequest> IS_DROPOFF_STAY = new TaxiRequestStatusPredicate(
-            TaxiRequestStatus.DROPOFF_STAY);
+    public static final Predicate<TaxiRequest> IS_DROPOFF = new TaxiRequestStatusPredicate(
+            TaxiRequestStatus.DROPOFF);
 
     public static final Predicate<TaxiRequest> IS_PERFORMED = new TaxiRequestStatusPredicate(
             TaxiRequestStatus.PERFORMED);

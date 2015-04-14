@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.schedule;
 
-import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.schedule.*;
 
 
 public interface TaxiTask
@@ -27,10 +27,8 @@ public interface TaxiTask
 {
     static enum TaxiTaskType
     {
-        PICKUP_DRIVE, PICKUP_STAY, DROPOFF_DRIVE, DROPOFF_STAY, CRUISE_DRIVE, WAIT_STAY;
-
-        //TODO consider shorter names:
-        //TO_PICKUP, PICKUP, TO_DROPOFF, DROPOFF, CRUISE, WAIT;
+        DRIVE, STAY, //not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
+        PICKUP, DRIVE_WITH_PASSENGER, DROPOFF;//serving a customer (TaxiTaskWithRequest)
     }
 
 

@@ -49,7 +49,7 @@ public class AssignmentProblem
     public void scheduleUnplannedRequests(SortedSet<TaxiRequest> unplannedRequests)
     {
         List<TaxiRequest> removedRequests = optimConfig.scheduler
-                .removePlannedRequestsFromAllSchedules();
+                .removeAwaitingRequestsFromAllSchedules();
         unplannedRequests.addAll(removedRequests);
 
         rData = new APSRequestData(optimConfig, unplannedRequests);
@@ -76,11 +76,14 @@ public class AssignmentProblem
     {
         List<VrpPathWithTravelData[]> paths = new ArrayList<>(rData.urgentReqCount);
 
-        //TODO this does not make sense
         //if only imm reqs then rMin = rData.urgentReqCount = rData.dimension
         //if both imm+adv then rMin should be urgentReqCount + soonUrgentReqCount
 
-        int rMin = Math.max(rData.urgentReqCount, Math.min(rData.dimension, vData.dimension));
+        int rMin = rData.urgentReqCount;//include also "soonUrgentReqCount" if "adv" reqs
+        if (rMin < vData.dimension) {
+            rMin = Math.min(rData.dimension, vData.dimension);
+        }
+                
         Max maxArrivalTimeForRMinRequests = new Max();
 
         for (int r = 0; r < rMin; r++) {

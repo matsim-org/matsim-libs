@@ -24,33 +24,33 @@ import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 import playground.michalm.taxi.data.TaxiRequest;
 
 
-public class TaxiPickupStayTask
+public class TaxiDropoffTask
     extends StayTaskImpl
     implements TaxiTaskWithRequest
 {
     private final TaxiRequest request;
 
 
-    public TaxiPickupStayTask(double beginTime, double endTime, TaxiRequest request)
+    public TaxiDropoffTask(double beginTime, double endTime, TaxiRequest request)
     {
-        super(beginTime, endTime, request.getFromLink());
+        super(beginTime, endTime, request.getToLink());
 
         this.request = request;
-        request.setPickupStayTask(this);
+        request.setDropoffTask(this);
     }
 
 
     @Override
     public void removeFromRequest()
     {
-        request.setPickupStayTask(null);
+        request.setDropoffTask(null);
     }
 
 
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.PICKUP_STAY;
+        return TaxiTaskType.DROPOFF;
     }
 
 

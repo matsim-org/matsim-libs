@@ -94,7 +94,7 @@ public class NPersonsVehicleRequestPathFinder extends VehicleRequestPathFinder {
 
     	LinkTimePair departure = null;
     	
-    	if(lastTask.getTaxiTaskType().equals(TaxiTaskType.PICKUP_STAY)){
+    	if(lastTask.getTaxiTaskType().equals(TaxiTaskType.PICKUP)){
     		
     		NPersonsPickupStayTask task = (NPersonsPickupStayTask)lastTask;
 
@@ -112,7 +112,7 @@ public class NPersonsVehicleRequestPathFinder extends VehicleRequestPathFinder {
         		}
     		}
     		
-    	} else if(lastTask.getTaxiTaskType().equals(TaxiTask.TaxiTaskType.WAIT_STAY)){
+    	} else if(lastTask.getTaxiTaskType().equals(TaxiTask.TaxiTaskType.STAY)){
     		
     		if(lastTask.getStatus().equals(TaskStatus.STARTED)){
     			departure = scheduler.getEarliestIdleness(veh);

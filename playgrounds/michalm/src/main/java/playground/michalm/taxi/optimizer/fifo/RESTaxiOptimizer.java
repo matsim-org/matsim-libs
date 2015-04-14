@@ -38,7 +38,7 @@ public class RESTaxiOptimizer
     protected void scheduleUnplannedRequests()
     {
         List<TaxiRequest> removedRequests = optimConfig.scheduler
-                .removePlannedRequestsFromAllSchedules();
+                .removeAwaitingRequestsFromAllSchedules();
         unplannedRequests.addAll(removedRequests);
 
         super.scheduleUnplannedRequests();

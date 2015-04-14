@@ -3,9 +3,9 @@ package playground.dhosse.prt.scheduler;
 import java.util.List;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.schedule.TaxiDropoffStayTask;
+import playground.michalm.taxi.schedule.TaxiDropoffTask;
 
-public class NPersonsDropoffStayTask extends TaxiDropoffStayTask {
+public class NPersonsDropoffStayTask extends TaxiDropoffTask {
 
 	List<TaxiRequest> requests;
 	
@@ -15,7 +15,7 @@ public class NPersonsDropoffStayTask extends TaxiDropoffStayTask {
 		this.requests = requests;
 		
 		for(TaxiRequest request : requests){
-			request.setDropoffStayTask(this);
+			request.setDropoffTask(this);
 		}
 		
 	}
@@ -24,7 +24,7 @@ public class NPersonsDropoffStayTask extends TaxiDropoffStayTask {
     public void removeFromRequest()
     {
 		for(TaxiRequest request : this.requests){
-			request.setDropoffStayTask(null);
+			request.setDropoffTask(null);
 		}
     }
 
@@ -32,7 +32,7 @@ public class NPersonsDropoffStayTask extends TaxiDropoffStayTask {
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DROPOFF_STAY;
+        return TaxiTaskType.DROPOFF;
     }
 
 

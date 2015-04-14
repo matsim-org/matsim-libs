@@ -21,8 +21,9 @@ package playground.michalm.taxi.optimizer;
 
 import java.util.Collection;
 
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.taxi.data.TaxiRequest;
@@ -55,6 +56,17 @@ public abstract class AbstractTaxiOptimizer
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
         if (requiresReoptimization) {
+//            //TODO consider:
+//            for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
+//                Schedule s = v.getSchedule();
+//                
+//                if (s.getStatus() == ScheduleStatus.STARTED) {
+//                    double predictedEndTime = s.getCurrentTask().getTaskTracker().predictEndTime(
+//                            optimConfig.context.getTime());
+//                    optimConfig.scheduler.updateCurrentAndPlannedTasks(s, predictedEndTime);
+//                }
+//            }
+//            
             scheduleUnplannedRequests();
             requiresReoptimization = false;
         }
@@ -80,14 +92,13 @@ public abstract class AbstractTaxiOptimizer
 
         if (!optimConfig.scheduler.getParams().destinationKnown) {
             if (newCurrentTask != null // schedule != COMPLETED
-                    && newCurrentTask.getTaxiTaskType() == TaxiTaskType.DROPOFF_DRIVE) {
+                    && newCurrentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_WITH_PASSENGER) {
                 requiresReoptimization = true;
             }
         }
     }
 
 
-    //TODO switch on/off
     @Override
     public void nextLinkEntered(DriveTask driveTask)
     {
@@ -98,7 +109,7 @@ public abstract class AbstractTaxiOptimizer
                 optimConfig.context.getTime());
         optimConfig.scheduler.updateCurrentAndPlannedTasks(schedule, predictedEndTime);
 
-        //we may here possibly decide here whether or not to reoptimize
+        //TODO we may here possibly decide whether or not to reoptimize
         //if (delays/speedups encountered) {requiresReoptimization = true;}
     }
 }

@@ -35,21 +35,4 @@ public class TaxiSchedulerUtils
             }
         };
     }
-
-
-    public static Predicate<Vehicle> createCanBeScheduled(final TaxiScheduler scheduler)
-    {
-        return new Predicate<Vehicle>() {
-            public boolean apply(Vehicle vehicle)
-            {
-                return TaxiSchedulerUtils.canBeScheduled(vehicle, scheduler);
-            }
-        };
-    }
-
-
-    public static boolean canBeScheduled(Vehicle vehicle, TaxiScheduler scheduler)
-    {
-        return scheduler.getEarliestIdleness(vehicle) != null;
-    }
 }

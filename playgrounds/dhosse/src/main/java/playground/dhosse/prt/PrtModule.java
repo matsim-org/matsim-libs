@@ -1,12 +1,9 @@
 package playground.dhosse.prt;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
-import org.matsim.contrib.dvrp.router.LeastCostPathCalculatorWithCache;
-import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
+import org.matsim.contrib.dvrp.*;
+import org.matsim.contrib.dvrp.router.*;
+import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
@@ -14,10 +11,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.dhosse.prt.launch.PrtParameters.AlgorithmConfig;
@@ -26,13 +20,10 @@ import playground.dhosse.prt.request.NPersonsVehicleRequestPathFinder;
 import playground.dhosse.prt.router.PrtTripRouterFactoryImpl;
 import playground.dhosse.prt.scheduler.PrtScheduler;
 import playground.michalm.taxi.data.TaxiData;
-import playground.michalm.taxi.optimizer.TaxiOptimizer;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.optimizer.filter.DefaultFilterFactory;
-import playground.michalm.taxi.optimizer.filter.FilterFactory;
+import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.run.TaxiLauncherUtils;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
+import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 public class PrtModule {
