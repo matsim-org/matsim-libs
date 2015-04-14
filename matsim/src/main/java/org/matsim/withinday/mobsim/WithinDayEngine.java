@@ -20,10 +20,6 @@
 
 package org.matsim.withinday.mobsim;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
@@ -39,13 +35,23 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 /**
  * This Class implements the MobsimEngine interface. If added to a
  * QSim, the QSim's internals ensure that WithinDayEngine.doSimStep(...)
  * is performed before the other MobsimEngines.
- * 
+ *
+ * Also, it lives as long as the Controler, as opposed to all other party of the QSim,
+ * and is added to each new QSim instance in turn.
+ *
  * @author cdobler
  */
+@Singleton
 public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProvider {
 
 	private static final Logger log = Logger.getLogger(WithinDayEngine.class);
@@ -70,12 +76,13 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 	private Map<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>> duringLegReplannerFactory;
 	
 	private InternalInterface internalInterface;
-	
+
+	@Inject
 	public WithinDayEngine(EventsManager eventsManager) {
 		this.eventsManager = eventsManager;
 		
-		this.duringActivityReplannerFactory = new LinkedHashMap<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>>();
-		this.duringLegReplannerFactory = new LinkedHashMap<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>>();
+		this.duringActivityReplannerFactory = new LinkedHashMap<>();
+		this.duringLegReplannerFactory = new LinkedHashMap<>();
 	}
 	
 	/*

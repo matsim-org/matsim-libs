@@ -20,10 +20,7 @@
 
 package org.matsim.roadpricing;
 
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -36,7 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -51,6 +48,8 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.List;
 
 /**
  * Some static methods to set up the road pricing scenarios in the test cases.
@@ -218,7 +217,7 @@ import org.matsim.core.utils.misc.Time;
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getNetwork()));
 		events.addHandler(scoring);
-		Mobsim sim = new QSimFactory().createMobsim(scenario, events);
+		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();
 		scoring.finish();
 

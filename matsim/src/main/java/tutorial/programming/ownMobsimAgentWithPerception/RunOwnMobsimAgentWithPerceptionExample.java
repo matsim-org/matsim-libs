@@ -59,7 +59,7 @@ public class RunOwnMobsimAgentWithPerceptionExample {
 			@Override
 			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 				
-				MobsimFactory factory = new QSimFactory() ;
+				MobsimFactory factory = QSimFactory.createQSimFactory();
 				// (one can look up often-used mobsim factories in the MobsimRegistrar class)
 
 				final QSim qsim = (QSim) factory.createMobsim(sc, eventsManager) ;

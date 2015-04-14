@@ -29,7 +29,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -62,7 +62,7 @@ public class BvgControler extends Controler {
 
 		log.info("Overriding runMobSim()");
 
-		QSim simulation = (QSim) new QSimFactory().createMobsim(this.getScenario(), this.getEvents());
+		QSim simulation = (QSim) QSimUtils.createDefaultQSim(this.getScenario(), this.getEvents());
 
 		simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 //		this.events.addHandler(new LogOutputEventHandler());

@@ -20,12 +20,6 @@
 
 package org.matsim.withinday.controller;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -33,13 +27,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -48,13 +37,18 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
-import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.TransportModeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Attempt to realize functionality provided by WithinDayController by
@@ -90,8 +84,6 @@ public class WithinDayControlerListener implements StartupListener {
 	private TripRouterFactory withinDayTripRouterFactory;
 	private final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 	private final Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
-	
-	private MobsimFactory originalMobsimFactory = null ;
 
 	/*
 	 * ===================================================================
@@ -228,16 +220,8 @@ public class WithinDayControlerListener implements StartupListener {
 		this.scenario = controler.getScenario();
 		this.eventsManager = controler.getEvents();
 				
-		// initialize a withinDayEngine and set WithinDayQSimFactory as MobsimFactory
-		this.withinDayEngine = new WithinDayEngine(this.eventsManager);
-		WithinDayQSimFactory mobsimFactory = null ;
-		if ( this.originalMobsimFactory==null ) {
-			mobsimFactory = new WithinDayQSimFactory(withinDayEngine);
-		} else {
-			mobsimFactory = new WithinDayQSimFactory(withinDayEngine, this.originalMobsimFactory );
-		}
-		controler.setMobsimFactory(mobsimFactory);
-		
+		this.withinDayEngine = controler.getInjector().getInstance(WithinDayEngine.class);
+
 		if (this.numReplanningThreads == 0) {
 			this.numReplanningThreads = controler.getConfig().global().getNumberOfThreads();
 		} else log.info("Number of replanning threads has already been set - it is NOT overwritten!");
@@ -340,7 +324,4 @@ public class WithinDayControlerListener implements StartupListener {
 		this.fosl.addSimulationListener(linkReplanningMap);
 	}
 
-	public void setOriginalMobsimFactory(MobsimFactory originalMobsimFactory) {
-		this.originalMobsimFactory = originalMobsimFactory;
-	}
 }

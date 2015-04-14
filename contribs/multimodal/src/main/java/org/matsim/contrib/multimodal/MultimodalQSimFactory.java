@@ -38,7 +38,7 @@ public class MultimodalQSimFactory implements MobsimFactory {
 	
 	public MultimodalQSimFactory(Map<String, TravelTime> multiModalTravelTimes) {
 		// use a QSimFactory as default delegate
-		this(multiModalTravelTimes, new QSimFactory());
+		this(multiModalTravelTimes, QSimFactory.createQSimFactory());
 	}
 
 	public MultimodalQSimFactory(Map<String, TravelTime> multiModalTravelTimes, MobsimFactory mobsimFactory) {

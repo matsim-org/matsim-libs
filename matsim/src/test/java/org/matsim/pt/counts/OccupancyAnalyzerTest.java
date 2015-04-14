@@ -19,12 +19,6 @@
 
 package org.matsim.pt.counts;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -36,7 +30,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -46,6 +40,11 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * @author mrieser / senozon
@@ -113,7 +112,7 @@ public class OccupancyAnalyzerTest {
 		OccupancyAnalyzer oa = new OccupancyAnalyzer(3600, 12*3600);
 		eventsManager.addHandler(oa);
 
-		QSim sim = (QSim) new QSimFactory().createMobsim(f.scenario, eventsManager);
+		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		Set<Id<TransitStopFacility>> enterStops = oa.getBoardStopIds();

@@ -27,7 +27,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AssignmentEmulatingQLaneNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -56,7 +56,7 @@ public class AssignmentEmulatingQLaneMain {
 					throw new RuntimeException("the following will only work for " + MobsimType.qsim.toString() ) ;
 				}
 				// ===
-				QSim simulation = (QSim) new QSimFactory().createMobsim( sc, eventsManager );
+				QSim simulation = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
 				simulation.addMobsimEngine(new QNetsimEngine(simulation, new AssignmentEmulatingQLaneNetworkFactory() ) );
 				return simulation ;
 				// note: this is called before "enrichSimulation" so we do not need to worry about that.

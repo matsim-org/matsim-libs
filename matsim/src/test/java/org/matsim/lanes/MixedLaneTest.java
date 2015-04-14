@@ -20,7 +20,6 @@
 package org.matsim.lanes;
 
 import junit.framework.Assert;
-
 import org.jfree.util.Log;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +34,7 @@ import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -91,7 +90,7 @@ public class MixedLaneTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
-		QSim qsim = (QSim) new QSimFactory().createMobsim(this.fixture.sc, events);
+		QSim qsim = (QSim) QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 		Assert.assertNotNull(handler.agentDepartureEvent);
 		Assert.assertEquals(3600.0, handler.agentDepartureEvent.getTime());
@@ -133,7 +132,7 @@ public class MixedLaneTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
-		QSim qsim = (QSim) new QSimFactory().createMobsim(this.fixture.sc, events);
+		QSim qsim = (QSim) QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 		Assert.assertNotNull(handler.agentDepartureEvent);
 		Assert.assertEquals(3600.0, handler.agentDepartureEvent.getTime());
@@ -171,7 +170,7 @@ public class MixedLaneTest {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
 
-		QSim qsim = (QSim) new QSimFactory().createMobsim(this.fixture.sc, events);
+		QSim qsim = (QSim) QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 		
 		Assert.assertNotNull(handler.agentDepartureEvent);
@@ -219,7 +218,7 @@ public class MixedLaneTest {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(fixture);
 		events.addHandler(handler);
 
-		QSim qsim = (QSim) new QSimFactory().createMobsim(fixture.sc, events);
+		QSim qsim = (QSim) QSimUtils.createDefaultQSim(fixture.sc, events);
 		qsim.run();
 		
 		Assert.assertNotNull(handler.agentDepartureEvent);
@@ -259,7 +258,7 @@ public class MixedLaneTest {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
 
-		QSim qsim = (QSim) new QSimFactory().createMobsim(this.fixture.sc, events);
+		QSim qsim = (QSim) QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 		
 		Assert.assertNotNull(handler.agentDepartureEvent);

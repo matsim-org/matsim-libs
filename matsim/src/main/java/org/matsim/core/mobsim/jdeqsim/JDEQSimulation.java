@@ -20,8 +20,6 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,6 +31,9 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDuration
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.utils.misc.Time;
+
+import javax.inject.Inject;
+import java.util.HashMap;
 
 
 /**
@@ -59,7 +60,7 @@ public class JDEQSimulation implements Mobsim {
 
 	protected final ActivityDurationInterpretation activityDurationInterpretation;
 
-
+	@Inject
 	public JDEQSimulation(final Scenario scenario, final EventsManager events) {
 		// constructor
 

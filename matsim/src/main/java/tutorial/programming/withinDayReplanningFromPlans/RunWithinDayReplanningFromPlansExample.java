@@ -20,9 +20,11 @@
 package tutorial.programming.withinDayReplanningFromPlans;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.util.TravelTime;
@@ -37,20 +39,31 @@ public class RunWithinDayReplanningFromPlansExample {
 
 	public static void main(String[] args){		
 		final Controler controler = new Controler("examples/tutorial/programming/example50VeryExperimentalWithinDayReplanning/withinday-config.xml");
+		// define the travel time collector (/predictor) that you want to use for routing:
+		Set<String> analyzedModes = new HashSet<String>();
+		analyzedModes.add(TransportMode.car);
+		final TravelTime travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(controler.getScenario(), analyzedModes);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindToProvider(Mobsim.class, new Provider<Mobsim>() {
+
+					private MyMobsimFactory myMobsimFactory = new MyMobsimFactory(new WithinDayTripRouterFactory(controler, travelTime));
+
+					@Override
+					public Mobsim get() {
+						return myMobsimFactory.createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
 		controler.addControlerListener(new StartupListener() {
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				Controler controler = event.getControler() ;
-				
-				// define the travel time collector (/predictor) that you want to use for routing:
-				Set<String> analyzedModes = new HashSet<String>();
-				analyzedModes.add(TransportMode.car);
-				TravelTime travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(controler.getScenario(), analyzedModes);
 				controler.getEvents().addHandler((TravelTimeCollector) travelTime);
 				controler.getMobsimListeners().add((TravelTimeCollector) travelTime);
-				
 				// set the mobsim factory (which insertes the within-day replanning agents):
-				controler.setMobsimFactory(new MyMobsimFactory(new WithinDayTripRouterFactory(event.getControler(), travelTime)));
 			}
 		}) ;
 		controler.run();

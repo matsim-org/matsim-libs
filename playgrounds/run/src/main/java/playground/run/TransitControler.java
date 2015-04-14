@@ -30,7 +30,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
@@ -61,7 +61,7 @@ public class TransitControler {
 
 		@Override
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-			QSim simulation = (QSim) new QSimFactory().createMobsim(sc, eventsManager);
+			QSim simulation = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
 
 //			simulation.getQSimTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
 //			this.events.addHandler(new LogOutputEventHandler());

@@ -81,7 +81,7 @@ public class PRRunner {
 		PRControlerListener prControlerListener = new PRControlerListener(controler, adaptiveControl);
 		controler.addControlerListener(prControlerListener);
 		
-		final MobsimFactory mf = new QSimFactory();
+		final MobsimFactory mf = QSimFactory.createQSimFactory();
 		controler.setMobsimFactory(new MobsimFactory() {
 			private QSim mobsim;
 

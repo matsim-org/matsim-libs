@@ -20,11 +20,6 @@
 
 package playground.christoph.mobsim.flexiblecells;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,13 +28,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
@@ -50,14 +39,18 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.christoph.mobsim.flexiblecells.events.VXYEvent;
 import playground.christoph.mobsim.flexiblecells.events.VXYEventsHandler;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class RunDemo {
 
@@ -184,8 +177,8 @@ public class RunDemo {
 		scenario.getConfig().qsim().setTimeStepSize(timeStepSize);
 		scenario.getConfig().qsim().setStartTime(startTime);
 		scenario.getConfig().qsim().setEndTime(endTime);
-		
-		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, eventsManager);
+
+		QSim qSim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
 		FlexibleCellSimEngine caEngine = new FlexibleCellSimEngineFactory().createFlexibleCellSimEngine(qSim);
 		qSim.addMobsimEngine(caEngine);
         qSim.addDepartureHandler(new FlexibleCellDepartureHandler(caEngine, CollectionUtils.stringToSet(TransportMode.walk)));

@@ -20,9 +20,6 @@
 
 package playground.mrieser.pt.demo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -36,7 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -48,19 +45,15 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
 import playground.mrieser.pt.analysis.RouteOccupancy;
 import playground.mrieser.pt.analysis.VehicleTracker;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class TwoLinesDemo {
 
@@ -307,7 +300,7 @@ public class TwoLinesDemo {
 		events.addHandler(analysis1);
 		events.addHandler(analysis2);
 
-		QSim sim = (QSim) new QSimFactory().createMobsim(this.scenario, events);
+		QSim sim = (QSim) QSimUtils.createDefaultQSim(this.scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();

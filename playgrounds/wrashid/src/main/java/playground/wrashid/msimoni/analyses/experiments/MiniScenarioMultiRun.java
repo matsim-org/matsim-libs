@@ -20,13 +20,6 @@
 
 package playground.wrashid.msimoni.analyses.experiments;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,12 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.network.NetworkWriter;
@@ -50,14 +38,15 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.wrashid.msimoni.analyses.InFlowInfoAcuumulatorWithPt;
 import playground.wrashid.msimoni.analyses.MainDensityAnalysisWithPtV2;
 import playground.wrashid.msimoni.analyses.OutFlowInfoAccumulatorWithPt;
+
+import java.util.*;
 
 public class MiniScenarioMultiRun {
 
@@ -235,8 +224,7 @@ public class MiniScenarioMultiRun {
 		// "100.0"); // instead of 1800.0
 		// scenario.getConfig().setParam("JDEQSim", "storageCapacityFactor",
 		// "5.0"); // instead of 1.0
-		Mobsim sim = new JDEQSimulationFactory().createMobsim(scenario,
-				eventsManager);
+		Mobsim sim = new JDEQSimulation(scenario, eventsManager);
 		sim.run();
 
 		// QSimConfigGroup conf = new QSimConfigGroup();

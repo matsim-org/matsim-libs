@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.router.util.TravelTime;
 
 import java.util.HashMap;
@@ -41,7 +41,7 @@ class MyQSimFactory implements MobsimFactory {
 
     @Override
     public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-        QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager);
+        QSim qSim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
         HashMap<String, TravelTime> multiModalTravelTimes = new HashMap<>();
         multiModalTravelTimes.put("car", carTravelTime);
         new MultiModalQSimModule(sc.getConfig(), multiModalTravelTimes).configure(qSim);

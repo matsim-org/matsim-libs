@@ -20,7 +20,6 @@
 package org.matsim.contrib.signals;
 
 import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 
 
 /**
@@ -59,7 +58,7 @@ public class SignalsMixedLaneTest {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
 
-		QSim qsim = (QSim) new QSimFactory().createMobsim(this.fixture.sc, events);
+		QSim qsim = (QSim) QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 
 		Assert.assertTrue(handler.hasCollectedLink2Event);

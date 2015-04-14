@@ -20,7 +20,6 @@
 package org.matsim.contrib.signals;
 
 import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
@@ -130,7 +129,7 @@ public class TravelTimeOneWayTest {
 			SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 			SignalEngine signalEngine = new QSimSignalEngine(manager);
 			//run the qsim
-			QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
+			QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 			sim.addQueueSimulationListeners(signalEngine);
 			sim.run();
 			log.debug("circulationTime: " + circulationTime);
@@ -166,8 +165,8 @@ public class TravelTimeOneWayTest {
 		events.addHandler(eventHandler);
 
 		SignalEngine signalEngine = this.initSignalEngine(scenario, events);
-		
-		QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
+
+		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
 		MeasurementPoint qSimMeasurementPoint = eventHandler.beginningOfLink2;
@@ -177,7 +176,7 @@ public class TravelTimeOneWayTest {
 		events = EventsUtils.createEventsManager();
 		eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
-		new QSimFactory().createMobsim(scenario, events).run();
+		QSimUtils.createDefaultQSim(scenario, events).run();
 		if (eventHandler.beginningOfLink2 != null) {
 			log.debug("tF = 60s, " + eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure
 					+ ", " + eventHandler.beginningOfLink2.numberOfVehPassed + ", "

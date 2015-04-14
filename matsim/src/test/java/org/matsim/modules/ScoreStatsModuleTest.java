@@ -27,18 +27,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.ScoreStatsControlerListener;
-import org.matsim.analysis.ScoreStatsModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.replanning.StrategyManagerModule;
-import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.scenario.ScenarioElementsModule;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.testcases.MatsimTestUtils;
 
 import javax.inject.Inject;
@@ -56,20 +49,12 @@ public class ScoreStatsModuleTest {
         Config config = utils.loadConfig("test/scenarios/equil/config.xml");
         config.controler().setLastIteration(nIterations - 1);
         Controler controler = new Controler(config);
-        controler.setModules(
-                new ScenarioElementsModule(),
-                new CharyparNagelScoringFunctionModule(),
-                new TripRouterModule(),
-                new TravelTimeCalculatorModule(),
-                new TravelDisutilityModule(),
-                new ScoreStatsModule(),
-                new StrategyManagerModule(),
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                        addControlerListener(MyControlerListener.class);
-                    }
-                });
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addControlerListener(MyControlerListener.class);
+            }
+        });
         controler.run();
     }
 

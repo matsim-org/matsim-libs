@@ -21,16 +21,16 @@ package playground.dgrether.signalsystems.otfvis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.signals.builder.FromDataBuilder;
+import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
+import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.signals.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -93,8 +93,8 @@ public class FourWaysVis {
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
 
-		
-		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(scenario, events);
+
+		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
 		
 		//		client.setConnectionManager(new DgConnectionManagerFactory().createConnectionManager());

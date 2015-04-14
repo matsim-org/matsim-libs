@@ -22,17 +22,13 @@ package playground.dressler.util;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -120,7 +116,7 @@ public class DDcontroller {
 			EventWriterTXT eventWriter = new EventWriterTXT("./output/events.txt");
 			events.addHandler(eventWriter);
 
-			QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
+			QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 //			sim.openNetStateWriter("./output/simout", netFilename, 10); // NetVis is no longer supported
 			sim.run();
 

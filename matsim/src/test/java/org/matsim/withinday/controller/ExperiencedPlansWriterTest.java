@@ -42,7 +42,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -78,7 +77,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
 		
-		config.qsim().setEndTime(24*3600);
+		config.qsim().setEndTime(24 * 3600);
 		
 		config.controler().setLastIteration(0);
 
@@ -95,6 +94,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		population.addPerson(createPerson(scenario, "p02"));
 		
 		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new WithinDayModule());
         controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);

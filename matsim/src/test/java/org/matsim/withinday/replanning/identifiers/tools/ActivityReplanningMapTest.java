@@ -39,10 +39,10 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.withinday.controller.WithinDayModule;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
-import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -100,10 +100,8 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
 
 		Controler controler = new Controler(config);
-		WithinDayEngine withinDayEngine = new WithinDayEngine(controler.getEvents());
-		withinDayEngine.initializeReplanningModules(2);
-		controler.setMobsimFactory(new WithinDayQSimFactory(withinDayEngine));
-		ControlerListenerForTests listener = new ControlerListenerForTests(withinDayEngine);
+		controler.addOverridingModule(new WithinDayModule());
+		ControlerListenerForTests listener = new ControlerListenerForTests();
 		controler.addControlerListener(listener);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
@@ -120,18 +118,13 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 	 */
 	private static class ControlerListenerForTests implements StartupListener {
 
-		private final WithinDayEngine withinDayEngine;
-		
-		public ControlerListenerForTests(WithinDayEngine withinDayEngine) {
-			this.withinDayEngine = withinDayEngine;
-		}
-		
 		@Override
 		public void notifyStartup(final StartupEvent event) {
+			event.getControler().getInjector().getInstance(WithinDayEngine.class).initializeReplanningModules(2);
 			MobsimDataProvider mobsimDataProvider = new MobsimDataProvider();
 			ActivityReplanningMap arp = new ActivityReplanningMap(mobsimDataProvider);
 			event.getControler().getEvents().addHandler(arp);
-			MobsimListenerForTests listener = new MobsimListenerForTests(arp, withinDayEngine);
+			MobsimListenerForTests listener = new MobsimListenerForTests(arp, event.getControler().getInjector().getInstance(WithinDayEngine.class));
 			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 			fosl.addSimulationListener(mobsimDataProvider);
 			fosl.addSimulationListener(arp);

@@ -26,17 +26,12 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneData20;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.lanes.data.v20.*;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -135,8 +130,8 @@ public class QLinkLanesTest extends MatsimTestCase {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		
 		this.initNetwork(scenario.getNetwork());
-		
-		QSim queueSim = (QSim) new QSimFactory().createMobsim(scenario, null);
+
+		QSim queueSim = (QSim) QSimUtils.createDefaultQSim(scenario, null);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		QLinkImpl ql = (QLinkImpl) queueNetwork.getNetsimLink(Id.create(1, Link.class));
 
@@ -150,8 +145,8 @@ public class QLinkLanesTest extends MatsimTestCase {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 1);
-		
-		QSim queueSim = (QSim) new QSimFactory().createMobsim(scenario, null);
+
+		QSim queueSim = (QSim) QSimUtils.createDefaultQSim(scenario, null);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getNetsimLink(Id.create(1, Link.class));
 
@@ -183,8 +178,8 @@ public class QLinkLanesTest extends MatsimTestCase {
 		scenario.getConfig().scenario().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 2);
-		
-		QSim queueSim = (QSim) new QSimFactory().createMobsim(scenario, null);
+
+		QSim queueSim = (QSim) QSimUtils.createDefaultQSim(scenario, null);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getNetsimLink(Id.create(1, Link.class));
 
@@ -216,8 +211,8 @@ public class QLinkLanesTest extends MatsimTestCase {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		this.initNetwork(scenario.getNetwork());
 		this.createLanes(scenario);
-		
-		QSim queueSim = (QSim) new QSimFactory().createMobsim(scenario, null);
+
+		QSim queueSim = (QSim) QSimUtils.createDefaultQSim(scenario, null);
 		NetsimNetwork queueNetwork = queueSim.getNetsimNetwork();
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getNetsimLink(Id.create(1, Link.class));
 

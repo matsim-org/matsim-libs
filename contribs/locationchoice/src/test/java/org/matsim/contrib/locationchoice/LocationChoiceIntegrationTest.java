@@ -48,7 +48,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -389,7 +389,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 	class FactoryForMobsimWithOTFVis implements MobsimFactory {
 		@Override
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-			QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
+			QSim qSim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
 			OTFClientLive.run(sc.getConfig(), server);
 			return qSim ;

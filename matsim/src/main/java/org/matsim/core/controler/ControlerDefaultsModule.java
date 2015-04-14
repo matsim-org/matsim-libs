@@ -25,8 +25,12 @@ package org.matsim.core.controler;
 import org.matsim.analysis.LegTimesModule;
 import org.matsim.analysis.ScoreStatsModule;
 import org.matsim.analysis.VolumesAnalyzerModule;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.corelisteners.LegHistogramModule;
 import org.matsim.core.controler.corelisteners.LinkStatsModule;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
+import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
@@ -40,6 +44,11 @@ import org.matsim.pt.counts.PtCountsModule;
 public class ControlerDefaultsModule extends AbstractModule {
     @Override
     public void install() {
+        if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.qsim.toString())) {
+            bindToProvider(Mobsim.class, QSimProvider.class);
+        } else if (getConfig().controler().getMobsim().equals(ControlerConfigGroup.MobsimType.JDEQSim.toString())) {
+            bindTo(Mobsim.class, JDEQSimulation.class);
+        }
         include(new ScenarioElementsModule());
         include(new TravelTimeCalculatorModule());
         include(new TravelDisutilityModule());

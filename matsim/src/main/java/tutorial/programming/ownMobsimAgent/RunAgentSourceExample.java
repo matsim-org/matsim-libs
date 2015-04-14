@@ -24,14 +24,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.MobsimRegistrar;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -49,8 +48,7 @@ public class RunAgentSourceExample {
                 sc.getConfig().qsim().setEndTime(25*60*60);
                 sc.getConfig().controler().setLastIteration(0);
                 sc.getPopulation().getPersons().clear();
-                MobsimFactory factory = new MobsimRegistrar().getFactoryRegister().getInstance(MobsimType.qsim.toString());
-                final QSim qsim = (QSim) factory.createMobsim(sc, eventsManager);
+                final QSim qsim = QSimUtils.createDefaultQSim(sc, eventsManager);
                 qsim.addAgentSource(new AgentSource() {
                     @Override
                     public void insertAgentsIntoMobsim() {

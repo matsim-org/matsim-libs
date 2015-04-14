@@ -24,11 +24,10 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
 import playground.dgrether.DgPaths;
 
 
@@ -47,7 +46,7 @@ public class DenverStarter {
 		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile);
 		Scenario sc = scl.loadScenario();
 		EventsManager e = (EventsManager) EventsUtils.createEventsManager();
-		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(sc, e);
+		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(sc, e);
 			
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, e, otfVisQSim);
 		OTFClientLive.run(sc.getConfig(), server);

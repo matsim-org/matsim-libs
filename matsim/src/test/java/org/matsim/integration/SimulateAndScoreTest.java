@@ -33,7 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -183,7 +183,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		scenario.getPopulation().addPerson(person);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		Netsim sim = new QSimFactory().createMobsim(scenario, events);
+		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
 		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
@@ -251,7 +251,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		scenario.getPopulation().addPerson(person);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		Netsim sim = new QSimFactory().createMobsim(scenario, events);
+		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);
 		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");

@@ -33,8 +33,8 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.withinday.controller.WithinDayModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
-import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 
 public class LinkReplanningMapTest extends MatsimTestCase {
@@ -54,9 +54,7 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		config.controler().setLastIteration(0);
 
 		Controler controler = new Controler(config);
-		WithinDayEngine withinDayEngine = new WithinDayEngine(controler.getEvents());
-		withinDayEngine.initializeReplanningModules(2);
-		controler.setMobsimFactory(new WithinDayQSimFactory(withinDayEngine));
+		controler.addOverridingModule(new WithinDayModule());
 		ControlerListenerForTests listener = new ControlerListenerForTests();
 		controler.addControlerListener(listener);
 		controler.run();
@@ -72,7 +70,7 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 
 		@Override
 		public void notifyStartup(final StartupEvent event) {
-			
+			event.getControler().getInjector().getInstance(WithinDayEngine.class).initializeReplanningModules(2);
 			EarliestLinkExitTimeProvider earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(
 					event.getControler().getScenario());
 			event.getControler().getEvents().addHandler(earliestLinkExitTimeProvider);

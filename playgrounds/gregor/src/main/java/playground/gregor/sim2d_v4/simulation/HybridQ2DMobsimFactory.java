@@ -20,12 +20,12 @@
 
 package playground.gregor.sim2d_v4.simulation;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -35,18 +35,25 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSim2DNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
-public class HybridQ2DMobsimFactory implements MobsimFactory {
+public class HybridQ2DMobsimFactory implements Provider<Mobsim> {
 
 	private final static Logger log = Logger.getLogger(HybridQ2DMobsimFactory.class);
 	
 	Sim2DEngine sim2DEngine = null;
 
+	Scenario sc;
+
+	EventsManager eventsManager;
+
+	public HybridQ2DMobsimFactory(Scenario sc, EventsManager eventsManager) {
+		this.sc = sc;
+		this.eventsManager = eventsManager;
+	}
 
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim get() {
 
 		if (!sc.getConfig().controler().getMobsim().equals("hybridQ2D")) {
 			throw new RuntimeException("This factory does not make sense for " + sc.getConfig().controler().getMobsim()  );

@@ -190,7 +190,7 @@ public class ParkAndRideMain {
 		prControlerListener.setAddPRtimeAllocationDisable(addPRtimeAllocationDisable);
 		controler.addControlerListener(prControlerListener);
 		
-		final MobsimFactory mf = new QSimFactory();
+		final MobsimFactory mf = QSimFactory.createQSimFactory();
 		controler.setMobsimFactory(new MobsimFactory() {
 			private QSim mobsim;
 

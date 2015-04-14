@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -81,9 +81,7 @@ public class RunTest {
 
 			log.info( "running actual simulation..." );
 			timeQSim = -System.currentTimeMillis();
-			new QSimFactory().createMobsim(
-						scenario,
-						events).run();
+			QSimUtils.createDefaultQSim(scenario, events).run();
 			timeQSim += System.currentTimeMillis();
 			log.info( "running actual simulation... DONE" );
 

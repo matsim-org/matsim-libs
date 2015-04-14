@@ -23,6 +23,9 @@ package org.matsim.contrib.otfvis;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.signals.builder.FromDataBuilder;
+import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
+import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,7 +33,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -45,9 +48,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.signals.data.SignalsData;
 import org.matsim.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
 import org.matsim.vis.otfvis.*;
@@ -55,7 +55,6 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -182,7 +181,7 @@ public class OTFVis {
 	
 	public static void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
+		QSim qSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);

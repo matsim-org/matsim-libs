@@ -33,20 +33,17 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -57,7 +54,6 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
-
 import playground.mrieser.pt.converter.Visum2TransitSchedule;
 import playground.mrieser.pt.utils.MergeNetworks;
 
@@ -203,7 +199,7 @@ public class DataPrepare {
 
 		log.info("start visualizer");
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(visScenario, events);
+		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(visScenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		otfVisQSim.run();

@@ -20,15 +20,7 @@
 
 package playground.christoph.icem2012;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -43,8 +35,9 @@ import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -56,6 +49,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -71,17 +65,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.facilities.ActivityOption;
-import org.matsim.facilities.OpeningTime;
-import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.facilities.*;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsFactory;
 import org.matsim.withinday.controller.WithinDayControlerListener;
-import org.matsim.withinday.mobsim.WithinDayQSimFactory;
+import org.matsim.withinday.controller.WithinDayModule;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
@@ -94,7 +84,6 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.api.core.v01.Coord3d;
@@ -114,12 +103,14 @@ import playground.christoph.evacuation.withinday.replanning.replanners.old.Curre
 import playground.christoph.evacuation.withinday.replanning.replanners.old.EndActivityAndEvacuateReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.old.ExtendCurrentActivityReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
-import playground.gregor.sim2d_v4.simulation.HybridQ2DMobsimFactory;
 import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
 import playground.gregor.sim2denvironment.GisDebugger;
 import playground.meisterk.kti.config.KtiConfigGroup;
 
-import com.vividsolutions.jts.geom.Geometry;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.*;
+import java.util.Map.Entry;
 
 public final class MarathonRunner implements StartupListener,
 	MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
@@ -218,7 +209,14 @@ public final class MarathonRunner implements StartupListener,
 
 		Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
-		
+		controler.addOverridingModule(new WithinDayModule());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindToProvider(Mobsim.class, CombiMobsimFactory.class);
+			}
+		});
+
 		MarathonRunner controlerListener = new MarathonRunner(controler);
 		controler.addControlerListener(controlerListener);
 		
@@ -334,32 +332,34 @@ public final class MarathonRunner implements StartupListener,
 	 * Combines a WithinDayQSimFactory and a HybridQ2DMobsimFactory
 	 * to have Within-day Replanning and Sim2D in one simulation.
 	 */
-	private static class CombiMobsimFactory extends HybridQ2DMobsimFactory {
+	private static class CombiMobsimFactory implements Provider<Mobsim> {
 	
-		private final WithinDayQSimFactory factory;
 		private Sim2DEngine sim2DEngine = null;
-		
-		public CombiMobsimFactory(WithinDayQSimFactory factory) {
-			this.factory = factory;
+		private Scenario sc;
+		private EventsManager eventsManager;
+		private WithinDayEngine withinDayEngine;
+
+		@Inject
+		CombiMobsimFactory(Scenario sc, EventsManager eventsManager, WithinDayEngine withinDayEngine) {
+			this.sc = sc;
+			this.eventsManager = eventsManager;
+			this.withinDayEngine = withinDayEngine;
 		}
-		
+
 		@Override
-		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		
-			QSim qSim = factory.createMobsim(sc, eventsManager);
+		public Mobsim get() {
+
+			QSim mobsim = QSimUtils.createDefaultQSim(sc, eventsManager);
+			log.info("Adding WithinDayEngine to Mobsim.");
+			mobsim.addMobsimEngine(withinDayEngine);
 			
-			Sim2DEngine e = new Sim2DEngine(qSim);
+			Sim2DEngine e = new Sim2DEngine(mobsim);
 			this.sim2DEngine = e;
-			qSim.addMobsimEngine(e);
+			mobsim.addMobsimEngine(e);
 //			Sim2DDepartureHandler d = new Sim2DDepartureHandler(e);
 //			qSim.addDepartureHandler(d);
 			
-			return qSim;
-		}
-		
-		@Override
-		public Sim2DEngine getSim2DEngine() {
-			return this.sim2DEngine;
+			return mobsim;
 		}
 	}
 
@@ -380,13 +380,7 @@ public final class MarathonRunner implements StartupListener,
 
 		
 		this.withinDayControlerListener.notifyStartup(event);
-		
-		/*
-		 * Replace WithinDayQSimFactory with a CombiMobsimFactory
-		 * which combines a WithinDayQSimFactory with a HybridQ2DMobsimFactory. 
-		 */
-		event.getControler().setMobsimFactory(new CombiMobsimFactory(new WithinDayQSimFactory(this.withinDayControlerListener.getWithinDayEngine())));
-		
+
 //		XYDataWriter xyDataWriter = new XYDataWriter();
 //		event.getControler().getEvents().addHandler(xyDataWriter);
 //		event.getControler().addControlerListener(xyDataWriter);

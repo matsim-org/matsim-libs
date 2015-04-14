@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.mobsim.pseudoqsimengine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -49,23 +45,20 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-
 import playground.thibautd.mobsim.CompareEventsUtils;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 import playground.thibautd.pseudoqsim.pseudoqsimengine.QSimWithPseudoEngineFactory;
 import playground.thibautd.scripts.scenariohandling.CreateGridNetworkWithDimensions;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author thibautd
@@ -124,7 +117,7 @@ public class PSeudoQSimCompareEventsTest {
 									travelTime.getLinkTravelTimes(),
 									scenario.getConfig().planCalcScore() ),
 								travelTime.getLinkTravelTimes() ) ) ),
-				new QSimFactory(),
+				QSimFactory.createQSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,
 				new QSimWithPseudoEngineFactory(
 					travelTime.getLinkTravelTimes() ),

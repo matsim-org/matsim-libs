@@ -20,10 +20,6 @@
 
 package org.matsim.withinday.mobsim;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -36,6 +32,10 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provides Mobsim related data such as the Agents or QVehicles.
@@ -82,7 +82,11 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 
 	private NetsimNetwork netsimNetwork;
 	private QSim qSim;
-	
+
+	public MobsimDataProvider() {
+
+	}
+
 	@Override
 	public final void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		

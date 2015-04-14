@@ -20,8 +20,6 @@
 
 package org.matsim.roadpricing;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -33,13 +31,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.Map;
 
 /**
  * Tests that {@link CalcPaidToll} calculates the correct tolls
@@ -210,7 +210,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getNetwork()));
 		events.addHandler(scoring);
 
-		Mobsim sim = new QSimFactory().createMobsim(scenario, events);
+		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();
 
 		paidToll.sendMoneyEvents(Time.MIDNIGHT, events);

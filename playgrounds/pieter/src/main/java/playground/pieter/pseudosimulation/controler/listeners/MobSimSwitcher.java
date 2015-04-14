@@ -7,8 +7,6 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-
-
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 
@@ -112,7 +110,7 @@ public class MobSimSwitcher implements ControlerListener,
 
 			if (mobsim != null) {
 				if (mobsim.equals("qsim")) {
-					matsimControler.setMobsimFactory(new QSimFactory());
+					matsimControler.setMobsimFactory(QSimFactory.createQSimFactory());
 					// controler.setMobsimFactory(new MentalSimFactory(ttcalc));
 				} else if (mobsim.equals("jdeqsim")) {
 					matsimControler.setMobsimFactory(new JDEQSimulationFactory());
@@ -120,7 +118,7 @@ public class MobSimSwitcher implements ControlerListener,
 				} 
 
 			} else {
-				matsimControler.setMobsimFactory(new QSimFactory());
+				matsimControler.setMobsimFactory(QSimFactory.createQSimFactory());
 			}
 		} else {
 			log.info("Running PSim");

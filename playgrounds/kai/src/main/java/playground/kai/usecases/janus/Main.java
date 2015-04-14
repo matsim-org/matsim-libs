@@ -32,7 +32,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -60,7 +60,7 @@ public class Main {
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
 			public Mobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
-				final QSim qsim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
+				final QSim qsim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
 				
 				qsim.addAgentSource(new AgentSource(){
 					@Override

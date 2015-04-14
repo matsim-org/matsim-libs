@@ -135,9 +135,6 @@ public class Controler extends AbstractController {
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
 
-	private MobsimFactory thisMobsimFactory = null;
-
-	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
 
 	private boolean dumpDataAtEnd = true; 
@@ -200,8 +197,6 @@ public class Controler extends AbstractController {
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			this.scenarioData  = ScenarioUtils.createScenario(this.config);
 		}
-		MobsimRegistrar mobsimRegistrar = new MobsimRegistrar();
-		this.mobsimFactoryRegister = mobsimRegistrar.getFactoryRegister();
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
 
@@ -384,19 +379,14 @@ public class Controler extends AbstractController {
 	}
 
 	private Mobsim getNewMobsim() {
-		if (this.thisMobsimFactory != null) {
-			Mobsim simulation = this.thisMobsimFactory.createMobsim(this.getScenario(), this.getEvents());
-			enrichSimulation(simulation);
-			return simulation;
-		} else if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null && 
+		if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null &&
 				((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
 			ExternalMobsim simulation = new ExternalMobsim(this.scenarioData , this.events);
 			simulation.setControlerIO(this.getControlerIO());
 			simulation.setIterationNumber(this.getIterationNumber());
 			return simulation;
 		} else {
-			MobsimFactory f = this.mobsimFactoryRegister.getInstance(this.config.controler().getMobsim());
-			Mobsim simulation = f.createMobsim(this.getScenario(), this.getEvents());
+			Mobsim simulation = injector.getInstance(Mobsim.class);
 			enrichSimulation(simulation);
 			return simulation;
 		}
@@ -535,15 +525,29 @@ public class Controler extends AbstractController {
 	public final void setTravelDisutilityFactory(
 			final TravelDisutilityFactory travelCostCalculatorFactory) {
 		this.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bindToInstance(TravelDisutilityFactory.class, travelCostCalculatorFactory);
-            }
-        });
+			@Override
+			public void install() {
+				bindToInstance(TravelDisutilityFactory.class, travelCostCalculatorFactory);
+			}
+		});
+	}
+
+	public final void setMobsimFactory(final Provider<Mobsim> mobsimProvider) {
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindToProvider(Mobsim.class, mobsimProvider);
+			}
+		});
 	}
 
 	public final void setMobsimFactory(final MobsimFactory mobsimFactory) {
-		this.thisMobsimFactory = mobsimFactory;
+		setMobsimFactory(new Provider<Mobsim>() {
+			@Override
+			public Mobsim get() {
+				return mobsimFactory.createMobsim(getScenario(), getEvents());
+			}
+		});
 	}
 
 	public final void setScoringFunctionFactory(
@@ -655,8 +659,24 @@ public class Controler extends AbstractController {
 	 *
 	 * @see ControlerConfigGroup#getMobsim()
 	 */
+	public final void addMobsimFactory(final String mobsimName, final Provider<Mobsim> mobsimProvider) {
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals(mobsimName)) {
+					bindToProvider(Mobsim.class, mobsimProvider);
+				}
+			}
+		});
+	}
+
 	public final void addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {
-		this.mobsimFactoryRegister.register(mobsimName, mobsimFactory);
+		addMobsimFactory(mobsimName, new Provider<Mobsim>() {
+			@Override
+			public Mobsim get() {
+				return mobsimFactory.createMobsim(getScenario(), getEvents());
+			}
+		});
 	}
 
 	public final void addSnapshotWriterFactory(final String snapshotWriterName, final SnapshotWriterFactory snapshotWriterFactory) {

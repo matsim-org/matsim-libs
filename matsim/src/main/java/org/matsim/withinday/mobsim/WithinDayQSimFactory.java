@@ -20,43 +20,36 @@
 
 package org.matsim.withinday.mobsim;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 
-public class WithinDayQSimFactory implements MobsimFactory {
+import javax.inject.Inject;
+
+public class WithinDayQSimFactory implements Provider<Mobsim> {
 
 	private static final Logger log = Logger.getLogger(WithinDayQSimFactory.class);
 
+	private final Scenario scenario;
+	private final EventsManager eventsManager;
 	private final WithinDayEngine withinDayEngine;
-	private final MobsimFactory delegateFactory;
-	
-	public WithinDayQSimFactory(WithinDayEngine withinDayEngine) {
+
+	@Inject
+	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine) {
+		this.scenario = scenario;
+		this.eventsManager = eventsManager;
 		this.withinDayEngine = withinDayEngine;
-		this.delegateFactory = new QSimFactory();
 	}
-	
-	public WithinDayQSimFactory(WithinDayEngine withinDayEngine, MobsimFactory delegateFactory) {
-		this.withinDayEngine = withinDayEngine;
-		this.delegateFactory = delegateFactory;
-	}
-	
-    @Override
-	public QSim createMobsim(Scenario sc, EventsManager eventsManager) {
-    	
-    	Mobsim mobsim = this.delegateFactory.createMobsim(sc, eventsManager);
-    	
-    	if (mobsim instanceof QSim) {
-    		log.info("Adding WithinDayEngine to Mobsim.");
-    		((QSim) mobsim).addMobsimEngine(withinDayEngine);
-    		return (QSim) mobsim;
-    	} else {
-    		throw new RuntimeException("Delegate MobsimFactory create a Mobsim from type " + mobsim.getClass().toString() +
-    				". Aborting since a Mobsim from type QSim was expexted!");
-    	}
+
+	@Override
+	public Mobsim get() {
+		QSim mobsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		log.info("Adding WithinDayEngine to Mobsim.");
+		mobsim.addMobsimEngine(withinDayEngine);
+		return mobsim;
 	}
 }

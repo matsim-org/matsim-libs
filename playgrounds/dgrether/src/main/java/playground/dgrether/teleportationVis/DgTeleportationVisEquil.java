@@ -19,25 +19,18 @@
  * *********************************************************************** */
 package playground.dgrether.teleportationVis;
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -45,8 +38,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
 import playground.dgrether.utils.LogOutputEventHandler;
+
+import java.util.Random;
 
 /**
  * @author dgrether
@@ -65,7 +59,7 @@ public class DgTeleportationVisEquil {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new LogOutputEventHandler());
 		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true);
-		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(scenario, events);
+		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		// client.setVisualizeTeleportedAgents(true);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
 		OTFClientLive.run(scenario.getConfig(), server);

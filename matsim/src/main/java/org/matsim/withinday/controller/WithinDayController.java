@@ -20,10 +20,6 @@
 
 package org.matsim.withinday.controller;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -34,21 +30,20 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
-import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This controller contains the basic structure for
@@ -240,9 +235,9 @@ public abstract class WithinDayController extends Controler implements StartupLi
 		super.getMobsimListeners().add(fosl);
 		
 		// initialize a withinDayEngine and set WithinDayQSimFactory as MobsimFactory
-		this.withinDayEngine = new WithinDayEngine(this.getEvents());
-		WithinDayQSimFactory mobsimFactory = new WithinDayQSimFactory(withinDayEngine);
-		this.setMobsimFactory(mobsimFactory);
+//		this.withinDayEngine = new WithinDayEngine(this.getEvents());
+//		WithinDayQSimFactory mobsimFactory = new WithinDayQSimFactory(withinDayEngine);
+//		this.setMobsimFactory(mobsimFactory);
 		
 		// register this as a Controller and Simulation Listener
 		this.getFixedOrderSimulationListener().addSimulationListener(this);

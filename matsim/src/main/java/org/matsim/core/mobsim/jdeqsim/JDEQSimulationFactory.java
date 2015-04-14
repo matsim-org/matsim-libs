@@ -19,16 +19,24 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 
-public class JDEQSimulationFactory implements MobsimFactory {
+import javax.inject.Inject;
+
+public class JDEQSimulationFactory implements Provider<Mobsim> {
+
+	@Inject
+	Scenario scenario;
+
+	@Inject
+	EventsManager eventsManager;
 
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		return new JDEQSimulation(sc, eventsManager);
+	public JDEQSimulation get() {
+		return new JDEQSimulation(scenario, eventsManager);
 	}
 
 }

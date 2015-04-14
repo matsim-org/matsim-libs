@@ -186,8 +186,8 @@ public class TransitQueueSimulationTest {
         ((SimulationConfigGroup) scenario.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(1.0*3600); // prevent running the actual simulation
         scenario.getConfig().qsim().setEndTime(1.0*3600); // prevent running the actual simulation
         // (the previous line was not there when I found this. kai, dec'11)
-        
-        QSim sim = (QSim) new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
+
+        QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());
         sim.run();
         List<MobsimAgent> agents = new ArrayList<MobsimAgent>(sim.getAgents());
         Collections.sort(agents, new Comparator<MobsimAgent>() {
@@ -341,7 +341,7 @@ public class TransitQueueSimulationTest {
 
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
-        QSim simulation = (QSim) new QSimFactory().createMobsim(scenario, events);
+        QSim simulation = (QSim) QSimUtils.createDefaultQSim(scenario, events);
         simulation.run();
     }
 
@@ -669,7 +669,7 @@ public class TransitQueueSimulationTest {
         events.addHandler(collector);
 
         // first test without special settings
-        QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
+        QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
         sim.run();
         assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -678,7 +678,7 @@ public class TransitQueueSimulationTest {
         // second test with special start/end times
         config.qsim().setStartTime(depTime + 20.0);
         config.qsim().setEndTime(depTime + 90.0);
-        sim = (QSim) new QSimFactory().createMobsim(scenario, events);
+        sim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
         sim.run();
         assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -794,7 +794,7 @@ public class TransitQueueSimulationTest {
         EventsManager events = EventsUtils.createEventsManager();
         EventsCollector collector = new EventsCollector();
         events.addHandler(collector);
-        new QSimFactory().createMobsim(scenario, events).run();
+        QSimUtils.createDefaultQSim(scenario, events).run();
         List<Event> allEvents = collector.getEvents();
 
         for (Event event : allEvents) {

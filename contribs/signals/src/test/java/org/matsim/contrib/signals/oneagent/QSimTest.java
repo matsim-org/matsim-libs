@@ -38,7 +38,7 @@ import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.api.experimental.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.signals.data.SignalsData;
 import org.matsim.signals.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
@@ -80,8 +80,8 @@ public class QSimTest implements
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
-		
-		QSim qsim = (QSim) new QSimFactory().createMobsim(scenario, events);
+
+		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		qsim.addQueueSimulationListeners(engine);
 		qsim.run();
 	}
@@ -113,8 +113,8 @@ public class QSimTest implements
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
-		
-		QSim qsim = (QSim) new QSimFactory().createMobsim(scenario, events);
+
+		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		qsim.addQueueSimulationListeners(engine);
 		qsim.run();
 	}
@@ -146,8 +146,8 @@ public class QSimTest implements
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
-		
-		QSim qsim = (QSim) new QSimFactory().createMobsim(scenario, events);
+
+		QSim qsim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		qsim.addQueueSimulationListeners(engine);
 		Exception ex = null;
 		try{

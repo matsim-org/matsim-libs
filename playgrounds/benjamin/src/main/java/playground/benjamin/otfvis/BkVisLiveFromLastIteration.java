@@ -1,16 +1,5 @@
 package playground.benjamin.otfvis;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
@@ -22,11 +11,15 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.io.*;
 
 /* *********************************************************************** *
  * project: org.matsim.*
@@ -129,7 +122,7 @@ public class BkVisLiveFromLastIteration {
 		Scenario sc = loader.loadScenario();
 		EventsManager events = EventsUtils.createEventsManager();
 		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(sc.getConfig().controler().getOutputDirectory(), true);
-		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(sc, events);
+		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(sc, events);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, sc, events, otfVisQSim);
 		OTFClientLive.run(config, server);

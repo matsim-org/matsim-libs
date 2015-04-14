@@ -20,11 +20,7 @@
 
 package org.matsim.integration.timevariantnetworks;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import junit.framework.Assert;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -41,14 +37,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.network.NetworkFactoryImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.TimeVariantLinkFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -61,6 +53,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsLogger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests that the QSim takes a TimeVariant Network into account.
@@ -96,8 +91,8 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
-		
-		Mobsim qsim = new QSimFactory().createMobsim(scenario, events);
+
+		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
 		qsim.run();
 
 		// check that we get the expected result
@@ -159,7 +154,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
-		Mobsim qsim = new QSimFactory().createMobsim(scenario, events);
+		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
         qsim.run();
 		/*
 		 * The last person of the first wave should have taken 20 s to travel
@@ -243,8 +238,8 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			}
 		});
 
-		
-		Mobsim qsim = new QSimFactory().createMobsim(scenario, events);
+
+		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
         qsim.run();
 
 	}

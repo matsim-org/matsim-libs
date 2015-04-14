@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
@@ -57,7 +57,7 @@ public class EquilTest extends MatsimTestCase {
 		events.addHandler(writer);
 
 //		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10
-		Mobsim sim = new QSimFactory().createMobsim(scenario, events);
+		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();
 
 		writer.closeFile();

@@ -62,7 +62,7 @@ public class Daganzo2012SimpleAdaptiveRun {
         controler.getConfig().controler().setCreateGraphs(false);
         final SimpleAdaptiveControl adaptiveControl = new SimpleAdaptiveControl();
 		addControlerListener(controler, adaptiveControl);
-		final MobsimFactory mf = new QSimFactory();
+		final MobsimFactory mf = QSimFactory.createQSimFactory();
 		
 		controler.setMobsimFactory(new MobsimFactory() {
 			private QSim mobsim;

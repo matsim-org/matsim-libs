@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -43,7 +43,7 @@ public class JXMapMain {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(filename);
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
+		QSim qSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
 		// WMSService wms = new WMSService("http://localhost:8080/geoserver/wms?service=WMS&","mz:poly");
 		//JXMapOTFVisClient.run(scenario.getConfig(), server, wms);

@@ -28,7 +28,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -101,7 +100,7 @@ public class Sim2DRunner implements IterationStartsListener{
 		
 //		controller.getEvents().addHandler(new SimSpeedObserver());
 
-		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory();
+		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory(sc, controller.getEvents());
 		controller.addMobsimFactory("hybridQ2D", factory);
 
 		

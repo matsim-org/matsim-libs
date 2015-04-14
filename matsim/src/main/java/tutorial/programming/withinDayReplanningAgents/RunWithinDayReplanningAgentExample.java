@@ -36,7 +36,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -65,7 +65,7 @@ public class RunWithinDayReplanningAgentExample {
 			public Mobsim createMobsim(final Scenario sc, final EventsManager ev) {
 
 				// take the default mobsim factory, but since the population is empty, it will not be filled with demand:
-				final QSim qsim = (QSim) (new QSimFactory()).createMobsim(sc,ev) ;
+				final QSim qsim = (QSim) QSimUtils.createDefaultQSim(sc, ev);
 				
 				// add my own agent(s):
 				qsim.addAgentSource(new AgentSource() {

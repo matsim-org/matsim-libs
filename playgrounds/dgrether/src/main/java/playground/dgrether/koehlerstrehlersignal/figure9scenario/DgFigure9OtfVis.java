@@ -28,13 +28,12 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.signals.model.SignalSystemsManager;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
 import playground.dgrether.DgOTFVis;
 
 
@@ -53,8 +52,8 @@ public class DgFigure9OtfVis {
 		FromDataBuilder builder = new FromDataBuilder(scenario, events);
 		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
 		SignalEngine engine = new QSimSignalEngine(manager);
-		
-		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(scenario, events);
+
+		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		otfVisQSim.addQueueSimulationListeners(engine);
 
 		

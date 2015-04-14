@@ -31,7 +31,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -195,7 +195,7 @@ public class VisualizeTransitPlans {
 
 	private void visualize() {
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(this.visScenario, events);
+		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(this.visScenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.visScenario.getConfig(), this.visScenario, events, otfVisQSim);
 		OTFClientLive.run(this.visScenario.getConfig(), server);
 		otfVisQSim.run();

@@ -19,23 +19,11 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -45,7 +33,7 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -55,6 +43,11 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.testcases.utils.SelectiveEventsCollector;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author mrieser
@@ -99,7 +92,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = (QSim) new QSimFactory().createMobsim(f.scenario, eventsManager);
+		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -158,7 +151,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = (QSim) new QSimFactory().createMobsim(f.scenario, eventsManager);
+		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -233,7 +226,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = (QSim) new QSimFactory().createMobsim(f.scenario, eventsManager);
+		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -315,7 +308,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = (QSim) new QSimFactory().createMobsim(f.scenario, eventsManager);
+		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -389,7 +382,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		QSim sim = (QSim) new QSimFactory().createMobsim(f.scenario, eventsManager);
+		QSim sim = (QSim) QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();

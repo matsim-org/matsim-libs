@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -51,9 +51,9 @@ public class FourWaysVisNetworkOnly {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 //		PopulationImpl population = scenario.getPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
-		
-		
-		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(scenario, events);
+
+
+		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
 		OTFClientLive.run(scenario.getConfig(), server);

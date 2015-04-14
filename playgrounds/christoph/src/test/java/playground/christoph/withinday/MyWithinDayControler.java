@@ -28,9 +28,7 @@ import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.withinday.mobsim.WithinDayEngine;
-import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -123,7 +121,7 @@ class MyWithinDayControler extends Controler {
 		createHandlersAndListeners();
 		// initializes "replanningManager"
 
-		sim = new WithinDayQSimFactory(withinDayEngine).createMobsim(this.scenarioData, this.events);
+//		sim = new WithinDayQSimFactory(withinDayEngine).createMobsim(this.scenarioData, this.events);
 		
 		// a QSim with two differences:
 		// (1) uses WithinDayAgentFactory instead of the regular agent factory
