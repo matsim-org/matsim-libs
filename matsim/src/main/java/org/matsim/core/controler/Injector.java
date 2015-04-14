@@ -32,7 +32,6 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 
-import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

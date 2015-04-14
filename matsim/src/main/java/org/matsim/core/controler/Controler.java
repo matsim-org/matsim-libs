@@ -20,6 +20,7 @@
 
 package org.matsim.core.controler;
 
+import com.google.inject.Provider;
 import com.google.inject.name.Names;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
@@ -67,7 +68,6 @@ import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
-import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -536,7 +536,7 @@ public class Controler extends AbstractController {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(Mobsim.class).toProvider((com.google.inject.Provider<? extends Mobsim>) mobsimProvider);
+				bind(Mobsim.class).toProvider(mobsimProvider);
 			}
 		});
 	}
