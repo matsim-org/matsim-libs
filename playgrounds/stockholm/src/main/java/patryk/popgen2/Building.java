@@ -1,0 +1,73 @@
+package patryk.popgen2;
+
+import java.util.ArrayList;
+
+import com.vividsolutions.jts.geom.Geometry;
+
+public class Building {
+	
+	private Geometry geometry;
+	private int buildingSize;
+	
+	private boolean singleFamilyBuilding = false;
+	private boolean multiFamilyBuilding = false;
+	private boolean workBuilding = false;
+
+	private ArrayList<String> homeBuildingTypes;
+	
+	public Building(Geometry geometry, int buildingSize) {
+		this.geometry = geometry;
+		this.buildingSize = buildingSize;
+		
+		this.homeBuildingTypes = new ArrayList<>();
+		this.homeBuildingTypes.add("Bostad; Flerfamiljshus");
+		this.homeBuildingTypes.add("Bostad; Ospecificerad");
+		this.homeBuildingTypes.add("Bostad; Sm�hus friliggande");
+		this.homeBuildingTypes.add("Bostad; Sm�hus med flera l�genheter");
+		this.homeBuildingTypes.add("Bostad; Sm�hus radhus");
+		this.homeBuildingTypes.add("Bostad; Sm�hus kedjehus");
+	}
+	
+	public void setBuildingType(String buildingType) {
+
+		if (homeBuildingTypes.subList(0,1).contains(buildingType)) {
+			multiFamilyBuilding = true;
+		}
+		else if (homeBuildingTypes.subList(2,5).contains(buildingType)) {
+			singleFamilyBuilding = true;
+		}
+		else {
+			workBuilding = true;
+		}
+	}
+	
+	
+	public boolean isHomeBuilding() {
+		if (singleFamilyBuilding == true || multiFamilyBuilding == true) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public boolean isSingleFamilyBuilding() {
+		return singleFamilyBuilding;
+	}
+	
+	public boolean isMultiFamilyBuilding() {
+		return multiFamilyBuilding;
+	}
+	
+	public boolean isWorkBuilding() {
+		return workBuilding;
+	}
+	
+	public Geometry getGeometry() {
+		return geometry;
+	}
+	
+	public int getBuildingSize() {
+		return buildingSize;
+	}
+}
