@@ -20,13 +20,11 @@
 
 package playground.vsptelematics.bangbang;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -43,6 +41,11 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.utils.EditRoutes;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author nagel
@@ -137,12 +140,15 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		// EditRoutes at this point only works for car routes
 		
 		NetworkRoute previousRoute = (NetworkRoute) ((Leg) plan.getPlanElements().get(planElementsIndex)).getRoute() ;
+		ArrayList<Id<Link>> previousLinkIds = new ArrayList<>(previousRoute.getLinkIds());
 		// new Route for current Leg.
 		EditRoutes.relocateCurrentLegRoute((Leg) plan.getPlanElements().get(planElementsIndex), ((HasPerson) agent).getPerson(), 
 				WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent), ((Activity) plan.getPlanElements().get(planElementsIndex+1)).getLinkId(), 
 				now, scenario.getNetwork(), tripRouter);
 		NetworkRoute currentRoute = (NetworkRoute) ((Leg) plan.getPlanElements().get(planElementsIndex)).getRoute() ;
-		if ( !previousRoute.getLinkIds().equals( currentRoute.getLinkIds() ) ) {
+		ArrayList<Id<Link>> currentLinkIds = new ArrayList<>(currentRoute.getLinkIds());
+
+		if ( !Arrays.deepEquals(previousLinkIds.toArray(), currentLinkIds.toArray()) ) {
 			log.warn("modified route");
 			this.scenario.getPopulation().getPersonAttributes().putAttribute( agent.getId().toString(), "marker", true ) ;
 		}
