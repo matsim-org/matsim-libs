@@ -19,11 +19,8 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -40,10 +37,6 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-
-import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
 
 /**
@@ -104,16 +97,16 @@ public class SeepageMobsimfactory  implements MobsimFactory{
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-
-		for(String travelMode:mainModes){
-			VehicleType mode = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode,VehicleType.class));
-			mode.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(travelMode));
-			mode.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(travelMode));
-			modeVehicleTypes.put(travelMode, mode);
-		}
-
-		agentSource.setModeVehicleTypes(modeVehicleTypes);
+//		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+//
+//		for(String travelMode:mainModes){
+//			VehicleType mode = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode,VehicleType.class));
+//			mode.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(travelMode));
+//			mode.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(travelMode));
+//			modeVehicleTypes.put(travelMode, mode);
+//		}
+//
+//		agentSource.setModeVehicleTypes(modeVehicleTypes);
 
 		qSim.addAgentSource(agentSource);
 		return qSim;
