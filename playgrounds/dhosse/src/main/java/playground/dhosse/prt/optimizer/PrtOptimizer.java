@@ -8,8 +8,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
@@ -24,9 +23,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import playground.jbischoff.taxi.optimizer.rank.IdleRankVehicleFinder;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.schedule.TaxiDriveTask;
-import playground.michalm.taxi.schedule.TaxiStayTask;
-import playground.michalm.taxi.schedule.TaxiTask;
+import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPaths;
@@ -97,13 +94,9 @@ public class PrtOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefor
 	}
 	
 	@Override
-	public void nextLinkEntered(DriveTask driveTask) {
-		
-		@SuppressWarnings("unchecked")
-		Schedule<TaxiTask> schedule = (Schedule<TaxiTask>)driveTask.getSchedule();
-		double predictedEndTime = driveTask.getTaskTracker().predictEndTime(context.getTime());
-		scheduler.updateCurrentAndPlannedTasks(schedule, predictedEndTime);
-		
+	public void nextLinkEntered(DriveTask driveTask)
+	{
+		scheduler.updateTimeline(TaxiSchedules.asTaxiSchedule(driveTask.getSchedule()));
 	}
 	
 	protected void scheduleUnplannedRequests()

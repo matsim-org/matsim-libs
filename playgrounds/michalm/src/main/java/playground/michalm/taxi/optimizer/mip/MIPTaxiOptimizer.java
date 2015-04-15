@@ -22,8 +22,6 @@ package playground.michalm.taxi.optimizer.mip;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
-import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -36,7 +34,7 @@ public class MIPTaxiOptimizer
 {
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
 
-    private boolean isLastPlanningHorizonFull = false;//in order to run optimization for the first request
+    private boolean wasLastPlanningHorizonFull = false;//in order to run optimization for the first request
     private boolean hasPickedUpReqsRecently = false;
 
     private int optimCounter = 0;
@@ -58,13 +56,13 @@ public class MIPTaxiOptimizer
     @Override
     protected void scheduleUnplannedRequests()
     {
-        if (unplannedRequests.size() == 0) {
+        if (unplannedRequests.isEmpty()) {
             //nothing new to be planned and we want to avoid extra re-planning of what has been
             //already planned (high computational cost while only marginal improvement) 
             return;
         }
 
-        if (isLastPlanningHorizonFull && //last time we planned as many requests as possible, and...
+        if (wasLastPlanningHorizonFull && //last time we planned as many requests as possible, and...
                 !hasPickedUpReqsRecently) {//...since then no empty space has appeared in the planning horizon 
             return;
         }
@@ -77,29 +75,19 @@ public class MIPTaxiOptimizer
             System.err.println(optimCounter + "; time=" + optimConfig.context.getTime());
         }
 
-        isLastPlanningHorizonFull = mipProblem.isPlanningHorizonFull();
+        wasLastPlanningHorizonFull = mipProblem.isPlanningHorizonFull();
         hasPickedUpReqsRecently = false;
     }
 
 
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask)
     {
-        super.nextTask(schedule);
-        checkIfRequiresReoptimization(schedule);
-    }
-
-
-    private void checkIfRequiresReoptimization(Schedule<? extends Task> schedule)
-    {
-        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {
-            return;
-        }
-
-        TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
-        if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP) {
+        if (newCurrentTask.getTaxiTaskType() == TaxiTaskType.PICKUP) {
             hasPickedUpReqsRecently = true;
-            requiresReoptimization = true;
+            return true;
         }
+
+        return false;
     }
 }

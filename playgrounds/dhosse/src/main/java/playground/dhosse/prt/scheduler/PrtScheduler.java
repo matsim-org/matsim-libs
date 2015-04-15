@@ -39,7 +39,7 @@ public class PrtScheduler extends TaxiScheduler {
           throw new IllegalStateException();
       }
 
-      Schedule<TaxiTask> bestSched = TaxiSchedules.getSchedule(best.vehicle);
+      Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
 
       if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
           TaxiTask lastTask = Schedules.getLastTask(bestSched);// only WAIT
@@ -93,7 +93,7 @@ public class PrtScheduler extends TaxiScheduler {
 	private void appendRequestToExistingScheduleTasks(VehicleRequestPath best,
 			List<VehicleRequestPath> requests) {
 		
-		Schedule<TaxiTask> sched = TaxiSchedules.getSchedule(best.vehicle);
+		Schedule<TaxiTask> sched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
 		
 		for(TaxiTask task : sched.getTasks()){
 			
@@ -110,7 +110,7 @@ public class PrtScheduler extends TaxiScheduler {
 	}
 
 	@Override
-	public void appendDropoffAfterPickup(Schedule<TaxiTask> schedule)
+	protected void appendDropoffAfterPickup(Schedule<TaxiTask> schedule)
     {
         NPersonsPickupStayTask pickupStayTask = (NPersonsPickupStayTask)Schedules.getLastTask(schedule);
 
@@ -130,7 +130,7 @@ public class PrtScheduler extends TaxiScheduler {
     }
 
 	@Override
-    public void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
+	protected void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
     {
         NPersonsDropoffStayTask dropoffStayTask = (NPersonsDropoffStayTask)Schedules.getLastTask(schedule);
 

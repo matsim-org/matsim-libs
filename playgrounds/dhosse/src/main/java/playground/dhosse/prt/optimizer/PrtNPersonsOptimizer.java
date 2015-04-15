@@ -24,7 +24,7 @@ public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
         if (requiresReoptimization) {
             scheduleUnplannedRequests();
             if(this.unplannedRequests.size() < 1){
-            	requiresReoptimization = false;
+                requiresReoptimization = false;
             }
         }
     }

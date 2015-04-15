@@ -22,7 +22,6 @@ package playground.michalm.taxi.optimizer.fifo;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -65,7 +64,6 @@ public class NOSTaxiOptimizer
     private void initIdleVehicles()
     {
         idleVehicles = new HashSet<>();
-
         for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
             if (optimConfig.scheduler.isIdle(veh)) {
                 idleVehicles.add(veh);
@@ -136,25 +134,9 @@ public class NOSTaxiOptimizer
     }
 
 
-    //==============================
-
     @Override
-    public void nextTask(Schedule<? extends Task> schedule)
+    protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask)
     {
-        @SuppressWarnings("unchecked")
-        Schedule<TaxiTask> taxiSchedule = (Schedule<TaxiTask>)schedule;
-
-        optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
-        TaxiTask newCurrentTask = taxiSchedule.nextTask();
-
-        if (newCurrentTask != null // schedule != COMPLETED
-                && newCurrentTask.getTaxiTaskType() == TaxiTaskType.STAY) {
-            requiresReoptimization = true;
-        }
+        return newCurrentTask.getTaxiTaskType() == TaxiTaskType.STAY;
     }
-
-
-    @Override
-    public void nextLinkEntered(DriveTask driveTask)
-    {}
 }

@@ -28,8 +28,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.scheduler.TaxiDelaySpeedupStats;
 import playground.michalm.taxi.util.stats.*;
 import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
@@ -43,19 +41,15 @@ class MultiRunTaxiLauncher
 
     private boolean warmup;
 
-    private final TaxiDelaySpeedupStats delaySpeedupStats;
     private final LeastCostPathCalculatorCacheStats cacheStats;
 
     private PrintWriter pw;
-    private PrintWriter pw2;
     private PrintWriter pw3;
 
 
     MultiRunTaxiLauncher(TaxiLauncherParams params)
     {
         super(params);
-
-        delaySpeedupStats = new TaxiDelaySpeedupStats();
         cacheStats = new LeastCostPathCalculatorCacheStats();
     }
 
@@ -65,8 +59,6 @@ class MultiRunTaxiLauncher
         try {
             pw = new PrintWriter(params.outputDir + "stats" + outputFileSuffix);
             pw.print("cfg\tn\tm\tPW\tPWp95\tPWmax\tPD\tPDp95\tPDmax\tDD\tPS\tDS\tW\tComp\n");
-
-            pw2 = new PrintWriter(params.outputDir + "timeUpdates" + outputFileSuffix);
 
             pw3 = new PrintWriter(params.outputDir + "cacheStats" + outputFileSuffix);
             pw3.print("cfg\tHits\tMisses\n");
@@ -85,23 +77,11 @@ class MultiRunTaxiLauncher
             events.addHandler(travelTimeCalculator);
         }
     }
-    
-    TaxiOptimizerConfiguration createOptimizerConfiguration()
-    {
-        TaxiOptimizerConfiguration optimizerConfig = super.createOptimizerConfiguration();
-
-        if (!warmup) {
-            optimizerConfig.scheduler.setDelaySpeedupStats(delaySpeedupStats);
-        }
-
-        return optimizerConfig;
-    }
 
 
     void closeOutputFiles()
     {
         pw.close();
-        pw2.close();
         pw3.close();
     }
 
@@ -158,10 +138,6 @@ class MultiRunTaxiLauncher
 
         multipleRunStats.printStats(pw, cfg, data);
         pw.flush();
-
-        delaySpeedupStats.printStats(pw2, params.algorithmConfig.name());
-        delaySpeedupStats.clearStats();
-        pw2.flush();
 
         cacheStats.printStats(pw3, params.algorithmConfig.name());
         cacheStats.clearStats();

@@ -55,7 +55,7 @@ public class TaxiStatsCalculator
 
     private void calculateStatsImpl(Vehicle vehicle)
     {
-        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);
+        Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
 
         if (schedule.getStatus() == ScheduleStatus.UNPLANNED) {
             return;// do not evaluate - the vehicle is unused

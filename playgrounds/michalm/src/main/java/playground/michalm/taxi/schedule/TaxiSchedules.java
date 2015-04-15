@@ -19,8 +19,7 @@
 
 package playground.michalm.taxi.schedule;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.*;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
@@ -52,9 +51,9 @@ public class TaxiSchedules
 
 
     @SuppressWarnings("unchecked")
-    public static Schedule<TaxiTask> getSchedule(Vehicle vehicle)
+    public static Schedule<TaxiTask> asTaxiSchedule(Schedule<? extends Task> schedule)
     {
-        return (Schedule<TaxiTask>)vehicle.getSchedule();
+        return (Schedule<TaxiTask>)schedule;
     }
 
 

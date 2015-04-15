@@ -148,6 +148,8 @@ public class TaxiRequest
 
             case STARTED:
                 return TaxiRequestStatus.PICKUP;
+                
+            case PERFORMED://continue
         }
 
         if (driveWithPassengerTask.getStatus() == TaskStatus.STARTED) {
@@ -160,6 +162,8 @@ public class TaxiRequest
 
             case PERFORMED:
                 return TaxiRequestStatus.PERFORMED;
+                
+            case PLANNED://illegal
         }
 
         throw new IllegalStateException("Unreachable code");

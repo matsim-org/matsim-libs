@@ -86,7 +86,6 @@ import playground.michalm.util.MovingAgentsRegister;
     /*package*/MatsimVrpContext context;
     /*package*/LegHistogram legHistogram;
 
-    /*package*/TaxiDelaySpeedupStats delaySpeedupStats;
     private String electricStatsDir;
     /*package*/List<String> waitList;
 
@@ -257,7 +256,7 @@ import playground.michalm.util.MovingAgentsRegister;
         //        qSim.getScenario().getConfig().simulation().setEndTime(86399);
         qSim.run();
         System.out.println("taxiless agents: ");
-        for (Id id : rvr.getMovingAgentIds()) {
+        for (Id<?> id : rvr.getMovingAgentIds()) {
             System.out.println(id.toString());
 
         }

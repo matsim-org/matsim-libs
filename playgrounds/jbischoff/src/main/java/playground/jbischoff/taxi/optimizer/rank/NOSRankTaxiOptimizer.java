@@ -132,7 +132,7 @@ public class NOSRankTaxiOptimizer
 
 
         @Override
-        public void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
+        protected void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
         {
             if (rankmode) {
                 TaxiDropoffTask dropoffStayTask = (TaxiDropoffTask)Schedules

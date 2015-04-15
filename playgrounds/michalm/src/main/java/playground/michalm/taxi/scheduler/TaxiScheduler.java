@@ -43,9 +43,6 @@ public class TaxiScheduler
     private final VrpPathCalculator calculator;
     private final TaxiSchedulerParams params;
 
-    private TaxiDelaySpeedupStats delaySpeedupStats;
-
-
     public TaxiScheduler(MatsimVrpContext context, VrpPathCalculator calculator,
             TaxiSchedulerParams params)
     {
@@ -54,7 +51,7 @@ public class TaxiScheduler
         this.params = params;
 
         for (Vehicle veh : context.getVrpData().getVehicles()) {
-            Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+            Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());
             schedule.addTask(new TaxiStayTask(veh.getT0(), veh.getT1(), veh.getStartLink()));
         }
     }
@@ -66,12 +63,6 @@ public class TaxiScheduler
     }
 
 
-    public void setDelaySpeedupStats(TaxiDelaySpeedupStats delaySpeedupStats)
-    {
-        this.delaySpeedupStats = delaySpeedupStats;
-    }
-
-
     public boolean isIdle(Vehicle vehicle)
     {
         double currentTime = context.getTime();
@@ -79,7 +70,7 @@ public class TaxiScheduler
             return false;
         }
 
-        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(vehicle);
+        Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(vehicle.getSchedule());
         if (schedule.getStatus() != ScheduleStatus.STARTED) {
             return false;
         }
@@ -98,7 +89,7 @@ public class TaxiScheduler
             return null;
         }
 
-        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+        Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());
         Link link;
         double time;
 
@@ -140,7 +131,7 @@ public class TaxiScheduler
             return null;
         }
 
-        Schedule<TaxiTask> schedule = TaxiSchedules.getSchedule(veh);
+        Schedule<TaxiTask> schedule = TaxiSchedules.asTaxiSchedule(veh.getSchedule());
         Link link;
         double time;
 
@@ -220,7 +211,7 @@ public class TaxiScheduler
             throw new IllegalStateException();
         }
 
-        Schedule<TaxiTask> bestSched = TaxiSchedules.getSchedule(best.vehicle);
+        Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
 
         if (bestSched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
             TaxiStayTask lastTask = (TaxiStayTask)Schedules.getLastTask(bestSched);// only WAIT
@@ -275,11 +266,7 @@ public class TaxiScheduler
         double endTime = context.getTime();
         TaxiTask currentTask = schedule.getCurrentTask();
 
-        if (delaySpeedupStats != null) {// optionally, one may record delays
-            delaySpeedupStats.updateStats(currentTask, endTime);
-        }
-
-        updateCurrentAndPlannedTasks(schedule, endTime);
+        updateTimelineImpl(schedule, endTime);
 
         if (!params.destinationKnown) {
             if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP) {
@@ -290,7 +277,7 @@ public class TaxiScheduler
     }
 
 
-    public void appendDropoffAfterPickup(Schedule<TaxiTask> schedule)
+    protected void appendDropoffAfterPickup(Schedule<TaxiTask> schedule)
     {
         TaxiPickupTask pickupStayTask = (TaxiPickupTask)Schedules.getLastTask(schedule);
 
@@ -309,7 +296,7 @@ public class TaxiScheduler
     }
 
 
-    public void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
+    protected void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
     {
         TaxiDropoffTask dropoffStayTask = (TaxiDropoffTask)Schedules.getLastTask(schedule);
 
@@ -321,24 +308,33 @@ public class TaxiScheduler
         schedule.addTask(new TaxiStayTask(t5, tEnd, link));
     }
 
+    
+    public void updateTimeline(Schedule<TaxiTask> schedule)
+    {
+        if (schedule.getStatus() != ScheduleStatus.STARTED) {
+            return;
+        }
+        
+        double predictedEndTime = schedule.getCurrentTask().getTaskTracker().predictEndTime(
+                context.getTime());
+        updateTimelineImpl(schedule, predictedEndTime);
+    }
+    
 
-    /**
-     * @param schedule
-     */
-    public void updateCurrentAndPlannedTasks(Schedule<TaxiTask> schedule, double currentTaskEndTime)
+    private void updateTimelineImpl(Schedule<TaxiTask> schedule, double newTaskEndTime)
     {
         Task currentTask = schedule.getCurrentTask();
 
-        if (currentTask.getEndTime() == currentTaskEndTime) {
+        if (currentTask.getEndTime() == newTaskEndTime) {
             return;
         }
 
-        currentTask.setEndTime(currentTaskEndTime);
+        currentTask.setEndTime(newTaskEndTime);
 
         List<TaxiTask> tasks = schedule.getTasks();
 
         int startIdx = currentTask.getTaskIdx() + 1;
-        double t = currentTaskEndTime;
+        double t = newTaskEndTime;
 
         for (int i = startIdx; i < tasks.size(); i++) {
             TaxiTask task = tasks.get(i);
@@ -414,7 +410,7 @@ public class TaxiScheduler
         removedRequests = new ArrayList<>();
 
         for (Vehicle veh : context.getVrpData().getVehicles()) {
-            removeAwaitingRequestsImpl(TaxiSchedules.getSchedule(veh));
+            removeAwaitingRequestsImpl(TaxiSchedules.asTaxiSchedule(veh.getSchedule()));
         }
 
         return removedRequests;
