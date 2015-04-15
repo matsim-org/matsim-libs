@@ -20,12 +20,6 @@
 
 package playground.christoph.evacuation.withinday.replanning.utils;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -39,6 +33,12 @@ import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
  * Compares walk speeds of people respecting their age, gender, etc.
@@ -62,7 +62,7 @@ public class WalkSpeedComparator implements Comparator<Id>, Serializable, Matsim
 		
 		Map<Id<Link>, Double> linkSlopes = new HashMap<>();
 		linkSlopes.put(link.getId(), 0.0);
-		travelTime = new WalkTravelTimeFactory(new PlansCalcRouteConfigGroup(), linkSlopes).createTravelTime();
+		travelTime = new WalkTravelTimeFactory(new PlansCalcRouteConfigGroup(), linkSlopes).get();
 		
 		travelTimesMap = new HashMap<>();
 	}

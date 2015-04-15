@@ -29,9 +29,9 @@ import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 
+import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -42,8 +42,8 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 	
 	private static final Logger log = Logger.getLogger(MultiModalTravelTimeFactory.class);
 	
-	private final Map<String, TravelTimeFactory> factories;
-	private final Map<String, TravelTimeFactory> additionalFactories;
+	private final Map<String, Provider<TravelTime>> factories;
+	private final Map<String, Provider<TravelTime>> additionalFactories;
 	private final Map<Id<Link>, Double> linkSlopes;
 	
 	public MultiModalTravelTimeFactory(Config config) {
@@ -54,7 +54,7 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 		this(config, linkSlopes, null);
 	}
 	
-	public MultiModalTravelTimeFactory(Config config, Map<Id<Link>, Double> linkSlopes, Map<String, TravelTimeFactory> additionalFactories) {
+	public MultiModalTravelTimeFactory(Config config, Map<Id<Link>, Double> linkSlopes, Map<String, Provider<TravelTime>> additionalFactories) {
 		this.linkSlopes = linkSlopes;
 		this.factories = new LinkedHashMap<>();
 		this.additionalFactories = additionalFactories;
@@ -69,8 +69,8 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 	public Map<String, TravelTime> createTravelTimes() {
 		Map<String, TravelTime> travelTimes = new HashMap<>();
 		
-		for (Entry<String, TravelTimeFactory> entry : factories.entrySet()) {
-			travelTimes.put(entry.getKey(), entry.getValue().createTravelTime());
+		for (Entry<String, Provider<TravelTime>> entry : factories.entrySet()) {
+			travelTimes.put(entry.getKey(), entry.getValue().get());
 		}
 		
 		return travelTimes;
@@ -84,16 +84,16 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 		
 		for (String mode : simulatedModes) {		
 			if (mode.equals(TransportMode.walk)) {
-				TravelTimeFactory factory = new WalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+				Provider<TravelTime> factory = new WalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
 				this.factories.put(mode, factory);
 			} else if (mode.equals(TransportMode.transit_walk)) {
-				TravelTimeFactory factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+				Provider<TravelTime> factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
 				this.factories.put(mode, factory);
 			} else if (mode.equals(TransportMode.bike)) {
-				TravelTimeFactory factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+				Provider<TravelTime> factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
 				this.factories.put(mode, factory);
 			} else {
-				TravelTimeFactory factory = getTravelTimeFactory(mode);
+				Provider<TravelTime> factory = getTravelTimeFactory(mode);
 				
 				if (factory == null) {
 					log.warn("Mode " + mode + " is not supported! " + 
@@ -111,7 +111,7 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 		}
 	}
 	
-	private TravelTimeFactory getTravelTimeFactory(String mode) {
+	private Provider<TravelTime> getTravelTimeFactory(String mode) {
 		if (additionalFactories != null) return this.additionalFactories.get(mode);
 		else return null;
 	}

@@ -20,16 +20,16 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 
-public class BikeTravelTimeFactory implements TravelTimeFactory {
+import javax.inject.Provider;
+import java.util.Map;
+
+public class BikeTravelTimeFactory implements Provider<TravelTime> {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	private final Map<Id<Link>, Double> linkSlopes;	// slope information in %
@@ -49,7 +49,7 @@ public class BikeTravelTimeFactory implements TravelTimeFactory {
 	}
 	
 	@Override
-	public TravelTime createTravelTime() {
+	public TravelTime get() {
 		return new BikeTravelTime(this.plansCalcRouteConfigGroup, this.linkSlopes);
 	}
 	

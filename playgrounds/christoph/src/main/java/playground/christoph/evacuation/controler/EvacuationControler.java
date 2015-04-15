@@ -307,8 +307,8 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * Use advanced walk-, bike and pt travel time calculators
 		 */
-		this.walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
-		this.bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
+		this.walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).get();
+		this.bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).get();
 		
 		// TODO: fix this.
 //		TravelTimeFactory ptFactory;
@@ -708,7 +708,7 @@ public class EvacuationControler extends WithinDayController implements
 		// if fuzzy travel times should be used
 		if (EvacuationConfig.useFuzzyTravelTimes) {
 			FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.getTravelTimeCollector(), this.householdsTracker, mobsimDataProvider);
-			carTravelTime = fuzzyTravelTimeEstimatorFactory.createTravelTime();
+			carTravelTime = fuzzyTravelTimeEstimatorFactory.get();
 		} else {
 			carTravelTime = this.getTravelTimeCollector();
 		}

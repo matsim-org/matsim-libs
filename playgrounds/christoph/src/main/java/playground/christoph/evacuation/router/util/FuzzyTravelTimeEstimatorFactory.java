@@ -22,13 +22,13 @@ package playground.christoph.evacuation.router.util;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
 
-public class FuzzyTravelTimeEstimatorFactory implements TravelTimeFactory {
+import javax.inject.Provider;
+
+public class FuzzyTravelTimeEstimatorFactory implements Provider<TravelTime> {
 	
 	private final Scenario scenario;
 	private final TravelTime travelTime;
@@ -47,7 +47,7 @@ public class FuzzyTravelTimeEstimatorFactory implements TravelTimeFactory {
 	}
 	
 	@Override
-	public FuzzyTravelTimeEstimator createTravelTime() {
+	public FuzzyTravelTimeEstimator get() {
 		return new FuzzyTravelTimeEstimator(scenario, travelTime, agentsTracker, mobsimDataProvider, 
 				distanceFuzzyFactorProviderFactory.createInstance(),
 				EvacuationConfig.fuzzyTravelTimeEstimatorRandomSeed + EvacuationConfig.deterministicRNGOffset);

@@ -22,9 +22,10 @@ package playground.christoph.evacuation.trafficmonitoring;
 
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 
-public class EvacuationPTTravelTimeFactory implements TravelTimeFactory {
+import javax.inject.Provider;
+
+public class EvacuationPTTravelTimeFactory implements Provider<TravelTime> {
 
 	private final String mode;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
@@ -46,7 +47,7 @@ public class EvacuationPTTravelTimeFactory implements TravelTimeFactory {
 	}
 
 	@Override
-	public TravelTime createTravelTime() {
+	public TravelTime get() {
 		return new EvacuationPTTravelTime(this.mode, this.plansCalcRouteConfigGroup);
 	}
 	

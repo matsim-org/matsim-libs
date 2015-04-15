@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 
+import javax.inject.Provider;
 import java.util.Map;
 
-class TransitWalkTravelTimeFactory implements TravelTimeFactory {
+class TransitWalkTravelTimeFactory implements Provider<TravelTime> {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	private final Map<Id<Link>, Double> linkSlopes;	// slope information in %
@@ -49,7 +49,7 @@ class TransitWalkTravelTimeFactory implements TravelTimeFactory {
 	}
 
 	@Override
-	public TravelTime createTravelTime() {
+	public TravelTime get() {
 		return new WalkTravelTime(plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(TransportMode.transit_walk), this.linkSlopes);
 	}
 	

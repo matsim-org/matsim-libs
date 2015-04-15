@@ -379,7 +379,7 @@ public class EvacuationControlerListener implements StartupListener {
 				} else {
 					FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(scenario, 
 							travelTime, this.householdsTracker, this.withinDayControlerListener.getMobsimDataProvider());
-					TravelTime fuzziedTravelTime = fuzzyTravelTimeEstimatorFactory.createTravelTime();
+					TravelTime fuzziedTravelTime = fuzzyTravelTimeEstimatorFactory.get();
 					fuzziedTravelTimes.put(mode, fuzziedTravelTime);
 				}
 			}

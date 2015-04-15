@@ -20,11 +20,6 @@
 
 package playground.christoph.evacuation.population;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
@@ -36,15 +31,16 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class CreateMultiModalLegRouters {
 
@@ -60,8 +56,8 @@ public class CreateMultiModalLegRouters {
 		PlansCalcRouteConfigGroup configGroup = config.plansCalcRoute();
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
 		travelTimes.put(TransportMode.car, carTravelTime);
-		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(configGroup).createTravelTime());
-		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(configGroup).createTravelTime());
+		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(configGroup).get());
+		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(configGroup).get());
 		// TODO: bugfix this...
 //		travelTimes.put(TransportMode.ride, new RideTravelTimeFactory(carTravelTime,
 //				new WalkTravelTimeFactory(configGroup).createTravelTime()).createTravelTime());

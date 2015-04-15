@@ -20,11 +20,8 @@
 
 package playground.christoph.parking;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -46,11 +43,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -62,7 +55,6 @@ import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.controller.ExperiencedPlansWriter;
 import org.matsim.withinday.controller.WithinDayControlerListener;
-
 import playground.christoph.parking.core.ParkingCostCalculatorImpl;
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
 import playground.christoph.parking.core.mobsim.InitialParkingSelector;
@@ -75,8 +67,10 @@ import playground.christoph.parking.withinday.replanner.ParkingSearchReplannerFa
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class WithinDayParkingControlerListener implements StartupListener, ReplanningListener, IterationEndsListener {
 
@@ -205,7 +199,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 
 		if (this.multiModalTravelTimes != null && this.multiModalTravelTimes.containsKey(TransportMode.walk)) {
 			walkTravelTime = this.multiModalTravelTimes.get(TransportMode.walk);
-		} else walkTravelTime = new WalkTravelTimeFactory(event.getControler().getConfig().plansCalcRoute()).createTravelTime();
+		} else walkTravelTime = new WalkTravelTimeFactory(event.getControler().getConfig().plansCalcRoute()).get();
 		
 		this.parkingRouterFactory = new ParkingRouterFactory(this.scenario, carTravelTime, walkTravelTime, 
 				event.getControler().getTravelDisutilityFactory(), tripRouterFactoryWrapper, nodesToCheck);

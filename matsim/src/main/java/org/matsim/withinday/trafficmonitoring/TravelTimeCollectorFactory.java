@@ -20,14 +20,14 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 
-public class TravelTimeCollectorFactory implements TravelTimeFactory {
+import javax.inject.Provider;
+import java.util.Set;
+
+public class TravelTimeCollectorFactory implements Provider<TravelTime> {
 
 	private TravelTimeCollector travelTime;
 	
@@ -42,7 +42,7 @@ public class TravelTimeCollectorFactory implements TravelTimeFactory {
 	}
 	
 	@Override
-	public TravelTime createTravelTime() {
+	public TravelTime get() {
 		return travelTime;
 	}
 }

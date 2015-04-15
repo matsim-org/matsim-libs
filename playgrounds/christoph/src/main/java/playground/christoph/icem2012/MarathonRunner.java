@@ -768,9 +768,9 @@ public final class MarathonRunner implements StartupListener,
 		initIdentifiers();
 		
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
-		travelTimes.put("walk2d", new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
-		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
+		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).get());
+		travelTimes.put("walk2d", new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).get());
+		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).get());
 //		travelTimes.put(TransportMode.pt, new PTTravelTimeKTIEvacuationFactory(this.scenario, 
 //					new PTTravelTimeFactory(this.scenario.getConfig().plansCalcRoute(), this.withinDayControlerListener.getTravelTimeCollector(), 
 //							new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime()).createTravelTime()).createTravelTime());
@@ -842,9 +842,9 @@ public final class MarathonRunner implements StartupListener,
 	private Map<String, TravelTime> createLinkReplanningMapTravelTime() {
 		
 		Map<String, TravelTime> factory = new HashMap<String, TravelTime>();
-		factory.put(TransportMode.walk, new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
-		factory.put("walk2d", new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
-		factory.put(TransportMode.bike, new BikeTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
+		factory.put(TransportMode.walk, new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).get());
+		factory.put("walk2d", new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).get());
+		factory.put(TransportMode.bike, new BikeTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).get());
 	
 		// replace modes
 		factory.put(TransportMode.car, new FreeSpeedTravelTime());

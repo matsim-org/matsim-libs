@@ -22,9 +22,10 @@ package org.matsim.contrib.multimodal.router.util;
 
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 
-class UnknownTravelTimeFactory implements TravelTimeFactory {
+import javax.inject.Provider;
+
+class UnknownTravelTimeFactory implements Provider<TravelTime> {
 
 	private final String mode;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
@@ -46,7 +47,7 @@ class UnknownTravelTimeFactory implements TravelTimeFactory {
 	}
 
 	@Override
-	public TravelTime createTravelTime() {
+	public TravelTime get() {
 		return new UnknownTravelTime(this.mode, this.plansCalcRouteConfigGroup);
 	}
 	

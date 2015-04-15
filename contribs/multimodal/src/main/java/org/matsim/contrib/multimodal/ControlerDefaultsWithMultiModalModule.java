@@ -41,7 +41,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.pt.router.TransitRouterFactory;
 
 import javax.inject.Inject;
@@ -52,7 +51,7 @@ import java.util.Map;
 
 public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
 
-    private final Map<String, TravelTimeFactory> additionalTravelTimeFactories = new LinkedHashMap<>();
+    private final Map<String, Provider<TravelTime>> additionalTravelTimeFactories = new LinkedHashMap<>();
 
     @Override
     public void install() {
@@ -66,7 +65,7 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
         addControlerListenerBinding().to(MultiModalControlerListener.class);
         bind(new TypeLiteral<Map<String, TravelTime>>() {
         }).toProvider(MultiModalTravelTimeLoader.class).in(Singleton.class);
-        bind(new TypeLiteral<Map<String, TravelTimeFactory>>() {
+        bind(new TypeLiteral<Map<String, Provider<TravelTime>>>() {
         }).toInstance(additionalTravelTimeFactories);
         bindMobsim().toProvider(MultimodalQSimFactory.class);
     }
@@ -74,10 +73,10 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
     private static class MultiModalTravelTimeLoader implements Provider<Map<String, TravelTime>> {
 
         private final Scenario scenario;
-        private final Map<String, TravelTimeFactory> additionalTravelTimeFactories;
+        private final Map<String, Provider<TravelTime>> additionalTravelTimeFactories;
 
         @Inject
-        MultiModalTravelTimeLoader(Scenario scenario, Map<String, TravelTimeFactory> additionalTravelTimeFactories) {
+        MultiModalTravelTimeLoader(Scenario scenario, Map<String, Provider<TravelTime>> additionalTravelTimeFactories) {
             this.scenario = scenario;
             this.additionalTravelTimeFactories = additionalTravelTimeFactories;
         }
@@ -129,7 +128,7 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
 
     }
 
-    public void addAdditionalTravelTimeFactory(String mode, TravelTimeFactory travelTimeFactory) {
+    public void addAdditionalTravelTimeFactory(String mode, Provider<TravelTime> travelTimeFactory) {
         this.additionalTravelTimeFactories.put(mode, travelTimeFactory);
     }
 

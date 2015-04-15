@@ -593,7 +593,7 @@ public class MultiModalDemo {
 	 */
 	private static void calculateExpectedModeShare(Config config) {
 		
-		TravelTime travelTime = new WalkTravelTimeFactory(config.plansCalcRoute()).createTravelTime();
+		TravelTime travelTime = new WalkTravelTimeFactory(config.plansCalcRoute()).get();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		createNetwork(sc);
 		
@@ -663,8 +663,8 @@ public class MultiModalDemo {
 			super.setUp();
 			
 			TravelTime carTravelTime = this.getLinkTravelTimes();
-			TravelTime bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
-			TravelTime walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
+			TravelTime bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).get();
+			TravelTime walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).get();
 			
 			int timeSlice = this.config.travelTimeCalculator().getTraveltimeBinSize();
 			int maxTime = 30 * 3600;
