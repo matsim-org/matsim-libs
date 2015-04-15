@@ -43,7 +43,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
-import playground.gregor.casim.monitoring.LaneSpeedObserver;
 import playground.gregor.casim.simulation.physics.AbstractCANetwork;
 import playground.gregor.casim.simulation.physics.CAEvent;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
@@ -284,9 +283,9 @@ public class RingRoadBiMultiLane {
 //		Monitor monitor = new CALinkMultiLaneMonitor(
 //				(CAMultiLaneLink) caNet.getCALink(Id.createLinkId("1")), 2.);
 
-		LaneSpeedObserver lso = new LaneSpeedObserver((AbstractCANetwork) caNet, s.lanes,s.sideLength);
-		em.addHandler(lso);
-		CAMultiLaneLink.obs = lso;
+//		LaneSpeedObserver lso = new LaneSpeedObserver((AbstractCANetwork) caNet, s.lanes,s.sideLength);
+//		em.addHandler(lso);
+//		CAMultiLaneLink.obs = lso;
 		// CALinkMonitorExact monitor = new CALinkMonitorExactIIUni(
 		// caNet.getCALink(Id.createLinkId("0")), 10.,
 		// ((CAMultiLaneLink) caNet.getCALink(Id.createLinkId("0")))

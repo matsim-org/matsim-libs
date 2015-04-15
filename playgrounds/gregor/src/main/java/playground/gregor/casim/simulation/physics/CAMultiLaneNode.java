@@ -261,9 +261,9 @@ public class CAMultiLaneNode implements CANode {
 		int intendedLane = CAMultiLaneLink.getIntendedLane(a.getLane(), this.lanes, nextLink.getNrLanes());
 		int newLane = nextLink.getParticles(intendedLane)[0] == null && nextLink.getLastLeftDsTimes(intendedLane)[0] < time -z ? intendedLane : -1;
 		if (newLane > -1 && a.getRho() >= CAMultiLaneLink.LANESWITCH_TS_TTA && MatsimRandom.getRandom().nextDouble() < CAMultiLaneLink.LANESWITCH_PROB) {
-			double bestLaneScore = nextLink.getLaneScore(a, a.getLane());
+			double bestLaneScore = nextLink.getLaneScore(a, a.getLane(),time);
 			for (int i = 0; i < this.lanes; i++) {
-				double laneScore = nextLink.getLaneScore(a, i);
+				double laneScore = nextLink.getLaneScore(a, i,time);
 				if (nextLink.getParticles(i)[0] == null && nextLink.getLastLeftDsTimes(i)[0] < time -z) {
 					if (laneScore > bestLaneScore) {
 						bestLaneScore = laneScore;
@@ -347,9 +347,9 @@ public class CAMultiLaneNode implements CANode {
 		int newLane = nextLink.getParticles(intendedLane)[idxLastCell] == null && nextLink.getLastLeftUsTimes(intendedLane)[idxLastCell] < time -z ? intendedLane : -1;
 
 		if (newLane > -1 && a.getRho() >= CAMultiLaneLink.LANESWITCH_TS_TTA && MatsimRandom.getRandom().nextDouble() < CAMultiLaneLink.LANESWITCH_PROB) {
-			double bestLaneScore = nextLink.getLaneScore(a, a.getLane());
+			double bestLaneScore = nextLink.getLaneScore(a, a.getLane(),time);
 			for (int i = 0; i < this.lanes; i++) {
-				double laneScore = nextLink.getLaneScore(a, i);
+				double laneScore = nextLink.getLaneScore(a, i,time);
 				if (nextLink.getParticles(i)[idxLastCell] == null && nextLink.getLastLeftDsTimes(i)[idxLastCell] < time -z) {
 					if (laneScore > bestLaneScore) {
 						bestLaneScore = laneScore;

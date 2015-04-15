@@ -32,11 +32,52 @@ public abstract class CAMoveableEntity {
 	private double rho;
 	private int lane;
 	private double timeGap = 1 / (AbstractCANetwork.RHO_HAT + AbstractCANetwork.V_HAT);
+	
+	private double lastMovementTime = 0;
+	private double spd = AbstractCANetwork.V_HAT;
+	
+	private final double [] laneSpds = new double[8];
+	private final double [] updates = new double[8];
 
 	public void proceed() {
 		this.pos += this.dir;
 	}
 
+	public void updateSpdOnProceed(double traveled, double time) {
+		double tt = time-this.lastMovementTime;
+		double cSpd = traveled/tt;
+		this.spd *= 0.8;
+		this.spd += 0.2 * cSpd;
+		this.lastMovementTime = time;
+	}
+	
+	public double getSpd() {
+		return this.spd;
+	}
+	
+	public void updateLaneSpeed(double spd, int lane) {
+		
+		double oldW = (this.updates[lane]/(this.updates[lane]+1));
+		double newW = (1/(this.updates[lane]+1));
+		
+//		double oldW = 0.9;
+//		double newW = 0.1;
+		
+		this.laneSpds[lane] *= oldW;
+		this.laneSpds[lane] += newW * spd;
+		this.updates[lane]++;
+	}
+	
+	public double getLaneSpeed(int lane) {
+		return this.laneSpds[lane];
+	}
+	
+	public double getMaxSpd(double time, double maxTraveled) {
+		double tt = time-this.lastMovementTime;
+		double cSpd = maxTraveled/tt;
+		return Math.min(getSpd(), cSpd);
+	}
+	
 	public int getPos() {
 		return this.pos;
 	}
@@ -119,5 +160,7 @@ public abstract class CAMoveableEntity {
 	public void setLane(int newLane) {
 		this.lane = newLane;
 	}
+
+	
 
 }
