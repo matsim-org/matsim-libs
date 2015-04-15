@@ -54,10 +54,10 @@ public class NPersonsPickupStayTask extends TaxiPickupTask {
         return "[" + getTaxiTaskType().name() + "]" + super.commonToString();
     }
     
-    public void appendRequest(TaxiRequest request){
+    public void appendRequest(TaxiRequest request, double pickupDuration){
 		this.requests.add(request);
 		request.setPickupTask(this);
-		super.setEndTime(getEndTime()+30);
+		super.setEndTime(getEndTime() + pickupDuration);
 	}
 
 }

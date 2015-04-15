@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.SortedSet;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
@@ -16,20 +15,19 @@ import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
-import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 
 import playground.jbischoff.taxi.optimizer.rank.IdleRankVehicleFinder;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
-import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiDriveTask;
+import playground.michalm.taxi.schedule.TaxiStayTask;
+import playground.michalm.taxi.schedule.TaxiTask;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPaths;
 

@@ -12,6 +12,7 @@ import org.matsim.contrib.dvrp.router.VrpPathCalculatorImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -32,6 +33,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.dhosse.prt.data.PrtData;
 import playground.dhosse.prt.passenger.PrtRequestCreator;
 
 public class PrtTripRouterFactoryImpl implements TripRouterFactory {
@@ -39,12 +41,14 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 	private final MatsimVrpContext context;
 	private final TravelTime travelTime;
 	private final TravelDisutility travelDisutility;
+	private final PrtData data;
 	
-	public PrtTripRouterFactoryImpl(final MatsimVrpContext context, final TravelTime ttime, final TravelDisutility tdis){
+	public PrtTripRouterFactoryImpl(final MatsimVrpContext context, final TravelTime ttime, final TravelDisutility tdis, PrtData data){
 
 		this.context = context;
 		this.travelTime = ttime;
 		this.travelDisutility = tdis;
+		this.data = data;
 		
 	}
 
@@ -59,6 +63,8 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 		TripRouter tripRouter = new TripRouter();
 
 		PlansCalcRouteConfigGroup routeConfigGroup = this.context.getScenario().getConfig().plansCalcRoute();
+
+		System.out.println(routeConfigGroup.getModeRoutingParams().get(TransportMode.walk));
 		
 		LeastCostPathCalculator routeAlgo =
 				leastCostPathAlgorithmFactory.createPathCalculator(
@@ -91,37 +97,17 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 					// (all implement IntermodalLeastCostPathCalculator)
 				}
 			}
-		
+			
 		for(String mainMode : routeConfigGroup.getTeleportedModeFreespeedFactors().keySet()){
 			
-//			tripRouter.setRoutingModule(mainMode, 
-//					new LegRouterWrapper(mainMode, populationFactory,
-//							new PseudoTransitLegRouter(
-//									network, routeAlgoPtFreeFlow,
-//									routeConfigGroup.getTeleportedModeFreespeedFactors().get(mainMode),
-//	                                routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor(),
-////									routeConfigGroup.getBeelineDistanceFactor(),
-//									modeRouteFactory)));
-			
-			tripRouter.setRoutingModule( mainMode, DefaultRoutingModules.createPseudoTransitRouter(mainMode, populationFactory, 
+			tripRouter.setRoutingModule( mainMode, 
+					DefaultRoutingModules.createPseudoTransitRouter(mainMode, populationFactory, 
 					network, routeAlgoPtFreeFlow, routeConfigGroup.getModeRoutingParams().get(mainMode) ) ) ;
-			
 			
 		}
 		
 		for (String mainMode : routeConfigGroup.getTeleportedModeSpeeds().keySet()) {
 
-//			tripRouter.setRoutingModule(
-//					mainMode,
-//					new LegRouterWrapper(
-//						mainMode,
-//                            populationFactory,
-//						new TeleportationLegRouter(
-//                                modeRouteFactory,
-//							routeConfigGroup.getTeleportedModeSpeeds().get( mainMode ),
-//                            routeConfigGroup.getModeRoutingParams().get( mainMode ).getBeelineDistanceFactor() ))) ;
-////							routeConfigGroup.getBeelineDistanceFactor())));
-			
 			RoutingModule module = DefaultRoutingModules.createTeleportationRouter(mainMode, populationFactory, routeConfigGroup.getModeRoutingParams().get(mainMode) ) ;
 			tripRouter.setRoutingModule( mainMode, module) ;
 			
@@ -129,30 +115,15 @@ public class PrtTripRouterFactoryImpl implements TripRouterFactory {
 
 		for ( String mainMode : routeConfigGroup.getNetworkModes() ) {
 
-//			tripRouter.setRoutingModule(
-//					mainMode,
-//					new LegRouterWrapper(
-//						mainMode,
-//                            populationFactory,
-//						new NetworkLegRouter(
-//                                network,
-//							routeAlgo,
-//                                modeRouteFactory)));
-			
 			RoutingModule module = DefaultRoutingModules.createNetworkRouter(mainMode, populationFactory, network, routeAlgoPtFreeFlow) ;
 			tripRouter.setRoutingModule(mainMode, module) ;
 			
 		}
-		PlanRouter r;
+		
 		tripRouter.setRoutingModule(
 				PrtRequestCreator.MODE, new PrtRouterWrapper(PrtRequestCreator.MODE, network,
-				populationFactory, (MatsimVrpContextImpl) this.context, new VrpPathCalculatorImpl(routeAlgo, this.travelTime, this.travelDisutility),
-				DefaultRoutingModules.createTeleportationRouter( TransportMode.transit_walk, populationFactory, routeConfigGroup.getModeRoutingParams().get(TransportMode.walk) ) ) 
-//				new LegRouterWrapper(TransportMode.transit_walk, populationFactory,
-//						new TeleportationLegRouter(
-//                                modeRouteFactory,
-//							routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk ),
-//							routeConfigGroup.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor())
+				populationFactory, (MatsimVrpContextImpl) this.context, this.data,
+				DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, populationFactory, routeConfigGroup.getModeRoutingParams().get(TransportMode.walk) ) ) 
 			);
 		
 		return tripRouter;

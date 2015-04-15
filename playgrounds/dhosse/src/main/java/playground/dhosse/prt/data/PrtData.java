@@ -30,7 +30,7 @@ public class PrtData extends TaxiData {
     	this.initRankQuadTree(bounds[0], bounds[1], bounds[2], bounds[3]);
     }
     
-    public void initRankQuadTree(double minX, double minY, double maxX, double maxY){
+    private void initRankQuadTree(double minX, double minY, double maxX, double maxY){
     	
     	quadTreeRanks = new QuadTree<TaxiRank>(minX, minY, maxX, maxY);
     	
@@ -41,11 +41,11 @@ public class PrtData extends TaxiData {
     	}
     }
     
-    public static TaxiRank getNearestRank(Coord coord){
+    public TaxiRank getNearestRank(Coord coord){
     	return quadTreeRanks.get(coord.getX(), coord.getY());
     }
     
-    public static TaxiRank getNearestRank(Link link){
+    public TaxiRank getNearestRank(Link link){
     	return quadTreeRanks.get(link.getCoord().getX(), link.getCoord().getY());
     }
     

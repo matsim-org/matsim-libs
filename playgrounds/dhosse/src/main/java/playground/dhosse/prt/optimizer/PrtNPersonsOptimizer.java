@@ -4,6 +4,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.matsim.contrib.dvrp.data.Requests;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.AbstractTaxiOptimizer;
@@ -16,6 +17,17 @@ public class PrtNPersonsOptimizer extends AbstractTaxiOptimizer{
 		super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR));
 		
 	}
+	
+	@Override
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
+    {
+        if (requiresReoptimization) {
+            scheduleUnplannedRequests();
+            if(this.unplannedRequests.size() < 1){
+            	requiresReoptimization = false;
+            }
+        }
+    }
 
 	protected void scheduleUnplannedRequests() {
 		

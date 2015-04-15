@@ -100,7 +100,7 @@ public class PrtScheduler extends TaxiScheduler {
 			if(task instanceof NPersonsPickupStayTask){
 				for(VehicleRequestPath vrp : requests){
 					if(vrp.path.getDepartureTime() < task.getBeginTime() && !task.getStatus().equals(TaskStatus.PERFORMED)){
-						((NPersonsPickupStayTask)task).appendRequest(vrp.request);
+						((NPersonsPickupStayTask)task).appendRequest(vrp.request, this.params.pickupDuration);
 					}
 				}
 			}

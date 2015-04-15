@@ -20,6 +20,9 @@ public class PrtConfigGroup extends ConfigGroup {
 	private static final String PICKUP_DURATION = "pickupDuration";
 	private static final String DROPOFF_DURATION = "dropoffDuration";
 	private static final String DESTINATION_KNOWN = "destinationKnown";
+	private static final String ONLINE_VEHICLE_TRACLER = "onlineVehicleTracker";
+	private static final String FIXED_COST = "fixedCost";
+	private static final String VAR_COST_D = "varCostD";
 	
 	private String prtIdentifier = "prt";
 	private String vehiclesFile = null;
@@ -30,7 +33,10 @@ public class PrtConfigGroup extends ConfigGroup {
 	private int vehicleMaximumCapacity = 1;
 	private double passengerPickupDuration = 0.0;
 	private double passengerDropoffDuration = 0.0;
+	private double fixedCost = 0.0;
+	private double varCostD = 0.0;
 	private boolean destinationKnown = false;
+	private boolean onlineVehicleTracker = false;
 	
 	public PrtConfigGroup() {
 		super(GROUP_NAME);
@@ -60,6 +66,12 @@ public class PrtConfigGroup extends ConfigGroup {
 			this.passengerDropoffDuration = Double.parseDouble(value);
 		} else if(DESTINATION_KNOWN.equals(key)){
 			this.destinationKnown = Boolean.getBoolean(value);
+		} else if(ONLINE_VEHICLE_TRACLER.equals(key)){
+			this.onlineVehicleTracker = Boolean.getBoolean(value);
+		} else if(FIXED_COST.equals(key)){
+			this.fixedCost = Double.parseDouble(value);
+		} else if(VAR_COST_D.equals(key)){
+			this.varCostD = Double.parseDouble(value);
 		} else {
 			log.error("unknown parameter: " + key + "...");
 		}
@@ -80,6 +92,9 @@ public class PrtConfigGroup extends ConfigGroup {
 		map.put(PICKUP_DURATION, Double.toString(this.passengerPickupDuration));
 		map.put(DROPOFF_DURATION, Double.toString(this.passengerDropoffDuration));
 		map.put(DESTINATION_KNOWN, Boolean.toString(destinationKnown));
+		map.put(ONLINE_VEHICLE_TRACLER, Boolean.toString(this.onlineVehicleTracker));
+		map.put(FIXED_COST, Double.toString(this.fixedCost));
+		map.put(VAR_COST_D, Double.toString(this.varCostD));
 		
 		return map;
 		
@@ -123,6 +138,26 @@ public class PrtConfigGroup extends ConfigGroup {
 	
 	public boolean getDestinationKnown(){
 		return this.destinationKnown;
+	}
+	
+	public void setVehiclesFile(String file){
+		this.vehiclesFile = file;
+	}
+	
+	public void setEventsFile(String file){
+		this.eventsFile = file;
+	}
+	
+	public boolean getUseOnlineVehicleTracker(){
+		return this.destinationKnown;
+	}
+	
+	public double getFixedCost(){
+		return this.fixedCost;
+	}
+	
+	public double getVariableCostsD(){
+		return this.varCostD;
 	}
 
 }
