@@ -111,7 +111,7 @@ public class KNBangBang {
 		config.qsim().setFlowCapFactor(0.04);
 		config.qsim().setStorageCapFactor(0.06);
 		config.qsim().setStuckTime(100.);
-		config.qsim().setStartTime(5.*3600.);
+		config.qsim().setStartTime(0.*3600.);
 		
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.WARN );
 		
