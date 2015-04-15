@@ -27,12 +27,32 @@ public class CreatePoznanPT
         Visum2TransitSchedule converter = new Visum2TransitSchedule(vNetwork,
                 scenario.getTransitSchedule(), scenario.getTransitVehicles());
 
+        // $TSYS:CODE;NAME;TYPE;PCU
+        // 1S;osobowe;PrT;1.000
+        // 2D;dostawcze;PrT;1.000
+        // 3C;ciężarowe;PrT;2.500
+        // 4R;Rower;PrT;1.000
+        // 5S_zewn;osobowe_zewn;PrT;1.000
+        // 6D_zewn;dostawcze_zewn;PrT;1.000
+        // 7C_zewn;ciężarowe_zewn;PrT;2.000
+        // 8Cc_zewn;ciężarowe ciężkie_zewn;PrT;3.000
+        // A;Autobusy ZTM;PuT;1.000
+        // AT;Tramwaj;PuT;1.000
+        // KP;Komunikacja podmiejska;PuT;1.000
+        // TKR;Kolej Regionalna;PuT;1.000
+        // TKS;Kolej IC;PuT;1.000
+        // U;Przewozy_PKS;PuT;1.000
+        // UAM;Autobus marketowy;PuT;1.000
+        // W;Przejścia piesze;PuTWalk;1.000
+        // WP;Pieszo;PuTWalk;1.000
+        // WP-2;Pieszo-2;PuT;1.000         
+
         converter.registerTransportMode("S", TransportMode.car);
         converter.registerTransportMode("D", TransportMode.car);
         converter.registerTransportMode("C", TransportMode.car);
-        
+
         converter.registerTransportMode("R", TransportMode.bike);
-        
+
         converter.registerTransportMode("S_zewn", TransportMode.car);
         converter.registerTransportMode("D_zewn", TransportMode.car);
         converter.registerTransportMode("C_zewn", TransportMode.car);
@@ -45,7 +65,7 @@ public class CreatePoznanPT
         converter.registerTransportMode("TKS", TransportMode.pt);
         converter.registerTransportMode("U", TransportMode.pt);
         converter.registerTransportMode("UAM", TransportMode.pt);
-        
+
         converter.registerTransportMode("W", TransportMode.walk);
         converter.registerTransportMode("WP", TransportMode.transit_walk);
         converter.registerTransportMode("WP-2", TransportMode.transit_walk);
@@ -65,8 +85,9 @@ public class CreatePoznanPT
     public static void main(String[] args)
     {
         //String visumFile = "d:/Google Drive/Poznan/Visum_2014/network/network_ver.4.net";
-        String visumFile = "d:/GoogleDrive/Poznan/network_ver.5 (33N).net";
-        String outDir = "d:/PP-rad/matsim-poznan/test/";
+        String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/network_ver.5_(33N).net";
+        //String visumFile = "d:/GoogleDrive/Poznan/Visum_2014/network/A ZTM.net";
+        String outDir = "d:/PP-rad/poznan/test/";
         String transitScheduleWithNetworkFile = outDir + "transitSchedule.xml";
         String transitNetworkFile = outDir + "pt_network.xml";
         String vehicleFile = outDir + "pt_vehicles.xml";
