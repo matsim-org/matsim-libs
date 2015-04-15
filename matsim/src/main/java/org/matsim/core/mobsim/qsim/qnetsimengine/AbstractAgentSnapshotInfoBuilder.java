@@ -19,19 +19,29 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.matsim.api.core.v01.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Queue;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
-
-import java.util.*;
 
 
 /**
@@ -42,9 +52,11 @@ import java.util.*;
 abstract class AbstractAgentSnapshotInfoBuilder {
 
     private final AgentSnapshotInfoFactory snapshotInfoFactory;
+	private Scenario scenario;
 	
 	AbstractAgentSnapshotInfoBuilder( Scenario sc, final AgentSnapshotInfoFactory agentSnapshotInfoFactory ){
         this.snapshotInfoFactory = agentSnapshotInfoFactory;
+        this.scenario = sc ;
 	}
 	
 	/**
@@ -133,6 +145,9 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 			pos.setAgentState(AgentState.PERSON_DRIVING_CAR);
 		} else {
 			pos.setAgentState(AgentState.PERSON_OTHER_MODE );
+		}
+		if ( scenario.getPopulation().getPersonAttributes().getAttribute( driverAgent.getId().toString(), "marker" ) != null ) { 
+			pos.setAgentState( AgentState.PERSON_OTHER_MODE ) ;
 		}
 
 		this.positionPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord, 
