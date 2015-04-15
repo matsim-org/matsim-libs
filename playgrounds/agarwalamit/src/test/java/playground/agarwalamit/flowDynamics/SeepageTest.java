@@ -136,7 +136,7 @@ public class SeepageTest {
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
 
-		SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory(QueueWithBufferType.seep);
+		SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory();
 
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1,seepNetFactory);
 		qSim1.addMobsimEngine(netsimEngine);
