@@ -19,7 +19,6 @@
 
 package playground.michalm.demand.poznan.kbr;
 
-import java.io.File;
 import java.util.Map;
 
 import org.matsim.api.core.v01.*;
@@ -30,8 +29,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrix;
 
 import playground.michalm.demand.ODDemandGenerator;
+import playground.michalm.util.array2d.Array2DReader;
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.util.visum.VisumODMatrixReader;
 import playground.michalm.zone.*;
 
 
@@ -58,22 +57,21 @@ public class PoznanSimpleDemandGeneration
             String odMatrixFile = odMatrixFilePrefix + i + "-" + (i + 1) + ".gz";
             System.out.println("Generation for " + odMatrixFile);
 
-            double[][] visumODMatrix = VisumODMatrixReader.readMatrixFile(new File(odMatrixFile));
-            Matrix odMatrix = MatrixUtils
-                    .createSparseMatrix("m" + i, zones.keySet(), visumODMatrix);
+            double[][] odMatrixFromFile = Array2DReader.getDoubleArray(odMatrixFile, zones.size());
+            Matrix odMatrix = MatrixUtils.createSparseMatrix("m" + i, zones.keySet(),
+                    odMatrixFromFile);
 
             dg.generateSinglePeriod(odMatrix, "dummy", "dummy", transportMode, i * 3600, 3600, 1);
         }
 
         dg.write(plansFile);
-
     }
 
 
     public static void main(String[] args)
     {
         String inputDir = "d:/GoogleDrive/Poznan/";
-        String plansFile = "d:/PP-rad/matsim-poznan/test/plans.xml.gz";
+        String plansFile = "d:/PP-rad/poznan/test/plans.xml.gz";
         String transportMode = TransportMode.car;
         new PoznanSimpleDemandGeneration().generate(inputDir, plansFile, transportMode);
     }

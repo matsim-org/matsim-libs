@@ -23,36 +23,32 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.text.*;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
+
+import org.matsim.core.utils.io.IOUtils;
 
 
-public class VisumODMatrixReader
+public class VisumMatrixReader
 {
-    public static double[][] readMatrixFile(File file)
+    public static double[][] readMatrixFile(String file)
     {
-        try (InputStream gzipStream = new GZIPInputStream(new FileInputStream(file));
-                BufferedReader reader = new BufferedReader(new InputStreamReader(gzipStream))) {
+        try (BufferedReader reader = IOUtils.getBufferedReader(file)) {
             NumberReader nr = new NumberReader(reader);
 
             nr.nextDouble();// time interval - from
             nr.nextDouble();// time interval - to
             nr.nextDouble();// factor
 
-            int nZones = nr.nextInt(); // number of zones
+            int count = nr.nextInt(); // number of objects
 
-            // =================
-
-            // Id[] zoneIds = new Id[nZones];
-            for (int i = 0; i < nZones; i++) {
+            // object ids
+            for (int i = 0; i < count; i++) {
                 nr.nextInt();
             }
 
-            // =================
-
-            double[][] odMatrix = (double[][])Array.newInstance(double.class, nZones, nZones);
-
-            for (int i = 0; i < nZones; i++) {
-                for (int j = 0; j < nZones; j++) {
+            // values
+            double[][] odMatrix = (double[][])Array.newInstance(double.class, count, count);
+            for (int i = 0; i < count; i++) {
+                for (int j = 0; j < count; j++) {
                     odMatrix[i][j] = nr.nextDouble();
                 }
             }

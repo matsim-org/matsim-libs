@@ -35,7 +35,12 @@ public class ZoneXmlWriter
         for (Zone z : zones.values()) {
             List<Tuple<String, String>> atts = new ArrayList<>();
             atts.add(new Tuple<String, String>("id", z.getId().toString()));
-            atts.add(new Tuple<String, String>("type", z.getType()));
+
+            String type = z.getType();
+            if (type != null && !type.isEmpty()) {
+                atts.add(new Tuple<String, String>("type", type));
+            }
+
             writeStartTag("zone", atts, true);
         }
     }

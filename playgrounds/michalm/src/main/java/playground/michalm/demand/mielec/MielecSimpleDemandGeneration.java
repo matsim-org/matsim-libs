@@ -19,7 +19,6 @@
 
 package playground.michalm.demand.mielec;
 
-import java.io.File;
 import java.util.Map;
 
 import org.matsim.api.core.v01.*;
@@ -65,7 +64,7 @@ public class MielecSimpleDemandGeneration
                 taxiProbability);
         ODDemandGenerator dg = new ODDemandGenerator(scenario, zones, true, ac, pc);
 
-        double[][] matrix = Array2DReader.getDoubleArray(new File(odMatrixFile), zones.size());
+        double[][] matrix = Array2DReader.getDoubleArray(odMatrixFile, zones.size());
         Matrix afternoonODMatrix = MatrixUtils.createSparseMatrix("afternoon", zones.keySet(),
                 matrix);
         double[][] transposedMatrix = Array2DUtils.transponse(matrix);

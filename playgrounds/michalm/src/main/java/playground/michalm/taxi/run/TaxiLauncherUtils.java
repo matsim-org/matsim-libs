@@ -20,7 +20,8 @@
 package playground.michalm.taxi.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.VrpLauncherUtils.*;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 
 import playground.michalm.taxi.data.TaxiData;

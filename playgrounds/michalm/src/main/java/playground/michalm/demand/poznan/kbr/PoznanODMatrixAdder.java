@@ -24,7 +24,7 @@ import java.lang.reflect.Array;
 import java.util.Map;
 
 import playground.michalm.demand.poznan.kbr.PoznanLanduseDemandGeneration.ActivityPair;
-import playground.michalm.util.visum.VisumODMatrixReader;
+import playground.michalm.util.visum.VisumMatrixReader;
 
 
 public class PoznanODMatrixAdder
@@ -60,7 +60,7 @@ public class PoznanODMatrixAdder
 
             System.out.println("readMatrix: " + odMatrixFile);
 
-            double[][] odMatrix = VisumODMatrixReader.readMatrixFile(new File(odMatrixFile));
+            double[][] odMatrix = VisumMatrixReader.readMatrixFile(odMatrixFile);
 
             if (totalODMatrices[i] == null) {
                 totalODMatrices[i] = (double[][])Array.newInstance(//

@@ -37,7 +37,7 @@ import playground.michalm.demand.*;
 import playground.michalm.demand.DefaultActivityCreator.GeometryProvider;
 import playground.michalm.demand.DefaultActivityCreator.PointAcceptor;
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.util.visum.VisumODMatrixReader;
+import playground.michalm.util.visum.VisumMatrixReader;
 import playground.michalm.zone.*;
 import playground.michalm.zone.util.SubzoneUtils;
 
@@ -326,7 +326,7 @@ public class PoznanLanduseDemandGeneration
                     + ".gz";
             System.out.println("Generation for " + odMatrixFile);
 
-            double[][] visumODMatrix = VisumODMatrixReader.readMatrixFile(new File(odMatrixFile));
+            double[][] visumODMatrix = VisumMatrixReader.readMatrixFile(odMatrixFile);
             Matrix odMatrix = MatrixUtils
                     .createSparseMatrix("m" + i, zones.keySet(), visumODMatrix);
             dg.generateSinglePeriod(odMatrix, actTypeFrom, actTypeTo, transportMode, i * 3600,
@@ -344,7 +344,7 @@ public class PoznanLanduseDemandGeneration
     public static void main(String[] args)
     {
         String inputDir = "d:/GoogleDrive/Poznan/";
-        String plansFile = "d:/PP-rad/matsim-poznan/test/plans.xml.gz";
+        String plansFile = "d:/PP-rad/poznan/test/plans.xml.gz";
         String transportMode = TransportMode.car;
         new PoznanLanduseDemandGeneration().generate(inputDir, plansFile, transportMode);
     }

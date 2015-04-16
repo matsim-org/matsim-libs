@@ -4,6 +4,8 @@ import java.io.*;
 import java.lang.reflect.Array;
 import java.util.*;
 
+import org.matsim.core.utils.io.IOUtils;
+
 
 /**
  * Reads 2D arrays (of different types) from files. To handle different types of data use
@@ -19,76 +21,70 @@ public class Array2DReader
     public static final Strategy STRING_STRATEGY = new StringStrategy();
 
 
-    public static double[][] getDoubleArray(File file, int cols)
+    public static double[][] getDoubleArray(String file, int cols)
     {
         return (double[][])getArray(file, cols, DOUBLE_STRATEGY);
     }
 
 
-    public static int[][] getIntArray(File file, int cols)
+    public static int[][] getIntArray(String file, int cols)
     {
         return (int[][])getArray(file, cols, INT_STRATEGY);
     }
 
 
-    public static String[][] getStringArray(File file, int cols)
+    public static String[][] getStringArray(String file, int cols)
     {
         return (String[][])getArray(file, cols, STRING_STRATEGY);
     }
 
 
-    public static Object getArray(File file, int cols, Strategy strategy)
+    public static Object getArray(String file, int cols, Strategy strategy)
     {
-        try {
-            return getArray(new FileReader(file), cols, strategy);
+        try (BufferedReader br = IOUtils.getBufferedReader(file)) {
+            return getArray(br, cols, strategy);
         }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException();
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
 
-    public static Object getArray(Reader reader, int cols, Strategy strategy)
+    public static Object getArray(BufferedReader br, int cols, Strategy strategy) throws IOException
     {
         List<Object> rows = new ArrayList<>();
         boolean endOfArray = false;
 
-        try (@SuppressWarnings("resource")
-        BufferedReader br = new BufferedReader(reader)) {
-            for (String line = br.readLine(); line != null; line = br.readLine()) {
-                StringTokenizer st = new StringTokenizer(line, " \t");
+        for (String line = br.readLine(); line != null; line = br.readLine()) {
+            StringTokenizer st = new StringTokenizer(line, " \t");
 
-                if (endOfArray) {
-                    if (st.hasMoreTokens()) {
-                        throw new RuntimeException("Non-empty line after matrix");
-                    }
-                }
-                else {
-                    if (!st.hasMoreTokens()) {
-                        endOfArray = true;
-                        continue;
-                    }
-
-                    Object row = strategy.createRow(cols);
-
-                    for (int i = 0; i < cols; i++) {
-                        if (!st.hasMoreTokens()) {
-                            throw new RuntimeException("Too few elements");
-                        }
-
-                        strategy.addToRow(row, i, st.nextToken());
-                    }
-
-                    if (st.hasMoreTokens()) {
-                        throw new RuntimeException("Too many elements");
-                    }
-
-                    rows.add(row);
+            if (endOfArray) {
+                if (st.hasMoreTokens()) {
+                    throw new RuntimeException("Non-empty line after matrix");
                 }
             }
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
+            else {
+                if (!st.hasMoreTokens()) {
+                    endOfArray = true;
+                    continue;
+                }
+
+                Object row = strategy.createRow(cols);
+
+                for (int i = 0; i < cols; i++) {
+                    if (!st.hasMoreTokens()) {
+                        throw new RuntimeException("Too few elements");
+                    }
+
+                    strategy.addToRow(row, i, st.nextToken());
+                }
+
+                if (st.hasMoreTokens()) {
+                    throw new RuntimeException("Too many elements");
+                }
+
+                rows.add(row);
+            }
         }
 
         if (rows.size() == 0) {
