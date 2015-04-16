@@ -45,7 +45,6 @@ public class ControlerWW {
         WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig());
 		controler.getEvents().addHandler(waitTimeCalculator);
 		controler.setTransitRouterFactory(new TransitRouterEventsWLFactory(controler, waitTimeCalculator.getWaitTimes()));
-		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.run();
 	}
 	
