@@ -36,7 +36,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * Therefore always use "fresh" Path object, i.e. driveTask.getPath() to get: total travel
  * time&cost, arrival time, or next link and its travel time
  */
-public class OnlineDriveTaskTrackerImpl
+class OnlineDriveTaskTrackerImpl
     implements OnlineDriveTaskTracker
 {
     private final DriveTask driveTask;
@@ -55,7 +55,7 @@ public class OnlineDriveTaskTrackerImpl
     private Link currentLink;
 
 
-    public OnlineDriveTaskTrackerImpl(DriveTask driveTask, VrpLeg vrpDynLeg,
+    OnlineDriveTaskTrackerImpl(DriveTask driveTask, VrpLeg vrpDynLeg,
             VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer)
     {
         this.driveTask = driveTask;
@@ -94,21 +94,6 @@ public class OnlineDriveTaskTrackerImpl
 
 
     @Override
-    public void arrivedOnLinkByNonNetworkMode()
-    {
-        VrpPath path = vrpDynLeg.getPath();
-
-        currentLinkIdx = path.getLinkCount() - 1;
-        currentLink = path.getLink(currentLinkIdx);
-
-        linkEnterTime = timer.getTimeOfDay();
-
-        plannedTTAtPrevNode = linkEnterTime - driveTask.getBeginTime();
-        plannedLinkTT = 0;
-    }
-
-
-    @Override
     public LinkTimePair getDiversionPoint(double currentTime)
     {
         if (vrpDynLeg.canChangeNextLink()) {
@@ -135,7 +120,7 @@ public class OnlineDriveTaskTrackerImpl
         LinkTimePair diversionPoint = getDiversionPoint(currentTime);
 
         if (!newSubPath.getFromLink().equals(diversionPoint.link)
-                || newSubPath.getDepartureTime() != diversionPoint.time) {
+                || newSubPath.getDepartureTime() != diversionPoint.time) {//TODO this time check may not work with cached VrpPaths??
             throw new IllegalArgumentException();
         }
 
@@ -165,27 +150,6 @@ public class OnlineDriveTaskTrackerImpl
 
 
     @Override
-    public Link getLink()
-    {
-        return currentLink;
-    }
-
-
-    @Override
-    public double getLinkEnterTime()
-    {
-        return linkEnterTime;
-    }
-
-
-    @Override
-    public double predictLinkExitTime(double currentTime)
-    {
-        return Math.max(currentTime, linkEnterTime + plannedLinkTT);
-    }
-
-
-    @Override
     public double predictEndTime(double currentTime)
     {
         double plannedTotalTT = plannedEndTime - driveTask.getBeginTime();
@@ -196,16 +160,8 @@ public class OnlineDriveTaskTrackerImpl
     }
 
 
-    @Override
-    public double getBeginTime()
+    private double predictLinkExitTime(double currentTime)
     {
-        return driveTask.getBeginTime();
-    }
-
-
-    @Override
-    public double getPlannedEndTime()
-    {
-        return plannedEndTime;
+        return Math.max(currentTime, linkEnterTime + plannedLinkTT);
     }
 }

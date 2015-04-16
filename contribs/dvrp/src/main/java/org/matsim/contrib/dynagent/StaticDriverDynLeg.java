@@ -99,7 +99,7 @@ public class StaticDriverDynLeg
     @Override
     public Double getExpectedTravelTime()
     {
-        //TODO add travel time of the destination link??
+        //TODO add travel time at the destination link??
         return route.getTravelTime();
     }
 

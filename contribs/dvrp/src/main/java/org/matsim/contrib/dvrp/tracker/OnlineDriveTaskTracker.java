@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.dvrp.tracker;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.router.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
@@ -27,15 +26,6 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 public interface OnlineDriveTaskTracker
     extends TaskTracker
 {
-    Link getLink();
-
-
-    double getLinkEnterTime();
-
-
-    double predictLinkExitTime(double currentTime);
-
-
     LinkTimePair getDiversionPoint(double currentTime);
 
 
@@ -43,7 +33,4 @@ public interface OnlineDriveTaskTracker
 
 
     void movedOverNode();
-
-
-    void arrivedOnLinkByNonNetworkMode();
 }

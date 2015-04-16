@@ -43,6 +43,7 @@ public class TaxiScheduler
     private final VrpPathCalculator calculator;
     private final TaxiSchedulerParams params;
 
+
     public TaxiScheduler(MatsimVrpContext context, VrpPathCalculator calculator,
             TaxiSchedulerParams params)
     {
@@ -308,18 +309,18 @@ public class TaxiScheduler
         schedule.addTask(new TaxiStayTask(t5, tEnd, link));
     }
 
-    
+
     public void updateTimeline(Schedule<TaxiTask> schedule)
     {
         if (schedule.getStatus() != ScheduleStatus.STARTED) {
             return;
         }
-        
-        double predictedEndTime = schedule.getCurrentTask().getTaskTracker().predictEndTime(
+
+        double predictedEndTime = TaskTrackers.predictEndTime(schedule.getCurrentTask(),
                 context.getTime());
         updateTimelineImpl(schedule, predictedEndTime);
     }
-    
+
 
     private void updateTimelineImpl(Schedule<TaxiTask> schedule, double newTaskEndTime)
     {
@@ -376,7 +377,7 @@ public class TaxiScheduler
 
                     break;
                 }
-            
+
                 case PICKUP: {
                     task.setBeginTime(t);// t == taxi's arrival time
                     double t0 = ((TaxiPickupTask)task).getRequest().getT0();// t0 == passenger's departure time

@@ -67,5 +67,5 @@ public interface Task
     TaskTracker getTaskTracker();
 
 
-    void setTaskTracker(TaskTracker taskTracker);
+    void initTaskTracker(TaskTracker taskTracker);
 }

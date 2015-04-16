@@ -22,7 +22,7 @@ package org.matsim.contrib.dvrp.vrpagent;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.router.*;
-import org.matsim.contrib.dvrp.tracker.*;
+import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 
 
 /**
@@ -31,8 +31,7 @@ import org.matsim.contrib.dvrp.tracker.*;
 public class VrpLeg
     implements DivertibleLeg
 {
-    private TaskTracker tracker;
-    private Boolean onlineTracking = null;
+    private OnlineDriveTaskTracker onlineTracker;
 
     private VrpPath path;
     private int currentLinkIdx = 0;
@@ -47,14 +46,17 @@ public class VrpLeg
     }
 
 
-    public void initTracking(TaskTracker tracker)
+    public void initOnlineTracking(OnlineDriveTaskTracker onlineTracker)
     {
-        if (onlineTracking != null) {
+        if (this.onlineTracker != null) {
             throw new IllegalStateException("Tracking already initialized");
         }
 
-        this.tracker = tracker;
-        onlineTracking = tracker instanceof OnlineDriveTaskTracker;
+        if (currentLinkIdx != 0) {
+            throw new IllegalStateException("Too late for initializing online tracking");
+        }
+
+        this.onlineTracker = onlineTracker;
     }
 
 
@@ -68,8 +70,8 @@ public class VrpLeg
             throw new IllegalStateException();
         }
 
-        if (onlineTracking) {
-            ((OnlineDriveTaskTracker)tracker).movedOverNode();
+        if (onlineTracker != null) {
+            onlineTracker.movedOverNode();
         }
     }
 
@@ -136,28 +138,20 @@ public class VrpLeg
     @Override
     public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId)
     {
-        if (!getDestinationLinkId().equals(linkId)) {
-            throw new IllegalStateException();
-        }
-
-        currentLinkIdx = path.getLinkCount() - 1;
-
-        if (onlineTracking) {
-            ((OnlineDriveTaskTracker)tracker).arrivedOnLinkByNonNetworkMode();
-        }
+        throw new UnsupportedOperationException();
     }
 
 
     @Override
     public Double getExpectedTravelTime()
     {
-        return tracker.getPlannedEndTime() - tracker.getBeginTime();
+        return null;//teleportation is not handled
     }
 
 
     @Override
     public Double getExpectedTravelDistance()
     {
-        return null;//TODO
+        return null;//teleportation is not handled
     }
 }

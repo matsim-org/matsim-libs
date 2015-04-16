@@ -111,13 +111,13 @@ public class RandomDynLeg
     @Override
     public Double getExpectedTravelTime()
     {
-        return MatsimRandom.getRandom().nextDouble() * 3600;
+        return null;//teleportation unsupported
     }
 
 
     @Override
     public Double getExpectedTravelDistance()
     {
-        return MatsimRandom.getRandom().nextDouble() * 3600 / 15;
+        return null;//teleportation unsupported
     }
 }
