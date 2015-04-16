@@ -103,11 +103,15 @@ public class EvacuationPatnaScenarioGenerator {
 		config.controler().setMobsim("qsim");
 		config.controler().setWriteEventsInterval(20);
 		config.controler().setWritePlansInterval(20);
-
+		
+		config.global().setCoordinateSystem("EPSG:24345");
+		config.travelTimeCalculator().setTraveltimeBinSize(900);
+		
 		config.qsim().setFlowCapFactor(0.011);	
 		config.qsim().setStorageCapFactor(0.033);
 		config.qsim().setSnapshotPeriod(5*60);
-		config.qsim().setEndTime(36*3600);
+		config.qsim().setEndTime(30*3600);
+		config.qsim().setStuckTime(100000);
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
 		config.qsim().setMainModes(mainModes);
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
@@ -123,7 +127,7 @@ public class EvacuationPatnaScenarioGenerator {
 		config.strategy().setMaxAgentPlanMemorySize(5);
 		config.strategy().addStrategySettings(expChangeBeta);
 		config.strategy().addStrategySettings(reRoute);
-		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.75);
 
 		//vsp default
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
