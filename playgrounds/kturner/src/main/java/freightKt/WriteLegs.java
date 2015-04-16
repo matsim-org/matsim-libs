@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 
 
 
@@ -21,30 +22,29 @@ import org.matsim.contrib.freight.carrier.Carrier;
  */
 
 class WriteLegs {
-	
+
 	private File file;
 	private List<Leg> legs = new ArrayList<Leg>();
-		
+
 	//Constructor: Writes Headline
 	WriteLegs(File file, Carrier carrier) {
 		this.file = file;
 		if (file.exists()){
-			writeCarrierLine(file, carrier);
+			//do nothing
 		} else {
 			writeHeadLine(file);
-			writeCarrierLine(file, carrier);
 		}
-		}
+	}
 
-	
+
 	private void writeHeadLine (File file) {
 		FileWriter writer;
-			
+
 		try {
 			writer = new FileWriter(file);  //Neuer File (überschreibt im Zweifel den alten - der jedoch nicht existieren dürfte!
 
-			writer.write("angefallene Leg" +System.getProperty("line.separator"));
-			writer.write("DepartureTime \t Traveltime \t Mode \t Distance \t Route");
+			writer.write("angefallene Legs" +System.getProperty("line.separator"));
+			writer.write("DepartureTime \t Traveltime \t Mode(vehType) \t Distance \t Route");
 			writer.write(System.getProperty("line.separator"));
 
 			// Schreibt den Stream in die Datei
@@ -59,10 +59,10 @@ class WriteLegs {
 		}
 		System.out.println("Datei: " + file + " geschrieben.");
 	}
-	
-	private void writeCarrierLine (File file, Carrier carrier) {
+
+	void writeCarrierLine (Carrier carrier) {
 		FileWriter writer;
-			
+
 		try {
 			writer = new FileWriter(file, true);  //wird an File angehangen
 
@@ -76,15 +76,15 @@ class WriteLegs {
 			e.printStackTrace();
 		}
 	}
-	
+
 	void addLegToWriter(Leg leg) {
 		legs.add(leg);
 	}
-	
-	
+
+
 	void writeTextLineToFile(String text){
 		FileWriter writer;
-		
+
 		try {
 			writer = new FileWriter(file, true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
 			writer.write(text);
@@ -98,22 +98,21 @@ class WriteLegs {
 		}
 		System.out.println("Datei: " + file + " geschrieben.");
 	}
-	
-	void writeLegsToFile() {
+
+	void writeLegsToFile(Carrier carrier) {
 		FileWriter writer;
-			
+
 		try {
 			// new FileWriter(file) - falls die Datei bereits existiert wird diese überschrieben
 			writer = new FileWriter(file, true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
 
 			// Text wird in den Stream geschrieben
-			
 			writer.write("### Legs: ###" + System.getProperty("line.separator"));
 			for (Leg leg : legs){
-				writer.write(leg.getDepartureTime() +"\t"+ leg.getTravelTime() +"\t"+ leg.getMode() +"\t"+ leg.getRoute().getDistance() +"\t"+ leg.getRoute().toString() );
-			writer.write(System.getProperty("line.separator"));
+				writer.write(leg.getDepartureTime() +"\t"+ leg.getTravelTime() +"\t"+  leg.getMode() +"\t"+  leg.getRoute().getDistance() +"\t"+ leg.getRoute().toString() );
+				writer.write(System.getProperty("line.separator"));
 			}
-				
+
 			// Schreibt den Stream in die Datei
 			// Sollte immer am Ende ausgeführt werden, sodass der Stream 
 			// leer ist und alles in der Datei steht.
@@ -125,5 +124,25 @@ class WriteLegs {
 			e.printStackTrace();
 		}
 		System.out.println("Datei: " + file + " geschrieben.");
+	}
+	
+	void writeLegToFile(Leg leg) {
+		FileWriter writer;
+
+		try {
+			// new FileWriter(file) - falls die Datei bereits existiert wird diese überschrieben
+			writer = new FileWriter(file, true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
+
+			// Text wird in den Stream geschrieben
+			writer.write(leg.getDepartureTime() +"\t"+ leg.getTravelTime() +"\t"+ leg.getMode() +"\t"+ leg.getRoute().getDistance() + "\t" + leg.getRoute().toString());
+			writer.write(System.getProperty("line.separator"));
+
+			writer.flush();
+
+			// Schließt den Stream
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

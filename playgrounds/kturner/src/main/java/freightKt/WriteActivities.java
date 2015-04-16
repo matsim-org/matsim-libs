@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.contrib.freight.carrier.Carrier;
 
 /**
  * @author kt
@@ -80,6 +81,23 @@ class WriteActivities {
 			e.printStackTrace();
 		}
 		System.out.println("Datei: " + file + " geschrieben.");
+	}
+	
+	void writeCarrierLine (Carrier carrier) {
+		FileWriter writer;
+
+		try {
+			writer = new FileWriter(file, true);  //wird an File angehangen
+
+			writer.write("#Carrier: "+ carrier.getId().toString());
+			writer.write(System.getProperty("line.separator"));
+
+			writer.flush();
+
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	void writeActsToFile() {
