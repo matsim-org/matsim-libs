@@ -29,7 +29,27 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class VisumMatrixReader
 {
-    public static double[][] readMatrixFile(String file)
+    public static double[][] readMatrix(String file)
+    {
+        VisumMatrixReader reader = new VisumMatrixReader();
+        reader.readFile(file);
+        return reader.getMatrix();
+    }
+
+
+    public static int[] readIds(String file)
+    {
+        VisumMatrixReader reader = new VisumMatrixReader();
+        reader.readFile(file);
+        return reader.getIds();
+    }
+
+
+    private int[] ids;
+    private double[][] matrix;
+
+
+    public void readFile(String file)
     {
         try (BufferedReader reader = IOUtils.getBufferedReader(file)) {
             NumberReader nr = new NumberReader(reader);
@@ -41,23 +61,34 @@ public class VisumMatrixReader
             int count = nr.nextInt(); // number of objects
 
             // object ids
+            ids = new int[count];
             for (int i = 0; i < count; i++) {
-                nr.nextInt();
+                ids[i] = nr.nextInt();
             }
 
             // values
-            double[][] odMatrix = (double[][])Array.newInstance(double.class, count, count);
+            matrix = (double[][])Array.newInstance(double.class, count, count);
             for (int i = 0; i < count; i++) {
                 for (int j = 0; j < count; j++) {
-                    odMatrix[i][j] = nr.nextDouble();
+                    matrix[i][j] = nr.nextDouble();
                 }
             }
-
-            return odMatrix;
         }
         catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
+    }
+
+
+    public int[] getIds()
+    {
+        return ids;
+    }
+
+
+    public double[][] getMatrix()
+    {
+        return matrix;
     }
 
 

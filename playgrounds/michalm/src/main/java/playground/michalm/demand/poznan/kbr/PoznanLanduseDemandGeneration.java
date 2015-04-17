@@ -326,7 +326,7 @@ public class PoznanLanduseDemandGeneration
                     + ".gz";
             System.out.println("Generation for " + odMatrixFile);
 
-            double[][] visumODMatrix = VisumMatrixReader.readMatrixFile(odMatrixFile);
+            double[][] visumODMatrix = VisumMatrixReader.readMatrix(odMatrixFile);
             Matrix odMatrix = MatrixUtils
                     .createSparseMatrix("m" + i, zones.keySet(), visumODMatrix);
             dg.generateSinglePeriod(odMatrix, actTypeFrom, actTypeTo, transportMode, i * 3600,
