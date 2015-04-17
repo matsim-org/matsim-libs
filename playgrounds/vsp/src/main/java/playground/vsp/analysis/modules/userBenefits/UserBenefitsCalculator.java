@@ -194,12 +194,22 @@ public class UserBenefitsCalculator {
 	}
 
 	public int getPersonsWithoutValidPlanCnt() {
-		return personsWithoutValidPlanScore;
+		if (this.considerAllPlans) {
+			logger.warn("All plans are forced to be considered. Asking for the number of persons without a valid plan doesn't make sense.");
+			return Integer.MIN_VALUE;
+		} else {
+			return personsWithoutValidPlanScore;
+		}
 	}
 	
 	public int getInvalidPlans() {
-		int invalidPlans = this.minusScore + this.nullScore;
-		return invalidPlans;
+		if (this.considerAllPlans) {
+			logger.warn("All plans are forced to be considered. Asking for the number of invalid plans doesn't make sense.");
+			return Integer.MIN_VALUE;
+		} else {
+			int invalidPlans = this.minusScore + this.nullScore;
+			return invalidPlans;
+		}
 	}
 	
 	public Map<Id<Person>, Double> getPersonId2Utility() {
