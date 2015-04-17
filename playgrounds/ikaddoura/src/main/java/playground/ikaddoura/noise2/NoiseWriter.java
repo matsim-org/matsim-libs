@@ -98,7 +98,7 @@ public class NoiseWriter {
 //		log.info("Writing receiver points to shapefile... Done. ");
 	}
 	
-	private static void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values) {
+	public static void write (String fileName , int columns , List<String> headers , List<HashMap<Id<ReceiverPoint>,Double>> values) {
 		
 		File file = new File(fileName);
 		file.mkdirs();

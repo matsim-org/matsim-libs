@@ -68,7 +68,7 @@ public class WelfareAnalysisMain {
 			log.info("run directory: " + runDirectory);
 			
 		} else {
-			runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/bln2/output/noise_int_2a_2/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_2a/";
 		}
 		
 		
@@ -93,14 +93,14 @@ public class WelfareAnalysisMain {
 				
 		// plans analysis
 		
-		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(scenario.getConfig(), WelfareMeasure.SELECTED, true);
+		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(scenario.getConfig(), WelfareMeasure.SELECTED, false);
         this.it2userBenefits_selected.put(iteration, userBenefitsCalculator_selected.calculateUtility_money(scenario.getPopulation()));
 		this.it2invalidPersons_selected.put(iteration, userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_selected.put(iteration, userBenefitsCalculator_selected.getInvalidPlans());
 		System.out.println("user benefits (selected):" + userBenefitsCalculator_selected.calculateUtility_money(scenario.getPopulation()));
 		System.out.println("invalid persons (selected):" + userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
 		
-		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(scenario.getConfig(), WelfareMeasure.LOGSUM, true);
+		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(scenario.getConfig(), WelfareMeasure.LOGSUM, false);
 		this.it2userBenefits_logsum.put(iteration, userBenefitsCalculator_logsum.calculateUtility_money(scenario.getPopulation()));
 		this.it2invalidPersons_logsum.put(iteration, userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_logsum.put(iteration, userBenefitsCalculator_logsum.getInvalidPlans());
@@ -131,7 +131,7 @@ public class WelfareAnalysisMain {
 		this.it2ptLegs.put(iteration, (double) tripAnalysisHandler.getPtLegs());
 		this.it2walkLegs.put(iteration, (double) tripAnalysisHandler.getWalkLegs());
 						
-		String fileName = runDirectory + "analysis_welfare.csv";
+		String fileName = runDirectory + "analysis_welfare_notConsideringAllPlans.csv";
 		File file = new File(fileName);
 			
 		try {

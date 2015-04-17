@@ -46,12 +46,12 @@ public class MergeNoiseCSVFile {
 	private double startTime = 3600.;
 	private double timeBinSize = 3600.;
 	private double endTime = 30. * 3600.;
-	private String pathToFilesToMerge = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/ITERS/it.100/damages_receiverPoint/";
-	private String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/receiverPoints/receiverPoints.csv";
+	private String pathToFilesToMerge = "/Users/ihab/Desktop/ils4/kaddoura/bln2/output/noise_int_2a_10/ITERS/it.100/damages_receiverPoint/";
+	private String receiverPointsFile = "/Users/ihab/Desktop/ils4/kaddoura/bln2/output/noise_int_2a_10/receiverPoints/receiverPoints.csv";
 	private String separator = ";";
 	private String label = "damages_receiverPoint";
 	
-	private String outputPath = pathToFilesToMerge;
+	private String outputPath = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_2a_10/";
 	
 	private BufferedWriter bw;
 	private Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<Double, Map<Id<ReceiverPoint>, Double>>();

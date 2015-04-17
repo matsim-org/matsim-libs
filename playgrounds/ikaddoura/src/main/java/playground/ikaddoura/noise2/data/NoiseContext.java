@@ -134,6 +134,19 @@ public class NoiseContext {
 		this.consideredActivityCoordsForDamages.clear();
 	}
 	
+	public void initialize(String gridFileCSV) {
+		setActivityCoords();
+		createGrid(gridFileCSV);
+		setActivityCoord2NearestReceiverPointId();
+		setRelevantLinkInfo();
+		
+		// delete unnecessary information
+		this.zoneTuple2listOfLinkIds.clear();
+		this.zoneTuple2listOfReceiverPointIds.clear();
+		this.consideredActivityCoordsForReceiverPointGrid.clear();
+		this.consideredActivityCoordsForDamages.clear();
+	}
+
 	private void setActivityCoords () {
 		
 		for (Person person: scenario.getPopulation().getPersons().values()) {
@@ -230,6 +243,12 @@ public class NoiseContext {
 			}
 		}
 		log.info("Total number of receiver points: " + receiverPoints.size());
+	}
+	
+	private void createGrid(String gridFileCSV) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("Not yet implemented. Aborting...");
+		
 	}
 		
 	private void setActivityCoord2NearestReceiverPointId () {

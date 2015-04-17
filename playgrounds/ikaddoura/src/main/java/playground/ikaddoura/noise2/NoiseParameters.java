@@ -78,6 +78,10 @@ public class NoiseParameters {
 			consideredActivitiesForReceiverPointGridList.add(consideredActivitiesForReceiverPointGrid[i]);
 		}
 		
+		if (this.receiverPointGap == 0.) {
+			throw new RuntimeException("The receiver point gap is 0. Aborting...");
+		}
+		
 		if (this.internalizeNoiseDamages) {
 			
 			// required for internalization
