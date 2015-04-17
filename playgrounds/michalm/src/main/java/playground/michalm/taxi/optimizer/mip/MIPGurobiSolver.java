@@ -64,7 +64,8 @@ public class MIPGurobiSolver
     private GRBVar[][] xVar;//for each request/vehicle pair, (i, j)
     private GRBVar[] wVar; //for each request, i
 
-    private final Mode mode = Mode.OFFLINE;
+    //private final Mode mode = Mode.OFFLINE;
+    private final Mode mode = Mode.ONLINE;
 
 
     MIPGurobiSolver(TaxiOptimizerConfiguration optimConfig,

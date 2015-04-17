@@ -81,8 +81,8 @@ public class MIPProblem
     private MIPSolution initialSolution;
     private MIPSolution finalSolution;
 
-    static final Mode MODE = Mode.OFFLINE_INIT_OPTIM;
-
+    //static final Mode MODE = Mode.OFFLINE_INIT_OPTIM;
+    static final Mode MODE = Mode.ONLINE_1;
 
     public MIPProblem(TaxiOptimizerConfiguration optimConfig,
             PathTreeBasedTravelTimeCalculator pathTravelTimeCalc)
