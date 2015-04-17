@@ -37,6 +37,7 @@ import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
 import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
+import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.config.Config;
@@ -52,6 +53,7 @@ import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
+import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -59,16 +61,11 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.vehicles.Vehicle;
-
-
+import org.matsim.vehicles.VehicleType;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * @author kt
@@ -98,7 +95,7 @@ public class KTFreight_v2 {
 
 	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/FixLegScoring4/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/Scoring5/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
@@ -123,12 +120,14 @@ public class KTFreight_v2 {
 	// Einstellungen für den Run	
 
 	private static final boolean addingCongestion = false ;  //doesn't work correctly, KT 10.12.2014
-	private static final boolean addingToll = false;  //added, kt. 07.08.2014
+	private static final boolean addingToll = true;  //added, kt. 07.08.2014
 	private static final boolean runMatsim = true;	 //when false only jsprit run will be performed
 	private static final int LAST_MATSIM_ITERATION = 0;  //only one iteration for writing events.
 	private static final int LAST_JSPRIT_ITERATION = 100;
 	private static final int NU_OF_TOTAL_RUNS = 1;	
 
+	//temporär zum Programieren als Ausgabe
+	private static WriteTextToFile textInfofile; 
 
 	private static RoadPricingSchemeImpl rpscheme = new RoadPricingSchemeImpl();
 
@@ -150,12 +149,13 @@ public class KTFreight_v2 {
 		System.out.println("#### Starting Run: " + runIndex + "of: "+ NU_OF_TOTAL_RUNS);
 		createDir(new File(OUTPUT_DIR + RUN + runIndex));
 		createDir(new File(TEMP_DIR));	
+		
 
 		// ### config stuff: ###	
 		Config config = createConfig(args);
 		//		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		//		AbstractController.checkConfigConsistencyAndWriteToLog(config, "dump");
-
+		textInfofile = new WriteTextToFile(new File(config.controler().getOutputDirectory() + "/#TextInformation.txt"), null);
 		
 		if ( addingCongestion ) { //erst config vorbereiten....Config ist fix, sobald in Scenario!!!! KT, 11.12.14
 			config.network().setTimeVariantNetwork(true);
@@ -204,14 +204,17 @@ public class KTFreight_v2 {
 		//		TravelDisutility trDisutil = ctrl.getTravelDisutilityFactory().createTravelDisutility(timeCalculator, cnScoringGroup) ;
 		//		
 
-		CarrierScoringFunctionFactory scoringFunctionFactory = createMyScoringFunction(scenario);
+		CarrierScoringFunctionFactory scoringFunctionFactory = createMyScoringFunction2(scenario);
+		CarrierPlanStrategyManagerFactory planStrategyManagerFactory =  createMyStrategymanager(); //Benötigt, da listener kein "Null" als StrategyFactory mehr erlaubt, KT 17.04.2015
+		
 
-		CarrierModule listener = new CarrierModule(carriers, null, scoringFunctionFactory) ;
+		CarrierModule listener = new CarrierModule(carriers, planStrategyManagerFactory, scoringFunctionFactory) ;
 		listener.setPhysicallyEnforceTimeWindowBeginnings(true);
 		ctrl.addOverridingModule(listener) ;
 
 		ctrl.run();
 	}
+	
 
 	private static void finalOutput(Config config, Carriers carriers) {
 		// ### some final output: ###
@@ -380,10 +383,18 @@ public class KTFreight_v2 {
 		//				rpCalculator.addPricingScheme(typeId.toString(), scheme);
 		//			}
 		//		}
-		rpCalculator.addPricingScheme("gridType", scheme );  //bisher nur für die GridVehicles, KT
+		rpCalculator.addPricingScheme("gridType01", scheme );  //bisher nur für die GridVehicles, KT
+		rpCalculator.addPricingScheme("gridType05", scheme );  //bisher nur für die GridVehicles, KT
+		rpCalculator.addPricingScheme("gridType10", scheme );  //bisher nur für die GridVehicles, KT
 		netBuilder.setRoadPricingCalculator(rpCalculator);
-
+		
 		rpscheme = scheme;
+		
+		for(Id<VehicleType> vehTypId: rpCalculator.getSchemes().keySet()){
+			textInfofile.writeTextLineToFile(vehTypId.toString());
+			textInfofile.writeTextLineToFile(rpCalculator.getPricingSchemes(vehTypId).toString());
+		}
+		
 	}
 
 
@@ -422,6 +433,49 @@ public class KTFreight_v2 {
 		}
 	}
 
+	//Benötigt, da listener kein "Null" als StrategyFactory mehr erlaubt, KT 17.04.2015
+	//Da keine Strategy notwendig hier zunächst eine "leere" Factory
+	private static CarrierPlanStrategyManagerFactory createMyStrategymanager(){
+		return new CarrierPlanStrategyManagerFactory() {
+
+			@Override
+			public GenericStrategyManager<CarrierPlan, Carrier> createStrategyManager() {
+				return null;
+			}
+			
+		};
+
+	}
+	
+	/*
+	 * Neue Variante der ScoringFunction KT, 17.04.15
+	 * //TODO: MoneyScoring, ActivityScoring
+	 * Activity: Kostensatz mitgeben, damit klar ist, wo er herkommt... oder vlt geht es in dem Konstrukt doch aus den Veh-Eigenschaften?? (KT, 17.04.15)
+	 */
+	
+	private static CarrierScoringFunctionFactoryImpl_KT createMyScoringFunction2 (final Scenario scenario) {
+
+		textInfofile.writeTextLineToFile("createMyScoringFunction2 aufgerufen");
+
+//		final Network network = scenario.getNetwork();
+		
+		return new CarrierScoringFunctionFactoryImpl_KT(scenario) {
+			
+			public ScoringFunction createScoringFunction(final Carrier carrier){
+			SumScoringFunction sumSf = new SumScoringFunction() ;
+			
+			VehicleFixCostScoring fixCost = new VehicleFixCostScoring(carrier);
+			sumSf.addScoringFunction(fixCost);
+			
+			LegScoring legScoring = new LegScoring(carrier);
+			sumSf.addScoringFunction(legScoring);
+			
+			
+			return sumSf;
+			}
+		};
+	}
+		
 	
 	/*
 	 * ToDo (7.1.15, KT)
@@ -429,55 +483,61 @@ public class KTFreight_v2 {
 	 *  +Fixkosten --> erledigt, wenn auch vorerst mit Behelfslösung (06.04.15)
 	 *  +var. Kosten pro Zeit (Fahrt -> Leg) --> erledigt (06.04.15)
 	 *  +var. Kosten pro km (Fahrt -> Leg)  --> erledigt (06.04.15) 
-	 *  -var. Kosten pro Zeit (Service -> Activity) -> dürfte auch das Warten vor verschlossenem Tor mit abbilden, nur wie kommt man an die vehType-abhängigen Kostensätze/
-	 * #Maut (Money): noch gar nicht angesehen
+	 *  /var. Kosten pro Zeit (Service -> Activity) -> dürfte auch das Warten vor verschlossenem Tor mit abbilden, nur wie kommt man an die vehType-abhängigen Kostensätze/
+	 *      --> ist einheitlich mit 0.008 EUR/s --> zunächst fest eingetragen
+	 * #Maut (Money): er kriegt die die Zahlungen (amount) nicht mit. 
 	 */
-	private static CarrierScoringFunctionFactory createMyScoringFunction(final Scenario scenario) {
-			
-		return new CarrierScoringFunctionFactory() {
-			
-			@Override
-			public ScoringFunction createScoringFunction(final Carrier carrier) {
-				
-				SumScoringFunctionFreight sum = new SumScoringFunctionFreight() ; //neu KT(06.04.15) für Fixkosten
+//	private static CarrierScoringFunctionFactory createMyScoringFunction(final Scenario scenario) {		
+//		textInfofile.writeTextLineToFile("createMyScoringFunction aufgerufen");
+//		
+//		return new CarrierScoringFunctionFactory() {
+//			
+//			
+//			/* (non-Javadoc)
+//			 * @see org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory#createScoringFunction(org.matsim.contrib.freight.carrier.Carrier)
+//			 */
+//			@Override
+//			public ScoringFunction createScoringFunction(final Carrier carrier) {
+//				
+//				SumScoringFunctionFreight sumFreight = new SumScoringFunctionFreight() ; //neu KT(06.04.15) für Fixkosten
 //				SumScoringFunction sum = new SumScoringFunction() ; //vorherige Verion ohne Fixkosten
-				
-				sum.addScoringFunction(new SumScoringFunctionFreight.FixCostScoring(){
-					
-					private double score = 0. ;	
-
-					private double calcFixCosts(Carrier carrier){
-						double fixCosts = 0. ;
-						CarrierPlan selectedPlan = carrier.getSelectedPlan();
-						if(selectedPlan != null) {
-							for(ScheduledTour tour : selectedPlan.getScheduledTours()){
-								if(!tour.getTour().getTourElements().isEmpty()){
-									fixCosts += (-1)*tour.getVehicle().getVehicleType().getVehicleCostInformation().fix;
-								}
-							}
-						}
-						return fixCosts;
-					}
-					
-					@Override
-					public void finish() { 
-						//TODO Wird bisher fleißig ignoriert (06.04.15)	--> Behelfslösung via getScore und calcFixCosts(Carrier carrier)
-					}
-
-					@Override
-					public double getScore() {
-						this.score = calcFixCosts(carrier);
-						return this.score;
-					}
-
-					@Override
-					public void addFixCost(Carrier carrier) { 
-						//TODO Wird bisher fleißig ignoriert (06.04.15) --> Behelfslösung via getScore und calcFixCosts(Carrier carrier)
-					}
-				}); //end addScoringFunction -> FixCost
-				
-				
-//				sum.addScoringFunction(new SumScoringFunctionFreight.LegScoring(){
+//				
+//				sumFreight.addScoringFunction(new SumScoringFunctionFreight.FixCostScoring(){
+//					
+//					private double score = 0. ;	
+//
+//					private double calcFixCosts(Carrier carrier){
+//						double fixCosts = 0. ;
+//						CarrierPlan selectedPlan = carrier.getSelectedPlan();
+//						if(selectedPlan != null) {
+//							for(ScheduledTour tour : selectedPlan.getScheduledTours()){
+//								if(!tour.getTour().getTourElements().isEmpty()){
+//									fixCosts += (-1)*tour.getVehicle().getVehicleType().getVehicleCostInformation().fix;
+//								}
+//							}
+//						}
+//						return fixCosts;
+//					}
+//					
+//					@Override
+//					public void finish() { 
+//						this.score = calcFixCosts(carrier);
+//						//TODO Wird bisher fleißig ignoriert (06.04.15)	--> Behelfslösung via getScore und calcFixCosts(Carrier carrier)
+//					}
+//
+//					@Override
+//					public double getScore() {
+//						return this.score;
+//					}
+//
+//					@Override
+//					public void addFixCost(Carrier carrier) { 
+//						//TODO Wird bisher fleißig ignoriert , da kein Aufruf der Funktion durch Matsim(06.04.15) --> Behelfslösung via getScore und calcFixCosts(Carrier carrier)
+//					}
+//				}); //end addScoringFunction -> FixCost
+//				
+//				
+//				sum.addScoringFunction(new SumScoringFunction.LegScoring(){
 //					private double score = 0. ;
 //					
 //					WriteLegs legWriter = new WriteLegs(new File(OUTPUT_DIR + "#LegsForScoringInformation.txt"), carrier); //KT
@@ -550,102 +610,107 @@ public class KTFreight_v2 {
 //			            	
 //					}
 //				}) ; //end addScoringFunction -> Leg
-				
-				sum.addScoringFunction(new SumScoringFunctionFreight.MoneyScoring() {
-					private double score = 0. ;
-					//analog zu Activity aufbauen; KT11.12.14
-					@Override
-					public double getScore() {
-						// TODO Auto-generated method stub
-						return this.score;
-					}
-
-					@Override
-					public void finish() {
-						// TODO Auto-generated method stub
-
-					}
-
-					@Override
-					public void addMoney(double amount) {
-						// TODO Auto-generated method stub
-
-					}
-				} ) ;
-
-				sum.addScoringFunction(new SumScoringFunctionFreight.ActivityScoring() {
-					//ActivityScoring scoringFunction = new ActivityScoring() {
-					//Added Activity Writer to log the Activities
-					WriteActivities activityWriter = new WriteActivities(new File(OUTPUT_DIR + "#ActivitiesForScoringInformation.txt")); //KT
-
-					private double score = 0. ;
-					private final double margUtlOfTime_s = 0.008 ;  //Schröder/Liedtke 2014
-				
-					@Override
-					public void finish() {
-						activityWriter.writeCarrierLine(carrier);
-						activityWriter.writeTextLineToFile("Activity Utils per s: " +"\t"+ margUtlOfTime_s +"\t"+ "Activity Utils per h: " +"\t"+ margUtlOfTime_s*3600);
-						activityWriter.writeActsToFile();
-						activityWriter.writeTextLineToFile(System.getProperty("line.separator"));
-					}
-					@Override
-					public double getScore() {
-						return this.score ;
-					}
-					@Override
-					public void handleFirstActivity(Activity act) {
-						activityWriter.addFirstActToWriter(act); 
-						
-						//Am Start gschieht nichts; ggf kann man hier noch Bewertung für Beladung des Fzgs einfügen, KT 14.04.15
-					}
-			            	
-					@Override
-					public void handleActivity(Activity activity) {
-						activityWriter.addActToWriter(activity); 
-
-						// Entwurf von KN
-						if (activity instanceof FreightActivity) {
-							FreightActivity act = (FreightActivity) activity;
-							// deduct score for the time spent at the facility:
-							final double actStartTime = act.getStartTime();
-							final double actEndTime = act.getEndTime();
-							score -= (actEndTime - actStartTime) * this.margUtlOfTime_s ;
-
-							//From KN: Penilty for missing TimeWindow --> Überarbeiten, überlegen ob und wie es bewertet wird.
-							//KT: zu früh (Waiting-Costs) wird genauso bewertet (Lohnkosten des Fahrers) -> 0.008 EUR/s
-							// fixed that for you. :) michaz
-							final double windowStartTime = act.getTimeWindow().getStart();
-//							final double windowEndTime = act.getTimeWindow().getEnd();   //aktuell nicht verwendet, KT 14.04.15
-
-							final double penalty = this.margUtlOfTime_s; // per second!
-							if ( actStartTime < windowStartTime ) {
-								score -= penalty * ( windowStartTime - actStartTime ) ;
-								// mobsim could let them wait ... but this is also not implemented for regular activities. kai, nov'13
-								//aktuell warten Sie die Zeit "vor dem Tor" ab und beginnen Service dann pünktlich mit der Öffnung.
-							}
-//							if ( windowEndTime < actEndTime ) { //Doppelbewertung zunächst raus, da bei Schroeder/Lietdke nicht vorgesehen. KT, 14.04.15
-//								score -= penalty * ( actEndTime - windowEndTime ) ;
-//							}
-							// (note: provide penalties that work with a gradient to help the evol algo. kai, nov'13)
-
-						} else {
-							log.warn("Carrier activities which are not FreightActivities are not scored here") ;
-						}
-
-					}
-					@Override
-					public void handleLastActivity(Activity act) {
-						activityWriter.addLastActToWriter(act); 						
-						// no penalty for everything that is after the last act (people don't work)
-					
-					} 
-				}) ;//	sum.addScoringFunction(scoringFunction); ;
-
-				return sum ;
-			}
-
-		};
-	}
+//				
+//				sum.addScoringFunction(new SumScoringFunction.MoneyScoring() {
+//					private double score = 0. ;
+//					
+//					WriteMoney moneyWriter = new WriteMoney(new File(OUTPUT_DIR + "#MoneyForScoringInformation.txt"), carrier); //KT
+//					//analog zu Activity aufbauen; KT11.12.14
+//					@Override
+//					public double getScore() {
+//						// TODO Auto-generated method stub
+//						return this.score;
+//					}
+//
+//					@Override
+//					public void finish() {
+//						moneyWriter.writeCarrierLine(carrier);
+//						moneyWriter.writeAmountToFile();
+//						moneyWriter.writeTextLineToFile(System.getProperty("line.separator"));
+//					}
+//
+//					@Override
+//					public void addMoney(double amount) { // Wird offenabr nicht aufgerufen. KT 17.04.15
+//						moneyWriter.writeTextLineToFile("addMoney - Mtehod called, KT 17.04.15"); 
+//						moneyWriter.addAmountToWriter(amount); 
+//						score += (-1)* amount;
+//
+//					}
+//				} ) ;
+//
+////				sum.addScoringFunction(new SumScoringFunction.ActivityScoring() {
+////					//ActivityScoring scoringFunction = new ActivityScoring() {
+////					//Added Activity Writer to log the Activities
+////					WriteActivities activityWriter = new WriteActivities(new File(OUTPUT_DIR + "#ActivitiesForScoringInformation.txt")); //KT
+////
+////					private double score = 0. ;
+////					private final double margUtlOfTime_s = 0.008 ;  //Schröder/Liedtke 2014
+////				
+////					@Override
+////					public void finish() {
+////						activityWriter.writeCarrierLine(carrier);
+////						activityWriter.writeTextLineToFile("Activity Utils per s: " +"\t"+ margUtlOfTime_s +"\t"+ "Activity Utils per h: " +"\t"+ margUtlOfTime_s*3600);
+////						activityWriter.writeActsToFile();
+////						activityWriter.writeTextLineToFile(System.getProperty("line.separator"));
+////					}
+////					@Override
+////					public double getScore() {
+////						return this.score ;
+////					}
+////					@Override
+////					public void handleFirstActivity(Activity act) {
+////						activityWriter.addFirstActToWriter(act); 
+////						
+////						//Am Start gschieht nichts; ggf kann man hier noch Bewertung für Beladung des Fzgs einfügen, KT 14.04.15
+////					}
+////			            	
+////					@Override
+////					public void handleActivity(Activity activity) {
+////						activityWriter.addActToWriter(activity); 
+////
+////						// Entwurf von KN
+////						if (activity instanceof FreightActivity) {
+////							FreightActivity act = (FreightActivity) activity;
+////							// deduct score for the time spent at the facility:
+////							final double actStartTime = act.getStartTime();
+////							final double actEndTime = act.getEndTime();
+////							score -= (actEndTime - actStartTime) * this.margUtlOfTime_s ;
+////
+////							//From KN: Penilty for missing TimeWindow --> Überarbeiten, überlegen ob und wie es bewertet wird.
+////							//KT: zu früh (Waiting-Costs) wird genauso bewertet (Lohnkosten des Fahrers) -> 0.008 EUR/s
+////							// fixed that for you. :) michaz
+////							final double windowStartTime = act.getTimeWindow().getStart();
+//////							final double windowEndTime = act.getTimeWindow().getEnd();   //aktuell nicht verwendet, KT 14.04.15
+////
+////							final double penalty = this.margUtlOfTime_s; // per second!
+////							if ( actStartTime < windowStartTime ) {
+////								score -= penalty * ( windowStartTime - actStartTime ) ;
+////								// mobsim could let them wait ... but this is also not implemented for regular activities. kai, nov'13
+////								//aktuell warten Sie die Zeit "vor dem Tor" ab und beginnen Service dann pünktlich mit der Öffnung.
+////							}
+//////							if ( windowEndTime < actEndTime ) { //Doppelbewertung zunächst raus, da bei Schroeder/Lietdke nicht vorgesehen. KT, 14.04.15
+//////								score -= penalty * ( actEndTime - windowEndTime ) ;
+//////							}
+////							// (note: provide penalties that work with a gradient to help the evol algo. kai, nov'13)
+////
+////						} else {
+////							log.warn("Carrier activities which are not FreightActivities are not scored here") ;
+////						}
+////
+////					}
+////					@Override
+////					public void handleLastActivity(Activity act) {
+////						activityWriter.addLastActToWriter(act); 						
+////						// no penalty for everything that is after the last act (people don't work)
+////					
+////					} 
+////				}) ;//	sum.addScoringFunction(scoringFunction); ;
+//
+//				return sum ;
+//			}
+//
+//		};
+//	}
 
 	private static void writeRunInfo() {
 		File file = new File(OUTPUT_DIR + "#RunInformation.txt");
