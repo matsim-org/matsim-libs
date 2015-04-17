@@ -37,23 +37,23 @@ public class VrpConfigUtils
     }
 
 
-    public static Config loadConfig(final String filename)
+    public static Config loadConfig(final String file)
     {
-        Config config = DynConfigUtils.loadConfig(filename);
+        Config config = DynConfigUtils.loadConfig(file);
         updatePlansCalcRouteConfigGroup(config);
         updateTravelTimeCalculatorConfigGroup(config);
         return config;
     }
 
-    
+
     private static void updatePlansCalcRouteConfigGroup(Config config)
     {
-        ModeRoutingParams taxiParams = new ModeRoutingParams() ;
+        ModeRoutingParams taxiParams = new ModeRoutingParams();
         taxiParams.setMode(TaxiUtils.TAXI_MODE);
         taxiParams.setTeleportedModeFreespeedFactor(1.1);//TODO probably should be larger than 1.0
         config.plansCalcRoute().addModeRoutingParams(taxiParams);
     }
-    
+
 
     private static void updateTravelTimeCalculatorConfigGroup(Config config)
     {

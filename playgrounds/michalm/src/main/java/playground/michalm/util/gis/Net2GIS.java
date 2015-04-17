@@ -34,22 +34,22 @@ public class Net2GIS
 {
     public static void main(String[] args)
     {
-        String dirName;
-        String netFileName;
-        String outFileNameLs;
-        String outFileNameN;
+        String dir;
+        String netFile;
+        String outFileLs;
+        String outFileN;
 
         if (args.length == 0) {// for testing
-            dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
-            netFileName = dirName + "network.xml";
-            outFileNameLs = dirName + "GIS\\linksLs.shp";
-            outFileNameN = dirName + "GIS\\nodes.shp";
+            dir = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
+            netFile = dir + "network.xml";
+            outFileLs = dir + "GIS\\linksLs.shp";
+            outFileN = dir + "GIS\\nodes.shp";
         }
         else if (args.length == 5) {
-            dirName = args[0];
-            netFileName = dirName + args[1];
-            outFileNameLs = dirName + args[2];
-            outFileNameN = dirName + args[4];
+            dir = args[0];
+            netFile = dir + args[1];
+            outFileLs = dir + args[2];
+            outFileN = dir + args[4];
         }
         else {
             throw new IllegalArgumentException("Incorrect program arguments: "
@@ -62,15 +62,15 @@ public class Net2GIS
         scenario.getConfig().global().setCoordinateSystem(coordSystem);
 
         Network network = scenario.getNetwork();
-        new MatsimNetworkReader(scenario).readFile(netFileName);
+        new MatsimNetworkReader(scenario).readFile(netFile);
 
         // links as lines
         FeatureGeneratorBuilderImpl builder = new FeatureGeneratorBuilderImpl(network, coordSystem);
         builder.setFeatureGeneratorPrototype(LineStringBasedFeatureGenerator.class);
         builder.setWidthCalculatorPrototype(LanesBasedWidthCalculator.class);
-        new Links2ESRIShape(network, outFileNameLs, builder).write();
+        new Links2ESRIShape(network, outFileLs, builder).write();
 
         // nodes as points
-        new Nodes2ESRIShape(network, outFileNameN, coordSystem).write();
+        new Nodes2ESRIShape(network, outFileN, coordSystem).write();
     }
 }

@@ -32,14 +32,14 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class BasicLocations2GIS<T extends BasicLocation<T>>
 {
     private List<T> basicLocations;
-    private String filename;
+    private String file;
     private PointFeatureFactory factory;
 
 
-    public BasicLocations2GIS(List<T> basicLocations, String filename, String coordinateSystem)
+    public BasicLocations2GIS(List<T> basicLocations, String file, String coordinateSystem)
     {
         this.basicLocations = basicLocations;
-        this.filename = filename;
+        this.file = file;
         initFeatureType(coordinateSystem);
     }
 
@@ -52,7 +52,7 @@ public class BasicLocations2GIS<T extends BasicLocation<T>>
             features.add(getFeature(bl.getCoord()));
         }
 
-        ShapeFileWriter.writeGeometries(features, filename);
+        ShapeFileWriter.writeGeometries(features, file);
     }
 
 

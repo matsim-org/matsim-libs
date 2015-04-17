@@ -178,9 +178,9 @@ public class MIPProblem
     }
 
 
-    private void loadSolution(String filename)
+    private void loadSolution(String file)
     {
-        try (Scanner s = new Scanner(new File(filename))) {
+        try (Scanner s = new Scanner(new File(file))) {
             //header
             if (!s.nextLine().startsWith("# Objective value = ")) {
                 throw new RuntimeException();

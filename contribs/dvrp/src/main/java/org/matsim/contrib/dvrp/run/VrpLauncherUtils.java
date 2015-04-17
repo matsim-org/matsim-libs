@@ -61,39 +61,39 @@ public class VrpLauncherUtils
     }
 
 
-    public static Scenario initScenario(String netFileName, String plansFileName)
+    public static Scenario initScenario(String netFile, String plansFile)
     {
-        return initScenario(netFileName, plansFileName, null);
+        return initScenario(netFile, plansFile, null);
     }
 
 
-    public static Scenario initScenario(String netFileName, String plansFileName,
-            String changeEventsFileName)
+    public static Scenario initScenario(String netFile, String plansFile,
+            String changeEventsFile)
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         NetworkImpl network = (NetworkImpl)scenario.getNetwork();
 
-        if (changeEventsFileName != null) {
+        if (changeEventsFile != null) {
             scenario.getConfig().network().setTimeVariantNetwork(true);
             scenario.getConfig().qsim().setFlowCapFactor(VARIANT_NETWORK_FLOW_CAP_FACTOR);
             network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
         }
 
-        new MatsimNetworkReader(scenario).readFile(netFileName);
+        new MatsimNetworkReader(scenario).readFile(netFile);
 
-        if (changeEventsFileName != null) {
+        if (changeEventsFile != null) {
             NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
-            parser.parse(changeEventsFileName);
+            parser.parse(changeEventsFile);
             network.setNetworkChangeEvents(parser.getEvents());
         }
 
-        new MatsimPopulationReader(scenario).readFile(plansFileName);
+        new MatsimPopulationReader(scenario).readFile(plansFile);
         return scenario;
     }
 
 
     public static TravelTimeCalculator initTravelTimeCalculatorFromEvents(Scenario scenario,
-            String eventsFileName, int timeInterval)
+            String eventsFile, int timeInterval)
     {
         TravelTimeCalculatorConfigGroup ttCalcConfigGroup = scenario.getConfig()
                 .travelTimeCalculator();
@@ -102,7 +102,7 @@ public class VrpLauncherUtils
         TravelTimeCalculator ttCalculator = new TravelTimeCalculatorFactoryImpl()
                 .createTravelTimeCalculator(scenario.getNetwork(), ttCalcConfigGroup);
 
-        return TravelTimeCalculators.initTravelTimeCalculatorFromEvents(eventsFileName,
+        return TravelTimeCalculators.initTravelTimeCalculatorFromEvents(eventsFile,
                 ttCalculator);
     }
 
@@ -123,10 +123,10 @@ public class VrpLauncherUtils
     }
 
 
-    public static VrpData initVrpData(MatsimVrpContext context, String vehiclesFileName)
+    public static VrpData initVrpData(MatsimVrpContext context, String vehiclesFile)
     {
         VrpData vrpData = new VrpDataImpl();
-        new VehicleReader(context.getScenario(), vrpData).parse(vehiclesFileName);
+        new VehicleReader(context.getScenario(), vrpData).parse(vehiclesFile);
         return vrpData;
     }
 
@@ -152,13 +152,13 @@ public class VrpLauncherUtils
     }
 
 
-    public static void writeHistograms(LegHistogram legHistogram, String histogramOutDirName)
+    public static void writeHistograms(LegHistogram legHistogram, String histogramOutDir)
     {
-        new File(histogramOutDirName).mkdir();
-        legHistogram.write(histogramOutDirName + "legHistogram_all.txt");
-        LegHistogramChart.writeGraphic(legHistogram, histogramOutDirName + "legHistogram_all.png");
+        new File(histogramOutDir).mkdir();
+        legHistogram.write(histogramOutDir + "legHistogram_all.txt");
+        LegHistogramChart.writeGraphic(legHistogram, histogramOutDir + "legHistogram_all.png");
         for (String legMode : legHistogram.getLegModes()) {
-            LegHistogramChart.writeGraphic(legHistogram, histogramOutDirName + "legHistogram_"
+            LegHistogramChart.writeGraphic(legHistogram, histogramOutDir + "legHistogram_"
                     + legMode + ".png", legMode);
         }
     }

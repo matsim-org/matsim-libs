@@ -110,8 +110,8 @@ class TaxiLauncherParams
 
     private String getPath(String dir, String key)
     {
-        String fileName = params.get(key);
-        return fileName == null ? null : dir + fileName;
+        String file = params.get(key);
+        return file == null ? null : dir + file;
     }
 
 

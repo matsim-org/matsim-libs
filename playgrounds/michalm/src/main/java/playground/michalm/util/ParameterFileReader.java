@@ -16,9 +16,9 @@ public class ParameterFileReader
     }
 
 
-    public static void readParameters(String filename, final ParameterProcessor processor)
+    public static void readParameters(String file, final ParameterProcessor processor)
     {
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             for (String line = br.readLine(); line != null; line = br.readLine()) {
                 StringTokenizer st = new StringTokenizer(line);
 
@@ -38,11 +38,11 @@ public class ParameterFileReader
     }
 
 
-    public static Map<String, String> readParametersToMap(String filename)
+    public static Map<String, String> readParametersToMap(String file)
     {
         final Map<String, String> map = new HashMap<>();
 
-        readParameters(filename, new ParameterProcessor() {
+        readParameters(file, new ParameterProcessor() {
             public void processParameter(String name, String value)
             {
                 map.put(name, value);
@@ -110,8 +110,8 @@ public class ParameterFileReader
     }
 
 
-    public static void readParametersByReflection(String filename, Object object)
+    public static void readParametersByReflection(String file, Object object)
     {
-        readParameters(filename, new ReflectionParameterProcessor(object));
+        readParameters(file, new ReflectionParameterProcessor(object));
     }
 }

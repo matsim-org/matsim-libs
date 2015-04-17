@@ -26,12 +26,12 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 public class TravelTimeCalculators
 {
-    public static TravelTimeCalculator initTravelTimeCalculatorFromEvents(String eventFileName,
+    public static TravelTimeCalculator initTravelTimeCalculatorFromEvents(String eventFile,
             TravelTimeCalculator ttimeCalc)
     {
         EventsManager inputEvents = EventsUtils.createEventsManager();
         inputEvents.addHandler(ttimeCalc);
-        new EventsReaderXMLv1(inputEvents).parse(eventFileName);
+        new EventsReaderXMLv1(inputEvents).parse(eventFile);
         return ttimeCalc;
     }
 }

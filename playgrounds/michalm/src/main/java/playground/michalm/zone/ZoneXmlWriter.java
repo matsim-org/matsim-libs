@@ -19,9 +19,9 @@ public class ZoneXmlWriter
     }
 
 
-    public void write(String fileName)
+    public void write(String file)
     {
-        openFile(fileName);
+        openFile(file);
         writeDoctype("zones", "http://matsim.org/files/dtd/zones_v1.dtd");
         writeStartTag("zones", Collections.<Tuple<String, String>>emptyList());
         writeZones();

@@ -38,14 +38,14 @@ public class MielecSimpleDemandGeneration
 {
     public static void main(String[] args)
     {
-        String dirName = "D:\\michalm\\2013_07\\mielec-2-peaks-new\\";
-        String networkFile = dirName + "network.xml";
-        String zonesXmlFile = dirName + "zones.xml";
-        String zonesShpFile = dirName + "GIS\\zones.SHP";
-        String odMatrixFile = dirName + "odMatrix.dat";
-        String plansFile = dirName + "plans.xml";
+        String dir = "D:\\michalm\\2013_07\\mielec-2-peaks-new\\";
+        String networkFile = dir + "network.xml";
+        String zonesXmlFile = dir + "zones.xml";
+        String zonesShpFile = dir + "GIS\\zones.SHP";
+        String odMatrixFile = dir + "odMatrix.dat";
+        String plansFile = dir + "plans.xml";
 
-        String taxiFile = dirName + "taxiCustomers_03_pc.txt";
+        String taxiFile = dir + "taxiCustomers_03_pc.txt";
 
         // double hours = 2;
         // double flowCoeff = 1;

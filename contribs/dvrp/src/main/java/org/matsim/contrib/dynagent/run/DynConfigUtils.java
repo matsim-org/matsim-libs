@@ -33,9 +33,9 @@ public class DynConfigUtils
     }
 
 
-    public static Config loadConfig(final String filename)
+    public static Config loadConfig(final String file)
     {
-        Config config = ConfigUtils.loadConfig(filename);
+        Config config = ConfigUtils.loadConfig(file);
         updateQSimConfigGroup(config);
         return config;
     }

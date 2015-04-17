@@ -30,13 +30,13 @@ import playground.michalm.taxi.data.file.*;
 
 public class TaxiLauncherUtils
 {
-    public static TaxiData initTaxiData(Scenario scenario, String taxisFileName,
-            String ranksFileName)
+    public static TaxiData initTaxiData(Scenario scenario, String taxisFile,
+            String ranksFile)
     {
         TaxiData taxiData = new TaxiData();
 
-        new ElectricVehicleReader(scenario, taxiData).parse(taxisFileName);
-        new TaxiRankReader(scenario, taxiData).parse(ranksFileName);
+        new ElectricVehicleReader(scenario, taxiData).parse(taxisFile);
+        new TaxiRankReader(scenario, taxiData).parse(ranksFile);
 
         return taxiData;
     }

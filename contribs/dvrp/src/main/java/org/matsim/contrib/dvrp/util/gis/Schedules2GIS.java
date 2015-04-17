@@ -55,10 +55,10 @@ public class Schedules2GIS
     }
 
 
-    public void write(String vrpOutDirName)
+    public void write(String vrpOutDir)
     {
-        new File(vrpOutDirName).mkdir();
-        String filename = vrpOutDirName + "\\route_";
+        new File(vrpOutDir).mkdir();
+        String file = vrpOutDir + "\\route_";
 
         for (Vehicle v : vehicles) {
             Iterable<DriveTask> drives = Schedules.createDriveTaskIter(v.getSchedule());
@@ -74,7 +74,7 @@ public class Schedules2GIS
             }
 
             if (!features.isEmpty()) {
-                ShapeFileWriter.writeGeometries(features, filename + v.getId() + ".shp");
+                ShapeFileWriter.writeGeometries(features, file + v.getId() + ".shp");
             }
         }
     }

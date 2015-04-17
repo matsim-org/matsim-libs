@@ -163,9 +163,9 @@ public class ResultsPostProcessor
     }
 
 
-    private void writeValues(String filename, String field)
+    private void writeValues(String file, String field)
     {
-        try (PrintWriter pw = new PrintWriter(filename)) {
+        try (PrintWriter pw = new PrintWriter(file)) {
             pw.printf("%s", field);
 
             {
@@ -248,20 +248,20 @@ public class ResultsPostProcessor
     }
 
 
-    public void process(String dir, String subDirPrefix, String filename)
+    public void process(String dir, String subDirPrefix, String file)
     {
         for (Experiment e : experiments) {
-            readFile(dir + subDirPrefix + e.id + "/" + filename, e);
+            readFile(dir + subDirPrefix + e.id + "/" + file, e);
         }
 
-        writeValues(dir + filename + ".T_W", "T_W");
-        writeValues(dir + filename + ".T_W_95", "T_W_95");
-        writeValues(dir + filename + ".T_W_MAX", "T_W_MAX");
-        writeValues(dir + filename + ".T_P", "T_P");
-        writeValues(dir + filename + ".T_P_95", "T_P_95");
-        writeValues(dir + filename + ".T_P_MAX", "T_P_MAX");
-        writeValues(dir + filename + ".T_W_T_P", "T_W-T_P");
-        writeValues(dir + filename + ".R_NI", "R_NI");
+        writeValues(dir + file + ".T_W", "T_W");
+        writeValues(dir + file + ".T_W_95", "T_W_95");
+        writeValues(dir + file + ".T_W_MAX", "T_W_MAX");
+        writeValues(dir + file + ".T_P", "T_P");
+        writeValues(dir + file + ".T_P_95", "T_P_95");
+        writeValues(dir + file + ".T_P_MAX", "T_P_MAX");
+        writeValues(dir + file + ".T_W_T_P", "T_W-T_P");
+        writeValues(dir + file + ".R_NI", "R_NI");
     }
 
 

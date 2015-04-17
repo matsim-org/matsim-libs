@@ -41,13 +41,13 @@ public class IdleVehicleUnplannedRequestStats
     private final double[] unplannedReqs = new double[MAX_TIME / STEP];
 
     private final TaxiOptimizerConfiguration optimConfig;
-    private final String filename;
+    private final String file;
 
 
-    public IdleVehicleUnplannedRequestStats(TaxiOptimizerConfiguration optimConfig, String filename)
+    public IdleVehicleUnplannedRequestStats(TaxiOptimizerConfiguration optimConfig, String file)
     {
         this.optimConfig = optimConfig;
-        this.filename = filename;
+        this.file = file;
     }
 
 
@@ -70,7 +70,7 @@ public class IdleVehicleUnplannedRequestStats
     @Override
     public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
     {
-        try (PrintWriter pw = new PrintWriter(filename)) {
+        try (PrintWriter pw = new PrintWriter(file)) {
             pw.println("time\tidleVehs\tunplReqs");
 
             for (int i = 0; i < idleVehs.length; i++) {
