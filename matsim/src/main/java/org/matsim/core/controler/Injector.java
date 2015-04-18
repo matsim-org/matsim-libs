@@ -66,7 +66,7 @@ public class Injector {
         }
         com.google.inject.Injector realInjector = bootstrapInjector.createChildInjector(guiceModules);
         for (Map.Entry<Key<?>, Binding<?>> entry : realInjector.getBindings().entrySet()) {
-            logger.debug(String.format("%s -> %s", entry.getKey(), entry.getValue()));
+            logger.debug(String.format("%s\n-> %s", entry.getKey(), entry.getValue()));
         }
         return fromGuiceInjector(realInjector);
     }
