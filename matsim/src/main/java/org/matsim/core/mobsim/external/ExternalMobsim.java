@@ -40,7 +40,7 @@ import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.population.AbstractPopulationWriterHandler;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -49,7 +49,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 
-public class ExternalMobsim implements Mobsim {
+public class ExternalMobsim implements RunnableMobsim {
 
 	private static final String CONFIG_MODULE = "simulation";
 

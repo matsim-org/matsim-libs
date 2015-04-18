@@ -36,13 +36,13 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 
 /**
  * @author nagel
  *
  */
-class MyMobsim implements Mobsim {
+class MyMobsim implements RunnableMobsim {
 	
 	private Scenario sc;
 	private EventsManager ev;

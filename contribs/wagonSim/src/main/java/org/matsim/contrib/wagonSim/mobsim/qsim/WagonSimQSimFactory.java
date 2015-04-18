@@ -27,7 +27,7 @@ import org.matsim.contrib.wagonSim.mobsim.qsim.framework.listeners.WagonSimVehic
 import org.matsim.contrib.wagonSim.mobsim.qsim.pt.WagonSimTransitStopHandlerFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -69,7 +69,7 @@ public class WagonSimQSimFactory implements MobsimFactory {
 	// those that are inserted here. Hence, QSim will try to create TransitAgents AND 
 	//	WagonSimAgents. 
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {

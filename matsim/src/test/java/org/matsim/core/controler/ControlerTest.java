@@ -36,7 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -764,7 +764,7 @@ public class ControlerTest {
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "T.veh.gz")).exists());
 	}
 
-	/*package*/ static class FakeMobsim implements Mobsim {
+	/*package*/ static class FakeMobsim implements RunnableMobsim {
 		@Override
 		public void run() {
 			// nothing to do
@@ -774,7 +774,7 @@ public class ControlerTest {
 	/*package*/ static class FakeMobsimFactory implements MobsimFactory {
 		/*package*/ int counter = 0;
 		@Override
-		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+		public RunnableMobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
 			this.counter++;
 			return new FakeMobsim();
 		}
@@ -783,7 +783,7 @@ public class ControlerTest {
 	/*package*/ static class CrashingMobsimFactory implements MobsimFactory {
 		/*package*/ int counter = 0;
 		@Override
-		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+		public RunnableMobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
 			this.counter++;
 			throw new NullPointerException("Just for testing...");
 		}

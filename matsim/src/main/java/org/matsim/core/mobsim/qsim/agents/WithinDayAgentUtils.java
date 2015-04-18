@@ -24,6 +24,10 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 
 /**
  * <p>
@@ -86,6 +90,13 @@ public class WithinDayAgentUtils {
 		} else {
 			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
 					" which does not support resetCaches(...). Aborting!");
+		}
+	}
+	public static final void rescheduleActivityEnd( MobsimAgent agent, RunnableMobsim mobsim ) {
+		if ( mobsim instanceof ActivityEndRescheduler ) {
+			((ActivityEndRescheduler) mobsim).rescheduleActivityEnd(agent);
+		} else {
+			throw new RuntimeException("mobsim does not support activity end rescheduling; aborting ...") ;
 		}
 	}
 	

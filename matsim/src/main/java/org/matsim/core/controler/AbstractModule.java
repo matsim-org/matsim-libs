@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 
@@ -115,8 +115,8 @@ public abstract class AbstractModule {
         return planStrategyMultibinder.addBinding(selectorName);
     }
 
-    protected final com.google.inject.binder.LinkedBindingBuilder<Mobsim> bindMobsim() {
-        return bind(Mobsim.class);
+    protected final com.google.inject.binder.LinkedBindingBuilder<RunnableMobsim> bindMobsim() {
+        return bind(RunnableMobsim.class);
     }
 
     protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {

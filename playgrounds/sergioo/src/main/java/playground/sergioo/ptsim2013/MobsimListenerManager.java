@@ -24,7 +24,7 @@ package playground.sergioo.ptsim2013;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimManager;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -44,11 +44,11 @@ class MobsimListenerManager implements MatsimManager {
 
 	private final static Logger log = Logger.getLogger(MobsimListenerManager.class);
 
-	private final Mobsim sim;
+	private final RunnableMobsim sim;
 
 	private final EventListenerList listenerList = new EventListenerList();
 
-	public MobsimListenerManager(Mobsim sim){
+	public MobsimListenerManager(RunnableMobsim sim){
 		this.sim = sim;
 	}
 
@@ -76,7 +76,7 @@ class MobsimListenerManager implements MatsimManager {
 	 * Creates the event and notifies all listeners
 	 */
 	public void fireQueueSimulationInitializedEvent() {
-		MobsimInitializedEvent<Mobsim> event = new MobsimInitializedEvent<Mobsim>(sim);
+		MobsimInitializedEvent<RunnableMobsim> event = new MobsimInitializedEvent<RunnableMobsim>(sim);
 		MobsimInitializedListener[] listener = this.listenerList.getListeners(MobsimInitializedListener.class);
     for (int i = 0; i < listener.length; i++) {
     	listener[i].notifyMobsimInitialized(event);
@@ -89,7 +89,7 @@ class MobsimListenerManager implements MatsimManager {
 	 * @param simTime the current time in the simulation
 	 */
 	public void fireQueueSimulationAfterSimStepEvent(final double simTime) {
-		MobsimAfterSimStepEvent<Mobsim> event = new MobsimAfterSimStepEvent<Mobsim>(sim, simTime);
+		MobsimAfterSimStepEvent<RunnableMobsim> event = new MobsimAfterSimStepEvent<RunnableMobsim>(sim, simTime);
 		MobsimAfterSimStepListener[] listener = this.listenerList.getListeners(MobsimAfterSimStepListener.class);
 		for (int i = 0; i < listener.length; i++) {
 			listener[i].notifyMobsimAfterSimStep(event);
@@ -100,7 +100,7 @@ class MobsimListenerManager implements MatsimManager {
 	 * Creates the event and notifies all listeners
 	 */
 	public void fireQueueSimulationBeforeCleanupEvent(){
-		MobsimBeforeCleanupEvent<Mobsim> event = new MobsimBeforeCleanupEvent<Mobsim>(this.sim);
+		MobsimBeforeCleanupEvent<RunnableMobsim> event = new MobsimBeforeCleanupEvent<RunnableMobsim>(this.sim);
 		MobsimBeforeCleanupListener[] listener = this.listenerList.getListeners(MobsimBeforeCleanupListener.class);
 		for (int i = 0; i < listener.length; i++){
 			listener[i].notifyMobsimBeforeCleanup(event);
@@ -108,7 +108,7 @@ class MobsimListenerManager implements MatsimManager {
 	}
 
 	public void fireQueueSimulationBeforeSimStepEvent(double time) {
-		MobsimBeforeSimStepEvent<Mobsim> event = new MobsimBeforeSimStepEvent<Mobsim>(sim, time);
+		MobsimBeforeSimStepEvent<RunnableMobsim> event = new MobsimBeforeSimStepEvent<RunnableMobsim>(sim, time);
 		MobsimBeforeSimStepListener[] listener = this.listenerList.getListeners(MobsimBeforeSimStepListener.class);
 		for (int i = 0; i < listener.length; i++) {
 			listener[i].notifyMobsimBeforeSimStep(event);

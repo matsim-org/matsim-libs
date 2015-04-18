@@ -58,6 +58,8 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 	private TripRouter tripRouter;
 	private Scenario scenario;
 
+	private Netsim mobsim;
+
 	KNWithinDayMobsimListener(TripRouter tripRouter) {
 		this.tripRouter = tripRouter;
 	}
@@ -65,13 +67,13 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
 		
-		Netsim mobsim = (Netsim) event.getQueueSimulation() ;
+		this.mobsim = (Netsim) event.getQueueSimulation() ;
 		this.scenario = mobsim.getScenario();
 
 		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan(mobsim); 
 				
 		for (MobsimAgent ma : agentsToReplan) {
-			doReplanning(ma, mobsim);
+			doReplanning(ma);
 		}
 	}
 	
@@ -100,7 +102,7 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 
 	}
 
-	private boolean doReplanning(MobsimAgent agent, Netsim mobsim ) {
+	private boolean doReplanning(MobsimAgent agent ) {
 		double now = mobsim.getSimTimer().getTimeOfDay() ;
 		
 		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ; 
@@ -126,43 +128,26 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 			return false ;
 		}
 
-		// now the real work begins. This, as an example, changes the activity (i.e. the destination of the current leg) and then
-		// re-splices the plan
+		// ---
 		
-//		Id<Link> newDestinationLinkId = Id.create("22", Link.class) ;
-//		Activity newAct = mobsim.getScenario().getPopulation().getFactory().createActivityFromLinkId("w", newDestinationLinkId ) ;
-//		newAct.setMaximumDuration(3600);
-//		
-//		planElements.set( planElementsIndex+1, newAct );
-		
-		// =============================================================================================================
-		// =============================================================================================================
-		// EditRoutes at this point only works for car routes
-		
-		NetworkRoute previousRoute = (NetworkRoute) ((Leg) plan.getPlanElements().get(planElementsIndex)).getRoute() ;
-		ArrayList<Id<Link>> previousLinkIds = new ArrayList<>(previousRoute.getLinkIds());
+		final Leg leg = (Leg) plan.getPlanElements().get(planElementsIndex);
+		ArrayList<Id<Link>> previousLinkIds = new ArrayList<>(((NetworkRoute) leg.getRoute()).getLinkIds());
 		// new Route for current Leg.
-		EditRoutes.relocateCurrentLegRoute((Leg) plan.getPlanElements().get(planElementsIndex), ((HasPerson) agent).getPerson(), 
+		EditRoutes.relocateCurrentLegRoute(leg, ((HasPerson) agent).getPerson(), 
 				WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent), ((Activity) plan.getPlanElements().get(planElementsIndex+1)).getLinkId(), 
 				now, scenario.getNetwork(), tripRouter);
-		NetworkRoute currentRoute = (NetworkRoute) ((Leg) plan.getPlanElements().get(planElementsIndex)).getRoute() ;
-		ArrayList<Id<Link>> currentLinkIds = new ArrayList<>(currentRoute.getLinkIds());
+		ArrayList<Id<Link>> currentLinkIds = new ArrayList<>(((NetworkRoute) leg.getRoute()).getLinkIds());
 
 		if ( !Arrays.deepEquals(previousLinkIds.toArray(), currentLinkIds.toArray()) ) {
 			log.warn("modified route");
 			this.scenario.getPopulation().getPersonAttributes().putAttribute( agent.getId().toString(), "marker", true ) ;
 		}
-		
-		// the route _from_ the modified activity also needs to be replanned:
-//		Leg futureLeg = (Leg) plan.getPlanElements().get(planElementsIndex + 2);
-//		EditRoutes.relocateFutureLegRoute(futureLeg, newDestinationLinkId, futureLeg.getRoute().getEndLinkId(), ((HasPerson) agent).getPerson(), 
-//				scenario.getNetwork(), tripRouter);
-		
-		// =============================================================================================================
-		// =============================================================================================================
+
+		// ---
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
 		WithinDayAgentUtils.resetCaches(agent);
+//		WithinDayAgentUtils.rescheduleActivityEnd(agent, mobsim);
 		
 		return true;
 	}

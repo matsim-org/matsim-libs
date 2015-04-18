@@ -20,11 +20,14 @@
 package org.matsim.core.mobsim.qsim.interfaces;
 
 import org.matsim.core.mobsim.framework.Steppable;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 
 /**
  * Design thoughs:<ul>
- * <li> This is an engine that is plugged into the Mobsim.  Thus the name.  Does not have to be a Mobsim itself.  kai, nov'11
+ * <li> This is an engine that is plugged into the Mobsim.  Thus the name. 
+ * <li> The main difference between a MobsimEngine and, say, a {@link MobsimBeforeSimStepListener}, is that the MobsimEngine obtains
+ * the {@link InternalInterface}, whose main functionality is arrangeNextAgentState, i.e. it allows to move the agents forward.
  * </ul>
  * 
  * @author dgrether, nagel

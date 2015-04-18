@@ -22,9 +22,9 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 
-public class ParkingPSim implements Mobsim{
+public class ParkingPSim implements RunnableMobsim{
 
 	private Scenario sc;
 	private EventsManager eventsManager;

@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -56,7 +56,7 @@ import playground.mrieser.svi.replanning.MultimodalDynamicODDemandCollector;
 /**
  * @author mrieser
  */
-public class DynusTMobsim implements Mobsim {
+public class DynusTMobsim implements RunnableMobsim {
 
 	private final static Logger log = Logger.getLogger(DynusTMobsim.class);
 

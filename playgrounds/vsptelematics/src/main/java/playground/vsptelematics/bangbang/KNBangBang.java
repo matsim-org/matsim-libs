@@ -38,7 +38,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -69,13 +69,13 @@ public class KNBangBang {
 	static private final Id<Link> accidentLinkId = Id.createLinkId( "4706699_484108_484109-4706699_484109_26662372");
 	static List<Id<Link>> replanningLinkIds = new ArrayList<>() ; 
 
-	private static final class KNMobsimProvider implements Provider<Mobsim> {
+	private static final class KNMobsimProvider implements Provider<RunnableMobsim> {
 		@Inject private Scenario scenario;
 		@Inject private EventsManager events ;
 		@Inject private Provider<TripRouter> tripRouterFactory;
 
 		@Override
-		public Mobsim get() {
+		public RunnableMobsim get() {
 			QSim qsim = QSimUtils.createDefaultQSim( scenario, events ) ;
 			
 			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouterFactory.get()));
@@ -111,7 +111,7 @@ public class KNBangBang {
 		config.qsim().setFlowCapFactor(0.04);
 		config.qsim().setStorageCapFactor(0.06);
 		config.qsim().setStuckTime(100.);
-		config.qsim().setStartTime(0.*3600.);
+		config.qsim().setStartTime(6.*3600.);
 		
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.WARN );
 		

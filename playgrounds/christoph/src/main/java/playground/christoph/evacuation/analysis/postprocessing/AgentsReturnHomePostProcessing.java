@@ -35,7 +35,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
@@ -187,7 +187,7 @@ public class AgentsReturnHomePostProcessing {
 		eventsManager.addHandler(agentsReturnHomeCounter);
 				
 		// MobsimInitializedListener
-		MobsimInitializedEvent<Mobsim> mobsimInitializedEvent = new MobsimInitializedEvent<Mobsim>(null);
+		MobsimInitializedEvent<RunnableMobsim> mobsimInitializedEvent = new MobsimInitializedEvent<RunnableMobsim>(null);
 		for(MobsimListener mobsimListener : mobsimListeners) {
 			if (mobsimListener instanceof MobsimInitializedListener) {
 				((MobsimInitializedListener) mobsimListener).notifyMobsimInitialized(mobsimInitializedEvent);
@@ -222,7 +222,7 @@ public class AgentsReturnHomePostProcessing {
 		public void handleEvent(Event event) {
 			double time = event.getTime();
 			while (time > lastSimStep) {
-				MobsimAfterSimStepEvent<Mobsim> e = new MobsimAfterSimStepEvent<Mobsim>(null, lastSimStep);
+				MobsimAfterSimStepEvent<RunnableMobsim> e = new MobsimAfterSimStepEvent<RunnableMobsim>(null, lastSimStep);
 				
 				for(MobsimListener mobsimListener : mobsimListeners) {
 					if (mobsimListener instanceof MobsimAfterSimStepListener) {

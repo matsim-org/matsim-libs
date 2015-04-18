@@ -245,7 +245,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 		oldRoute.setLinkIds(oldRoute.getStartLinkId(), linkIds, oldRoute.getEndLinkId());
 			
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		WithinDayAgentUtils.resetCaches(withinDayAgent);
+		WithinDayAgentUtils.resetCaches(withinDayAgent );
 
 		return true;
 	}

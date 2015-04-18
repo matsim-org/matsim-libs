@@ -28,7 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -59,7 +59,7 @@ public class Main {
 
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
-			public Mobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
+			public RunnableMobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
 				final QSim qsim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
 				
 				qsim.addAgentSource(new AgentSource(){

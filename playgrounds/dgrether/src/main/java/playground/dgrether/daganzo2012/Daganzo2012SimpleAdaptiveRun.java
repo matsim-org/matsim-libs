@@ -30,7 +30,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -61,9 +61,9 @@ public class Daganzo2012SimpleAdaptiveRun {
         final SimpleAdaptiveControl adaptiveControl = new SimpleAdaptiveControl();
 		addControlerListener(controler, adaptiveControl);
 
-		controler.setMobsimFactory(new Provider<Mobsim>() {
+		controler.setMobsimFactory(new Provider<RunnableMobsim>() {
 			@Override
-			public Mobsim get() {
+			public RunnableMobsim get() {
 				QSim mobsim = QSimUtils.createDefaultQSim(controler.getScenario(), controler.getEvents());
 				mobsim.addMobsimEngine(adaptiveControl);
 				return mobsim;

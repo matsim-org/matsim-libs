@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.pt.PtConstants;
@@ -188,9 +188,9 @@ public class ParkAndRideMain {
 		prControlerListener.setAddPRtimeAllocationDisable(addPRtimeAllocationDisable);
 		controler.addControlerListener(prControlerListener);
 
-		controler.setMobsimFactory(new Provider<Mobsim>() {
+		controler.setMobsimFactory(new Provider<RunnableMobsim>() {
 			@Override
-			public Mobsim get() {
+			public RunnableMobsim get() {
 				QSim mobsim = QSimUtils.createDefaultQSim(controler.getScenario(), controler.getEvents());
 				mobsim.addMobsimEngine(adaptiveControl);
 				return mobsim;

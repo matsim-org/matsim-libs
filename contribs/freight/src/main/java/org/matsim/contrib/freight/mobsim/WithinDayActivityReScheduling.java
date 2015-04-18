@@ -13,6 +13,7 @@ import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -31,7 +32,7 @@ import org.matsim.core.utils.misc.Time;
  * which allows this. Then this could go away.
  * 
  */
-class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener, MobsimEngine {
+class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimStepListener {
 
 	private static Logger logger = Logger.getLogger(WithinDayActivityReScheduling.class);
 	
@@ -39,8 +40,6 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 	
 	private Set<Activity> encounteredActivities = new HashSet<Activity>();
 
-	private InternalInterface internalInterface;
-	
 	private CarrierAgentTracker carrierAgentTracker;
 	
 	WithinDayActivityReScheduling(FreightAgentSource freightAgentSource, CarrierAgentTracker carrierAgentTracker) {
@@ -52,11 +51,11 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		Collection<MobsimAgent> agentsToReplan = freightAgentSource.getMobSimAgents();
 		for (MobsimAgent pa : agentsToReplan) {
-			doReplanning(pa, e.getSimulationTime());
+			doReplanning(pa, e.getSimulationTime(), e.getQueueSimulation());
 		}
 	}
 
-	private boolean doReplanning(MobsimAgent mobsimAgent, double time) {
+	private boolean doReplanning(MobsimAgent mobsimAgent, double time, RunnableMobsim mobsim) {
 		PlanAgent planAgent = (PlanAgent) mobsimAgent;
 		Id agentId = planAgent.getCurrentPlan().getPerson().getId();
 		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(mobsimAgent);
@@ -78,32 +77,11 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 				act.setEndTime(newEndTime);
 //				WithinDayAgentUtils.calculateAndSetDepartureTime(mobsimAgent, act);
 				WithinDayAgentUtils.resetCaches( mobsimAgent );
-				internalInterface.rescheduleActivityEnd(mobsimAgent);
+				WithinDayAgentUtils.rescheduleActivityEnd(mobsimAgent,mobsim);
 				encounteredActivities.add(act);
 				return true ;
 			}
 		} 	
 		return true;
 	}
-
-	@Override
-	public void setInternalInterface(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;
-	}
-
-	@Override
-	public void doSimStep(double time) {
-		
-	}
-
-	@Override
-	public void onPrepareSim() {
-		
-	}
-
-	@Override
-	public void afterSim() {
-		
-	}
-
 }

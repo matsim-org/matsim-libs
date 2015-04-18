@@ -27,13 +27,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.pseudosimulation.controler.listeners.MobSimSwitcher;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 
 import javax.inject.Inject;
 
-public class SwitchingMobsimProvider implements Provider<Mobsim> {
+public class SwitchingMobsimProvider implements Provider<RunnableMobsim> {
 
     private Config config;
     private Scenario scenario;
@@ -47,7 +47,7 @@ public class SwitchingMobsimProvider implements Provider<Mobsim> {
     }
 
     @Override
-    public Mobsim get() {
+    public RunnableMobsim get() {
         String mobsim = config.controler().getMobsim();
         if (MobSimSwitcher.isQSimIteration) {
             if (mobsim.equals("jdeqsim")) {

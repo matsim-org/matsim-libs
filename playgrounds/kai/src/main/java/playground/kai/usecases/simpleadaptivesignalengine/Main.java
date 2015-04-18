@@ -25,7 +25,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -45,7 +45,7 @@ public class Main {
 
 		final MobsimFactory mobsimFactory = new MobsimFactory() {
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager events) {
+			public RunnableMobsim createMobsim(Scenario sc, EventsManager events) {
 				QSim qsim = (QSim) QSimUtils.createDefaultQSim(sc, events);
 				qsim.addQueueSimulationListeners(simpleAdaptiveSignalEngine) ;
 				events.addHandler(simpleAdaptiveSignalEngine) ;

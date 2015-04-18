@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 
 /**
  * @author dgrether
  */
-public class MobsimInitializedEvent<T extends Mobsim> extends
+public class MobsimInitializedEvent<T extends RunnableMobsim> extends
 		AbstractMobsimEvent<T> {
 
 	public MobsimInitializedEvent(T queuesim) {

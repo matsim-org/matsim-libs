@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
@@ -18,7 +18,7 @@ import org.matsim.core.utils.misc.Time;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.DummyTTMatrix;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
 
-public class JDEPSim implements Mobsim{
+public class JDEPSim implements RunnableMobsim{
 
 	private Scenario sc;
 	private EventsManager eventsManager;

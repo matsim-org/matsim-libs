@@ -25,7 +25,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -67,7 +67,7 @@ public class RunOTFVisDebugRandomizedTransitRouterTravelTimeAndDisutility {
 		ctrl.setMobsimFactory(new MobsimFactory(){
 
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+			public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 				QSim qSim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
 				
 				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);

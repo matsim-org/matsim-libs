@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
@@ -125,7 +125,7 @@ public class TraVolCnter implements LinkEnterEventHandler,
 		events.addHandler(traVolCounter);
 
 //		Mobsim sim = QueueSimulationFactory.createMobsimStatic(scenario, events);
-		Mobsim sim = null ;
+		RunnableMobsim sim = null ;
 		Logger.getLogger(TraVolCnter.class).fatal("no longer supported") ;
 		System.exit(-1) ;
 		sim.run();

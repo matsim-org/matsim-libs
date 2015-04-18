@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.CarrierConfig;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -42,7 +42,7 @@ import javax.inject.Inject;
 import java.util.Collection;
 
 
-public class FreightQSimFactory implements Provider<Mobsim> {
+public class FreightQSimFactory implements Provider<RunnableMobsim> {
 
 	private final Scenario scenario;
 	private EventsManager eventsManager;
@@ -58,7 +58,7 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 	}
 
 	@Override
-	public Mobsim get() {
+	public RunnableMobsim get() {
 		QSimConfigGroup conf = scenario.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException(
@@ -71,7 +71,8 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 		if (carrierConfig.getPhysicallyEnforceTimeWindowBeginnings()) {
 			WithinDayActivityReScheduling withinDayActivityRescheduling = new WithinDayActivityReScheduling(agentSource, carrierAgentTracker);
 			sim.addQueueSimulationListeners(withinDayActivityRescheduling);
-			sim.addMobsimEngine(withinDayActivityRescheduling);
+//			sim.addMobsimEngine(withinDayActivityRescheduling);
+			// no longer needed (I think).  kai, apr'15
 		}
 		return sim;
 	}

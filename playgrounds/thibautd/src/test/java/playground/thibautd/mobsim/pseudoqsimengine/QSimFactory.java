@@ -24,7 +24,7 @@ package playground.thibautd.mobsim.pseudoqsimengine;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 
@@ -41,7 +41,7 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 class QSimFactory implements MobsimFactory {
 
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		return QSimUtils.createDefaultQSim(sc, eventsManager);
 	}
 

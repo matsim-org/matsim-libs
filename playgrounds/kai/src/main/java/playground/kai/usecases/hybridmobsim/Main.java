@@ -23,7 +23,7 @@ package playground.kai.usecases.hybridmobsim;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -41,7 +41,7 @@ public class Main {
 		
 		final MobsimFactory mobsimFactory = new MobsimFactory() {
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager events) {
+			public RunnableMobsim createMobsim(Scenario sc, EventsManager events) {
 				QSim qsim = new QSim(sc, events);
 
 				ActivityEngine activityEngine = new ActivityEngine();

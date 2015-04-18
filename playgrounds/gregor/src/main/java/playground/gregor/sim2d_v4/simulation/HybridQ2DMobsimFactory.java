@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSim2DNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 
-public class HybridQ2DMobsimFactory implements Provider<Mobsim> {
+public class HybridQ2DMobsimFactory implements Provider<RunnableMobsim> {
 
 	private final static Logger log = Logger.getLogger(HybridQ2DMobsimFactory.class);
 	
@@ -53,7 +53,7 @@ public class HybridQ2DMobsimFactory implements Provider<Mobsim> {
 	}
 
 	@Override
-	public Mobsim get() {
+	public RunnableMobsim get() {
 
 		if (!sc.getConfig().controler().getMobsim().equals("hybridQ2D")) {
 			throw new RuntimeException("This factory does not make sense for " + sc.getConfig().controler().getMobsim()  );

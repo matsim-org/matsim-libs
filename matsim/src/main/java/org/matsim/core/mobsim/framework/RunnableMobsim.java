@@ -30,7 +30,7 @@ package org.matsim.core.mobsim.framework;
  *
  * @author dgrether
  */
-public interface Mobsim {
+public interface RunnableMobsim {
 
   /**
    * Start the mobility simulation

@@ -25,6 +25,15 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
+/**
+ * Design thoughts:<ul>
+ * <li> The main functionality of this interface is arrangeNextAgentState.
+ * <li> getMobsim is provided as a convenience.
+ * </ul>
+ * 
+ * @author nagel
+ *
+ */
 public interface InternalInterface extends ActivityEndRescheduler {
 	public Netsim getMobsim(); 
 	public void arrangeNextAgentState(MobsimAgent agent);

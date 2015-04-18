@@ -41,7 +41,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -213,7 +213,7 @@ public final class MarathonRunner implements StartupListener,
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(Mobsim.class).toProvider(CombiMobsimFactory.class);
+				bind(RunnableMobsim.class).toProvider(CombiMobsimFactory.class);
 			}
 		});
 
@@ -332,7 +332,7 @@ public final class MarathonRunner implements StartupListener,
 	 * Combines a WithinDayQSimFactory and a HybridQ2DMobsimFactory
 	 * to have Within-day Replanning and Sim2D in one simulation.
 	 */
-	private static class CombiMobsimFactory implements Provider<Mobsim> {
+	private static class CombiMobsimFactory implements Provider<RunnableMobsim> {
 	
 		private Sim2DEngine sim2DEngine = null;
 		private Scenario sc;
@@ -347,7 +347,7 @@ public final class MarathonRunner implements StartupListener,
 		}
 
 		@Override
-		public Mobsim get() {
+		public RunnableMobsim get() {
 
 			QSim mobsim = QSimUtils.createDefaultQSim(sc, eventsManager);
 			log.info("Adding WithinDayEngine to Mobsim.");

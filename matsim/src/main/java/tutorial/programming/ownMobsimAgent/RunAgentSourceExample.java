@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -44,7 +44,7 @@ public class RunAgentSourceExample {
 		final Controler controler = new Controler("examples/tutorial/config/example5-config.xml");
         controler.setMobsimFactory(new MobsimFactory() {
             @Override
-            public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+            public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
                 sc.getConfig().qsim().setEndTime(25*60*60);
                 sc.getConfig().controler().setLastIteration(0);
                 sc.getPopulation().getPersons().clear();

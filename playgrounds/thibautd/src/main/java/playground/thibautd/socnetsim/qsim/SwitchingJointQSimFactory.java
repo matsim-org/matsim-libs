@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
@@ -47,7 +47,7 @@ public class SwitchingJointQSimFactory implements MobsimFactory, IterationStarts
 	}
 
 	@Override
-	public Mobsim createMobsim(
+	public RunnableMobsim createMobsim(
 			final Scenario sc,
 			final EventsManager eventsManager) {
 		final PseudoSimConfigGroup config = (PseudoSimConfigGroup)

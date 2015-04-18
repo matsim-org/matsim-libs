@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -217,7 +217,7 @@ import java.util.List;
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore scoring = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(config, scenario.getNetwork()));
 		events.addHandler(scoring);
-		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
+		RunnableMobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();
 		scoring.finish();
 

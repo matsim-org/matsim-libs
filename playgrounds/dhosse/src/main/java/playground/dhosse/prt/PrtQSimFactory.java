@@ -54,7 +54,7 @@ public class PrtQSimFactory implements MobsimFactory{
 	}
 
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		
 		TaxiOptimizerConfiguration taxiConfig = initOptimizerConfiguration(prtConfig, context, calculator, algorithmConfig);
 		TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiConfig);

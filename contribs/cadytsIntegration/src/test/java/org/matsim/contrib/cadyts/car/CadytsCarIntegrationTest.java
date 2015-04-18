@@ -42,7 +42,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.PlanStrategy;
@@ -317,7 +317,7 @@ public class CadytsCarIntegrationTest {
 	}
 
 	
-	private static class DummyMobsim implements Mobsim {
+	private static class DummyMobsim implements RunnableMobsim {
 		public DummyMobsim() {
 		}
 		@Override
@@ -327,7 +327,7 @@ public class CadytsCarIntegrationTest {
 
 	private static class DummyMobsimFactory implements MobsimFactory {
 		@Override
-		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+		public RunnableMobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
 			return new DummyMobsim();
 		}
 	}

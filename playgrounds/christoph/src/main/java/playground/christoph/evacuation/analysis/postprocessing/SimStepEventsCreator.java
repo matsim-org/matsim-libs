@@ -23,7 +23,7 @@ package playground.christoph.evacuation.analysis.postprocessing;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -50,14 +50,14 @@ public class SimStepEventsCreator implements BasicEventHandler {
 	public SimStepEventsCreator(List<MobsimListener> mobsimListeners) {
 		this.mobsimListeners = mobsimListeners;
 		
-		MobsimInitializedEvent<Mobsim> eInitialized = new MobsimInitializedEvent<Mobsim>(null);
+		MobsimInitializedEvent<RunnableMobsim> eInitialized = new MobsimInitializedEvent<RunnableMobsim>(null);
 		for(MobsimListener mobsimListener : mobsimListeners) {
 			if (mobsimListener instanceof BeforeMobsimListener) {
 				((MobsimInitializedListener) mobsimListener).notifyMobsimInitialized(eInitialized);
 			}
 		}
 		
-		MobsimBeforeSimStepEvent<Mobsim> eBefore = new MobsimBeforeSimStepEvent<Mobsim>(null, lastSimStep);
+		MobsimBeforeSimStepEvent<RunnableMobsim> eBefore = new MobsimBeforeSimStepEvent<RunnableMobsim>(null, lastSimStep);
 		for(MobsimListener mobsimListener : mobsimListeners) {
 			if (mobsimListener instanceof MobsimBeforeSimStepListener) {
 				((MobsimBeforeSimStepListener) mobsimListener).notifyMobsimBeforeSimStep(eBefore);
@@ -70,7 +70,7 @@ public class SimStepEventsCreator implements BasicEventHandler {
 		double time = event.getTime();
 		while (time > lastSimStep) {
 			
-			MobsimAfterSimStepEvent<Mobsim> eAfter = new MobsimAfterSimStepEvent<Mobsim>(null, lastSimStep);
+			MobsimAfterSimStepEvent<RunnableMobsim> eAfter = new MobsimAfterSimStepEvent<RunnableMobsim>(null, lastSimStep);
 			for(MobsimListener mobsimListener : mobsimListeners) {
 				if (mobsimListener instanceof MobsimAfterSimStepListener) {
 					((MobsimAfterSimStepListener) mobsimListener).notifyMobsimAfterSimStep(eAfter);
@@ -79,7 +79,7 @@ public class SimStepEventsCreator implements BasicEventHandler {
 			
 			lastSimStep++;
 			
-			MobsimBeforeSimStepEvent<Mobsim> eBefore = new MobsimBeforeSimStepEvent<Mobsim>(null, lastSimStep);
+			MobsimBeforeSimStepEvent<RunnableMobsim> eBefore = new MobsimBeforeSimStepEvent<RunnableMobsim>(null, lastSimStep);
 			for(MobsimListener mobsimListener : mobsimListeners) {
 				if (mobsimListener instanceof BeforeMobsimListener) {
 					((MobsimBeforeSimStepListener) mobsimListener).notifyMobsimBeforeSimStep(eBefore);
@@ -94,7 +94,7 @@ public class SimStepEventsCreator implements BasicEventHandler {
 	}
 	
 	public void allEventsProcessed() {
-		MobsimAfterSimStepEvent<Mobsim> e = new MobsimAfterSimStepEvent<Mobsim>(null, lastSimStep);
+		MobsimAfterSimStepEvent<RunnableMobsim> e = new MobsimAfterSimStepEvent<RunnableMobsim>(null, lastSimStep);
 		for(MobsimListener mobsimListener : mobsimListeners) {
 			if (mobsimListener instanceof MobsimAfterSimStepListener) {
 				((MobsimAfterSimStepListener) mobsimListener).notifyMobsimAfterSimStep(e);

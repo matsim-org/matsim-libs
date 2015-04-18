@@ -22,7 +22,7 @@ package playground.dgrether.satellic;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -42,7 +42,7 @@ public class DgWithindayMobsimFactory implements MobsimFactory {
 	 * @see org.matsim.core.mobsim.framework.MobsimFactory#createMobsim(org.matsim.api.core.v01.Scenario, org.matsim.core.api.experimental.events.EventsManager)
 	 */
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		QSim qSim1 = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim1.addMobsimEngine(activityEngine);

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -59,7 +59,7 @@ public class SeepageMobsimfactory  implements MobsimFactory{
 	static final List<String> mainModes = Arrays.asList(TransportMode.car,TransportMode.bike);
 	
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager events) {
+	public RunnableMobsim createMobsim(Scenario sc, EventsManager events) {
 		//From QSimFactory inspired code
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {

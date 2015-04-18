@@ -21,7 +21,7 @@ package playground.dgrether.designdrafts.controller;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 
 
 /**
@@ -30,6 +30,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
  */
 public interface DgMobsimBuilder {
 
-	public Mobsim createMobsim(Scenario sc, EventsManager events);
+	public RunnableMobsim createMobsim(Scenario sc, EventsManager events);
 	
 }

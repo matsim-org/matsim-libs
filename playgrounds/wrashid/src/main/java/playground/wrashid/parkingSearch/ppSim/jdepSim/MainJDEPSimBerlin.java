@@ -26,7 +26,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
 
 public class MainJDEPSimBerlin {
@@ -56,7 +56,7 @@ public class MainJDEPSimBerlin {
 		eventsManager.resetHandlers(0);
 		eventsWriter.init(outputFolder + "events.xml");
 
-		Mobsim sim = new JDEPSim(scenario, eventsManager);
+		RunnableMobsim sim = new JDEPSim(scenario, eventsManager);
 		// Mobsim sim = new PPSim(scenario, eventsManager);
 
 		Message.ttMatrix = new TTMatrixFromStoredTable("C:/data/parkingSearch/psim/berlin/ITERS/it.50/50.60secBin.ttMatrix.txt", scenario.getNetwork());
