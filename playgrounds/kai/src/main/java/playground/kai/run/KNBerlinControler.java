@@ -42,7 +42,7 @@ class KNBerlinControler {
 		config.timeAllocationMutator().setMutationRange(7200.);
 
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-		config.vspExperimental().setScoreMSAStartsAtIteration( (int)(0.8*config.controler().getLastIteration()) );
+//		config.vspExperimental().setScoreMSAStartsAtIteration( (int)(0.8*config.controler().getLastIteration()) );
 
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true) ;
 		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );

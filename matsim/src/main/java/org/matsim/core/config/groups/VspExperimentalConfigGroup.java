@@ -52,14 +52,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 
 	// ---
 
-	private static final String MODES_FOR_SUBTOURMODECHOICE = "modes";
-	private static final String CHAIN_BASED_MODES = "chainBasedModes";
-
-	private String modesForSubTourModeChoice = "car, pt";
-	private String chainBasedModes = "car";
-
-	// ---
-
 	private static final String WRITING_OUTPUT_EVENTS = "writingOutputEvents" ;
 	private boolean writingOutputEvents = false ;
 
@@ -98,19 +90,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(LOGIT_SCALE_PARAM_FOR_PLANS_REMOVAL)
 	public void setLogitScaleParamForPlansRemoval(double logitScaleParamForPlansRemoval) {
 		this.logitScaleParamForPlansRemoval = logitScaleParamForPlansRemoval;
-	}
-	// ---
-	private static final String SCORE_MSA_STARTS_AT_ITERATION = "scoreMSAStartsAtIteration" ;
-	private Integer scoreMSAStartsAtIteration = null ;
-	@StringGetter(SCORE_MSA_STARTS_AT_ITERATION)
-	@Deprecated // use fractionOfIterationsToStartScoreMSA
-	public Integer getScoreMSAStartsAtIteration() {
-		return scoreMSAStartsAtIteration;
-	}
-	@StringSetter(SCORE_MSA_STARTS_AT_ITERATION)
-	@Deprecated // use fractionOfIterationsToStartScoreMSA
-	public void setScoreMSAStartsAtIteration(Integer scoreMSAStartsAtIteration) {
-		this.scoreMSAStartsAtIteration = scoreMSAStartsAtIteration;
 	}
 	// ---
 	private static final String FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA = "fractionOfIterationsToStartScoreMSA" ;
@@ -165,8 +144,8 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 
-		map.put(SCORE_MSA_STARTS_AT_ITERATION, "(deprecated, use " + FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA + ") first iteration of MSA score averaging. The matsim theory department " +
-				"suggests to use this together with switching of choice set innovation, but it has not been tested yet.") ;
+//		map.put(SCORE_MSA_STARTS_AT_ITERATION, "(deprecated, use " + FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA + ") first iteration of MSA score averaging. The matsim theory department " +
+//				"suggests to use this together with switching of choice set innovation, but it has not been tested yet.") ;
 		map.put(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA, "fraction of iterations at which MSA score averaging is started. The matsim theory department " +
 				"suggests to use this together with switching off choice set innovation (where a similar switch exists), but it has not been tested yet.") ;
 		map.put( ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS, "(do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the " +
@@ -193,8 +172,8 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 
 		map.put(INPUT_MZ05_FILE, "(do not use) Set this filename of MZ05 daily analysis");
 
-		map.put(MODES_FOR_SUBTOURMODECHOICE, "(do not use) set the traffic mode option for subTourModeChoice by Yu");
-		map.put(CHAIN_BASED_MODES, "(do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. \"car,bike\", \"car\"");
+//		map.put(MODES_FOR_SUBTOURMODECHOICE, "(do not use) set the traffic mode option for subTourModeChoice by Yu");
+//		map.put(CHAIN_BASED_MODES, "(do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. \"car,bike\", \"car\"");
 
 		return map;
 	}
@@ -206,22 +185,22 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	public void setInputMZ05File(final String inputMZ05File) {
 		this.inputMZ05File = inputMZ05File;
 	}
-	@StringGetter(MODES_FOR_SUBTOURMODECHOICE)
-	public String getModesForSubTourModeChoice() {
-		return this.modesForSubTourModeChoice;
-	}
-	@StringSetter(MODES_FOR_SUBTOURMODECHOICE)
-	public void setModesForSubTourModeChoice(final String modesForSubTourModeChoice) {
-		this.modesForSubTourModeChoice = modesForSubTourModeChoice;
-	}
-	@StringGetter(CHAIN_BASED_MODES)
-	public String getChainBasedModes() {
-		return this.chainBasedModes;
-	}
-	@StringSetter(CHAIN_BASED_MODES)
-	public void setChainBasedModes(final String chainBasedModes) {
-		this.chainBasedModes = chainBasedModes;
-	}
+//	@StringGetter(MODES_FOR_SUBTOURMODECHOICE)
+//	public String getModesForSubTourModeChoice() {
+//		return this.modesForSubTourModeChoice;
+//	}
+//	@StringSetter(MODES_FOR_SUBTOURMODECHOICE)
+//	public void setModesForSubTourModeChoice(final String modesForSubTourModeChoice) {
+//		this.modesForSubTourModeChoice = modesForSubTourModeChoice;
+//	}
+////	@StringGetter(CHAIN_BASED_MODES)
+////	public String getChainBasedModes() {
+////		return this.chainBasedModes;
+////	}
+//	@StringSetter(CHAIN_BASED_MODES)
+//	public void setChainBasedModes(final String chainBasedModes) {
+//		this.chainBasedModes = chainBasedModes;
+//	}
 	@StringGetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
 	public boolean isRemovingUnneccessaryPlanAttributes() {
 		return this.removingUnneccessaryPlanAttributes;
@@ -251,12 +230,12 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	
 	@Override
 	protected void checkConsistency() {
-		if ( getScoreMSAStartsAtIteration()!=null ) {
-			log.warn( "config option " + SCORE_MSA_STARTS_AT_ITERATION + " is deprecated; use " + FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA ) ;
-		}
-		if ( getScoreMSAStartsAtIteration()!=null && getFractionOfIterationsToStartScoreMSA()!=null ) {
-			throw new RuntimeException("cannot set both of " + SCORE_MSA_STARTS_AT_ITERATION + " and " + 
-					FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA + " to non-null.  Aborting ...") ;
-		}
+//		if ( getScoreMSAStartsAtIteration()!=null ) {
+//			log.warn( "config option " + SCORE_MSA_STARTS_AT_ITERATION + " is deprecated; use " + FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA ) ;
+//		}
+//		if ( getScoreMSAStartsAtIteration()!=null && getFractionOfIterationsToStartScoreMSA()!=null ) {
+//			throw new RuntimeException("cannot set both of " + SCORE_MSA_STARTS_AT_ITERATION + " and " + 
+//					FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA + " to non-null.  Aborting ...") ;
+//		}
 	}
 }

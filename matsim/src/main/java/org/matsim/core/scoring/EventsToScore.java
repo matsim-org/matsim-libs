@@ -96,24 +96,11 @@ public class EventsToScore implements BasicEventHandler {
 		
 		Config config = this.scenario.getConfig() ;
 		
-		// yy the following is also in the consistency check.  Leaving it also here for the time being since it is difficult to make sense out of the settings
-		// if they are inconsistent.  In the longer run, the deprecated things should just go.  kai, oct'14
-		Integer tmp2 = config.vspExperimental().getScoreMSAStartsAtIteration() ;
-
-		Integer tmp = null ;
 		if ( config.vspExperimental().getFractionOfIterationsToStartScoreMSA()!=null ) {
-			tmp = (int) ((config.controler().getLastIteration() - config.controler().getFirstIteration()) 
+			final int diff = config.controler().getLastIteration() - config.controler().getFirstIteration();
+			log.warn( " diff=" + diff ) ;
+			this.scoreMSAstartsAtIteration = (int) (diff 
 				* config.vspExperimental().getFractionOfIterationsToStartScoreMSA() + config.controler().getFirstIteration());
-		}
-		
-		if ( tmp!=null && tmp2!=null && !tmp.equals(tmp2) ) {
-			throw new RuntimeException( "inconsistent" ) ;
-		}
-		
-		if ( tmp!=null ) {
-			this.scoreMSAstartsAtIteration = tmp ;
-		} else if ( tmp2!=null ) {
-			this.scoreMSAstartsAtIteration = tmp2 ;
 		}
 		
 	}

@@ -20,7 +20,10 @@
 
 package org.matsim.core.scoring;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
@@ -71,10 +74,15 @@ public class EventsToScoreTest extends MatsimTestCase {
 	}
 	public void testMsaAveraging() {
 		Config config = ConfigUtils.createConfig() ;
-		config.vspExperimental().setScoreMSAStartsAtIteration(100) ;
+		
+		config.controler().setFirstIteration(10);
+		config.controler().setLastIteration(110);
+		
 		config.planCalcScore().setMarginalUtilityOfMoney(1.);
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		config.vspExperimental().setFractionOfIterationsToStartScoreMSA(0.9);
+		
+		Scenario scenario = ScenarioUtils.createScenario(config);
         Population population = scenario.getPopulation();
 		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		population.addPerson(person);
@@ -86,7 +94,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(e2s);
 		
-		for ( int mockIteration = 99 ; mockIteration <= 110 ; mockIteration++ ) {
+		for ( int mockIteration = config.controler().getFirstIteration() ; mockIteration <= config.controler().getLastIteration() ; mockIteration++ ) {
 
 			events.resetHandlers(mockIteration) ;
 
