@@ -92,18 +92,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		this.logitScaleParamForPlansRemoval = logitScaleParamForPlansRemoval;
 	}
 	// ---
-	private static final String FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA = "fractionOfIterationsToStartScoreMSA" ;
-	private Double fractionOfIterationsToStartScoreMSA = null ;
-	@StringGetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
-	public Double getFractionOfIterationsToStartScoreMSA() {
-		return fractionOfIterationsToStartScoreMSA;
-	}
-	@StringSetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
-	public void setFractionOfIterationsToStartScoreMSA(Double fractionOfIterationsToStartScoreMSA) {
-		this.fractionOfIterationsToStartScoreMSA = fractionOfIterationsToStartScoreMSA;
-	}
-
-	// ---
 	private static final String GENERATING_BOARDING_DENIED_EVENT = "isGeneratingBoardingDeniedEvent" ;  // seems to be singular.
 	private boolean isGeneratingBoardingDeniedEvent = false ; // default is that this event is NOT generated.  kai, oct'12
 	@StringGetter(GENERATING_BOARDING_DENIED_EVENT)
@@ -146,8 +134,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 
 //		map.put(SCORE_MSA_STARTS_AT_ITERATION, "(deprecated, use " + FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA + ") first iteration of MSA score averaging. The matsim theory department " +
 //				"suggests to use this together with switching of choice set innovation, but it has not been tested yet.") ;
-		map.put(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA, "fraction of iterations at which MSA score averaging is started. The matsim theory department " +
-				"suggests to use this together with switching off choice set innovation (where a similar switch exists), but it has not been tested yet.") ;
 		map.put( ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS, "(do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the " +
 						"parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, " +
 				"set the following to true.") ;

@@ -183,7 +183,7 @@ public class GautengControler_subpopulations {
 			
 //			config.global().setRandomSeed(4713);
 			
-			config.vspExperimental().setFractionOfIterationsToStartScoreMSA(0.8);
+			config.planCalcScore().setFractionOfIterationsToStartScoreMSA(0.8);
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); 
 		}

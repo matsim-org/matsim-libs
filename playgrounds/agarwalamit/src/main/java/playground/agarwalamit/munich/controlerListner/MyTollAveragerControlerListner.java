@@ -71,7 +71,7 @@ public class MyTollAveragerControlerListner implements StartupListener, Iteratio
 
 		int firstIt = this.scenario.getConfig().controler().getFirstIteration();
 		int lastIt = this.scenario.getConfig().controler().getLastIteration();
-		double msaStarts = this.scenario.getConfig().vspExperimental().getFractionOfIterationsToStartScoreMSA();
+		double msaStarts = this.scenario.getConfig().planCalcScore().getFractionOfIterationsToStartScoreMSA();
 		averagingStartIteration= firstIt + (int) (msaStarts * (lastIt-firstIt));
 
 		for(Id<Person> personId:scenario.getPopulation().getPersons().keySet()){

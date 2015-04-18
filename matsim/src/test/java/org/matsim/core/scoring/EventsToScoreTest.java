@@ -80,7 +80,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		
 		config.planCalcScore().setMarginalUtilityOfMoney(1.);
 
-		config.vspExperimental().setFractionOfIterationsToStartScoreMSA(0.9);
+		config.planCalcScore().setFractionOfIterationsToStartScoreMSA(0.9);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
         Population population = scenario.getPopulation();

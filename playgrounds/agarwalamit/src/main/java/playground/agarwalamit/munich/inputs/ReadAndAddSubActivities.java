@@ -85,7 +85,7 @@ public class ReadAndAddSubActivities {
 		
 		config.controler().setOutputDirectory(null);
 		config.plans().setInputFile(inputPlans);
-		config.vspExperimental().setFractionOfIterationsToStartScoreMSA(0.8);
+		config.planCalcScore().setFractionOfIterationsToStartScoreMSA(0.8);
 		
 		new ConfigWriter(config).write(outConfig);
 	}

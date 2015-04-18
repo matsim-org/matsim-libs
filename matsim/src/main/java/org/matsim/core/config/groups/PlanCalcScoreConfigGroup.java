@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringGetter;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringSetter;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -131,6 +133,8 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 	 */
 	public static final String EXPERIENCED_PLAN_KEY = "experiencedPlan";
 	
+	// ---
+	private static final String FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA = "fractionOfIterationsToStartScoreMSA" ;
 	// ---
 
 	@Override
@@ -282,6 +286,8 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
+		map.put(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA, "fraction of iterations at which MSA score averaging is started. The matsim theory department " +
+				"suggests to use this together with switching off choice set innovation (where a similar switch exists), but it has not been tested yet.") ;
 		map.put(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION, "There used to be a plateau between duration=0 and duration=zeroUtilityDuration. "
 				+ "This caused durations to evolve to zero once they were below zeroUtilityDuration, causing problems.  Only use this switch if you need to be "
 				+ "backwards compatible with some old results.  (changed nov'13)") ;
@@ -925,11 +931,21 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		private boolean writeExperiencedPlans = false;
 
+		private Double fractionOfIterationsToStartScoreMSA = null ;
+
+		@StringGetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
+		public Double getFractionOfIterationsToStartScoreMSA() {
+			return fractionOfIterationsToStartScoreMSA;
+		}
+		@StringSetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
+		public void setFractionOfIterationsToStartScoreMSA(Double fractionOfIterationsToStartScoreMSA) {
+			this.fractionOfIterationsToStartScoreMSA = fractionOfIterationsToStartScoreMSA;
+		}
+
 		@StringGetter( LEARNING_RATE )
 		public double getLearningRate() {
 			return learningRate;
 		}
-
 		@StringSetter( LEARNING_RATE )
 		public void setLearningRate(double learningRate) {
 			this.learningRate = learningRate;
@@ -1131,8 +1147,14 @@ public class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public double getMarginalUtlOfWaiting_utils_hr() {
 		return delegate.getMarginalUtlOfWaiting_utils_hr();
 	}
-
 	public void setMarginalUtlOfWaiting_utils_hr(double waiting) {
 		delegate.setMarginalUtlOfWaiting_utils_hr(waiting);
+	}
+	
+	public void setFractionOfIterationsToStartScoreMSA( Double val ) {
+		delegate.setFractionOfIterationsToStartScoreMSA(val);
+	}
+	public Double getFractionOfIterationsToStartScoreMSA() {
+		return delegate.getFractionOfIterationsToStartScoreMSA() ;
 	}
 }

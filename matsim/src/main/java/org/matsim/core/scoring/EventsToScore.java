@@ -96,11 +96,11 @@ public class EventsToScore implements BasicEventHandler {
 		
 		Config config = this.scenario.getConfig() ;
 		
-		if ( config.vspExperimental().getFractionOfIterationsToStartScoreMSA()!=null ) {
+		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA()!=null ) {
 			final int diff = config.controler().getLastIteration() - config.controler().getFirstIteration();
 			log.warn( " diff=" + diff ) ;
 			this.scoreMSAstartsAtIteration = (int) (diff 
-				* config.vspExperimental().getFractionOfIterationsToStartScoreMSA() + config.controler().getFirstIteration());
+				* config.planCalcScore().getFractionOfIterationsToStartScoreMSA() + config.controler().getFirstIteration());
 		}
 		
 	}
