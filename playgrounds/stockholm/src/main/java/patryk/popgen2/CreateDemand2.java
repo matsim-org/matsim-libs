@@ -66,7 +66,6 @@ public class CreateDemand2 {
 	
 	private void run() {
 		int processedCarDrivers = 0;
-		int agentsAdded = 0;
 		int everyXthPerson = (int) (1/scaleFactor);
 		
 		ObjectAttributes agentAttributes = scenario.getPopulation().getPersonAttributes();
@@ -75,17 +74,15 @@ public class CreateDemand2 {
 		
 		XY2Links xy2links = new XY2Links(scenario);
 		
-		for (ParsedPerson pPerson : persons) {
+		for (ParsedPerson pPerson : persons) {	
 			if (pPerson.getMode().equals("car") && (pPerson.getHomeZone().substring(0, 2).equals("71") || pPerson.getHomeZone().substring(0, 2).equals("72")) 
-					&& (pPerson.getWorkZone().substring(0, 2).equals("71") || pPerson.getWorkZone().substring(0, 2).equals("72"))) {
+				&& (pPerson.getWorkZone().substring(0, 2).equals("71") || pPerson.getWorkZone().substring(0, 2).equals("72"))) {
 				if (processedCarDrivers % everyXthPerson == 0) {
 					createAgent(pPerson, agentAttributes, xy2links);
-					agentsAdded++;
 				}
-				processedCarDrivers++;
-			}
+			processedCarDrivers++;
+			} 
 		}
-		System.out.println(agentsAdded);
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write(initialPlansFile);
 	}
