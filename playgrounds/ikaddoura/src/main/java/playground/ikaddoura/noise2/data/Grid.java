@@ -39,7 +39,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.PtConstants;
 
 /**
- * Computes a grid of receiver points.
+ * Computes a grid of receiver points and provides some basic spatial functionality,
+ * e.g. the nearest receiver point for the coordinates of each 'considered' activity type. 
  * 
  * @author lkroeger, ikaddoura
  *
@@ -53,10 +54,10 @@ public class Grid {
 		
 	private final Map<Id<Person>, List<Coord>> personId2consideredActivityCoords = new HashMap<Id<Person>, List<Coord>>();
 	
-	private final List <Coord> consideredActivityCoordsForDamages = new ArrayList <Coord>();
+	private final List <Coord> consideredActivityCoordsForSpatialFunctionality = new ArrayList <Coord>();
 	private final List <Coord> consideredActivityCoordsForReceiverPointGrid = new ArrayList <Coord>();
 	
-	private final List<String> consideredActivitiesForDamages = new ArrayList<String>();
+	private final List<String> consideredActivitiesForSpatialFunctionality = new ArrayList<String>();
 	private final List<String> consideredActivitiesForReceiverPointGrid = new ArrayList<String>();
 	
 	private double xCoordMin = Double.MAX_VALUE;
@@ -77,7 +78,7 @@ public class Grid {
 		
 		String[] consideredActTypesForDamagesArray = gridParams.getConsideredActivitiesForDamages();
 		for (int i = 0; i < consideredActTypesForDamagesArray.length; i++) {
-			this.consideredActivitiesForDamages.add(consideredActTypesForDamagesArray[i]);
+			this.consideredActivitiesForSpatialFunctionality.add(consideredActTypesForDamagesArray[i]);
 		}
 		
 		String[] consideredActTypesForReceiverPointGridArray = gridParams.getConsideredActivitiesForReceiverPointGrid();
@@ -97,7 +98,7 @@ public class Grid {
 		// delete unnecessary information
 		this.zoneTuple2listOfReceiverPointIds.clear();
 		this.consideredActivityCoordsForReceiverPointGrid.clear();
-		this.consideredActivityCoordsForDamages.clear();
+		this.consideredActivityCoordsForSpatialFunctionality.clear();
 	}
 
 	private void setActivityCoords () {
@@ -110,7 +111,7 @@ public class Grid {
 					
 					if (!activity.getType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 						
-						if (this.consideredActivitiesForDamages.contains(activity.getType())) {
+						if (this.consideredActivitiesForSpatialFunctionality.contains(activity.getType())) {
 							List<Coord> activityCoordinates = new ArrayList<Coord>();
 							
 							if (personId2consideredActivityCoords.containsKey(person.getId())) {
@@ -120,7 +121,7 @@ public class Grid {
 							activityCoordinates.add(activity.getCoord());
 							personId2consideredActivityCoords.put(person.getId(), activityCoordinates);
 							
-							consideredActivityCoordsForDamages.add(activity.getCoord());
+							consideredActivityCoordsForSpatialFunctionality.add(activity.getCoord());
 						}
 						
 						if (this.consideredActivitiesForReceiverPointGrid.contains(activity.getType())) {
@@ -200,7 +201,7 @@ public class Grid {
 	private void setActivityCoord2NearestReceiverPointId () {
 		
 		int counter = 0;
-		for (Coord coord : consideredActivityCoordsForDamages) {
+		for (Coord coord : consideredActivityCoordsForSpatialFunctionality) {
 			if (counter % 100000 == 0) {
 				log.info("Setting activity coordinates to nearest receiver point. activity location # " + counter);
 			}

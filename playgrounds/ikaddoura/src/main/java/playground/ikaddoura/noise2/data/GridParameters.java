@@ -32,7 +32,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
  * 
- * Provides the parameters required to build the grid.
+ * Provides the parameters required to build a simple grid with some basic spatial functionality.
  * 
  * @author ikaddoura
  *
@@ -45,7 +45,7 @@ public class GridParameters {
 	private String transformationFactory = TransformationFactory.DHDN_GK4;
 
 	private String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
-	private String[] consideredActivitiesForDamages = {"home", "work"};
+	private String[] consideredActivitiesForSpatialFunctionality = {"home", "work"};
 	
 	// Setting all minimum and maximum coordinates to 0.0 means the receiver points are computed for the entire area for which any of the considered activities for the receiver point grid are found.
 	private double receiverPointsGridMinX = 0.;
@@ -60,8 +60,8 @@ public class GridParameters {
 		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
 		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
 
-		for (int i = 0; i < consideredActivitiesForDamages.length; i++) {
-			consideredActivitiesForDamagesList.add(consideredActivitiesForDamages[i]);
+		for (int i = 0; i < consideredActivitiesForSpatialFunctionality.length; i++) {
+			consideredActivitiesForDamagesList.add(consideredActivitiesForSpatialFunctionality[i]);
 		}
 
 		for (int i = 0; i < this.consideredActivitiesForReceiverPointGrid.length; i++) {
@@ -143,7 +143,7 @@ public class GridParameters {
 	}
 	
 	public String[] getConsideredActivitiesForDamages() {		
-		return consideredActivitiesForDamages;
+		return consideredActivitiesForSpatialFunctionality;
 	}
 
 	public void setConsideredActivitiesForDamages(String[] consideredActivities) {
@@ -151,7 +151,7 @@ public class GridParameters {
 		for (int i = 0; i < consideredActivities.length; i++) {
 			log.info(consideredActivities[i]);
 		}
-		this.consideredActivitiesForDamages = consideredActivities;
+		this.consideredActivitiesForSpatialFunctionality = consideredActivities;
 	}
 	
 }

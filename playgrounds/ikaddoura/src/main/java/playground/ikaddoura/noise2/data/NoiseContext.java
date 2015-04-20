@@ -39,7 +39,7 @@ import playground.ikaddoura.noise2.NoiseParameters;
 import playground.ikaddoura.noise2.handler.NoiseEquations;
 
 /**
- * Contains the spatial data as well as time-specific data relevant for the noise computation.
+ * Contains the grid and further noise-specific information.
  * 
  * @author lkroeger, ikaddoura
  *

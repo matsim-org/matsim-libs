@@ -29,10 +29,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 
 /**
+ * Provides the parameters required to compute noise emissions, immissions and damages.
+ * 
  * @author ikaddoura
  *
  */
@@ -45,8 +46,6 @@ public class NoiseParameters {
 	private double scaleFactor = 1.;
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
-	private String transformationFactory = TransformationFactory.DHDN_GK4;
-
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
 	
 	private boolean throwNoiseEventsAffected = true;
@@ -179,14 +178,6 @@ public class NoiseParameters {
 
 	public List<Id<Link>> getTunnelLinkIDs() {
 		return tunnelLinkIDs;
-	}
-
-	public String getTransformationFactory() {
-		return transformationFactory;
-	}
-
-	public void setTransformationFactory(String transformationFactory) {
-		this.transformationFactory = transformationFactory;
 	}
 
 	public boolean isInternalizeNoiseDamages() {
