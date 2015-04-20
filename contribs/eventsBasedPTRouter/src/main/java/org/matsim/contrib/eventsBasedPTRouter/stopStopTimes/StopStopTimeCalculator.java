@@ -27,6 +27,7 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 	private final Map<Id<Vehicle>, Tuple<Id<TransitStopFacility>, Double>> inTransitVehicles = new HashMap<Id<Vehicle>, Tuple<Id<TransitStopFacility>, Double>>(1000);
 	private final Set<Id<Vehicle>> vehicleIds = new HashSet<Id<Vehicle>>();
 	private double timeSlot;
+	private boolean useVehicleIds = true;
 	
 	//Constructors
 	public StopStopTimeCalculator(final TransitSchedule transitSchedule, final Config config) {
@@ -115,7 +116,7 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 	}
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if(vehicleIds.contains(event.getVehicleId())) {
+		if(!useVehicleIds || vehicleIds.contains(event.getVehicleId())) {
 			Tuple<Id<TransitStopFacility>, Double> route = inTransitVehicles.remove(event.getVehicleId());
 			if(route!=null)
 				stopStopTimes.get(route.getFirst()).get(event.getFacilityId()).addStopStopTime((int) (route.getSecond()/timeSlot), event.getTime()-route.getSecond());
@@ -124,7 +125,10 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 	}
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if(vehicleIds.contains(event.getVehicleId()) && event.getPersonId().toString().startsWith("pt_"+event.getVehicleId()+"_"))
+		if((!useVehicleIds || vehicleIds.contains(event.getVehicleId())) && event.getPersonId().toString().startsWith("pt_") && event.getPersonId().toString().contains(event.getVehicleId().toString()))
 			inTransitVehicles.remove(event.getVehicleId());
+	}
+	public void setUseVehicleIds(boolean useVehicleIds) {
+		this.useVehicleIds = useVehicleIds;
 	}
 }
