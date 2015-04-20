@@ -48,8 +48,8 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWS extends TransitRouter
 	private Link previousLink;
 	private double previousTime;
 	private double cachedLinkTime;
-	private final Map<Id, double[]> linkTravelTimes = new HashMap<Id, double[]>();
-	private final Map<Id, double[]> linkWaitingTimes = new HashMap<Id, double[]>();
+	private final Map<Id<Link>, double[]> linkTravelTimes = new HashMap<Id<Link>, double[]>();
+	private final Map<Id<Link>, double[]> linkWaitingTimes = new HashMap<Id<Link>, double[]>();
 	private final int numSlots;
 	private final double timeSlot;
 

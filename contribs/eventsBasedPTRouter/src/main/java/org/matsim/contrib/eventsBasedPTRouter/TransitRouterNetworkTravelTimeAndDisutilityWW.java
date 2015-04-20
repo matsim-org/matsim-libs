@@ -47,8 +47,8 @@ import java.util.Map;
  */
 public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouterNetworkTravelTimeAndDisutility implements TravelDisutility {
 
-	private final Map<Id, double[]> linkTravelTimes = new HashMap<Id, double[]>();
-	private final Map<Id, double[]> linkWaitingTimes = new HashMap<Id, double[]>();
+	private final Map<Id<Link>, double[]> linkTravelTimes = new HashMap<Id<Link>, double[]>();
+	private final Map<Id<Link>, double[]> linkWaitingTimes = new HashMap<Id<Link>, double[]>();
 	private final double timeSlot;
 	private final int numSlots;
 	private Link previousLink;
@@ -67,7 +67,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 				double[] times = new double[numSlots];
 				for(int slot = 0; slot<numSlots; slot++) {
 					double linksTime = travelTime.getLinkTravelTime(network.getLinks().get(link.fromNode.stop.getStopFacility().getLinkId()), startTime+slot*timeSlot, null, null);
-					for(Id linkId:link.route.getRoute().getSubRoute(link.fromNode.stop.getStopFacility().getLinkId(), link.toNode.stop.getStopFacility().getLinkId()).getLinkIds())
+					for(Id<Link> linkId:link.route.getRoute().getSubRoute(link.fromNode.stop.getStopFacility().getLinkId(), link.toNode.stop.getStopFacility().getLinkId()).getLinkIds())
 						linksTime += travelTime.getLinkTravelTime(network.getLinks().get(linkId), startTime+slot*timeSlot, null, null);
 					times[slot] = linksTime;
 				}

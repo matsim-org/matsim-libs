@@ -2,6 +2,10 @@ package org.matsim.contrib.eventsBasedPTRouter.stopStopTimes;
 
 public class StopStopTimeDataArray implements StopStopTimeData {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	//Attributes
 	private double[] stopStopTimeMeans;
 	private double[] stopStopTimeSquares;

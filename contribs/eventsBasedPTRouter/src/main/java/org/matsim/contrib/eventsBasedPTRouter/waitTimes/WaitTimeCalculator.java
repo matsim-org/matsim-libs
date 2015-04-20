@@ -27,12 +27,14 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.Vehicle;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -48,11 +50,11 @@ public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEn
 
 	//Attributes
 	private final double timeSlot;
-	private final Map<Tuple<Id, Id>, Map<Id, WaitTimeData>> waitTimes = new HashMap<Tuple<Id, Id>, Map<Id, WaitTimeData>>(1000);
-	private final Map<Tuple<Id, Id>, Map<Id, double[]>> scheduledWaitTimes = new HashMap<Tuple<Id, Id>, Map<Id, double[]>>(1000);
-	private final Map<Id, Double> agentsWaitingData = new HashMap<Id, Double>();
-	private Map<Id, Tuple<Id, Id>> linesRoutesOfVehicle = new HashMap<Id, Tuple<Id, Id>>();
-	private Map<Id, Id> stopOfVehicle = new HashMap<Id, Id>();
+	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, WaitTimeData>> waitTimes = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, WaitTimeData>>(1000);
+	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, double[]>> scheduledWaitTimes = new HashMap<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, double[]>>(1000);
+	private final Map<Id<Person>, Double> agentsWaitingData = new HashMap<Id<Person>, Double>();
+	private Map<Id<Vehicle>, Tuple<Id<TransitLine>, Id<TransitRoute>>> linesRoutesOfVehicle = new HashMap<Id<Vehicle>, Tuple<Id<TransitLine>, Id<TransitRoute>>>();
+	private Map<Id<Vehicle>, Id<TransitStopFacility>> stopOfVehicle = new HashMap<Id<Vehicle>, Id<TransitStopFacility>>();
 	
 	//Constructors
 	public WaitTimeCalculator(final TransitSchedule transitSchedule, final Config config) {
@@ -67,8 +69,8 @@ public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEn
 				for(Departure departure:route.getDepartures().values())
 					sortedDepartures[d++] = departure.getDepartureTime();
 				Arrays.sort(sortedDepartures);
-				Map<Id, WaitTimeData> stopsMap = new HashMap<Id, WaitTimeData>(100);
-				Map<Id, double[]> stopsScheduledMap = new HashMap<Id, double[]>(100);
+				Map<Id<TransitStopFacility>, WaitTimeData> stopsMap = new HashMap<Id<TransitStopFacility>, WaitTimeData>(100);
+				Map<Id<TransitStopFacility>, double[]> stopsScheduledMap = new HashMap<Id<TransitStopFacility>, double[]>(100);
 				for(TransitRouteStop stop:route.getStops()) {
 					stopsMap.put(stop.getStopFacility().getId(), new WaitTimeDataArray((int) (totalTime/timeSlot)+1));
 					double[] cacheWaitTimes = new double[(int) (totalTime/timeSlot)+1];
@@ -90,7 +92,7 @@ public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEn
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId(), cacheWaitTimes);
 				}
-				Tuple<Id, Id> key = new Tuple<Id, Id>(line.getId(), route.getId());
+				Tuple<Id<TransitLine>, Id<TransitRoute>> key = new Tuple<Id<TransitLine>, Id<TransitRoute>>(line.getId(), route.getId());
 				waitTimes.put(key, stopsMap);
 				scheduledWaitTimes.put(key, stopsScheduledMap);
 			}
@@ -99,14 +101,19 @@ public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEn
 	//Methods
 	public WaitTime getWaitTimes() {
 		return new WaitTime() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
-			public double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
 				return WaitTimeCalculator.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
 			}
 		};
 	}
-	private double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
-		Tuple<Id, Id> key = new Tuple<Id, Id>(lineId, routeId);
+	private double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+		Tuple<Id<TransitLine>, Id<TransitRoute>> key = new Tuple<Id<TransitLine>, Id<TransitRoute>>(lineId, routeId);
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId);
 		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
 			double[] waitTimes = scheduledWaitTimes.get(key).get(stopId);
@@ -117,7 +124,7 @@ public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEn
 	}
 	@Override
 	public void reset(int iteration) {
-		for(Map<Id, WaitTimeData> routeData:waitTimes.values())
+		for(Map<Id<TransitStopFacility>, WaitTimeData> routeData:waitTimes.values())
 			for(WaitTimeData waitTimeData:routeData.values())
 				waitTimeData.resetWaitTimes();
 		agentsWaitingData.clear();
@@ -135,7 +142,7 @@ public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEn
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Double startWaitingTime = agentsWaitingData.get(event.getPersonId());
 		if(startWaitingTime!=null) {
-			Tuple<Id, Id> lineRoute = linesRoutesOfVehicle.get(event.getVehicleId());
+			Tuple<Id<TransitLine>, Id<TransitRoute>> lineRoute = linesRoutesOfVehicle.get(event.getVehicleId());
 			WaitTimeData data = waitTimes.get(lineRoute).get(stopOfVehicle.get(event.getVehicleId()));
 			data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 			agentsWaitingData.remove(event.getPersonId());
@@ -150,7 +157,7 @@ public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEn
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		linesRoutesOfVehicle.put(event.getVehicleId(), new Tuple<Id, Id>(event.getTransitLineId(), event.getTransitRouteId()));
+		linesRoutesOfVehicle.put(event.getVehicleId(), new Tuple<Id<TransitLine>, Id<TransitRoute>>(event.getTransitLineId(), event.getTransitRouteId()));
 	}
 
 }

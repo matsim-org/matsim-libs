@@ -28,6 +28,10 @@ package org.matsim.contrib.eventsBasedPTRouter.waitTimes;
 
 public class WaitTimeDataArray implements WaitTimeData {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	//Attributes
 	private double[] waitTimes;
 	private int[] numTimes;

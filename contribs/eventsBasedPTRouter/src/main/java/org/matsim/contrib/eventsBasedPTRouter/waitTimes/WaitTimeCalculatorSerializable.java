@@ -48,6 +48,10 @@ import java.util.Map;
 
 public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static int scheduleCalls;
 	private static int waitTimeCalls;
 	//Attributes
@@ -108,14 +112,19 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 	//Methods
 	public WaitTime getWaitTimes() {
 		return new WaitTime() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			@Override
-			public double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
 				return WaitTimeCalculatorSerializable.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
 			}
 		};
 	}
 
-	private double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+	private double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
 		Tuple<String, String> key = new Tuple<String, String>(lineId.toString(), routeId.toString());
 		waitTimeCalls++;
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId.toString());

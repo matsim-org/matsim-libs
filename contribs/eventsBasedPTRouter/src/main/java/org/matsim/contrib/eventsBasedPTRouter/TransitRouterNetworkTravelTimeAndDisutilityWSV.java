@@ -50,9 +50,9 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWSV extends TransitRoute
 	private Link previousLink;
 	private double previousTime;
 	private double cachedTravelTime;
-	private final Map<Id, double[]> linkTravelTimes = new HashMap<Id, double[]>();
-	private final Map<Id, double[]> linkWaitingTimes = new HashMap<Id, double[]>();
-	private final Map<Id, double[]> linkVehicleOccupancy = new HashMap<Id, double[]>();
+	private final Map<Id<Link>, double[]> linkTravelTimes = new HashMap<Id<Link>, double[]>();
+	private final Map<Id<Link>, double[]> linkWaitingTimes = new HashMap<Id<Link>, double[]>();
+	private final Map<Id<Link>, double[]> linkVehicleOccupancy = new HashMap<Id<Link>, double[]>();
 	private final int numSlots;
 	private final double timeSlot;
 	
