@@ -12,6 +12,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 /**
  * @author kt
  * Sammelt die einzelnen anfallenden Activities und gibt diese in einer Datei aus.
+ * Analyse für das ActivityScoring.
  */
 
 /*TODO: 

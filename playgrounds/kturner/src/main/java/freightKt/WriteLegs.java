@@ -8,13 +8,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 
 
 
 /**
  * @author kt
  * Sammelt die einzelnen anfallenden Legs und gibt diese in einer Datei aus.
+ * Analyse für das LegScoring.
  */
 
 /*TODO: 

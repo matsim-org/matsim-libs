@@ -11,6 +11,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 /**
  * @author kt
  * Sammelt die einzelnen anfallenden Betraege und gibt diese in einer Datei aus.
+ * Analyse für das MoneyScoring (v.a. Maut).
  */
 
 /*TODO: 
@@ -35,8 +36,6 @@ class WriteMoney {
 			writer = new FileWriter(file);  //Neuer File (überschreibt im Zweifel den alten - der jedoch nicht existieren dürfte!
 
 			writer.write("angefallene Geldzahlungen" +System.getProperty("line.separator"));
-//			writer.write("Type \t LinkID \t FacilityID \t StartTime \t EndTime \t maxDuration");
-			writer.write(System.getProperty("line.separator"));
 
 			// Schreibt den Stream in die Datei
 			// Sollte immer am Ende ausgeführt werden, sodass der Stream 

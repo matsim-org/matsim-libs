@@ -3,14 +3,11 @@ package freightKt;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.matsim.contrib.freight.carrier.Carrier;
 
 /**
  * @author kt
- * Sammelt die einzelnen anfallenden Betraege und gibt diese in einer Datei aus.
+ * Schreibt die übergebenen Texte in eine Datei.
+ * Kann zu allgemeinen Analysezwecken genutzt werden.
  */
 
 /*TODO: 
@@ -34,7 +31,6 @@ class WriteTextToFile {
 			writer = new FileWriter(file);  //Neuer File (überschreibt im Zweifel den alten - der jedoch nicht existieren dürfte!
 
 			writer.write("explizit ausgegebene Textzeilen beliebiger Art" +System.getProperty("line.separator"));
-//			writer.write("Type \t LinkID \t FacilityID \t StartTime \t EndTime \t maxDuration");
 			writer.write(System.getProperty("line.separator"));
 
 			// Schreibt den Stream in die Datei
