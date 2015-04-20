@@ -7,6 +7,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
 
+
 public class SumScoringFunctionFreight extends SumScoringFunction implements ScoringFunction {
 	
 	public interface FixCostScoring extends BasicScoring  {	//New KT
@@ -47,6 +48,13 @@ public class SumScoringFunctionFreight extends SumScoringFunction implements Sco
             score += contribution;
 		}
 		return score;
+	}
+	
+	@Override
+	public void finish() {
+		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
+			basicScoringFunction.finish();
+		}
 	}
 	
 	@Override
