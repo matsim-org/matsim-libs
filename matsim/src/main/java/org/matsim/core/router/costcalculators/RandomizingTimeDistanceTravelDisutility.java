@@ -20,8 +20,6 @@
 
 package org.matsim.core.router.costcalculators;
 
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -32,6 +30,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Random;
 
 /**
  * A simple cost calculator which only respects time and distance to calculate generalized costs
@@ -64,7 +64,7 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 		public Builder() {
 		}
 		@Override
-		public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
+		public RandomizingTimeDistanceTravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
                 return new RandomizingTimeDistanceTravelDisutility(timeCalculator, cnScoringGroup, this.sigma )  ;
 		}
 		public void setSigma( double val ) {
@@ -73,12 +73,7 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 	}  
 	// === end Builder ===
 
-	@Deprecated // use the builder.  Let me know if/why this is not possible in your case.  kai, mar'15
-	public RandomizingTimeDistanceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		this( timeCalculator, cnScoringGroup, 0. ) ;
-	}
-	
-	RandomizingTimeDistanceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, double sigma ) { 
+	RandomizingTimeDistanceTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, double sigma ) {
 		this.timeCalculator = timeCalculator;
 
 		/* Usually, the travel-utility should be negative (it's a disutility) but the cost should be positive. Thus negate the utility.*/
@@ -111,7 +106,6 @@ public final class RandomizingTimeDistanceTravelDisutility implements TravelDisu
 			this.normalization = 1. ;
 		}
 
-		
 	}
 
 

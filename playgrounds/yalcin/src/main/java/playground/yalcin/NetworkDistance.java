@@ -20,16 +20,7 @@
 
 package playground.yalcin;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.ScreenOverlayType;
-
+import net.opengis.kml._2.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -59,6 +50,10 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class NetworkDistance {
 
@@ -131,7 +126,7 @@ public class NetworkDistance {
 
 		// create the router algorithm
 		TravelTime travelTime = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-		TravelDisutility linkCosts = new RandomizingTimeDistanceTravelDisutility(travelTime, config.planCalcScore());
+		TravelDisutility linkCosts = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime, config.planCalcScore());
 		Dijkstra router = new Dijkstra(network, linkCosts, travelTime);
 
 		// we need to transform the coordinate from wgs84 to gk4 for calculating distances

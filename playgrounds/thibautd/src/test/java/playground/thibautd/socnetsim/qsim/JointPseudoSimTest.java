@@ -89,9 +89,7 @@ public class JointPseudoSimTest {
 							public TripRouter get() {
 								return defFact.instantiateAndConfigureTripRouter(
 										new RoutingContextImpl(
-											new RandomizingTimeDistanceTravelDisutility(
-												travelTime.getLinkTravelTimes(),
-												scenario.getConfig().planCalcScore() ), 
+												new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime.getLinkTravelTimes(), scenario.getConfig().planCalcScore()),
 											travelTime.getLinkTravelTimes() ) );
 							}
 						},
@@ -130,9 +128,7 @@ public class JointPseudoSimTest {
 							public TripRouter get() {
 								return defFact.instantiateAndConfigureTripRouter(
 										new RoutingContextImpl(
-											new RandomizingTimeDistanceTravelDisutility(
-												travelTime.getLinkTravelTimes(),
-												scenario.getConfig().planCalcScore() ), 
+												new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime.getLinkTravelTimes(), scenario.getConfig().planCalcScore()),
 											travelTime.getLinkTravelTimes() ) );
 							}
 						},

@@ -35,8 +35,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -152,7 +152,7 @@ public class JointTripRouterFactoryTest {
 					public TravelDisutility createTravelDisutility(
 							TravelTime timeCalculator,
 							PlanCalcScoreConfigGroup cnScoringGroup) {
-						return new RandomizingTimeDistanceTravelDisutility( timeCalculator , cnScoringGroup );
+						return new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeCalculator, cnScoringGroup);
 					}
 				},
 				new FreeSpeedTravelTime(),

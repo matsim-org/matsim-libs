@@ -41,7 +41,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
-import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -89,7 +88,7 @@ public class NetworkLegRouterTest {
 		TravelTime timeObject = ttCalcFactory.createTravelTimeCalculator(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
 		{
-			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility(timeObject, f.s.getConfig().planCalcScore() ) ;
+			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeObject, f.s.getConfig().planCalcScore());
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 
@@ -108,8 +107,8 @@ public class NetworkLegRouterTest {
 		{
 			f.s.getConfig().planCalcScore().setMonetaryDistanceCostRateCar(-1.) ;
 			// yyyyyy the above should be positive
-			
-			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility(timeObject, f.s.getConfig().planCalcScore() ) ;
+
+			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeObject, f.s.getConfig().planCalcScore());
 
 			LeastCostPathCalculator routeAlgo = new Dijkstra(f.s.getNetwork(), costObject, timeObject );
 

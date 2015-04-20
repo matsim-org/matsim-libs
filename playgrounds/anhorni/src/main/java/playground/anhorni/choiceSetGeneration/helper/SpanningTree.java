@@ -19,12 +19,6 @@
 
 package playground.anhorni.choiceSetGeneration.helper;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +34,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.*;
 
 public class SpanningTree {
 
@@ -185,7 +181,7 @@ public class SpanningTree {
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 		Config conf = scenario.getConfig();
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, conf.travelTimeCalculator()).getLinkTravelTimes();
-		SpanningTree st = new SpanningTree(ttc,new RandomizingTimeDistanceTravelDisutility(ttc, conf.planCalcScore()));
+		SpanningTree st = new SpanningTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(ttc, conf.planCalcScore()));
 		Node origin = network.getNodes().get(Id.create(1, Node.class));
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);

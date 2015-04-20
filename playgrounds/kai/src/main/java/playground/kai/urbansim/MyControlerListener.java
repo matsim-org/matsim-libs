@@ -60,7 +60,7 @@ public class MyControlerListener implements /*IterationEndsListener,*/ ShutdownL
 		Controler controler = event.getControler() ;
 
 		TravelTime ttc = controler.getLinkTravelTimes();
-		LeastCostPathTree st = new LeastCostPathTree(ttc,new RandomizingTimeDistanceTravelDisutility(ttc, controler.getConfig().planCalcScore()));
+		LeastCostPathTree st = new LeastCostPathTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(ttc, controler.getConfig().planCalcScore()));
 
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 		double dpTime = 8.*3600 ;

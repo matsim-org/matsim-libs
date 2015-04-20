@@ -182,7 +182,7 @@ public class RunMunichZone30Controller extends AbstractController {
 
 
 		// travel disutility (generalized cost)
-		final TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility(this.travelTime.getLinkTravelTimes(), this.config.planCalcScore());
+		final TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(this.travelTime.getLinkTravelTimes(), this.config.planCalcScore());
 		//
 		//final FreespeedTravelTimeAndDisutility ptTimeCostCalc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 

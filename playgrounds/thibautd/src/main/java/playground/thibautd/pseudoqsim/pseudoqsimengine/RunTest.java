@@ -63,9 +63,7 @@ public class RunTest {
 					new TripRouterFactoryBuilderWithDefaults().build(
 						scenario ).instantiateAndConfigureTripRouter(
 							new RoutingContextImpl(
-								new RandomizingTimeDistanceTravelDisutility(
-									travelTime.getLinkTravelTimes(),
-									config.planCalcScore() ),
+									new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime.getLinkTravelTimes(), config.planCalcScore()),
 								travelTime.getLinkTravelTimes() ) )
 				),
 				scenario).run( scenario.getPopulation() );

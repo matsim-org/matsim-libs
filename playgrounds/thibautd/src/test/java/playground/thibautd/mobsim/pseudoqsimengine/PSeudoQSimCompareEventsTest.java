@@ -112,9 +112,7 @@ public class PSeudoQSimCompareEventsTest {
 					new TripRouterFactoryBuilderWithDefaults().build(
 						scenario ).instantiateAndConfigureTripRouter(
 							new RoutingContextImpl(
-								new RandomizingTimeDistanceTravelDisutility(
-									travelTime.getLinkTravelTimes(),
-									scenario.getConfig().planCalcScore() ),
+									new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(travelTime.getLinkTravelTimes(), scenario.getConfig().planCalcScore()),
 								travelTime.getLinkTravelTimes() ) ) ),
 				new QSimFactory(),
 				DUMP_EVENTS ? utils.getOutputDirectory()+"/qSimEvent.xml" : null,

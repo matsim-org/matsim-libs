@@ -20,12 +20,6 @@
 
 package playground.johannes.studies.gis;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +34,11 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.Comparator;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 public class SpanningTree {
 
@@ -192,7 +191,7 @@ public class SpanningTree {
 		new MatsimNetworkReader(scenario).readFile("../../input/network.xml");
 
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
-		SpanningTree st = new SpanningTree(ttc,new RandomizingTimeDistanceTravelDisutility(ttc, scenario.getConfig().planCalcScore()));
+		SpanningTree st = new SpanningTree(ttc, new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(ttc, scenario.getConfig().planCalcScore()));
 		Node origin = network.getNodes().get(Id.create(1, Node.class));
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);

@@ -23,13 +23,6 @@ package org.matsim.contrib.locationchoice;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.MaxDCScoreWrapper;
-import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMaxDCScore;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
@@ -38,12 +31,10 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class BestReplyLocationChoicePlanStrategyTest {
 	
@@ -88,7 +79,7 @@ public class BestReplyLocationChoicePlanStrategyTest {
 		
 		public ReplanningContextImpl(Scenario scenario) {
 			this.travelTime = new FreeSpeedTravelTime();
-			this.travelDisutility = new RandomizingTimeDistanceTravelDisutility(this.travelTime, scenario.getConfig().planCalcScore());			
+			this.travelDisutility = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(this.travelTime, scenario.getConfig().planCalcScore());
 			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork());
 			this.tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(scenario);
 		}
