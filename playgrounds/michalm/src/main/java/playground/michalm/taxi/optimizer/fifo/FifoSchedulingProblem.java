@@ -29,13 +29,13 @@ import playground.michalm.taxi.vehreqpath.*;
 public class FifoSchedulingProblem
 {
     private final TaxiOptimizerConfiguration optimConfig;
-    private final VehicleRequestPathCost vrpComparator;
+    private final VehicleRequestPathCost vrpCost;
 
 
     public FifoSchedulingProblem(TaxiOptimizerConfiguration optimConfig)
     {
         this.optimConfig = optimConfig;
-        this.vrpComparator = optimConfig.getVrpCost();
+        this.vrpCost = optimConfig.getVrpCost();
     }
 
 
@@ -45,7 +45,7 @@ public class FifoSchedulingProblem
             TaxiRequest req = unplannedRequests.peek();
 
             VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
-                    optimConfig.context.getVrpData().getVehicles(), vrpComparator);
+                    optimConfig.context.getVrpData().getVehicles(), vrpCost);
 
             if (best == null) {//TODO won't work with req filtering
                 return;
