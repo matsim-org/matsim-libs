@@ -22,10 +22,10 @@ public class Building {
 		this.homeBuildingTypes = new ArrayList<>();
 		this.homeBuildingTypes.add("Bostad; Flerfamiljshus");
 		this.homeBuildingTypes.add("Bostad; Ospecificerad");
-		this.homeBuildingTypes.add("Bostad; Sm�hus friliggande");
-		this.homeBuildingTypes.add("Bostad; Sm�hus med flera l�genheter");
-		this.homeBuildingTypes.add("Bostad; Sm�hus radhus");
-		this.homeBuildingTypes.add("Bostad; Sm�hus kedjehus");
+		this.homeBuildingTypes.add("Bostad; Småhus friliggande");
+		this.homeBuildingTypes.add("Bostad; Småhus med flera lägenheter");
+		this.homeBuildingTypes.add("Bostad; Småhus radhus");
+		this.homeBuildingTypes.add("Bostad; Småhus kedjehus");
 	}
 	
 	public void setBuildingType(String buildingType) {
