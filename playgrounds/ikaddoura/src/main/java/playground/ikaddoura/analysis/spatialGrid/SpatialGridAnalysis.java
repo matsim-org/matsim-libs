@@ -48,6 +48,13 @@ import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandle
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
+/**
+ * Computes the user benefits and caused noise costs based on the plans file and the events.
+ * Maps the results to the home location of the causing agent. 
+ * 
+ * @author ikaddoura
+ *
+ */
 public class SpatialGridAnalysis {
 	private static final Logger log = Logger.getLogger(SpatialGridAnalysis.class);
 	
@@ -58,7 +65,10 @@ public class SpatialGridAnalysis {
 	
 	// if the following variable is null the standard events file is used
 	private static String eventsFileWithNoiseEvents;
-	private static boolean useMoneyEvents;
+	
+	// if the following variable is true, the events have to contain noise events.
+	// if the following variable is false, money events are analyzed and assumed to correspond to the caused noise costs
+	private static boolean useNoiseEvents;
 		
 	public static void main(String[] args) {
 		
@@ -78,19 +88,19 @@ public class SpatialGridAnalysis {
 			outputFilePath = args[4];		
 			log.info("analysis output path: " + outputFilePath);
 			
-			useMoneyEvents = Boolean.valueOf(args[5]);		
-			log.info("use money events: " + outputFilePath);
+			useNoiseEvents = Boolean.valueOf(args[5]);		
+			log.info("use noise events: " + outputFilePath);
 			
 		} else {
 			
 			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
 			eventsFileWithNoiseEvents = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/baseCase_2_noiseAnalysis/r31341/noiseAnalysis_BlnBC2_2/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
 //			eventsFileWithNoiseEvents = null;
-			outputFilePath = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/analysis_spatial_grid_2/";
+			outputFilePath = runDirectory + "analysis_spatial_grid_2/";
 			
 			receiverPointGap = 100.;
 			homeActivityType = "home";
-			useMoneyEvents = false;
+			useNoiseEvents = true;
 		}
 		
 		SpatialGridAnalysis analysis = new SpatialGridAnalysis();
@@ -165,7 +175,7 @@ public class SpatialGridAnalysis {
 		
 		log.info("Reading events file...");
 
-		if (useMoneyEvents) {
+		if (useNoiseEvents == false) {
 			events.addHandler(moneyHandler);
 			
 			MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -228,7 +238,7 @@ public class SpatialGridAnalysis {
 				// caused noise cost
 				double personsCausedNoiseCost = 0.;
 				
-				if (useMoneyEvents) {
+				if (useNoiseEvents == false) {
 					personsCausedNoiseCost = moneyHandler.getPersonId2amount().get(person.getId());		
 					
 				} else {
@@ -247,7 +257,7 @@ public class SpatialGridAnalysis {
 				// affected noise cost
 				double personsAffectedNoiseCost = 0.;
 				
-				if (useMoneyEvents) {
+				if (useNoiseEvents == false) {
 					log.warn("The amounts in the money events correspond to the caused noise cost. To analyze the amount that each person is affected by noise use the noise events.");
 				} else {
 					if (noiseHandler.getPersonId2affectedNoiseCost().containsKey(person.getId())) {
