@@ -20,7 +20,7 @@ ranksFile              taxi_ranks-0.xml
 #changeEventsFile       ------
 
 #type of the available dispatching algorithms
-algorithmConfig        NOS_DSE_FF
+algorithmConfig        RULE_DSE_FF
 
 #limit Dijkstra algorithm to the n nearest requests relatie to a given vehicle (based on straight-line distance)
 nearestRequestsLimit    25
