@@ -95,7 +95,7 @@ public class KTFreight_v2 {
 
 	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/Scoring5/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/ScoringToll1/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
@@ -155,7 +155,7 @@ public class KTFreight_v2 {
 		Config config = createConfig(args);
 		//		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
 		//		AbstractController.checkConfigConsistencyAndWriteToLog(config, "dump");
-		textInfofile = new WriteTextToFile(new File(config.controler().getOutputDirectory() + "/#TextInformation.txt"), null);
+		textInfofile = new WriteTextToFile(new File(TEMP_DIR + "#TextInformation.txt"), null);
 		
 		if ( addingCongestion ) { //erst config vorbereiten....Config ist fix, sobald in Scenario!!!! KT, 11.12.14
 			config.network().setTimeVariantNetwork(true);
@@ -185,7 +185,7 @@ public class KTFreight_v2 {
 		Carriers carriers = createCarriers(vehicleTypes);
 		generateCarrierPlans(scenario.getNetwork(), carriers, vehicleTypes, config);
 
-		new WriteCarrierScoreInfos(carriers, new File(OUTPUT_DIR + "#JspritCarrierScoreInformation.txt"), runIndex);
+		new WriteCarrierScoreInfos(carriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation.txt"), runIndex);
 
 		return carriers;
 	}
@@ -449,29 +449,28 @@ public class KTFreight_v2 {
 	
 	/*
 	 * Neue Variante der ScoringFunction KT, 17.04.15
-	 * //TODO: MoneyScoring, ActivityScoring
+	 * //TODO: Test von  MoneyScoring, ActivityScoring
 	 * Activity: Kostensatz mitgeben, damit klar ist, wo er herkommt... oder vlt geht es in dem Konstrukt doch aus den Veh-Eigenschaften?? (KT, 17.04.15)
+	 * TODO: Maut fuktoniert nicht (MoneyScoring). Ist jedoch in Events zu sehen.
 	 */
 	
 	private static CarrierScoringFunctionFactoryImpl_KT createMyScoringFunction2 (final Scenario scenario) {
 
 		textInfofile.writeTextLineToFile("createMyScoringFunction2 aufgerufen");
-
-//		final Network network = scenario.getNetwork();
 		
-		return new CarrierScoringFunctionFactoryImpl_KT(scenario) {
+		return new CarrierScoringFunctionFactoryImpl_KT(scenario, TEMP_DIR) {
 			
 			public ScoringFunction createScoringFunction(final Carrier carrier){
 			SumScoringFunction sumSf = new SumScoringFunction() ;
 			
-			VehicleFixCostScoring fixCost = new VehicleFixCostScoring(carrier);
-			sumSf.addScoringFunction(fixCost);
+//			VehicleFixCostScoring fixCost = new VehicleFixCostScoring(carrier);
+//			sumSf.addScoringFunction(fixCost);
 			
-			LegScoring legScoring = new LegScoring(carrier);
-			sumSf.addScoringFunction(legScoring);
+//			LegScoring legScoring = new LegScoring(carrier);
+//			sumSf.addScoringFunction(legScoring);
 			
-			ActivityScoring actScoring = new ActivityScoring(carrier);
-			sumSf.addScoringFunction(actScoring);
+//			ActivityScoring actScoring = new ActivityScoring(carrier);
+//			sumSf.addScoringFunction(actScoring);
 			
 			MoneyScoring moneyScoring = new MoneyScoring(carrier);
 			sumSf.addScoringFunction(moneyScoring);

@@ -29,34 +29,45 @@ import org.matsim.core.scoring.SumScoringFunction;
 public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunctionFactory{
 
     static class VehicleFixCostScoring implements SumScoringFunction.BasicScoring {
-
+    	
+    	private double score;
         private Carrier carrier;
 
-        public VehicleFixCostScoring(Carrier carrier) {
+        VehicleFixCostScoring(Carrier carrier) {
             super();
             this.carrier = carrier;
         }
 
+        WriteMoney fixCostWriter = new WriteMoney(new File(TEMP_DIR + "#FixCostsForScoringInfor.txt"), carrier);
+        
         @Override
         public void finish() {
-
+			fixCostWriter.writeCarrierLine(carrier);
+//			fixCostWriter.writeAmountsToFile();
+			fixCostWriter.writeTextLineToFile(System.getProperty("line.separator"));	
         }
 
         @Override
         public double getScore() {
-        	
-        	double fixCosts = 0. ;
-        	
-        	CarrierPlan selectedPlan = carrier.getSelectedPlan();
+        	calcFixCosts();  //Geht so, da Fixkosten nur einmal auftreten und somit vor der finalen Abfrage des Scores berechnet werden können
+			return score;
+        }
+
+		private void calcFixCosts() {
+			CarrierPlan selectedPlan = carrier.getSelectedPlan();
         	if(selectedPlan != null) {
         		for(ScheduledTour tour : selectedPlan.getScheduledTours()){
         			if(!tour.getTour().getTourElements().isEmpty()){
-        				fixCosts += (-1)*tour.getVehicle().getVehicleType().getVehicleCostInformation().fix;
+        				double fixCosts= tour.getVehicle().getVehicleType().getVehicleCostInformation().fix;
+        				fixCostWriter.addAmountToWriter(fixCosts);
+        				fixCostWriter.writeMoneyToFile(fixCosts);
+        				score += (-1)*fixCosts;
         			}
         		}
         	}
-			return fixCosts;
-        }  
+		}  
+        
+        
       
    } //End class  FixCosts
 
@@ -65,16 +76,14 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     	private static Logger log = Logger.getLogger(LegScoring.class);
     	
     	private double score = 0. ;
-    	 private Carrier carrier;
+    	private Carrier carrier;
 
-         public LegScoring(Carrier carrier) {
+        LegScoring(Carrier carrier) {
              super();
              this.carrier = carrier;
          }
 		
-		WriteLegs legWriter = new WriteLegs(new File(scenario.getConfig().controler().getOutputDirectory()+ "/#LegsForScoringInformation.txt"), carrier); //KT
-
-
+		WriteLegs legWriter = new WriteLegs(new File(TEMP_DIR + "#LegsForScoringInfor.txt"), carrier); //KT
 
 		private double getTimeParameter(CarrierVehicle vehicle) {
             return vehicle.getVehicleType().getVehicleCostInformation().perTimeUnit;
@@ -149,20 +158,20 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     static class ActivityScoring implements SumScoringFunction.ActivityScoring {
 
     	private static Logger log = Logger.getLogger(ActivityScoring.class);
-    	
-    	//Added Activity Writer to log the Activities
-		WriteActivities activityWriter = new WriteActivities(new File(scenario.getConfig().controler().getOutputDirectory()+ "/#ActivitiesForScoringInformation.txt")); //KT
 
 		private double score = 0. ;
 		private final double margUtlOfTime_s = 0.008 ;  //Wert aus Schröder/Liedtke 2014
     	
 		private Carrier carrier;
 
-		public ActivityScoring(Carrier carrier) {
+		ActivityScoring(Carrier carrier) {
 			super();
 			this.carrier = carrier;
 		}
     	
+    	//Added Activity Writer to log the Activities
+		WriteActivities activityWriter = new WriteActivities(new File(TEMP_DIR + "#ActivitiesForScoringInfor.txt")); //KT
+		
 		@Override
 		public void finish() {
 			activityWriter.writeCarrierLine(carrier);
@@ -228,20 +237,20 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     
     static class MoneyScoring implements SumScoringFunction.MoneyScoring {
 
-    	double score = 0.;
-    	Carrier carrier; 
+    	private double score = 0.;
+    	private Carrier carrier; 
     	
-    	WriteMoney moneyWriter = new WriteMoney(new File(scenario.getConfig().controler().getOutputDirectory() + "/#MoneyForScoringInformation.txt"), carrier); //KT
-    	
-    	public MoneyScoring (Carrier carrier){
+    	MoneyScoring (Carrier carrier){
     		super();
     		this.carrier = carrier;
     	}
     	
+     	WriteMoney moneyWriter = new WriteMoney(new File(TEMP_DIR + "#MoneyForScoringInfor.txt"), carrier); //KT
+     	
 		@Override
 		public void finish() {	
 			moneyWriter.writeCarrierLine(carrier);
-			moneyWriter.writeAmountToFile();
+//			moneyWriter.writeAmountsToFile();
 			moneyWriter.writeTextLineToFile(System.getProperty("line.separator"));
 		}
 
@@ -252,8 +261,8 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 
 		@Override
 		public void addMoney(double amount) {
-			moneyWriter.writeTextLineToFile("addMoney - Mtehod called, KT 17.04.15"); 
-			moneyWriter.addAmountToWriter(amount); 
+			moneyWriter.writeMoneyToFile(amount);
+//			moneyWriter.addAmountToWriter(amount); 
 			score += (-1)* amount;			
 		}
     	
@@ -266,9 +275,11 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 	}
 
 	private static Scenario scenario;
+	private static String TEMP_DIR;
 	
-    public CarrierScoringFunctionFactoryImpl_KT(Scenario scenario) {
+    public CarrierScoringFunctionFactoryImpl_KT(Scenario scenario, String tempDir) {
         super();
         CarrierScoringFunctionFactoryImpl_KT.scenario = scenario;
+        CarrierScoringFunctionFactoryImpl_KT.TEMP_DIR = tempDir;
     }
 }

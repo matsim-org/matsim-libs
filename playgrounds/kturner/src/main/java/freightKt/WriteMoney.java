@@ -15,7 +15,7 @@ import org.matsim.contrib.freight.carrier.Carrier;
  */
 
 /*TODO: 
- * 
+ * addToWriter - Methode funktioniert nicht. ArrayList erhält keinen Eintrag :-(
  */
 
 class WriteMoney {
@@ -85,11 +85,11 @@ class WriteMoney {
 		}
 	}
 	
-	void addAmountToWriter(Double amount) {
+	void addAmountToWriter(double amount) {
 		amounts.add(amount);
 	}
 	
-	void writeAmountToFile() {
+	void writeAmountsToFile() {
 		FileWriter writer;
 			
 		try {
@@ -98,9 +98,10 @@ class WriteMoney {
 
 			// Text wird in den Stream geschrieben
 			writer.write("### Money Paid:" + System.getProperty("line.separator"));
-			for (Double amount : amounts){
-			writer.write(amount.toString());
-			writer.write(System.getProperty("line.separator"));
+			writer.write("Anz Zahlungen: " + amounts.size() + System.getProperty("line.separator"));
+			for (Double am : amounts){
+				writer.write(am.toString());
+				writer.write(System.getProperty("line.separator"));
 			}
 					
 			// Schreibt den Stream in die Datei
@@ -114,5 +115,25 @@ class WriteMoney {
 			e.printStackTrace();
 		}
 		System.out.println("Datei: " + file + " geschrieben.");
+	}
+	
+	void writeMoneyToFile(double amount) {
+		FileWriter writer;
+
+		try {
+			// new FileWriter(file) - falls die Datei bereits existiert wird diese überschrieben
+			writer = new FileWriter(file, true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
+
+			// Text wird in den Stream geschrieben
+			writer.write("Zahlung: "+ amount);
+			writer.write(System.getProperty("line.separator"));
+
+			writer.flush();
+
+			// Schließt den Stream
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
