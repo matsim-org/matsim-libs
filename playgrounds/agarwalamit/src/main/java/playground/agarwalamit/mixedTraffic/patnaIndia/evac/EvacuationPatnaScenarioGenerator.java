@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -73,8 +74,8 @@ public class EvacuationPatnaScenarioGenerator {
 	private String networkFile = dir+"/inputs/networkUniModal.xml";
 	private String outNetworkFile = dir+"/run105/input/evac_network.xml.gz";
 
-	private String popFile = dir+"/inputs/SelectedPlansOnly.xml";
-	private String outPopFile = dir+"/run105/input/evac_plans.xml.gz";
+	private String popFile = dir+"/run105/input/patna_evac_plans_100Pct.xml.gz";
+	private String outPopFile = dir+"/run105/input/patna_evac_plans_100Pct_filtered.xml.gz";
 
 	private String areShapeFile = dir+"/run105/input/area_epsg24345.shp";
 	private final Id<Link> safeLinkId = Id.createLinkId("safeLink_Patna");
@@ -208,7 +209,8 @@ public class EvacuationPatnaScenarioGenerator {
 			Activity home = popFact.createActivityFromLinkId(((Activity)actPe).getType(), ((Activity)actPe).getLinkId());
 
 			//check if the person is in the area shape, if not leave them out
-			if(! evavcuationArea.contains(MGC.coord2Point(((Activity)actPe).getCoord()))){
+			Coord actCoord = ((Activity)actPe).getCoord();
+			if(actCoord!=null && !evavcuationArea.contains(MGC.coord2Point(actCoord)) ){
 				continue;
 			}
 
