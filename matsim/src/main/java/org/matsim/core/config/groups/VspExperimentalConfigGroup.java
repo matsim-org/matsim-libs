@@ -57,11 +57,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 
 	// ---
 
-	private static final String MATSIM_GLOBAL_TIME_FORMAT = "matsimGlobalTimeformat" ;
-	private String matsimGlobalTimeFormat = Time.TIMEFORMAT_HHMMSS;
-
-	// ---
-
 	public VspExperimentalConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -139,8 +134,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 				"set the following to true.") ;
 		map.put(USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE, "if an approximation of the opportunity cost of time is included into the radius calculation for location choice." +
 				"`true' will be faster, but it is an approximation.  Default is `true'; `false' is available for backwards compatibility.") ;
-		map.put(MATSIM_GLOBAL_TIME_FORMAT, "changes MATSim's global time format used in output files. Can be used to enforce writing fractional seconds e.g. in output_plans.  " +
-		"default is `hh:mm:ss' (because of backwards compatibility). see Time.java for possible formats");
 
 		map.put(WRITING_OUTPUT_EVENTS, "if true then writes output_events in output directory.  default is `false'." +
 		" Will only work when lastIteration is multiple of events writing interval" ) ;
@@ -203,15 +196,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(WRITING_OUTPUT_EVENTS)
 	public void setWritingOutputEvents(boolean writingOutputEvents) {
 		this.writingOutputEvents = writingOutputEvents;
-	}
-	@StringGetter(MATSIM_GLOBAL_TIME_FORMAT)
-	public String getMatsimGlobalTimeFormat() {
-		return this.matsimGlobalTimeFormat;
-	}
-	@StringSetter(MATSIM_GLOBAL_TIME_FORMAT)
-	public void setMatsimGlobalTimeFormat(String format) {
-		this.matsimGlobalTimeFormat = format;
-		Time.setDefaultTimeFormat(format) ;
 	}
 	
 	@Override
