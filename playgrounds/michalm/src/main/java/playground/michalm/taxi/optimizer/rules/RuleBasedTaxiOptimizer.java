@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.fifo;
+package playground.michalm.taxi.optimizer.rules;
 
 import java.util.*;
 
@@ -31,7 +31,7 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 import playground.michalm.taxi.vehreqpath.*;
 
 
-public class NOSTaxiOptimizer
+public class RuleBasedTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
     private final VehicleFilter vehicleFilter;
@@ -39,9 +39,9 @@ public class NOSTaxiOptimizer
     private Set<Vehicle> idleVehicles;
 
 
-    public NOSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
+    public RuleBasedTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
-        super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR));
+        super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false);
         this.vehicleFilter = optimConfig.filterFactory.createVehicleFilter();
         this.requestFilter = optimConfig.filterFactory.createRequestFilter();
     }

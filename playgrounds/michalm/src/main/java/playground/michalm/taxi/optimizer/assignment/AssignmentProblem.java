@@ -36,8 +36,9 @@ public class AssignmentProblem
 
     private final TaxiOptimizerConfiguration optimConfig;
 
+    private SortedSet<TaxiRequest> unplannedRequests;
     private VehicleData vData;
-    private APSRequestData rData;
+    private AssignmentRequestData rData;
 
 
     public AssignmentProblem(TaxiOptimizerConfiguration optimConfig)
@@ -48,27 +49,29 @@ public class AssignmentProblem
 
     public void scheduleUnplannedRequests(SortedSet<TaxiRequest> unplannedRequests)
     {
-        List<TaxiRequest> removedRequests = optimConfig.scheduler
-                .removeAwaitingRequestsFromAllSchedules();
-        unplannedRequests.addAll(removedRequests);
+        this.unplannedRequests = unplannedRequests;
 
-        rData = new APSRequestData(optimConfig, unplannedRequests);
+        initData();
+        if (vData.dimension == 0 || rData.dimension == 0) {
+            return;
+        }
+
+        List<VrpPathWithTravelData[]> pathsByReq = createVrpPaths();
+        double[][] reqToVehCostMatrix = createReqToVehCostMatrix(pathsByReq);
+        int[] reqToVehAssignments = new HungarianAlgorithm(reqToVehCostMatrix).execute();
+
+        scheduleRequests(reqToVehAssignments, pathsByReq);
+    }
+
+
+    private void initData()
+    {
+        rData = new AssignmentRequestData(optimConfig, unplannedRequests);
         if (rData.dimension == 0) {
             return;
         }
 
         vData = new VehicleData(optimConfig);
-        if (vData.dimension == 0) {
-            return;
-        }
-
-        List<VrpPathWithTravelData[]> pathsByReq = createVrpPaths();
-
-        double[][] reqToVehCostMatrix = createReqToVehCostMatrix(pathsByReq);
-
-        int[] reqToVehAssignments = new HungarianAlgorithm(reqToVehCostMatrix).execute();
-
-        scheduleRequests(reqToVehAssignments, pathsByReq, unplannedRequests);
     }
 
 
@@ -83,7 +86,7 @@ public class AssignmentProblem
         if (rMin < vData.dimension) {
             rMin = Math.min(rData.dimension, vData.dimension);
         }
-                
+
         Max maxArrivalTimeForRMinRequests = new Max();
 
         for (int r = 0; r < rMin; r++) {
@@ -175,7 +178,7 @@ public class AssignmentProblem
 
 
     private void scheduleRequests(int[] reqToVehAssignments,
-            List<VrpPathWithTravelData[]> pathsByReq, SortedSet<TaxiRequest> unplannedRequests)
+            List<VrpPathWithTravelData[]> pathsByReq)
     {
         for (int r = 0; r < reqToVehAssignments.length; r++) {
             int v = reqToVehAssignments[r];

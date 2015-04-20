@@ -19,28 +19,43 @@
 
 package playground.michalm.taxi.optimizer.fifo;
 
-import java.util.List;
+import java.util.*;
+
+import org.matsim.contrib.dvrp.data.Requests;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.*;
 
 
-public class RESTaxiOptimizer
-    extends OTSTaxiOptimizer
+public class FifoTaxiOptimizer
+    extends AbstractTaxiOptimizer
 {
-    public RESTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
+    public static FifoTaxiOptimizer createOptimizerWithoutRescheduling(
+            TaxiOptimizerConfiguration optimConfig)
     {
-        super(optimConfig);
+        return new FifoTaxiOptimizer(optimConfig, false);
+    }
+
+
+    public static FifoTaxiOptimizer createOptimizerWithRescheduling(
+            TaxiOptimizerConfiguration optimConfig)
+    {
+        return new FifoTaxiOptimizer(optimConfig, true);
+    }
+
+
+    private FifoTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,
+            boolean rescheduleAwaitingRequests)
+    {
+        super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR),
+                rescheduleAwaitingRequests);
     }
 
 
     @Override
     protected void scheduleUnplannedRequests()
     {
-        List<TaxiRequest> removedRequests = optimConfig.scheduler
-                .removeAwaitingRequestsFromAllSchedules();
-        unplannedRequests.addAll(removedRequests);
-
-        super.scheduleUnplannedRequests();
+        new FifoSchedulingProblem(optimConfig)
+                .scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
     }
 }

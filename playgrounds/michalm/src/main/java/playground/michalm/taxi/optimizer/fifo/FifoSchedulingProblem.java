@@ -17,30 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.assignment;
+package playground.michalm.taxi.optimizer.fifo;
 
-import java.util.SortedSet;
-
-import org.matsim.contrib.dvrp.data.Requests;
+import java.util.Queue;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.vehreqpath.*;
 
 
-class APSRequestData
+public class FifoSchedulingProblem
 {
-    final TaxiRequest[] requests;
-    final int urgentReqCount;
-    final int dimension;
+    private final TaxiOptimizerConfiguration optimConfig;
+    private final VehicleRequestPathCost vrpComparator;
 
 
-    APSRequestData(TaxiOptimizerConfiguration optimConfig, SortedSet<TaxiRequest> unplannedRequests)
+    public FifoSchedulingProblem(TaxiOptimizerConfiguration optimConfig)
     {
-        dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        this.optimConfig = optimConfig;
+        this.vrpComparator = optimConfig.getVrpCost();
+    }
 
-        urgentReqCount = Requests.countRequests(unplannedRequests, new Requests.IsUrgentPredicate(
-                optimConfig.context.getTime()));
 
-        requests = unplannedRequests.toArray(new TaxiRequest[dimension]);
+    public void scheduleUnplannedRequests(Queue<TaxiRequest> unplannedRequests)
+    {
+        while (!unplannedRequests.isEmpty()) {
+            TaxiRequest req = unplannedRequests.peek();
+
+            VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
+                    optimConfig.context.getVrpData().getVehicles(), vrpComparator);
+
+            if (best == null) {//TODO won't work with req filtering
+                return;
+            }
+
+            optimConfig.scheduler.scheduleRequest(best);
+            unplannedRequests.poll();
+        }
     }
 }

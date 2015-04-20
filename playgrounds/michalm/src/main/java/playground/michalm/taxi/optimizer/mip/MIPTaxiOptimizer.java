@@ -42,7 +42,7 @@ public class MIPTaxiOptimizer
 
     public MIPTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
-        super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR));
+        super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
 
         if (!optimConfig.scheduler.getParams().destinationKnown) {
             throw new IllegalArgumentException("Destinations must be known ahead");

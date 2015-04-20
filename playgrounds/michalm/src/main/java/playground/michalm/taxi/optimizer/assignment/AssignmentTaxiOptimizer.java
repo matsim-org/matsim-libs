@@ -27,12 +27,12 @@ import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
 
 
-public class APSTaxiOptimizer
+public class AssignmentTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    public APSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
+    public AssignmentTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
-        super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR));
+        super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true);
     }
 
 

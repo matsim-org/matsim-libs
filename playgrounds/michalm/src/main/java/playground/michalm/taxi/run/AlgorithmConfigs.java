@@ -4,54 +4,55 @@ import static playground.michalm.taxi.run.AlgorithmConfig.*;
 
 import java.util.EnumSet;
 
+
 class AlgorithmConfigs
 {
-    static final EnumSet<AlgorithmConfig> NOS_TW_xx = EnumSet.of(//
-    //        NOS_TW_TD,//
-            NOS_TW_FF
-    //NOS_TW_15M
+    static final EnumSet<AlgorithmConfig> RULE_TW_xx = EnumSet.of(//
+            //RULE_TW_TD,//
+            RULE_TW_FF
+            //RULE_TW_15M
             );
 
-    static final EnumSet<AlgorithmConfig> NOS_TP_xx = EnumSet.of(//
-    //        NOS_TP_TD, //
-            NOS_TP_FF
-    //NOS_TP_15M
+    static final EnumSet<AlgorithmConfig> RULE_TP_xx = EnumSet.of(//
+            //RULE_TP_TD, //
+            RULE_TP_FF
+            //RULE_TP_15M
             );
 
-    static final EnumSet<AlgorithmConfig> NOS_DSE_xx = EnumSet.of(//
-    //        NOS_DSE_TD, //
-            NOS_DSE_FF
-    //NOS_DSE_15M
+    static final EnumSet<AlgorithmConfig> RULE_DSE_xx = EnumSet.of(//
+            //RULE_DSE_TD, //
+            RULE_DSE_FF
+            //RULE_DSE_15M
             );
 
-    static final EnumSet<AlgorithmConfig> OTS_TW_xx = EnumSet.of(//
-            //OTS_TW_FF
-            OTS_TW_15M);
+    static final EnumSet<AlgorithmConfig> FIFO_1_S_TW_xx = EnumSet.of(//
+            //FIFO_1_S_TW_FF
+            FIFO_1_S_TW_15M);
 
-    static final EnumSet<AlgorithmConfig> OTS_TP_xx = EnumSet.of(//
-            //OTS_TP_FF
-            OTS_TP_15M);
+    static final EnumSet<AlgorithmConfig> FIFO_1_S_TP_xx = EnumSet.of(//
+            //FIFO_1_S_TP_FF
+            FIFO_1_S_TP_15M);
 
-    static final EnumSet<AlgorithmConfig> RES_TW_xx = EnumSet.of(//
-            //RES_TW_FF
-            RES_TW_15M);
+    static final EnumSet<AlgorithmConfig> FIFO_RES_TW_xx = EnumSet.of(//
+            //FIFO_RES_TW_FF
+            FIFO_RES_TW_15M);
 
-    static final EnumSet<AlgorithmConfig> RES_TP_xx = EnumSet.of(//
-            //RES_TP_FF
-            RES_TP_15M);
+    static final EnumSet<AlgorithmConfig> FIFO_RES_TP_xx = EnumSet.of(//
+            //FIFO_RES_TP_FF
+            FIFO_RES_TP_15M);
 
-    static final EnumSet<AlgorithmConfig> APS_TW_xx = EnumSet.of(//
-            //APS_TW_TD,
-            //APS_TW_FF
-            APS_TW_15M);
+    static final EnumSet<AlgorithmConfig> ASSIGN_TW_xx = EnumSet.of(//
+            //ASSIGN_TW_TD,
+            //ASSIGN_TW_FF
+            ASSIGN_TW_15M);
 
-    static final EnumSet<AlgorithmConfig> APS_TP_xx = EnumSet.of(//
-            //APS_TP_TD,
-            //APS_TP_FF
-            APS_TP_15M);
+    static final EnumSet<AlgorithmConfig> ASSIGN_TP_xx = EnumSet.of(//
+            //ASSIGN_TP_TD,
+            //ASSIGN_TP_FF
+            ASSIGN_TP_15M);
 
-    static final EnumSet<AlgorithmConfig> APS_DSE_xx = EnumSet.of(//
-            //APS_DSE_TD,
-            //APS_DSE_FF
-            APS_DSE_15M);
+    static final EnumSet<AlgorithmConfig> ASSIGN_DSE_xx = EnumSet.of(//
+            //ASSIGN_DSE_TD,
+            //ASSIGN_DSE_FF
+            ASSIGN_DSE_15M);
 }

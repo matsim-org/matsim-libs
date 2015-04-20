@@ -28,10 +28,8 @@ import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.filter.*;
-import playground.michalm.taxi.scheduler.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.vehreqpath.*;
 
 
@@ -42,22 +40,17 @@ import playground.michalm.taxi.vehreqpath.*;
  */
 public class TaxiOptimizerWithPreassignment
 {
-    public static OTSTaxiOptimizer createOptimizer(MatsimVrpContext context,
-            VrpPathCalculator calculator, double pickupDuration, double dropoffDuration,
-            String reqIdToVehIdFile, String workingDir)
+    public static FifoTaxiOptimizer createOptimizer(TaxiOptimizerConfiguration optimConfig,
+            Map<Id<Request>, Vehicle> reqIdToVehMap)
     {
-        final Map<Id<Request>, Vehicle> reqIdToVehMap = readReqIdToVehMap(context, reqIdToVehIdFile);
+        VehicleRequestPathFinder vrpFinder = createVrpFinder(optimConfig.calculator,
+                optimConfig.scheduler, reqIdToVehMap);
 
-        TaxiSchedulerParams params = new TaxiSchedulerParams(true, pickupDuration, dropoffDuration);
-        TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
+        TaxiOptimizerConfiguration newOptimConfig = new TaxiOptimizerConfiguration(
+                optimConfig.context, optimConfig.calculator, optimConfig.scheduler, vrpFinder,
+                optimConfig.filterFactory, optimConfig.goal, optimConfig.workingDirectory);
 
-        VehicleRequestPathFinder vrpFinder = createVrpFinder(calculator, scheduler, reqIdToVehMap);
-        FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
-
-        TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
-                calculator, scheduler, vrpFinder, filterFactory, Goal.NULL, workingDir);
-
-        return new OTSTaxiOptimizer(optimConfig);
+        return FifoTaxiOptimizer.createOptimizerWithoutRescheduling(newOptimConfig);
     }
 
 
@@ -76,7 +69,7 @@ public class TaxiOptimizerWithPreassignment
     }
 
 
-    private static Map<Id<Request>, Vehicle> readReqIdToVehMap(MatsimVrpContext context,
+    public static Map<Id<Request>, Vehicle> readReqIdToVehMap(MatsimVrpContext context,
             String reqIdToVehIdFile)
     {
         try (Scanner scanner = new Scanner(new File(reqIdToVehIdFile))) {

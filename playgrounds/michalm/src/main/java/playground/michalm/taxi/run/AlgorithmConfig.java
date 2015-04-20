@@ -29,68 +29,69 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
-import playground.michalm.taxi.optimizer.fifo.*;
+import playground.michalm.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
+import playground.michalm.taxi.optimizer.fifo.FifoTaxiOptimizer;
 import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
+import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 
 
 enum AlgorithmConfig
 {
-    NOS_TW_TD(NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, DISTANCE),
+    RULE_TW_TD(RULES, MIN_WAIT_TIME, FREE_FLOW_SPEED, DISTANCE),
 
-    NOS_TW_FF(NO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+    RULE_TW_FF(RULES, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
 
-    NOS_TW_15M(NO_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
+    RULE_TW_15M(RULES, MIN_WAIT_TIME, EVENTS, TIME),
 
-    NOS_TP_TD(NO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, DISTANCE),
+    RULE_TP_TD(RULES, MIN_PICKUP_TIME, FREE_FLOW_SPEED, DISTANCE),
 
-    NOS_TP_FF(NO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
+    RULE_TP_FF(RULES, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
 
-    NOS_TP_15M(NO_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
+    RULE_TP_15M(RULES, MIN_PICKUP_TIME, EVENTS, TIME),
 
-    NOS_DSE_TD(NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, DISTANCE),
+    RULE_DSE_TD(RULES, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, DISTANCE),
 
-    NOS_DSE_FF(NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, TIME),
+    RULE_DSE_FF(RULES, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, TIME),
 
-    NOS_DSE_15M(NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS, TIME),
+    RULE_DSE_15M(RULES, DEMAND_SUPPLY_EQUIL, EVENTS, TIME),
 
-    OTS_TW_FF(ONE_TIME_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+    FIFO_1_S_TW_FF(FIFO_1_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
 
-    OTS_TW_15M(ONE_TIME_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
+    FIFO_1_S_TW_15M(FIFO_1_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
 
-    OTS_TP_FF(ONE_TIME_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
+    FIFO_1_S_TP_FF(FIFO_1_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
 
-    OTS_TP_15M(ONE_TIME_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
+    FIFO_1_S_TP_15M(FIFO_1_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
 
-    RES_TW_FF(RE_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+    FIFO_RES_TW_FF(FIFO_FIFO_RESCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
 
-    RES_TW_15M(RE_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
+    FIFO_RES_TW_15M(FIFO_FIFO_RESCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
 
-    RES_TP_FF(RE_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
+    FIFO_RES_TP_FF(FIFO_FIFO_RESCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
 
-    RES_TP_15M(RE_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
+    FIFO_RES_TP_15M(FIFO_FIFO_RESCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
 
-    APS_TW_FF(AP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+    ASSIGN_TW_FF(ASSIGNMENT, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
 
-    APS_TW_15M(AP_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
+    ASSIGN_TW_15M(ASSIGNMENT, MIN_WAIT_TIME, EVENTS, TIME),
 
-    APS_TP_FF(AP_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
+    ASSIGN_TP_FF(ASSIGNMENT, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
 
-    APS_TP_15M(AP_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
+    ASSIGN_TP_15M(ASSIGNMENT, MIN_PICKUP_TIME, EVENTS, TIME),
 
-    APS_DSE_FF(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, TIME),
+    ASSIGN_DSE_FF(ASSIGNMENT, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, TIME),
 
-    APS_DSE_15M(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS, TIME),
+    ASSIGN_DSE_15M(ASSIGNMENT, DEMAND_SUPPLY_EQUIL, EVENTS, TIME),
 
-    MIP_TW_FF(MIP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME);
+    MIP_TW_FF(MIP, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME);
 
     static enum AlgorithmType
     {
-        NO_SCHEDULING, //
-        ONE_TIME_SCHEDULING, //
-        RE_SCHEDULING, //
-        AP_SCHEDULING, //
-        MIP_SCHEDULING;
+        RULES, //
+        FIFO_1_SCHEDULING, //
+        FIFO_FIFO_RESCHEDULING, //
+        ASSIGNMENT, //
+        MIP;
     }
 
 
@@ -113,19 +114,19 @@ enum AlgorithmConfig
     TaxiOptimizer createTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         switch (algorithmType) {
-            case NO_SCHEDULING:
-                return new NOSTaxiOptimizer(optimConfig);
+            case RULES:
+                return new RuleBasedTaxiOptimizer(optimConfig);
 
-            case ONE_TIME_SCHEDULING:
-                return new OTSTaxiOptimizer(optimConfig);
+            case FIFO_1_SCHEDULING:
+                return FifoTaxiOptimizer.createOptimizerWithoutRescheduling(optimConfig);
 
-            case RE_SCHEDULING:
-                return new RESTaxiOptimizer(optimConfig);
+            case FIFO_FIFO_RESCHEDULING:
+                return FifoTaxiOptimizer.createOptimizerWithRescheduling(optimConfig);
 
-            case AP_SCHEDULING:
-                return new APSTaxiOptimizer(optimConfig);
+            case ASSIGNMENT:
+                return new AssignmentTaxiOptimizer(optimConfig);
 
-            case MIP_SCHEDULING:
+            case MIP:
                 return new MIPTaxiOptimizer(optimConfig);
 
             default:

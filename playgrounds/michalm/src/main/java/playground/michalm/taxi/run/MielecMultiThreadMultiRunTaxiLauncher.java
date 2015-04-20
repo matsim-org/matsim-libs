@@ -56,9 +56,9 @@ class MielecMultiThreadMultiRunTaxiLauncher
                     public void run()
                     {
                         MultiRunTaxiLauncher.runAll(RUNS, params,//
-                                NOS_TW_xx, //
-                                NOS_TP_xx, //
-                                NOS_DSE_xx);
+                                RULE_TW_xx, //
+                                RULE_TP_xx, //
+                                RULE_DSE_xx);
                     }
                 });
             }

@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.optimizer;
 
-import java.util.Collection;
+import java.util.*;
 
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -34,27 +34,29 @@ public abstract class AbstractTaxiOptimizer
     implements TaxiOptimizer
 {
     protected final TaxiOptimizerConfiguration optimConfig;
-
     protected final Collection<TaxiRequest> unplannedRequests;
+    private final boolean doUnscheduleAwaitingRequests;
 
     protected boolean requiresReoptimization = false;
 
 
     public AbstractTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,
-            Collection<TaxiRequest> unplannedRequests)
+            Collection<TaxiRequest> unplannedRequests, boolean doUnscheduleAwaitingRequests)
     {
         this.optimConfig = optimConfig;
         this.unplannedRequests = unplannedRequests;
+        this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
     }
-
-
-    protected abstract void scheduleUnplannedRequests();
 
 
     @Override
     public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e)
     {
         if (requiresReoptimization) {
+            if (doUnscheduleAwaitingRequests) {
+                unscheduleAwaitingRequests();
+            }
+
             for (Vehicle v : optimConfig.context.getVrpData().getVehicles()) {
                 optimConfig.scheduler.updateTimeline(TaxiSchedules.asTaxiSchedule(v.getSchedule()));
             }
@@ -63,6 +65,17 @@ public abstract class AbstractTaxiOptimizer
             requiresReoptimization = false;
         }
     }
+
+
+    protected void unscheduleAwaitingRequests()
+    {
+        List<TaxiRequest> removedRequests = optimConfig.scheduler
+                .removeAwaitingRequestsFromAllSchedules();
+        unplannedRequests.addAll(removedRequests);
+    }
+
+
+    protected abstract void scheduleUnplannedRequests();
 
 
     @Override
@@ -78,21 +91,20 @@ public abstract class AbstractTaxiOptimizer
     {
         Schedule<TaxiTask> taxiSchedule = TaxiSchedules.asTaxiSchedule(schedule);
         optimConfig.scheduler.updateBeforeNextTask(taxiSchedule);
-        
+
         TaxiTask newCurrentTask = taxiSchedule.nextTask();
-        
+
         if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
             requiresReoptimization = doReoptimizeAfterNextTask(newCurrentTask);
         }
     }
-    
-    
+
+
     protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask)
     {
-        return !optimConfig.scheduler.getParams().destinationKnown && 
-            (newCurrentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_WITH_PASSENGER);
+        return !optimConfig.scheduler.getParams().destinationKnown
+                && (newCurrentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_WITH_PASSENGER);
     }
-    
 
 
     @Override

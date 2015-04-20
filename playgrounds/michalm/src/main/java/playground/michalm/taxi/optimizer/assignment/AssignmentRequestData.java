@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.fifo;
+package playground.michalm.taxi.optimizer.assignment;
 
-import java.util.*;
+import java.util.SortedSet;
 
 import org.matsim.contrib.dvrp.data.Requests;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 
 
-public class OTSTaxiOptimizer
-    extends AbstractTaxiOptimizer
+class AssignmentRequestData
 {
-    public OTSTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
-    {
-        super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR));
-    }
+    final TaxiRequest[] requests;
+    final int urgentReqCount;
+    final int dimension;
 
 
-    @Override
-    protected void scheduleUnplannedRequests()
+    AssignmentRequestData(TaxiOptimizerConfiguration optimConfig, SortedSet<TaxiRequest> unplannedRequests)
     {
-        new FIFOSchedulingProblem(optimConfig)
-                .scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
+        dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        urgentReqCount = Requests.countRequests(unplannedRequests, new Requests.IsUrgentPredicate(
+                optimConfig.context.getTime()));
+
+        requests = unplannedRequests.toArray(new TaxiRequest[dimension]);
     }
 }

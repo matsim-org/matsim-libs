@@ -37,8 +37,8 @@ import org.matsim.contrib.dvrp.util.DistanceUtils;
 import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.fifo.NOSTaxiOptimizer;
 import playground.michalm.taxi.optimizer.filter.*;
+import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 import playground.michalm.taxi.schedule.*;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
@@ -49,7 +49,7 @@ import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
  */
 
 public class NOSRankTaxiOptimizer
-    extends NOSTaxiOptimizer
+    extends RuleBasedTaxiOptimizer
 {
     protected final TaxiOptimizerConfiguration optimConfig;
     protected final IdleRankVehicleFinder idleVehicleFinder;

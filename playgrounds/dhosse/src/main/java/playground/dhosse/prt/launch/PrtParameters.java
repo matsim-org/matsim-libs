@@ -23,12 +23,10 @@ import playground.michalm.taxi.optimizer.AbstractTaxiOptimizer;
 import playground.michalm.taxi.optimizer.TaxiOptimizer;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.optimizer.assignment.APSTaxiOptimizer;
-import playground.michalm.taxi.optimizer.fifo.NOSTaxiOptimizer;
-import playground.michalm.taxi.optimizer.fifo.OTSTaxiOptimizer;
-import playground.michalm.taxi.optimizer.fifo.RESTaxiOptimizer;
+import playground.michalm.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
+import playground.michalm.taxi.optimizer.fifo.FifoTaxiOptimizer;
 import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
+import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
 
 public class PrtParameters {
 
@@ -222,16 +220,16 @@ public class PrtParameters {
 	    {
 	        switch (algorithmType) {
 	            case NO_SCHEDULING:
-	                return new NOSTaxiOptimizer(optimConfig);
+	                return new RuleBasedTaxiOptimizer(optimConfig);
 
 	            case ONE_TIME_SCHEDULING:
-	                return new OTSTaxiOptimizer(optimConfig);
+	                return FifoTaxiOptimizer.createOptimizerWithoutRescheduling(optimConfig);
 
 	            case RE_SCHEDULING:
-	                return new RESTaxiOptimizer(optimConfig);
+	                return FifoTaxiOptimizer.createOptimizerWithRescheduling(optimConfig);
 
 	            case AP_SCHEDULING:
-	                return new APSTaxiOptimizer(optimConfig);
+	                return new AssignmentTaxiOptimizer(optimConfig);
 
 	            case MIP_SCHEDULING:
 	                return new MIPTaxiOptimizer(optimConfig);

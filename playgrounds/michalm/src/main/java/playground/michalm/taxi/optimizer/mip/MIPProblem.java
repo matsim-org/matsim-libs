@@ -124,10 +124,6 @@ public class MIPProblem
 
     private void initData()
     {
-        List<TaxiRequest> removedRequests = optimConfig.scheduler
-                .removeAwaitingRequestsFromAllSchedules();
-        unplannedRequests.addAll(removedRequests);
-
         vData = new VehicleData(optimConfig);
         if (vData.dimension == 0) {
             return;
@@ -135,9 +131,6 @@ public class MIPProblem
 
         int maxReqCount = getPlanningHorizon();
         rData = new MIPRequestData(optimConfig, unplannedRequests, maxReqCount);
-        if (rData.dimension == 0) {
-            return;
-        }
     }
 
 
