@@ -22,14 +22,16 @@ package playground.michalm.taxi.scheduler;
 public class TaxiSchedulerParams
 {
     public final boolean destinationKnown;
+    public final boolean vehicleDiversion;
     public final double pickupDuration;
     public final double dropoffDuration;
 
 
-    public TaxiSchedulerParams(boolean destinationKnown, double pickupDuration,
-            double dropoffDuration)
+    public TaxiSchedulerParams(boolean destinationKnown, boolean vehicleDiversion,
+            double pickupDuration, double dropoffDuration)
     {
         this.destinationKnown = destinationKnown;
+        this.vehicleDiversion = vehicleDiversion;
         this.pickupDuration = pickupDuration;
         this.dropoffDuration = dropoffDuration;
     }

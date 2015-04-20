@@ -120,7 +120,7 @@ public class PrtQSimFactory implements MobsimFactory{
 	private TaxiOptimizerConfiguration initOptimizerConfiguration(PrtConfigGroup prtConfig, MatsimVrpContext context,
 			VrpPathCalculator calculator, AlgorithmConfig algorithmConfig){
 		
-		TaxiSchedulerParams taxiParams = new TaxiSchedulerParams(prtConfig.getDestinationKnown(), prtConfig.getPickupDuration(), prtConfig.getDropoffDuration());
+		TaxiSchedulerParams taxiParams = new TaxiSchedulerParams(prtConfig.getDestinationKnown(), false, prtConfig.getPickupDuration(), prtConfig.getDropoffDuration());
 		
 		if(prtConfig.getVehicleCapacity() > 1){
 			

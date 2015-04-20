@@ -48,7 +48,8 @@ class TaxiLauncherParams
     Boolean onlineVehicleTracker;
     Boolean advanceRequestSubmission;
     Boolean destinationKnown;
-    
+    Boolean vehicleDiversion;
+
     Double pickupDuration;
     Double dropoffDuration;
     
@@ -82,8 +83,13 @@ class TaxiLauncherParams
 
         onlineVehicleTracker = getBoolean("onlineVehicleTracker");
         advanceRequestSubmission = getBoolean("advanceRequestSubmission");
-
         destinationKnown = getBoolean("destinationKnown");
+        vehicleDiversion = getBoolean("vehicleDiversion");
+        
+        if (vehicleDiversion && !onlineVehicleTracker) {
+            throw new IllegalArgumentException("Diversion requires online tracking");
+        }
+        
         pickupDuration = getDouble("pickupDuration");
         dropoffDuration = getDouble("dropoffDuration");
 

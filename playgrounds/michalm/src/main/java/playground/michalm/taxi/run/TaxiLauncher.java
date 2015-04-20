@@ -163,7 +163,7 @@ class TaxiLauncher
     TaxiOptimizerConfiguration createOptimizerConfiguration()
     {
         TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(params.destinationKnown,
-                params.pickupDuration, params.dropoffDuration);
+                params.vehicleDiversion, params.pickupDuration, params.dropoffDuration);
         TaxiScheduler scheduler = new TaxiScheduler(context, pathCalculator, schedulerParams);
         VehicleRequestPathFinder vrpFinder = new VehicleRequestPathFinder(pathCalculator, scheduler);
         FilterFactory filterFactory = new DefaultFilterFactory(scheduler,

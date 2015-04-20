@@ -430,15 +430,15 @@ public class TaxiScheduler
     {
         switch (schedule.getStatus()) {
             case STARTED:
-                TaxiTask task = schedule.getCurrentTask();
+                TaxiTask currentTask = schedule.getCurrentTask();
 
-                if (Schedules.isLastTask(task)) {
+                if (Schedules.isLastTask(currentTask)) {
                     return;
                 }
 
                 int obligatoryTasks = 0;// remove all planned tasks
 
-                switch (task.getTaxiTaskType()) {
+                switch (currentTask.getTaxiTaskType()) {
                     case PICKUP:
                         if (!params.destinationKnown) {
                             return;
@@ -451,14 +451,20 @@ public class TaxiScheduler
                         break;
 
                     case DRIVE:
-                        //ASSUMING: PICKUP_DRIVE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//                        if (!params.destinationKnown) {
-//                            return;
-//                        }
-//
-//                        obligatoryTasks = 3;
-//                        break;
-                        
+                        if (!params.vehicleDiversion) {
+                            //do not remove PICKUP following DRIVE
+                            TaxiTask nextTask = (TaxiTask)Schedules.getNextTask(currentTask);
+                            if (nextTask.getTaxiTaskType() == TaxiTaskType.PICKUP) {
+                                if (!params.destinationKnown) {
+                                    return;
+                                }
+    
+                                obligatoryTasks = 3;
+                                break;
+                            }
+                        }
+                        //otherwise (i.e. !vehicleDiversion || !PICKUP) - continue
+
                     case DROPOFF:
                     case STAY:
                         obligatoryTasks = 0;
@@ -472,8 +478,8 @@ public class TaxiScheduler
                 double tBegin = schedule.getEndTime();
                 double tEnd = Math.max(tBegin, schedule.getVehicle().getT1());
 
-                if (task.getTaxiTaskType() == TaxiTaskType.STAY) {
-                    task.setEndTime(tEnd);//extend WaitTask
+                if (currentTask.getTaxiTaskType() == TaxiTaskType.STAY) {
+                    currentTask.setEndTime(tEnd);//extend WaitTask
                 }
                 else {
                     Link link = Schedules.getLastLinkInSchedule(schedule);

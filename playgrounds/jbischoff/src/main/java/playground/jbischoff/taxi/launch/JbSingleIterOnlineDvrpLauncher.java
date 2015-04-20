@@ -216,7 +216,7 @@ import playground.michalm.util.MovingAgentsRegister;
 
         double pickupDuration = 120;
         double dropoffDuration = 60;
-        TaxiSchedulerParams params = new TaxiSchedulerParams(false, pickupDuration, dropoffDuration);
+        TaxiSchedulerParams params = new TaxiSchedulerParams(false, false, pickupDuration, dropoffDuration);
 
         NOSRankTaxiOptimizer optimizer = NOSRankTaxiOptimizer.createNOSRankTaxiOptimizer(context,
                 calculator, params, tdisSource, dirName);
