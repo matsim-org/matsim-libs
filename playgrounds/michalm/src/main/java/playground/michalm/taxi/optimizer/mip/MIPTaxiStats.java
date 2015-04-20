@@ -98,6 +98,6 @@ public class MIPTaxiStats
 
     private TaxiStats calcTaxiStats()
     {
-        return new TaxiStatsCalculator().calculateStats(data.getVehicles());
+        return new TaxiStatsCalculator(data.getVehicles()).getStats();
     }
 }

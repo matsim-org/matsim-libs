@@ -58,10 +58,10 @@ class MultiRunTaxiLauncher
     {
         try {
             pw = new PrintWriter(params.outputDir + "stats" + outputFileSuffix);
-            pw.print("cfg\tn\tm\tPW\tPWp95\tPWmax\tPD\tPDp95\tPDmax\tDD\tPS\tDS\tW\tComp\n");
+            pw.println(MultiRunStats.HEADER);
 
             pw3 = new PrintWriter(params.outputDir + "cacheStats" + outputFileSuffix);
-            pw3.print("cfg\tHits\tMisses\n");
+            pw3.println(LeastCostPathCalculatorCacheStats.HEADER);
         }
         catch (IOException e) {
             throw new RuntimeException(e);
@@ -126,8 +126,8 @@ class MultiRunTaxiLauncher
             long t0 = System.currentTimeMillis();
             MatsimRandom.reset(RANDOM_SEEDS[i]);
             simulateIteration();
-            TaxiStats evaluation = (TaxiStats)new TaxiStatsCalculator().calculateStats(context
-                    .getVrpData().getVehicles());
+            TaxiStats evaluation = new TaxiStatsCalculator(context.getVrpData().getVehicles())
+                    .getStats();
             long t1 = System.currentTimeMillis();
             cacheStats.updateStats(routerWithCache);
             multipleRunStats.updateStats(evaluation, t1 - t0);
@@ -205,6 +205,6 @@ class MultiRunTaxiLauncher
             throw new IllegalArgumentException();
         }
 
-        runAll(runs, params);
+        run(runs, params);
     }
 }

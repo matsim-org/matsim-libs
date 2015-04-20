@@ -80,8 +80,7 @@ public class SingleRunTaxiLauncher
         pw.println("m\t" + context.getVrpData().getVehicles().size());
         pw.println("n\t" + context.getVrpData().getRequests().size());
         pw.println(TaxiStats.HEADER);
-        TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData()
-                .getVehicles());
+        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles()).getStats();
         pw.println(stats);
         pw.flush();
 

@@ -281,8 +281,7 @@ import playground.michalm.util.MovingAgentsRegister;
     {
         PrintWriter pw = new PrintWriter(System.out);
         pw.println(TaxiStats.HEADER);
-        TaxiStats stats = new TaxiStatsCalculator().calculateStats(context.getVrpData()
-                .getVehicles());
+        TaxiStats stats = new TaxiStatsCalculator(context.getVrpData().getVehicles()).getStats();
         pw.println(stats);
         pw.flush();
 

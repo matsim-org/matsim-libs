@@ -30,25 +30,19 @@ import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
 
 public class TaxiStatsCalculator
 {
-    private TaxiStats stats;
+    private final TaxiStats stats = new TaxiStats();
 
 
-    public TaxiStats calculateStats(Iterable<? extends Vehicle> vehicles)
+    public TaxiStatsCalculator(Iterable<? extends Vehicle> vehicles)
     {
-        stats = new TaxiStats();
-
         for (Vehicle v : vehicles) {
             calculateStatsImpl(v);
         }
-
-        return stats;
     }
 
 
-    public TaxiStats calculateStats(Vehicle vehicle)
+    public TaxiStats getStats()
     {
-        stats = new TaxiStats();
-        calculateStatsImpl(vehicle);
         return stats;
     }
 
@@ -70,169 +64,85 @@ public class TaxiStatsCalculator
 
             switch (t.getTaxiTaskType()) {
                 case DRIVE:
-                    TaxiTask nextTask = (TaxiTask)Schedules.getNextTask(t);
-
-                    if (nextTask.getTaxiTaskType() == TaxiTaskType.PICKUP) {
-                        stats.pickupDriveTime += time;
-
-                        if (stats.maxPickupDriveTime < time) {
-                            stats.maxPickupDriveTime = time;
-                        }
-
-                        stats.pickupDriveTimeStats.addValue(time);
-                    }
-                    else {
-                        stats.nonPickupDriveTime += time;
-                    }
+                    TaxiTaskType nextTaskType = ((TaxiTask)Schedules.getNextTask(t))
+                            .getTaxiTaskType();
+                    (nextTaskType == TaxiTaskType.PICKUP ? //
+                            stats.pickupDriveTimes : stats.otherDriveTimes).addValue(time);
 
                     break;
 
                 case DRIVE_WITH_PASSENGER:
-                    stats.driveWithPassengerTime += time;
+                    stats.driveWithPassengerTimes.addValue(time);
                     break;
 
                 case PICKUP:
-                    stats.pickupTime += time;
+                    stats.pickupTimes.addValue(time);
 
                     Request req = ((TaxiPickupTask)t).getRequest();
                     double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
-                    stats.passengerWaitTime += waitTime;
-
-                    if (stats.maxPassengerWaitTime < waitTime) {
-                        stats.maxPassengerWaitTime = waitTime;
-                    }
-
-                    stats.passengerWaitTimeStats.addValue(waitTime);
+                    stats.passengerWaitTimes.addValue(waitTime);
 
                     break;
 
                 case DROPOFF:
-                    stats.dropoffTime += time;
+                    stats.dropoffTimes.addValue(time);
                     break;
 
                 case STAY:
-                    stats.stayTime += time;
+                    stats.stayTimes.addValue(time);
             }
         }
 
-        double latestValidEndTime = schedule.getVehicle().getT1();
-        double actualEndTime = schedule.getEndTime();
-
-        stats.overTime += Math.max(actualEndTime - latestValidEndTime, 0);
+        stats.taxiOverTimes.addValue(schedule.getEndTime() - schedule.getVehicle().getT1());
     }
 
 
     public static class TaxiStats
     {
-        private double pickupDriveTime;
-        private double nonPickupDriveTime;
-        private double driveWithPassengerTime;
-        private double pickupTime;
-        private double dropoffTime;
-        private double stayTime;
-        private double overTime;
-        private double passengerWaitTime;
+        public final DescriptiveStatistics passengerWaitTimes = new DescriptiveStatistics();
+        public final DescriptiveStatistics pickupDriveTimes = new DescriptiveStatistics();
+        public final DescriptiveStatistics otherDriveTimes = new DescriptiveStatistics();
+        public final DescriptiveStatistics driveWithPassengerTimes = new DescriptiveStatistics();
+        public final DescriptiveStatistics pickupTimes = new DescriptiveStatistics();
+        public final DescriptiveStatistics dropoffTimes = new DescriptiveStatistics();
+        public final DescriptiveStatistics stayTimes = new DescriptiveStatistics();
+        public final DescriptiveStatistics taxiOverTimes = new DescriptiveStatistics();
 
-        private double maxPickupDriveTime;
-        private double maxPassengerWaitTime;
-
-        private final DescriptiveStatistics pickupDriveTimeStats = new DescriptiveStatistics();
-        private final DescriptiveStatistics passengerWaitTimeStats = new DescriptiveStatistics();
-
-
-        public double getPickupDriveTime()
-        {
-            return pickupDriveTime;
-        }
-
-
-        public double getNonPickupDriveTime()
-        {
-            return nonPickupDriveTime;
-        }
-
-
-        public double getDriveWithPassengerTime()
-        {
-            return driveWithPassengerTime;
-        }
-
-
-        public double getPickupTime()
-        {
-            return pickupTime;
-        }
-
-
-        public double getDropoffTime()
-        {
-            return dropoffTime;
-        }
-
-
-        public double getStayTime()
-        {
-            return stayTime;
-        }
-
-
-        public double getOverTime()
-        {
-            return overTime;
-        }
-
-
-        public double getPassengerWaitTime()
-        {
-            return passengerWaitTime;
-        }
-
-
-        public double getMaxPickupDriveTime()
-        {
-            return maxPickupDriveTime;
-        }
-
-
-        public double getMaxPassengerWaitTime()
-        {
-            return maxPassengerWaitTime;
-        }
-
-
-        public DescriptiveStatistics getPickupDriveTimeStats()
-        {
-            return pickupDriveTimeStats;
-        }
-
-
-        public DescriptiveStatistics getPassengerWaitTimeStats()
-        {
-            return passengerWaitTimeStats;
-        }
-
-
-        public static final String HEADER = "PickupDriveT\t" //
+        public static final String HEADER = "PassengerWaitT\t" //
+                + "MaxPassengerWaitT"//
+                //
+                + "PickupDriveT\t" //
                 + "MaxPickupDriveT\t" //
-                + "NonPickupDriveT" //
+                //
+                + "OtherDriveT" //
                 + "DriveWithPassengerT\t"//
+                //
                 + "PickupT\t" //
+                + "DropoffT\t" //
                 + "StayT\t" //
-                + "PassengerWaitT\t" //
-                + "MaxPassengerWaitT";
+                //
+                + "OverT";
 
 
         @Override
         public String toString()
         {
-            return new StringBuilder().append(pickupDriveTime).append('\t') //
-                    .append(maxPickupDriveTime).append('\t') //
-                    .append(nonPickupDriveTime).append('\t') //
-                    .append(driveWithPassengerTime).append('\t') //
-                    .append(pickupTime).append('\t') //
-                    .append(stayTime).append('\t') //
-                    .append(passengerWaitTime).append('\t') //
-                    .append(maxPassengerWaitTime).toString();
+            return new StringBuilder()//
+                    .append(passengerWaitTimes.getMean()).append('\t') //
+                    .append(passengerWaitTimes.getMax()).append('\t') //
+                    //
+                    .append(passengerWaitTimes.getMean()).append('\t') //
+                    .append(passengerWaitTimes.getMax()).append('\t') //
+                    //
+                    .append(otherDriveTimes.getMean()).append('\t') //
+                    .append(driveWithPassengerTimes.getMean()).append('\t') //
+                    //
+                    .append(pickupTimes.getMean()).append('\t') //
+                    .append(dropoffTimes.getMean()).append('\t') //
+                    .append(stayTimes.getMean()).append('\t') //
+                    //
+                    .append(taxiOverTimes.getMean()).append('\t')//
+                    .toString();
         }
     }
 }

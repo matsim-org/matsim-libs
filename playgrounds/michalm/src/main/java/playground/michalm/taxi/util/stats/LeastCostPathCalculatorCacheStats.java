@@ -38,6 +38,9 @@ public class LeastCostPathCalculatorCacheStats
     }
 
 
+    public static final String HEADER = "cfg\tHits\tMisses";
+
+
     public void printStats(PrintWriter pw, String id)
     {
         pw.printf("%10s\t%f\t%f\n", id, hitStats.getMean(), missStats.getMean());

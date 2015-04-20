@@ -40,89 +40,82 @@ public class ResultsPostProcessor
 
     private static class Stats
     {
-        private String name;
-        private int n;
-        private int m;
+        private final String cfg;
+        private final int n;
+        private final int m;
 
-        private double passengerWaitT;
-        private double percentile95PassengerWaitT;
-        private double maxPassengerWaitT;
-        private double pickupDriveT;
-        private double percentile95PickupDriveT;
-        private double maxPickupDriveT;
-        private double dropoffDriveT;
-        private double pickupT;
-        private double dropoffT;
-        @SuppressWarnings("unused")
-        private double waitT;
-        @SuppressWarnings("unused")
-        private double compT;
-
-        // ============
-
-        private double T_W;
-        private double T_W_95;
-        private double T_W_MAX;
-        @SuppressWarnings("unused")
-        private double T_D;
-        @SuppressWarnings("unused")
-        private double R_W;
-        private double T_P;
-        private double T_P_95;
-        private double T_P_MAX;
-        @SuppressWarnings("unused")
-        private double R_P;
-        private double R_NI;
+        private final double[] values;
 
 
-        private void calcStats(int timeWindow)
+        private Stats(Scanner sc, int count)
         {
-            T_W = passengerWaitT / n / 60;
-            T_W_95 = percentile95PassengerWaitT / 60;
-            T_W_MAX = maxPassengerWaitT / 60;
-            T_P = pickupDriveT / n / 60;
-            T_P_95 = percentile95PickupDriveT / 60;
-            T_P_MAX = maxPickupDriveT / 60;
-            T_D = dropoffDriveT / n / 60;
-            R_W = passengerWaitT / (passengerWaitT + pickupT + dropoffDriveT + dropoffT);
-            R_P = pickupDriveT / (pickupDriveT + dropoffDriveT);
-            R_NI = (pickupDriveT + pickupT + dropoffDriveT + dropoffT) / (timeWindow * m);
+            cfg = sc.next();
+            n = sc.nextInt();
+            m = sc.nextInt();
+
+            values = new double[count];
+            for (int i = 0; i < count; i++) {
+                values[i] = sc.nextDouble();
+            }
         }
     }
 
 
-    private final List<Experiment> experiments;
-    private final int timeWindow;
+    private static final Experiment EMPTY_COLUMN = new Experiment("empty column");
+
+    private final Experiment[] experiments;
+    private final String[] statsColumns;
 
 
-    public ResultsPostProcessor(List<Experiment> experiments, int timeWindow)
+    public ResultsPostProcessor(String... ids)
     {
-        this.experiments = experiments;
-        this.timeWindow = timeWindow;
+        experiments = new Experiment[ids.length];
+        for (int i = 0; i < experiments.length; i++) {
+            String id = ids[i];
+            experiments[i] = id == null ? EMPTY_COLUMN : new Experiment(ids[i]);
+        }
+
+        String[] cols = MultiRunStats.HEADER.split("\\s+");
+        Arrays.equals(Arrays.copyOf(cols, 3), new String[] { "cfg", "n", "m" });
+        statsColumns = Arrays.copyOfRange(cols, 3, cols.length);
+    }
+
+
+    public void process(String dir, String subDirPrefix, String file)
+    {
+        for (Experiment e : experiments) {
+            if (e != EMPTY_COLUMN) {
+                readFile(dir + subDirPrefix + e.id + "/" + file, e);
+            }
+        }
+
+        for (int i = 0; i < statsColumns.length; i++) {
+            writeValues(dir + file, i);
+        }
     }
 
 
     private void readFile(String file, Experiment experiment)
     {
         try (Scanner sc = new Scanner(new File(file))) {
-            // header
-            // cfg n   m   PW  PWmax   PD  DD  PS  DS  W   Comp
-            sc.nextLine();
+            String header = sc.nextLine();
+            if (!header.equals(MultiRunStats.HEADER)) {
+                System.err.println("Non-standard header");
+            }
 
-            int m0 = -1;
-            int n0 = -1;
+            if (!sc.hasNext()) {
+                throw new RuntimeException("No stats");
+            }
+
+            Stats s0 = new Stats(sc, statsColumns.length);
+            experiment.stats.add(s0);
+
             while (sc.hasNext()) {
-                Stats stats = readLine(sc);
+                Stats stats = new Stats(sc, statsColumns.length);
 
-                if (experiment.stats.size() == 0) {
-                    m0 = stats.m;
-                    n0 = stats.n;
-                }
-                else {
-                    if (stats.m != m0 || stats.n != n0) {
-                        throw new RuntimeException(
-                                "The file should contain result for the same 'm' and 'n'");
-                    }
+                if (stats.m != s0.m || stats.n != s0.n) {
+                    throw new RuntimeException(
+                            "The file must contain result for the same 'm' and 'n'");
                 }
 
                 experiment.stats.add(stats);
@@ -134,108 +127,56 @@ public class ResultsPostProcessor
     }
 
 
-    private Stats readLine(Scanner sc)
+    private void writeValues(String file, int column)
     {
-        Stats stats = new Stats();
+        String field = statsColumns[column];
+        try (PrintWriter pw = new PrintWriter(file + "_" + field)) {
+            StringBuffer lineId = new StringBuffer(field);
+            StringBuffer lineN = new StringBuffer("n");
+            StringBuffer lineM = new StringBuffer("m");
+            StringBuffer lineRatio = new StringBuffer("ratio");
 
-        //        cfg n   m   PW  PWp95   PWmax   PD  PDp95   PDmax   DD  PS  DS  W   Comp
-        //        APS_15M_TW    1719    50  276513.60   380.00  763.45  218268.90   NaN 0.00    610428.85   206280.00   103140.00   3001882.25  11.94
-
-        stats.name = sc.next();
-        stats.n = sc.nextInt();
-        stats.m = sc.nextInt();
-
-        stats.passengerWaitT = sc.nextDouble();
-        stats.percentile95PassengerWaitT = sc.nextDouble();
-        stats.maxPassengerWaitT = sc.nextDouble();
-        stats.pickupDriveT = sc.nextDouble();
-        stats.percentile95PickupDriveT = sc.nextDouble();
-        stats.maxPickupDriveT = sc.nextDouble();
-        stats.dropoffDriveT = sc.nextDouble();
-        stats.pickupT = sc.nextDouble();
-        stats.dropoffT = sc.nextDouble();
-        stats.waitT = sc.nextDouble();
-        stats.compT = sc.nextDouble();
-
-        stats.calcStats(timeWindow);
-
-        return stats;
-    }
-
-
-    private void writeValues(String file, String field)
-    {
-        try (PrintWriter pw = new PrintWriter(file)) {
-            pw.printf("%s", field);
-
-            {
-                int prevTaxis = experiments.get(0).stats.get(0).m;
-
-                for (Experiment e : experiments) {
-                    int m = e.stats.get(0).m;
-
-                    if (prevTaxis != m) {
-                        pw.print('\t');//insert one empty column
-                    }
-                    prevTaxis = m;
-
-                    double ratio = (double)e.stats.get(0).n / m;
-                    pw.printf("\t%f", ratio);
+            for (Experiment e : experiments) {
+                if (e == EMPTY_COLUMN) {
+                    lineId.append('\t');
+                    lineN.append('\t');
+                    lineM.append('\t');
+                    lineRatio.append('\t');
+                }
+                else {
+                    Stats s = e.stats.get(0);
+                    double ratio = (double)s.n / s.m;
+                    lineId.append('\t').append(e.id);
+                    lineN.append('\t').append(s.n);
+                    lineM.append('\t').append(s.m);
+                    lineRatio.append('\t').append(ratio);
                 }
             }
 
-            pw.println();
+            pw.println(lineId.toString());
+            pw.println(lineN.toString());
+            pw.println(lineM.toString());
+            pw.println(lineRatio.toString());
 
-            int count = experiments.get(0).stats.size();
+            int statsCount = experiments[0].stats.size();
 
-            for (int i = 0; i < count; i++) {
-                Stats s0 = experiments.get(0).stats.get(i);
-                String name = s0.name;
-                pw.printf("%s", name);
-                int prevTaxis = s0.m;
+            for (int i = 0; i < statsCount; i++) {
+                String cfg0 = experiments[0].stats.get(i).cfg;
+                pw.printf("%s", cfg0);
 
                 for (Experiment e : experiments) {
-                    double value;
-                    Stats s = e.stats.get(i);
-
-                    if (!name.equals(s.name)) {
-                        throw new RuntimeException();
-                    }
-
-                    if ("T_W".equals(field)) {
-                        value = s.T_W;
-                    }
-                    else if ("T_W_95".equals(field)) {
-                        value = s.T_W_95;
-                    }
-                    else if ("T_W_MAX".equals(field)) {
-                        value = s.T_W_MAX;
-                    }
-                    else if ("T_P".equals(field)) {
-                        value = s.T_P;
-                    }
-                    else if ("T_P_95".equals(field)) {
-                        value = s.T_P_95;
-                    }
-                    else if ("T_P_MAX".equals(field)) {
-                        value = s.T_P_MAX;
-                    }
-                    else if ("T_W-T_P".equals(field)) {
-                        value = s.T_W - s.T_P;
-                    }
-                    else if ("R_NI".equals(field)) {
-                        value = s.R_NI;
+                    if (e == EMPTY_COLUMN) {
+                        pw.print('\t');//insert one empty column
                     }
                     else {
-                        throw new RuntimeException();
-                    }
+                        Stats s = e.stats.get(i);
 
-                    if (prevTaxis != s.m) {
-                        pw.print('\t');
-                    }
-                    prevTaxis = s.m;
+                        if (!cfg0.equals(s.cfg)) {
+                            throw new RuntimeException();
+                        }
 
-                    pw.printf("\t%f", value);
+                        pw.printf("\t%f", s.values[column]);
+                    }
                 }
 
                 pw.println();
@@ -248,76 +189,53 @@ public class ResultsPostProcessor
     }
 
 
-    public void process(String dir, String subDirPrefix, String file)
-    {
-        for (Experiment e : experiments) {
-            readFile(dir + subDirPrefix + e.id + "/" + file, e);
-        }
-
-        writeValues(dir + file + ".T_W", "T_W");
-        writeValues(dir + file + ".T_W_95", "T_W_95");
-        writeValues(dir + file + ".T_W_MAX", "T_W_MAX");
-        writeValues(dir + file + ".T_P", "T_P");
-        writeValues(dir + file + ".T_P_95", "T_P_95");
-        writeValues(dir + file + ".T_P_MAX", "T_P_MAX");
-        writeValues(dir + file + ".T_W_T_P", "T_W-T_P");
-        writeValues(dir + file + ".R_NI", "R_NI");
-    }
-
-
     public static void processMielec()
     {
-        List<Experiment> experiments = new ArrayList<>();
-        experiments.add(new Experiment("10-50"));
-        experiments.add(new Experiment("15-50"));
-        experiments.add(new Experiment("20-50"));
-        experiments.add(new Experiment("25-50"));
-        experiments.add(new Experiment("30-50"));
-        experiments.add(new Experiment("35-50"));
-        experiments.add(new Experiment("40-50"));
-
-        experiments.add(new Experiment("10-25"));
-        experiments.add(new Experiment("15-25"));
-        experiments.add(new Experiment("20-25"));
-        experiments.add(new Experiment("25-25"));
-        experiments.add(new Experiment("30-25"));
-        experiments.add(new Experiment("35-25"));
-        experiments.add(new Experiment("40-25"));
-
-        int timeWindow = 14 * 3600;//approx.
-
-        String dir = "d:/michalm/2014_02/";
+        String dir = "d:/PP-rad/mielec/2014_02/";
         String subDirPrefix = "mielec-2-peaks-new-";
 
-        new ResultsPostProcessor(experiments, timeWindow).process(dir, subDirPrefix, "stats");
+        new ResultsPostProcessor(//
+                "10-50",//
+                "15-50",//
+                "20-50",//
+                "25-50",//
+                "30-50",//
+                "35-50",//
+                "40-50",//
+                null,// empty column
+                "10-25",//
+                "15-25",//
+                "20-25",//
+                "25-25",//
+                "30-25",//
+                "35-25",//
+                "40-25"//
+        ).process(dir, subDirPrefix, "stats");
     }
 
 
     public static void processBerlin()
     {
-        List<Experiment> experiments = new ArrayList<>();
-        experiments.add(new Experiment("1.0"));
-        experiments.add(new Experiment("1.5"));
-        experiments.add(new Experiment("2.0"));
-        experiments.add(new Experiment("2.5"));
-        experiments.add(new Experiment("3.0"));
-        experiments.add(new Experiment("3.5"));
-//        experiments.add(new Experiment("4.0"));
-//        experiments.add(new Experiment("4.5"));
-//        experiments.add(new Experiment("5.0"));
-
-        int timeWindow = 14 * 3600;//very approx.
-
         String dir = "d:/michalm/Berlin_2014_11/";
         String subDirPrefix = "demand_";
 
-        new ResultsPostProcessor(experiments, timeWindow).process(dir, subDirPrefix, "stats");
+        new ResultsPostProcessor(//
+                "1.0",//
+                "1.5",//
+                "2.0",//
+                "2.5",//
+                "3.0",//
+                "3.5",//
+                "4.0",//
+                "4.5",//
+                "5.0"//
+        ).process(dir, subDirPrefix, "stats");
     }
 
 
     public static void main(String[] args)
     {
-        //processMielec();
-        processBerlin();
+        processMielec();
+        //processBerlin();
     }
 }

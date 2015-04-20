@@ -10,51 +10,65 @@ import playground.michalm.taxi.util.stats.TaxiStatsCalculator.TaxiStats;
 
 public class MultiRunStats
 {
-    final SummaryStatistics taxiPickupDriveTime = new SummaryStatistics();
-    final SummaryStatistics percentile95TaxiPickupDriveTime = new SummaryStatistics();
-    final SummaryStatistics maxTaxiPickupDriveTime = new SummaryStatistics();
-    final SummaryStatistics taxiNonPickupDriveTime = new SummaryStatistics();
-    final SummaryStatistics taxiDriveWithPassengerTime = new SummaryStatistics();
-    final SummaryStatistics taxiPickupTime = new SummaryStatistics();
-    final SummaryStatistics passengerWaitTime = new SummaryStatistics();
-    final SummaryStatistics percentile95PassengerWaitTime = new SummaryStatistics();
-    final SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
-    final SummaryStatistics computationTime = new SummaryStatistics();
+    private final SummaryStatistics passengerWaitTime = new SummaryStatistics();
+    private final SummaryStatistics pc95PassengerWaitTime = new SummaryStatistics();
+    private final SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
+
+    private final SummaryStatistics pickupDriveTime = new SummaryStatistics();
+    private final SummaryStatistics pc95PickupDriveTime = new SummaryStatistics();
+    private final SummaryStatistics maxPickupDriveTime = new SummaryStatistics();
+
+    private final SummaryStatistics otherDriveTime = new SummaryStatistics();
+    private final SummaryStatistics driveWithPassengerTime = new SummaryStatistics();
+    private final SummaryStatistics pickupTime = new SummaryStatistics();
+
+    private final SummaryStatistics computationTime = new SummaryStatistics();
 
 
-    void updateStats(TaxiStats evaluation, long computationTimeInMillis)
+    void updateStats(TaxiStats singleRunStats, long computationTimeInMillis)
     {
-        taxiPickupDriveTime.addValue(evaluation.getPickupDriveTime());
-        percentile95TaxiPickupDriveTime.addValue(evaluation.getPickupDriveTimeStats()
-                .getPercentile(95));
-        maxTaxiPickupDriveTime.addValue(evaluation.getMaxPickupDriveTime());
-        taxiNonPickupDriveTime.addValue(evaluation.getNonPickupDriveTime());
-        taxiDriveWithPassengerTime.addValue(evaluation.getDriveWithPassengerTime());
-        taxiPickupTime.addValue(evaluation.getPickupTime());
-        passengerWaitTime.addValue(evaluation.getPassengerWaitTime());
-        percentile95PassengerWaitTime.addValue(evaluation.getPassengerWaitTimeStats()
-                .getPercentile(95));
-        maxPassengerWaitTime.addValue(evaluation.getMaxPassengerWaitTime());
+        passengerWaitTime.addValue(singleRunStats.passengerWaitTimes.getMean());
+        pc95PassengerWaitTime.addValue(singleRunStats.passengerWaitTimes.getPercentile(95));
+        maxPassengerWaitTime.addValue(singleRunStats.passengerWaitTimes.getMax());
+
+        pickupDriveTime.addValue(singleRunStats.pickupDriveTimes.getMean());
+        pc95PickupDriveTime.addValue(singleRunStats.pickupDriveTimes.getPercentile(95));
+        maxPickupDriveTime.addValue(singleRunStats.pickupDriveTimes.getMax());
+
+        otherDriveTime.addValue(singleRunStats.otherDriveTimes.getMean());
+        driveWithPassengerTime.addValue(singleRunStats.driveWithPassengerTimes.getMean());
+        pickupTime.addValue(singleRunStats.pickupTimes.getMean());
+
         computationTime.addValue(0.001 * (computationTimeInMillis));
     }
 
 
+    static final String HEADER = "cfg\tn\tm\t"//
+            + "PW\tPWp95\tPWmax\t"//
+            + "PD\tPDp95\tPDmax\t"//
+            + "otherD\tDwP\tP\t"//
+            + "Comp";
+
+
     void printStats(PrintWriter pw, String cfg, VrpData data)
     {
-        pw.printf(
-                "%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        pw.printf("%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
                 cfg,//
                 data.getRequests().size(),//
                 data.getVehicles().size(),//
+                //
                 passengerWaitTime.getMean(),//
-                percentile95PassengerWaitTime.getMean(), //
+                pc95PassengerWaitTime.getMean(), //
                 maxPassengerWaitTime.getMean(),//
-                taxiPickupDriveTime.getMean(),//
-                percentile95TaxiPickupDriveTime.getMean(), //
-                maxTaxiPickupDriveTime.getMean(),//
-                taxiNonPickupDriveTime.getMean(),//
-                taxiDriveWithPassengerTime.getMean(),//
-                taxiPickupTime.getMean(),//
+                //
+                pickupDriveTime.getMean(),//
+                pc95PickupDriveTime.getMean(), //
+                maxPickupDriveTime.getMean(),//
+                //
+                otherDriveTime.getMean(),//
+                driveWithPassengerTime.getMean(),//
+                pickupTime.getMean(),//
+                //
                 computationTime.getMean());
     }
 }

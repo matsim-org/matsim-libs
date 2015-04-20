@@ -450,8 +450,16 @@ public class TaxiScheduler
                         obligatoryTasks = 1;
                         break;
 
-                    case DROPOFF:
                     case DRIVE:
+                        //ASSUMING: PICKUP_DRIVE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//                        if (!params.destinationKnown) {
+//                            return;
+//                        }
+//
+//                        obligatoryTasks = 3;
+//                        break;
+                        
+                    case DROPOFF:
                     case STAY:
                         obligatoryTasks = 0;
                         break;

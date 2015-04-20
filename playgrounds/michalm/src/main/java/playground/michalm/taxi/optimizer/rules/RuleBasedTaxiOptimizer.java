@@ -63,7 +63,7 @@ public class RuleBasedTaxiOptimizer
 
     private void initIdleVehicles()
     {
-        idleVehicles = new HashSet<>();
+        idleVehicles = new LinkedHashSet<>();
         for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
             if (optimConfig.scheduler.isIdle(veh)) {
                 idleVehicles.add(veh);

@@ -5,13 +5,15 @@ import java.util.Map;
 
 import playground.michalm.util.ParameterFileReader;
 
+import static playground.michalm.taxi.run.AlgorithmConfigs.*;
 
-public class MultiRunBerlinTaxiLauncher
+
+public class MultiRunMielecTaxiLauncher
 {
     public static void main(String... args)
     {
         int runs = 20;
-        String paramFile = "d:/PP-rad/berlin/Berlin_2014_11/params.in";
+        String paramFile = "d:/PP-rad/mielec/2014_02/params.in";
         String specificParamFile = args[0];
 
         Map<String, String> specificParams = ParameterFileReader
@@ -23,6 +25,10 @@ public class MultiRunBerlinTaxiLauncher
         generalParams.putAll(specificParams);//side effect: overriding params with the specific ones
         TaxiLauncherParams params = new TaxiLauncherParams(generalParams);
 
-        MultiRunTaxiLauncher.run(runs, params);
+        MultiRunTaxiLauncher.runAll(runs, params, //
+                RULE_TW_xx, RULE_TP_xx, RULE_DSE_xx,//
+                FIFO_1_S_TW_xx, FIFO_1_S_TP_xx,//
+                FIFO_RES_TW_xx, FIFO_RES_TP_xx,//
+                ASSIGN_TW_xx, ASSIGN_TP_xx, ASSIGN_DSE_xx);
     }
 }
