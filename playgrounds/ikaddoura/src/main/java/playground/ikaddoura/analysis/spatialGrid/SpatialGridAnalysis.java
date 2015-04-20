@@ -292,10 +292,10 @@ public class SpatialGridAnalysis {
 		headers.add("receiverPointId");
 		headers.add("xCoord");
 		headers.add("yCoord");
-		headers.add("homeLocations");
-		headers.add("userBenefits [money]");
-		headers.add("causedNoiseCost [money]");
-		headers.add("affectedNoiseCost [money]");
+		headers.add("homeLocations (sample size)");
+		headers.add("userBenefits (sample size) [money]");
+		headers.add("causedNoiseCost (sample size) [money]");
+		headers.add("affectedNoiseCost (sample size) [money]");
 		
 		List<HashMap<Id<ReceiverPoint>,Double>> values = new ArrayList<>();
 		values.add(id2xCoord);

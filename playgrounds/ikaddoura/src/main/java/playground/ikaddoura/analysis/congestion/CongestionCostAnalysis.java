@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.analysis;
+package playground.ikaddoura.analysis.congestion;
 
 import java.io.File;
 import java.util.Map;
