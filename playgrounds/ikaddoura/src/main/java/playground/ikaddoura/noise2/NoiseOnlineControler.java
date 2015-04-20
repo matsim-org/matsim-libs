@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.routing.TollDisutilityCalculatorFactory;
 
@@ -69,13 +70,36 @@ public class NoiseOnlineControler {
 
 	private void run(String configFile) {
 		
+		// grid parameters
+		
+		GridParameters gridParameters = new GridParameters();
+		
+		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+				
+		if (setup.equals("berlin1")) {
+			
+			gridParameters.setReceiverPointGap(100.);
+			
+			String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+			gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+		
+		} else if (setup.equals("berlin2")) {
+		
+			gridParameters.setReceiverPointGap(100.);
+	
+			String[] consideredActivitiesForDamages = {"home"};
+			gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+			
+		} else {
+			throw new RuntimeException("Unknown parameter setup. Aborting...");
+		}
+		
+		// noise parameters
+		
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(10.);
 		
-		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		noiseParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
-		
-		// Berlin Tunnel Link IDs
 		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
 		tunnelLinkIDs.add(Id.create("108041", Link.class));
 		tunnelLinkIDs.add(Id.create("108142", Link.class));
@@ -120,48 +144,14 @@ public class NoiseOnlineControler {
 		tunnelLinkIDs.add(Id.create("73496", Link.class));
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
-		
-		if (setup.equals("berlin1a")) {
-			
-			noiseParameters.setReceiverPointGap(100.);
-			
-			String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-			noiseParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
-		
-		} else if (setup.equals("berlin1b")) {
-			
-			noiseParameters.setReceiverPointGap(250.);
-			noiseParameters.setThrowNoiseEventsAffected(false);
-			
-			String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-			noiseParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
-		
-		} else if (setup.equals("berlin2a")) {
-		
-			noiseParameters.setReceiverPointGap(100.);
-	
-			String[] consideredActivitiesForDamages = {"home"};
-			noiseParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
-			
-		} else if (setup.equals("berlin2b")) {
-		
-			noiseParameters.setReceiverPointGap(250.);
-			noiseParameters.setThrowNoiseEventsAffected(false);
-			
-			String[] consideredActivitiesForDamages = {"home"};
-			noiseParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);			
-	
-		} else {
-			throw new RuntimeException("Unknown parameter setup. Aborting...");
-		}
 				
+		// controler
+		
 		Controler controler = new Controler(configFile);
 
-		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), noiseParameters);
-		
+		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
 		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(noiseContext);
 		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-				
 		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	

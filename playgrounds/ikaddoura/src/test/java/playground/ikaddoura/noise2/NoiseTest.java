@@ -62,7 +62,9 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
+import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.data.NoiseReceiverPoint;
 import playground.ikaddoura.noise2.data.PersonActivityInfo;
 import playground.ikaddoura.noise2.data.ReceiverPoint;
 import playground.ikaddoura.noise2.events.NoiseEventAffected;
@@ -90,28 +92,26 @@ public class NoiseTest {
 
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		
+		GridParameters gridParameters = new GridParameters();
+		gridParameters.setReceiverPointGap(250.);	
+		
 		NoiseParameters noiseParameters = new NoiseParameters();
-		noiseParameters.setReceiverPointGap(250.);
 		noiseParameters.setScaleFactor(1.);
 		String[] consideredActivities = {"home", "work"};
-		noiseParameters.setConsideredActivitiesForDamages(consideredActivities);
+		gridParameters.setConsideredActivitiesForDamages(consideredActivities);
 		
-		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
-		
+		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
 		
 		// test the grid of receiver points
 		Assert.assertEquals("wrong number of receiver points", 16, noiseContext.getReceiverPoints().size(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong coord for receiver point Id '10'", new CoordImpl(500, 100).toString(), noiseContext.getReceiverPoints().get(Id.create(10, ReceiverPoint.class)).getCoord().toString());
 		
-//		// test the allocation of receiver point to grid cell
-//		Assert.assertEquals("wrong number of grid cells for which receiver points are stored", 9, noiseContext.getZoneTuple2listOfReceiverPointIds().size(), MatsimTestUtils.EPSILON);
-				
 		// test the allocation of activity coordinates to the nearest receiver point
-		Assert.assertEquals("wrong nearest receiver point Id for coord 300/300 (x/y)", "5", noiseContext.getActivityCoord2receiverPointId().get(new CoordImpl(300, 300)).toString());
-		Assert.assertEquals("wrong nearest receiver point Id for coord 150/150 (x/y)", "9", noiseContext.getActivityCoord2receiverPointId().get(new CoordImpl(150, 150)).toString());
-		Assert.assertEquals("wrong nearest receiver point Id for coord 100/100 (x/y)", "8", noiseContext.getActivityCoord2receiverPointId().get(new CoordImpl(100, 100)).toString());
-		Assert.assertEquals("wrong nearest receiver point Id for coord 500/500 (x/y)", "2", noiseContext.getActivityCoord2receiverPointId().get(new CoordImpl(500, 500)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 300/300 (x/y)", "5", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(300, 300)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 150/150 (x/y)", "9", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(150, 150)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 100/100 (x/y)", "8", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(100, 100)).toString());
+		Assert.assertEquals("wrong nearest receiver point Id for coord 500/500 (x/y)", "2", noiseContext.getGrid().getActivityCoord2receiverPointId().get(new CoordImpl(500, 500)).toString());
 					
 		// test the allocation of relevant links to the receiver point
 		Assert.assertEquals("wrong relevant link for receiver point Id '15'", 3, noiseContext.getReceiverPoints().get(Id.create("15", Link.class)).getLinkId2distanceCorrection().size());
@@ -165,12 +165,14 @@ public class NoiseTest {
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
 		
-		NoiseParameters noiseParameters = new NoiseParameters();
-		noiseParameters.setReceiverPointGap(250.);
-		noiseParameters.setScaleFactor(1.);
+		GridParameters gridParameters = new GridParameters();
+		gridParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
-		noiseParameters.setConsideredActivitiesForDamages(consideredActivities);
+		gridParameters.setConsideredActivitiesForDamages(consideredActivities);
+		
+		NoiseParameters noiseParameters = new NoiseParameters();
+		noiseParameters.setScaleFactor(1.);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
@@ -183,7 +185,7 @@ public class NoiseTest {
 		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 			
-		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
 		
@@ -403,7 +405,7 @@ public class NoiseTest {
 								((Activity)noiseContext.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(0)).getCoord() :
 								((Activity)noiseContext.getScenario().getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(2)).getCoord();
 							
-						Id<ReceiverPoint> rpId = noiseContext.getActivityCoord2receiverPointId().get(coord);
+						Id<ReceiverPoint> rpId = noiseContext.getGrid().getActivityCoord2receiverPointId().get(coord);
 						
 						if(!affectedPersonsPerReceiverPointTest.containsKey(rpId)){
 							
@@ -564,7 +566,7 @@ public class NoiseTest {
 			e.printStackTrace();
 		}
 		
-		for(ReceiverPoint rp : noiseContext.getReceiverPoints().values()){
+		for(NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()){
 			
 			Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
 			
@@ -971,10 +973,11 @@ public class NoiseTest {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config4.xml";
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
+		GridParameters gridParameters = new GridParameters();
 		
 		Controler controler = new Controler(configFile);
 
-		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
 		
 		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(noiseContext);
 		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);

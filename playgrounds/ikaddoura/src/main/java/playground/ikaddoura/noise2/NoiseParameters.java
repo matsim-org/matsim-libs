@@ -43,18 +43,9 @@ public class NoiseParameters {
 	private double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
 	private double timeBinSizeNoiseComputation = 3600.0;
 	private double scaleFactor = 1.;
-	private double receiverPointGap = 250.;
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
-	private String[] consideredActivitiesForDamages = {"home", "work"};
 	private String transformationFactory = TransformationFactory.DHDN_GK4;
-
-	// Setting all minimum and maximum coordinates to 0.0 means the receiver points are computed for the entire area for which any of the considered activities for the receiver point grid are found.
-	private double receiverPointsGridMinX = 0.;
-	private double receiverPointsGridMinY = 0.;
-	private double receiverPointsGridMaxX = 0.;
-	private double receiverPointsGridMaxY = 0.;
-	private String[] consideredActivitiesForReceiverPointGrid = {"home", "work"};
 
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
 	
@@ -67,20 +58,6 @@ public class NoiseParameters {
 	// ########################################################################################################
 			
 	public void checkForConsistency() {
-		
-		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
-		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
-
-		for (int i = 0; i < consideredActivitiesForDamages.length; i++) {
-			consideredActivitiesForDamagesList.add(consideredActivitiesForDamages[i]);
-		}
-		for (int i = 0; i < this.consideredActivitiesForReceiverPointGrid.length; i++) {
-			consideredActivitiesForReceiverPointGridList.add(consideredActivitiesForReceiverPointGrid[i]);
-		}
-		
-		if (this.receiverPointGap == 0.) {
-			throw new RuntimeException("The receiver point gap is 0. Aborting...");
-		}
 		
 		if (this.internalizeNoiseDamages) {
 			
@@ -118,36 +95,6 @@ public class NoiseParameters {
 				log.warn("Inconsistent parameters will be adjusted:");
 				this.setComputeCausingAgents(true);
 			}
-		}
-		
-		if (this.computeNoiseDamages) {
-						
-			if (consideredActivitiesForDamagesList.size() == 0) {
-				log.warn("Not considering any activity type for the noise damage computation."
-						+ "The computation of noise damages should be disabled.");
-			}
-			
-			if (this.receiverPointsGridMaxX != 0.
-					|| receiverPointsGridMinX != 0.
-					|| receiverPointsGridMaxY != 0.
-					|| receiverPointsGridMinY != 0.) {
-				throw new RuntimeException("In order to keep track of the agent activities, the grid of receiver points should not be limited to a set of predefined coordinates."
-						+ "For a grid covering all activity locations, set the minimum and maximum x/y parameters to 0.0. Aborting... ");
-			}
-						
-			if (this.receiverPointsGridMinX == 0. && this.receiverPointsGridMinY == 0. && this.receiverPointsGridMaxX == 0. && receiverPointsGridMaxY == 0.) {
-				for (String type : consideredActivitiesForDamagesList) {
-					if (!consideredActivitiesForReceiverPointGridList.contains(type)) {
-						throw new RuntimeException("An activity type which is considered for the damage calculation (" + type
-								+ ") should also be considered for the minimum and maximum coordinates of the receiver point grid area. Aborting...");
-					}
-				}
-			}
-		}
-		
-		if (consideredActivitiesForReceiverPointGridList.size() == 0 && this.receiverPointsGridMinX == 0. && this.receiverPointsGridMinY == 0. && this.receiverPointsGridMaxX == 0. && receiverPointsGridMaxY == 0.) {
-			throw new RuntimeException("NEITHER providing a considered activity type for the minimum and maximum coordinates of the receiver point grid area "
-					+ "NOR providing receiver point grid minimum and maximum coordinates. Aborting...");
 		}
 	}
 	
@@ -195,11 +142,6 @@ public class NoiseParameters {
 		this.scaleFactor = scaleFactor;
 	}
 
-	public void setReceiverPointGap(double receiverPointGap) {
-		log.info("Setting the horizontal/vertical distance between each receiver point to " + receiverPointGap);
-		this.receiverPointGap = receiverPointGap;
-	}
-
 	public void setRelevantRadius(double relevantRadius) {
 		log.info("Setting the radius of relevant links around each receiver point to " + relevantRadius);
 		this.relevantRadius = relevantRadius;
@@ -214,54 +156,6 @@ public class NoiseParameters {
 		log.info("Setting tunnel link IDs to " + tunnelLinkIDs.toString());
 		this.tunnelLinkIDs = tunnelLinkIDs;
 	}
-
-	public double getReceiverPointsGridMinX() {
-		return receiverPointsGridMinX;
-	}
-
-	public void setReceiverPointsGridMinX(double receiverPointsGridMinX) {
-		log.info("Setting receiverPoints grid MinX Coordinate to " + receiverPointsGridMinX);
-		this.receiverPointsGridMinX = receiverPointsGridMinX;
-	}
-
-	public double getReceiverPointsGridMinY() {
-		return receiverPointsGridMinY;
-	}
-
-	public void setReceiverPointsGridMinY(double receiverPointsGridMinY) {
-		log.info("Setting receiverPoints grid MinY Coordinate to " + receiverPointsGridMinY);
-		this.receiverPointsGridMinY = receiverPointsGridMinY;
-	}
-
-	public double getReceiverPointsGridMaxX() {
-		return receiverPointsGridMaxX;
-	}
-
-	public void setReceiverPointsGridMaxX(double receiverPointsGridMaxX) {
-		log.info("Setting receiverPoints grid MaxX Coordinate to " + receiverPointsGridMaxX);
-		this.receiverPointsGridMaxX = receiverPointsGridMaxX;
-	}
-
-	public double getReceiverPointsGridMaxY() {
-		return receiverPointsGridMaxY;
-	}
-
-	public void setReceiverPointsGridMaxY(double receiverPointsGridMaxY) {
-		log.info("Setting receiverPoints grid MaxY Coordinate to " + receiverPointsGridMaxY);
-		this.receiverPointsGridMaxY = receiverPointsGridMaxY;
-	}
-
-	public String[] getConsideredActivitiesForDamages() {		
-		return consideredActivitiesForDamages;
-	}
-
-	public void setConsideredActivitiesForDamages(String[] consideredActivities) {
-		log.info("Setting considered activities to: ");
-		for (int i = 0; i < consideredActivities.length; i++) {
-			log.info(consideredActivities[i]);
-		}
-		this.consideredActivitiesForDamages = consideredActivities;
-	}
 	
 	public double getAnnualCostRate() {
 		return annualCostRate;
@@ -273,10 +167,6 @@ public class NoiseParameters {
 	
 	public double getScaleFactor() {
 		return scaleFactor;
-	}
-	
-	public double getReceiverPointGap() {
-		return receiverPointGap;
 	}
 	
 	public double getRelevantRadius() {
@@ -297,15 +187,6 @@ public class NoiseParameters {
 
 	public void setTransformationFactory(String transformationFactory) {
 		this.transformationFactory = transformationFactory;
-	}
-
-	public String[] getConsideredActivitiesForReceiverPointGrid() {
-		return consideredActivitiesForReceiverPointGrid;
-	}
-
-	public void setConsideredActivitiesForReceiverPointGrid(
-			String[] consideredActivitiesForReceiverPointGrid) {
-		this.consideredActivitiesForReceiverPointGrid = consideredActivitiesForReceiverPointGrid;
 	}
 
 	public boolean isInternalizeNoiseDamages() {

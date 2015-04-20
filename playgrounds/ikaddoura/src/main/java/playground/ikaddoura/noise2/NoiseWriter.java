@@ -37,6 +37,7 @@ import org.matsim.core.utils.misc.Time;
 
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.data.NoiseLink;
+import playground.ikaddoura.noise2.data.NoiseReceiverPoint;
 import playground.ikaddoura.noise2.data.ReceiverPoint;
 
 /**
@@ -202,7 +203,7 @@ public class NoiseWriter {
 			bw.write("Receiver Point Id;Immission " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 			bw.newLine();
 			
-			for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				
 				bw.write(rp.getId() + ";" + rp.getFinalImmission());
 				bw.newLine();
@@ -249,7 +250,7 @@ public class NoiseWriter {
 			bw.write("Receiver Point Id;Considered Agent Units " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 			bw.newLine();
 			
-			for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				
 				bw.write(rp.getId() + ";" + rp.getAffectedAgentUnits());
 				bw.newLine();
@@ -295,7 +296,7 @@ public class NoiseWriter {
 			bw.write("Receiver Point Id;Damages " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 			bw.newLine();
 			
-			for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				
 				bw.write(rp.getId() + ";" + rp.getDamageCosts());
 				bw.newLine();

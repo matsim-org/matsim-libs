@@ -38,9 +38,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.noise2.NoiseParameters;
 import playground.ikaddoura.noise2.NoiseWriter;
-import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.data.Grid;
+import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.ReceiverPoint;
 import playground.ikaddoura.noise2.events.NoiseEventsReader;
 import playground.ikaddoura.noise2.utils.NoiseEventAnalysisHandler;
@@ -83,10 +83,10 @@ public class SpatialGridAnalysis {
 			
 		} else {
 			
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/";
-//			eventsFileWithNoiseEvents = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/baseCase_2_noiseAnalysis/r31341/noiseAnalysis_BlnBC2_1/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
-			eventsFileWithNoiseEvents = null;
-			outputFilePath = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/analysis_spatial_grid_1/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
+			eventsFileWithNoiseEvents = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/baseCase_2_noiseAnalysis/r31341/noiseAnalysis_BlnBC2_2/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
+//			eventsFileWithNoiseEvents = null;
+			outputFilePath = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/analysis_spatial_grid_2/";
 			
 			receiverPointGap = 100.;
 			homeActivityType = "home";
@@ -104,18 +104,11 @@ public class SpatialGridAnalysis {
 		HashMap<Id<ReceiverPoint>, Double> rp2totalCausedNoiseCost = new HashMap<>();
 		HashMap<Id<ReceiverPoint>, Double> rp2totalAffectedNoiseCost = new HashMap<>();
 
-		// noise parameters 
+		// grid parameters 
 		
-		NoiseParameters noiseParameters = new NoiseParameters();
-		noiseParameters.setReceiverPointGap(receiverPointGap);
-		noiseParameters.setScaleFactor(10.);
-		noiseParameters.setInternalizeNoiseDamages(false);
-		noiseParameters.setComputeNoiseDamages(false);
-		noiseParameters.setComputeCausingAgents(false);
-		noiseParameters.setInternalizeNoiseDamages(false);
-		noiseParameters.setThrowNoiseEventsAffected(false);
-		noiseParameters.setThrowNoiseEventsCaused(false);
-			
+		GridParameters gridParameters = new GridParameters();
+		gridParameters.setReceiverPointGap(receiverPointGap);
+					
 //		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
 //		double xMin = 4590855.;
 //		double yMin = 5819679.;
@@ -128,14 +121,16 @@ public class SpatialGridAnalysis {
 //		double xMax = 4620323.;
 //		double yMax = 5839639.;
 //		
-//		noiseParameters.setReceiverPointsGridMinX(xMin);
-//		noiseParameters.setReceiverPointsGridMinY(yMin);
-//		noiseParameters.setReceiverPointsGridMaxX(xMax);
-//		noiseParameters.setReceiverPointsGridMaxY(yMax);
+//		gridParameters.setReceiverPointsGridMinX(xMin);
+//		gridParameters.setReceiverPointsGridMinY(yMin);
+//		gridParameters.setReceiverPointsGridMaxX(xMax);
+//		gridParameters.setReceiverPointsGridMaxY(yMax);
 			
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		noiseParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 			
+		// scenario
+		
 		String configFile = runDirectory + "output_config.xml.gz";
 		String populationFile = runDirectory + "output_plans.xml.gz";
 		String networkFile = runDirectory + "output_network.xml.gz";
@@ -145,12 +140,15 @@ public class SpatialGridAnalysis {
 		config.network().setInputFile(networkFile);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-				
-		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
-		noiseContext.initialize();
 		
 		File file = new File(outputFilePath);
 		file.mkdirs();
+		
+		// grid
+		
+		Grid grid = new Grid(scenario, gridParameters);
+		
+		// events	
 		
 		String eventsFile;
 		if (eventsFileWithNoiseEvents == null) {
@@ -210,7 +208,7 @@ public class SpatialGridAnalysis {
 			} else {
 
 				// get the nearest receiver point 
-				Id<ReceiverPoint> homeRPid = noiseContext.getActivityCoord2receiverPointId().get(homeActivity.getCoord());
+				Id<ReceiverPoint> homeRPid = grid.getActivityCoord2receiverPointId().get(homeActivity.getCoord());
 				if (rp2homeLocations.containsKey(homeRPid)) {
 					double homeLocationsNew = rp2homeLocations.get(homeRPid) + 1;
 					rp2homeLocations.put(homeRPid, homeLocationsNew);
@@ -268,19 +266,17 @@ public class SpatialGridAnalysis {
 		}
 			
 		// write the results
-		
-		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath);
-		
+				
 		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
 		HashMap<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
 		int c = 0;
-		for(Id<ReceiverPoint> id : noiseContext.getReceiverPoints().keySet()) {
+		for(Id<ReceiverPoint> id : grid.getReceiverPoints().keySet()) {
 			c++;
 			if(c % 10000 == 0) {
 				log.info("Writing out receiver point # "+ c);
 			}
-			id2xCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getX());
-			id2yCoord.put(id, noiseContext.getReceiverPoints().get(id).getCoord().getY());
+			id2xCoord.put(id, grid.getReceiverPoints().get(id).getCoord().getX());
+			id2yCoord.put(id, grid.getReceiverPoints().get(id).getCoord().getY());
 		}
 		List<String> headers = new ArrayList<String>();
 		headers.add("receiverPointId");

@@ -32,19 +32,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.PtConstants;
 
 import playground.ikaddoura.noise2.NoiseParameters;
 import playground.ikaddoura.noise2.handler.NoiseEquations;
 
 /**
- * Computes a grid of receiver points and further spatial data which is required during the computation of noise immissions and damages.
- * Contains the spatial data as well as time-specific data.
+ * Contains the spatial data as well as time-specific data relevant for the noise computation.
  * 
  * @author lkroeger, ikaddoura
  *
@@ -55,61 +50,42 @@ public class NoiseContext {
 			
 	private final Scenario scenario;
 	private final NoiseParameters noiseParams;
-		
-	private final Map<Id<Person>, List<Coord>> personId2consideredActivityCoords = new HashMap<Id<Person>, List<Coord>>();
-	private final List <Coord> consideredActivityCoordsForDamages = new ArrayList <Coord>();
-	private final List <Coord> consideredActivityCoordsForReceiverPointGrid = new ArrayList <Coord>();
-	
-	private final List<String> consideredActivitiesForDamages = new ArrayList<String>();
-	private final List<String> consideredActivitiesForReceiverPointGrid = new ArrayList<String>();
-	
-	private double xCoordMin = Double.MAX_VALUE;
-	private double xCoordMax = Double.MIN_VALUE;
-	private double yCoordMin = Double.MAX_VALUE;
-	private double yCoordMax = Double.MIN_VALUE;
-	
-	private final Map<Tuple<Integer,Integer>,List<Id<ReceiverPoint>>> zoneTuple2listOfReceiverPointIds = new HashMap<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>>();
-	private final Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<Coord, Id<ReceiverPoint>>();
-	
+	private final Grid grid;
+			
+	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
 	private double xCoordMinLinkNode = Double.MAX_VALUE;
 	private double xCoordMaxLinkNode = Double.MIN_VALUE;
 	private double yCoordMinLinkNode = Double.MAX_VALUE;
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
+		
+	// for routing purposes
 	
-	private final Map<Tuple<Integer,Integer>, List<Id<Link>>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer, Integer>, List<Id<Link>>>();
-	
-	// only required for routing purposes
 	private Map<Double, Map<Id<Link>, NoiseLink>> timeInterval2linkId2noiseLinks = new HashMap<>();
 	
 	// time interval specific information
+	
 	private double currentTimeBinEndTime;
-	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 	private final Map<Id<Link>, NoiseLink> noiseLinks;
 	private double eventTime = Double.MIN_VALUE;
-					
-	public NoiseContext(Scenario scenario, NoiseParameters noiseParams) {
-		
+
+	private final Map<Id<ReceiverPoint>, NoiseReceiverPoint> noiseReceiverPoints;
+	
+	// ############################################
+	
+	public NoiseContext(Scenario scenario, GridParameters gridParameters, NoiseParameters noiseParameters) {
 		this.scenario = scenario;
 		
-		this.noiseParams = noiseParams;
+		this.grid = new Grid(scenario, gridParameters);
+		
+		this.noiseParams = noiseParameters;
 		this.noiseParams.checkForConsistency();
 		
 		this.currentTimeBinEndTime = noiseParams.getTimeBinSizeNoiseComputation();
 		
-		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
+		this.noiseReceiverPoints = new HashMap<Id<ReceiverPoint>, NoiseReceiverPoint>();
 		this.noiseLinks = new HashMap<Id<Link>, NoiseLink>();
-		
-		String[] consideredActTypesForDamagesArray = noiseParams.getConsideredActivitiesForDamages();
-		for (int i = 0; i < consideredActTypesForDamagesArray.length; i++) {
-			this.consideredActivitiesForDamages.add(consideredActTypesForDamagesArray[i]);
-		}
-		
-		String[] consideredActTypesForReceiverPointGridArray = noiseParams.getConsideredActivitiesForReceiverPointGrid();
-		for (int i = 0; i < consideredActTypesForReceiverPointGridArray.length; i++) {
-			this.consideredActivitiesForReceiverPointGrid.add(consideredActTypesForReceiverPointGridArray[i]);
-		}
 	}
-	
+
 	// for routing purposes
 	public void storeTimeInterval() {
 		
@@ -122,153 +98,48 @@ public class NoiseContext {
 	}
 	
 	public void initialize() {
-		setActivityCoords();
-		createGrid();
-		setActivityCoord2NearestReceiverPointId();
+		checkConsistency();
 		setRelevantLinkInfo();
-		
-		// delete unnecessary information
-		this.zoneTuple2listOfLinkIds.clear();
-		this.zoneTuple2listOfReceiverPointIds.clear();
-		this.consideredActivityCoordsForReceiverPointGrid.clear();
-		this.consideredActivityCoordsForDamages.clear();
 	}
 	
-	public void initialize(String gridFileCSV) {
-		setActivityCoords();
-		createGrid(gridFileCSV);
-		setActivityCoord2NearestReceiverPointId();
-		setRelevantLinkInfo();
-		
-		// delete unnecessary information
-		this.zoneTuple2listOfLinkIds.clear();
-		this.zoneTuple2listOfReceiverPointIds.clear();
-		this.consideredActivityCoordsForReceiverPointGrid.clear();
-		this.consideredActivityCoordsForDamages.clear();
-	}
+	private void checkConsistency() {
+		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
+		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
 
-	private void setActivityCoords () {
+		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForDamages().length; i++) {
+			consideredActivitiesForDamagesList.add(this.grid.getGridParams().getConsideredActivitiesForDamages()[i]);
+		}
 		
-		for (Person person: scenario.getPopulation().getPersons().values()) {
-				
-			for (PlanElement planElement: person.getSelectedPlan().getPlanElements()) {
-				if (planElement instanceof Activity) {
-					Activity activity = (Activity) planElement;
-					
-					if (!activity.getType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForReceiverPointGrid().length; i++) {
+			consideredActivitiesForReceiverPointGridList.add(this.grid.getGridParams().getConsideredActivitiesForReceiverPointGrid()[i]);
+		}
+		
+		if (this.noiseParams.isComputeNoiseDamages()) {
+			
+			if (consideredActivitiesForDamagesList.size() == 0) {
+				log.warn("Not considering any activity type for the noise damage computation."
+						+ "The computation of noise damages should be disabled.");
+			}
+			
+			if (this.grid.getGridParams().getReceiverPointsGridMaxX() != 0.
+					|| this.grid.getGridParams().getReceiverPointsGridMinX() != 0.
+					|| this.grid.getGridParams().getReceiverPointsGridMaxY() != 0.
+					|| this.grid.getGridParams().getReceiverPointsGridMinY() != 0.) {
+				throw new RuntimeException("In order to keep track of the agent activities, the grid of receiver points should not be limited to a set of predefined coordinates."
+						+ "For a grid covering all activity locations, set the minimum and maximum x/y parameters to 0.0. Aborting... ");
+			}
 						
-						if (this.consideredActivitiesForDamages.contains(activity.getType())) {
-							List<Coord> activityCoordinates = new ArrayList<Coord>();
-							
-							if (personId2consideredActivityCoords.containsKey(person.getId())) {
-								activityCoordinates = personId2consideredActivityCoords.get(person.getId());
-							}
-							
-							activityCoordinates.add(activity.getCoord());
-							personId2consideredActivityCoords.put(person.getId(), activityCoordinates);
-							
-							consideredActivityCoordsForDamages.add(activity.getCoord());
-						}
-						
-						if (this.consideredActivitiesForReceiverPointGrid.contains(activity.getType())) {
-							consideredActivityCoordsForReceiverPointGrid.add(activity.getCoord());
-						}
+			if (this.grid.getGridParams().getReceiverPointsGridMinX() == 0. && this.grid.getGridParams().getReceiverPointsGridMinY() == 0. && this.grid.getGridParams().getReceiverPointsGridMaxX() == 0. && this.grid.getGridParams().getReceiverPointsGridMaxY() == 0.) {
+				for (String type : consideredActivitiesForDamagesList) {
+					if (!consideredActivitiesForReceiverPointGridList.contains(type)) {
+						throw new RuntimeException("An activity type which is considered for the damage calculation (" + type
+								+ ") should also be considered for the minimum and maximum coordinates of the receiver point grid area. Aborting...");
 					}
 				}
 			}
 		}
 	}
-	
-	private void createGrid() {
-		
-		if (this.noiseParams.getReceiverPointsGridMinX() == 0. && this.noiseParams.getReceiverPointsGridMinY() == 0. && this.noiseParams.getReceiverPointsGridMaxX() == 0. && this.noiseParams.getReceiverPointsGridMaxY() == 0.) {
-			
-			log.info("Creating receiver points for the entire area between the minimum and maximium x and y activity coordinates of all activity locations.");
-						
-			for (Coord coord : consideredActivityCoordsForReceiverPointGrid) {
-				if (coord.getX() < xCoordMin) {
-					xCoordMin = coord.getX();
-				}
-				if (coord.getX() > xCoordMax) {
-					xCoordMax = coord.getX();
-				}
-				if (coord.getY() < yCoordMin) {
-					yCoordMin = coord.getY();
-				}
-				if (coord.getY() > yCoordMax) {
-					yCoordMax = coord.getY();
-				}
-			}
-			
-		} else {
-			
-			xCoordMin = this.noiseParams.getReceiverPointsGridMinX();
-			xCoordMax = this.noiseParams.getReceiverPointsGridMaxX();
-			yCoordMin = this.noiseParams.getReceiverPointsGridMinY();
-			yCoordMax = this.noiseParams.getReceiverPointsGridMaxY();
-			
-			log.info("Creating receiver points for the area between the coordinates (" + xCoordMin + "/" + yCoordMin + ") and (" + xCoordMax + "/" + yCoordMax + ").");
-			
-			createReceiverPoints();
-		}
-		
-		createReceiverPoints();		
-	}
-	
-	private void createReceiverPoints() {
 
-		int counter = 0;
-		
-		for (double y = yCoordMax + 100. ; y > yCoordMin - 100. - noiseParams.getReceiverPointGap() ; y = y - noiseParams.getReceiverPointGap()) {
-		
-			for (double x = xCoordMin - 100. ; x < xCoordMax + 100. + noiseParams.getReceiverPointGap() ; x = x + noiseParams.getReceiverPointGap()) {
-				
-				Id<ReceiverPoint> id = Id.create(counter, ReceiverPoint.class);
-				Coord coord = new CoordImpl(x, y);
-				
-				ReceiverPoint rp = new ReceiverPoint(id);
-				rp.setCoord(coord);
-				
-				receiverPoints.put(id, rp);
-				
-				counter++;
-						
-				Tuple<Integer,Integer> zoneTuple = getZoneTuple(coord);
-				List<Id<ReceiverPoint>> listOfReceiverPointIDs = new ArrayList<Id<ReceiverPoint>>();
-				if (zoneTuple2listOfReceiverPointIds.containsKey(zoneTuple)) {
-					listOfReceiverPointIDs = zoneTuple2listOfReceiverPointIds.get(zoneTuple);
-				}
-				listOfReceiverPointIDs.add(id);
-				zoneTuple2listOfReceiverPointIds.put(zoneTuple, listOfReceiverPointIDs);
-			}
-		}
-		log.info("Total number of receiver points: " + receiverPoints.size());
-	}
-	
-	private void createGrid(String gridFileCSV) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("Not yet implemented. Aborting...");
-		
-	}
-		
-	private void setActivityCoord2NearestReceiverPointId () {
-		
-		int counter = 0;
-		for (Coord coord : consideredActivityCoordsForDamages) {
-			if (counter % 100000 == 0) {
-				log.info("Setting activity coordinates to nearest receiver point. activity location # " + counter);
-			}
-			
-			if (!(activityCoord2receiverPointId.containsKey(coord))) {
-			
-				Id<ReceiverPoint> receiverPointId = identifyNearestReceiverPoint(coord);
-				activityCoord2receiverPointId.put(coord, receiverPointId);
-			}
-			
-			counter++;
-		}				
-	}
-	
 	private void setRelevantLinkInfo() {
 		
 		setLinksMinMax();
@@ -276,21 +147,23 @@ public class NoiseContext {
 				
 		int counter = 0;
 		
-		for (ReceiverPoint rp : this.receiverPoints.values()) {
-			counter++;
+		for (ReceiverPoint rp : this.grid.getReceiverPoints().values()) {
 			
+			counter++;
 			if (counter % 10000. == 0.) {
 				log.info("Setting relevant link information for receiver point # " + counter);
 			}
 			
-			double pointCoordX = this.receiverPoints.get(rp.getId()).getCoord().getX();
-			double pointCoordY = this.receiverPoints.get(rp.getId()).getCoord().getY();
+			NoiseReceiverPoint nrp = new NoiseReceiverPoint(rp.getId(), rp.getCoord());
+			
+			double pointCoordX = nrp.getCoord().getX();
+			double pointCoordY = nrp.getCoord().getY();
 
 			Map<Id<Link>,Double> relevantLinkIds2Ds = new HashMap<>();
 			Map<Id<Link>,Double> relevantLinkIds2angleImmissionCorrection = new HashMap<>();
 		
 			// get the zone grid cell around the receiver point
-			Tuple<Integer,Integer> zoneTuple = getZoneTupleForLinks(this.receiverPoints.get(rp.getId()).getCoord());
+			Tuple<Integer,Integer> zoneTuple = getZoneTupleForLinks(nrp.getCoord());
 			
 			// collect all Ids of links in this zone grid cell...
 			List<Id<Link>> potentialLinks = new ArrayList<>();
@@ -407,7 +280,7 @@ public class NoiseContext {
 							log.warn("Distance between " + linkId + " and " + rp.getId() + " is 0. The calculation of the correction term Ds requires a distance > 0. Therefore, setting the distance to a minimum value of " + minimumDistance + ".");
 						}
 						double correctionTermDs = NoiseEquations.calculateDistanceCorrection(distance);
-						double correctionTermAngle = calculateAngleImmissionCorrection(this.receiverPoints.get(rp.getId()).getCoord(), scenario.getNetwork().getLinks().get(linkId));
+						double correctionTermAngle = calculateAngleImmissionCorrection(nrp.getCoord(), scenario.getNetwork().getLinks().get(linkId));
 						
 						relevantLinkIds2Ds.put(linkId, correctionTermDs);
 						relevantLinkIds2angleImmissionCorrection.put(linkId, correctionTermAngle);						
@@ -415,8 +288,10 @@ public class NoiseContext {
 				}
 			}
 			
-			rp.setLinkId2distanceCorrection(relevantLinkIds2Ds);
-			rp.setLinkId2angleCorrection(relevantLinkIds2angleImmissionCorrection);
+			nrp.setLinkId2distanceCorrection(relevantLinkIds2Ds);
+			nrp.setLinkId2angleCorrection(relevantLinkIds2angleImmissionCorrection);
+			
+			this.noiseReceiverPoints.put(nrp.getId(), nrp);
 		}
 	}
 	
@@ -566,86 +441,12 @@ public class NoiseContext {
 		return immissionCorrection;
 	}
 	
-	private Tuple<Integer, Integer> getZoneTuple(Coord coord) {
-		 
-		double xCoord = coord.getX();
-		double yCoord = coord.getY();
-		
-		int xDirection = (int) ((xCoord - xCoordMin) / (noiseParams.getReceiverPointGap() / 1.));	
-		int yDirection = (int) ((yCoordMax - yCoord) / noiseParams.getReceiverPointGap() / 1.);
-		
-		Tuple<Integer, Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
-		return zoneDefinition;
-	}
-	
-	private Id<ReceiverPoint> identifyNearestReceiverPoint (Coord coord) {
-		Id<ReceiverPoint> nearestReceiverPointId = null;
-		
-		List<Tuple<Integer,Integer>> tuples = new ArrayList<Tuple<Integer,Integer>>();
-		Tuple<Integer,Integer> centralTuple = getZoneTuple(coord);
-		tuples.add(centralTuple);
-		int x = centralTuple.getFirst();
-		int y = centralTuple.getSecond();
-		Tuple<Integer,Integer> TupleNW = new Tuple<Integer, Integer>(x-1, y-1);
-		tuples.add(TupleNW);
-		Tuple<Integer,Integer> TupleN = new Tuple<Integer, Integer>(x, y-1);
-		tuples.add(TupleN);
-		Tuple<Integer,Integer> TupleNO = new Tuple<Integer, Integer>(x+1, y-1);
-		tuples.add(TupleNO);
-		Tuple<Integer,Integer> TupleW = new Tuple<Integer, Integer>(x-1, y);
-		tuples.add(TupleW);
-		Tuple<Integer,Integer> TupleO = new Tuple<Integer, Integer>(x+1, y);
-		tuples.add(TupleO);
-		Tuple<Integer,Integer> TupleSW = new Tuple<Integer, Integer>(x-1, y+1);
-		tuples.add(TupleSW);
-		Tuple<Integer,Integer> TupleS = new Tuple<Integer, Integer>(x, y+1);
-		tuples.add(TupleS);
-		Tuple<Integer,Integer> TupleSO = new Tuple<Integer, Integer>(x+1, y+1);
-		tuples.add(TupleSO);
-		
-		List<Id<ReceiverPoint>> relevantReceiverPointIds = new ArrayList<Id<ReceiverPoint>>();
-		
-		for (Tuple<Integer,Integer> tuple : tuples) {
-			if (zoneTuple2listOfReceiverPointIds.containsKey(tuple)) {
-				for (Id<ReceiverPoint> id : zoneTuple2listOfReceiverPointIds.get(tuple)) {
-					relevantReceiverPointIds.add(id);
-				}
-			}
-		}
-		
-		double minDistance = Double.MAX_VALUE;
-
-		for (Id<ReceiverPoint> receiverPointId : relevantReceiverPointIds) {
-			double xValue = this.receiverPoints.get(receiverPointId).getCoord().getX();
-			double yValue = this.receiverPoints.get(receiverPointId).getCoord().getY();
-			
-			double a = coord.getX() - xValue;
-			double b = coord.getY() - yValue;
-			
-			double distance = Math.sqrt((Math.pow(a, 2))+(Math.pow(b, 2)));
-			if (distance < minDistance) {
-				minDistance = distance;
-				nearestReceiverPointId = receiverPointId;
-			}
-		}
-
-		return nearestReceiverPointId;
-	}
-	
 	public Scenario getScenario() {
 		return scenario;
 	}
-
-	public Map<Id<Person>, List<Coord>> getPersonId2listOfConsideredActivityCoords() {
-		return personId2consideredActivityCoords;
-	}
-
-	public Map<Coord, Id<ReceiverPoint>> getActivityCoord2receiverPointId() {
-		return activityCoord2receiverPointId;
-	}
 	
-	public Map<Id<ReceiverPoint>, ReceiverPoint> getReceiverPoints() {
-		return receiverPoints;
+	public Map<Id<ReceiverPoint>, NoiseReceiverPoint> getReceiverPoints() {
+		return noiseReceiverPoints;
 	}
 	
 	public NoiseParameters getNoiseParams() {
@@ -674,6 +475,10 @@ public class NoiseContext {
 
 	public double getEventTime() {
 		return eventTime;
+	}
+
+	public Grid getGrid() {
+		return grid;
 	}
 
 }

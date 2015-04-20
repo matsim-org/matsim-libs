@@ -41,6 +41,7 @@ import org.matsim.vehicles.Vehicle;
 import playground.ikaddoura.noise2.NoiseWriter;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.data.NoiseLink;
+import playground.ikaddoura.noise2.data.NoiseReceiverPoint;
 import playground.ikaddoura.noise2.data.PersonActivityInfo;
 import playground.ikaddoura.noise2.data.ReceiverPoint;
 import playground.ikaddoura.noise2.events.NoiseEventAffected;
@@ -92,7 +93,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
 		this.noiseContext.setCurrentTimeBinEndTime(this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
 		
-		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.getLinkId2IsolatedImmission().clear();
 			rp.setFinalImmission(0.);
 			rp.setAffectedAgentUnits(0.);
@@ -107,7 +108,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		this.noiseContext.getNoiseLinks().clear();
 		
-		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.getLinkId2IsolatedImmission().clear();
 			rp.setFinalImmission(0.);
 			rp.setAffectedAgentUnits(0.);
@@ -142,8 +143,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	}
 
 	private void updateActivityInformation() {
-		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-						
+		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			for (Id<Person> personId : rp.getPersonId2actInfos().keySet()) {
 				Iterator<PersonActivityInfo> it = rp.getPersonId2actInfos().get(personId).iterator();
 				while (it.hasNext()) {
@@ -183,7 +183,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 	private void calculateAffectedAgentUnits() {
 		
-		for (ReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
+		for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 			
 			double affectedAgentUnits = 0.;
 			if (!(rp.getPersonId2actInfos().isEmpty())) {
@@ -288,7 +288,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	
 	private void calculateDamagePerReceiverPoint() {
 		
-		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 				
 			double noiseImmission = rp.getFinalImmission();
 			double affectedAgentUnits = rp.getAffectedAgentUnits();
@@ -305,7 +305,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		Map<Id<ReceiverPoint>, Map<Id<Link>, Double>> rpId2linkId2costShare = new HashMap<Id<ReceiverPoint>, Map<Id<Link>,Double>>();
 
-		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 										
 			Map<Id<Link>,Double> linkId2costShare = new HashMap<Id<Link>, Double>();
 							
@@ -327,7 +327,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		}
 		
 		// summing up the link-based costs
-		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 
 			if (rp.getDamageCosts() != 0.) {
 				
@@ -438,7 +438,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	
 	private void throwNoiseEventsAffected() {
 		
-		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			
 			if (!(rp.getPersonId2actInfos().isEmpty())) {
 				
@@ -467,7 +467,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 
 	private void calculateNoiseImmission() {
 		
-		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 					
 			Map<Id<Link>, Double> linkId2isolatedImmission = new HashMap<Id<Link>, Double>();
 			

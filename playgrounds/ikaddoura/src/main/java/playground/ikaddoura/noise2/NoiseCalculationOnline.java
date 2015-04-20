@@ -31,7 +31,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.data.ReceiverPoint;
+import playground.ikaddoura.noise2.data.NoiseReceiverPoint;
 import playground.ikaddoura.noise2.handler.NoisePricingHandler;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
@@ -86,7 +86,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		this.noiseContext.getNoiseLinks().clear();
 		this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
 		
-		for (ReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
+		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.getLinkId2IsolatedImmission().clear();
 			rp.setFinalImmission(0.);
 			rp.setDamageCosts(0.);

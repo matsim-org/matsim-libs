@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -32,9 +33,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
@@ -95,8 +96,39 @@ public class NoiseCalculationOffline {
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(lastIteration);
 		
+		// ################################
+		
+		GridParameters gridParameters = new GridParameters();
+		gridParameters.setReceiverPointGap(receiverPointGap);
+		
+//		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
+//		double xMin = 4590855.;
+//		double yMin = 5819679.;
+//		double xMax = 4594202.;
+//		double yMax = 5821736.;
+		
+//      // Berlin Coordinates: Area of Berlin
+//		double xMin = 4573258.;
+//		double yMin = 5801225.;
+//		double xMax = 4620323.;
+//		double yMax = 5839639.;
+//		
+//		gridParameters.setReceiverPointsGridMinX(xMin);
+//		gridParameters.setReceiverPointsGridMinY(yMin);
+//		gridParameters.setReceiverPointsGridMaxX(xMax);
+//		gridParameters.setReceiverPointsGridMaxY(yMax);
+		
+		// Berlin Activity Types
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		String[] consideredActivities = {"home"};
+		gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+		
+		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+		
+		// ################################
+		
 		NoiseParameters noiseParameters = new NoiseParameters();
-		noiseParameters.setReceiverPointGap(receiverPointGap);
 		noiseParameters.setScaleFactor(10.);
 		noiseParameters.setInternalizeNoiseDamages(false);
 		
@@ -145,34 +177,9 @@ public class NoiseCalculationOffline {
 		tunnelLinkIDs.add(Id.create("73496", Link.class));
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
-		
-//		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
-//		double xMin = 4590855.;
-//		double yMin = 5819679.;
-//		double xMax = 4594202.;
-//		double yMax = 5821736.;
-		
-//      // Berlin Coordinates: Area of Berlin
-//		double xMin = 4573258.;
-//		double yMin = 5801225.;
-//		double xMax = 4620323.;
-//		double yMax = 5839639.;
-//		
-//		noiseParameters.setReceiverPointsGridMinX(xMin);
-//		noiseParameters.setReceiverPointsGridMinY(yMin);
-//		noiseParameters.setReceiverPointsGridMaxX(xMax);
-//		noiseParameters.setReceiverPointsGridMaxY(yMax);
-		
-		// Berlin Activity Types
-		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-//		String[] consideredActivities = {"home"};
-		noiseParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
-		
-		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		noiseParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 				
 		log.info("Loading scenario...");
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		log.info("Loading scenario... Done.");
 		
 		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
@@ -184,7 +191,7 @@ public class NoiseCalculationOffline {
 		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
 		events.addHandler(eventWriter);
 			
-		NoiseContext noiseContext = new NoiseContext(scenario, noiseParameters);
+		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
 				
