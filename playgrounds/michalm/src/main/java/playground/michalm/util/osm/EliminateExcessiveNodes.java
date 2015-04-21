@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.*;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
