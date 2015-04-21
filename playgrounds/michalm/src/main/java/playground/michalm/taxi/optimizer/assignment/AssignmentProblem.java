@@ -51,8 +51,7 @@ public class AssignmentProblem
     {
         this.unplannedRequests = unplannedRequests;
 
-        initData();
-        if (vData.dimension == 0 || rData.dimension == 0) {
+        if (!initDataAndCheckIfSchedulingRequired()) {
             return;
         }
 
@@ -64,14 +63,15 @@ public class AssignmentProblem
     }
 
 
-    private void initData()
+    private boolean initDataAndCheckIfSchedulingRequired()
     {
         rData = new AssignmentRequestData(optimConfig, unplannedRequests);
         if (rData.dimension == 0) {
-            return;
+            return false;
         }
 
         vData = new VehicleData(optimConfig);
+        return vData.dimension > 0;
     }
 
 

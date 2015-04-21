@@ -38,9 +38,9 @@ class MIPRequestData
 
 
     MIPRequestData(TaxiOptimizerConfiguration optimConfig,
-            SortedSet<TaxiRequest> unplannedRequests, int maxReqCount)
+            SortedSet<TaxiRequest> unplannedRequests, int planningHorizon)
     {
-        dimension = Math.min(maxReqCount, unplannedRequests.size());
+        dimension = Math.min(planningHorizon, unplannedRequests.size());
 
         requests = Iterables.toArray(Iterables.limit(unplannedRequests, dimension),
                 TaxiRequest.class);

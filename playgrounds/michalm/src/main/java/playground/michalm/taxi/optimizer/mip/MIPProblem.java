@@ -96,8 +96,7 @@ public class MIPProblem
     {
         this.unplannedRequests = unplannedRequests;
 
-        initData();
-        if (vData.dimension == 0 || rData.dimension == 0) {
+        if (!initDataAndCheckIfSchedulingRequired()) {
             return;
         }
 
@@ -122,15 +121,15 @@ public class MIPProblem
     }
 
 
-    private void initData()
+    private boolean initDataAndCheckIfSchedulingRequired()
     {
         vData = new VehicleData(optimConfig);
         if (vData.dimension == 0) {
-            return;
+            return false;
         }
 
-        int maxReqCount = getPlanningHorizon();
-        rData = new MIPRequestData(optimConfig, unplannedRequests, maxReqCount);
+        rData = new MIPRequestData(optimConfig, unplannedRequests, getPlanningHorizon());
+        return rData.dimension > 0;
     }
 
 
