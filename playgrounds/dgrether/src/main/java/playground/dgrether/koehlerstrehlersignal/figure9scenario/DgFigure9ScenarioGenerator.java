@@ -19,17 +19,14 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.figure9scenario;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.data.SignalsScenarioWriter;
+import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -37,11 +34,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.v11.LaneData11;
-import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v11.*;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
@@ -59,12 +52,10 @@ import org.matsim.signals.model.Signal;
 import org.matsim.signals.model.SignalGroup;
 import org.matsim.signals.model.SignalPlan;
 import org.matsim.signals.model.SignalSystem;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
-import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
-import org.matsim.contrib.signals.utils.SignalUtils;
-
 import playground.dgrether.DgPaths;
+
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**

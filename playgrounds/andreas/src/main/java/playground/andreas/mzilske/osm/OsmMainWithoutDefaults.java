@@ -19,16 +19,8 @@
 
 package playground.andreas.mzilske.osm;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -37,8 +29,10 @@ import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
 import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
 import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
-
 import uk.co.randomjunk.osmosis.transform.v0_6.TransformTask;
+
+import java.io.File;
+import java.util.*;
 
 public class OsmMainWithoutDefaults {
 	

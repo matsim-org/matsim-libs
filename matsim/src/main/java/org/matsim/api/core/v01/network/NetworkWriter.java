@@ -18,9 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.api.experimental.network;
+package org.matsim.api.core.v01.network;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimWriter;
 
 /**
@@ -28,7 +27,6 @@ import org.matsim.core.api.internal.MatsimWriter;
  *
  */
 public class NetworkWriter implements MatsimWriter {
-	// this really is essentially a factory. :-)
 
 	private final Network network ;
 	

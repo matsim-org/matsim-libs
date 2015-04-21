@@ -20,19 +20,9 @@
 
 package playground.christoph.evacuation.network;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -40,8 +30,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.KmlNetworkWriter;
@@ -54,8 +44,10 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.vis.kml.KMZWriter;
-
 import playground.christoph.evacuation.config.EvacuationConfig;
+
+import java.io.IOException;
+import java.util.*;
 
 /*
  * Adapts a given Network to be used in an evacuation scenario.

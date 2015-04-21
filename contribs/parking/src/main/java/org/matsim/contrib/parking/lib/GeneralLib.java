@@ -22,7 +22,6 @@ package org.matsim.contrib.parking.lib;
 import net.opengis.kml._2.DocumentType;
 import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -40,16 +39,15 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.StringMatrixFilter;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -70,7 +68,6 @@ import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-
 import java.awt.*;
 import java.io.*;
 import java.util.*;

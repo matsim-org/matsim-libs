@@ -19,20 +19,13 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.osm;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -45,9 +38,11 @@ import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
 import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
 import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
-
 import playground.dgrether.DgPaths;
 import playground.dgrether.osm.OSMEntityCollector;
+
+import java.io.File;
+import java.util.*;
 
 
 /**

@@ -19,17 +19,18 @@
 
 package playground.michalm.util.gis;
 
-import java.util.*;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class SubNetworkCreator

@@ -20,14 +20,7 @@
 
 package playground.christoph.evacuation.withinday.replanning.utils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.atomic.AtomicBoolean;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -35,10 +28,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -64,7 +57,6 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
-
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.controler.EvacuationTripRouterFactory;
@@ -75,7 +67,13 @@ import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Decides where a household will meet after the evacuation order has been given.

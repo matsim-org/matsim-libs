@@ -1,25 +1,19 @@
 package playground.mzilske.d4d;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import crosby.binary.osmosis.OsmosisReader;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.tagfilter.v0_6.TagFilter;
-
 import playground.mzilske.osm.NetworkSink;
-import crosby.binary.osmosis.OsmosisReader;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.*;
 
 public class CreateNetwork {
 	

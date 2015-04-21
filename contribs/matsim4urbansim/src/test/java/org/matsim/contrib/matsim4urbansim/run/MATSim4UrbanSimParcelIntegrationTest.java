@@ -18,25 +18,24 @@
  * *********************************************************************** */
 package org.matsim.contrib.matsim4urbansim.run;
 
+import difflib.Delta;
+import difflib.DiffUtils;
+import difflib.Patch;
+import org.apache.log4j.Logger;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.network.NetworkWriter;
+import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
+import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
+import org.matsim.contrib.matsim4urbansim.utils.CreateTestUrbansimPopulation;
+import org.matsim.core.utils.misc.CRCChecksum;
+import org.matsim.testcases.MatsimTestUtils;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
-import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
-import org.matsim.contrib.matsim4urbansim.utils.CreateTestUrbansimPopulation;
-import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestUtils;
-
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
 
 /**
  * @author nagel

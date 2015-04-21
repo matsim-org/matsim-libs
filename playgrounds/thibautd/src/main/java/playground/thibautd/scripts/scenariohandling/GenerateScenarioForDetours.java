@@ -19,51 +19,29 @@
  * *********************************************************************** */
 package playground.thibautd.scripts.scenariohandling;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.HouseholdsConfigGroup;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.ScenarioConfigGroup;
-import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.households.Household;
-import org.matsim.households.HouseholdImpl;
-import org.matsim.households.Households;
-import org.matsim.households.HouseholdsImpl;
-import org.matsim.households.HouseholdsWriterV10;
-
+import org.matsim.households.*;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
 import playground.thibautd.utils.UniqueIdFactory;
+
+import java.util.*;
 
 /**
  * @author thibautd

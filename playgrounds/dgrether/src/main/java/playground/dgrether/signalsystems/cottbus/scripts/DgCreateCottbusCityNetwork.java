@@ -19,9 +19,10 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus.scripts;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -31,12 +32,9 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
 import playground.dgrether.DgPaths;
 import playground.dgrether.events.DgNetShrinkImproved;
 import playground.dgrether.koehlerstrehlersignal.network.DgNetworkUtils;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 
 /**

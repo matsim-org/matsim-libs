@@ -1,7 +1,5 @@
 package org.matsim.contrib.matsim4urbansim.accessibility;
 
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -9,6 +7,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
@@ -22,7 +21,6 @@ import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
 import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -33,6 +31,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.Map;
 
 public class AccessibilityTest implements SpatialGridDataExchangeInterface, ZoneDataExchangeInterface {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();

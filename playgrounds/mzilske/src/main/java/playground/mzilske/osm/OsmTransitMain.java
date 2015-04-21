@@ -19,11 +19,8 @@
 
 package playground.mzilske.osm;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -32,6 +29,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
 import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+
+import java.io.File;
+import java.io.IOException;
 
 public class OsmTransitMain {
 	

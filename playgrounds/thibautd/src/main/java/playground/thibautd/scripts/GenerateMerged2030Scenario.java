@@ -19,18 +19,17 @@
  * *********************************************************************** */
 package playground.thibautd.scripts;
 
-import java.io.File;
-
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
 import playground.ivt.matsim2030.Matsim2030Utils;
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
+
+import java.io.File;
 
 /**
  * @author thibautd
