@@ -27,11 +27,10 @@ import org.apache.commons.math3.optim.ConvergenceChecker;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+import org.apache.commons.math3.optim.nonlinear.scalar.MultivariateOptimizer;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
-import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.PowellOptimizer;
 import org.apache.log4j.Logger;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
@@ -51,10 +50,6 @@ public class ModelIterator {
 	private final double precisionClustering;
 	private final double precisionDegree;
 
-	private final double initialPrimaryStep;
-	private final double initialSecondaryStep;
-
-	private final int stagnationLimit;
 	private final int maxIterations;
 
 	// TODO: make adaptive (the closer to the target value,
@@ -72,10 +67,6 @@ public class ModelIterator {
 		this.precisionClustering = config.getPrecisionClustering();
 		this.precisionDegree = config.getPrecisionDegree();
 
-		this.initialPrimaryStep = config.getInitialPrimaryStep();
-		this.initialSecondaryStep = config.getInitialSecondaryStep();
-
-		this.stagnationLimit = config.getStagnationLimit();
 		this.maxIterations = config.getMaxIterations();
 	}
 
@@ -95,15 +86,9 @@ public class ModelIterator {
 	public SocialNetwork iterateModelToTarget(
 			final ModelRunner runner,
 			final Thresholds initialThresholds ) {
-		final CMAESOptimizer optimizer =
-			new CMAESOptimizer(
-					maxIterations,
-					0,
-					true,
-					0,
-					0,
-					new MersenneTwister( 123 ),
-					false, // whether to collect data
+		final MultivariateOptimizer optimizer =
+			new PowellOptimizer(
+					1E-9,1E-9,
 					new Convergence() );
 
 		final double x = initialThresholds.getPrimaryThreshold();
@@ -114,10 +99,7 @@ public class ModelIterator {
 					GoalType.MINIMIZE,
 					new MaxEval( maxIterations ),
 					new InitialGuess( new double[]{ x , y } ),
-					new ObjectiveFunction( new Function( runner ) ),
-					new CMAESOptimizer.Sigma( new double[]{ initialPrimaryStep , initialSecondaryStep } ),
-					new CMAESOptimizer.PopulationSize( 10 ),
-					SimpleBounds.unbounded( 2 )
+					new ObjectiveFunction( new Function( runner ) )
 					);
 
 		return runner.runModel( new Thresholds( result.getPoint()[ 0 ] , result.getPoint()[ 1 ] ) );
@@ -137,12 +119,6 @@ public class ModelIterator {
 		if ( rate < 0 || rate > 1 ) throw new IllegalArgumentException( rate+" is not in [0;1]" );
 		this.samplingRateClustering = rate;
 	}
-
-	//private boolean isAcceptable(
-	//		final Thresholds thresholds ) {
-	//	return distClustering( thresholds ) < precisionClustering &&
-	//		distDegree( thresholds ) < precisionDegree;
-	//}
 
 	private double distClustering( final Thresholds thresholds ) {
 		return Math.abs( targetClustering -  thresholds.getResultingClustering() );
