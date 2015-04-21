@@ -61,10 +61,10 @@ public class DumpRelations {
 
 	private static final double distThreshold = 100000;
 
-	private static final double numRelations = 6000;
+	private static final double numRelations = 3000;
 
 	public static void main(String[] args) throws IOException {
-		String runId = "826";
+		String runId = "874";
 		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
 		String refFile2 = "/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml";
 		String refFile1 = "/home/johannes/gsv/matrices/refmatrices/itp.xml";

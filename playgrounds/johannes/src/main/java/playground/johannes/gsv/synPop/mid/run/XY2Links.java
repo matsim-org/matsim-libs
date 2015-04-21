@@ -52,7 +52,9 @@ public class XY2Links {
 		new MatsimNetworkReader(scenario).readFile(netfile);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
-
+//		NetworkCleaner cleaner = new NetworkCleaner();
+//		cleaner.run(network);
+		
 		final PopulationImpl plans = (PopulationImpl) scenario.getPopulation();
 		plans.setIsStreaming(true);
 		final PopulationReader plansReader = new MatsimPopulationReader(scenario);

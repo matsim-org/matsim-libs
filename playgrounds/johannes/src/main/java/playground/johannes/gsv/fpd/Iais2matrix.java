@@ -17,13 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.io;
+package playground.johannes.gsv.fpd;
 
-import java.util.List;
-
-import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrix;
-import org.matsim.visum.VisumMatrixReader;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
@@ -32,29 +30,31 @@ import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
  * @author johannes
  *
  */
-public class Visum2KeyMatrix {
+public class Iais2matrix {
 
-	public static KeyMatrix convert(Matrix visumMatrix) {
-		KeyMatrix keyMatrix = new KeyMatrix();
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/fpd/fraunhofer/study/data/raw/15-04-2015/AggregatedTrajectories_HFW_noTransit_min3D_Flows_daily.csv"));
+		String line = reader.readLine();
 		
-		for(List<Entry> entries : visumMatrix.getFromLocations().values()) {
-			for(Entry entry : entries) {
-				keyMatrix.add(entry.getFromLocation(), entry.getToLocation(), entry.getValue());
-			}
+		KeyMatrix m = new KeyMatrix();
+		
+		while((line = reader.readLine()) != null) {
+			String tokens[] = line.split(",");
+			
+			String id_i = tokens[2];
+			String id_j = tokens[3];
+			double volume = Double.parseDouble(tokens[29]);
+			
+			m.set(id_i, id_j, volume);
 		}
-
-		return keyMatrix;
-	}
-	
-	public static void main(String[] args) {
-		Matrix visumMatrix = new Matrix("1", null);
-		VisumMatrixReader reader = new VisumMatrixReader(visumMatrix);
-		reader.readFile("/home/johannes/gsv/matrices/raw/TomTom/TTgrob_Winter .txt");
-		
-		KeyMatrix keyMatrix = convert(visumMatrix);
+		reader.close();
 		
 		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(keyMatrix, "/home/johannes/gsv/matrices/raw/TomTom/TTgrob_Winter.xml");
+		writer.write(m, "/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/15-04-2015/iais.3D.xml");
 	}
 
 }

@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.johannes.gsv.sim.cadyts.CadytsContext;
-import playground.johannes.gsv.sim.cadyts.ODCalibrator;
 
 /**
  * @author johannes

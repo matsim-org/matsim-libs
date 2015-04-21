@@ -64,7 +64,7 @@ public class MatrixCompare2 {
 	 */
 	public static void main(String[] args) throws IOException {
 		String runId = "826";
-		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
+		String simFile = "/home/johannes/sge/prj/matsim/run/874/output/nuts3/miv.summer.sym.xml";//String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
 //		String simFile = "/home/johannes/gsv/matrices/simmatrices/avr/779-780/miv.sym.xml";
 		String refFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
 		/*
@@ -100,6 +100,8 @@ public class MatrixCompare2 {
 		System.out.println(String.format("Intraplan sum: %s", MatrixOperations.sum(m1)));
 		System.out.println(String.format("%s sum: %s", runId, MatrixOperations.sum(m2)));
 
+//		System.exit(-1);
+		
 		KeyMatrix mErr = MatrixOperations.errorMatrix(m1, m2);
 		writeErrorRank(mErr, m1, m2, zones);
 
@@ -302,7 +304,8 @@ public class MatrixCompare2 {
 					System.err.println();
 				}
 				
-				if (d > 100000 && d < 1000000) {
+//				if (d > 100000 && d < 1000000) {
+				if (d > 0 && d < 1000000) {
 					Double val = m.get(i, j);
 					// if(val == null) val = 1.0;
 					if (val != null && val > 0) {

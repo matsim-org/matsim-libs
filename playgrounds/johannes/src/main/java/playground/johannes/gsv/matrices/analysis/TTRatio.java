@@ -55,8 +55,8 @@ public class TTRatio {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-//		String carVolFile = "/home/johannes/gsv/matrices/simmatrices/miv.826.xml";
-		String carVolFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
+		String carVolFile = "/home/johannes/gsv/matrices/simmatrices/miv.826.xml";
+//		String carVolFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
 		String railVolFile = "/home/johannes/gsv/matrices/analysis/marketShares/rail.all.nuts3.xml";
 		String carTTFile = "/home/johannes/gsv/matrices/analysis/marketShares/ttMatrix.xml";
 		String railTTFile = "/home/johannes/gsv/matrices/analysis/marketShares/railTT.xml";
@@ -69,16 +69,16 @@ public class TTRatio {
 
 		reader.parse(railVolFile);
 		KeyMatrix railVol = reader.getMatrix();
-//		MatrixOperations.applyFactor(railVol, 1/365.0);
+		MatrixOperations.applyFactor(railVol, 1/365.0);
 
 		reader.parse(carTTFile);
 		KeyMatrix carTT = reader.getMatrix();
-		MatrixOperations.applyFactor(carTT, 1.5);
+		MatrixOperations.applyFactor(carTT, 2);
 		
 		reader.parse(railTTFile);
 		KeyMatrix railTT = reader.getMatrix();
 
-		List<Tuple<String, String>> relations = getRelations(railVol, 10000);
+		List<Tuple<String, String>> relations = getRelations(railVol, 100000);
 //		List<Tuple<String, String>> relations = getRelations(carVol, 10000);
 		
 		BufferedWriter ratioWriter = new BufferedWriter(new FileWriter("/home/johannes/gsv/matrices/analysis/marketShares/ratio.txt"));
@@ -118,8 +118,9 @@ public class TTRatio {
 		
 		ratioWriter.close();
 		
-		Discretizer disc = FixedSampleSizeDiscretizer.create(ratios.toNativeArray(), 50);
-		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), disc);
+		Discretizer disc = FixedSampleSizeDiscretizer.create(ratios.toNativeArray(), 50, 200);
+//		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), disc);
+		TDoubleDoubleHashMap hist = Correlations.mean(ratios.toNativeArray(), shares.toNativeArray(), new LinearDiscretizer(0.02));
 		TXTWriter.writeMap(hist, "Ratio", "Share", "/home/johannes/gsv/matrices/analysis/marketShares/ratio.hist.txt");
 	}
 

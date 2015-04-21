@@ -45,20 +45,20 @@ public class TomTom2Matrix {
 
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 		Matrix m = new Matrix("tomtom", null);
 		VisumMatrixReader reader = new VisumMatrixReader(m);
 
-		reader.readFile("/home/johannes/gsv/matrices/raw/TomTom/TTgrob_gesamt_aus_zeitunabhängig.txt");
+		reader.readFile(args[0]);
 
 		ZoneCollection zones = new ZoneCollection();
-		String data = new String(Files.readAllBytes(Paths.get("/home/johannes/gsv/gis/nuts/de.nuts3.json")));
+		String data = new String(Files.readAllBytes(Paths.get(args[1])));
 		zones.addAll(Zone2GeoJSON.parseFeatureCollection(data));
-		zones.setPrimaryKey("gsvId");
+		zones.setPrimaryKey("NO");
 		data = null;
-		
+
 		Set<Entry> all = new HashSet<>();
 		for (List<Entry> entries : m.getFromLocations().values()) {
 			all.addAll(entries);
@@ -75,13 +75,13 @@ public class TomTom2Matrix {
 			ProgressLogger.step();
 			Zone zi = zones.get(e.getFromLocation());
 			Zone zj = zones.get(e.getToLocation());
-			if(zi != null && zj != null) {
-			km.set(e.getFromLocation(), e.getToLocation(), e.getValue());
+			if (zi != null && zj != null) {
+				km.set(e.getFromLocation(), e.getToLocation(), e.getValue());
 			}
 		}
 
 		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(km, "/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml");
+		writer.write(km, args[2]);
 	}
 
 }
