@@ -24,7 +24,8 @@ package org.matsim.contrib.pseudosimulation.mobsim;
 
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.pseudosimulation.controler.listeners.MobSimSwitcher;
+import org.matsim.contrib.pseudosimulation.PSimControler;
+import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.RunnableMobsim;
@@ -38,18 +39,20 @@ public class SwitchingMobsimProvider implements Provider<RunnableMobsim> {
     private Config config;
     private Scenario scenario;
     private EventsManager eventsManager;
+    private PSimControler.MobSimSwitcher mobSimSwitcher;
 
     @Inject
-    SwitchingMobsimProvider(Config config, Scenario scenario, EventsManager eventsManager) {
+    SwitchingMobsimProvider(Config config, Scenario scenario, EventsManager eventsManager, PSimControler.MobSimSwitcher mobSimSwitcher) {
         this.config = config;
         this.scenario = scenario;
         this.eventsManager = eventsManager;
+        this.mobSimSwitcher = mobSimSwitcher;
     }
 
     @Override
     public RunnableMobsim get() {
         String mobsim = config.controler().getMobsim();
-        if (MobSimSwitcher.isQSimIteration) {
+        if (mobSimSwitcher.isQSimIteration()) {
             if (mobsim.equals("jdeqsim")) {
                 return new JDEQSimulation(scenario, eventsManager);
             } else {

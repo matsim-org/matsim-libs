@@ -5,7 +5,9 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.pseudosimulation.controler.listeners.MobSimSwitcher;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
+import org.matsim.contrib.pseudosimulation.PSimControler;
+import org.matsim.core.config.Config;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
@@ -16,17 +18,18 @@ import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
  *         Extends Ordonez's {@link WaitTimeStuckCalculator} to only handle
  *         events during QSim iterations.
  */
-public class PSimWaitTimeCalculator extends WaitTimeStuckCalculator {
-
-	public PSimWaitTimeCalculator(Population population,
-			TransitSchedule transitSchedule, int timeSlot, int totalTime) {
-		super(population, transitSchedule, timeSlot, totalTime);
-
+public class PSimWaitTimeCalculator extends WaitTimeCalculatorSerializable {
+	private final PSimControler.MobSimSwitcher switcher;
+	public PSimWaitTimeCalculator(
+			TransitSchedule transitSchedule, Config config,
+								  PSimControler.MobSimSwitcher switcher) {
+		super(transitSchedule,config);
+		this.switcher = switcher;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		if (MobSimSwitcher.isQSimIteration) {
+		if (switcher.isQSimIteration()) {
 			Logger.getLogger(this.getClass()).error(
 					"Calling reset on traveltimecalc");
 			super.reset(iteration);
@@ -35,20 +38,16 @@ public class PSimWaitTimeCalculator extends WaitTimeStuckCalculator {
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
 
-	@Override
-	public void handleEvent(PersonStuckEvent event) {
-		if (MobSimSwitcher.isQSimIteration)
-			super.handleEvent(event);
-	}
+
 
 }

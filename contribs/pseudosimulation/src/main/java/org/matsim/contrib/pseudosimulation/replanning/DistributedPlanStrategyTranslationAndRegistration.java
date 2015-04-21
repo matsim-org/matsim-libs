@@ -1,16 +1,14 @@
-package org.matsim.contrib.pseudosimulation.distributed.replanning;
+package org.matsim.contrib.pseudosimulation.replanning;
 
-import org.matsim.contrib.pseudosimulation.controler.PSimControler;
-import org.matsim.contrib.pseudosimulation.distributed.replanning.factories.DistributedPlanMutatorStrategyFactory;
-import org.matsim.contrib.pseudosimulation.distributed.replanning.factories.DistributedPlanSelectorStrategyFactory;
-import org.matsim.contrib.pseudosimulation.replanning.modules.PSimPlanMarkerModule;
+import org.matsim.contrib.pseudosimulation.PSimControler;
+import org.matsim.contrib.pseudosimulation.replanning.factories.DistributedPlanMutatorStrategyFactory;
+import org.matsim.contrib.pseudosimulation.replanning.factories.DistributedPlanSelectorStrategyFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.modules.*;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,9 +24,9 @@ import java.util.Map;
  *         during PSim iterations, and only run during QSim iterations.
  *         <p/>
  *         <p/>
- *         This class records strategies that should work with PSim. It extends
- *         their factories by appending a {@link PSimPlanMarkerModule} at the
- *         end of each strategy. Each factory is registered during controler
+ *         This class records strategies that should work with PSim. It creates staretgy delegate instances
+ *         and adds mutated strategies to PSim.
+ *         Each factory is registered during controler
  *         construction, and the config entries are changed to refer to their
  *         PSim equivalents in the controler's substituteStrategies() method.
  *         <p/>
@@ -40,11 +38,14 @@ import java.util.Map;
  *         non-QSim iterations.
  */
 public class DistributedPlanStrategyTranslationAndRegistration {
+    public static final String SUFFIX = "PSIM";
     public static Map<String, Class<? extends PlanStrategyFactory>> SupportedSelectors = new HashMap<>();
-
     public static Map<String, Class<? extends PlanStrategyFactory>> SupportedMutators = new HashMap<>();
     public static Map<String, Character> SupportedMutatorGenes = new HashMap<>();
     public static boolean TrackGenome = false;
+
+    private DistributedPlanStrategyTranslationAndRegistration() {
+    }
 
     static void initMaps() {
         SupportedSelectors.put("KeepLastSelected", KeepLastSelectedPlanStrategyFactory.class);
@@ -77,35 +78,21 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     }
 
-
-
-    public static final String SUFFIX = "PSIM";
-
-    public DistributedPlanStrategyTranslationAndRegistration(Controler  controler, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
-
+    public static void registerStrategiesWithControler(Controler controler, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
         for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedSelectors.entrySet()) {
-            try {
-                controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
-                        new DistributedPlanSelectorStrategyFactory<>( slave,
-                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance(), quickReplanning, selectionInflationFactor, controler.getScenario(), controler.getEvents()));
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
-                e1.printStackTrace();
-            }
+            controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
+                    new DistributedPlanSelectorStrategyFactory(slave,quickReplanning,selectionInflationFactor,controler,e.getKey()));
+
         }
 
         for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedMutators.entrySet()) {
-            try {
-                controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
-                        new DistributedPlanMutatorStrategyFactory<>(slave,
-                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance(),
-                                SupportedMutatorGenes.get(e.getKey()),TrackGenome,controler));
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
-                e1.printStackTrace();
-            }
+            controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
+                    new DistributedPlanMutatorStrategyFactory(slave, SupportedMutatorGenes.get(e.getKey()),TrackGenome,controler,e.getKey())
+                    );
         }
 
-
     }
+
 
     public static boolean isStrategySupported(String name) {
         if (SupportedSelectors.size() == 0)
@@ -129,10 +116,10 @@ public class DistributedPlanStrategyTranslationAndRegistration {
             } else {
                 if (SupportedMutators.containsKey(classname))
                     settings.setStrategyName(classname + DistributedPlanStrategyTranslationAndRegistration.SUFFIX);
-                if (SupportedSelectors.containsKey(classname)){
+                if (SupportedSelectors.containsKey(classname)) {
                     settings.setStrategyName(classname + DistributedPlanStrategyTranslationAndRegistration.SUFFIX);
                     //implement quick replanning by simply multiplying the selector weights by the number of PSim Iterations
-                    if(quickReplanning){
+                    if (quickReplanning) {
                         settings.setWeight(settings.getWeight() * (double) selectionInflationFactor);
                     }
                 }

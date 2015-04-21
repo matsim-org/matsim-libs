@@ -2,22 +2,24 @@ package org.matsim.contrib.pseudosimulation.trafficinfo;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.contrib.pseudosimulation.controler.listeners.MobSimSwitcher;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
+import org.matsim.contrib.pseudosimulation.PSimControler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 
-public class PSimStopStopTimeCalculator extends StopStopTimeCalculator {
-
+public class PSimStopStopTimeCalculator extends StopStopTimeCalculatorSerializable {
+	private final PSimControler.MobSimSwitcher switcher;
 	public PSimStopStopTimeCalculator(TransitSchedule transitSchedule,
-			 int timeSlot, int totalTime) {
+			 int timeSlot, int totalTime, PSimControler.MobSimSwitcher switcher) {
 		super(transitSchedule,  timeSlot, totalTime);
+		this.switcher = switcher;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		if (MobSimSwitcher.isQSimIteration) {
+		if (switcher.isQSimIteration()) {
 			Logger.getLogger(this.getClass()).error(
 					"Calling reset on traveltimecalc");
 			super.reset(iteration);
@@ -26,13 +28,13 @@ public class PSimStopStopTimeCalculator extends StopStopTimeCalculator {
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
 

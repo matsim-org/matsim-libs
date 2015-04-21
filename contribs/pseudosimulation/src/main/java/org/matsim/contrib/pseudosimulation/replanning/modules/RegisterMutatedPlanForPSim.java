@@ -1,4 +1,4 @@
-package org.matsim.contrib.pseudosimulation.distributed.replanning.modules;
+package org.matsim.contrib.pseudosimulation.replanning.modules;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -7,7 +7,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.contrib.pseudosimulation.distributed.replanning.PlanCatcher;
+import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 
 /**
  * Created by fouriep on 11/26/14.

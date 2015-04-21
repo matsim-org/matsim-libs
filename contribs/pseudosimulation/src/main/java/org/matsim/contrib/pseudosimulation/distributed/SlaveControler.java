@@ -8,17 +8,15 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
-import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
-import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
+import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
-import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
-import org.matsim.contrib.pseudosimulation.distributed.replanning.DistributedPlanStrategyTranslationAndRegistration;
-import org.matsim.contrib.pseudosimulation.distributed.replanning.PlanCatcher;
+import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
+import org.matsim.contrib.common.randomizedtransitrouter.RandomizedTransitRouterModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -44,6 +42,9 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.Vehicle;
+
+import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
+import org.matsim.contrib.eventsBasedPTRouter.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -207,12 +208,13 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler = new Controler(scenario);
         plancatcher = new PlanCatcher();
-        new DistributedPlanStrategyTranslationAndRegistration(this.matsimControler, plancatcher, quickReplannning, numberOfPSimIterationsPerCycle);
+        DistributedPlanStrategyTranslationAndRegistration.registerStrategiesWithControler(this.matsimControler, plancatcher, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler.setOverwriteFiles(true);
         matsimControler.addControlerListener(this);
         linkTravelTimes = new FreeSpeedTravelTime();
         travelTime = new ReplaceableTravelTime();
         travelTime.setTravelTime(linkTravelTimes);
+        pSimFactory = new PSimFactory();
         matsimControler.setModules(new AbstractModule() {
             @Override
             public void install() {
@@ -255,6 +257,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         if (IntelligentRouters) {
             matsimControler.setTransitRouterFactory(new TransitRouterEventsWSFactory(scenario, waitTimes, stopStopTimes));
         } else {
+                    TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
+                            new TravelTimeAndDistanceBasedTravelDisutilityFactory();
+                    matsimControler.setTravelDisutilityFactory(disutilityFactory);
+                    disutilityFactory.setSigma(0.1);
             matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
         }
         if (trackGenome) {
@@ -305,8 +311,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 
     @Override
     public void run() {
-        pSimFactory = new PSimFactory();
-        matsimControler.setMobsimFactory(pSimFactory);
         matsimControler.run();
     }
 

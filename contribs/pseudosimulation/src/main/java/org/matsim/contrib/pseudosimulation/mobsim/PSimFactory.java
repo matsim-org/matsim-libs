@@ -26,9 +26,6 @@ public class PSimFactory implements MobsimFactory {
 	private TravelTime travelTime;
 	private WaitTime waitTime;
 	private StopStopTime stopStopTime;
-
-
-	private int iteration = 0;
 	private TransitPerformance transitPerformance;
 
 	@Override

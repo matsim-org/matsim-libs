@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.contrib.pseudosimulation.PSimControler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -45,15 +46,22 @@ public class TransitPerformanceRecorder {
     private final Scenario scenario;
     private final Map<Id<Vehicle>, Vehicle> vehicles;
     private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
-
-    public TransitPerformance getTransitPerformance() {
-        return transitPerformance;
-    }
-
+    private PSimControler.MobSimSwitcher switcher;
     private TransitPerformance transitPerformance;
     private VehicleTrackerCollection vehicletrackers;
     private Map<Id<Departure>, TransitRoute> departureIdToRoute;
 
+
+
+    private boolean shouldReset() {
+        if(switcher == null)
+            return true;
+        return switcher.isQSimIteration();
+    }
+    public TransitPerformanceRecorder(Scenario scenario, EventsManager eventsManager, PSimControler.MobSimSwitcher switcher) {
+        this(scenario, eventsManager);
+        this.switcher = switcher;
+    }
     public TransitPerformanceRecorder(Scenario scenario, EventsManager eventsManager) {
 //        identifyVehicleRoutes();
         vehicletrackers = new VehicleTrackerCollection(scenario.getTransitVehicles().getVehicles().size());
@@ -65,6 +73,10 @@ public class TransitPerformanceRecorder {
         this.transitPerformance = new TransitPerformance();
     }
 
+    public TransitPerformance getTransitPerformance() {
+        return transitPerformance;
+    }
+
     private int getVehicleCapacity(Id<Vehicle> vehicleId) {
         VehicleType type = vehicles.get(vehicleId).getType();
         VehicleCapacity capacity = vehicleTypes.get(type.getId()).getCapacity();
@@ -72,28 +84,16 @@ public class TransitPerformanceRecorder {
 
     }
 
-//    private void identifyVehicleRoutes() {
-//        departureIdToRoute = new HashMap<>();
-//        Collection<TransitLine> lines = scenario.getTransitSchedule().getTransitLines().values();
-//        for (TransitLine line : lines) {
-//            Collection<TransitRoute> routes = line.getRoutes().values();
-//            for (TransitRoute route : routes) {
-//                Collection<Departure> departures = route.getDepartures().values();
-//                for (Departure departure : departures) {
-//                    departureIdToRoute.put(new FullDeparture(line.getId(), route.getId(), departure.getVehicleId(),
-//                            departure.getId()).getFullDepartureId(), route);
-//                }
-//            }
-//        }
-//    }
 
     class RidershipHandler implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 
         @Override
         public void reset(int iteration) {
-            vehicletrackers = new VehicleTrackerCollection(scenario.getTransitVehicles().getVehicles().size());
-            transitPerformance = new TransitPerformance();
+            if(shouldReset()) {
+                vehicletrackers = new VehicleTrackerCollection(scenario.getTransitVehicles().getVehicles().size());
+                transitPerformance = new TransitPerformance();
+            }
         }
 
 

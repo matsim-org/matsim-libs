@@ -1,4 +1,4 @@
-package org.matsim.contrib.pseudosimulation.distributed.replanning.modules;
+package org.matsim.contrib.pseudosimulation.replanning.modules;
 
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;

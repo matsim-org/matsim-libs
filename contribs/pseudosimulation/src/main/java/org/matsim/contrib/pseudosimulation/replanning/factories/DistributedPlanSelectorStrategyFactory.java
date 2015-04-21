@@ -17,41 +17,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.pseudosimulation.distributed.replanning.factories;
+package org.matsim.contrib.pseudosimulation.replanning.factories;
 
-import org.matsim.contrib.pseudosimulation.distributed.replanning.PlanCatcher;
-import org.matsim.contrib.pseudosimulation.distributed.replanning.modules.RegisterMutatedPlanForPSim;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
+import org.matsim.contrib.pseudosimulation.replanning.selectors.DistributedPlanSelector;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 
 /**
- * @author fouriep Creates plan selector of type T for distributed Simulation. Limits the expected value of being selected for PSim execution
- * in a cycle to the value specified in the config for the selector, thus updating plan scores to the latest travel time information
- * but preventing excessive repeated execution of plans during the cycle.
+ * @author fouriep Creates plan selector for distributed Simulation. Limits the expected value of being selected for PSim execution
+ *         in a cycle to the value specified in the config for the selector, thus updating plan scores to the latest travel time information
+ *         but preventing excessive repeated execution of plans during the cycle.
  *         .
  */
-public class DistributedPlanMutatorStrategyFactory<T extends PlanStrategyFactory> implements
-		PlanStrategyFactory {
-    private final PlanCatcher slave;
-    private final char gene;
-    private final boolean trackGenome;
+public class DistributedPlanSelectorStrategyFactory implements PlanStrategyFactory {
+
+    private final String strategyName;
     private final Controler controler;
-    T delegate;
-    public DistributedPlanMutatorStrategyFactory(PlanCatcher slave, T delegate, char gene, boolean trackGenome, Controler controler) {
-        this.delegate = delegate;
+    boolean quickReplanning;
+    int selectionInflationFactor;
+    private PlanCatcher slave;
+    private Scenario scenario;
+
+    public DistributedPlanSelectorStrategyFactory(PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor, Controler controler, String strategyName) {
         this.slave = slave;
-        this.gene=gene;
-        this.trackGenome=trackGenome;
-        this.controler=controler;
+        this.quickReplanning = quickReplanning;
+        this.selectionInflationFactor = selectionInflationFactor;
+        this.controler = controler;
+        this.strategyName = strategyName;
     }
 
-	@Override
-	public PlanStrategy get() {
-        PlanStrategyImpl planStrategy = (PlanStrategyImpl) delegate.get();
-        planStrategy.addStrategyModule(new RegisterMutatedPlanForPSim(slave,gene,trackGenome,controler));
-        return planStrategy;
-	}
+    @Override
+    public PlanStrategy get() {
+        PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(
+                new DistributedPlanSelector( controler, strategyName, slave, quickReplanning,  selectionInflationFactor)
+        );
+        return builder.build();
+    }
 
 }

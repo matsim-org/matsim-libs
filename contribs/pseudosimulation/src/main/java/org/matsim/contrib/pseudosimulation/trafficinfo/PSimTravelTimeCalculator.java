@@ -11,26 +11,29 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.pseudosimulation.PSimControler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-
-import org.matsim.contrib.pseudosimulation.controler.listeners.MobSimSwitcher;
+import org.matsim.contrib.pseudosimulation.PSimControler;
 
 /**
  * @author fouriep
  * 
  */
 public class PSimTravelTimeCalculator extends TravelTimeCalculator {
+	private final PSimControler.MobSimSwitcher switcher;
+
 	public PSimTravelTimeCalculator(Network network,
-			TravelTimeCalculatorConfigGroup ttconfigGroup, int numHrs) {
+			TravelTimeCalculatorConfigGroup ttconfigGroup, int numHrs, PSimControler.MobSimSwitcher switcher) {
 		super(network, ttconfigGroup.getTraveltimeBinSize(), numHrs,
 				ttconfigGroup);
+		this.switcher = switcher;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		if (MobSimSwitcher.isQSimIteration) {
+		if (switcher == null || switcher.isQSimIteration()) {
 			Logger.getLogger(this.getClass()).error(
 					"Calling reset on traveltimecalc");
 			super.reset(iteration);
@@ -42,43 +45,43 @@ public class PSimTravelTimeCalculator extends TravelTimeCalculator {
 
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(e);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent e) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(e);
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
-		if (MobSimSwitcher.isQSimIteration)
+		if (switcher.isQSimIteration())
 			super.handleEvent(event);
 	}
 
