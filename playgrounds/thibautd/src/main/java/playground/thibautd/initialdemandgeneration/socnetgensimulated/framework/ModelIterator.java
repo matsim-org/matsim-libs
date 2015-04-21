@@ -27,10 +27,11 @@ import org.apache.commons.math3.optim.ConvergenceChecker;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
+import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.MultiDirectionalSimplex;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.SimplexOptimizer;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
+import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.log4j.Logger;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
@@ -94,7 +95,16 @@ public class ModelIterator {
 	public SocialNetwork iterateModelToTarget(
 			final ModelRunner runner,
 			final Thresholds initialThresholds ) {
-		final SimplexOptimizer optimizer = new SimplexOptimizer( new Convergence() );
+		final CMAESOptimizer optimizer =
+			new CMAESOptimizer(
+					maxIterations,
+					0,
+					true,
+					0,
+					0,
+					new MersenneTwister( 123 ),
+					false, // whether to collect data
+					new Convergence() );
 
 		final double x = initialThresholds.getPrimaryThreshold();
 		final double y = initialThresholds.getSecondaryReduction();
@@ -105,8 +115,10 @@ public class ModelIterator {
 					new MaxEval( maxIterations ),
 					new InitialGuess( new double[]{ x , y } ),
 					new ObjectiveFunction( new Function( runner ) ),
-					//new NelderMeadSimplex( new double[]{ initialPrimaryStep , initialSecondaryStep } ) );
-					new MultiDirectionalSimplex( new double[]{ initialPrimaryStep , initialSecondaryStep } ) );
+					new CMAESOptimizer.Sigma( new double[]{ initialPrimaryStep , initialSecondaryStep } ),
+					new CMAESOptimizer.PopulationSize( 10 ),
+					SimpleBounds.unbounded( 2 )
+					);
 
 		return runner.runModel( new Thresholds( result.getPoint()[ 0 ] , result.getPoint()[ 1 ] ) );
 	}
