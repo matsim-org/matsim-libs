@@ -49,6 +49,7 @@ public final class SeepageNetworkFactory implements NetsimNetworkFactory<QNode, 
 				@Override
 				public QLaneI createLane(QLinkImpl qLinkImpl) {
 					AAQueueWithBuffer.Builder builder = new AAQueueWithBuffer.Builder(qLinkImpl) ;
+					builder.setVehicleQueue(new PassingVehicleQ());
 					return builder.build() ;
 				}};
 			return new QLinkImpl( link, network, toQueueNode, laneFactory ) ;

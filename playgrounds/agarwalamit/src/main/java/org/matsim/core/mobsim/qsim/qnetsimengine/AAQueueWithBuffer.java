@@ -505,7 +505,7 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 
 			addToBuffer(veh, now);
 			removeVehicleFromQueue(now,veh);
-			if(seepageAllowed && veh.getDriver().getMode().equals(seepMode)) noOfSeepModeBringFwd++;
+			if(isRestrictingNumberOfSeepMode && seepageAllowed && veh.getDriver().getMode().equals(seepMode)) noOfSeepModeBringFwd++;
 		} // end while
 	}
 
@@ -874,48 +874,38 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 	private boolean seepageAllowed = false;
 	private String seepMode = null; 
 	private boolean isSeepModeStorageFree = false;
+	
 	private int maxSeepModeAllowed = 4;
 	private int noOfSeepModeBringFwd = 0;
+	/**
+	 * basically required to get more data points in the congested branch of FD
+	 */
+	private boolean isRestrictingNumberOfSeepMode = true;
 	
 	private QVehicle peekFromVehQueue(){
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-
-		if(!seepageAllowed || vehQueue.size() <= 1){
-			// no seepage or no vehicle or only one vehicle in queue
-			return vehQueue.peek();
-		} else if(vehQueue.peek().getEarliestLinkExitTime()>now ){
-			//if earliestLinkExitTime of front vehicle is not reached returns
-			return vehQueue.peek();
-		} else if(vehQueue.peek().getDriver().getMode().equals(seepMode)) {
-			//driver is present in veh and driving seep mode
-			return vehQueue.peek();
-		} else {
-			if(noOfSeepModeBringFwd == maxSeepModeAllowed) {
+		QVehicle returnVeh = vehQueue.peek();
+		
+		if(seepageAllowed){
+			if(isRestrictingNumberOfSeepMode && noOfSeepModeBringFwd == maxSeepModeAllowed) {
 				noOfSeepModeBringFwd = 0;
-				return vehQueue.peek();
+				return returnVeh;
 			}
-			QVehicle returnVeh = null;
-			boolean foundSeepMode = false;
+			
 			VehicleQ<QVehicle> newVehQueue = new PassingVehicleQ();
-			Iterator<QVehicle> it = vehQueue.iterator();
+			newVehQueue.addAll(vehQueue);
+			
+			Iterator<QVehicle> it = newVehQueue.iterator();
 
 			while(it.hasNext()){
-				QVehicle veh = vehQueue.poll(); 
-				if(veh.getDriver()==null) {
-				} else if(veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals(seepMode) && !foundSeepMode) {
+				QVehicle veh = newVehQueue.poll(); 
+				if( veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals(seepMode)  && veh.getDriver()!=null) {
 					returnVeh = veh;
-					newVehQueue.add(veh);
-					foundSeepMode=true;
-				} else {
-					newVehQueue.add(veh);
+					break;
 				}
 			}
-			if(!vehQueue.isEmpty()) throw new RuntimeException("This queue should be empty at this point.");
-			vehQueue.addAll(newVehQueue);
-			if(returnVeh==null) return vehQueue.peek();
-			else return returnVeh;
 		}
-
+		return returnVeh;
 	}
 
 	private QVehicle pollFromVehQueue(QVehicle veh2Remove){

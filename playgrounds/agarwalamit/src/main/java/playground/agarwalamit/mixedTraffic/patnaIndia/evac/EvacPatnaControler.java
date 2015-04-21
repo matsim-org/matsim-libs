@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
@@ -126,7 +127,7 @@ public class EvacPatnaControler {
 		controler.setDumpDataAtEnd(true);
 
 		if(isUsingSeepage){
-			controler.setMobsimFactory(new SeepageMobsimfactory());
+			controler.setMobsimFactory(new SeepageMobsimfactory(QueueWithBufferType.amit));
 		}
 		
 		if(congestionPricing) {

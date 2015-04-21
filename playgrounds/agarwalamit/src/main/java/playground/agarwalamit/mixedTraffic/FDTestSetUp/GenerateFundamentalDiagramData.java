@@ -52,6 +52,7 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageNetworkFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -116,11 +117,11 @@ public class GenerateFundamentalDiagramData {
 
 		String RUN_DIR = "../../../repos/shared-svn/projects/mixedTraffic/seepage/";
 
-		String OUTPUT_FOLDER ="/fd/carBike_holes_1c1b/seepage/";
+		String OUTPUT_FOLDER ="/fd/carBike_holes_9C4B/seepage/";
 		// seepageAllowed, runDir, useHoles, useModifiedNetworkFactory, hole speed, distribution
 
 		String [] travelModes= {"car","bike"};
-		Double [] modalSplit = {1.,0.25}; // in pcu
+		Double [] modalSplit = {9.,1.}; // in pcu
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
 
@@ -135,7 +136,7 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setReduceDataPointsByFactor(1);
 		generateFDData.setUsingSeepNetworkFactory(true);
 		//		HOLE_SPEED = args[4];
-		generateFDData.setIsPlottingDistribution(true);
+		generateFDData.setIsPlottingDistribution(false);
 		generateFDData.run();
 
 	}
@@ -476,7 +477,7 @@ public class GenerateFundamentalDiagramData {
 
 		if(SEEP_NETWORK_FACTORY){
 			log.warn("Using modified \"QueueWithBuffer\". Keep eyes open.");
-			SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory();
+			SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory(QueueWithBufferType.amit);
 			netsimEngine = new QNetsimEngine(qSim,seepNetFactory);
 		} else {
 			netsimEngine = new QNetsimEngine(qSim);
