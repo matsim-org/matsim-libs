@@ -22,6 +22,15 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.math3.analysis.MultivariateFunction;
+import org.apache.commons.math3.optim.ConvergenceChecker;
+import org.apache.commons.math3.optim.InitialGuess;
+import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.PointValuePair;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.MultiDirectionalSimplex;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.SimplexOptimizer;
 import org.apache.log4j.Logger;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
@@ -51,9 +60,6 @@ public class ModelIterator {
 	// the more precise is should get)
 	private double samplingRateClustering = 1;
 	private final List<EvolutionListener> listeners = new ArrayList< >();
-
-	private final double contractionFactor = 2;
-	private final double expansionFactor = 3;
 
 	public ModelIterator( final SocialNetworkGenerationConfigGroup config ) {
 		this.targetClustering = config.getTargetClustering();
@@ -88,90 +94,21 @@ public class ModelIterator {
 	public SocialNetwork iterateModelToTarget(
 			final ModelRunner runner,
 			final Thresholds initialThresholds ) {
-		// Rosenbrock 1960
-		generate( runner , initialThresholds );
+		final SimplexOptimizer optimizer = new SimplexOptimizer( new Convergence() );
 
-		Thresholds currentParent = initialThresholds;
+		final double x = initialThresholds.getPrimaryThreshold();
+		final double y = initialThresholds.getSecondaryReduction();
 
-		Direction d1 = new Direction( 1 , 0 , initialPrimaryStep );
-		Direction d2 = new Direction( 0 , 1 , initialSecondaryStep );
+		final PointValuePair result =
+			optimizer.optimize(
+					GoalType.MINIMIZE,
+					new MaxEval( maxIterations ),
+					new InitialGuess( new double[]{ x , y } ),
+					new ObjectiveFunction( new Function( runner ) ),
+					//new NelderMeadSimplex( new double[]{ initialPrimaryStep , initialSecondaryStep } ) );
+					new MultiDirectionalSimplex( new double[]{ initialPrimaryStep , initialSecondaryStep } ) );
 
-		double currentAcceptedDeg = Double.POSITIVE_INFINITY;
-		double currentAcceptedClust = Double.POSITIVE_INFINITY;
-
-		double degTolerance = 1;
-		double clusterTolerance = 0.05;
-
-		for ( int iter=1, stagnationCount=0;
-				iter < maxIterations && stagnationCount < stagnationLimit;
-				iter++, stagnationCount++ ) {
-			log.info( "Iteration # "+iter );
-
-			final Direction d = iter % 2 == 0 ? d1 : d2;
-			final Move move = new Move( currentParent , d.getXStep() , d.getYStep() );
-
-			final SocialNetwork sn = generate( runner , move.getChild() );
-
-			final boolean isImproving =
-				improves(
-						move.getChild(),
-						move.getParent(),
-						currentAcceptedDeg,
-						currentAcceptedClust );
-
-			if ( isImproving ) {
-				d.gotSucess = true;
-				d.totalMovement += d.stepSize;
-				d.stepSize *= expansionFactor;
-				currentParent = move.getChild();
-				stagnationCount = 0;
-
-				currentAcceptedDeg = Math.min( currentAcceptedDeg , move.getChild().getResultingAverageDegree() + degTolerance );
-				currentAcceptedClust = Math.min( currentAcceptedClust , move.getChild().getResultingClustering() + clusterTolerance ); 
-
-				degTolerance *= .95;
-				clusterTolerance *= .95;
-			}
-			else {
-				d.gotFail = true;
-				d.stepSize /= -contractionFactor;
-			}
-
-			for ( EvolutionListener l : listeners )
-				l.handleMove( move, isImproving );
-
-			if ( isAcceptable( move.getChild() ) ) {
-				log.info( "END - " + move.getChild() + " fulfills the precision criteria!" );
-				return sn;
-			}
-
-			if ( d1.gotFail && d1.gotSucess && d2.gotFail && d2.gotSucess ) {
-				// update directions
-				final double xMov = d1.getXTotalMovement() + d2.getXTotalMovement();
-				final double yMov = d1.getYTotalMovement() + d2.getYTotalMovement();
-				final double newStepSize = ( initialPrimaryStep + initialSecondaryStep ) / 2;
-				d1 = new Direction( xMov, yMov, newStepSize );
-				// Movement in second direction, minus its projection on the new first
-				// new direction
-				final double scalarProduct = d1.x * d2.getXTotalMovement() + d1.y * d2.getYTotalMovement();
-				d2 = new Direction( d2.getXTotalMovement() - scalarProduct * d1.x, d2.getYTotalMovement() - scalarProduct * d1.y, newStepSize );
-				assert Math.abs( d1.getXStep() * d2.getXStep() + d1.getYStep() * d2.getYStep() ) < 1E-9: d1 + " ; " + d2;
-			}
-		}
-
-		log.warn( "stop iterations before reaching the required precision level!" );
-		log.info( "END - Maximum number of iterations or stagnation reached. Best so far: " + currentParent );
-		return runner.runModel( currentParent );
-	}
-
-	private boolean improves(
-			final Thresholds child,
-			final Thresholds parent,
-			final double currentAcceptedDegDist,
-			final double currentAcceptedClusteringDist) {
-		if ( distDegree( child ) > currentAcceptedDegDist ) return false;
-		if ( distClustering( child ) > currentAcceptedClusteringDist ) return false;
-		return distDegree( child ) < distDegree( parent ) || distClustering( child ) < distClustering( parent );
+		return runner.runModel( new Thresholds( result.getPoint()[ 0 ] , result.getPoint()[ 1 ] ) );
 	}
 
 	private double estimateClustering( final SocialNetwork sn ) {
@@ -189,11 +126,11 @@ public class ModelIterator {
 		this.samplingRateClustering = rate;
 	}
 
-	private boolean isAcceptable(
-			final Thresholds thresholds ) {
-		return distClustering( thresholds ) < precisionClustering &&
-			distDegree( thresholds ) < precisionDegree;
-	}
+	//private boolean isAcceptable(
+	//		final Thresholds thresholds ) {
+	//	return distClustering( thresholds ) < precisionClustering &&
+	//		distDegree( thresholds ) < precisionDegree;
+	//}
 
 	private double distClustering( final Thresholds thresholds ) {
 		return Math.abs( targetClustering -  thresholds.getResultingClustering() );
@@ -203,88 +140,41 @@ public class ModelIterator {
 		return Math.abs( targetDegree -  thresholds.getResultingAverageDegree() );
 	}
 
-	public static class Move {
-		private final Thresholds parent;
-		private final double stepPrimary;
-		private final double stepSecondary;
-		private final Thresholds child;
-
-		private Move(
-				final Thresholds parent,
-				final double stepPrimary,
-				final double stepSecondary ) {
-			this.parent = parent;
-			this.stepPrimary = stepPrimary;
-			this.stepSecondary = stepSecondary;
-			this.child = new Thresholds(
-					parent.getPrimaryThreshold() + stepPrimary,
-					parent.getSecondaryReduction() + stepSecondary );
-		}
-
-		public Thresholds getParent() {
-			return parent;
-		}
-
-		public double getStepPrimary() {
-			return stepPrimary;
-		}
-
-		public double getStepSecondary() {
-			return stepSecondary;
-		}
-
-		public Thresholds getChild() {
-			return child;
-		}
-	}
-
-	private static class Direction {
-		public final double x;
-		public final double y;
-
-		public boolean gotFail = false;
-		public boolean gotSucess = false;
-
-		public double stepSize = 1;
-		public double totalMovement = 0;
-
-		public Direction( final double x, final double y , final double initialStep ) {
-			final double norm = Math.sqrt( x * x + y * y );
-			this.x = x / norm;
-			this.y = y / norm;
-			this.stepSize = initialStep;
-		}
-
-		public double getXStep() {
-			return x * stepSize;
-		}
-
-		public double getXTotalMovement() {
-			return x * totalMovement;
-		}
-
-		public double getYTotalMovement() {
-			return y * totalMovement;
-		}
-
-		public double getYStep() {
-			return y * stepSize;
-		}
-
-		@Override
-		public String toString() {
-			return "( "+x+" , "+y+" )";
-		}
-	}
-
 	public static interface EvolutionListener {
-		public void handleMove( Move m , boolean improved );
+		public void handleMove( Thresholds m );
 	}
 
 	private static class EvolutionLogger implements EvolutionListener {
 		@Override
-		public void handleMove( final Move m , final boolean improved ) {
-			log.info( "generated network for "+m.getChild() );
+		public void handleMove( final Thresholds m ) {
+			log.info( "generated network for "+m );
+		}
+	}
+
+	private class Function implements MultivariateFunction {
+		private final ModelRunner runner;
+
+		public Function( ModelRunner runner ) {
+			this.runner = runner;
+		}
+
+		@Override
+		public double value( final double[] args ) {
+			final Thresholds thr = new Thresholds( args[ 0 ] , args[ 1 ] );
+	 		generate( runner , thr );
+
+			for ( EvolutionListener l : listeners ) l.handleMove( thr );
+
+			return distDegree( thr ) / precisionDegree +
+				distClustering( thr ) / precisionClustering;
+		}
+	}
+
+	private class Convergence implements ConvergenceChecker<PointValuePair> {
+		@Override
+		public boolean converged( final int i , final PointValuePair prev , final PointValuePair curr ) {
+			// not really satisfying...
+			return curr.getValue().doubleValue() < 1;
 		}
 	}
 }

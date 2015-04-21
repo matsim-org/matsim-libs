@@ -43,9 +43,7 @@ public class FileWriterEvolutionListener implements ModelIterator.EvolutionListe
 		this.writer = IOUtils.getBufferedWriter( fileName );
 		
 		try {
-			this.writer.write( "originPrimaryThreshold\toriginSecondaryReduction\toriginAvgDegree\toriginClustering\t"+
-					"destinationPrimaryThreshold\tdestinationSecondaryReduction\tdestinationAvgDegree\tdestinationClustering\t"+
-					"improved" );
+			this.writer.write( "primaryThreshold\tsecondaryReduction\tavgDegree\tclustering" );
 		}
 		catch ( IOException e ) {
 			log.error( "problem while opening file "+fileName , e );
@@ -55,20 +53,15 @@ public class FileWriterEvolutionListener implements ModelIterator.EvolutionListe
 	}
 
 	@Override
-	public void handleMove( final ModelIterator.Move m , final boolean improving ) {
+	public void handleMove( final Thresholds m ) {
 		if ( !doAnalyse ) return;
 		try {
 			writer.newLine();
 			writer.write(
-					m.getParent().getPrimaryThreshold()+"\t"+
-					m.getParent().getSecondaryReduction()+"\t"+
-					m.getParent().getResultingAverageDegree()+"\t"+
-					m.getParent().getResultingClustering()+"\t"+
-					m.getChild().getPrimaryThreshold()+"\t"+
-					m.getChild().getSecondaryReduction()+"\t"+
-					m.getChild().getResultingAverageDegree()+"\t"+
-					m.getChild().getResultingClustering()+"\t"+
-					improving );
+					m.getPrimaryThreshold()+"\t"+
+					m.getSecondaryReduction()+"\t"+
+					m.getResultingAverageDegree()+"\t"+
+					m.getResultingClustering() );
 			// make sure results are immediately available
 			writer.flush();
 		}
