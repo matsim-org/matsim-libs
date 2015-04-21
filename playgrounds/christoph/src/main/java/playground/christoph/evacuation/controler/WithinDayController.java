@@ -41,7 +41,6 @@ import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 import java.util.Collections;
 import java.util.Map;
@@ -64,8 +63,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	 * How many parallel Threads shall do the Replanning.
 	 */
 	private int numReplanningThreads = 2;
-	
-	private TravelTimeCollectorFactory travelTimeCollectorFactory = new TravelTimeCollectorFactory();
+
 	private TravelTimeCollector travelTimeCollector;
 	private Set<String> travelTimeCollectorModes = null;
 	private ActivityReplanningMap activityReplanningMap;
@@ -129,7 +127,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 			return;
 		}
 		if (travelTimeCollector == null) {
-			travelTimeCollector = travelTimeCollectorFactory.createTravelTimeCollector(this.scenarioData, analyzedModes);
+			travelTimeCollector = new TravelTimeCollector(this.scenarioData, analyzedModes);
 			fosl.addSimulationListener(travelTimeCollector);
 			this.events.addHandler(travelTimeCollector);
 		}

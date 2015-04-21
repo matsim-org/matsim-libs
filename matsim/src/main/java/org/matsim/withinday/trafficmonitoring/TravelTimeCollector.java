@@ -20,31 +20,11 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CyclicBarrier;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -65,6 +45,11 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CyclicBarrier;
 
 /**
  * Collects link travel times over a given time span (storedTravelTimesBinSize)
@@ -111,19 +96,13 @@ public class TravelTimeCollector implements TravelTime,
 	private final boolean filterModes;
 	
 	
-	// use the factory
-	/*package*/ TravelTimeCollector(Scenario scenario, Set<String> analyzedModes) {
+	public TravelTimeCollector(Scenario scenario, Set<String> analyzedModes) {
 		/*
 		 * The parallelization should scale almost linear, therefore we do use
 		 * the number of available threads according to the config file.
 		 */
-		this(scenario.getNetwork(), scenario.getConfig().global().getNumberOfThreads(), analyzedModes);
-	}
-
-	// use the factory
-	/*package*/ TravelTimeCollector(Network network, int numOfThreads, Set<String> analyzedModes) {
-		this.network = network;
-		this.numOfThreads = numOfThreads;
+		this.network = scenario.getNetwork();
+		this.numOfThreads = scenario.getConfig().global().getNumberOfThreads();
 
 		if (analyzedModes == null || analyzedModes.size() == 0) {
 			this.filterModes = false;
@@ -132,7 +111,7 @@ public class TravelTimeCollector implements TravelTime,
 			this.analyzedModes = new HashSet<String>(analyzedModes);
 			filterModes = true;
 		}
-		
+
 		init();
 	}
 

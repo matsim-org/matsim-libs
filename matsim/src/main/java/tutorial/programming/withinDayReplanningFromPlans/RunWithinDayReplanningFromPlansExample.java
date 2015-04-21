@@ -30,7 +30,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -42,7 +41,7 @@ public class RunWithinDayReplanningFromPlansExample {
 		// define the travel time collector (/predictor) that you want to use for routing:
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
-		final TravelTime travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(controler.getScenario(), analyzedModes);
+		final TravelTime travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

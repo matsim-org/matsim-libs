@@ -19,12 +19,8 @@
 package playground.vsptelematics.bangbang;
 
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -55,10 +51,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.*;
 
 /**
  * @author nagel
@@ -172,7 +166,7 @@ public class KNBangBang {
 
 		Set<String> analyzedModes = new HashSet<>() ;
 		analyzedModes.add( TransportMode.car ) ;
-		final TravelTime travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(controler.getScenario(), analyzedModes);
+		final TravelTime travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
 		controler.getEvents().addHandler((TravelTimeCollector) travelTime);
 		controler.getMobsimListeners().add((TravelTimeCollector) travelTime);
 		

@@ -42,7 +42,6 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.TransportModeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,7 +64,6 @@ public class WithinDayControlerListener implements StartupListener {
 	private boolean locked = false;
 	
 	private int numReplanningThreads = 0;
-	private TravelTimeCollectorFactory travelTimeCollectorFactory = new TravelTimeCollectorFactory();
 	private TravelTimeCollector travelTimeCollector;
 	private Set<String> travelTimeCollectorModes = null;
 	private ActivityReplanningMap activityReplanningMap;
@@ -285,7 +283,7 @@ public class WithinDayControlerListener implements StartupListener {
 	}
 
 	private void createAndInitTravelTimeCollector(Set<String> analyzedModes) {
-		travelTimeCollector = travelTimeCollectorFactory.createTravelTimeCollector(this.scenario, analyzedModes);
+		travelTimeCollector = new TravelTimeCollector(this.scenario, analyzedModes);
 		fosl.addSimulationListener(travelTimeCollector);
 		this.eventsManager.addHandler(travelTimeCollector);
 	}
