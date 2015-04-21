@@ -21,7 +21,6 @@ package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 
@@ -53,7 +52,8 @@ public class ModelIterator {
 	private double samplingRateClustering = 1;
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
-	private final double exponent = 1;
+	private final double contractionFactor = 2;
+	private final double expansionFactor = 3;
 
 	public ModelIterator( final SocialNetworkGenerationConfigGroup config ) {
 		this.targetClustering = config.getTargetClustering();
@@ -93,56 +93,85 @@ public class ModelIterator {
 
 		Thresholds currentParent = initialThresholds;
 
-		double primaryStep = initialPrimaryStep;
-		double secondaryStep = initialSecondaryStep;
+		Direction d1 = new Direction( 1 , 0 , initialPrimaryStep );
+		Direction d2 = new Direction( 0 , 1 , initialSecondaryStep );
 
-		boolean optimizeDegree = true;
+		double currentAcceptedDeg = Double.POSITIVE_INFINITY;
+		double currentAcceptedClust = Double.POSITIVE_INFINITY;
+
+		double degTolerance = 1;
+		double clusterTolerance = 0.05;
+
 		for ( int iter=1, stagnationCount=0;
 				iter < maxIterations && stagnationCount < stagnationLimit;
 				iter++, stagnationCount++ ) {
 			log.info( "Iteration # "+iter );
 
-			final Move move =
-				new Move(
-						currentParent,
-						!optimizeDegree ? 0 :
-							(currentParent.getResultingAverageDegree() > targetDegree ? primaryStep : -primaryStep ),
-						optimizeDegree ? 0 :
-							(currentParent.getResultingClustering() > targetClustering ? -secondaryStep : secondaryStep ) );
-					
+			final Direction d = iter % 2 == 0 ? d1 : d2;
+			final Move move = new Move( currentParent , d.getXStep() , d.getYStep() );
 
 			final SocialNetwork sn = generate( runner , move.getChild() );
 
-			final boolean isImproving = optimizeDegree ?
-				distDegree( move.getChild() ) <= distDegree( move.getParent() ) :
-				distClustering( move.getChild() ) <= distClustering( move.getParent() );
+			final boolean isImproving =
+				improves(
+						move.getChild(),
+						move.getParent(),
+						currentAcceptedDeg,
+						currentAcceptedClust );
 
 			if ( isImproving ) {
+				d.gotSucess = true;
+				d.totalMovement += d.stepSize;
+				d.stepSize *= expansionFactor;
 				currentParent = move.getChild();
 				stagnationCount = 0;
+
+				currentAcceptedDeg = Math.min( currentAcceptedDeg , move.getChild().getResultingAverageDegree() + degTolerance );
+				currentAcceptedClust = Math.min( currentAcceptedClust , move.getChild().getResultingClustering() + clusterTolerance ); 
+
+				degTolerance *= .95;
+				clusterTolerance *= .95;
 			}
 			else {
-				primaryStep /= 2;
-				secondaryStep /= 2;
+				d.gotFail = true;
+				d.stepSize /= -contractionFactor;
 			}
 
-			for ( EvolutionListener l : listeners ) l.handleMove( move , isImproving );
-
-			if ( isAcceptable( move.getChild() , optimizeDegree ) ) {
-				primaryStep = initialPrimaryStep;
-				secondaryStep = initialSecondaryStep;
-				optimizeDegree = !optimizeDegree;
-			}
+			for ( EvolutionListener l : listeners )
+				l.handleMove( move, isImproving );
 
 			if ( isAcceptable( move.getChild() ) ) {
-				log.info( "END - "+move.getChild()+" fulfills the precision criteria!" );
+				log.info( "END - " + move.getChild() + " fulfills the precision criteria!" );
 				return sn;
+			}
+
+			if ( d1.gotFail && d1.gotSucess && d2.gotFail && d2.gotSucess ) {
+				// update directions
+				final double xMov = d1.getXTotalMovement() + d2.getXTotalMovement();
+				final double yMov = d1.getYTotalMovement() + d2.getYTotalMovement();
+				final double newStepSize = ( initialPrimaryStep + initialSecondaryStep ) / 2;
+				d1 = new Direction( xMov, yMov, newStepSize );
+				// Movement in second direction, minus its projection on the new first
+				// new direction
+				final double scalarProduct = d1.x * d2.getXTotalMovement() + d1.y * d2.getYTotalMovement();
+				d2 = new Direction( d2.getXTotalMovement() - scalarProduct * d1.x, d2.getYTotalMovement() - scalarProduct * d1.y, newStepSize );
+				assert Math.abs( d1.getXStep() * d2.getXStep() + d1.getYStep() * d2.getYStep() ) < 1E-9: d1 + " ; " + d2;
 			}
 		}
 
 		log.warn( "stop iterations before reaching the required precision level!" );
-		log.info( "END - Maximum number of iterations or stagnation reached. Best so far: "+currentParent );
+		log.info( "END - Maximum number of iterations or stagnation reached. Best so far: " + currentParent );
 		return runner.runModel( currentParent );
+	}
+
+	private boolean improves(
+			final Thresholds child,
+			final Thresholds parent,
+			final double currentAcceptedDegDist,
+			final double currentAcceptedClusteringDist) {
+		if ( distDegree( child ) > currentAcceptedDegDist ) return false;
+		if ( distClustering( child ) > currentAcceptedClusteringDist ) return false;
+		return distDegree( child ) < distDegree( parent ) || distClustering( child ) < distClustering( parent );
 	}
 
 	private double estimateClustering( final SocialNetwork sn ) {
@@ -166,25 +195,12 @@ public class ModelIterator {
 			distDegree( thresholds ) < precisionDegree;
 	}
 
-	private boolean isAcceptable(
-			final Thresholds thresholds,
-			final boolean optimizeDegree ) {
-		return !optimizeDegree ?
-			distClustering( thresholds ) < precisionClustering :
-			distDegree( thresholds ) < precisionDegree;
-	}
-
 	private double distClustering( final Thresholds thresholds ) {
 		return Math.abs( targetClustering -  thresholds.getResultingClustering() );
 	}
 
 	private double distDegree( final Thresholds thresholds ) {
 		return Math.abs( targetDegree -  thresholds.getResultingAverageDegree() );
-	}
-
-	private double function( Thresholds t ) {
-		return Math.pow( distDegree( t ) / precisionDegree , exponent ) +
-			100 * Math.pow( distClustering( t ) / precisionClustering , exponent );
 	}
 
 	public static class Move {
