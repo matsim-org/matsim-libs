@@ -52,15 +52,9 @@ public final class SeepageNetworkFactory implements NetsimNetworkFactory<QNode, 
 					return builder.build() ;
 				}};
 			return new QLinkImpl( link, network, toQueueNode, laneFactory ) ;
-		case seep:
-			LaneFactory laneFactory2 = new LaneFactory(){
-				@Override
-				public QLaneI createLane(QLinkImpl qLinkImpl) {
-					AAQueueWithBuffer.Builder builder = new AAQueueWithBuffer.Builder(qLinkImpl) ;
-					return builder.build() ;
-				}};
-			return new QLinkImpl(link, network, toQueueNode,laneFactory2);
-//			return new SeepQLinkImpl(link, network, toQueueNode, new PassingVehicleQ());
+//		case seep:
+//			return new SeepQLinkImpl(link, network, toQueueNode, new PassingVehicleQ()); 
+			// seepage can be used from core now.
 		default:
 			throw new RuntimeException("not implemented") ;
 		}

@@ -18,15 +18,11 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -44,7 +40,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
  */
 
 public class SeepageMobsimfactory  implements MobsimFactory{
-	public static enum QueueWithBufferType { standard, amit, seep }
+	public static enum QueueWithBufferType { standard, amit }
 
 	private QueueWithBufferType queueWithBufferType; ;
 	
@@ -56,8 +52,6 @@ public class SeepageMobsimfactory  implements MobsimFactory{
 		this.queueWithBufferType = type ;
 	}
 
-	static final List<String> mainModes = Arrays.asList(TransportMode.car,TransportMode.bike);
-	
 	@Override
 	public RunnableMobsim createMobsim(Scenario sc, EventsManager events) {
 		//From QSimFactory inspired code
@@ -96,17 +90,6 @@ public class SeepageMobsimfactory  implements MobsimFactory{
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-
-//		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-//
-//		for(String travelMode:mainModes){
-//			VehicleType mode = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode,VehicleType.class));
-//			mode.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed(travelMode));
-//			mode.setPcuEquivalents(MixedTrafficVehiclesUtils.getPCU(travelMode));
-//			modeVehicleTypes.put(travelMode, mode);
-//		}
-//
-//		agentSource.setModeVehicleTypes(modeVehicleTypes);
 
 		qSim.addAgentSource(agentSource);
 		return qSim;
