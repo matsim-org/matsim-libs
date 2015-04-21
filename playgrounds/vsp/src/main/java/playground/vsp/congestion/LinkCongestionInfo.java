@@ -139,11 +139,20 @@ public class LinkCongestionInfo {
 		this.storageCapacityCars = storageCapacityCars;
 	}
 
-	public boolean isLinkFree(double time){
-		double earliestLeaveTime = Math.floor(lastLeaveTime+ this.marginalDelayPerLeavingVehicle_sec) +1;
-		if(time > earliestLeaveTime){
-			return true;
-		} else return false; 
+	public boolean isLinkFree(Id<Person> nowLeavingAgent, double time){
+		double freeSpeedLeaveTimeOfLastLeftAgent = this.personId2freeSpeedLeaveTime.get(lastLeavingAgent);
+		double freeSpeedLeaveTimeOfNowAgent = this.personId2freeSpeedLeaveTime.get(nowLeavingAgent);
+		double timeHeadway = freeSpeedLeaveTimeOfNowAgent -  freeSpeedLeaveTimeOfLastLeftAgent;
+		double minTimeHeadway = this.marginalDelayPerLeavingVehicle_sec;
+		
+		if (timeHeadway < minTimeHeadway) return false;
+		else if (timeHeadway == minTimeHeadway){
+			double earliestLeaveTime = Math.floor(lastLeaveTime+ minTimeHeadway) +1;
+			if(time > earliestLeaveTime){
+				return true;
+			} else return false;
+		}
+		else return true;
 	}
 	public List<Id<Link>> getSpillBackCausingLinks() {
 		return spillBackCausingLinks;

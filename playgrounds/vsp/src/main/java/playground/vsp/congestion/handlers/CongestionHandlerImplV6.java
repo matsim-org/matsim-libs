@@ -178,7 +178,7 @@ PersonStuckEventHandler, ActivityEndEventHandler
 			Id<Link> causingLink;
 			String congestionType;
 
-			if(linkInfo.isLinkFree(linkLeaveTime)){
+			if(linkInfo.isLinkFree(personId, linkLeaveTime)){
 				causingLink = getNextLinkInRoute(personId, linkId, linkLeaveTime);
 				causingAgent = linkId2congestionInfo.get(causingLink).getLastEnteredAgent(); 
 

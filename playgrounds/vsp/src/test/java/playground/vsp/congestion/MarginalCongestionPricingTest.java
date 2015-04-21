@@ -376,12 +376,11 @@ public class MarginalCongestionPricingTest {
 		modeVehicleTypes.put("car", car);
 		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qSim.addAgentSource(agentSource);
-
 		return qSim;
 	}
 
 	/**
-	 * generates network with 6 links. Even persons will go on one branch (down) and odd persons will go on other (up).
+	 * generates network with 6 links. Even persons will go on one branch (up) and odd persons will go on other (down).
 	 *<p>				  o----4----o
 	 *<p> 				  |
 	 *<p>				  3 
@@ -392,7 +391,7 @@ public class MarginalCongestionPricingTest {
 	 *<p>				  |
 	 *<p>				  5
 	 *<p>				  |
-	 *<p>				  o----5----o
+	 *<p>				  o----6----o
 	 */
 	private class createPseudoInputs {
 		Scenario scenario;

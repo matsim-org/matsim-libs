@@ -62,6 +62,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 /**
  * Accounting for flow delays even if leaving agents list is empty.
@@ -69,7 +70,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
  * @author amit
  */
 
-public class CombinedFlowAndStorageDelayTestV4 {
+public class CombinedFlowAndStorageDelayTest {
 	
 	private final boolean usingOTFVis = false;
 	
@@ -83,13 +84,13 @@ public class CombinedFlowAndStorageDelayTestV4 {
 	 * agents are stored to charge later if required.
 	 */
 	@Test
-	public final void combinationOfFlowAndStorageDelay(){
+	public final void implV4Test(){
 		/*
 		 * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on 
 		 * other route. After agent 1 leave the link 2 (marginal flow delay =100), agent 2 is delayed. Mean while, before agent 2 can move to next link,
 		 * link 3 is blocked by agent 3 (departed on link 5). Thus, agent 2 on link 2 is delayed. Causing agents should be 1 (flow cap), 4 (storage cap).
 		 */
-		List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays();
+		List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays("v4");
 		
 		for(CongestionEvent e : congestionEvents){
 			if(e.getAffectedAgentId().equals(Id.createPersonId("2")) && e.getCausingAgentId().equals(Id.createPersonId("1"))){
@@ -101,7 +102,25 @@ public class CombinedFlowAndStorageDelayTestV4 {
 		Assert.assertEquals("Number of congestion events are not correct.", 4, congestionEvents.size(), MatsimTestUtils.EPSILON);
 	}
 
-	private List<CongestionEvent> getAffectedPersonId2Delays(){
+	@Test
+	public final void implV6Test(){
+		/*
+		 * In the test, two routes (1-2-3-4 and 5-3-4) are assigned to agents. First two agents (1,2) start on first route and next two (3,4) on 
+		 * other route. After agent 1 leave the link 2 (marginal flow delay =100), agent 2 is delayed. Mean while, before agent 2 can move to next link,
+		 * link 3 is blocked by agent 3 (departed on link 5). Thus, agent 2 on link 2 is delayed. Causing agents should be 1 (flow cap), 4 (storage cap).
+		 */
+		List<CongestionEvent> congestionEvents = getAffectedPersonId2Delays("v6");
+		
+		for(CongestionEvent e : congestionEvents){
+			if(e.getAffectedAgentId().equals(Id.createPersonId("2")) && e.getLinkId().equals(Id.createLinkId("2"))){
+				Assert.assertEquals("Wrong causing agent", Id.createPersonId("1"), e.getCausingAgentId());
+				// this is not captured by only leaving agents list.
+			} 
+		}
+		Assert.assertEquals("Number of congestion events are not correct.", 3, congestionEvents.size(), MatsimTestUtils.EPSILON);
+	}
+	
+	private List<CongestionEvent> getAffectedPersonId2Delays(String congestionPricingImpl){
 
 		createPseudoInputs pseudoInputs = new createPseudoInputs();
 		pseudoInputs.createNetwork();
@@ -124,8 +143,8 @@ public class CombinedFlowAndStorageDelayTestV4 {
 			}
 
 		});
-
-		events.addHandler(new CongestionHandlerImplV4(events, sc));
+		if(congestionPricingImpl.equalsIgnoreCase("v4")) events.addHandler(new CongestionHandlerImplV4(events, sc));
+		else if(congestionPricingImpl.equalsIgnoreCase("v6")) events.addHandler(new CongestionHandlerImplV6(events, sc));
 
 		QSim sim = createQSim(sc, events);
 		sim.run();

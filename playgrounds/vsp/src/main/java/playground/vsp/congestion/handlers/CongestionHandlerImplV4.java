@@ -251,7 +251,7 @@ ActivityEndEventHandler
 
 				double delayToPayFor = linkInfo.getPersonId2DelaysToPayFor().get(delayedPerson);
 				Iterator<Id<Person>> causingAgents = agentsCausingFlowDelays.iterator();
-				while(causingAgents.hasNext() && delayToPayFor > 0) {
+				while(delayToPayFor > 0 && causingAgents.hasNext()) {
 					Id<Person> causingPerson = causingAgents.next();
 					chargeAndThrowEvents(event, causingPerson, event.getLinkId());
 					delayToPayFor = linkInfo.getPersonId2DelaysToPayFor().get(delayedPerson);
@@ -268,7 +268,7 @@ ActivityEndEventHandler
 			double delayToPayFor = linkInfo.getPersonId2DelaysToPayFor().get(delayedPerson);
 			Iterator< Id<Person>> causingAgentsIterator = leavingAgentsList.iterator();
 
-			while (causingAgentsIterator.hasNext() && delayToPayFor > 0){
+			while ( delayToPayFor > 0 && causingAgentsIterator.hasNext()){
 				Id<Person> causingAgent = causingAgentsIterator.next();
 				chargeAndThrowEvents(event, causingAgent,event.getLinkId());
 				delayToPayFor = linkInfo.getPersonId2DelaysToPayFor().get(delayedPerson);
@@ -357,7 +357,7 @@ ActivityEndEventHandler
 
 		double delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(Id.createPersonId(event.getVehicleId()));
 
-		while(spillBackLinkIterator.hasNext() && delayToPayFor > 0) {
+		while(delayToPayFor > 0 && spillBackLinkIterator.hasNext()) {
 
 			Id<Link> spillBackCausingLink = spillBackLinkIterator.next();
 			processSpillBackDelays(event, spillBackCausingLink);
@@ -387,7 +387,7 @@ ActivityEndEventHandler
 
 		Iterator<Id<Person>> enteredPersonsListIterator = personsEnteredOnSpillBackCausingLink.iterator();
 
-		while(enteredPersonsListIterator.hasNext() && delayToPayFor > 0){
+		while(delayToPayFor > 0  && enteredPersonsListIterator.hasNext()){
 			Id<Person> personToBeCharged = enteredPersonsListIterator.next();
 
 			chargeAndThrowEvents(event, personToBeCharged,spillBackCausingLink);
@@ -400,7 +400,7 @@ ActivityEndEventHandler
 			Collections.reverse(personsLeftSpillBackCausingLink);
 			Iterator<Id<Person>> prsnLftSpillBakCauinLinkItrtr = personsLeftSpillBackCausingLink.iterator();
 
-			while(prsnLftSpillBakCauinLinkItrtr.hasNext() && delayToPayFor > 0.){ // again charged for flow cap of link
+			while( delayToPayFor > 0. && prsnLftSpillBakCauinLinkItrtr.hasNext()){ // again charged for flow cap of link
 				Id<Person> chargedPersonId = prsnLftSpillBakCauinLinkItrtr.next();
 
 				chargeAndThrowEvents(event, chargedPersonId, spillBackCausingLink);
