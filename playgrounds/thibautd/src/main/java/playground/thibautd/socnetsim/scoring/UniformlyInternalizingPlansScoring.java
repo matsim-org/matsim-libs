@@ -146,6 +146,7 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 			}
 
 			for ( Person alter : alters ) {
+				if ( alter == null ) throw new NullPointerException( "not all alters part of the population?" );
 				final double ratio = ratioCalculator.getInternalizationRatio( ego.getId() , alter.getId() );
 				internalizedScore += ratio * getScore( alter );
 			}
