@@ -1,13 +1,5 @@
 package playground.sergioo.transitRouters2013;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -20,26 +12,19 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
-
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWS;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWSV;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterVariableImpl;
+import playground.sergioo.singapore2012.transitRouterVariable.*;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculatorTuple;
 import playground.sergioo.singapore2012.transitRouterVariable.vehicleOccupancy.VehicleOccupancyCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeStuckCalculator;
+
+import java.io.*;
+import java.util.List;
 
 public class MainTR {
 
@@ -63,7 +48,7 @@ public class MainTR {
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(scenario.getTransitSchedule(), (int)binSize, (int) (endTime-startTime));
 		StopStopTimeCalculatorTuple stopStopTimeCalculatorTuple = new StopStopTimeCalculatorTuple(scenario.getTransitSchedule(), (int)binSize, (int) (endTime-startTime));
 		VehicleOccupancyCalculator vehicleOccupancyCalculator = new VehicleOccupancyCalculator(scenario.getTransitSchedule(), ((ScenarioImpl)scenario).getTransitVehicles(), (int)binSize, (int) (endTime-startTime));
-		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
 		eventsManager.addHandler(waitTimeStuckCalculator);
 		eventsManager.addHandler(waitTimeCalculator);

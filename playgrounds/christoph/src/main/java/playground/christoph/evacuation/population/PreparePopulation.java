@@ -34,7 +34,6 @@ import org.matsim.core.population.*;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
@@ -81,8 +80,7 @@ public class PreparePopulation {
 		
 		log.info("Reading events file to get data for travel time calculator...");
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		TravelTimeCalculator travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), 
-				scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator travelTime = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		eventsManager.addHandler(travelTime);
 		new MatsimEventsReader(eventsManager).readFile(eventsFile);
 		log.info("done.");

@@ -20,16 +20,6 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -51,11 +41,15 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
 
 public class WalkDistanceEstimator {
@@ -134,8 +128,7 @@ public class WalkDistanceEstimator {
 		 *       as an argument.
 		 *---------------------------------------------------------------------*/
 		// Set up router.
-		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
-		TravelTimeCalculator ttc = ttcf.createTravelTimeCalculator(sAll.getNetwork(), sAll.getConfig().travelTimeCalculator());
+		TravelTimeCalculator ttc = TravelTimeCalculator.create(sAll.getNetwork(), sAll.getConfig().travelTimeCalculator());
 		TravelDisutilityFactory tccf = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		TravelDisutility tc = tccf.createTravelDisutility(ttc.getLinkTravelTimes(), sAll.getConfig().planCalcScore());
 		EventsManager em = EventsUtils.createEventsManager();

@@ -95,7 +95,7 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 
         @Override
         public TravelTimeCalculator get() {
-            return new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+            return TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
         }
 
     }

@@ -46,7 +46,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -206,7 +205,7 @@ public class AgentsInEvacuationAreaPostProcessing {
 		// TravelTimeCalculator
 		config.travelTimeCalculator().setFilterModes(true);
 		config.travelTimeCalculator().setAnalyzedModes(TransportMode.car);
-		TravelTimeCalculator travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
+		TravelTimeCalculator travelTime = TravelTimeCalculator.create(scenario.getNetwork(), config.travelTimeCalculator());
 		eventsManager.addHandler(travelTime);
 		
 		String eventsFile = dummyInputController.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML);

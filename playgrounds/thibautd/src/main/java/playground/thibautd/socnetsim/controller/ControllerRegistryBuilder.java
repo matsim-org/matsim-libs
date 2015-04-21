@@ -34,7 +34,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -306,9 +306,7 @@ public class ControllerRegistryBuilder {
 			this.travelTime =
 				new DeactivableTravelTimeProvider(
 						new PSimIterationsCriterion( scenario.getConfig() ),
-						new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(
-								scenario.getNetwork(),
-								scenario.getConfig().travelTimeCalculator()) );
+						TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator()));
 			this.events.addHandler(travelTime);	
 		}
 		return travelTime;

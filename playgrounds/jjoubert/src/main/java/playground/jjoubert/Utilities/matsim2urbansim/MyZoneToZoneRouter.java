@@ -20,29 +20,12 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import nl.knaw.dans.common.dbflib.CorruptedTableException;
-import nl.knaw.dans.common.dbflib.DbfLibException;
-import nl.knaw.dans.common.dbflib.Field;
-import nl.knaw.dans.common.dbflib.IfNonExistent;
-import nl.knaw.dans.common.dbflib.InvalidFieldLengthException;
-import nl.knaw.dans.common.dbflib.InvalidFieldTypeException;
-import nl.knaw.dans.common.dbflib.NumberValue;
-import nl.knaw.dans.common.dbflib.Record;
-import nl.knaw.dans.common.dbflib.Table;
-import nl.knaw.dans.common.dbflib.Type;
-import nl.knaw.dans.common.dbflib.Value;
-import nl.knaw.dans.common.dbflib.Version;
-
+import cern.colt.matrix.impl.DenseDoubleMatrix2D;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
+import nl.knaw.dans.common.dbflib.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -60,17 +43,14 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import cern.colt.matrix.impl.DenseDoubleMatrix2D;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
 public class MyZoneToZoneRouter {
 	private final Logger log = Logger.getLogger(MyZoneToZoneRouter.class);
@@ -97,8 +77,7 @@ public class MyZoneToZoneRouter {
 	
 	public void prepareTravelTimeData(final String eventsFilename){
 		log.info("Processing the events file for zone-to-zone travel time calculation");
-		TravelTimeCalculatorFactory ttcf = new TravelTimeCalculatorFactoryImpl();
-		TravelTimeCalculator travelTimeCalculator = ttcf.createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		TravelDisutilityFactory tccf = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		TravelDisutility travelCost = tccf.createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		

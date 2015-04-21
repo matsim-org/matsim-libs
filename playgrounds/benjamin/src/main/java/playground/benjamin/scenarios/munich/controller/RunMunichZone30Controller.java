@@ -59,7 +59,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -104,7 +103,7 @@ public class RunMunichZone30Controller extends AbstractController {
 		this.eventsManager.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
 		this.legTimes = new CalcLegTimes();
 		this.eventsManager.addHandler(legTimes);
-		this.travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		this.travelTime = TravelTimeCalculator.create(this.network, this.config.travelTimeCalculator());
 		this.eventsManager.addHandler(travelTime);	
 		super.run(config);
 	}

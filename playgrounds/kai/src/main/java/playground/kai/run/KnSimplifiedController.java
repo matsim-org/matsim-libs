@@ -43,7 +43,6 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
@@ -91,7 +90,7 @@ public class KnSimplifiedController extends AbstractController {
 		this.events.addHandler(new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network));
 		this.legTimes = new CalcLegTimes();
 		this.events.addHandler(legTimes);
-		this.travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+		this.travelTimeCalculator = TravelTimeCalculator.create(this.network, this.config.travelTimeCalculator());
 		this.events.addHandler(travelTimeCalculator);	
 		super.run(config);
 	}

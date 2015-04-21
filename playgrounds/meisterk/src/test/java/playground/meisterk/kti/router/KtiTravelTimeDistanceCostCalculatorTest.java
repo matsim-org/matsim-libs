@@ -31,12 +31,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-
 import playground.meisterk.kti.config.KtiConfigGroup;
 
 public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
@@ -67,10 +64,7 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 		config.planCalcScore().setMonetaryDistanceCostRateCar(-0.5) ;
 		config.planCalcScore().setMarginalUtilityOfMoney(1.) ;
 
-		TravelTimeCalculatorFactory travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-		TravelTimeCalculator travelTimeCalculator = travelTimeCalculatorFactory.createTravelTimeCalculator(
-				this.network,
-				config.travelTimeCalculator());
+		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(this.network, config.travelTimeCalculator());
 
 		this.events = EventsUtils.createEventsManager();
 		this.events.addHandler(travelTimeCalculator);

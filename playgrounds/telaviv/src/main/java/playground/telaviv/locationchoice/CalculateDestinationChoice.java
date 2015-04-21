@@ -20,8 +20,6 @@
 
 package playground.telaviv.locationchoice;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
@@ -29,15 +27,16 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-
 import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.zones.CreateODDistanceMatrix;
 import playground.telaviv.zones.CreateODTravelTimeMatrices;
 import playground.telaviv.zones.Emme2Zone;
 import playground.telaviv.zones.ZoneMapping;
+
+import java.util.Map;
 
 public class CalculateDestinationChoice {
 
@@ -74,8 +73,8 @@ public class CalculateDestinationChoice {
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		log.info("done");
-		
-		TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
+
+		TravelTime travelTime = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		
 		CalculateDestinationChoice cdc = new CalculateDestinationChoice(scenario);
 		

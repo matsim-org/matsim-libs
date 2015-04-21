@@ -45,8 +45,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class NetworkLegRouterTest {
@@ -84,8 +83,7 @@ public class NetworkLegRouterTest {
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) f.s.getPopulation().getFactory()).getModeRouteFactory();
 
-		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl()  ;
-		TravelTime timeObject = ttCalcFactory.createTravelTimeCalculator(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
+		TravelTime timeObject = TravelTimeCalculator.create(f.s.getNetwork(), f.s.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
 
 		{
 			TravelDisutility costObject = new RandomizingTimeDistanceTravelDisutility.Builder().createTravelDisutility(timeObject, f.s.getConfig().planCalcScore());

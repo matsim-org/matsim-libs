@@ -4,31 +4,6 @@ package playground.pieter.singapore.hits;
 //import java.util.ArrayList;
 //import java.util.List;
 //import java.util.TimeZone;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.management.timer.Timer;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -56,7 +31,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.algorithms.XY2Links;
@@ -69,15 +43,24 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
-
 import others.sergioo.util.dataBase.DataBaseAdmin;
-
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra;
 import playground.sergioo.hitsRouter2013.TransitRouterVariableImpl;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
-import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeStuckCalculator;
+
+import javax.management.timer.Timer;
+import java.io.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 public class HITSAnalyser {
 
 	private HITSData hitsData;
@@ -126,9 +109,8 @@ public class HITSAnalyser {
 		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(
 				scenario.getPopulation(), scenario.getTransitSchedule(),
 				(int) binSize, (int) (endTime - startTime));
-		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl()
-				.createTravelTimeCalculator(scenario.getNetwork(), scenario
-						.getConfig().travelTimeCalculator());
+		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario
+				.getConfig().travelTimeCalculator());
 		System.out.println("Loading events");
 		if(!freeSpeedRouting){
 			EventsManager eventsManager =

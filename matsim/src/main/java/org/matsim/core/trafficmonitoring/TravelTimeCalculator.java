@@ -19,25 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.trafficmonitoring;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -49,6 +34,11 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Calculates actual travel times on link from events and optionally also the link-to-link 
@@ -98,7 +88,47 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 	private final boolean calculateLinkToLinkTravelTimes;
 
 	private TravelTimeDataFactory ttDataFactory = null;
-		
+
+	public static TravelTimeCalculator create(Network network, TravelTimeCalculatorConfigGroup group) {
+		TravelTimeCalculator calculator = new TravelTimeCalculator(network, group);
+
+		switch ( group.getTravelTimeCalculatorType() ) {
+			case TravelTimeCalculatorArray:
+				calculator.setTravelTimeDataFactory(new TravelTimeDataArrayFactory(network, calculator.numSlots));
+				break;
+			case TravelTimeCalculatorHashMap:
+				calculator.setTravelTimeDataFactory(new TravelTimeDataHashMapFactory(network));
+				break;
+			default:
+				throw new RuntimeException(group.getTravelTimeCalculatorType() + " is unknown!");
+		}
+
+		AbstractTravelTimeAggregator travelTimeAggregator;
+		if ("optimistic".equals(group.getTravelTimeAggregatorType())) {
+			travelTimeAggregator = new OptimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice);
+			calculator.setTravelTimeAggregator(travelTimeAggregator);
+		} else if ("experimental_LastMile".equals(group.getTravelTimeAggregatorType())) {
+			travelTimeAggregator = new PessimisticTravelTimeAggregator(calculator.numSlots, calculator.timeSlice);
+			calculator.setTravelTimeAggregator(travelTimeAggregator);
+			log.warn("Using experimental TravelTimeAggregator! \nIf this was not intended please remove the travelTimeAggregator entry in the controler section in your config.xml!");
+		} else {
+			throw new RuntimeException(group.getTravelTimeAggregatorType() + " is unknown!");
+		}
+
+		TravelTimeGetter travelTimeGetter;
+		if ("average".equals(group.getTravelTimeGetterType())) {
+			travelTimeGetter = new AveragingTravelTimeGetter();
+		} else if ("linearinterpolation".equals(group.getTravelTimeGetterType())) {
+			travelTimeGetter = new LinearInterpolatingTravelTimeGetter(calculator.numSlots, calculator.timeSlice);
+		} else {
+			throw new RuntimeException(group.getTravelTimeGetterType() + " is unknown!");
+		}
+		travelTimeAggregator.connectTravelTimeGetter(travelTimeGetter);
+
+		return calculator;
+	}
+
+
 	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup); // default: 30 hours at most
 	}
@@ -280,7 +310,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 			throw new IllegalStateException("No link to link travel time is available " +
 					"if calculation is switched off by config option!");      
 		}
-		DataContainer data = this.getLinkToLinkTravelTimeData(new Tuple<Id<Link>, Id<Link>>(fromLinkId, toLinkId), true);
+		DataContainer data = this.getLinkToLinkTravelTimeData(new Tuple<>(fromLinkId, toLinkId), true);
 		if (data.needsConsolidation) {
 			consolidateData(data);
 		}

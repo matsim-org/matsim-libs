@@ -23,11 +23,9 @@ package playground.christoph.router.traveltime;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 
-public class TravelTimeCalculatorWithBufferFactory implements TravelTimeCalculatorFactory {
+public class TravelTimeCalculatorWithBufferFactory {
 
-	@Override
 	public TravelTimeCalculator createTravelTimeCalculator(Network network, TravelTimeCalculatorConfigGroup group) {
 		return new TravelTimeCalculatorWithBuffer(network, group);
 	}

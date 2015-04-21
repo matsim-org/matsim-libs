@@ -1,8 +1,5 @@
 package playground.sergioo.accessibility2013;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -15,14 +12,16 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class CarAccessibility {
 
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
 		(new MatsimNetworkReader(scenario)).readFile(args[1]);
-		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
+		TravelTimeCalculator travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator());
 		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
 		eventsManager.addHandler(travelTimeCalculator);
 		(new EventsReaderXMLv1(eventsManager)).parse(args[2]);

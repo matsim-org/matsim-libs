@@ -20,13 +20,6 @@
 
 package playground.telaviv.zones;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,13 +32,14 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
-
 import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.locationchoice.FullNetworkDijkstra;
 import playground.telaviv.locationchoice.FullNetworkDijkstraFactory;
+
+import java.util.*;
 
 public class CreateODTravelTimeMatrices {
 
@@ -67,7 +61,7 @@ public class CreateODTravelTimeMatrices {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		ZoneMapping zoneMapping = new ZoneMapping(scenario, TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84"));
-		TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();		
+		TravelTime travelTime = TravelTimeCalculator.create(scenario.getNetwork(), scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		new CreateODTravelTimeMatrices(scenario, zoneMapping, travelTime).calculateODMatrices();
 	}
 	

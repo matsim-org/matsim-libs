@@ -38,7 +38,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -103,7 +103,7 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 			TripRouterFactoryBuilderWithDefaults tripRouterFactoryBuilderWithDefaults = new TripRouterFactoryBuilderWithDefaults();
 			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = tripRouterFactoryBuilderWithDefaults.createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
 			TripRouterFactory tripRouterFactory = new DefaultTripRouterFactoryImpl(controler.getScenario(), leastCostPathCalculatorFactory, transitRouterFactory);
-            final TravelTime travelTime = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(controler.getScenario().getNetwork(), controler.getConfig().travelTimeCalculator()).getLinkTravelTimes();
+			final TravelTime travelTime = TravelTimeCalculator.create(controler.getScenario().getNetwork(), controler.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 			TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContext() {
 
 				@Override

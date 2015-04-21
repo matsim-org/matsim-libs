@@ -15,9 +15,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,8 +60,7 @@ public ChoiceGenerationControler(String[] args) {
 //    controler.setScoringFunctionFactory(
 //            new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(),
 //                    controler.getScenario()));
-    travelTimeCalculator = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(scenario.getNetwork(),
-            config.travelTimeCalculator());
+    travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), config.travelTimeCalculator());
 
     EventsManagerImpl eventsManager = new EventsManagerImpl();
     EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);

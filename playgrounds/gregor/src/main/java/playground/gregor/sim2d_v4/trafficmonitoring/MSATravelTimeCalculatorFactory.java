@@ -25,14 +25,11 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.trafficmonitoring.OptimisticTravelTimeAggregator;
 import org.matsim.core.trafficmonitoring.PessimisticTravelTimeAggregator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 
-public class MSATravelTimeCalculatorFactory implements
-		TravelTimeCalculatorFactory {
+public class MSATravelTimeCalculatorFactory  {
 	
 	private static final Logger log = Logger.getLogger(MSATravelTimeCalculatorFactory.class);
 
-	@Override
 	public TravelTimeCalculator createTravelTimeCalculator(Network network,
 			TravelTimeCalculatorConfigGroup group) {
 		TravelTimeCalculator calculator = new TravelTimeCalculator(network, group);
