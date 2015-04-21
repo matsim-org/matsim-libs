@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -53,8 +54,6 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -64,13 +63,10 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
- * Tests that in congested part, walk can overtake (seep) car mode.
+ * Tests that in congested part, walk (seep mode) can overtake (seep) car mode.
  * 
  */
 public class SeepageTest {
-
-
-
 	/**
 	 *  Two carAgents end act at time 948 and 949 sec and walkAgent ends act at 49 sec.
 	 *  Link length is 1 km and flow capacity 1 PCU/min. Speed of car and walk is 20 mps and 1 mps.
@@ -136,9 +132,7 @@ public class SeepageTest {
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
 
-		SeepageNetworkFactory seepNetFactory = new SeepageNetworkFactory();
-
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1,seepNetFactory);
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
 		qSim1.addMobsimEngine(netsimEngine);
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
@@ -181,6 +175,7 @@ public class SeepageTest {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList("car","walk"));
+			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
 
 			config.setParam("seepage", "isSeepageAllowed", "true");
 			config.setParam("seepage", "seepMode", "walk");
