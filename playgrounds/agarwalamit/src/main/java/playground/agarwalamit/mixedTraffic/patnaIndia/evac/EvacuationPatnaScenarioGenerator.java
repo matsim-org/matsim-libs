@@ -37,9 +37,9 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.grips.scenariogenerator.EvacuationNetworkGenerator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
@@ -76,6 +76,8 @@ public class EvacuationPatnaScenarioGenerator {
 
 	private String popFile = dir+"/run105/input/patna_evac_plans_100Pct.xml.gz";
 	private String outPopFile = dir+"/run105/input/patna_evac_plans_100Pct_filtered.xml.gz";
+	
+	private String outConfigFile = dir+"/run105/input/patna_evac_config.xml.gz";
 
 	private String areShapeFile = dir+"/run105/input/area_epsg24345.shp";
 	private final Id<Link> safeLinkId = Id.createLinkId("safeLink_Patna");
@@ -87,29 +89,36 @@ public class EvacuationPatnaScenarioGenerator {
 		new EvacuationPatnaScenarioGenerator().run();
 	}
 
-	public Config getPatnaEvacConfig(){
-		return this.scenario.getConfig();
-	}
-	
 	void run(){
 		scenario =  ScenarioUtils.loadScenario(ConfigUtils.createConfig());
-		getEvacNetwork();
+		createEvacNetwork();
+		scenario.getConfig().network().setInputFile(outNetworkFile);
 
-		//config params
+		// population
+		ScenarioUtils.loadScenario(scenario);
+		createEvacPopulation();
+		scenario.getConfig().plans().setInputFile(outPopFile);
+		
+		//config
+		createConfig();
+	}
+	
+	private void createConfig(){
+		
 		Config config = scenario.getConfig();
 		config.network().setInputFile(outNetworkFile);
+		config.plans().setInputFile(outPopFile);
+		config.controler().setOutputDirectory(dir+"/run105/100pct/");
 
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(100);
 		config.controler().setMobsim("qsim");
 		config.controler().setWriteEventsInterval(20);
 		config.controler().setWritePlansInterval(20);
-		
+
 		config.global().setCoordinateSystem("EPSG:24345");
 		config.travelTimeCalculator().setTraveltimeBinSize(900);
-		
-		config.qsim().setFlowCapFactor(0.011);	
-		config.qsim().setStorageCapFactor(0.033);
+
 		config.qsim().setSnapshotPeriod(5*60);
 		config.qsim().setEndTime(30*3600);
 		config.qsim().setStuckTime(100000);
@@ -137,51 +146,37 @@ public class EvacuationPatnaScenarioGenerator {
 		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
 		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
 		//vsp default
-		
+
 		ActivityParams homeAct = new ActivityParams("home");
 		homeAct.setTypicalDuration(1*3600);
 		config.planCalcScore().addActivityParams(homeAct);
-		
+
 		ActivityParams evacAct = new ActivityParams("evac");
 		evacAct.setTypicalDuration(1*3600);
 		config.planCalcScore().addActivityParams(evacAct);
 
-		config.planCalcScore().setPerforming_utils_hr(6.0);
-		config.planCalcScore().setTraveling_utils_hr(0);
-		config.planCalcScore().setTravelingBike_utils_hr(0);
-		config.planCalcScore().setTravelingOther_utils_hr(0);
-		config.planCalcScore().setTravelingPt_utils_hr(0);
-		config.planCalcScore().setTravelingWalk_utils_hr(0);
+//		config.planCalcScore().setPerforming_utils_hr(6.0);
+//		config.planCalcScore().setTraveling_utils_hr(0);
+//		config.planCalcScore().setTravelingBike_utils_hr(0);
+//		config.planCalcScore().setTravelingOther_utils_hr(0);
+//		config.planCalcScore().setTravelingPt_utils_hr(0);
+//		config.planCalcScore().setTravelingWalk_utils_hr(0);
+//
+//		config.planCalcScore().setConstantCar(-3.50);
+//		config.planCalcScore().setConstantOther(-2.2);
+//		config.planCalcScore().setConstantBike(0);
+//		config.planCalcScore().setConstantPt(-3.4);
+//		config.planCalcScore().setConstantWalk(-0.0);
 
-		config.planCalcScore().setConstantCar(-3.50);
-		config.planCalcScore().setConstantOther(-2.2);
-		config.planCalcScore().setConstantBike(0);
-		config.planCalcScore().setConstantPt(-3.4);
-		config.planCalcScore().setConstantWalk(-0.0);
-		
 		config.plansCalcRoute().setNetworkModes(mainModes);
 		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
 		config.plansCalcRoute().setTeleportedModeSpeed("walk", 4/3.6); 
 		config.plansCalcRoute().setTeleportedModeSpeed("pt", 20/3.6);
 		
-		if(EvacPatnaControler.isUsingSeepage){
-			config.setParam("seepage", "isSeepageAllowed", "true");
-			config.setParam("seepage", "seepMode", "bike");
-			config.setParam("seepage", "isSeepModeStorageFree", "false");
-			String outputDir = dir+"run105/evac_seepage/";
-			config.controler().setOutputDirectory(outputDir);
-		} else {
-			String outputDir = dir+"run105/evac_passing/";
-			config.controler().setOutputDirectory(outputDir);
-		}
-
-		// population
-		ScenarioUtils.loadScenario(scenario);
-		getEvacPopulation();
-		config.plans().setInputFile(outPopFile);
+		new ConfigWriter(config).write(outConfigFile);
 	}
 
-	private Scenario getEvacNetwork(){
+	private Scenario createEvacNetwork(){
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(popFile, networkFile);
 		//read shape file and get area
 		ShapeFileReader reader = new ShapeFileReader();
@@ -196,7 +191,7 @@ public class EvacuationPatnaScenarioGenerator {
 		return sc;
 	}
 
-	private void getEvacPopulation() {
+	private void createEvacPopulation() {
 		// population, (home - evac)
 		Population popOut = scenario.getPopulation();
 		PopulationFactory popFact = popOut.getFactory();

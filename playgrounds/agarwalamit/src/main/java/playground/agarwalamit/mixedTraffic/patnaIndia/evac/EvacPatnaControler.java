@@ -21,13 +21,13 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Provider;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -38,21 +38,54 @@ import org.matsim.vehicles.VehicleUtils;
 
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
+import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
+import playground.vsp.congestion.handlers.TollHandler;
+import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 /**
  * @author amit
  */
 
 public class EvacPatnaControler {
-	
-	final static boolean  isUsingSeepage = true;
-	
+
 	public static void main(String[] args) {
+
+		String configFile ;
+		boolean  isUsingSeepage;
+		String outDir;
+		boolean congestionPricing;
+
+		if(args.length==0){
+			configFile = "../../../repos/runs-svn/patnaIndia/run105/input/patna_evac_config.xml.gz";
+			isUsingSeepage = false;
+			outDir = "../../../repos/runs-svn/patnaIndia/run105/100pct/";
+			congestionPricing = true;
+		} else {
+			configFile = args[0];
+			isUsingSeepage = Boolean.valueOf(args[1]);
+			outDir = args[2];
+			congestionPricing = Boolean.valueOf(args[3]);
+		}
+
+		Config config = ConfigUtils.loadConfig(configFile);
+		config.controler().setOutputDirectory(outDir);
+
+		if(congestionPricing) config.controler().setOutputDirectory(config.controler().getOutputDirectory()+"/congestionPricing/");
 		
-		EvacuationPatnaScenarioGenerator scenarioCreator = new EvacuationPatnaScenarioGenerator();
-		scenarioCreator.run();
-		Scenario sc = ScenarioUtils.loadScenario(scenarioCreator.getPatnaEvacConfig()); 
-		
+		if(isUsingSeepage){	
+			config.setParam("seepage", "isSeepageAllowed", "true");
+			config.setParam("seepage", "seepMode", "bike");
+			config.setParam("seepage", "isSeepModeStorageFree", "false");
+			String outputDir = config.controler().getOutputDirectory()+"/evac_seepage/";
+			config.controler().setOutputDirectory(outputDir);
+		} else {
+			String outputDir = config.controler().getOutputDirectory()+"/evac_passing/";
+			config.controler().setOutputDirectory(outputDir);
+		}
+
+		Scenario sc = ScenarioUtils.loadScenario(config); 
+
 		sc.getConfig().qsim().setUseDefaultVehicles(false);
 		((ScenarioImpl) sc).createVehicleContainer();
 
@@ -75,18 +108,6 @@ public class EvacPatnaControler {
 		modesType.put("bike", bike);
 		sc.getVehicles().addVehicleType(bike);
 
-//		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
-//		walk.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("walk"));
-//		//		walk.setPcuEquivalents(0.10);  			
-//		modesType.put("walk",walk);
-//		sc.getVehicles().addVehicleType(walk);
-//
-//		VehicleType pt = VehicleUtils.getFactory().createVehicleType(Id.create("pt",VehicleType.class));
-//		pt.setMaximumVelocity(MixedTrafficVehiclesUtils.getSpeed("pt"));
-//		//		pt.setPcuEquivalents(5);  			
-//		modesType.put("pt",pt);
-//		sc.getVehicles().addVehicleType(pt);
-
 		for(Person p:sc.getPopulation().getPersons().values()){
 			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
 			String travelMode = null;
@@ -99,7 +120,7 @@ public class EvacPatnaControler {
 			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(travelMode));
 			sc.getVehicles().addVehicle(vehicle);
 		}
-		
+
 		final Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(true);
@@ -107,8 +128,16 @@ public class EvacPatnaControler {
 		if(isUsingSeepage){
 			controler.setMobsimFactory(new SeepageMobsimfactory());
 		}
+		
+		if(congestionPricing) {
+			TollHandler tollHandler = new TollHandler(controler.getScenario());
+			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV6(controler.getEvents(), (ScenarioImpl)controler.getScenario()) ));
+		}
+		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl)controler.getScenario()));
 		controler.run();
-		
+
 	}
 }
