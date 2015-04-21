@@ -31,10 +31,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -47,18 +45,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -78,6 +73,24 @@ public class SeepageTest {
 	public void seepageOfWalkInCongestedRegime(){
 
 		SimpleNetwork net = new SimpleNetwork();
+		
+		Scenario sc = net.scenario;
+		sc.getConfig().qsim().setUseDefaultVehicles(false);
+		((ScenarioImpl)sc).createVehicleContainer();
+		
+		
+		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>();
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car,VehicleType.class));
+		car.setMaximumVelocity(20);
+		car.setPcuEquivalents(1.0);
+		modesType.put(TransportMode.car, car);
+		sc.getVehicles().addVehicleType(car);
+
+		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.walk,VehicleType.class));
+		walk.setMaximumVelocity(1);
+		walk.setPcuEquivalents(0.1);
+		modesType.put(TransportMode.walk, walk);
+		sc.getVehicles().addVehicleType(walk);
 
 		for (int i=0;i<3;i++){
 			Id<Person> id = Id.createPersonId(i);
@@ -103,15 +116,18 @@ public class SeepageTest {
 			Activity a2 = net.population.getFactory().createActivityFromLinkId("w", net.link3.getId());
 			plan.addActivity(a2);
 			net.population.addPerson(p);
+			
+			Id<Vehicle> vehicleId = Id.create(p.getId(),Vehicle.class);
+			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(vehicleId,modesType.get(leg.getMode()));
+			sc.getVehicles().addVehicle(vehicle);
 		}
-
+		
 		Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes = new HashMap<>();
 
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
 
-
-		QSim qSim = createQSim(net,manager);
+		QSim qSim = QSimUtils.createDefaultQSim(sc, manager);
 		qSim.run();
 
 		Map<Id<Link>, Double> travelTime1 = personLinkTravelTimes.get(Id.createPersonId("2"));
@@ -124,39 +140,6 @@ public class SeepageTest {
 		Assert.assertEquals("Wrong walk travel time.", 1010, walkTravelTime);
 		Assert.assertEquals("Seepage is not implemented", 894, walkTravelTime-carTravelTime);
 	}
-
-	private static QSim createQSim (SimpleNetwork net, EventsManager manager){
-		Scenario sc = net.scenario;
-		QSim qSim1 = new QSim(sc, manager);
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
-		car.setMaximumVelocity(20);
-		car.setPcuEquivalents(1.0);
-		modeVehicleTypes.put("car", car);
-
-		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
-		walk.setMaximumVelocity(1);
-		walk.setPcuEquivalents(0.1);
-		modeVehicleTypes.put("walk", walk);
-		agentSource.setModeVehicleTypes(modeVehicleTypes);
-		qSim.addAgentSource(agentSource);
-		return qSim;
-	}
-
 
 	private static final class SimpleNetwork{
 
@@ -174,7 +157,7 @@ public class SeepageTest {
 			config = scenario.getConfig();
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
-			config.qsim().setMainModes(Arrays.asList("car","walk"));
+			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
 			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
 
 			config.setParam("seepage", "isSeepageAllowed", "true");
@@ -188,7 +171,7 @@ public class SeepageTest {
 			Node node3 = network.createAndAddNode(Id.createNodeId("3"), scenario.createCoord( 0.0,1000.0));
 			Node node4 = network.createAndAddNode(Id.createNodeId("4"), scenario.createCoord( 0.0,1100.0));
 
-			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList("car","walk"));
+			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList(TransportMode.car,TransportMode.walk));
 
 			link1 = network.createAndAddLink(Id.createLinkId("1"), node1, node2, 100, 25, 36000, 1, null, "22"); 
 			link2 = network.createAndAddLink(Id.createLinkId("2"), node2, node3, 1000, 25, 60, 1, null, "22");	//flow capacity is 1 PCU per min.
@@ -201,7 +184,7 @@ public class SeepageTest {
 			population = scenario.getPopulation();
 		}
 	}
-	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler {
+	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 		private final Map<Id<Person>, Map<Id<Link>, Double>> personLinkTravelTimes;
 
@@ -211,7 +194,6 @@ public class SeepageTest {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			System.out.println(event.toString());
 			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
 			if (travelTimes == null) {
 				travelTimes = new HashMap<>();
@@ -222,7 +204,6 @@ public class SeepageTest {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			System.out.println(event.toString());
 			Map<Id<Link>, Double> travelTimes = this.personLinkTravelTimes.get(Id.createPersonId(event.getVehicleId()));
 			if (travelTimes != null) {
 				Double d = travelTimes.get(event.getLinkId());
@@ -235,12 +216,6 @@ public class SeepageTest {
 
 		@Override
 		public void reset(int iteration) {
-		}
-
-		@Override
-		public void handleEvent(PersonArrivalEvent event) {
-			System.out.println(event.toString());
-
 		}
 	}
 }
