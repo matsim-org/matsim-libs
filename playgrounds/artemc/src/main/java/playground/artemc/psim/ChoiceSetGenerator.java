@@ -12,6 +12,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.artemc.analysis.IndividualScoreFromPopulationSQLWriter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Choice set generator based on the selected plan. Uses Psim for plans scoring.
@@ -25,6 +26,7 @@ public class ChoiceSetGenerator implements ShutdownListener
 
 	ChoiceGenerationControler choiceGenerationControler;
 	Population population;
+	HashMap<Id<Person>,Plan> initialPlans = new HashMap<Id<Person>,Plan>();
 	static Integer choiceNumber = 2;
 
 	public ChoiceSetGenerator(String[] args){
@@ -53,12 +55,15 @@ public class ChoiceSetGenerator implements ShutdownListener
 
 		PopulationFactory populationFactory = population.getFactory();
 		ArrayList<Person> newPersons = new ArrayList<>();
-		for (Id personId : population.getPersons().keySet()) {
+		for (Id<Person> personId : population.getPersons().keySet()) {
 
 			Plan plan = population.getPersons().get(personId).getSelectedPlan();
+			initialPlans.put(personId, plan);
+
+			population.getPersons().get(personId).createCopyOfSelectedPlanAndMakeSelected();
+			plan = population.getPersons().get(personId).getSelectedPlan();
 			population.getPersons().get(personId).getPlans().clear();
 			population.getPersons().get(personId).addPlan(plan);
-
 
 			/* Plan cloning*/
 			for (int i = 1; i < choiceNumber; i++) {
@@ -90,9 +95,9 @@ public class ChoiceSetGenerator implements ShutdownListener
 			}
 
 			/*Clear all plans from initial person*/
-			Plan planSelected = population.getPersons().get(personId).getSelectedPlan();
+			Plan selectedPlan = population.getPersons().get(personId).getSelectedPlan();
 			population.getPersons().get(personId).getPlans().clear();
-			population.getPersons().get(personId).addPlan(planSelected);
+			population.getPersons().get(personId).addPlan(selectedPlan);
 		}
 
 		/*Add new agents to the simulation*/
@@ -117,8 +122,15 @@ public class ChoiceSetGenerator implements ShutdownListener
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population newPopulation = scenario.getPopulation();
 		for(Id<Person> personId:population.getPersons().keySet()){
-			Id<Person> orgPersonId = Id.create(personId.toString().split("_")[0],Person.class);
-			Plan planToAdd = population.getPersons().get(personId).getSelectedPlan();
+			Id<Person> orgPersonId = Id.create(personId.toString().split("_")[0], Person.class);
+
+			Plan planToAdd = null;
+			if(personId.toString().contains("_")){
+				planToAdd = population.getPersons().get(personId).getSelectedPlan();
+			}
+			else {
+				planToAdd = initialPlans.get(personId);
+			}
 
 			if(newPopulation.getPersons().containsKey(orgPersonId)){
 				newPopulation.getPersons().get(orgPersonId).addPlan(planToAdd);
@@ -130,6 +142,8 @@ public class ChoiceSetGenerator implements ShutdownListener
 			}
 		}
 
+
+		/*Write score table to SQL*/
 		String connectionPropertiesPath = "/Users/artemc/Workspace/playgrounds/artemc/connections/matsim2postgresLocal.properties";
 		String schema="corridor";
 
