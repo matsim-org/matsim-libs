@@ -85,13 +85,11 @@ public class CongestionTestExamples {
 		new CongestionTestExamples().getDelayDataForPricingImpls(sc,testNetwork);
 		
 		// merging network
-		numberOfPersonInPlan = 5;
 		testNetwork = "merging";
 		MergingNetworkAndPlans mergeInputs = new MergingNetworkAndPlans();
 		mergeInputs.createNetwork();
-		mergeInputs.createPopulation(numberOfPersonInPlan);
+		mergeInputs.createPopulation();
 		sc = mergeInputs.getDesiredScenario();
-		Logger.getLogger(CongestionTestExamples.class).warn("During implV3, agent 4 leave node first whereas in other two impls agent 5 leave first.");
 		new CongestionTestExamples().getDelayDataForPricingImpls(sc,testNetwork);
 		
 		//diverging network 
@@ -168,7 +166,6 @@ public class CongestionTestExamples {
 			public void handleEvent(CongestionEvent event) {
 				congestionEvents.add(event);
 			}
-
 		});
 		
 		if(congestionPricingImpl.equalsIgnoreCase("v3")) {
