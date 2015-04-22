@@ -22,6 +22,7 @@
 package playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -45,6 +46,7 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 		LinkEnterEventHandler, PersonArrivalEventHandler {
 
 	private static final int TIMEBINSIZE = 5*60; // [sec]
+	private static final boolean EXCLUDEPT = true;
 
 	private int currentTimeBin;
 	private Map<Integer, Map<Id<Link>, Integer>> densities;
@@ -72,18 +74,24 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		incDensity(event.getLinkId(), event.getTime());
+		if (!EXCLUDEPT || event.getPersonId().toString().contains(TransportMode.pt)) {
+			incDensity(event.getLinkId(), event.getTime());
+		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		decDensity(event.getLinkId(), event.getTime());
-		incFlow(event.getLinkId(), event.getTime());
+		if (!EXCLUDEPT || event.getPersonId().toString().contains(TransportMode.pt)) {
+			decDensity(event.getLinkId(), event.getTime());
+			incFlow(event.getLinkId(), event.getTime());
+		}
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		decDensity(event.getLinkId(), event.getTime());
+		if (!EXCLUDEPT || event.getPersonId().toString().contains(TransportMode.pt)) {
+			decDensity(event.getLinkId(), event.getTime());
+		}
 	}
 
 	@Override
