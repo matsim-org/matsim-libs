@@ -29,6 +29,7 @@ public final class RunWithRoadPricing {
 
 	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
+		
 		boolean useCadyts = false;
 		if (args[1].equals("cadyts")) {
 			useCadyts = true;
@@ -42,9 +43,9 @@ public final class RunWithRoadPricing {
 		Config config = ConfigUtils.loadConfig(configFile,
 				new RoadPricingConfigGroup());
 
-		if (useCadyts) {
-			registerCadytsStrategy(config);
-		}
+		//if (useCadyts) {
+		//	registerCadytsStrategy(config);
+		//}
 
 		// load the scenario:
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -98,14 +99,14 @@ public final class RunWithRoadPricing {
 		// cfgWriter.write("config_utskrift.xml");
 	}
 
-	private static void registerCadytsStrategy(Config config) {
-		// probably remove standard PlansSelector?
-		StrategySettings strategySettings = new StrategySettings(
-				ConfigUtils.createAvailableStrategyId(config));
-		strategySettings.setStrategyName(CADYTS_STRATEGY_NAME);
-		strategySettings.setWeight(1.0);
-		config.strategy().addStrategySettings(strategySettings);
-	}
+//	private static void registerCadytsStrategy(Config config) {
+//		// probably remove standard PlansSelector?
+//		StrategySettings strategySettings = new StrategySettings(
+//				ConfigUtils.createAvailableStrategyId(config));
+//		strategySettings.setStrategyName(CADYTS_STRATEGY_NAME);
+//		strategySettings.setWeight(1.0);
+//		config.strategy().addStrategySettings(strategySettings);
+//	}
 
 	private static void registerCadyts(final Controler controler,
 			final double cadytsWeight) {
