@@ -1,6 +1,5 @@
 package playground.smeintjes;
 
-import 
 
 /**
  * Class to generate multiple networks of a predetermined size.
