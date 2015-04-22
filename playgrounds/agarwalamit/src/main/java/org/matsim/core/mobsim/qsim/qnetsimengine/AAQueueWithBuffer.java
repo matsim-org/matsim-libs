@@ -880,13 +880,14 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 	/**
 	 * basically required to get more data points in the congested branch of FD
 	 */
-	private boolean isRestrictingNumberOfSeepMode = true;
+	private boolean isRestrictingNumberOfSeepMode = false;
 	
 	private QVehicle peekFromVehQueue(){
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle returnVeh = vehQueue.peek();
 		
 		if(seepageAllowed){
+			
 			if(isRestrictingNumberOfSeepMode && noOfSeepModeBringFwd == maxSeepModeAllowed) {
 				noOfSeepModeBringFwd = 0;
 				return returnVeh;
@@ -899,7 +900,7 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 
 			while(it.hasNext()){
 				QVehicle veh = newVehQueue.poll(); 
-				if( veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals(seepMode)  && veh.getDriver()!=null) {
+				if( veh.getDriver()!=null && veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals(seepMode) ) {
 					returnVeh = veh;
 					break;
 				}
