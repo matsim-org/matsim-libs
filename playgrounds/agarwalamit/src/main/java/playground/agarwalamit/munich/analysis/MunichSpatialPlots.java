@@ -56,19 +56,21 @@ public class MunichSpatialPlots {
 
 	String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";
 	String bau = runDir+"/bau";
-	String policyName = "eci";
+	String policyName = "ei";
 	String policyCase = runDir+"/"+policyName;
 	private final double countScaleFactor = 100;
 	private final double gridSize = 500;
+	private boolean isWritingGGPLOTData = true;
+	private int noOfBins = 15;
 
 	public static void main(String[] args) {
 		MunichSpatialPlots plots = new MunichSpatialPlots();
-		//		plots.writeCongestionToCells();
-						plots.writeEmissionToCells();
+		plots.writeCongestionToCells();
+		plots.writeEmissionToCells();
 		//		plots.writeUserWelfareToCells();
 		//				plots.writePopulationDensityCountToCells();
-//		plots.writePersonTollToCells();
-//		plots.writeLinkTollToCells();
+		//		plots.writePersonTollToCells();
+		//		plots.writeLinkTollToCells();
 	}
 
 	public void writePopulationDensityCountToCells(){
@@ -95,7 +97,7 @@ public class MunichSpatialPlots {
 			plot.processHomeLocation(act, 1*countScaleFactor); // if want to interpolate
 		}
 
-		plot.writeRData("popDensity_interpolate");
+		plot.writeRData("popDensity_interpolate",isWritingGGPLOTData);
 
 	}
 
@@ -151,7 +153,7 @@ public class MunichSpatialPlots {
 			}
 		}
 
-		plot.writeRData("userWelfare_"+WelfareMeasure.SELECTED);
+		plot.writeRData("userWelfare_"+WelfareMeasure.SELECTED,isWritingGGPLOTData);
 
 	}
 
@@ -192,7 +194,7 @@ public class MunichSpatialPlots {
 
 			plot.processHomeLocation(act, processableIntensity);
 		}
-		plot.writeRData("tollAtHomeLocation");
+		plot.writeRData("tollAtHomeLocation",isWritingGGPLOTData);
 	}
 
 	public void writeLinkTollToCells() {
@@ -208,25 +210,25 @@ public class MunichSpatialPlots {
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
 
 		double processIntensity = 0;
-		
+
 		if(inputs.isComparing){
 			Scenario scPolicy = LoadMyScenarios.loadScenarioFromOutputDir(policyCase);
 			LinkTollFromExternalCosts linktollsAnalyzer = new LinkTollFromExternalCosts();
 			linkTollPolicy = linktollsAnalyzer.getLinkToTotalExternalCost(scPolicy, policyName);
 		}
-		
+
 		for(Link l : sc.getNetwork().getLinks().values()){
-			
+
 			if(inputs.isComparing){
 				processIntensity = linkTollPolicy.get(l.getId());
 			} else {
 				processIntensity = 0; // for bau --> no toll
 			}
-			
+
 			plot.processLink(l, processIntensity*countScaleFactor);
-			
+
 		}
-		plot.writeRData("linkTolls");
+		plot.writeRData("linkTolls",isWritingGGPLOTData);
 	}
 
 
@@ -239,22 +241,24 @@ public class MunichSpatialPlots {
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
-		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
+		double simEndTime = LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig);
 
-		CongestionLinkAnalyzer emsLnkAna = new CongestionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEventsFile, 1); 
-		emsLnkAna.init(sc);
-		emsLnkAna.preProcessData();
-		emsLnkAna.postProcessData();
-		linkDelaysBau = emsLnkAna.getCongestionPerLinkTimeInterval();
+		CongestionLinkAnalyzer delayAnalyzer = new CongestionLinkAnalyzer(simEndTime, inputs.initialCaseEventsFile, noOfBins); 
+		delayAnalyzer.init(sc);
+		delayAnalyzer.preProcessData();
+		delayAnalyzer.postProcessData();
+		linkDelaysBau = delayAnalyzer.getCongestionPerLinkTimeInterval();
 
 		if(inputs.isComparing){
-			emsLnkAna = new CongestionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEventsFile, 1);
-			emsLnkAna.init(LoadMyScenarios.loadScenarioFromNetwork(inputs.compareToCaseNetwork));
-			emsLnkAna.preProcessData();
-			emsLnkAna.postProcessData();
-			linkDelaysPolicy = emsLnkAna.getCongestionPerLinkTimeInterval();
+			simEndTime = LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig);
+			delayAnalyzer = new CongestionLinkAnalyzer(simEndTime, inputs.compareToCaseEventsFile, noOfBins);
+			delayAnalyzer.init(LoadMyScenarios.loadScenarioFromNetwork(inputs.compareToCaseNetwork));
+			delayAnalyzer.preProcessData();
+			delayAnalyzer.postProcessData();
+			linkDelaysPolicy = delayAnalyzer.getCongestionPerLinkTimeInterval();
 		}
 		double sumDelays =0;
 
@@ -291,17 +295,17 @@ public class MunichSpatialPlots {
 					sumDelays += (delays);
 				}
 			}
+			plot.writeRData("delays_"+(int)time/3600+"h", isWritingGGPLOTData);
+			SpatialDataInputs.LOG.info("Total delays from link emission map is "+sumDelays);
+
+			double cellWeights =0;
+			for(Point p: plot.getCellWeights().keySet()){
+				cellWeights += plot.getCellWeights().get(p);
+			}
+			SpatialDataInputs.LOG.info("Total delays from cell weights  is "+cellWeights);
+			plot.clear();
+			sumDelays=0;
 		}
-
-		plot.writeRData("delays");
-		SpatialDataInputs.LOG.info("Total delays from link emission map is "+sumDelays);
-
-		double cellWeights =0;
-		for(Point p: plot.getCellWeights().keySet()){
-			cellWeights += plot.getCellWeights().get(p);
-		}
-		SpatialDataInputs.LOG.info("Total delays from cell weights  is "+cellWeights);
-
 	}
 
 
@@ -310,7 +314,7 @@ public class MunichSpatialPlots {
 		Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsPolicy = new HashMap<>();
 
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,policyCase);
+		SpatialDataInputs inputs = new SpatialDataInputs("line",bau, policyCase);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -319,16 +323,16 @@ public class MunichSpatialPlots {
 		//		inputs.setBoundingBox(4452550.25, 4479483.33, 5324955.00, 5345696.81);
 		//		inputs.setSmoothingRadius(500.);
 
-		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/");
+		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
 
-		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEmissionEventsFile, 1);
+		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEmissionEventsFile, noOfBins);
 		emsLnkAna.init();
 		emsLnkAna.preProcessData();
 		emsLnkAna.postProcessData();
 		linkEmissionsBau = emsLnkAna.getLink2TotalEmissions();
 
 		if(inputs.isComparing){
-			emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEmissionEventsFile, 1);
+			emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig), inputs.compareToCaseEmissionEventsFile, noOfBins);
 			emsLnkAna.init();
 			emsLnkAna.preProcessData();
 			emsLnkAna.postProcessData();
@@ -372,17 +376,17 @@ public class MunichSpatialPlots {
 					sumEmission += (emiss);
 				}
 			}
+			plot.writeRData("NO2_"+(int)time/3600+"h",isWritingGGPLOTData);
+			SpatialDataInputs.LOG.info("Total NO2 emissions from link emission map is "+sumEmission);
+
+			double cellWeights =0;
+			for(Point p: plot.getCellWeights().keySet()){
+				cellWeights += plot.getCellWeights().get(p);
+			}
+			SpatialDataInputs.LOG.info("Total NO2 emissions from cell weights  is "+cellWeights);
+			plot.clear();
+			sumEmission=0;
 		}
-
-		plot.writeRData("NO2");
-		SpatialDataInputs.LOG.info("Total NO2 emissions from link emission map is "+sumEmission);
-
-		double cellWeights =0;
-		for(Point p: plot.getCellWeights().keySet()){
-			cellWeights += plot.getCellWeights().get(p);
-		}
-		SpatialDataInputs.LOG.info("Total NO2 emissions from cell weights  is "+cellWeights);
-
 	}
 
 	private Map<Id<Person>, Double> getPersonIdToTollPayments (Scenario sc){

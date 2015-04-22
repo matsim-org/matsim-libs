@@ -49,12 +49,7 @@ public class SpatialInterpolation {
 		createGridFromBoundingBox();
 		this.grid.writeGrid(outputFolder, inputs.targetCRS.toString());
 		this.outputFolder = outputFolder;
-
-		// initialize map
-		this.cellWeights = new HashMap<Point, Double>();
-		for(Point p :this.grid.getGrid().values()){
-			this.cellWeights.put(p, 0.);
-		}
+		clear();
 	}
 
 	private GeometryFactory gf;
@@ -64,7 +59,16 @@ public class SpatialInterpolation {
 
 	private Map<Point, Double> cellWeights;
 	private String outputFolder ;
-	private final boolean writingGGPLOTData = true;
+
+	/**
+	 * Used to clear the cell weights map.
+	 */
+	public void clear(){
+		this.cellWeights = new HashMap<Point, Double>();
+		for(Point p :this.grid.getGrid().values()){
+			this.cellWeights.put(p, 0.);
+		}
+	}
 
 	/**
 	 * @return general grid of cells from pre defined bounding box
@@ -230,10 +234,14 @@ public class SpatialInterpolation {
 	}
 
 	/**
+	 * @param fileNamePrefix
+	 * @param writingGGPLOTData if true, will write one row for each vertex of polygon else 
+	 * will write all vertices in a row
+	 * 
 	 * Same data sheet can be used for plotting surface polygon and filled contour plot data. 
 	 * <p> The file name will composed of grid type, cell width, link weight method and scenario seperated by "_".
 	 */
-	public void writeRData(String fileNamePrefix){
+	public void writeRData(String fileNamePrefix, boolean writingGGPLOTData){
 		SpatialDataInputs.LOG.info("====Writing data to plot polygon surface in R.====");
 
 		GridType type = inputs.gridType;

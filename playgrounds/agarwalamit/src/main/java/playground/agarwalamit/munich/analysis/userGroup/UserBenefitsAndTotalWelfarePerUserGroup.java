@@ -74,7 +74,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 
 	public static void main(String[] args) {
 		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
-		String [] runCases = {"bau","ei","ci","eci","10ei"};
+		String [] runCases = {"bau","ei","ci","eci"};
 		new UserBenefitsAndTotalWelfarePerUserGroup(outputDir, false).runAndWrite(runCases);
 	}
 
@@ -216,8 +216,8 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 
 	private boolean isPersonIncluded(Id<Person> personId){
 		double score = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getScore();
-		if (score < 0 ) return false;
-		else return true;
+		if (score >= 0 ) return true;
+		else return false;
 	}
 
 }
