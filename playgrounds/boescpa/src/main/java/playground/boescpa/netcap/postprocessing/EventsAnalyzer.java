@@ -24,10 +24,7 @@ package playground.boescpa.netcap.postprocessing;
 import org.matsim.api.core.v01.network.Network;
 import playground.boescpa.lib.tools.networkModification.NetworkUtils;
 import playground.boescpa.lib.tools.scenarioAnalyzer.ScenarioAnalyzer;
-import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.AgentCounter;
-import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
-import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.TripActivityCrosscorrelator;
-import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.TripAnalyzer;
+import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.*;
 
 /**
  * WHAT IS IT FOR?
@@ -47,7 +44,8 @@ public class EventsAnalyzer {
 			ScenarioAnalyzerEventHandler[] handlers = {
 					new AgentCounter(network),
 					new TripAnalyzer(network),
-					new TripActivityCrosscorrelator(network)
+					new TripActivityCrosscorrelator(network),
+					new MFDCreator(network)
 			};
 			ScenarioAnalyzer scenarioAnalyzer = new ScenarioAnalyzer(path2EventFile, scaleFactor, handlers);
 			scenarioAnalyzer.analyzeScenario();
