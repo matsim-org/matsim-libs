@@ -7,8 +7,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -45,7 +46,7 @@ class KNBerlinControler {
 //		config.vspExperimental().setScoreMSAStartsAtIteration( (int)(0.8*config.controler().getLastIteration()) );
 
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true) ;
-		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration );
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT );
 		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());

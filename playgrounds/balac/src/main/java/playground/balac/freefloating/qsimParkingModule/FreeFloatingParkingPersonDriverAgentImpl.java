@@ -22,7 +22,8 @@ import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingLinkInfo;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -566,7 +567,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 	 */
 	void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
-		ActivityDurationInterpretation activityDurationInterpretation = 
+		PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation = 
 				(this.simulation.getScenario().getConfig().plans().getActivityDurationInterpretation());
 		double departure = FreeFloatingActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
 

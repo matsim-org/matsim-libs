@@ -31,7 +31,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
 import org.matsim.core.population.ActivityImpl;
 
@@ -41,14 +42,14 @@ import org.matsim.core.population.ActivityImpl;
  * @author rashid_waraich
  */
 public class EndLegMessage extends EventMessage {
-	private final ActivityDurationInterpretation activityDurationInterpretation ;
+	private final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation ;
 	public EndLegMessage(final Scheduler scheduler, final Vehicle vehicle) {
 		// need the time interpretation info here.  Attaching it to the message feels weird.  The scheduler seems a pure simulation object.
 		// Consequence: attach it to Vehicle
 		super(scheduler, vehicle);
 		this.priority = SimulationParameters.PRIORITY_ARRIVAL_MESSAGE;
 		if ( vehicle == null ) {
-			this.activityDurationInterpretation = ActivityDurationInterpretation.minOfDurationAndEndTime ;
+			this.activityDurationInterpretation = PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ;
 			// need this for some test cases. kai, nov'13
 		} else {
 			this.activityDurationInterpretation = vehicle.getActivityEndTimeInterpretation() ;

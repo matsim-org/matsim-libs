@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringSetter;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 
 public class PlansConfigGroup extends ReflectiveConfigGroup {
 
@@ -37,6 +37,7 @@ public class PlansConfigGroup extends ReflectiveConfigGroup {
 		public static final String CompressedNetworkRoute = "CompressedNetworkRoute";
 	}
 
+	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly }
 	private static final String INPUT_FILE = "inputPlansFile";
 	private static final String INPUT_PERSON_ATTRIBUTES_FILE = "inputPersonAttributesFile";
 	private static final String NETWORK_ROUTE_TYPE = "networkRouteType";
@@ -50,7 +51,7 @@ public class PlansConfigGroup extends ReflectiveConfigGroup {
 	//--
 	
 	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
-	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.tryEndTimeThenDuration ;
+	private PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation = PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ;
 
 	//--
 
@@ -75,11 +76,11 @@ public class PlansConfigGroup extends ReflectiveConfigGroup {
 				" (as freight, through traffic, etc.). The attribute must be of String type." );
 
 		StringBuilder str = new StringBuilder() ;
-		for ( ActivityDurationInterpretation itp : ActivityDurationInterpretation.values() ) {
+		for ( PlansConfigGroup.ActivityDurationInterpretation itp : PlansConfigGroup.ActivityDurationInterpretation.values() ) {
 			str.append(" ").append(itp.toString());
 		}
 		comments.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides " 
-				+ ActivityDurationInterpretation.minOfDurationAndEndTime + " will internally use a different " +
+				+ PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime + " will internally use a different " +
 		"(simpler) version of the TimeAllocationMutator.") ;
 
 		return comments;
@@ -126,7 +127,7 @@ public class PlansConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter(ACTIVITY_DURATION_INTERPRETATION)
-	public ActivityDurationInterpretation getActivityDurationInterpretation() {
+	public PlansConfigGroup.ActivityDurationInterpretation getActivityDurationInterpretation() {
 		return this.activityDurationInterpretation ;
 	}
 //	public void setActivityDurationInterpretation(final String str) {
@@ -134,15 +135,15 @@ public class PlansConfigGroup extends ReflectiveConfigGroup {
 //		this.setActivityDurationInterpretation(actDurInterpret);
 //	}
 	@StringSetter(ACTIVITY_DURATION_INTERPRETATION)
-	public void setActivityDurationInterpretation( final ActivityDurationInterpretation actDurInterpret ) {
-		if ( ActivityDurationInterpretation.endTimeOnly.equals(actDurInterpret) ){
+	public void setActivityDurationInterpretation( final PlansConfigGroup.ActivityDurationInterpretation actDurInterpret ) {
+		if ( PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly.equals(actDurInterpret) ){
 			/*
 			 * I don't think this is the correct place for consistency checks but this bug is so hard to find that the user should be warned in any case. dg 08-2012
 			 */
 			Logger.getLogger(this.getClass()).warn("You are using " + actDurInterpret + " as activityDurationInterpretation. " +
 			"This is not working in conjunction with the pt module as pt interaction activities then will never end!");
 			Logger.getLogger(this.getClass()).warn("ActivityDurationInterpreation " + actDurInterpret + " is deprecated; use " 
-					+ ActivityDurationInterpretation.minOfDurationAndEndTime + " instead. kai, jan'13") ;
+					+ PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime + " instead. kai, jan'13") ;
 		}
 		this.activityDurationInterpretation = actDurInterpret;
 	}

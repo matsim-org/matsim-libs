@@ -409,7 +409,7 @@ public class M4UConfigUtils {
 		// set some defaults:
 		VspExperimentalConfigGroup vsp = config.vspExperimental();
 		vsp.setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;
-		config.plans().setActivityDurationInterpretation(VspExperimentalConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ) ;
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ) ;
 		vsp.setRemovingUnneccessaryPlanAttributes(true) ;
 		
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8) ;

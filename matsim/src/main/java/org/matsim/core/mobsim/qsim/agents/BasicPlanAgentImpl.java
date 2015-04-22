@@ -10,7 +10,8 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -135,7 +136,7 @@ final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<P
 	 * ensure that the ActivityEndsList in the {@link QSim} is also updated.
 	 */
 	private final void calculateAndSetDepartureTime(Activity act) {
-		ActivityDurationInterpretation activityDurationInterpretation = this.getScenario().getConfig().plans().getActivityDurationInterpretation();
+		PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation = this.getScenario().getConfig().plans().getActivityDurationInterpretation();
 		double now = this.getSimTimer().getTimeOfDay() ;
 		double departure = ActivityDurationUtils.calculateDepartureTime(act, now, activityDurationInterpretation);
 	

@@ -20,10 +20,12 @@
 package org.matsim.population;
 
 import com.google.inject.Inject;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.population.LegImpl;
@@ -46,7 +48,7 @@ class VspPlansCleaner implements BeforeMobsimListener {
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		Population pop = scenario.getPopulation();
 		Config config = scenario.getConfig() ;
-		ActivityDurationInterpretation actDurInterp = ( config.plans().getActivityDurationInterpretation() ) ;
+		PlansConfigGroup.ActivityDurationInterpretation actDurInterp = ( config.plans().getActivityDurationInterpretation() ) ;
 		for ( Person person : pop.getPersons().values() ) {
 
 			Plan plan = person.getSelectedPlan() ; 
@@ -56,17 +58,17 @@ class VspPlansCleaner implements BeforeMobsimListener {
 				if ( pe instanceof Activity ) {
 					Activity act = (Activity) pe ;
 					
-					if ( actDurInterp == ActivityDurationInterpretation.minOfDurationAndEndTime ) {
+					if ( actDurInterp == PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ) {
 						
 						// person stays at the activity either until its duration is over or until its end time, whatever comes first
 						// do nothing
 						
-					} else if ( actDurInterp == ActivityDurationInterpretation.endTimeOnly ) {
+					} else if ( actDurInterp == PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly ) {
 						
 						// always set duration to undefined:
 						act.setMaximumDuration( Time.UNDEFINED_TIME ) ;
 						
-					} else if ( actDurInterp == ActivityDurationInterpretation.tryEndTimeThenDuration ) {
+					} else if ( actDurInterp == PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ) {
 						
 						// set duration to undefined if there is an activity end time:
 						if ( act.getEndTime() != Time.UNDEFINED_TIME ) {

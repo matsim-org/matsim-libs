@@ -27,9 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 
 /**
  * @author nagel
@@ -143,10 +144,10 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			log.warn("You are not removing unnecessary plan attributes; vsp default is to do that.") ;
 		}
 		
-		ActivityDurationInterpretation actDurInterpr =  config.plans().getActivityDurationInterpretation()  ;
-		if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {
+		PlansConfigGroup.ActivityDurationInterpretation actDurInterpr =  config.plans().getActivityDurationInterpretation()  ;
+		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly ) {
 			// added jan'13
-			log.warn(ActivityDurationInterpretation.endTimeOnly + " is deprecated. Use " + ActivityDurationInterpretation.tryEndTimeThenDuration + " instead.") ;
+			log.warn(PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly + " is deprecated. Use " + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + " instead.") ;
 			problem = true;
 			// added before nov'12
 			if( config.scenario().isUseTransit()) {
@@ -159,13 +160,13 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		}
 		
 		// added jan'13
-		if ( actDurInterpr == ActivityDurationInterpretation.minOfDurationAndEndTime ) {
+		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ) {
 			problem = true ;
 			System.out.flush() ;
 			log.warn("You are using ActivityDurationInterpretation " + config.plans().getActivityDurationInterpretation() + " ; vsp default is to use " +
-					ActivityDurationInterpretation.tryEndTimeThenDuration + 
+					PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + 
 							"This means you have to add the following lines into the vspExperimental section of your config file: ") ;
-			log.warn( "   <param name=\"activityDurationInterpretation\" value=\"" + ActivityDurationInterpretation.tryEndTimeThenDuration + "\" />" ) ;
+			log.warn( "   <param name=\"activityDurationInterpretation\" value=\"" + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + "\" />" ) ;
 			log.warn("Please report if this causes odd results (this will simplify many code maintenance issues, but is unfortunately not well tested).") ;
 		}
 		

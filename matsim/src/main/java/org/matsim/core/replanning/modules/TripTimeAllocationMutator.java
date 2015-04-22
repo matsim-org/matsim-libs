@@ -21,7 +21,8 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
@@ -48,12 +49,12 @@ public class TripTimeAllocationMutator extends AbstractMultithreadedModule {
 		super(config.global());
 		this.mutationRange = config.timeAllocationMutator().getMutationRange() ;
 		this.affectingDuration = config.timeAllocationMutator().isAffectingDuration() ;
-		ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
-		if ( actDurInterpr == ActivityDurationInterpretation.minOfDurationAndEndTime ) {
+		PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
+		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ) {
 			useActivityDurations = true ;
-		} else if ( actDurInterpr == ActivityDurationInterpretation.endTimeOnly ) {
+		} else if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly ) {
 			useActivityDurations = false ;
-		} else if ( actDurInterpr == ActivityDurationInterpretation.tryEndTimeThenDuration ) {
+		} else if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ) {
 			throw new UnsupportedOperationException( "need to clarify the correct setting here.  Probably not a big deal, but not done yet.  kai, aug'10") ;
 		} else {
 			throw new IllegalStateException( "beahvior not defined for this configuration setting") ;

@@ -42,7 +42,8 @@ import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -202,7 +203,7 @@ public class MultiModalControlerListenerTest {
 		config.qsim().setRemoveStuckVehicles(true);
 		config.qsim().setStuckTime(100.0);
 
-		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.minOfDurationAndEndTime );
+		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
 		// added by me to fix the test.  If you normally run with the default setting (now tryEndTimeThenDuration), I would suggest to remove
 		// the above line and adapt the test outcome.  Kai, feb'14
 

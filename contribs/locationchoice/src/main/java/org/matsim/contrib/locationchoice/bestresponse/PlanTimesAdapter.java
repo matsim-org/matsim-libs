@@ -28,7 +28,8 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -48,7 +49,7 @@ public class PlanTimesAdapter {
 	// 0: complete routing
 	// 1: local routing
 	// 2: no routing (distance-based approximation)
-	private ApproximationLevel approximationLevel = ApproximationLevel.COMPLETE_ROUTING; 
+	private PlansConfigGroup.ApproximationLevel approximationLevel = PlansConfigGroup.ApproximationLevel.COMPLETE_ROUTING; 
 	private final MultiNodeDijkstra forwardMultiNodeDijkstra;
 	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final Network network;
@@ -57,7 +58,7 @@ public class PlanTimesAdapter {
 	
 	private static final Logger log = Logger.getLogger(PlanTimesAdapter.class);
 		
-	/* package */ PlanTimesAdapter(ApproximationLevel approximationLevel, MultiNodeDijkstra forwardMultiNodeDijkstra, 
+	/* package */ PlanTimesAdapter(PlansConfigGroup.ApproximationLevel approximationLevel, MultiNodeDijkstra forwardMultiNodeDijkstra, 
 			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, TripRouter router, Scenario scenario) {
 		this.approximationLevel = approximationLevel;
 		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
@@ -95,12 +96,12 @@ public class PlanTimesAdapter {
 			}
 			
 			PathCosts pathCosts = null;
-			if (approximationLevel == ApproximationLevel.COMPLETE_ROUTING ) {
+			if (approximationLevel == PlansConfigGroup.ApproximationLevel.COMPLETE_ROUTING ) {
 				pathCosts = computeTravelTimeFromCompleteRouting(plan.getPerson(),
 					plan.getPreviousActivity(plan.getPreviousLeg(act)), act, ((Leg)plan.getPreviousLeg(act)).getMode());
-			} else if (approximationLevel == ApproximationLevel.LOCAL_ROUTING ){
+			} else if (approximationLevel == PlansConfigGroup.ApproximationLevel.LOCAL_ROUTING ){
 				pathCosts = computeTravelTimeFromLocalRouting(plan, actlegIndex, planElementIndex, act);
-			} else if (approximationLevel == ApproximationLevel.NO_ROUTING ) {
+			} else if (approximationLevel == PlansConfigGroup.ApproximationLevel.NO_ROUTING ) {
 				pathCosts = approximateTravelTimeFromDistance(plan, actlegIndex, planElementIndex, act);
 			}
 			
@@ -140,7 +141,7 @@ public class PlanTimesAdapter {
 
 			actTmp.setStartTime(arrivalTime);
 
-			ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
+			PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = ( config.plans().getActivityDurationInterpretation() ) ;
 			switch ( actDurInterpr ) {
 			case tryEndTimeThenDuration:
 				if ( act.getEndTime() == Time.UNDEFINED_TIME &&
@@ -163,7 +164,7 @@ public class PlanTimesAdapter {
 			default:
 				throw new RuntimeException("activity duration interpretation of " 
 						+ config.plans().getActivityDurationInterpretation().toString() + " is not supported for locationchoice; aborting ... " +
-								"Use " + ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;
+								"Use " + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration.toString() + "instead.") ;
 			}
 
 		}

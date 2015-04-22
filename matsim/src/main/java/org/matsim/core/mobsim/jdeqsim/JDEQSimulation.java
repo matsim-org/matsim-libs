@@ -27,12 +27,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.mobsim.framework.RunnableMobsim;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;
+
 import java.util.HashMap;
 
 
@@ -58,7 +60,7 @@ public class JDEQSimulation implements RunnableMobsim {
 
 	protected Scenario scenario;
 
-	protected final ActivityDurationInterpretation activityDurationInterpretation;
+	protected final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation;
 
 	@Inject
 	public JDEQSimulation(final Scenario scenario, final EventsManager events) {

@@ -25,7 +25,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -58,7 +59,7 @@ public class SignalSystemsIntegrationTest {
 	@Test
 	public void testSignalSystems() {
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
-		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.minOfDurationAndEndTime);
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
 		//		config.controler().setOutputDirectory(controlerOutputDir);
 		//		config.addQSimConfigGroup(new QSimConfigGroup());

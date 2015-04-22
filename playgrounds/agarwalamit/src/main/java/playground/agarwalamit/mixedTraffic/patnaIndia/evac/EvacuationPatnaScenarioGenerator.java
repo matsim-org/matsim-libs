@@ -38,11 +38,12 @@ import org.matsim.contrib.grips.scenariogenerator.EvacuationNetworkGenerator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -144,7 +145,7 @@ public class EvacuationPatnaScenarioGenerator {
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
 		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
 		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
-		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.tryEndTimeThenDuration);
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
 		//vsp default
 
 		ActivityParams homeAct = new ActivityParams("home");

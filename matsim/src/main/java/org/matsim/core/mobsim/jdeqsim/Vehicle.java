@@ -29,7 +29,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.routes.NetworkRoute;
 
 /**
@@ -46,9 +47,9 @@ public class Vehicle extends SimUnit {
 	private Id<Link> currentLinkId = null;
 	private int linkIndex;
 	private Id<Link>[] currentLinkRoute = null;
-	private final ActivityDurationInterpretation activityEndTimeInterpretation;
+	private final PlansConfigGroup.ActivityDurationInterpretation activityEndTimeInterpretation;
 
-	public Vehicle(Scheduler scheduler, Person ownerPerson, ActivityDurationInterpretation activityDurationInterpretation) {
+	public Vehicle(Scheduler scheduler, Person ownerPerson, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
 		super(scheduler);
 		this.ownerPerson = ownerPerson;
 		this.activityEndTimeInterpretation = activityDurationInterpretation;
@@ -292,7 +293,7 @@ public class Vehicle extends SimUnit {
 		return dpMessage;
 	}
 
-	public ActivityDurationInterpretation getActivityEndTimeInterpretation() {
+	public PlansConfigGroup.ActivityDurationInterpretation getActivityEndTimeInterpretation() {
 		return this.activityEndTimeInterpretation ;
 	}
 

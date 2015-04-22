@@ -22,7 +22,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
-import org.matsim.core.utils.misc.Time;
 
 interface ConfigKey {}
 
@@ -40,10 +39,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	// ---
 	private static final String REMOVING_UNNECESSARY_PLAN_ATTRIBUTES = "removingUnnecessaryPlanAttributes" ;
 	private boolean removingUnneccessaryPlanAttributes = false ;
-
-	// ---
-
-	public static enum ActivityDurationInterpretation { minOfDurationAndEndTime, tryEndTimeThenDuration, @Deprecated endTimeOnly } 
 
 	// ---
 

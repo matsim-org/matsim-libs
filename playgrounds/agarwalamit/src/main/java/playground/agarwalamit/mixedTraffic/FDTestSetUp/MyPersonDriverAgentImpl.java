@@ -28,7 +28,8 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -328,7 +329,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPasseng
 	 */
 	void calculateAndSetDepartureTime(Activity act) {
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
-		ActivityDurationInterpretation activityDurationInterpretation = 
+		PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation = 
 				( this.simulation.getScenario().getConfig().plans().getActivityDurationInterpretation() ) ;
 		double departure = this.calculateDepartureTime(act, now, activityDurationInterpretation);
 
@@ -476,13 +477,13 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPasseng
 	}
 	
 
-	private double calculateDepartureTime(Activity act, double now, ActivityDurationInterpretation activityDurationInterpretation) {
+	private double calculateDepartureTime(Activity act, double now, PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation) {
 		if ( act.getMaximumDuration() == Time.UNDEFINED_TIME && (act.getEndTime() == Time.UNDEFINED_TIME)) {
 			// yyyy does this make sense?  below there is at least one execution path where this should lead to an exception.  kai, oct'10
 			return Double.POSITIVE_INFINITY ;
 		} else {
 			double departure = 0;
-			if (activityDurationInterpretation.equals(ActivityDurationInterpretation.minOfDurationAndEndTime)) {
+			if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime)) {
 				// person stays at the activity either until its duration is over or until its end time, whatever comes first
 				if (act.getMaximumDuration() == Time.UNDEFINED_TIME) {
 					departure = act.getEndTime();
@@ -491,13 +492,13 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPasseng
 				} else {
 					departure = Math.min(act.getEndTime(), now + act.getMaximumDuration());
 				}
-			} else if (activityDurationInterpretation.equals(ActivityDurationInterpretation.endTimeOnly )) {
+			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly )) {
 				if (act.getEndTime() != Time.UNDEFINED_TIME) {
 					departure = act.getEndTime();
 				} else {
 					throw new IllegalStateException("activity end time not set and using something else not allowed.");
 				}
-			} else if (activityDurationInterpretation.equals(ActivityDurationInterpretation.tryEndTimeThenDuration )) {
+			} else if (activityDurationInterpretation.equals(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration )) {
 				// In fact, as of now I think that _this_ should be the default behavior.  kai, aug'10
 				if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
 					departure = act.getEndTime();

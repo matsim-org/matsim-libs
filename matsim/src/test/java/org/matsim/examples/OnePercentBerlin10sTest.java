@@ -24,7 +24,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.MatsimRandom;
@@ -61,7 +62,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		config.qsim().setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
 		
-		config.plans().setActivityDurationInterpretation(ActivityDurationInterpretation.minOfDurationAndEndTime);
+		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		

@@ -23,7 +23,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -71,7 +72,7 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 	public void testConfig5(){
 		Config config= super.loadConfig("test/input/playground/wrashid/parkingChoice/utils/chessConfig5.xml");
 		
-		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.minOfDurationAndEndTime );
+		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime );
 		
 		ActivityDurationEstimator activityDurationEstimator = getActivityDurationEstimations(config);
 	

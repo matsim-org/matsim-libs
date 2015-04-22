@@ -22,14 +22,14 @@
 
 package org.matsim.population;
 
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
 public class VspPlansCleanerModule extends AbstractModule {
     @Override
     public void install() {
-        VspExperimentalConfigGroup.ActivityDurationInterpretation actDurInterpr = getConfig().plans().getActivityDurationInterpretation() ;
-        if ( actDurInterpr != VspExperimentalConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime
+        PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = getConfig().plans().getActivityDurationInterpretation() ;
+        if ( actDurInterpr != PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime
                 || getConfig().vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
             addControlerListenerBinding().to(VspPlansCleaner.class);
         }

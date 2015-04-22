@@ -22,7 +22,8 @@ package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
@@ -40,7 +41,7 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 
 	private final double mutationRange;
 	private final boolean affectingDuration ;
-	private final ActivityDurationInterpretation activityDurationInterpretation;
+	private final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation;
 
 	/**
 	 * Creates a new TimeAllocationMutator with a mutation range as defined in
