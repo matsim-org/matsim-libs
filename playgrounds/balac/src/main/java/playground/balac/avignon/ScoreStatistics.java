@@ -14,54 +14,58 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class ScoreStatistics {
-	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-	PopulationReader populationReader = new MatsimPopulationReader(scenario);
 	
-	public void run(String plansFilePath) throws IOException {
-		populationReader.readFile(plansFilePath);
-
-		int count = 0;
+	
+	public void run(String[] input) throws IOException {
 		
-		double sum = 0.0;
+		for (String plansFilePath : input) {
+			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+			PopulationReader populationReader = new MatsimPopulationReader(scenario);
+			populationReader.readFile(plansFilePath);
 	
-		ArrayList<Double> a = new ArrayList<Double>();
-		Population pop = scenario.getPopulation();	
-		for (Person p:pop.getPersons().values()) {
-			//boolean grocery = false;
-			for (PlanElement pe: p.getSelectedPlan().getPlanElements()) {
-				if (pe instanceof Activity) {
-					if (((Activity) pe).getType().equals("shopgrocery")) {
-						//grocery = true;
+			int count = 0;
+			
+			double sum = 0.0;
+		
+			ArrayList<Double> a = new ArrayList<Double>();
+			Population pop = scenario.getPopulation();	
+			for (Person p:pop.getPersons().values()) {
+				//boolean grocery = false;
+				for (PlanElement pe: p.getSelectedPlan().getPlanElements()) {
+					if (pe instanceof Activity) {
+						if (((Activity) pe).getType().equals("shopgrocery")) {
+							//grocery = true;
+						}
 					}
 				}
+				//if (grocery) {
+					a.add(p.getSelectedPlan().getScore());
+					sum += p.getSelectedPlan().getScore();
+					count++;
+				//}
 			}
-			//if (grocery) {
-				a.add(p.getSelectedPlan().getScore());
-				sum += p.getSelectedPlan().getScore();
-				count++;
-			//}
-		}
-		
-		double average = sum / (double)count;
-		sum = 0.0;
-		for (double d: a) {
 			
-			sum += Math.pow(d - average, 2);
+			double average = sum / (double)count;
+			sum = 0.0;
+			for (double d: a) {
+				
+				sum += Math.pow(d - average, 2);
+				
+			}
+			double variance = sum/(double)a.size();
+			double standardDeviation = Math.sqrt(variance);
 			
+			System.out.println(average);
+			System.out.println(variance);
+			System.out.println(standardDeviation);
 		}
-		double variance = sum/(double)count;
-		double standardDeviation = Math.sqrt(variance);
-		
-		System.out.println(average);
-		System.out.println(variance);
-		System.out.println(standardDeviation);
 	}
 	
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		ScoreStatistics m = new ScoreStatistics();
-		m.run(args[0]);
+		m.run(args);
 	}
 	
 }

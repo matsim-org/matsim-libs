@@ -86,7 +86,7 @@ public class GeneratingFleetFromDemand {
 	    	s = reader.readLine();
 	    	
 	    }
-	    
+	    reader.close();
 	    reader = IOUtils.getBufferedReader(args[0]);
 	    s = reader.readLine();
 	    s = reader.readLine();
@@ -108,14 +108,14 @@ public class GeneratingFleetFromDemand {
 
 			s = reader.readLine();
 	    }
-	    
+	    reader.close();
 	    double[] ratios = new double[vehicles.keySet().size()];
 	    String[] connection = new String[vehicles.keySet().size()];
 	    Object[] allIds =  vehicles.keySet().toArray();
 	    
 	    for(int j = 0; j < vehicles.keySet().size(); j++) {
 		   
-		   ratios[j] = vehicles.get((String)allIds[j]).get(2) / (vehicles.get((String)allIds[j]).get(1) + vehicles.get((String)allIds[j]).get(0));
+		   ratios[j] = (double)vehicles.get((String)allIds[j]).get(2) / (double)(vehicles.get((String)allIds[j]).get(1) + (double)vehicles.get((String)allIds[j]).get(0));
 		   connection[j] = (String)allIds[j];
 	   }
 	    
@@ -136,7 +136,7 @@ public class GeneratingFleetFromDemand {
 		    }
 	    
 
-		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand.txt")));
+		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_run34.txt")));
 
 		reader = IOUtils.getBufferedReader(args[1]);
 	    
@@ -146,41 +146,40 @@ public class GeneratingFleetFromDemand {
 	    
 	    
 	    for (int k = 0; k < ratios.length; k++) {
-	    	if (co + vehicles.get(connection[k]).get(1) < 911)
-	    	numberOfVehicles.put(connection[k], vehicles.get(connection[k]).get(1));
+	    	if (co + vehicles.get(connection[k]).get(0) < 911)
+	    	numberOfVehicles.put(connection[k], vehicles.get(connection[k]).get(0));
 	    	else {
 		    	numberOfVehicles.put(connection[k], 911 - co);
+		    	co += 911 - co;
 		    	break;
 	    	}
-	    	co += vehicles.get(connection[k]).get(1);
+	    	co += vehicles.get(connection[k]).get(0);
 	    	
 	    }
 	    while(s != null ) {
 	    	
-	    	String[] arr = s.split("\t", -1);
-	    
-	    	
+	    	String[] arr = s.split("\t", -1);	    	
 	    	
 	    	for (int h = 0; h < 6; h++  )
 	    		output.write(arr[h] + "\t");
 	    	
 	    	if (numberOfVehicles.containsKey(arr[0])) 
-	    		output.write(numberOfVehicles.get(arr[0]));
+	    		output.write(Integer.toString(numberOfVehicles.get(arr[0])));
 	    	else
-	    		output.write(0);
+	    		output.write(Integer.toString(0));
 	    	output.newLine();
 	    	
 	    	
 	    	s = reader.readLine();
 	    	
 	    }
-	    
+	    reader.close();
 	    output.flush();
 	    output.close();
 	    
-	    reader = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand.txt");
-	    output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_v2.txt")));
-	    
+	    reader = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_run34.txt");
+	    output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_run34_v2.txt")));
+	    s = reader.readLine();
 	    while(s != null ) {
 	    	
 	    	String[] arr = s.split("\t", -1);
@@ -199,7 +198,7 @@ public class GeneratingFleetFromDemand {
 	    	s = reader.readLine();
 	    	
 	    }
-	    
+	    reader.close();
 	    output.flush();
 	    output.close();
 	    

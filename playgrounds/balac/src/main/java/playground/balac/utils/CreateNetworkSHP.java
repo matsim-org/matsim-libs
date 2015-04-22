@@ -21,12 +21,15 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class CreateNetworkSHP {
+	
+	
 
     public static void main(String[] args) throws Exception {
    
-    	    	
+    	double centerX = 683217.0; 
+    	double centerY = 247300.0;	    	
         Config config = ConfigUtils.createConfig();
-        config.network().setInputFile("C:/Users/balacm/Desktop/Retailers_10pc/network.xml.gz");
+        config.network().setInputFile("C:/Users/balacm/Desktop/mmNetwork.xml.gz");
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
              
@@ -49,17 +52,22 @@ public class CreateNetworkSHP {
                 create();
 
         for (Link link : network.getLinks().values()) {
-        	
-            Coordinate fromNodeCoordinate = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
-            Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
-            Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
-            SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
-                    new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
-            features.add(ft);
+        	if (link.getAllowedModes().contains("car")){
+				if(Math.sqrt(Math.pow(link.getCoord().getX() - centerX, 2) +(Math.pow(link.getCoord().getY() - centerY, 2))) < 31000) {
+	
+		            Coordinate fromNodeCoordinate = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+		            Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+		            Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
+		            SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
+		                    new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
+		            features.add(ft);
+	            
+				}
+        	}
         }   
-        ShapeFileWriter.writeGeometries(features, "C:/Users/balacm/Desktop/Retailers_10pc/network_links.shp");
+        ShapeFileWriter.writeGeometries(features, "C:/Users/balacm/Desktop/Emissions/network_links.shp");
         
-        features = new ArrayList();
+      /*  features = new ArrayList();
         PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
                 setCrs(crs).
                 setName("nodes").
@@ -70,6 +78,6 @@ public class CreateNetworkSHP {
             SimpleFeature ft = nodeFactory.createPoint(node.getCoord(), new Object[] {node.getId().toString()}, null);
             features.add(ft);
         }
-        ShapeFileWriter.writeGeometries(features, "C:/Users/balacm/Desktop/Retailers_10pc/network_nodes.shp");
+        ShapeFileWriter.writeGeometries(features, "C:/Users/balacm/Desktop/Emissions/network_nodes.shp");*/
     }
 }

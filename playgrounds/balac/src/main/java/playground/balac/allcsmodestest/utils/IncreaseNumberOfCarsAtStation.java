@@ -11,7 +11,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class IncreaseNumberOfCarsAtStation {
 	public void run (String[] args) throws IOException {
-		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_100x.txt")));
+		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_run24_iter2_100x.txt")));
 		BufferedReader reader = IOUtils.getBufferedReader(args[0]);
 	    String s = reader.readLine();
 	    output.write(s);

@@ -27,6 +27,7 @@ import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.transformations.CH1903LV03toCH1903LV03Plus;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03Plus;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.config.TransitRouterConfigGroup;
@@ -237,7 +238,7 @@ public class PTRoutingClaude {
 		
 		System.out.println("starting to parse the input file");
 		
-		WGS84toCH1903LV03Plus transformation = new WGS84toCH1903LV03Plus();
+		CH1903LV03toCH1903LV03Plus transformation = new CH1903LV03toCH1903LV03Plus();
 		
 		ReadSBBData sbbData = new ReadSBBData(args[1], args[2]);
 		sbbData.read();
@@ -247,11 +248,11 @@ public class PTRoutingClaude {
 		
 		while(s != null) {
 			
-			String[] arr = s.split("\\t");
+			String[] arr = s.split("\\s");
 			
 			if (!(arr[1].startsWith("-") || arr[2].startsWith("-") || arr[3].startsWith("-") || arr[4].startsWith("-"))) {
 			
-			Coord coordStartT = new CoordImpl(arr[2], arr[1]);
+			Coord coordStartT = new CoordImpl(arr[1], arr[2]);
 			
 			CoordImpl coordStart = (CoordImpl) transformation.transform(coordStartT);
 			
@@ -260,7 +261,7 @@ public class PTRoutingClaude {
 			Link lStart = lUtils.getClosestLink(coordStart);
 			
 			
-			Coord coordEndT = new CoordImpl(arr[4], arr[3]);
+			Coord coordEndT = new CoordImpl(arr[3], arr[4]);
 			
 			CoordImpl coordEnd = (CoordImpl) transformation.transform(coordEndT);
 

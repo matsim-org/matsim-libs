@@ -12,7 +12,7 @@ public class RentalTimesStatistics {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
-		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/1.200.RT_CS");
+		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Documents/Papers/STRC 2015/Presentation/Limited/Iter3/1.200.RT_CS");
 		int[] rentalTimes = new int[30];
 		int[] distance = new int[50];
 		int[] distanceTraveled = new int[80];
@@ -29,6 +29,7 @@ public class RentalTimesStatistics {
 		int count1 = 0;
 		int countZero = 0;
 		double di = 0.0;
+		double turnover = 0.0;
 		double time1 = 0.0;
 		while(s != null) {
 			String[] arr = s.split("\\s");
@@ -38,13 +39,14 @@ public class RentalTimesStatistics {
 				bla.add(Double.parseDouble(arr[0]));
 			//	usedCars.add(arr[8]);
 				double startTime = Double.parseDouble(arr[1]);
-				rentalStart[(int)((startTime) / 3600)]++;			
 
 			//	distanceTraveled[(int)((Double.parseDouble(arr[4])) / 2000)]++;		
 			
 				double endTime = Double.parseDouble(arr[2]);
 				rentalTimes[(int)((endTime - startTime) / 3600)]++;
+				rentalStart[(int)((startTime) / 3600)]++;			
 				
+				turnover += 0.68 * Double.parseDouble(arr[4]) / 1000.0 + 2.8 * (endTime - startTime) / 3600.0;
 			
 				//timeBla[(int)((Double.parseDouble(arr[4])) / 5000.0)] += (endTime - startTime);
 			//	countBla[(int)((Double.parseDouble(arr[4])) / 5000.0)] ++;
@@ -77,6 +79,8 @@ public class RentalTimesStatistics {
 
 		for (int i = 0; i < distanceTraveled.length; i++) 
 			System.out.println((double)distanceTraveled[i]/(double)count * 100.0);
+		
+		System.out.println(turnover);
 		
 	}
 

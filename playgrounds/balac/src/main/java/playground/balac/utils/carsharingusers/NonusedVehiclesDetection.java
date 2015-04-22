@@ -117,7 +117,7 @@ public class NonusedVehiclesDetection {
 	    
 	    for(int j = 0; j < vehicles.keySet().size(); j++) {
 		   
-		   ratios[j] = vehicles.get((String)allIds[j]).get(2) / (vehicles.get((String)allIds[j]).get(1) + vehicles.get((String)allIds[j]).get(0));
+		   ratios[j] = (double)vehicles.get((String)allIds[j]).get(2) / (double)(vehicles.get((String)allIds[j]).get(1) + (double)vehicles.get((String)allIds[j]).get(0));
 		   connection[j] = (String)allIds[j];
 	   }
 	    
@@ -152,7 +152,7 @@ public class NonusedVehiclesDetection {
 	    	
 	    }
 
-		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_changed_v6.txt")));
+		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_run34_iter2.txt")));
 
  reader = IOUtils.getBufferedReader(args[1]);
 	    

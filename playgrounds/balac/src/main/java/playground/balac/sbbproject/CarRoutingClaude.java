@@ -55,16 +55,12 @@ public class CarRoutingClaude {
 	public void run(final String[] args) throws IOException {
 		
 		String rootPathOut = args[2];
-		//String rootPathOut = "C:/Users/balacm/Desktop/";
 
-		String rootPath = args[2];
-		//String rootPath = "C:/Users/balacm/Desktop/CarSharing/run34/ITERS/it.1/";
+		String rootPath = args[1];
 
 		String eventsFile = rootPath + "out.events_new.txt.gz";
-		//String eventsFile = rootPath + "1.1.events.xml.gz";
-		String outputPlansFile = rootPathOut + args[1] + "outputPlanFileX.xml";
+		String outputPlansFile = rootPathOut +  "outputPlanFileX.xml";
 
-		//parseArguments(args);
 		final Config config = ConfigUtils.loadConfig(args[0]);
 		
 		final Scenario sc = ScenarioUtils.loadScenario(config);
