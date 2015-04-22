@@ -674,12 +674,12 @@ public class Controler extends AbstractController {
 			@Override
 			public void install() {
 				if (getConfig().controler().getMobsim().equals(mobsimName)) {
-					bind(RunnableMobsim.class).toProvider((com.google.inject.Provider<? extends RunnableMobsim>) mobsimProvider);
+					bind(RunnableMobsim.class).toProvider(mobsimProvider);
 				}
 			}
 		});
 	}
-
+	@Deprecated // use provider version
 	public final void addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {
 		addMobsimFactory(mobsimName, new Provider<RunnableMobsim>() {
 			@Override

@@ -33,6 +33,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
@@ -135,6 +138,13 @@ public class EditRoutes {
 		
 		return true;
 	}
+	
+	public static boolean relocateCurrentRoute( MobsimAgent agent, Id<Link> toLinkId, double now, Network network, TripRouter tripRouter ) {
+		Leg leg = WithinDayAgentUtils.getModifiableCurrentLeg(agent) ;
+		Person person = ((HasPerson) agent).getPerson() ;
+		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent) ;
+		return relocateCurrentLegRoute( leg, person, currentLinkIndex, toLinkId, now, network, tripRouter ) ;
+	}
 
 	/**
 	 * Re-locates a future route. The route is given by its leg.
@@ -154,14 +164,11 @@ public class EditRoutes {
 		 *  Get the Id of the current Link.
 		 *  Create a List that contains all links of a route, including the Start- and EndLinks.
 		 */
-		List<Id<Link>> allLinkIds = getRouteLinkIds(oldRoute);
-		Id<Link> currentLinkId = allLinkIds.get(currentLinkIndex);
+		List<Id<Link>> oldLinkIds = getRouteLinkIds(oldRoute);
+		Id<Link> currentLinkId = oldLinkIds.get(currentLinkIndex);
 
-		Link fromLink = network.getLinks().get(currentLinkId);
-		Link toLink = network.getLinks().get(toLinkId);
-		
-		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
-		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
+		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(network.getLinks().get(currentLinkId));
+		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(network.getLinks().get(toLinkId));
 		
 		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, time, person);
 		
@@ -171,7 +178,7 @@ public class EditRoutes {
 		}
 				
 		// The linkIds of the new Route
-		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+		List<Id<Link>> newLinkIds = new ArrayList<Id<Link>>();
 
 		/*
 		 * Get those Links which have already been passed.
@@ -180,7 +187,7 @@ public class EditRoutes {
 		 * at index 1.
 		 */
 		if (currentLinkIndex > 0) {
-			linkIds.addAll(allLinkIds.subList(1, currentLinkIndex + 1));
+			newLinkIds.addAll(oldLinkIds.subList(1, currentLinkIndex + 1));
 		}
 
 		Leg newLeg = (Leg) planElements.get(0);
@@ -194,11 +201,11 @@ public class EditRoutes {
 			 * remove that linkId from the linkIds List - it is stored
 			 * in the endLinkId field of the route.
 			 */
-			if (linkIds.size() > 0 && linkIds.get(linkIds.size() - 1).equals(newRoute.getEndLinkId())) {
-				linkIds.remove(linkIds.size() - 1);
+			if (newLinkIds.size() > 0 && newLinkIds.get(newLinkIds.size() - 1).equals(newRoute.getEndLinkId())) {
+				newLinkIds.remove(newLinkIds.size() - 1);
 			}
 
-			linkIds.addAll(((NetworkRoute) newRoute).getLinkIds());
+			newLinkIds.addAll(((NetworkRoute) newRoute).getLinkIds());
 		}
 		else {
 			logger.warn("The Route data could not be copied to the old Route. Old Route will be used!");
@@ -206,7 +213,7 @@ public class EditRoutes {
 		}
 
 		// Overwrite old Route
-		oldRoute.setLinkIds(oldRoute.getStartLinkId(), linkIds, toFacility.getLinkId());
+		oldRoute.setLinkIds(oldRoute.getStartLinkId(), newLinkIds, toFacility.getLinkId());
 
 		return true;
 	}

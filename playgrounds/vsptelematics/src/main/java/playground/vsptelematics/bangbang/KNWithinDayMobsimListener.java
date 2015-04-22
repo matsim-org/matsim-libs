@@ -133,9 +133,8 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		final Leg leg = (Leg) plan.getPlanElements().get(planElementsIndex);
 		ArrayList<Id<Link>> previousLinkIds = new ArrayList<>(((NetworkRoute) leg.getRoute()).getLinkIds());
 		// new Route for current Leg.
-		EditRoutes.relocateCurrentLegRoute(leg, ((HasPerson) agent).getPerson(), 
-				WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent), ((Activity) plan.getPlanElements().get(planElementsIndex+1)).getLinkId(), 
-				now, scenario.getNetwork(), tripRouter);
+		final Id<Link> destinationLinkId = ((Activity) plan.getPlanElements().get(planElementsIndex+1)).getLinkId();
+		EditRoutes.relocateCurrentRoute(agent, destinationLinkId, now, scenario.getNetwork(), tripRouter);
 		ArrayList<Id<Link>> currentLinkIds = new ArrayList<>(((NetworkRoute) leg.getRoute()).getLinkIds());
 
 		if ( !Arrays.deepEquals(previousLinkIds.toArray(), currentLinkIds.toArray()) ) {

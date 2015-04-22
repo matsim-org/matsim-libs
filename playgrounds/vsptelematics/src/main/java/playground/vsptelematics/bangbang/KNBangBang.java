@@ -46,8 +46,10 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
@@ -72,7 +74,7 @@ public class KNBangBang {
 		public RunnableMobsim get() {
 			QSim qsim = QSimUtils.createDefaultQSim( scenario, events ) ;
 			
-			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouterFactory.get()));
+//			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouterFactory.get()));
 			
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qsim);
 			OTFClientLive.run(scenario.getConfig(), server);
@@ -134,18 +136,18 @@ public class KNBangBang {
 		{
 			NetworkChangeEvent event = cef.createNetworkChangeEvent(8*3600.) ;
 			event.addLink( scenario.getNetwork().getLinks().get( accidentLinkId ) ) ;
-			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 0.1 ) ;
+			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 0.5 ) ;
 			event.setFlowCapacityChange(change);
-			ChangeValue lanesChange = new ChangeValue( ChangeType.FACTOR, 0.1 ) ;
+			ChangeValue lanesChange = new ChangeValue( ChangeType.FACTOR, 0.5 ) ;
 			event.setLanesChange(lanesChange);
 			events.add(event) ;
 		}
 		{
 			NetworkChangeEvent event = cef.createNetworkChangeEvent(9*3600.) ;
 			event.addLink( scenario.getNetwork().getLinks().get( accidentLinkId ) );
-			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 10. ) ;
+			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 2. ) ;
 			event.setFlowCapacityChange(change);
-			ChangeValue lanesChange = new ChangeValue( ChangeType.FACTOR, 10. ) ;
+			ChangeValue lanesChange = new ChangeValue( ChangeType.FACTOR, 2. ) ;
 			event.setLanesChange(lanesChange);
 			events.add(event) ;
 		}
@@ -160,7 +162,7 @@ public class KNBangBang {
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bindMobsim().toProvider(KNMobsimProvider.class) ;
+				this.bind( RunnableMobsim.class ).toProvider(KNMobsimProvider.class) ;
 			}
 		});
 
