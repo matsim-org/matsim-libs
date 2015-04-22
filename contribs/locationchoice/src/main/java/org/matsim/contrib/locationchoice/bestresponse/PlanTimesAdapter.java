@@ -49,7 +49,7 @@ public class PlanTimesAdapter {
 	// 0: complete routing
 	// 1: local routing
 	// 2: no routing (distance-based approximation)
-	private PlansConfigGroup.ApproximationLevel approximationLevel = PlansConfigGroup.ApproximationLevel.COMPLETE_ROUTING; 
+	private ApproximationLevel approximationLevel = ApproximationLevel.COMPLETE_ROUTING; 
 	private final MultiNodeDijkstra forwardMultiNodeDijkstra;
 	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final Network network;
@@ -58,7 +58,7 @@ public class PlanTimesAdapter {
 	
 	private static final Logger log = Logger.getLogger(PlanTimesAdapter.class);
 		
-	/* package */ PlanTimesAdapter(PlansConfigGroup.ApproximationLevel approximationLevel, MultiNodeDijkstra forwardMultiNodeDijkstra, 
+	/* package */ PlanTimesAdapter(ApproximationLevel approximationLevel, MultiNodeDijkstra forwardMultiNodeDijkstra, 
 			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, TripRouter router, Scenario scenario) {
 		this.approximationLevel = approximationLevel;
 		this.forwardMultiNodeDijkstra = forwardMultiNodeDijkstra;
@@ -96,12 +96,12 @@ public class PlanTimesAdapter {
 			}
 			
 			PathCosts pathCosts = null;
-			if (approximationLevel == PlansConfigGroup.ApproximationLevel.COMPLETE_ROUTING ) {
+			if (approximationLevel == ApproximationLevel.COMPLETE_ROUTING ) {
 				pathCosts = computeTravelTimeFromCompleteRouting(plan.getPerson(),
 					plan.getPreviousActivity(plan.getPreviousLeg(act)), act, ((Leg)plan.getPreviousLeg(act)).getMode());
-			} else if (approximationLevel == PlansConfigGroup.ApproximationLevel.LOCAL_ROUTING ){
+			} else if (approximationLevel == ApproximationLevel.LOCAL_ROUTING ){
 				pathCosts = computeTravelTimeFromLocalRouting(plan, actlegIndex, planElementIndex, act);
-			} else if (approximationLevel == PlansConfigGroup.ApproximationLevel.NO_ROUTING ) {
+			} else if (approximationLevel == ApproximationLevel.NO_ROUTING ) {
 				pathCosts = approximateTravelTimeFromDistance(plan, actlegIndex, planElementIndex, act);
 			}
 			
