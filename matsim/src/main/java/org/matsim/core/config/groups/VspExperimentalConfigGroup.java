@@ -127,8 +127,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 
-//		map.put(SCORE_MSA_STARTS_AT_ITERATION, "(deprecated, use " + FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA + ") first iteration of MSA score averaging. The matsim theory department " +
-//				"suggests to use this together with switching of choice set innovation, but it has not been tested yet.") ;
 		map.put( ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS, "(do not use except of you have to) There was a problem with pt interaction scoring.  Some people solved it by overwriting the " +
 						"parameters of the pt interaction activity type.  Doing this now throws an Exception.  If you still insist on doing this, " +
 				"set the following to true.") ;
@@ -151,9 +149,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 
 		map.put(INPUT_MZ05_FILE, "(do not use) Set this filename of MZ05 daily analysis");
 
-//		map.put(MODES_FOR_SUBTOURMODECHOICE, "(do not use) set the traffic mode option for subTourModeChoice by Yu");
-//		map.put(CHAIN_BASED_MODES, "(do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. \"car,bike\", \"car\"");
-
 		return map;
 	}
 	@StringGetter(INPUT_MZ05_FILE)
@@ -164,22 +159,6 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	public void setInputMZ05File(final String inputMZ05File) {
 		this.inputMZ05File = inputMZ05File;
 	}
-//	@StringGetter(MODES_FOR_SUBTOURMODECHOICE)
-//	public String getModesForSubTourModeChoice() {
-//		return this.modesForSubTourModeChoice;
-//	}
-//	@StringSetter(MODES_FOR_SUBTOURMODECHOICE)
-//	public void setModesForSubTourModeChoice(final String modesForSubTourModeChoice) {
-//		this.modesForSubTourModeChoice = modesForSubTourModeChoice;
-//	}
-////	@StringGetter(CHAIN_BASED_MODES)
-////	public String getChainBasedModes() {
-////		return this.chainBasedModes;
-////	}
-//	@StringSetter(CHAIN_BASED_MODES)
-//	public void setChainBasedModes(final String chainBasedModes) {
-//		this.chainBasedModes = chainBasedModes;
-//	}
 	@StringGetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
 	public boolean isRemovingUnneccessaryPlanAttributes() {
 		return this.removingUnneccessaryPlanAttributes;
@@ -200,12 +179,5 @@ public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	
 	@Override
 	protected void checkConsistency() {
-//		if ( getScoreMSAStartsAtIteration()!=null ) {
-//			log.warn( "config option " + SCORE_MSA_STARTS_AT_ITERATION + " is deprecated; use " + FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA ) ;
-//		}
-//		if ( getScoreMSAStartsAtIteration()!=null && getFractionOfIterationsToStartScoreMSA()!=null ) {
-//			throw new RuntimeException("cannot set both of " + SCORE_MSA_STARTS_AT_ITERATION + " and " + 
-//					FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA + " to non-null.  Aborting ...") ;
-//		}
 	}
 }
