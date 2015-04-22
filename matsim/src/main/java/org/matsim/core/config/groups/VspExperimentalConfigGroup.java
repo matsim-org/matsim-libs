@@ -23,8 +23,6 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-interface ConfigKey {}
-
 /**
  * config group for experimental parameters. this group and its parameters should not be used outside of vsp.
  * @author dgrether
@@ -32,6 +30,7 @@ interface ConfigKey {}
  */
 public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);
 
 	public static final String GROUP_NAME = "vspExperimental";

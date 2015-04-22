@@ -51,7 +51,7 @@ public class PlansConfigGroup extends ReflectiveConfigGroup {
 	//--
 	
 	private static final String ACTIVITY_DURATION_INTERPRETATION="activityDurationInterpretation" ;
-	private PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation = PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration ;
+	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.tryEndTimeThenDuration ;
 
 	//--
 
