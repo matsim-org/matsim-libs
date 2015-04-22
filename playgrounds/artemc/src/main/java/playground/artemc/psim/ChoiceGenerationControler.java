@@ -1,6 +1,8 @@
 package playground.artemc.psim;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
@@ -8,62 +10,85 @@ import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
- * Created by fouriep on 4/20/15.
+ * Created by pieterfourie on 4/20/15.
+ * A class for artemc to where you load the travel time structures with events,
+ * and psim repeatedly executes using those fixed times.
+ * so produces the plans that are optimal if each agent were the only one to adapt to the system,
+ * i.e. if their change did not affect other traffic.
  */
-public class ChoiceGenerationControler {
+public class ChoiceGenerationControler implements BeforeMobsimListener {
 
-    public static void main(String[] args) {
-        final WaitTimeStuckCalculator waitTimeCalculator;
-        final StopStopTimeCalculator stopStopTimeCalculator;
-        final TravelTimeCalculator travelTimeCalculator;
-        Config config;
-        Controler controler;
-        Scenario scenario;
+	private WaitTimeStuckCalculator waitTimeCalculator;
+	private StopStopTimeCalculator stopStopTimeCalculator;
+	private TravelTimeCalculator travelTimeCalculator;
+	private PSimFactory pSimFactory;
+	private Config config;
+	private Scenario scenario;
+	private Controler controler;
 
-        config = ConfigUtils.loadConfig(args[0]);
-        scenario = ScenarioUtils.loadScenario(config);
-        controler = new Controler(scenario);
-        config.planCalcScore().setWriteExperiencedPlans(true);
-        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+	public void setControler(Controler controler) {
+		this.controler = controler;
+	}
 
-        waitTimeCalculator = new WaitTimeStuckCalculator(
-                controler.getScenario().getPopulation(),
-                controler.getScenario().getTransitSchedule(),
-                controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
-                (int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
-        stopStopTimeCalculator = new StopStopTimeCalculator(
-                controler.getScenario().getTransitSchedule(),
-                controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
-                (int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
-        controler.setTransitRouterFactory(
-                new TransitRouterEventsWSFactory(controler.getScenario(),
-                        waitTimeCalculator.getWaitTimes(),
-                        stopStopTimeCalculator.getStopStopTimes()));
-        controler.setScoringFunctionFactory(
-                new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(),
-                        controler.getScenario()));
+	public Controler getControler() {
+		return controler;
+	}
+
+
+	public ChoiceGenerationControler(String configFile, String eventsFile) {
+
+		config = ConfigUtils.loadConfig(configFile);
+		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+		config.parallelEventHandling().setNumberOfThreads(1);
+		config.planCalcScore().setWriteExperiencedPlans(true);
+		scenario = ScenarioUtils.loadScenario(config);
+		controler = new Controler(scenario);
+
+		waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
+		stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
+		controler.setTransitRouterFactory(new TransitRouterEventsWSFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+//    controler.setScoringFunctionFactory(
+//            new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(),
+//                    controler.getScenario()));
         travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), config.travelTimeCalculator());
 
-        EventsManagerImpl eventsManager = new EventsManagerImpl();
-        EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
-        eventsManager.addHandler(waitTimeCalculator);
-        eventsManager.addHandler(stopStopTimeCalculator);
-        eventsManager.addHandler(travelTimeCalculator);
-        reader.parse(args[1]);
+		EventsManagerImpl eventsManager = new EventsManagerImpl();
+		EventsReaderXMLv1 reader = new EventsReaderXMLv1(eventsManager);
+		eventsManager.addHandler(waitTimeCalculator);
+		eventsManager.addHandler(stopStopTimeCalculator);
+		eventsManager.addHandler(travelTimeCalculator);
+		reader.parse(eventsFile);
 
-        PSimFactory pSimFactory = new PSimFactory();
-        controler.setMobsimFactory(pSimFactory);
-        pSimFactory.setWaitTime(waitTimeCalculator.getWaitTimes());
-        pSimFactory.setTravelTime(travelTimeCalculator.getLinkTravelTimes());
-        pSimFactory.setStopStopTime(stopStopTimeCalculator.getStopStopTimes());
-    }
+		pSimFactory = new PSimFactory();
+		controler.setMobsimFactory(pSimFactory);
+		controler.addControlerListener(this);
+	}
+
+	public void run() {
+		controler.run();
+	}
 
 
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		Collection<Plan> plans = new ArrayList<>();
+		for (Person person : controler.getScenario().getPopulation().getPersons().values()) {
+			plans.add(person.getSelectedPlan());
+		}
+		pSimFactory.setWaitTime(waitTimeCalculator.getWaitTimes());
+		pSimFactory.setTravelTime(travelTimeCalculator.getLinkTravelTimes());
+		pSimFactory.setStopStopTime(stopStopTimeCalculator.getStopStopTimes());
+		pSimFactory.setPlans(plans);
+	}
 }
