@@ -100,7 +100,7 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 					densitiesTimeBin += this.densities.get(i).get(linkId);
 				}
 			}
-			densityString = densityString + densitiesTimeBin + ScenarioAnalyzer.DEL;
+			densityString = densityString + (densitiesTimeBin*scaleFactor) + ScenarioAnalyzer.DEL;
 			// flow:
 			int flowsTimeBin = 0;
 			for (Id<Link> linkId : this.flows.get(i).keySet()) {
@@ -108,7 +108,7 @@ public class MFDCreator implements ScenarioAnalyzerEventHandler, LinkLeaveEventH
 					flowsTimeBin += this.flows.get(i).get(linkId);
 				}
 			}
-			flowString = flowString + flowsTimeBin + ScenarioAnalyzer.DEL;
+			flowString = flowString + (flowsTimeBin*scaleFactor) + ScenarioAnalyzer.DEL;
 		}
 		return timebinString + ScenarioAnalyzer.NL
 				+ densityString + ScenarioAnalyzer.NL
