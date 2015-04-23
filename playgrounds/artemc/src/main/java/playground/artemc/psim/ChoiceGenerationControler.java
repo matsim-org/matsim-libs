@@ -8,7 +8,6 @@ import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculat
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -21,19 +20,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Created by pieterfourie on 4/20/15.
- * A class for artemc to where you load the travel time structures with events,
- * and psim repeatedly executes using those fixed times.
- * so produces the plans that are optimal if each agent were the only one to adapt to the system,
- * i.e. if their change did not affect other traffic.
+ * Created by artemc on 4/20/15.
+ * A class for to evaluate choice alternatives based on travel times from events.
+ * It loads the travel time structures with events and psim repeatedly executes using those fixed times.
  */
+
 public class ChoiceGenerationControler implements BeforeMobsimListener {
 
 	private WaitTimeStuckCalculator waitTimeCalculator;
 	private StopStopTimeCalculator stopStopTimeCalculator;
 	private TravelTimeCalculator travelTimeCalculator;
 	private PSimFactory pSimFactory;
-	private Config config;
 	private Scenario scenario;
 	private Controler controler;
 
@@ -45,10 +42,8 @@ public class ChoiceGenerationControler implements BeforeMobsimListener {
 		return controler;
 	}
 
+	public ChoiceGenerationControler(Config config, String eventsFile) {
 
-	public ChoiceGenerationControler(String configFile, String eventsFile) {
-
-		config = ConfigUtils.loadConfig(configFile);
 		config.parallelEventHandling().setSynchronizeOnSimSteps(false);
 		config.parallelEventHandling().setNumberOfThreads(1);
 		config.planCalcScore().setWriteExperiencedPlans(true);
@@ -73,12 +68,14 @@ public class ChoiceGenerationControler implements BeforeMobsimListener {
 		pSimFactory = new PSimFactory();
 		controler.setMobsimFactory(pSimFactory);
 		controler.addControlerListener(this);
-	}
+
+
+    }
 
 	public void run() {
+      //controler.setOverwriteFiles(true);
 		controler.run();
 	}
-
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {

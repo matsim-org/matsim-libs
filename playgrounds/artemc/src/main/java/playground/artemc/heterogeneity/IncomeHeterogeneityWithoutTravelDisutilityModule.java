@@ -78,6 +78,16 @@ public class IncomeHeterogeneityWithoutTravelDisutilityModule extends AbstractMo
 				IncomePopulationReader incomesReader = new IncomePopulationReader(incomeHeterogeneityImpl, this.scenario.getPopulation());
 				incomesReader.parse(incomeFile);
 
+/* Copy income file - not required, as saved in output_personAttributes.xml */
+/*				File orgIncomeFile = new File(incomeFile);
+				File outputIncomeFile = new File(this.scenario.getConfig().controler().getOutputDirectory() + "/incomes.csv");
+				try {
+					FileUtils.copyFile(orgIncomeFile, outputIncomeFile);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+*/
+
 				MapWriter writer = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/incomeFactors.csv");
 				writer.write(incomeHeterogeneityImpl.getIncomeFactors(), "PersonId", "IncomeFactor;");
 

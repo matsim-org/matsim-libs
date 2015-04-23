@@ -29,35 +29,45 @@ public class IndividualScoreFromPopulationSQLWriter {
 	Population population;
 	Config config;
 
-	public IndividualScoreFromPopulationSQLWriter(Config config, Population population){
-        this.population = population;
+	public IndividualScoreFromPopulationSQLWriter(Config config, Population population) {
+		this.population = population;
 		this.config = config;
 	}
 
-	public void writeToDatabase(String connectionPropertiesFile, String schema, String tableName){
+	public void writeToDatabase(String connectionPropertiesFile, String schema, String tableName) {
 		File connectionProperties = new File(connectionPropertiesFile);
 		Integer maximalNumberOfPlans = 0;
 
 		//Read plan scores and calculate user benefits (logsum)
-		HashMap<String, ArrayList<String>> scoreMap = new HashMap<String, ArrayList<String>>();
+		HashMap<String, ArrayList<String>> dataMap = new HashMap<String, ArrayList<String>>();
 		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.config, WelfareMeasure.LOGSUM, false);
 
 		for (Person person : population.getPersons().values()) {
-			if(!scoreMap.containsKey(person.getId().toString()))
-				scoreMap.put(person.getId().toString(), new ArrayList<String>());
-			scoreMap.get(person.getId().toString()).add(person.getSelectedPlan().getScore().toString());
+			if (!dataMap.containsKey(person.getId().toString())) dataMap.put(person.getId().toString(), new ArrayList<String>());
 
-			for(Plan plan:person.getPlans()){
-				if(!plan.isSelected()){
-					scoreMap.get(person.getId().toString()).add(plan.getScore().toString());
+			dataMap.get(person.getId().toString()).add(person.getSelectedPlan().getScore().toString());
+			if (person.getSelectedPlan().getCustomAttributes().containsKey("toll")) {
+				dataMap.get(person.getId().toString()).add((String) person.getSelectedPlan().getCustomAttributes().get("toll"));
+			} else {
+				dataMap.get(person.getId().toString()).add("");
+			}
+
+			for (Plan plan : person.getPlans()) {
+				if (!plan.isSelected()) {
+					dataMap.get(person.getId().toString()).add(plan.getScore().toString());
+					if (plan.getCustomAttributes().containsKey("toll")) {
+						dataMap.get(person.getId().toString()).add((String) plan.getCustomAttributes().get("toll"));
+					} else {
+						dataMap.get(person.getId().toString()).add("");
+					}
+
 				}
 			}
 
-			scoreMap.get(person.getId().toString()).add(Double.toString(userBenefitsCalculator_logsum.calculateUtilityOfPerson_utils(person)));
+			dataMap.get(person.getId().toString()).add(Double.toString(userBenefitsCalculator_logsum.calculateUtilityOfPerson_utils(person)));
 
 			/*Save maximal number of plans*/
-			if(person.getPlans().size()>maximalNumberOfPlans)
-				maximalNumberOfPlans = person.getPlans().size();
+			if (person.getPlans().size() > maximalNumberOfPlans) maximalNumberOfPlans = person.getPlans().size();
 		}
 
 		//Write selected plan scores to Database;
@@ -65,30 +75,29 @@ public class IndividualScoreFromPopulationSQLWriter {
 		String formattedDate = df.format(new Date());
 
 		List<PostgresqlColumnDefinition> columns = new ArrayList<>();
-		columns.add(new PostgresqlColumnDefinition("person_id",
-		                                           PostgresType.TEXT, "primary key"));
-		columns.add(new PostgresqlColumnDefinition("selected_score",
-		                                           PostgresType.FLOAT8));
-		for(int i=1;i<maximalNumberOfPlans;i++) {
-			columns.add(new PostgresqlColumnDefinition("score_alt"+i, PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("person_id", PostgresType.TEXT, "primary key"));
+		columns.add(new PostgresqlColumnDefinition("selected_score", PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("toll_selected", PostgresType.FLOAT8));
+		for (int i = 1; i < maximalNumberOfPlans; i++) {
+			columns.add(new PostgresqlColumnDefinition("score_alt" + i, PostgresType.FLOAT8));
+			columns.add(new PostgresqlColumnDefinition("toll_alt" + i + "", PostgresType.FLOAT8));
 		}
 
-		columns.add(new PostgresqlColumnDefinition("logsum",
-		                                           PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("logsum", PostgresType.FLOAT8));
 
 		try {
 			DataBaseAdmin individualScoresDBA = new DataBaseAdmin(connectionProperties);
 			PostgresqlCSVWriter individualScoresWriter = new PostgresqlCSVWriter("BENEFITS", tableName, individualScoresDBA, 1000, columns);
-			individualScoresWriter.addComment(String.format("MATSim selected plan scores from output population of %s created on %s.",
-			                                                config.controler().getOutputDirectory(), formattedDate));
-			for (String personId : scoreMap.keySet()) {
-				Object[] data = new Object[maximalNumberOfPlans+2];
+			individualScoresWriter.addComment(String.format("MATSim selected plan scores from output population of %s created on %s.", config.controler().getOutputDirectory(), formattedDate));
+			for (String personId : dataMap.keySet()) {
+				Object[] data = new Object[maximalNumberOfPlans*2 + 2];
 				data[0] = personId;
-				for(int i=1;i<data.length;i++){
-					data[i] = scoreMap.get(personId).get(i-1);
+				for (int i = 1; i < data.length; i++) {
+					data[i] = dataMap.get(personId).get(i - 1);
 				}
 				individualScoresWriter.addLine(data);
 			}
+
 			individualScoresWriter.finish();
 			individualScoresDBA.close();
 		} catch (IOException e) {

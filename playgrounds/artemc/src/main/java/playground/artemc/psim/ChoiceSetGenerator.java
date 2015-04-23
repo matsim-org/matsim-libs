@@ -4,12 +4,28 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.analysis.IndividualScoreFromPopulationSQLWriter;
+import playground.artemc.heterogeneity.IncomeHeterogeneityWithoutTravelDisutilityModule;
+import playground.artemc.heterogeneity.TravelDisutilityIncomeHeterogeneityProviderWrapper;
+import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
+import playground.artemc.heterogeneityWithToll.TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper;
+import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
+import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
+import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillOverModule;
+import playground.artemc.scenarios.scenarioInitializer;
+import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,34 +40,72 @@ public class ChoiceSetGenerator implements ShutdownListener
 
 	private static final Logger log = Logger.getLogger(ChoiceSetGenerator.class);
 
-	ChoiceGenerationControler choiceGenerationControler;
-	Population population;
-	HashMap<Id<Person>,Plan> initialPlans = new HashMap<Id<Person>,Plan>();
+	private ChoiceGenerationControler choiceGenerationControler;
+	private Population population;
+	private HashMap<Id<Person>,Plan> initialPlans = new HashMap<Id<Person>,Plan>();
+	private MoneyEventHandler moneyHandler;
 	static Integer choiceNumber = 2;
 
-	public ChoiceSetGenerator(String[] args){
-		this.choiceGenerationControler = new ChoiceGenerationControler(args[0],args[1]);
+	public ChoiceSetGenerator(Config config, String eventsFile){
+		this.choiceGenerationControler = new ChoiceGenerationControler(config, eventsFile);
 		this.population = choiceGenerationControler.getControler().getScenario().getPopulation();
 	}
 
 	public static void main(String[] args) {
-		ChoiceSetGenerator choiceSetGenerator = new ChoiceSetGenerator(args);
-		choiceSetGenerator.choiceGenerationControler.getControler().addControlerListener(choiceSetGenerator);
+		String inputDirectory = args[0];
+		String outputDirectory = args[1];
+		String eventFilePath = args[2];
+
+		Config config = scenarioInitializer.initScenario(inputDirectory, outputDirectory);
+		ChoiceSetGenerator choiceSetGenerator = new ChoiceSetGenerator(config, eventFilePath);
+		Controler controler = choiceSetGenerator.choiceGenerationControler.getControler();
+		choiceSetGenerator.IncomeHeterogeneityAndTollInitializer(controler);
+
+		//Add self for after run plan join and output writing
+		controler.addControlerListener(choiceSetGenerator);
+
 		choiceSetGenerator.run();
 	}
 
-	public void run(){
+	public void IncomeHeterogeneityAndTollInitializer(Controler controler) {
 
-//		String inputPopulationFile = args[0];
-//		String outputPopulationFile = args[1];
-//
-//		/*Create scenario and load population*/
-//		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		log.info("Reading population...");
-//		new MatsimPopulationReader(scenario).readFile(inputPopulationFile);
-//		Population population = ((ScenarioImpl) scenario).getPopulation();
-//
-//		System.out.println("Number of persons: " + population.getPersons().size());
+		Integer inputDirectoryDepth = controler.getConfig().plans().getInputFile().split("/").length;
+		boolean roadpricing = controler.getConfig().plans().getInputFile().split("/")[inputDirectoryDepth-2].contains("toll");
+
+		if(roadpricing==true) {
+			log.info("First-best roadpricing enabled!");
+//			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(),new UpdateSocialCostPricingSchemeModule());
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillOverModule());
+			controler.addOverridingModule( new AbstractModule() {
+				@Override
+				public void install() {
+					bind(TravelDisutilityFactory.class).toProvider(TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
+				}});
+		}else{
+			log.info("No roadpricing!");
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule());
+			controler.addOverridingModule( new AbstractModule() {
+				@Override
+				public void install() {
+					bind(TravelDisutilityFactory.class).toProvider(TravelDisutilityIncomeHeterogeneityProviderWrapper.TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider.class);
+				}});
+		}
+
+		//Scoring
+		controler.setScoringFunctionFactory(new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
+
+		// Additional analysis
+		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
+		controler.addControlerListener(analysisControlerListener);
+
+		//Money payment analysis
+		moneyHandler = new MoneyEventHandler();
+		controler.getEvents().addHandler(moneyHandler);
+
+		controler.getScenario().getConfig().controler().setLastIteration(0);
+	}
+
+	public void run(){
 
 		PopulationFactory populationFactory = population.getFactory();
 		ArrayList<Person> newPersons = new ArrayList<>();
@@ -121,7 +175,9 @@ public class ChoiceSetGenerator implements ShutdownListener
 	public void notifyShutdown(ShutdownEvent event) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population newPopulation = scenario.getPopulation();
+
 		for(Id<Person> personId:population.getPersons().keySet()){
+
 			Id<Person> orgPersonId = Id.create(personId.toString().split("_")[0], Person.class);
 
 			Plan planToAdd = null;
@@ -131,6 +187,12 @@ public class ChoiceSetGenerator implements ShutdownListener
 			else {
 				planToAdd = initialPlans.get(personId);
 			}
+
+			Double monetaryPayments = moneyHandler.getPersonId2amount().get(personId);
+			if(monetaryPayments==null) {
+				monetaryPayments=0.0;
+			}
+			planToAdd.getCustomAttributes().put("toll", monetaryPayments.toString());
 
 			if(newPopulation.getPersons().containsKey(orgPersonId)){
 				newPopulation.getPersons().get(orgPersonId).addPlan(planToAdd);
@@ -152,6 +214,7 @@ public class ChoiceSetGenerator implements ShutdownListener
 		String tableName = schema+".scores_";
 		String tableSuffix = event.getControler().getConfig().controler().getOutputDirectory().split("/")[relativeOutputDirectory-1];
 		tableSuffix = tableSuffix.replaceAll("\\.0x", "x");
+		tableSuffix = tableSuffix.replaceAll("-", "_");
 		tableName = tableName + tableSuffix;
 
 		IndividualScoreFromPopulationSQLWriter sqlWriter = new IndividualScoreFromPopulationSQLWriter(event.getControler().getConfig(),newPopulation);
