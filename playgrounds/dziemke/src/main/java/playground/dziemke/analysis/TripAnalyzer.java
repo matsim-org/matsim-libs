@@ -41,7 +41,7 @@ public class TripAnalyzer {
 		//double minDistance = 0;
 		double maxDistance = 100;
 		
-		boolean onlyWorkTrips = true; // NEW
+		boolean onlyWorkTrips = false; // NEW
 				
 		// --------------------------------------------------------------------------------------------------
 		boolean ageFilter = false;
@@ -49,9 +49,9 @@ public class TripAnalyzer {
 		Integer maxAge = 119;	
 		// --------------------------------------------------------------------------------------------------
 		
-		String runId = "run_193";
+		String runId = "run_168a";
 //		String runId = "run791";
-		String usedIteration = "0"; // most frequently used value: 150
+		String usedIteration = "300"; // most frequently used value: 150
 //		String usedIteration = "600";
 	    
 	    int maxBinDuration = 120;
@@ -71,24 +71,30 @@ public class TripAnalyzer {
 	    
 	    
 	    // Input and output files
-	    String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+	    String networkFile = "/Users/dominik/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
+//	    String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 //	    String networkFile = "D:/Workspace/runs-svn/"  + runId + "/counts_network_merged.xml_cl.xml.gz";
 	    
 //	    String eventsFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + usedIteration + "/" 
 //	    String eventsFile = "D:/Workspace/runs-svn/" + runId + "/output_rerun/ITERS/it." + usedIteration + "/" 
 //	    		+ runId + "." + usedIteration + ".events.txt.gz";
-	    String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
+//	    String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
+//				+ runId + "." + usedIteration + ".events.xml.gz";
+	    String eventsFile = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
 				+ runId + "." + usedIteration + ".events.xml.gz";
 
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat"; // wrong!!!
 //	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/18/persons1.dat";
-	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
+//	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
+	    String cemdapPersonFile = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/persons1.dat";
 	    
 	    //String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis";
-	    String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+//	    String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+	    String outputDirectory = "/Users/dominik/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
 //	    String outputDirectory = "D:/Workspace/runs-svn/other/" + runId + "/analysis";
 	    
-	    String shapeFileBerlin = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
+//	    String shapeFileBerlin = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
+	    String shapeFileBerlin = "/Users/dominik/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
 	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileBerlin, "NR");
 	    Geometry berlinGeometry = zoneGeometries.get(planningAreaId);
 	    
@@ -344,6 +350,7 @@ public class TripAnalyzer {
 						double length = link.getLength();
 						tripDistanceMeter = tripDistanceMeter + length;
 					}
+					// TODO here, the distances from activity to link and link to activity are missing!
 					double tripDistanceRouted = tripDistanceMeter / 1000.;
 					
 					
