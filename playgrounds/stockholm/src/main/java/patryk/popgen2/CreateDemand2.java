@@ -36,15 +36,15 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
 public class CreateDemand2 {
-	
 	private final String populationFile = "./data/synthetic_population/agentData.csv";
-	private final String zonesShapefile = "./data/shapes/zones_EPSG3857.shp";
+	private final String zonesShapefile = "./data/shapes/sverige_TZ_EPSG3857.shp";
+	private final String zonesBoundaryShape = "./data/shapes/limit_EPSG3857.shp";
 	private final String buildingsShapefile = "./data/shapes/by_reduc_EPSG3857.shp";
 	private final String networkFile = "./data/network/network_v09.xml";
-	private final String initialPlansFile = "./data/demand_output/initial_plans.xml";
-	private final String agentHomeXY = "./data/demand_output/agenthomeXY.txt";
-	private final String agentWorkXY = "./data/demand_output/agentWorkXY.txt";
-	private final double scaleFactor = 0.02;
+	private final String initialPlansFile = "./data/demand_output/initial_plans2.xml";
+	private final String agentHomeXY = "./data/demand_output/agenthomeXY2.txt";
+	private final String agentWorkXY = "./data/demand_output/agentWorkXY2.txt";
+	private final double scaleFactor = 0.10;
 	private final double workersInHomeBuildings = 0.05;
 	
 	private final HashMap<String, Zone> zones;
@@ -70,17 +70,25 @@ public class CreateDemand2 {
 		
 		ObjectAttributes agentAttributes = scenario.getPopulation().getPersonAttributes();
 		LinksRemover linksRem = new LinksRemover(scenario.getNetwork());
-		linksRem.run();
+		linksRem.run(); // remove links where we do not want any activities (inactive links, highways...)
 		
 		XY2Links xy2links = new XY2Links(scenario);
 		
-		for (ParsedPerson pPerson : persons) {	
-			if (pPerson.getMode().equals("car") && (pPerson.getHomeZone().substring(0, 2).equals("71") || pPerson.getHomeZone().substring(0, 2).equals("72")) 
-				&& (pPerson.getWorkZone().substring(0, 2).equals("71") || pPerson.getWorkZone().substring(0, 2).equals("72"))) {
-				if (processedCarDrivers % everyXthPerson == 0) {
-					createAgent(pPerson, agentAttributes, xy2links);
+		SelectZones selectzones = new SelectZones(zones, zonesBoundaryShape);
+		ArrayList<String> coveredZones = selectzones.getZonesInsideBoundary(); 
+		
+		for (ParsedPerson pPerson : persons) {		
+			if (coveredZones.contains(pPerson.getHomeZone()) && coveredZones.contains(pPerson.getWorkZone())) { 
+				if (pPerson.getMode().equals("car")
+						&& (pPerson.getHomeZone().substring(0, 2).equals("71") || pPerson
+								.getHomeZone().substring(0, 2).equals("72"))
+						|| (pPerson.getWorkZone().substring(0, 2).equals("71") || pPerson
+								.getWorkZone().substring(0, 2).equals("72"))) {
+					if (processedCarDrivers % everyXthPerson == 0) {
+						createAgent(pPerson, agentAttributes, xy2links);
+					}
+					processedCarDrivers++;
 				}
-			processedCarDrivers++;
 			} 
 		}
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
@@ -124,7 +132,7 @@ public class CreateDemand2 {
 		agent.addPlan(plan);
 		scenario.getPopulation().addPerson(agent);
 		
-		xy2links.run(agent);
+		xy2links.run(agent); //assign activity coordinates to links
 		
 		try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(agentHomeXY, true)))) {
 		    out.println(String.valueOf(homeCoord.getX()) + ";" + String.valueOf(homeCoord.getY()));
@@ -247,7 +255,7 @@ public class CreateDemand2 {
 		for (SimpleFeature ft : ShapeFileReader.getAllFeatures(filename)) {
 			try {
 				String zoneId = ft.getAttribute("ZONE").toString();
-				Zone zone = zones.get(zoneId.substring(0, zoneId.indexOf('.')));
+				Zone zone = zones.get(zoneId);
 				if (zone != null) {
 					zone.setGeometry(wktReader.read((ft.getAttribute("the_geom")).toString()));
 				}
