@@ -43,6 +43,15 @@ public final class CSVWriter {
 			throw new RuntimeException("could not write");
 		}
 	}
+	
+	public final void writeField( String val ) {
+		try {
+			writer.write( val + SEPARATOR ) ;
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("could not write");
+		}
+	}
 
 	public final void writeNewLine() {
 		try {

@@ -379,6 +379,18 @@ implements ShutdownListener, StartupListener {
 		log.info("Writing plotting data for other analyis into " + adaptedOutputDirectory + " ...");
 
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
+		
+		// write header
+		writer.writeField(Labels.X_COORDINATE);
+		writer.writeField(Labels.Y_COORDINATE);
+		writer.writeField(Labels.ACCESSIBILITY_BY_FREESPEED);
+		writer.writeField(Labels.ACCESSIBILITY_BY_CAR);
+		writer.writeField(Labels.ACCESSIBILITY_BY_BIKE);
+		writer.writeField(Labels.ACCESSIBILITY_BY_WALK);
+		writer.writeField(Labels.ACCESSIBILITY_BY_PT);
+		writer.writeField(Labels.POPULATION_DENSITIY);
+		writer.writeField(Labels.POPULATION_DENSITIY);
+		writer.writeNewLine(); 
 
 		final SpatialGrid spatialGrid = this.getAccessibilityGrids().get( Modes4Accessibility.freeSpeed ) ;
 		// yy for time being, have to assume that this is always there

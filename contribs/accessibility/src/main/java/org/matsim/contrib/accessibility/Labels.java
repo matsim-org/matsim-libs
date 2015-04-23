@@ -21,4 +21,6 @@ public class Labels {
 	public static final String BIKE_FILENAME 	= "bike" + ACCESSIBILITY_CELLSIZE ;
 	public static final String WALK_FILENAME 	= "walk" + ACCESSIBILITY_CELLSIZE ;
 	public static final String PT_FILENAME 		= "pt" + ACCESSIBILITY_CELLSIZE ;
+	
+	public static final String POPULATION_DENSITIY = "population_density" ;
 }
