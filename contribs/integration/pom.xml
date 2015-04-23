@@ -27,7 +27,7 @@
                plugin. Thus, define some name that does not exist). This means
                there is no possibility to execute regular unit test unless
                they are in well defined packages that would have to be included
-               manually below.
+               manually below. 
                -->
           <includes>
             <include>**/SomeNonExistingTestName</include>
@@ -44,7 +44,6 @@
     <profile>
       <id>daily</id>
       <build>
-        <pluginManagement>
           <plugins>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
@@ -56,13 +55,11 @@
               </configuration>
             </plugin>
           </plugins>
-        </pluginManagement>
       </build>
     </profile>
     <profile>
       <id>weekly</id>
       <build>
-        <pluginManagement>
           <plugins>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
@@ -74,7 +71,6 @@
               </configuration>
             </plugin>
           </plugins>
-        </pluginManagement>
       </build>
     </profile>
   </profiles>
