@@ -1,6 +1,6 @@
 package org.matsim.integration.daily.accessibility;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,8 +14,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisMapnikFileCreator;
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
@@ -32,7 +32,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -48,10 +47,6 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class AccessibilityRunTest {
 	public static final Logger log = Logger.getLogger( AccessibilityRunTest.class ) ;
-
-	public static final Boolean doPopulationWeightedPlot = null;
-
-	public static final Boolean doNonPopulationWeightedPlot = null;
 	
 	private static final double cellSize = 1000.;
 
@@ -59,17 +54,19 @@ public class AccessibilityRunTest {
 
 	@Test
 	public void doAccessibilityTest() {
-		
-		// TODO substitute this by a proper path
-		String ptStopsFile = "/Users/dominik/Workspace/data/nmbm/transit/minibusStops.csv";
+		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
+		String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
+		String minibusPtTravelMatrix = "../../matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelmatrix.csv.gz";
+		String measuringPointsAsPtStops = "../../matsimExamples/countries/za/nmbm/minibus-pt/measuringPointsAsStops.csv.gz";
 
 //		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
 		
 		AccessibilityConfigGroup acg = (AccessibilityConfigGroup) config.getModule( AccessibilityConfigGroup.GROUP_NAME ) ;
+		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME);
 		
-		config.network().setInputFile("../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz");
-		config.facilities().setInputFile("../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz" );
+		config.network().setInputFile(networkFile);
+		config.facilities().setInputFile(facilitiesFile);
 
 		config.controler().setLastIteration(0);
 
@@ -90,38 +87,75 @@ public class AccessibilityRunTest {
 		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
+//		scenario.getConfig().scenario().setUseTransit(true);
+		
+		mbpcg.setUsingTravelTimesAndDistances(true);
+		mbpcg.setPtTravelTimesInputFile(minibusPtTravelMatrix);
+		mbpcg.setPtStopsInputFile(measuringPointsAsPtStops);
+		
+		// TODO set the proper file here
+		mbpcg.setPtTravelDistancesInputFile(minibusPtTravelMatrix);
+		
+		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
+        
+        System.out.println("teleported mode speed factors (1): " + plansCalcRoute.getTeleportedModeFreespeedFactors());
+        System.out.println("teleported mode speeds (1): " + plansCalcRoute.getTeleportedModeSpeeds());
+        System.out.println("beeline distance factors (1): " + plansCalcRoute.getBeelineDistanceFactors());
+          
+        // teleported mode speed for pt also required, see PtMatrix:120
+        ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
+        ptParameters.setTeleportedModeSpeed(50./3.6);
+        plansCalcRoute.addModeRoutingParams(ptParameters );
+        
+        // by adding ModeRoutingParams (as done above for pt), the other parameters are deleted
+        // those parameters which are needed, have to be set again to be available.
+
+        // teleported mode speed for walking also required, see PtMatrix:141
+        ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
+        walkParameters.setTeleportedModeSpeed(3./3.6);
+        plansCalcRoute.addModeRoutingParams(walkParameters );
+        
+        // teleported mode speed for bike also required, see AccessibilityControlerListenerImpl:168
+        ModeRoutingParams bikeParameters = new ModeRoutingParams(TransportMode.bike);
+        bikeParameters.setTeleportedModeSpeed(15./3.6);
+        plansCalcRoute.addModeRoutingParams(bikeParameters );	
+		
+		System.out.println("teleported mode speed factors (2): " + plansCalcRoute.getTeleportedModeFreespeedFactors());
+		System.out.println("teleported mode speeds (2): " + plansCalcRoute.getTeleportedModeSpeeds());
+		System.out.println("beeline distance factors (2): " + plansCalcRoute.getBeelineDistanceFactors());
+		
 		assertNotNull(config);
 		
 		
-		// new adding pt matrix
+		// new
+//		// adding pt matrix, based on transit stops
+//		// should actually work. Problem is, however, that there are just too many pt stops (for minibus; ca. 36000),
+//		// So, the computation takes forever
+//		// Therefore, use different approach below (only create pt matrix for measuring points)
 //		MatrixBasedPtRouterConfigGroup mbpcg = (MatrixBasedPtRouterConfigGroup) config.getModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+//		// add transit stops
 //		mbpcg.setPtStopsInputFile(ptStopsFile);
 //
 //        PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
 //        
-//        System.out.println("teleported mode speed for pt: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt));
-//        System.out.println("teleported mode speed for bike: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.bike));
-//        System.out.println("teleported mode speed for ride: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.ride));
-//        System.out.println("teleported mode speed for car: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.car));
-//        System.out.println("teleported mode speed for walk: " + plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk));
-//        
-//        System.out.println("beeline distance factors: " + plansCalcRoute.getBeelineDistanceFactors());
-//        System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-//        System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
-//        
+//        System.out.println("teleported mode speed factors (1): " + plansCalcRoute.getTeleportedModeFreespeedFactors());
+//        System.out.println("teleported mode speeds (1): " + plansCalcRoute.getTeleportedModeSpeeds());
+//        System.out.println("beeline distance factors (1): " + plansCalcRoute.getBeelineDistanceFactors());
+//          
+//        // if no travel matrix (distances and times) is provided, the teleported mode speed for pt needs to be set
 //        ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
-////        ptParameters.setTeleportedModeSpeed(50./3.6);
+//        ptParameters.setTeleportedModeSpeed(50./3.6);
+//        plansCalcRoute.addModeRoutingParams(ptParameters );
+//        
+//        // by adding ModeRoutingParams (as done above for pt), the other parameters are deleted
+//        // the walk parameters are needed, however. This is why they have to be set here again
 //
 //        ModeRoutingParams walkParameters = new ModeRoutingParams(TransportMode.walk);
-//        
-//        System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-//        System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
-//
-//		plansCalcRoute.addModeRoutingParams(ptParameters );
-//		plansCalcRoute.addModeRoutingParams(walkParameters );
+//        plansCalcRoute.addModeRoutingParams(walkParameters );	
 //		
-//		System.out.println("teleported mode speed factors: " + plansCalcRoute.getTeleportedModeFreespeedFactors());
-//		System.out.println("teleported mode speeds: " + plansCalcRoute.getTeleportedModeSpeeds());
+//		System.out.println("teleported mode speed factors (2): " + plansCalcRoute.getTeleportedModeFreespeedFactors());
+//		System.out.println("teleported mode speeds (2): " + plansCalcRoute.getTeleportedModeSpeeds());
+//		System.out.println("beeline distance factors (2): " + plansCalcRoute.getBeelineDistanceFactors());
 //
 //        BoundingBox nbb = BoundingBox.createBoundingBox(scenario.getNetwork());
 //			
@@ -143,7 +177,17 @@ public class AccessibilityRunTest {
 				}
 			}
 		}
-
+		
+		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+        
+        // extends of the network are (as they can looked up by using the bounding box):
+        // minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
+        // choose map view a bit bigger
+        double[] mapViewExtent = {100000,-3720000,180000,-3675000};
+			
+		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
+		// end new
+		
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		Controler controler = new Controler(scenario) ;
 		controler.setOverwriteFiles(true);
@@ -152,197 +196,133 @@ public class AccessibilityRunTest {
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
 		// other algorithms, the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 
-		
-		// two loops over activity types and modes to add one GridBasedAccessibilityControlerListenerV3 for each combination
+		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
-//			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-				if ( !actType.equals("w") ) {
-					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-					continue ;
-				}
-//				if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
-//					log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
-//					continue ;
-//				}
+			if ( !actType.equals("w") ) {
+				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+				continue ;
+			}
 
-				config.controler().setOutputDirectory( utils.getOutputDirectory());
-				ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
-				for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
-					for ( ActivityOption option : fac.getActivityOptions().values() ) {
-						if ( option.getType().equals(actType) ) {
-							opportunities.addActivityFacility(fac);
-						}
+			config.controler().setOutputDirectory( utils.getOutputDirectory());
+			ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
+			for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
+				for ( ActivityOption option : fac.getActivityOptions().values() ) {
+					if ( option.getType().equals(actType) ) {
+						opportunities.addActivityFacility(fac);
 					}
 				}
+			}
 
-				activityFacilitiesMap.put(actType, opportunities);
+			activityFacilitiesMap.put(actType, opportunities);
 
-				GridBasedAccessibilityControlerListenerV3 listener = 
-						new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
-				// define the mode that will be considered
-				listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-//				listener.setComputingAccessibilityForMode(mode, true);
-				listener.addAdditionalFacilityData(homes) ;
-				listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+			GridBasedAccessibilityControlerListenerV3 listener = 
+//					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
+					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
 				
-				// new
-//				SpatialGrid ptGrid = listener.getAccessibilityGrids().get(TransportMode.pt);
-//				for (double x = ptGrid.getXmin(); x < ptGrid.getXmax(); ptGrid.getResolution()) {
-//					for (double y = ptGrid.getYmin(); y < ptGrid.getYmax(); ptGrid.getResolution()) {
-//						if (!ptGrid.isInBounds(x, y)) {
-//							new RuntimeException("Coordinate should not be outside bounds!");
-//						} else {
-//							// TODO perform routing as done in "Extract..." class with x,y coords as input
-//							// instead of transitstops
-//						}
-//					}
-//				}
-//				
-//				// TODO add ptMATrix here, after MeasuringPoints had been used f
-//				
-//				listener.addPtMatrix(ptMatrix);
-				// end new
-
-//				listener.writeToSubdirectoryWithName(actType + "/" + mode);
-				listener.writeToSubdirectoryWithName(actType);
+			// define the mode that will be considered
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 				
-				listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
+			listener.addAdditionalFacilityData(homes) ;
+			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+				
+			listener.writeToSubdirectoryWithName(actType);
+				
+			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
 
-				controler.addControlerListener(listener);
-//			}
+			controler.addControlerListener(listener);
 		}
 
-		controler.run();
+	controler.run();
+			
+	String workingDirectory =  config.controler().getOutputDirectory();
+	
+	createQGisOutput(activityTypes, mapViewExtent, workingDirectory);
+	}
 
-		
-
-		// ############################################################################################################
-		// creating visual output
-		// ############################################################################################################
-		
-		// GnuplotScriptWriter.createGnuplotScript(config, activityTypes);
-		
-		String workingDirectory =  config.controler().getOutputDirectory();
-
+	
+	/**
+	 * Create QGis project files
+	 * 
+	 * @param activityTypes
+	 * @param mapViewExtent
+	 * @param workingDirectory
+	 */
+	private static void createQGisOutput(List<String> activityTypes, double[] mapViewExtent, String workingDirectory) {
 		// create Mapnik file that is needed to have OSM layer in QGis project
 		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
-				
 		
-		// Write QGis project file
-		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_SA_Albers, workingDirectory);
-		
-//		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SA_Albers, TransformationFactory.WGS84);
-//		
-//		Coord lowerLeftCoordinateSAALbers = new CoordImpl(100000,-3720000);
-//		Coord upperRightCoordinateSAALbers = new CoordImpl(180000,-3675000);
-//		Coord lowerLeftCoordinateWGS84 = transformation.transform(lowerLeftCoordinateSAALbers);
-//		Coord upperRightCoordinateWGS84 = transformation.transform(upperRightCoordinateSAALbers);
-//		
-//		System.out.println("###########################################################################");
-//		System.out.println("lowerLeftCoordinateWGS84: " + lowerLeftCoordinateWGS84);
-//		System.out.println("upperRightCoordinateWGS84: " + upperRightCoordinateWGS84);
-//		System.out.println("###########################################################################");
-//		
-//		//extent double array of the minx, miny, maxx and maxy coordinates of the starting view
-		
-		
-		double[] extent = {100000,-3720000,180000,-3675000};
-		writer.setExtent(extent);
-		
-		//raster layer
-		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "/osm_mapnik.xml");
-		new AccessibilityXmlRenderer(mapnikLayer);
-		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
-		writer.addLayer(0,mapnikLayer);
-		
-		
-
 		// loop over activity types to produce one QGIs project file for each combination
 		for (String actType : activityTypes) {
-//			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
+			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
 				if ( !actType.equals("w") ) {
 					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 					continue ;
 				}
-//				if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
-//					log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
+//				if ( !mode.equals(Modes4Accessibility.freeSpeed)) {
+//					log.error("skipping everything except freespeed and pt for debugging purposes; remove in production code. dz, nov'14") ;
 //					continue ;
 //				}
-				
-				workingDirectory =  config.controler().getOutputDirectory() + actType + "/";
+		
+				// Write QGis project file
+				QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_SA_Albers, workingDirectory);
+				String qGisProjectFile = "QGisProjectFile_" + mode + ".qgs";
+				writer.setExtent(mapViewExtent);
+					
+				// osm raster layer
+				// working directory needs to be the storage location of the file
 				writer.changeWorkingDirectory(workingDirectory);
 				
-				String qGisProjectFile = "/QGisProjectFile.qgs";
+				RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "/osm_mapnik.xml");
+				new AccessibilityXmlRenderer(mapnikLayer);
+				mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
+				writer.addLayer(0,mapnikLayer);
+
+				// working directory needs to be the storage location of the file
+				String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
+				writer.changeWorkingDirectory(actSpecificWorkingDirectory);
 				
-				VectorLayer densityLayer = new VectorLayer("density", workingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point);
-				densityLayer.setXField(1);
-				densityLayer.setYField(2);
+				// density layer
+				VectorLayer densityLayer = new VectorLayer(
+						"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
+				densityLayer.setXField(Labels.X_COORDINATE);
+				densityLayer.setYField(Labels.Y_COORDINATE);
 				AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
-				dRenderer.setRenderingAttribute(8);
+				dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
 				writer.addLayer(densityLayer);
 				
-				
-				VectorLayer accessibilityLayer = new VectorLayer("accessibility", workingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point);
-				//there are two ways to set x and y fields for csv geometry files
-				//1) if there is a header, you can set the members xField and yField to the name of the column headers
-				//2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
-				accessibilityLayer.setXField(1);
-				accessibilityLayer.setYField(2);
+				// accessibility layer
+				VectorLayer accessibilityLayer = new VectorLayer(
+						"accessibility", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
+				// there are two ways to set x and y fields for csv geometry files
+				// 1) if there is a header, you can set the members xField and yField to the name of the column headers
+				// 2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
+				accessibilityLayer.setXField(Labels.X_COORDINATE);
+				accessibilityLayer.setYField(Labels.Y_COORDINATE);
 				AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
-				renderer.setRenderingAttribute(3); // choose column/header to visualize
-				writer.addLayer(accessibilityLayer);
-				
-				writer.write(qGisProjectFile);
-				
-				
-				// old version, not dependent on analysis.vsp
-//				String version = "<qgis projectname=\"\" version=\"2.6.1-Brighton\">\n";
-//
-//				QGisProjectFileWriter qgisWriter = new QGisProjectFileWriter();
-//
-//				try {
-//					BufferedWriter writer = IOUtils.getBufferedWriter( config.controler().getOutputDirectory() + "/" + actType 
-//							+ "/" + mode + "/QGisProjectFile.qgs" ) ;
-//					//					openFile(this.outputFolder+filename);
-//
-//					qgisWriter.writeQGisHead(writer);
-//					writer.write(version);
-//					//					handler.startLegend(writer);
-//					//					handler.writeLegendLayer(writer,key);
-//					//					handler.writeProjectLayer(writer, key, geometry, claz, type);
-//
-//					//TODO Should be split up into (customizable) modules later, so far just a big collection of everything
-//					if (actType.equals("w")) {
-//						qgisWriter.writeEverythingWork(writer, "../../"+mapnikFileName);
-//					} else if (actType.equals("e")){
-//						qgisWriter.writeEverythingEdu(writer, "../../"+mapnikFileName);						
-//					} else {
-//						qgisWriter.writeEverythingOther(writer, "../../"+mapnikFileName);
-//					}
-//
-//					//					handler.endProjectLayers(writer);
-//					//					handler.writeProperties(writer);
-//					qgisWriter.endDocument(writer);
-//
-//					writer.flush();
-//					writer.close();
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//					throw new RuntimeException( "writing QGis project file did not work") ;
-//				}
-				// end old version
-				
-
-			// now creating a snapshot based on above-created project file
-			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-				if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
-					log.error("skipping everything except freespeed for debugging purposes; remove in production code. dz, nov'14") ;
-					continue ;
+				if (mode.equals(Modes4Accessibility.freeSpeed)) {
+					renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_FREESPEED); // choose column/header to visualize
+				} else if (mode.equals(Modes4Accessibility.car)) {
+					renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_CAR); // choose column/header to visualize
+				} else if (mode.equals(Modes4Accessibility.bike)) {
+					renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_BIKE); // choose column/header to visualize
+				} else if (mode.equals(Modes4Accessibility.walk)) {
+					renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_WALK); // choose column/header to visualize
+				} else if (mode.equals(Modes4Accessibility.pt)) {
+					renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_PT); // choose column/header to visualize
+				} else {
+					throw new RuntimeException("Other modes not yet considered!");
 				}
-				
+				writer.addLayer(accessibilityLayer);
+
+				// write the project file
+				writer.write(qGisProjectFile);
+			
 				String osName = System.getProperty("os.name");
-				
-				createSnapshot(workingDirectory, mode, osName);
+				createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}		
 	}
@@ -358,17 +338,17 @@ public class AccessibilityRunTest {
 	 */
 	private static void createSnapshot(String workingDirectory, Modes4Accessibility mode, String osName) {
 		
-		//TODO adapt this mehtod so that maps for different modes are created.
+		//TODO adapt this method so that maps for different modes are created.
 		
 		// if OS is Windows
 		// example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
 		if ( osName.contains("Win") || osName.contains("win")) {
 			// On Windows, the PATH variables need to be set correctly to be able to call "qgis.bat" on the command line
 			// This needs to be done manually. It does not seem to be set automatically when installing QGis
-			String cmd = "qgis.bat " + workingDirectory + "QGisProjectFile.qgs" +
-					" --snapshot " + workingDirectory + "snapshot.png";
+			String cmd = "qgis.bat " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
+					" --snapshot " + workingDirectory + "snapshot_" + mode + ".png";
 
-			String stdoutFileName = workingDirectory + "snapshot.log";
+			String stdoutFileName = workingDirectory + "snapshot_" + mode + ".log";
 			int timeout = 99999;
 
 			ExeRunner.run(cmd, stdoutFileName, timeout);
@@ -376,11 +356,10 @@ public class AccessibilityRunTest {
 		// if OS is Macintosh
 		// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
 		} else if ( osName.contains("Mac") || osName.contains("mac") ) {
-			
-			String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile.qgs" +
-			" --snapshot " + workingDirectory + "snapshot.png";
+			String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
+					" --snapshot " + workingDirectory + "snapshot_" + mode + ".png";
 
-			String stdoutFileName = workingDirectory + "snapshot.log";
+					String stdoutFileName = workingDirectory + "snapshot_" + mode + ".log";
 			
 			int timeout = 99999;
 
