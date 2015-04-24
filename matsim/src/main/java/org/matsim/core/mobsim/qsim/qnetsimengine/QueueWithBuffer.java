@@ -83,7 +83,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 * changes.  kai, sep'14
 	 */
 	class FlowcapAccumulate {
-		private double timeStep = Double.NEGATIVE_INFINITY ;
+		private double timeStep = 0.;//Double.NEGATIVE_INFINITY ;
 		private double value = 0. ;
 		double getTimeStep() {
 			return timeStep;
@@ -287,8 +287,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.calculateStorageCapacity();
 
 		if(this.accumulatingFlowToZero){
-			remainingflowCap = flowCapacityPerTimeStep;
-		} else{
+			flowcap_accumulate.setValue(flowCapacityPerTimeStep);
+		} else {
 			flowcap_accumulate.setValue((flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0) );
 		}
 		
@@ -310,8 +310,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// kai/mz/amit, mar'12
 		
 		if(this.accumulatingFlowToZero){
-			if (remainingflowCap >= 0.0  ) {
-				remainingflowCap -= veh.getSizeInEquivalents();
+			updateFlowAccumulation(now);
+			if (flowcap_accumulate.getValue() >= 0.0  ) {
+				flowcap_accumulate.addValue(-veh.getSizeInEquivalents(), now);
 			}
 			else {
 				throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
@@ -348,13 +349,14 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
-		
-		if(this.accumulatingFlowToZero){
+		final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
+		if(this.accumulatingFlowToZero){
+			updateFlowAccumulation(now);
 			return (
 					usedBufferStorageCapacity < bufferStorageCapacity
 					&&
-					((remainingflowCap >= 0.0) )
+					((flowcap_accumulate.getValue() >= 0.0) )
 					);
 		} else {
 			return (
@@ -365,18 +367,31 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 	}
 
+	private void updateFlowAccumulation(final double now){
+
+		if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() < 0 && isNotOfferingVehicle() ){
+
+			double flowCapSoFar = flowcap_accumulate.getValue();
+			double newStoredFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
+			double totalFlowCap = flowCapSoFar + newStoredFlowCap;
+
+			if(totalFlowCap > flowCapacityPerTimeStep) {
+				flowcap_accumulate.setValue(flowCapacityPerTimeStep);
+				flowcap_accumulate.timeStep = now;
+			}else {
+				flowcap_accumulate.addValue(newStoredFlowCap,now);
+			}
+		}
+	}
+
 	@Override
 	public final void updateRemainingFlowCapacity() {
-		if(this.accumulatingFlowToZero){
-			if (thisTimeStepGreen && remainingflowCap < 0 && isNotOfferingVehicle() ) {
-				remainingflowCap += flowCapacityPerTimeStep;
-			}
-		} else {
+		if(!this.accumulatingFlowToZero){
 			remainingflowCap = flowCapacityPerTimeStep;
-		if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
-			final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
-			flowcap_accumulate.addValue( flowCapacityPerTimeStepFractionalPart, now);
-		}
+			if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
+				final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+				flowcap_accumulate.addValue( flowCapacityPerTimeStepFractionalPart, now);
+			}
 		}
 	}
 
@@ -501,7 +516,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		QVehicle veh = pollFromVehQueue(veh2Remove); 
 
-		if(isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
+		if(seepageAllowed && isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
 
 		} else {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
@@ -533,8 +548,8 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	@Override
 	public final boolean isActive() {
 		if(this.accumulatingFlowToZero){
-		return (this.remainingflowCap < 0.0) // still accumulating, thus active
-				|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
+		return /*(this.remainingflowCap < 0.0) // still accumulating, thus active
+				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
 		} else {
 			return (this.flowcap_accumulate.getValue() < 1.0) // still accumulating, thus active
 					|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
@@ -626,6 +641,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
+		flowcap_accumulate.timeStep = bufferLastMovedTime -1;
 		return veh;
 	}
 
