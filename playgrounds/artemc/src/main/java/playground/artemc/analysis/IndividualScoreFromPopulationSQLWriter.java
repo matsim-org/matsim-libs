@@ -71,7 +71,7 @@ public class IndividualScoreFromPopulationSQLWriter {
 		}
 
 		//Write selected plan scores to Database;
-		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
+		DateFormat df = new SimpleDateFormat("yyyy_MM_dd HH_mm_ss");
 		String formattedDate = df.format(new Date());
 
 		List<PostgresqlColumnDefinition> columns = new ArrayList<>();

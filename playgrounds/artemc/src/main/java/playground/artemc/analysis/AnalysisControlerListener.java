@@ -120,11 +120,22 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
+		addMonetaryExpensesToPlanAttributes(event);
 		runCalculation(event);
-
 		writeWelfareAnalysis(event);
 		writeTripAnalysis(event);
 		writeTimeCostAnalysis(event);
+	}
+
+	private void addMonetaryExpensesToPlanAttributes(IterationEndsEvent event){
+		for(Person person:event.getControler().getScenario().getPopulation().getPersons().values()){
+			Double monetaryPayments = moneyHandler.getPersonId2amount().get(person.getId());
+			if(monetaryPayments==null) {
+				monetaryPayments=0.0;
+			}
+			person.getSelectedPlan().getCustomAttributes().put("toll",monetaryPayments.toString());
+			event.getControler().getScenario().getPopulation().getPersonAttributes().putAttribute(person.getId().toString(),"selectedPlanToll",monetaryPayments.toString());
+		}
 	}
 
 	private void runCalculation(IterationEndsEvent  event){
@@ -138,7 +149,15 @@ public class AnalysisControlerListener implements StartupListener, IterationEnds
 		this.it2invalidPersons_selected.put(event.getIteration(), userBenefitsCalculator_selected.getPersonsWithoutValidPlanCnt());
 		this.it2invalidPlans_selected.put(event.getIteration(), userBenefitsCalculator_selected.getInvalidPlans());
 
-		double tollSum = this.moneyHandler.getSumOfMonetaryAmounts();
+		double tollSum = 0.0;
+		for(Person person:event.getControler().getScenario().getPopulation().getPersons().values()){
+			Double monetaryPayments = moneyHandler.getPersonId2amount().get(person.getId());
+			if(monetaryPayments==null) {
+				monetaryPayments=0.0;
+			}
+			tollSum = tollSum + monetaryPayments;
+		}
+
 		this.it2tollSum.put(event.getIteration(), (-1) * tollSum);
 		this.it2stuckEvents.put(event.getIteration(), this.tripAnalysisHandler.getAgentStuckEvents());
 		this.it2totalTravelTimeAllModes.put(event.getIteration(), this.tripAnalysisHandler.getTotalTravelTimeAllModes());

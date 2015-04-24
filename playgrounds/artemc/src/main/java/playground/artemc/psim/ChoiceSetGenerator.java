@@ -15,8 +15,10 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.analysis.IndividualScoreFromPopulationSQLWriter;
+import playground.artemc.heterogeneity.HeterogeneityConfigGroup;
 import playground.artemc.heterogeneity.IncomeHeterogeneityWithoutTravelDisutilityModule;
 import playground.artemc.heterogeneity.TravelDisutilityIncomeHeterogeneityProviderWrapper;
 import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
@@ -40,15 +42,24 @@ public class ChoiceSetGenerator implements ShutdownListener
 
 	private static final Logger log = Logger.getLogger(ChoiceSetGenerator.class);
 
-	private ChoiceGenerationControler choiceGenerationControler;
+	private final ChoiceGenerationControler choiceGenerationControler;
+
+	private Controler controler;
 	private Population population;
 	private HashMap<Id<Person>,Plan> initialPlans = new HashMap<Id<Person>,Plan>();
 	private MoneyEventHandler moneyHandler;
 	static Integer choiceNumber = 2;
 
 	public ChoiceSetGenerator(Config config, String eventsFile){
-		this.choiceGenerationControler = new ChoiceGenerationControler(config, eventsFile);
-		this.population = choiceGenerationControler.getControler().getScenario().getPopulation();
+
+		choiceGenerationControler = new ChoiceGenerationControler(config, eventsFile);
+
+		this.controler = choiceGenerationControler.getControler();
+		this.population = controler.getScenario().getPopulation();
+
+		//Add self for after run plan join and output writing
+		controler.addControlerListener(this);
+
 	}
 
 	public static void main(String[] args) {
@@ -58,16 +69,14 @@ public class ChoiceSetGenerator implements ShutdownListener
 
 		Config config = scenarioInitializer.initScenario(inputDirectory, outputDirectory);
 		ChoiceSetGenerator choiceSetGenerator = new ChoiceSetGenerator(config, eventFilePath);
-		Controler controler = choiceSetGenerator.choiceGenerationControler.getControler();
-		choiceSetGenerator.IncomeHeterogeneityAndTollInitializer(controler);
 
-		//Add self for after run plan join and output writing
-		controler.addControlerListener(choiceSetGenerator);
+		choiceSetGenerator.IncomeHeterogeneityAndTollInitializer();
+		choiceSetGenerator.CreateChoiceSets();
 
-		choiceSetGenerator.run();
+		choiceSetGenerator.choiceGenerationControler.run();
 	}
 
-	public void IncomeHeterogeneityAndTollInitializer(Controler controler) {
+	public void IncomeHeterogeneityAndTollInitializer() {
 
 		Integer inputDirectoryDepth = controler.getConfig().plans().getInputFile().split("/").length;
 		boolean roadpricing = controler.getConfig().plans().getInputFile().split("/")[inputDirectoryDepth-2].contains("toll");
@@ -105,13 +114,20 @@ public class ChoiceSetGenerator implements ShutdownListener
 		controler.getScenario().getConfig().controler().setLastIteration(0);
 	}
 
-	public void run(){
+	public void CreateChoiceSets(){
 
 		PopulationFactory populationFactory = population.getFactory();
 		ArrayList<Person> newPersons = new ArrayList<>();
+
+		/*Read original personalAttributes file*/
+		HeterogeneityConfigGroup heterogeneityConfig = ConfigUtils.addOrGetModule(controler.getConfig(), HeterogeneityConfigGroup.GROUP_NAME, HeterogeneityConfigGroup.class);
+		String personalAttributesFile = heterogeneityConfig.getIncomeFile();
+		new ObjectAttributesXmlReader(population.getPersonAttributes()).parse(personalAttributesFile);
+
 		for (Id<Person> personId : population.getPersons().keySet()) {
 
 			Plan plan = population.getPersons().get(personId).getSelectedPlan();
+			plan.getCustomAttributes().put("toll", population.getPersonAttributes().getAttribute(personId.toString(), "selectedPlanToll"));
 			initialPlans.put(personId, plan);
 
 			population.getPersons().get(personId).createCopyOfSelectedPlanAndMakeSelected();
@@ -145,6 +161,7 @@ public class ChoiceSetGenerator implements ShutdownListener
 					Person newPerson = populationFactory.createPerson(Id.createPersonId(personId.toString()+"_"+count));
 					newPerson.addPlan(newPlan);
 					newPersons.add(newPerson);
+					population.getPersonAttributes().putAttribute(newPerson.getId().toString(), "income", population.getPersonAttributes().getAttribute(personId.toString(), "income"));
 				}
 			}
 
@@ -163,7 +180,6 @@ public class ChoiceSetGenerator implements ShutdownListener
 //		System.out.println("New number of persons: " + population.getPersons().size());
 //		new org.matsim.core.population.PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(outputPopulationFile);
 
-		choiceGenerationControler.run();
 	}
 
 	public ArrayList<Plan> generateChoices(Plan selectedPlan) {
@@ -173,26 +189,26 @@ public class ChoiceSetGenerator implements ShutdownListener
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Population newPopulation = scenario.getPopulation();
+		Scenario newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Population newPopulation = newScenario.getPopulation();
 
 		for(Id<Person> personId:population.getPersons().keySet()){
 
 			Id<Person> orgPersonId = Id.create(personId.toString().split("_")[0], Person.class);
 
-			Plan planToAdd = null;
-			if(personId.toString().contains("_")){
-				planToAdd = population.getPersons().get(personId).getSelectedPlan();
-			}
-			else {
-				planToAdd = initialPlans.get(personId);
-			}
-
 			Double monetaryPayments = moneyHandler.getPersonId2amount().get(personId);
 			if(monetaryPayments==null) {
 				monetaryPayments=0.0;
 			}
-			planToAdd.getCustomAttributes().put("toll", monetaryPayments.toString());
+
+			Plan planToAdd = null;
+			if(personId.toString().contains("_")){
+				planToAdd = population.getPersons().get(personId).getSelectedPlan();
+				planToAdd.getCustomAttributes().put("toll", monetaryPayments.toString());
+			}
+			else {
+				planToAdd = initialPlans.get(personId);
+			}
 
 			if(newPopulation.getPersons().containsKey(orgPersonId)){
 				newPopulation.getPersons().get(orgPersonId).addPlan(planToAdd);
@@ -203,7 +219,6 @@ public class ChoiceSetGenerator implements ShutdownListener
 				newPopulation.addPerson(newPerson);
 			}
 		}
-
 
 		/*Write score table to SQL*/
 		String connectionPropertiesPath = "/Users/artemc/Workspace/playgrounds/artemc/connections/matsim2postgresLocal.properties";
@@ -220,6 +235,6 @@ public class ChoiceSetGenerator implements ShutdownListener
 		IndividualScoreFromPopulationSQLWriter sqlWriter = new IndividualScoreFromPopulationSQLWriter(event.getControler().getConfig(),newPopulation);
 		sqlWriter.writeToDatabase(connectionPropertiesPath, schema, tableName);
 
-		new PopulationWriter(scenario.getPopulation()).write(choiceGenerationControler.getControler().getConfig().controler().getOutputDirectory()+"/output_plansJoin.xml");
+		new PopulationWriter(newScenario.getPopulation()).write(choiceGenerationControler.getControler().getConfig().controler().getOutputDirectory()+"/output_plansJoin.xml");
 	}
 }
