@@ -91,7 +91,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 		ctl.addControlerListener(new LegChainModesListener());
         ctl.getConfig().controler().setCreateGraphs(false);
         ctl.getConfig().controler().setWriteEventsInterval(100);
-		Config config = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).getScenario().getConfig();
+//		Config config = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(args[0]).getScenario().getConfig();
 		ctl.run();
 	}
 
@@ -111,16 +111,14 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 
 		@Override
 		public void run(final Plan plan) {
-			List<PlanElement> pes = plan.getPlanElements();
-			int peSize = pes.size();
-			for (int i = 0; i < peSize; i += 2) {
-				if (((ActivityImpl) pes.get(i)).getType().equals("tta")) {
+			for (int i = 0; i < plan.getPlanElements().size(); i += 2) {
+				if (((ActivityImpl) plan.getPlanElements().get(i)).getType().equals("tta")) {
 					return;
 				}
 			}
 
 			PlanImpl copyPlan = new PlanImpl(plan.getPerson());
-			if (peSize > 1) {
+			if (plan.getPlanElements().size() > 1) {
 				boolean done = false;
 				while (!done) {
 					copyPlan.getPlanElements().clear();
@@ -128,33 +126,33 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 					// Idx for leg in PlanElements, whose TransportMode
 					// would be
 					// changed.
-					int legIdx = rnd.nextInt(peSize / 2) * 2 + 1;
+					int legIdx = rnd.nextInt(plan.getPlanElements().size() / 2) * 2 + 1;
 
-					String crtMode = ((Leg) copyPlan.getPlanElements()
+					String currentMode = ((Leg) copyPlan.getPlanElements()
 							.get(legIdx)).getMode();
-					String newMode = crtMode;
-					while (newMode.equals(crtMode)) {
+					String newMode = currentMode;
+					while (newMode.equals(currentMode)) {
 						newMode = possibleModes[rnd
 								.nextInt(possibleModes.length)];
 					}
 
-					if (crtMode.equals(TransportMode.car)) {
+					if (currentMode.equals(TransportMode.car)) {
 						done = changeCar2UnCar(copyPlan, legIdx, newMode);
 					} else {
 						if (newMode.equals(TransportMode.car)) {
-							done = changeUnCar2Car(copyPlan, legIdx);
+							done = changeUnCar2Car(copyPlan, legIdx, network);
 						} else {
 							done = changeUnCar2UnCar(copyPlan, legIdx, newMode);
 						}
 					}
 				}
-				pes.clear();
+				plan.getPlanElements().clear();
 				((PlanImpl) plan).copyFrom(copyPlan);
 			}
 
 		}
 
-		private boolean changeUnCar2UnCar(final PlanImpl plan, final int legIdx,
+		private static boolean changeUnCar2UnCar(final PlanImpl plan, final int legIdx,
 				final String mode) {
 			PlanElement pe = plan.getPlanElements().get(legIdx);
 			if (pe != null) {
@@ -318,7 +316,7 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			return null;
 		}
 
-		private boolean changeUnCar2Car(final PlanImpl plan, final int legIdx) {
+		private static boolean changeUnCar2Car(final PlanImpl plan, final int legIdx, Network network) {
 			CarLegChain clc = new CarLegChain(plan);
 			List<PlanElement> pes = plan.getPlanElements();
 			int firstCarActIdx = clc.getFirstActIdx();

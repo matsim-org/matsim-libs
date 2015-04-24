@@ -21,6 +21,7 @@ package playground.yu.changeLegModeWithParkLocation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
@@ -34,9 +35,11 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+
 import playground.yu.tests.ChangeLegModeWithParkLocation;
 
 /**
@@ -213,6 +216,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 				}
 			}
 
+			System.err.println("legChainModes: " + legChainModes ) ;
 			assertEquals("different legChainModes?", criterion, legChainModes
 					.toString());
 		}
@@ -270,7 +274,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		{
 			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
 			stratSets.setStrategyName( DefaultSelector.ChangeExpBeta.toString() ) ;
-			stratSets.setWeight(0.1);
+			stratSets.setWeight(0.0);
 			config.strategy().addStrategySettings(stratSets);
 		}{
 			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
@@ -280,7 +284,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		}{
 			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
 			stratSets.setStrategyName( DefaultStrategy.ReRoute.toString() );
-			stratSets.setWeight(0.4);
+			stratSets.setWeight(0.0);
 			config.strategy().addStrategySettings(stratSets);
 		}
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
@@ -290,8 +294,9 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		ctl.addPlanStrategyFactory("abc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy get() {
-				PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector() ) ;
+				PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector<Plan,Person>() ) ;
 				builder.addStrategyModule( new ChangeLegModeWithParkLocation( config, scenario.getNetwork() ) );
+				builder.addStrategyModule(new ReRoute(scenario) );
 				return builder.build() ;
 			}
 		} ) ;
@@ -317,7 +322,24 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			Controler {
 		public ChangeLegModeWithParkLocationControler(final Config config) {
 			super(config);
-			throw new RuntimeException("overriding loadStrategyManager is deprecated; for that reason, this class does not work any more. kai, oct'14") ;
+			final Scenario scenario = this.getScenario() ;
+			
+			PlanStrategyFactory planStrategyFactory = new PlanStrategyFactory(){
+				@Override public PlanStrategy get() {
+					PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector<Plan,Person>() ) ;
+					builder.addStrategyModule(new ChangeLegModeWithParkLocation(config, scenario.getNetwork()));
+					builder.addStrategyModule(new ReRoute(getScenario()));
+					return builder.build();
+				}
+			} ;
+			this.addPlanStrategyFactory("abc", planStrategyFactory);
+
+			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
+			stratSets.setStrategyName("abc") ;
+			stratSets.setWeight(0.5);
+			config.strategy().addStrategySettings(stratSets);
+
+//			throw new RuntimeException("overriding loadStrategyManager is deprecated; for that reason, this class does not work any more. kai, oct'14") ;
 		}
 
 //		@Override
