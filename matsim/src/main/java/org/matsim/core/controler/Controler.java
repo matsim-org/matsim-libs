@@ -179,29 +179,35 @@ public class Controler extends AbstractController {
 	}
 
 	private Controler(final String configFileName, final Config config, final Scenario scenario) {
-        this.controlerListenerManager.setControler(this);
-        if (scenario != null) {
+		if (scenario != null) {
+			// scenario already loaded (recommended):
 			this.scenarioLoaded = true;
 			this.scenario  = scenario;
 			this.config = scenario.getConfig();
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		} else {
 			if (configFileName == null) {
+				// config should already be loaded:
 				if (config == null) {
 					throw new IllegalArgumentException("Either the config or the filename of a configfile must be set to initialize the Controler.");
 				}
 				this.config = config;
 			} else {
+				// else load config:
 				this.config = ConfigUtils.loadConfig(configFileName);
 			}
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
+
+			// load scenario:
 			this.scenario  = ScenarioUtils.createScenario(this.config);
+			loadData() ;
 		}
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
 
 		this.events = EventsUtils.createEventsManager(this.config);
 
+		this.controlerListenerManager.setControler(this);
 
 		this.config.parallelEventHandling().makeLocked();
 	}
@@ -214,7 +220,7 @@ public class Controler extends AbstractController {
 		if (this.config.scenario().isUseTransit()) {
 			setupTransitSimulation();
 		}
-		loadData();
+//		loadData();
 		// I find it difficult (to teach) that the behavior between the constructor and controler.run() depends on which constructor
 		// you call. kai, apr'14
 

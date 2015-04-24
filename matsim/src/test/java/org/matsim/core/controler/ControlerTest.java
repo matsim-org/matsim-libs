@@ -66,9 +66,16 @@ public class ControlerTest {
 		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
         assertNotNull(controler.getScenario().getPopulation());
-        assertEquals(0, controler.getScenario().getNetwork().getLinks().size());
-        assertEquals(0, controler.getScenario().getNetwork().getNodes().size());
-        assertEquals(0, controler.getScenario().getPopulation().getPersons().size());
+//        assertEquals(0, controler.getScenario().getNetwork().getLinks().size());
+//        assertEquals(0, controler.getScenario().getNetwork().getNodes().size());
+//        assertEquals(0, controler.getScenario().getPopulation().getPersons().size());
+        assertEquals(23, controler.getScenario().getNetwork().getLinks().size());
+        assertEquals(15, controler.getScenario().getNetwork().getNodes().size());
+        assertEquals(100, controler.getScenario().getPopulation().getPersons().size());
+        
+        // note: because scenario is now loaded in the constructor, the collections already contain material after the constructor.
+        // kai, apr'15
+        
 		assertNotNull(controler.getEvents());
 	}
 
@@ -653,13 +660,18 @@ public class ControlerTest {
 		config.controler().setWritePlansInterval(0);
 		config.plans().setInputFile("dummy/non-existing/population.xml");
 
-		final Controler controler = new Controler(config);
-		controler.setMobsimFactory(new FakeMobsimFactory());
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
 		try {
+			Controler controler = new Controler(config);
+			controler.setMobsimFactory(new FakeMobsimFactory());
+			controler.getConfig().controler().setCreateGraphs(false);
+			controler.setDumpDataAtEnd(false);
 			controler.run();
 			Assert.fail("expected exception, got none.");
+			
+			// note: I moved loadScenario in the controler from run() into the constructor to mirror the loading sequence one has
+			// when calling new Controler(scenario).  In consequence, it fails already in the constructor; one could stop after that.  
+			// kai, apr'15
+			
 		} catch (RuntimeException e) {
 			log.info("catched expected exception.", e);
 		}
@@ -667,6 +679,7 @@ public class ControlerTest {
 
 	@Test
 	public void test_ExceptionOnMissingNetworkFile() {
+		try {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(0);
@@ -677,9 +690,13 @@ public class ControlerTest {
 		controler.setMobsimFactory(new FakeMobsimFactory());
         controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
-		try {
 			controler.run();
 			Assert.fail("expected exception, got none.");
+			
+			// note: I moved loadScenario in the controler from run() into the constructor to mirror the loading sequence one has
+			// when calling new Controler(scenario).  In consequence, it fails already in the constructor; one could stop after that.  
+			// kai, apr'15
+			
 		} catch (RuntimeException e) {
 			log.info("catched expected exception.", e);
 		}
@@ -687,6 +704,7 @@ public class ControlerTest {
 
 	@Test
 	public void test_ExceptionOnMissingFacilitiesFile() {
+		try {
 		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(0);
 		config.controler().setWriteEventsInterval(0);
@@ -697,9 +715,13 @@ public class ControlerTest {
 		controler.setMobsimFactory(new FakeMobsimFactory());
         controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
-		try {
 			controler.run();
 			Assert.fail("expected exception, got none.");
+			
+			// note: I moved loadScenario in the controler from run() into the constructor to mirror the loading sequence one has
+			// when calling new Controler(scenario).  In consequence, it fails already in the constructor; one could stop after that.  
+			// kai, apr'15
+			
 		} catch (RuntimeException e) {
 			log.info("catched expected exception.", e);
 		}
