@@ -74,14 +74,14 @@ public class TransitControler extends Controler {
 
 		if(this.useHeadwayControler){
 			transitEngine.setAbstractTransitDriverFactory(new FixedHeadwayCycleUmlaufDriverFactory());
-			this.events.addHandler(new FixedHeadwayControler(qSim, transitEngine));
+			this.getEvents().addHandler(new FixedHeadwayControler(qSim, transitEngine));
 		}
 
         for (MobsimListener l : this.getMobsimListeners()) {
             qSim.addQueueSimulationListeners(l);
         }
         if (this.useOTFVis) {
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(getConfig(),getScenario(), events, qSim);
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(getConfig(),getScenario(), getEvents(), qSim);
 			OTFClientLive.run(getConfig(), server);
 		}
 		qSim.run();

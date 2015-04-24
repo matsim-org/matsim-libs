@@ -16,7 +16,7 @@ class DESController extends Controler {
 	@Override
 	protected void runMobSim() {
 
-		new JDEQSimulation(this.getScenario(), this.events).run();
+		new JDEQSimulation(this.getScenario(), this.getEvents()).run();
 	}
 
 	public static void main(final String[] args) {

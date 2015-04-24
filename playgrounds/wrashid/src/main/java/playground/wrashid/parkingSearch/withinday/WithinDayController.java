@@ -122,14 +122,14 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	}
 
 	public void createAndInitTravelTimeCollector(Set<String> analyzedModes) {
-		if (this.events == null) {
+		if (this.getEvents() == null) {
 			log.warn("Cannot create and init the TravelTimeCollector. EventsManager has not be initialized yet!");
 			return;
 		}
 		if (travelTimeCollector == null) {
 			travelTimeCollector = new TravelTimeCollector(this.getScenario(), analyzedModes);
 			fosl.addSimulationListener(travelTimeCollector);
-			this.events.addHandler(travelTimeCollector);
+			this.getEvents().addHandler(travelTimeCollector);
 		}
 	}
 
@@ -138,7 +138,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	}
 
 	public void createAndInitActivityReplanningMap() {
-		if (this.events == null) {
+		if (this.getEvents() == null) {
 			log.warn("Cannot create and init the ActivityReplanningMap. EventsManager has not be initialized yet!");
 			return;
 		}
@@ -158,7 +158,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	}
 	
 	public void createAndInitLinkReplanningMap(Map<String, TravelTime> travelTime) {
-		if (this.events == null) {
+		if (this.getEvents() == null) {
 			log.warn("Cannot create and init the LinkReplanningMap. EventsManager has not be initialized yet!");
 			return;
 		}

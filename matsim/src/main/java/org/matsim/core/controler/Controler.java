@@ -105,7 +105,7 @@ public class Controler extends AbstractController {
 	private final Config config; 
 	private final Scenario scenario ;
 
-	protected final EventsManager events;
+	private final EventsManager events;
 
 	private Injector injector;
 	private boolean injectorCreated = false;
@@ -461,16 +461,16 @@ public class Controler extends AbstractController {
 		return this.injector.getInstance(ScoringFunctionFactory.class);
 	}
 
-    public final EventsManager getEvents() {
-		return this.events;
-	}
-
     public final Config getConfig() {
 		return config;
 	}
 
     public final Scenario getScenario() {
 	    return scenario;
+    }
+
+    public final EventsManager getEvents() {
+	    return events;
     }
 
     public final Injector getInjector() {

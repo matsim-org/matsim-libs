@@ -21,7 +21,7 @@ public class EventReadControler extends Controler {
 	public void runMobSim(){
 		//if (buffer == null){
 			// the processing happens during the reading process
-			BufferedEventsReaderTXTv1 reader = new BufferedEventsReaderTXTv1(events);
+			BufferedEventsReaderTXTv1 reader = new BufferedEventsReaderTXTv1(getEvents());
 			reader.readFile(pathToEventsFile);
 			buffer=reader.getBuffer();
 			/*

@@ -87,7 +87,7 @@ public class PControler extends Controler {
 			}
 		}
 		if (this.useOTFVis) {
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(getConfig(),getScenario(), events, simulation);
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(getConfig(),getScenario(), getEvents(), simulation);
 			OTFClientLive.run(getConfig(), server);
 		}
 		simulation.run();

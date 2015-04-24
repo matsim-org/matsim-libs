@@ -505,7 +505,7 @@ public class EvacuationControler extends WithinDayController implements
 			evacuationTimePicture = new EvacuationTimePicture(getScenario(), coordAnalyzer.createInstance(), householdsTracker, mobsimDataProvider);
 			this.addControlerListener(evacuationTimePicture);
 			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
-			this.events.addHandler(evacuationTimePicture);	
+			this.getEvents().addHandler(evacuationTimePicture);	
 		}
 		
 		// Create and add an AgentsInEvacuationAreaCounter.
@@ -515,19 +515,19 @@ public class EvacuationControler extends WithinDayController implements
 					this.decisionDataProvider, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
-			this.events.addHandler(agentsInEvacuationAreaCounter);
+			this.getEvents().addHandler(agentsInEvacuationAreaCounter);
 			
 			agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(this.getScenario(), coordAnalyzer.createInstance(), 
 					this.decisionDataProvider, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaActivityCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaActivityCounter);
-			this.events.addHandler(agentsInEvacuationAreaActivityCounter);
+			this.getEvents().addHandler(agentsInEvacuationAreaActivityCounter);
 			
 			this.agentsReturnHomeCounter = new AgentsReturnHomeCounter(this.getScenario(), analyzedModes, coordAnalyzer.createInstance(), 
 					this.decisionDataProvider, scaleFactor);
 			this.addControlerListener(this.agentsReturnHomeCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsReturnHomeCounter);
-			this.events.addHandler(agentsReturnHomeCounter);
+			this.getEvents().addHandler(agentsReturnHomeCounter);
 		}
 				
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
