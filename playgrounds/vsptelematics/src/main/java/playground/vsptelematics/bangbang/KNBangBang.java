@@ -74,7 +74,7 @@ public class KNBangBang {
 		public RunnableMobsim get() {
 			QSim qsim = QSimUtils.createDefaultQSim( scenario, events ) ;
 			
-//			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouterFactory.get()));
+			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouterFactory.get()));
 			
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qsim);
 			OTFClientLive.run(scenario.getConfig(), server);
@@ -136,18 +136,18 @@ public class KNBangBang {
 		{
 			NetworkChangeEvent event = cef.createNetworkChangeEvent(8*3600.) ;
 			event.addLink( scenario.getNetwork().getLinks().get( accidentLinkId ) ) ;
-			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 0.5 ) ;
+			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 0.1 ) ;
 			event.setFlowCapacityChange(change);
-			ChangeValue lanesChange = new ChangeValue( ChangeType.FACTOR, 0.5 ) ;
+			ChangeValue lanesChange = new ChangeValue( ChangeType.FACTOR, 0.1 ) ;
 			event.setLanesChange(lanesChange);
 			events.add(event) ;
 		}
 		{
 			NetworkChangeEvent event = cef.createNetworkChangeEvent(9*3600.) ;
 			event.addLink( scenario.getNetwork().getLinks().get( accidentLinkId ) );
-			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 2. ) ;
+			ChangeValue change = new ChangeValue( ChangeType.FACTOR, 10. ) ;
 			event.setFlowCapacityChange(change);
-			ChangeValue lanesChange = new ChangeValue( ChangeType.FACTOR, 2. ) ;
+			ChangeValue lanesChange = new ChangeValue( ChangeType.FACTOR, 10. ) ;
 			event.setLanesChange(lanesChange);
 			events.add(event) ;
 		}
