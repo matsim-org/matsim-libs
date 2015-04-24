@@ -93,7 +93,7 @@ public class InputsForFDTestSetUp {
 			config.qsim().setLinkDynamics(LinkDynamics.PassingQ.toString());
 		}
 		if(GenerateFundamentalDiagramData.WITH_HOLES){
-			config.qsim().setTrafficDynamics(QSimConfigGroup.withHoles);
+			config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
 			config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_WITH_HOLES);
 			config.setParam("WITH_HOLE", "HOLE_SPEED", GenerateFundamentalDiagramData.HOLE_SPEED);
 		}

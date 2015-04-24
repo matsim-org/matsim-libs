@@ -115,25 +115,25 @@ public class GenerateFundamentalDiagramData {
 
 	public static void main(String[] args) {
 
-		String RUN_DIR = "../../../repos/shared-svn/projects/mixedTraffic/seepage/";
+		String RUN_DIR = "../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/qsim";
 
-		String OUTPUT_FOLDER ="/fd/carBike_holes_9C4B/seepage/";
+		String OUTPUT_FOLDER ="/singleModes/motorbike/";
 		// seepageAllowed, runDir, useHoles, useModifiedNetworkFactory, hole speed, distribution
 
-		String [] travelModes= {"car","bike"};
-		Double [] modalSplit = {9.,1.}; // in pcu
+		String [] travelModes= {"motorbike"};
+		Double [] modalSplit = {1.}; // in pcu
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
-
+		
 		generateFDData.setTravelModes(travelModes);
 		generateFDData.setModalSplit(modalSplit);
 		generateFDData.setPassingAllowed(true);
-		generateFDData.setSeepageAllowed(true);
+		generateFDData.setSeepageAllowed(false);
 		generateFDData.setIsWritingFinalFdData(true);
 		generateFDData.setWriteInputFiles(true);
 		generateFDData.setRunDirectory(RUN_DIR+OUTPUT_FOLDER);
-		generateFDData.setUseHoles(true);
-		generateFDData.setReduceDataPointsByFactor(1);
+		generateFDData.setUseHoles(false);
+		generateFDData.setReduceDataPointsByFactor(20);
 		generateFDData.setUsingSeepNetworkFactory(true);
 		//		HOLE_SPEED = args[4];
 		generateFDData.setIsPlottingDistribution(false);
@@ -171,6 +171,7 @@ public class GenerateFundamentalDiagramData {
 		inputs = new InputsForFDTestSetUp();
 		inputs.run();
 		scenario = inputs.getScenario();
+		
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 
 		if(WRITE_FD_DATA) openFileAndWriteHeader(RUN_DIR+"/data.txt");

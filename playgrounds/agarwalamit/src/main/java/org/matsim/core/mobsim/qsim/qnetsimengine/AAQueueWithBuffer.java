@@ -260,9 +260,9 @@ final class AAQueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		//following are copied part from QNetSimEngine instead of copying the whole class.
 		QSimConfigGroup qsimConfigGroup = qsimConfig;
-		if ( QSimConfigGroup.queue.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+		if ( QSimConfigGroup.TrafficDynamics.queue.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			AAQueueWithBuffer.HOLES=false ;
-		} else if ( QSimConfigGroup.withHoles.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+		} else if ( QSimConfigGroup.TrafficDynamics.withHoles.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			AAQueueWithBuffer.HOLES = true ;
 		} else {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
