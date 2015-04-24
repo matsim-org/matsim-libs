@@ -23,14 +23,11 @@ import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.util.Solutions;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.controler.CarrierModule;
 import org.matsim.contrib.freight.jsprit.MatsimJspritFactory;
@@ -40,21 +37,20 @@ import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.contrib.freight.replanning.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
-import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.replanning.GenericStrategyManager;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -97,7 +93,7 @@ public class KTFreight_v2 {
 
 	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/ScoringToll1/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/toll2/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
@@ -155,8 +151,8 @@ public class KTFreight_v2 {
 
 		// ### config stuff: ###	
 		Config config = createConfig(args);
-		//		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
-		//		AbstractController.checkConfigConsistencyAndWriteToLog(config, "dump");
+				config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
+				ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "dump");
 		textInfofile = new WriteTextToFile(new File(TEMP_DIR + "#TextInformation.txt"), null);
 		
 		if ( addingCongestion ) { //erst config vorbereiten....Config ist fix, sobald in Scenario!!!! KT, 11.12.14

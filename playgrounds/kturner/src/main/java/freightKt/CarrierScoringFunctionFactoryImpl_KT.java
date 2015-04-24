@@ -251,16 +251,19 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 		public void finish() {	
 			moneyWriter.writeCarrierLine(carrier);
 //			moneyWriter.writeAmountsToFile();
+			moneyWriter.writeTextLineToFile("finish aufgerufen");
 			moneyWriter.writeTextLineToFile(System.getProperty("line.separator"));
 		}
 
 		@Override
 		public double getScore() {
+			moneyWriter.writeTextLineToFile("get Score aufgerufen");
 			return this.score;
 		}
 
 		@Override
 		public void addMoney(double amount) {
+			moneyWriter.writeTextLineToFile("add-Money aufgerufen");
 			moneyWriter.writeMoneyToFile(amount);
 //			moneyWriter.addAmountToWriter(amount); 
 			score += (-1)* amount;			
