@@ -44,6 +44,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signals.mobsim.DefaultSignalizeableItem;
+import org.matsim.signals.mobsim.SignalizeableItem;
 import org.matsim.signals.model.SignalGroupState;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -64,7 +65,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  *
  * @author nagel
  */
-final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsim.SignalizeableItem {
+final class AAQueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private static final Logger log = Logger.getLogger( AAQueueWithBuffer.class ) ;
 
 	/**
@@ -232,7 +233,7 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 
 	private AAQueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> id, 
 			double length, double effectiveNumberOfLanes, double flowCapacity_s) {
-		this.id = id;
+		this.id = id ;
 		this.qLink = qLinkImpl;
 		this.link = qLinkImpl.link ;
 		this.network = qLinkImpl.network ;
@@ -285,7 +286,9 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 		this.calculateFlowCapacity();
 		this.calculateStorageCapacity();
 
-		if(!this.newCapacityUpdate){
+		if(this.newCapacityUpdate){
+			flowcap_accumulate.setValue(flowCapacityPerTimeStep);
+		} else{
 			flowcap_accumulate.setValue((flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0) );
 		}
 		
@@ -366,7 +369,7 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 
 	private void updateFlowAccumulation(final double now){
 		
-		if(this.newCapacityUpdate && this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() < 0 ){
+		if( this.flowcap_accumulate.getTimeStep() < now && this.flowcap_accumulate.getValue() < 0 && isNotOfferingVehicle() ){
 			
 			double flowCapSoFar = flowcap_accumulate.getValue();
 			double newStoredFlowCap = (now - flowcap_accumulate.getTimeStep()) * flowCapacityPerTimeStep;
@@ -400,8 +403,6 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 				* network.simEngine.getMobsim().getScenario().getConfig().qsim().getFlowCapFactor();
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
 		flowCapacityPerTimeStepFractionalPart = flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep;
-		
-		if(this.newCapacityUpdate) flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 	}
 
 	private void calculateStorageCapacity() {
@@ -515,7 +516,7 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 
 		QVehicle veh = pollFromVehQueue(veh2Remove); 
 
-		if(isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
+		if(seepageAllowed && isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
 
 		} else {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
@@ -547,8 +548,6 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 	@Override
 	public final boolean isActive() {
 		if(this.newCapacityUpdate){
-			double 	now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
-			updateFlowAccumulation(now);
 			
 		return /*(this.flowcap_accumulate.getValue() < 0.0) // still accumulating, thus active
 				|| */ (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
@@ -643,6 +642,7 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
+		flowcap_accumulate.timeStep = bufferLastMovedTime-1;
 		return veh;
 	}
 
@@ -900,7 +900,7 @@ final class AAQueueWithBuffer extends QLaneI implements org.matsim.signals.mobsi
 
 			while(it.hasNext()){
 				QVehicle veh = newVehQueue.poll(); 
-				if( veh.getDriver()!=null && veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals(seepMode) ) {
+				if( veh.getEarliestLinkExitTime()<=now && veh.getDriver().getMode().equals(seepMode) ) {
 					returnVeh = veh;
 					break;
 				}
