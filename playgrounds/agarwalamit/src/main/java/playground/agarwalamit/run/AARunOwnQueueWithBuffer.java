@@ -6,6 +6,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class AARunOwnQueueWithBuffer {
@@ -17,7 +18,7 @@ public class AARunOwnQueueWithBuffer {
 		
 		Controler controler = new Controler( scenario ) ;
 		
-		MobsimFactory mobsimFactory = new SeepageMobsimfactory() ; 
+		MobsimFactory mobsimFactory = new SeepageMobsimfactory(QueueWithBufferType.amit) ; 
 
 		controler.setMobsimFactory(mobsimFactory);
 		
