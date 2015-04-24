@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -35,6 +36,7 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -51,13 +53,56 @@ public class AccessibilityRunTest {
 	private static final double cellSize = 1000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	
+	
+//	@SuppressWarnings("static-method")
+//	@Test
+//	public void doTest() {
+//		System.out.println("available ram: " + (Runtime.getRuntime().maxMemory() / 1024/1024));
+//
+//		final String FN = "matsimExamples/tutorial/lesson-3/network.xml" ;
+//
+//		Config config = ConfigUtils.createConfig();
+//		Scenario sc = ScenarioUtils.createScenario( config ) ;
+//
+//		try {
+//			new MatsimNetworkReader(sc).readFile(FN);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		try {
+//			new MatsimNetworkReader(sc).readFile("../" + FN);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		try {
+//			new MatsimNetworkReader(sc).readFile("../../" + FN);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		try {
+//			new MatsimNetworkReader(sc).readFile("../../../" + FN);
+//			// this is the one that works locally
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//
+//		Assert.assertTrue(true);
+//	}
+	
 
 	@Test
 	public void doAccessibilityTest() {
-		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
-		String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
-		String minibusPtTravelMatrix = "../../matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelmatrix.csv.gz";
-		String measuringPointsAsPtStops = "../../matsimExamples/countries/za/nmbm/minibus-pt/measuringPointsAsStops.csv.gz";
+//		String folderStructure = "../../"; // local
+		String folderStructure = "../../../"; // server
+			
+		String networkFile = folderStructure + "matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
+		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
+		String minibusPtTravelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
+		String minibusPtTravelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
+		String measuringPointsAsPtStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/measuringPointsAsStops/stops.csv.gz";
+
 
 //		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
@@ -90,11 +135,9 @@ public class AccessibilityRunTest {
 //		scenario.getConfig().scenario().setUseTransit(true);
 		
 		mbpcg.setUsingTravelTimesAndDistances(true);
-		mbpcg.setPtTravelTimesInputFile(minibusPtTravelMatrix);
 		mbpcg.setPtStopsInputFile(measuringPointsAsPtStops);
-		
-		// TODO set the proper file here
-		mbpcg.setPtTravelDistancesInputFile(minibusPtTravelMatrix);
+		mbpcg.setPtTravelTimesInputFile(minibusPtTravelTimeMatrix);
+		mbpcg.setPtTravelDistancesInputFile(minibusPtTravelDistanceMatrix);
 		
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
         
@@ -103,9 +146,9 @@ public class AccessibilityRunTest {
         System.out.println("beeline distance factors (1): " + plansCalcRoute.getBeelineDistanceFactors());
           
         // teleported mode speed for pt also required, see PtMatrix:120
-        ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
-        ptParameters.setTeleportedModeSpeed(50./3.6);
-        plansCalcRoute.addModeRoutingParams(ptParameters );
+//        ModeRoutingParams ptParameters = new ModeRoutingParams(TransportMode.pt);
+//        ptParameters.setTeleportedModeSpeed(50./3.6);
+//        plansCalcRoute.addModeRoutingParams(ptParameters );
         
         // by adding ModeRoutingParams (as done above for pt), the other parameters are deleted
         // those parameters which are needed, have to be set again to be available.
