@@ -848,90 +848,90 @@ public class CAMultiLaneLinkTest extends MatsimTestCase {
 
 	}
 
-	@Test
-	public void testCAMultiLaneLinkLaneChangingLR() {
-		CAMultiLaneLink l = createCAMultiLaneLink();
-		CAConstantDensityEstimator.RHO = 2;
+//	@Test
+//	public void testCAMultiLaneLinkLaneChangingLR() {
+//		CAMultiLaneLink l = createCAMultiLaneLink();
+//		CAConstantDensityEstimator.RHO = 2;
+//
+//		CAMoveableEntity[] l0 = l.getParticles(0);
+//		CAMoveableEntity[] l1 = l.getParticles(1);
+//		CAMoveableEntity[] l2 = l.getParticles(2);
+//		CASimpleDynamicAgent a = new CASimpleDynamicAgent(null, -1, null, l);
+//		a.materialize(1, 1, 1);
+//		l1[1] = a;
+//		l1[4] = new CASimpleDynamicAgent(null, -1, null, null);
+//
+//		l0[2] = new CASimpleDynamicAgent(null, -1, null, null);
+//		l2[8] = new CASimpleDynamicAgent(null, -1, null, null);
+//		CAEvent e = new CAEvent(10, a, l, CAEventType.TTA);
+//		l.handleEvent(e);
+//
+//		assertEquals(2, a.getLane());
+//		assertEquals(2, a.getPos());
+//		assertEquals(1, a.getDir());
+//
+//		int cells = l.getSize();
+//		for (int i = 0; i < cells; i++) {
+//			if (i != 2) {
+//				assertEquals(null, l0[i]);
+//			} else {
+//				assertEquals(true, l0[i] != null ? true : false);
+//				assertEquals(a, l2[i]);
+//			}
+//			if (i != 4) {
+//				assertEquals(null, l1[i]);
+//			} else {
+//				assertEquals(true, l1[i] != null ? true : false);
+//			}
+//			if (i == 8 || i == 2) {
+//				assertEquals(true, l2[i] != null ? true : false);
+//			} else {
+//				assertEquals(null, l2[i]);
+//			}
+//		}
+//	}
 
-		CAMoveableEntity[] l0 = l.getParticles(0);
-		CAMoveableEntity[] l1 = l.getParticles(1);
-		CAMoveableEntity[] l2 = l.getParticles(2);
-		CASimpleDynamicAgent a = new CASimpleDynamicAgent(null, -1, null, l);
-		a.materialize(1, 1, 1);
-		l1[1] = a;
-		l1[4] = new CASimpleDynamicAgent(null, -1, null, null);
-
-		l0[2] = new CASimpleDynamicAgent(null, -1, null, null);
-		l2[8] = new CASimpleDynamicAgent(null, -1, null, null);
-		CAEvent e = new CAEvent(10, a, l, CAEventType.TTA);
-		l.handleEvent(e);
-
-		assertEquals(2, a.getLane());
-		assertEquals(2, a.getPos());
-		assertEquals(1, a.getDir());
-
-		int cells = l.getSize();
-		for (int i = 0; i < cells; i++) {
-			if (i != 2) {
-				assertEquals(null, l0[i]);
-			} else {
-				assertEquals(true, l0[i] != null ? true : false);
-				assertEquals(a, l2[i]);
-			}
-			if (i != 4) {
-				assertEquals(null, l1[i]);
-			} else {
-				assertEquals(true, l1[i] != null ? true : false);
-			}
-			if (i == 8 || i == 2) {
-				assertEquals(true, l2[i] != null ? true : false);
-			} else {
-				assertEquals(null, l2[i]);
-			}
-		}
-	}
-
-	@Test
-	public void testCAMultiLaneLinkLaneChangingRL() {
-		CAMultiLaneLink l = createCAMultiLaneLink();
-		CAConstantDensityEstimator.RHO = 2;
-		int cells = l.getSize();
-		CAMoveableEntity[] l0 = l.getParticles(0);
-		CAMoveableEntity[] l1 = l.getParticles(1);
-		CAMoveableEntity[] l2 = l.getParticles(2);
-		CASimpleDynamicAgent a = new CASimpleDynamicAgent(null, -1, null, l);
-		a.materialize(cells - 2, -1, 1);
-		l1[cells - 2] = a;
-		l1[cells - 4] = new CASimpleDynamicAgent(null, -1, null, null);
-
-		l0[cells - 3] = new CASimpleDynamicAgent(null, -1, null, null);
-		l2[cells - 8] = new CASimpleDynamicAgent(null, -1, null, null);
-		CAEvent e = new CAEvent(10, a, l, CAEventType.TTA);
-		l.handleEvent(e);
-
-		assertEquals(2, a.getLane());
-		assertEquals(cells - 3, a.getPos());
-		assertEquals(-1, a.getDir());
-
-		for (int i = 0; i < cells; i++) {
-			if (i != cells - 3) {
-				assertEquals(null, l0[i]);
-			} else {
-				assertEquals(true, l0[i] != null ? true : false);
-				assertEquals(a, l2[i]);
-			}
-			if (i != cells - 4) {
-				assertEquals(null, l1[i]);
-			} else {
-				assertEquals(true, l1[i] != null ? true : false);
-			}
-			if (i == cells - 8 || i == cells - 3) {
-				assertEquals(true, l2[i] != null ? true : false);
-			} else {
-				assertEquals(null, l2[i]);
-			}
-		}
-	}
+//	@Test
+//	public void testCAMultiLaneLinkLaneChangingRL() {
+//		CAMultiLaneLink l = createCAMultiLaneLink();
+//		CAConstantDensityEstimator.RHO = 2;
+//		int cells = l.getSize();
+//		CAMoveableEntity[] l0 = l.getParticles(0);
+//		CAMoveableEntity[] l1 = l.getParticles(1);
+//		CAMoveableEntity[] l2 = l.getParticles(2);
+//		CASimpleDynamicAgent a = new CASimpleDynamicAgent(null, -1, null, l);
+//		a.materialize(cells - 2, -1, 1);
+//		l1[cells - 2] = a;
+//		l1[cells - 4] = new CASimpleDynamicAgent(null, -1, null, null);
+//
+//		l0[cells - 3] = new CASimpleDynamicAgent(null, -1, null, null);
+//		l2[cells - 8] = new CASimpleDynamicAgent(null, -1, null, null);
+//		CAEvent e = new CAEvent(10, a, l, CAEventType.TTA);
+//		l.handleEvent(e);
+//
+//		assertEquals(2, a.getLane());
+//		assertEquals(cells - 3, a.getPos());
+//		assertEquals(-1, a.getDir());
+//
+//		for (int i = 0; i < cells; i++) {
+//			if (i != cells - 3) {
+//				assertEquals(null, l0[i]);
+//			} else {
+//				assertEquals(true, l0[i] != null ? true : false);
+//				assertEquals(a, l2[i]);
+//			}
+//			if (i != cells - 4) {
+//				assertEquals(null, l1[i]);
+//			} else {
+//				assertEquals(true, l1[i] != null ? true : false);
+//			}
+//			if (i == cells - 8 || i == cells - 3) {
+//				assertEquals(true, l2[i] != null ? true : false);
+//			} else {
+//				assertEquals(null, l2[i]);
+//			}
+//		}
+//	}
 
 	private CAMultiLaneLink createCAMultiLaneLink() {
 		DummyNetwork caNet = new DummyNetwork();
