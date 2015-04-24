@@ -239,7 +239,7 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * get number of threads from config file
 		 */
-		this.setNumberOfReplanningThreads(this.config.global().getNumberOfThreads());
+		this.setNumberOfReplanningThreads(this.getConfig().global().getNumberOfThreads());
 		
 		/*
 		 * Create and initialize replanning manager and replanning maps.
@@ -264,13 +264,13 @@ public class EvacuationControler extends WithinDayController implements
 			 * is created. Since we need one, we enable transit, call getTransitSchedule
 			 * (which triggers the creation in the scenario) and disable transit again.
 			 */
-			if (!config.scenario().isUseTransit()) {
-				config.scenario().setUseTransit(true);
+			if (!getConfig().scenario().isUseTransit()) {
+				getConfig().scenario().setUseTransit(true);
 				scenarioData.getTransitSchedule();
-				config.scenario().setUseTransit(false);
+				getConfig().scenario().setUseTransit(false);
 			}
 			
-			new TransitScheduleReader(scenarioData).readFile(config.transit().getTransitScheduleFile());
+			new TransitScheduleReader(scenarioData).readFile(getConfig().transit().getTransitScheduleFile());
 			routerNetwork = new TransitRouterNetwork();
 			new TransitRouterNetworkReaderMatsimV1(scenarioData, routerNetwork).parse(EvacuationConfig.transitRouterFile);
 		}
@@ -293,7 +293,7 @@ public class EvacuationControler extends WithinDayController implements
 
 		MobsimDataProvider mobsimDataProvider = new MobsimDataProvider();
 		
-		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
+		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
         if (!NetworkUtils.isMultimodal(getScenario().getNetwork())) {
             new MultiModalNetworkCreator(multiModalConfigGroup).run(getScenario().getNetwork());
 		}
@@ -307,8 +307,8 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * Use advanced walk-, bike and pt travel time calculators
 		 */
-		this.walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).get();
-		this.bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).get();
+		this.walkTravelTime = new WalkTravelTimeFactory(this.getConfig().plansCalcRoute()).get();
+		this.bikeTravelTime = new BikeTravelTimeFactory(this.getConfig().plansCalcRoute()).get();
 		
 		// TODO: fix this.
 //		TravelTimeFactory ptFactory;
@@ -353,7 +353,7 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
 		 */
-		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getLinkTravelTimes(), this.config.planCalcScore());
+		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getLinkTravelTimes(), this.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getLinkTravelTimes());
 
 
@@ -376,8 +376,8 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * Adapt walk- and bike speed according to car speed reduction.
 		 */
-		this.config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, this.config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * EvacuationConfig.speedFactor);
-		this.config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, this.config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike) * EvacuationConfig.speedFactor);
+		this.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, this.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * EvacuationConfig.speedFactor);
+		this.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, this.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike) * EvacuationConfig.speedFactor);
 		
 		// load household object attributes
 		this.householdObjectAttributes = new ObjectAttributes();
@@ -445,7 +445,7 @@ public class EvacuationControler extends WithinDayController implements
 		 * Create vehicles for households and add them to the scenario.
 		 * When useVehicles is set to true, the scenario creates a Vehicles container if necessary.
 		 */
-		this.config.scenario().setUseVehicles(true);
+		this.getConfig().scenario().setUseVehicles(true);
 		createVehiclesForHouseholds = new CreateVehiclesForHouseholds(this.scenarioData, this.householdVehicleAssignmentReader.getAssignedVehicles());
 		createVehiclesForHouseholds.run();
 		
@@ -510,7 +510,7 @@ public class EvacuationControler extends WithinDayController implements
 		
 		// Create and add an AgentsInEvacuationAreaCounter.
 		if (EvacuationConfig.countAgentsInEvacuationArea) {
-			double scaleFactor = 1 / this.config.qsim().getFlowCapFactor();
+			double scaleFactor = 1 / this.getConfig().qsim().getFlowCapFactor();
 			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, analyzedModes, coordAnalyzer.createInstance(), 
 					this.decisionDataProvider, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaCounter);
@@ -572,7 +572,7 @@ public class EvacuationControler extends WithinDayController implements
 	 */
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (event.getIteration() == this.config.controler().getFirstIteration()) {
+		if (event.getIteration() == this.getConfig().controler().getFirstIteration()) {
 			this.assignVehiclesToPlans.reassignVehicles();
 		}
 	}
@@ -725,7 +725,7 @@ public class EvacuationControler extends WithinDayController implements
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		TravelDisutilityFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, penaltyCalculator);
 
-        LeastCostPathCalculatorFactory nonPanicFactory = new FastAStarLandmarksFactory(getScenario().getNetwork(), new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
+        LeastCostPathCalculatorFactory nonPanicFactory = new FastAStarLandmarksFactory(getScenario().getNetwork(), new FreespeedTravelTimeAndDisutility(this.getConfig().planCalcScore()));
 		LeastCostPathCalculatorFactory panicFactory = new RandomCompassRouterFactory(EvacuationConfig.tabuSearch, EvacuationConfig.compassProbability);
 		LeastCostPathCalculatorFactory factory = new LeastCostPathCalculatorSelectorFactory(nonPanicFactory, panicFactory, this.decisionDataProvider);
 		

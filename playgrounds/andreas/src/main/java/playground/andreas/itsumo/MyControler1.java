@@ -300,10 +300,10 @@ public class MyControler1 extends Controler {
 			driversLog.renameTo(eventsFile);
 
 			Events2Snapshot events2Snapshot = new org.matsim.run.Events2Snapshot();
-            events2Snapshot.run(eventsFile, this.config, getScenario().getNetwork());
+            events2Snapshot.run(eventsFile, this.getConfig(), getScenario().getNetwork());
 
 			// Run NetVis if possible
-			if (this.config.getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
+			if (this.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
 				String[] visargs = {"./output/vis/Snapshot"};
 				// NetVis.main(visargs);
 			}

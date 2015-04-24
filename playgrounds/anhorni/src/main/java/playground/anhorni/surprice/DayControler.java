@@ -46,7 +46,7 @@ public class DayControler extends Controler {
 
         this.setScoringFunctionFactory(
 				new SurpriceScoringFunctionFactory(
-			  			this, this.config.planCalcScore(), getScenario().getNetwork(), this.memories, this.day, this.preferences)
+			  			this, this.getConfig().planCalcScore(), getScenario().getNetwork(), this.memories, this.day, this.preferences)
 				);
 	} 
 				
@@ -69,14 +69,14 @@ public class DayControler extends Controler {
 	  	this.addControlerListener(new ModeSharesControlerListener("distances"));  	
 	  	this.addControlerListener(new AgentAnalysisShutdownListener(this.day, this.getControlerIO().getOutputPath()));
 	  	
-	  	if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
+	  	if (Boolean.parseBoolean(this.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
 	  		this.addControlerListener(new RoadPricing(this.preferences));
 		}
-	  	double stoppingCriterionVal = Double.parseDouble(this.config.findParam(Surprice.SURPRICE_RUN, "stoppingCriterionVal"));
+	  	double stoppingCriterionVal = Double.parseDouble(this.getConfig().findParam(Surprice.SURPRICE_RUN, "stoppingCriterionVal"));
 	  	if (stoppingCriterionVal > 0.0) {	
 	  		this.setTermination(stoppingCriterionVal);
 	  	}
-	  	if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "warmstart"))) {
+	  	if (Boolean.parseBoolean(this.getConfig().findParam(Surprice.SURPRICE_RUN, "warmstart"))) {
 	  		this.addControlerListener(new AdaptNextDay(this.populationPreviousDay));
 	  	}
 	}

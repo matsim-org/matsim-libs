@@ -80,8 +80,8 @@ public class RunControlerMATSim2030 extends Controler {
 		super.setScoringFunctionFactory(dcScoringFunctionFactory);
 		dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);		
 		
-		TransitRouterConfig conf = new TransitRouterConfig(super.config);
-		NewTransitRouterImplFactory factory = new NewTransitRouterImplFactory(super.scenarioData.getTransitSchedule(), conf, this.config);
+		TransitRouterConfig conf = new TransitRouterConfig(super.getConfig());
+		NewTransitRouterImplFactory factory = new NewTransitRouterImplFactory(super.scenarioData.getTransitSchedule(), conf, this.getConfig());
 		
 		
 		
@@ -104,7 +104,7 @@ public class RunControlerMATSim2030 extends Controler {
 		 */
 		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
 		mmcg.setSimulatedModes("");
-		config.addModule(mmcg);
+		getConfig().addModule(mmcg);
 		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(this.getScenario(), leastCostPathCalculatorFactory);
 		TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(this.getScenario(), defaultDelegateFactory, 
 				factory);

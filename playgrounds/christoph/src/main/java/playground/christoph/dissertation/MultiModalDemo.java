@@ -663,10 +663,10 @@ public class MultiModalDemo {
 			super.setUp();
 			
 			TravelTime carTravelTime = this.getLinkTravelTimes();
-			TravelTime bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).get();
-			TravelTime walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).get();
+			TravelTime bikeTravelTime = new BikeTravelTimeFactory(this.getConfig().plansCalcRoute()).get();
+			TravelTime walkTravelTime = new WalkTravelTimeFactory(this.getConfig().plansCalcRoute()).get();
 			
-			int timeSlice = this.config.travelTimeCalculator().getTraveltimeBinSize();
+			int timeSlice = this.getConfig().travelTimeCalculator().getTraveltimeBinSize();
 			int maxTime = 30 * 3600;
 			WaitToLinkCalculator waitToLinkCalculator = new WaitToLinkCalculator(timeSlice, maxTime);
 			this.getEvents().addHandler(waitToLinkCalculator);

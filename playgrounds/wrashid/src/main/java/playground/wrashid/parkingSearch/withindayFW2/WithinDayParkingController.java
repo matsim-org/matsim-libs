@@ -88,15 +88,15 @@ public class WithinDayParkingController extends WithinDayController implements R
 		
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.config.plansCalcRoute()));
+		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, this.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.getConfig().plansCalcRoute()));
 		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
 		
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 		
-		RoutingContext routingContext = new RoutingContextImpl(costFactory, super.getTravelTimeCollector(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(costFactory, super.getTravelTimeCollector(), this.getConfig().planCalcScore());
 		
 		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), this.scenarioData, parkingAgentsTracker,
 				this.getWithinDayTripRouterFactory(), routingContext);
@@ -109,7 +109,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 
 
 		// connect facilities to network
-		new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
+		new WorldConnectLocations(this.getConfig()).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
 
 		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
@@ -141,7 +141,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.getConfig().planCalcScore());
 
 		insertParkingActivities = new InsertParkingActivities(scenarioData, this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
 

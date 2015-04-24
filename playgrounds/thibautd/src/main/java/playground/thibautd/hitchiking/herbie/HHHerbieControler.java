@@ -57,7 +57,7 @@ public class HHHerbieControler extends HitchHikingControler {
 			final Scenario scenario,
 			final SpotWeighter weighter) {
 		super( scenario , weighter );
-		herbieConfigGroup = (HerbieConfigGroup) super.config.getModule(HerbieConfigGroup.GROUP_NAME);
+		herbieConfigGroup = (HerbieConfigGroup) super.getConfig().getModule(HerbieConfigGroup.GROUP_NAME);
         addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -94,7 +94,7 @@ public class HHHerbieControler extends HitchHikingControler {
 
         HerbiePlanBasedScoringFunctionFactory herbieScoringFunctionFactory =
 			new HerbiePlanBasedScoringFunctionFactory(
-				super.config,
+				super.getConfig(),
 				this.herbieConfigGroup,
 				facPenalties.getFacilityPenalties(),
                     getScenario().getActivityFacilities(),
@@ -117,10 +117,10 @@ public class HHHerbieControler extends HitchHikingControler {
 				new HerbieTransitRouterFactory( 
 					getScenario().getTransitSchedule(),
 					new TransitRouterConfig(
-						config.planCalcScore(),
-						config.plansCalcRoute(),
-						config.transitRouter(),
-						config.vspExperimental()),
+						getConfig().planCalcScore(),
+						getConfig().plansCalcRoute(),
+						getConfig().transitRouter(),
+						getConfig().vspExperimental()),
 					herbieConfigGroup,
 					new TravelScoringFunction( params, herbieConfigGroup ) ) );
 

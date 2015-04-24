@@ -77,9 +77,9 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 			 * The KTIConfigGroup is loaded as generic Module. We replace this
 			 * generic object with a KtiConfigGroup object and copy all its parameter.
 			 */
-			ConfigGroup module = this.config.getModule(KtiConfigGroup.GROUP_NAME);
-			this.config.removeModule(KtiConfigGroup.GROUP_NAME);
-			this.config.addModule(this.ktiConfigGroup);
+			ConfigGroup module = this.getConfig().getModule(KtiConfigGroup.GROUP_NAME);
+			this.getConfig().removeModule(KtiConfigGroup.GROUP_NAME);
+			this.getConfig().addModule(this.ktiConfigGroup);
 			
 			for (Entry<String, String> entry : module.getParams().entrySet()) {
 				this.ktiConfigGroup.addParam(entry.getKey(), entry.getValue());
@@ -94,19 +94,19 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 			
 			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
 			loader.loadScenario();
-			if (this.config.scenario().isUseHouseholds()) {
+			if (this.getConfig().scenario().isUseHouseholds()) {
 				this.loadHouseholds();
 			}
 			this.setScenarioLoaded(true);
 		}
 		
 		// connect facilities to links
-        new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
+        new WorldConnectLocations(this.getConfig()).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
 	}
 	
 	private void loadHouseholds() {
-		if ((this.scenarioData.getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
-			String hhFileName = this.config.households().getInputFile();
+		if ((this.scenarioData.getHouseholds() != null) && (this.getConfig().households() != null) && (this.getConfig().households().getInputFile() != null) ) {
+			String hhFileName = this.getConfig().households().getInputFile();
 			log.info("loading households from " + hhFileName);
 			new HouseholdsReaderV10(this.scenarioData.getHouseholds()).parse(hhFileName);
 			log.info("households loaded.");

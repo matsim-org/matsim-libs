@@ -70,10 +70,10 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		// TravelTimeCollector for car mode
 		
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.config.plansCalcRoute()));
+		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, this.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.getConfig().plansCalcRoute()));
 
 		// travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
 		// Only the "non-simulated" modes handled by the multimodal extension should go in there.
@@ -81,7 +81,7 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
 		this.initWithinDayTripRouterFactory();
 		
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.getConfig().planCalcScore());
 		
 		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenarioData, travelTimes,
 				this.getTravelDisutilityFactory());

@@ -89,7 +89,7 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
 		this.initWithinDayTripRouterFactory();
 		
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.getConfig().planCalcScore());
 		
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),

@@ -49,7 +49,7 @@ public class TRBControler extends Controler {
 	      super.setUp();
 	      
 	      TRBScoringFunctionFactory trbScoringFunctionFactory =
-	  			new TRBScoringFunctionFactory(this.config.planCalcScore(), this);
+	  			new TRBScoringFunctionFactory(this.getConfig().planCalcScore(), this);
 	  		this.setScoringFunctionFactory(trbScoringFunctionFactory);
 
 	  		this.addControlerListener(new FacilitiesLoadCalculator(((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties()));

@@ -295,11 +295,11 @@ public class BetaTravelTest extends MatsimTestCase {
 			StrategyManager manager = new StrategyManager();
 			manager.setMaxPlansPerAgent(5);
 
-			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.planCalcScore()));
+			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.getConfig().planCalcScore()));
 			manager.addStrategyForDefaultSubpopulation(strategy1, 0.80);
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(this.config.global().getNumberOfThreads()));
+			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(this.getConfig().global().getNumberOfThreads()));
 			manager.addStrategyForDefaultSubpopulation(strategy2, 0.80);
 
 			// reduce the replanning probabilities over the iterations

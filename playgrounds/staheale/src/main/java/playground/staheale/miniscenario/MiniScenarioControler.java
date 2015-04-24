@@ -67,7 +67,7 @@ public class MiniScenarioControler extends Controler {
 
 		this.getConfig().setParam("locationchoice", "restraintFcnFactor", "0.0");
 
-		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.config.getModule("locationchoice"));
+		ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler((DestinationChoiceConfigGroup) this.getConfig().getModule("locationchoice"));
 		ScaleEpsilon scaleEpsilon = defineFlexibleActivities.createScaleEpsilon();
 
 		ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
@@ -81,7 +81,7 @@ public class MiniScenarioControler extends Controler {
         Network network = getScenario().getNetwork();
 
 		// create the AgentInteractionScoringFunctionFactory
-		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(this, this.config, planCalcScoreConfigGroup,
+		AgentInteractionScoringFunctionFactory factory = new AgentInteractionScoringFunctionFactory(this, this.getConfig(), planCalcScoreConfigGroup,
 				facilities, network, Double.parseDouble(this.getConfig().findParam("locationchoice", "scaleFactor")),
 				facilityOccupancies, attributes, scaleEpsilon, actTypeConverter,
 				defineFlexibleActivities.getFlexibleTypes());
@@ -93,7 +93,7 @@ public class MiniScenarioControler extends Controler {
 
 		addControlerListener(new FacilitiesOccupancyCalculator(this.facilityOccupancies, AgentInteraction.numberOfTimeBins, AgentInteraction.scaleNumberOfPersons));
 
-		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter, "car"));
-		this.addControlerListener(new DistanceStats(this.config, "best", "l", actTypeConverter, "car"));
+		this.addControlerListener(new DistanceStats(this.getConfig(), "best", "s", actTypeConverter, "car"));
+		this.addControlerListener(new DistanceStats(this.getConfig(), "best", "l", actTypeConverter, "car"));
 	}
 }

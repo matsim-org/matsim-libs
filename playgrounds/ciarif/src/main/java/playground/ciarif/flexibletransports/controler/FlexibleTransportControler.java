@@ -56,7 +56,7 @@ public final class FlexibleTransportControler extends Controler
    super(args);
 //
    //super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
-   super.config.addModule(this.ftConfigGroup);
+   super.getConfig().addModule(this.ftConfigGroup);
 //
       ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.car, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
       ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.pt, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
@@ -83,7 +83,7 @@ public final class FlexibleTransportControler extends Controler
 //    }
 
       FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
-      this.config, 
+      this.getConfig(), 
       this.ftConfigGroup, 
       ((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
               getScenario().getActivityFacilities(), getScenario().getNetwork());

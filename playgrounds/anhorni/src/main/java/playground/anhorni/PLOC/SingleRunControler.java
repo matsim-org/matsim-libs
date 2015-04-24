@@ -73,10 +73,10 @@ public class SingleRunControler extends Controler {
       if (this.day > -1) super.addControlerListener(new ShoppingCalculator(this.personAttributes, this.tempVar, this.day));
       
       ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(
-    		  (DestinationChoiceConfigGroup) this.config.getModule("locationchoice"));
+    		  (DestinationChoiceConfigGroup) this.getConfig().getModule("locationchoice"));
 	  ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
             
-		this.addControlerListener(new DistanceStats(this.config, "best", "s", actTypeConverter, "car"));
+		this.addControlerListener(new DistanceStats(this.getConfig(), "best", "s", actTypeConverter, "car"));
 		
 		throw new RuntimeException("integrate LC with listener!");
 	}  

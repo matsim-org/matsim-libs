@@ -67,15 +67,15 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		// TravelTimeCollector for car mode
 
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.config.plansCalcRoute()));
+		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, this.getConfig().plansCalcRoute()));
+		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.getConfig().plansCalcRoute()));
 		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelDisutilityFactory();
 
-		RoutingContext routingContext = new RoutingContextImpl(costFactory, super.getTravelTimeCollector(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(costFactory, super.getTravelTimeCollector(), this.getConfig().planCalcScore());
 		
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(), this.scenarioData, parkingAgentsTracker,

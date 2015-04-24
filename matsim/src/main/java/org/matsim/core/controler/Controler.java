@@ -89,7 +89,7 @@ public class Controler extends AbstractController {
 	public static final String FILENAME_EVENTS_TXT = "events.txt.gz";
 	public static final String FILENAME_EVENTS_XML = "events.xml.gz";
 	public static final String FILENAME_LINKSTATS = "linkstats.txt.gz";
-    public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
+	public static final String FILENAME_TRAVELDISTANCESTATS = "traveldistancestats";
 	public static final String FILENAME_POPULATION = "output_plans.xml.gz";
 	public static final String FILENAME_NETWORK = "output_network.xml.gz";
 	public static final String FILENAME_HOUSEHOLDS = "output_households.xml.gz";
@@ -102,15 +102,15 @@ public class Controler extends AbstractController {
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
-	protected final Config config; 
+	private final Config config; 
 	protected final Scenario scenarioData ;
 
 	protected final EventsManager events;
 
-    private Injector injector;
-    private boolean injectorCreated = false;
+	private Injector injector;
+	private boolean injectorCreated = false;
 
-    public static interface TerminationCriterion {
+	public static interface TerminationCriterion {
 		boolean continueIterations( int iteration ) ;
 	}
 
@@ -461,10 +461,6 @@ public class Controler extends AbstractController {
 		return this.injector.getInstance(ScoringFunctionFactory.class);
 	}
 
-	public final Config getConfig() {
-		return this.config;
-	}
-
     public final EventsManager getEvents() {
 		return this.events;
 	}
@@ -473,7 +469,11 @@ public class Controler extends AbstractController {
 		return this.scenarioData;
 	}
 
-    public final Injector getInjector() {
+    public Config getConfig() {
+		return config;
+	}
+
+public final Injector getInjector() {
         return this.injector;
     }
 

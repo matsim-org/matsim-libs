@@ -51,7 +51,7 @@ public class RCControler extends Controler {
 	
 	public Set<Id<Link>> createTunnelLinks() {
 		Set<Id<Link>> links = new HashSet<>();
-		String tunnellinksfile = this.config.findParam("rc", "tunnellinksfile");
+		String tunnellinksfile = this.getConfig().findParam("rc", "tunnellinksfile");
 		
 		 try {
 	          final BufferedReader in = new BufferedReader(new FileReader(tunnellinksfile));

@@ -151,7 +151,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		HashMap<String, HashSet<Id>> parkingTypes = initParkingTypes(this);
 		
 		// connect facilities to network
-        new WorldConnectLocations(this.config).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
+        new WorldConnectLocations(this.getConfig()).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
 
 		super.initWithinDayEngine(numReplanningThreads);
 		super.createAndInitTravelTimeCollector();
@@ -176,7 +176,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 		this.addControlerListener(parkingAgentsTracker);
 
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.getConfig().planCalcScore());
 		
 		insertParkingActivities = new InsertParkingActivities(scenarioData, this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
 

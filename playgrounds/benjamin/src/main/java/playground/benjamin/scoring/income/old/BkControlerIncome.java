@@ -84,7 +84,7 @@ public class BkControlerIncome extends BkControler {
 			
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
-			TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme, config);
+			TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme, getConfig());
 			setTravelDisutilityFactory(travelCostCalculatorFactory);
 		}
 		else{

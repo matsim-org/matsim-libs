@@ -93,9 +93,7 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 		
 		Network network = this.scenario.getNetwork();
 		PopulationFactory populationFactory = this.scenario.getPopulation().getFactory();
-		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
-
-        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
         Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		for (String mode : simulatedModes) {
 

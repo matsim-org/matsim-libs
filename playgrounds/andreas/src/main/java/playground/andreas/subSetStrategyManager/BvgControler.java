@@ -84,11 +84,11 @@ public class BvgControler extends Controler {
 			Set<Id> ids = ReadSingleTripPersons.readStopNameMap(singleTripPersonsFile);
 			StrategyManager mgr = new StrategyManager();
 
-			PlanStrategy strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.planCalcScore()));
+			PlanStrategy strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.getConfig().planCalcScore()));
 			mgr.addStrategyForDefaultSubpopulation(strategy1, 0.9);
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy2.addStrategyModule(new TripTimeAllocationMutator(this.config,7200, true));
+			strategy2.addStrategyModule(new TripTimeAllocationMutator(this.getConfig(),7200, true));
 			strategy2.addStrategyModule(new ReRoute(getScenario()));
 			mgr.addStrategyForDefaultSubpopulation(strategy2, 0.1);
 			mgr.addChangeRequestForDefaultSubpopulation(90,strategy2,0.0);

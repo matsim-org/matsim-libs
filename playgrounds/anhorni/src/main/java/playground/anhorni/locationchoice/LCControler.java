@@ -42,7 +42,7 @@ public class LCControler extends Controler {
     @Override
     protected void setUp() {
       super.setUp();
-        this.setScoringFunctionFactory(new LocationChoiceScoringFunctionFactory(this.config.planCalcScore(), this.facilityPenalties, getScenario().getActivityFacilities(), getScenario().getNetwork()));
+        this.setScoringFunctionFactory(new LocationChoiceScoringFunctionFactory(this.getConfig().planCalcScore(), this.facilityPenalties, getScenario().getActivityFacilities(), getScenario().getNetwork()));
     }
  
     public static void main (final String[] args) { 

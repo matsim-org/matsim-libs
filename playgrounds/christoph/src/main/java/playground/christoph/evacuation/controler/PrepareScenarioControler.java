@@ -112,7 +112,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		/*
 		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
 		 */
-		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getLinkTravelTimes(), this.config.planCalcScore());
+		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getLinkTravelTimes(), this.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getLinkTravelTimes());
 		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.scenarioData);
 
@@ -133,7 +133,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 * Create vehicles for households and add them to the scenario.
 		 * When useVehicles is set to true, the scenario creates a Vehicles container if necessary.
 		 */
-		this.config.scenario().setUseVehicles(true);
+		this.getConfig().scenario().setUseVehicles(true);
 		createVehiclesForHouseholds = new CreateVehiclesForHouseholds(this.scenarioData, this.householdVehicleAssignmentReader.getAssignedVehicles());
 		createVehiclesForHouseholds.run();
 		
@@ -168,7 +168,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 	 */
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (event.getIteration() == this.config.controler().getFirstIteration()) {
+		if (event.getIteration() == this.getConfig().controler().getFirstIteration()) {
 			this.assignVehiclesToPlans.reassignVehicles();
 		}
 	}

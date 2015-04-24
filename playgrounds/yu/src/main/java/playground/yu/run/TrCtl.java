@@ -82,7 +82,7 @@ public class TrCtl extends TransitControler {
 //		ctl.addControlerListener(oal);
 //		ctl.addControlerListener(new PtCountControlerListener(ctl.config,
 //		ctl.oa));
-		ctl.addControlerListener(new PtCountControlerListener(ctl.config) ) ;
+		ctl.addControlerListener(new PtCountControlerListener(ctl.getConfig()) ) ;
 		// the PtCountControlerListener now has its own OccupancyAnalyzer.  kai, oct'10
 
 		ctl.setOverwriteFiles(true);

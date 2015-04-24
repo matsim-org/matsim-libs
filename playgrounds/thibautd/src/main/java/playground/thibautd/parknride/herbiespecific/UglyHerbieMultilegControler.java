@@ -61,7 +61,7 @@ public class UglyHerbieMultilegControler extends Controler {
 	
 	public UglyHerbieMultilegControler( final Scenario scenario ) {
 		super( scenario );
-		herbieConfigGroup = (HerbieConfigGroup) super.config.getModule(HerbieConfigGroup.GROUP_NAME);
+		herbieConfigGroup = (HerbieConfigGroup) super.getConfig().getModule(HerbieConfigGroup.GROUP_NAME);
         addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -102,7 +102,7 @@ public class UglyHerbieMultilegControler extends Controler {
 
         HerbiePlanBasedScoringFunctionFactory herbieScoringFunctionFactory =
 			new HerbiePlanBasedScoringFunctionFactory(
-				super.config,
+				super.getConfig(),
 				this.herbieConfigGroup,
 				facPenalties.getFacilityPenalties(),
                     getScenario().getActivityFacilities(),
@@ -127,10 +127,10 @@ public class UglyHerbieMultilegControler extends Controler {
 				new HerbieTransitRouterFactory( 
 					getScenario().getTransitSchedule(),
 					new TransitRouterConfig(
-						config.planCalcScore(),
-						config.plansCalcRoute(),
-						config.transitRouter(),
-						config.vspExperimental()),
+						getConfig().planCalcScore(),
+						getConfig().plansCalcRoute(),
+						getConfig().transitRouter(),
+						getConfig().vspExperimental()),
 					herbieConfigGroup,
 					new TravelScoringFunction( params, herbieConfigGroup ) ) );
 

@@ -36,5 +36,8 @@ public interface IntermodalLeastCostPathCalculator extends LeastCostPathCalculat
 	 * @see Link#setAllowedModes(Set)
 	 */
 	public void setModeRestriction(final Set<String> modeRestriction);
+	// To me, this is a bit more like "possibleModes", i.e. if I am bicycle I might accept "car" links _and_ "bicycle" links, while 
+	// if I am a car I can only accept bicycle links. kai, apr'15
+	// It seems that in most cases we are not using it, also because it is slow. kai, apr'15
 
 }

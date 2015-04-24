@@ -67,7 +67,7 @@ public class WagonSimController extends Controler {
 				new WagonSimRouterFactoryImpl(
 						listener, 
 						scenario.getTransitSchedule(), new 
-						TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental()), 
+						TransitRouterConfig(getConfig().planCalcScore(), getConfig().plansCalcRoute(), getConfig().transitRouter(), getConfig().vspExperimental()), 
 						scenario.getPopulation().getPersonAttributes(), 
 						vehicleLinkSpeedAttributes);
 		this.setTripRouterFactory(new WagonSimTripRouterFactoryImpl(scenario, routerFactory, minShuntingTimes));

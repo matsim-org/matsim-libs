@@ -81,24 +81,24 @@ public final class TransitControler extends Controler {
 	}
 
 	private final void init() {
-		if (this.config.getModule(TransitConfigGroup.GROUP_NAME) == null) {
-			this.config.addModule(this.transitConfig);
+		if (this.getConfig().getModule(TransitConfigGroup.GROUP_NAME) == null) {
+			this.getConfig().addModule(this.transitConfig);
 		} else {
 			// this would not be necessary if TransitConfigGroup is part of core config
-			ConfigGroup oldModule = this.config.getModule(TransitConfigGroup.GROUP_NAME);
-			this.config.removeModule(TransitConfigGroup.GROUP_NAME);
+			ConfigGroup oldModule = this.getConfig().getModule(TransitConfigGroup.GROUP_NAME);
+			this.getConfig().removeModule(TransitConfigGroup.GROUP_NAME);
 			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
 			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
 			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
 		}
-		this.config.scenario().setUseTransit(true);
-		this.config.scenario().setUseVehicles(true);
-		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
+		this.getConfig().scenario().setUseTransit(true);
+		this.getConfig().scenario().setUseVehicles(true);
+		Set<EventsFileFormat> formats = EnumSet.copyOf(this.getConfig().controler().getEventsFileFormats());
 		formats.add(EventsFileFormat.xml);
-		this.config.controler().setEventsFileFormats(formats);
+		this.getConfig().controler().setEventsFileFormats(formats);
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
-		this.config.planCalcScore().addActivityParams(transitActivityParams);
+		this.getConfig().planCalcScore().addActivityParams(transitActivityParams);
         ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 	}
 
@@ -106,7 +106,7 @@ public final class TransitControler extends Controler {
 	protected void loadControlerListeners() {
 		super.loadControlerListeners();
 		addTransitControlerListener();
-		if (config.getModule(COUNTS_MODULE_NAME) != null) {
+		if (getConfig().getModule(COUNTS_MODULE_NAME) != null) {
 			addPtCountControlerListener();
 		}
 	}
@@ -117,7 +117,7 @@ public final class TransitControler extends Controler {
 //		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
 //		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
 //		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
-		addControlerListener(new PtCountControlerListener(config) );
+		addControlerListener(new PtCountControlerListener(getConfig()) );
 		// the PtCountControlerListener now has its own OccupancyAnalyzer.  kai, oct'10
 
         this.getConfig().controler().setCreateGraphs(false);

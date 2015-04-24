@@ -85,8 +85,8 @@ public class TransitControler extends Controler {
 			}
 		}
 		if (this.useOTFVis) {
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config,getScenario(), events, simulation);
-			OTFClientLive.run(config, server);
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(getConfig(),getScenario(), events, simulation);
+			OTFClientLive.run(getConfig(), server);
 		}
 		simulation.run();
 	}	

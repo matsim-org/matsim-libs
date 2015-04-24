@@ -46,7 +46,7 @@ public class HerbieEnergyFlowsController extends EnergyFlowsController {
 	
 	public HerbieEnergyFlowsController(String[] args) {
 		super(args);
-		super.config.addModule(this.herbieConfigGroup);
+		super.getConfig().addModule(this.herbieConfigGroup);
 		super.setOverwriteFiles(true);
 	}
 
@@ -61,14 +61,14 @@ public class HerbieEnergyFlowsController extends EnergyFlowsController {
 	@Override
 	protected void setUp() {
         HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
-				super.config,
+				super.getConfig(),
 				this.herbieConfigGroup,
 				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
                 getScenario().getActivityFacilities(),
                 getScenario().getNetwork());
 		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
 				
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
+		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(getConfig().planCalcScore());
 		
 		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
 		TravelTime timeCalculator = super.getLinkTravelTimes();

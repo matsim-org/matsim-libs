@@ -65,7 +65,7 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
                         ptTimeCostCalc);
 
         final boolean networkIsMultimodal = NetworkUtils.isMultimodal(scenario.getNetwork());
-		if ( networkIsMultimodal ) {
+        if ( networkIsMultimodal ) {
             // note: LinkImpl has a default allowed mode of "car" so that all links
             // of a monomodal network are actually restricted to car, making the check
             // of multimodality unecessary from a behavioral point of view.

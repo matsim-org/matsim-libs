@@ -75,15 +75,15 @@ public class EnergyFlowsController extends Controler {
 		}
 		
 		// add subpopulation score stats
-		ScoreStatsControlerListener nonTransitScoreStats = new ScoreStatsControlerListener(config, nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + ScoreStatsControlerListener.FILENAME_SCORESTATS), config.controler().isCreateGraphs());
+		ScoreStatsControlerListener nonTransitScoreStats = new ScoreStatsControlerListener(getConfig(), nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + ScoreStatsControlerListener.FILENAME_SCORESTATS), getConfig().controler().isCreateGraphs());
 		this.addControlerListener(nonTransitScoreStats);
-		ScoreStatsControlerListener transitScoreStats = new ScoreStatsControlerListener(config, transitPopulation, super.getControlerIO().getOutputFilename("transit" + ScoreStatsControlerListener.FILENAME_SCORESTATS), config.controler().isCreateGraphs());
+		ScoreStatsControlerListener transitScoreStats = new ScoreStatsControlerListener(getConfig(), transitPopulation, super.getControlerIO().getOutputFilename("transit" + ScoreStatsControlerListener.FILENAME_SCORESTATS), getConfig().controler().isCreateGraphs());
 		this.addControlerListener(transitScoreStats);
 
 		// add subpopulation travel distance stats
-        TravelDistanceStats nonTransitTravelDistanceStats = new TravelDistanceStats(nonTransitPopulation, getScenario().getNetwork(), super.getControlerIO().getOutputFilename("nontransit" + FILENAME_TRAVELDISTANCESTATS), config.controler().isCreateGraphs());
+        TravelDistanceStats nonTransitTravelDistanceStats = new TravelDistanceStats(nonTransitPopulation, getScenario().getNetwork(), super.getControlerIO().getOutputFilename("nontransit" + FILENAME_TRAVELDISTANCESTATS), getConfig().controler().isCreateGraphs());
 		this.addControlerListener(nonTransitTravelDistanceStats);
-        TravelDistanceStats transitTravelDistanceStats = new TravelDistanceStats(transitPopulation, getScenario().getNetwork(), super.getControlerIO().getOutputFilename("transit" + FILENAME_TRAVELDISTANCESTATS), config.controler().isCreateGraphs());
+        TravelDistanceStats transitTravelDistanceStats = new TravelDistanceStats(transitPopulation, getScenario().getNetwork(), super.getControlerIO().getOutputFilename("transit" + FILENAME_TRAVELDISTANCESTATS), getConfig().controler().isCreateGraphs());
 		this.addControlerListener(transitTravelDistanceStats);
 	}
 	
@@ -94,7 +94,7 @@ public class EnergyFlowsController extends Controler {
 	@Override
 	protected void setUp() {
 		if (this.getScoringFunctionFactory() == null) {
-			this.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(this.config.planCalcScore(), this.getScenario()));
+			this.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(this.getConfig().planCalcScore(), this.getScenario()));
 		}
 		super.setUp();
 	}
