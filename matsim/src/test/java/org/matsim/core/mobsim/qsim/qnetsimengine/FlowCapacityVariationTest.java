@@ -155,7 +155,7 @@ public class FlowCapacityVariationTest {
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			config = scenario.getConfig();
 			config.qsim().setMainModes(Arrays.asList(travelMode));
-			config.qsim().setAccumulatingFlowToZero(true);
+			config.qsim().setUsingFastCapacityUpdate(true);
 
 			population = scenario.getPopulation();
 		}

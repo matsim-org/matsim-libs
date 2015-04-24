@@ -195,7 +195,7 @@ public class DeparturesOnSameLinkSameTime {
 			// Vehicles info			
 			((ScenarioImpl)scenario).createVehicleContainer();
 			scenario.getConfig().qsim().setUseDefaultVehicles(false);
-			scenario.getConfig().qsim().setAccumulatingFlowToZero(true);
+			scenario.getConfig().qsim().setUsingFastCapacityUpdate(true);
 
 			VehicleType vt = VehicleUtils.getFactory().createVehicleType(Id.create(travelMode, VehicleType.class));
 			vt.setMaximumVelocity(20);

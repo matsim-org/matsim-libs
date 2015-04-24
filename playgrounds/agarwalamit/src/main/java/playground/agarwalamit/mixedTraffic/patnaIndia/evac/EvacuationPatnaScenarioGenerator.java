@@ -125,7 +125,7 @@ public class EvacuationPatnaScenarioGenerator {
 		config.qsim().setStuckTime(100000);
 		config.qsim().setLinkDynamics(LinkDynamics.PassingQ.name());
 		config.qsim().setMainModes(mainModes);
-		config.qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
+		config.qsim().setTrafficDynamics(QSimConfigGroup.withHoles);
 
 		StrategySettings expChangeBeta = new StrategySettings(Id.create("1",StrategySettings.class));
 		expChangeBeta.setStrategyName("ChangeExpBeta");

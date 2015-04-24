@@ -52,8 +52,7 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
     private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
     private static final String USE_DEFAULT_VEHICLES = "useDefaultVehicles";
 
-	public static final String TRAFF_DYN_QUEUE = "queue";
-	public static final String TRAFF_DYN_W_HOLES = "withHoles";
+	public static enum TrafficDynamics { queue, withHoles } ;
 
 	public static final String MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END = "maxOfStarttimeAndEarliestActivityEnd";
 	public static final String ONLY_USE_STARTTIME = "onlyUseStarttime";
@@ -75,7 +74,7 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
     private boolean usePersonIdForMissingVehicleId = true;
     private boolean useDefaultVehicles = true;
     private int numberOfThreads = 1;
-	private String trafficDynamics = TRAFF_DYN_QUEUE;
+	private TrafficDynamics trafficDynamics = TrafficDynamics.queue ;
 	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END;
 	private String vehicleBehavior = VEHICLE_BEHAVIOR_TELEPORT;
 	
@@ -107,8 +106,8 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 	public static final String LINK_WIDTH = "linkWidth";
 	
 	// ---
-	private final static String FLOW_ACCUMULATION_TO_ZERO = "accumulatingFlowToOne";
-	private boolean accumulatingFlowToZero = false ;
+	private final static String FAST_CAPACITY_UPDATE = "usingFastCapacityUpdate";
+	private boolean usingFastCapacityUpdate = false ;
 	// ---
 
 	public QSimConfigGroup() {
@@ -185,9 +184,14 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 				+ "In contrast to earlier versions, the non-parallel special version is no longer there." ) ;
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING );
 		map.put(STUCK_TIME, STUCK_TIME_STRING );
-		map.put(TRAFFIC_DYNAMICS, "`"
-				+ TRAFF_DYN_QUEUE + "' for the standard queue model, `"
-				+ TRAFF_DYN_W_HOLES + "' (experimental!!) for the queue model with holes");
+		
+		{
+			String options = null ;
+			for ( TrafficDynamics dyn : TrafficDynamics.values() ) {
+				options += dyn + " " ;
+			}
+			map.put(TRAFFIC_DYNAMICS, "options: " + options ) ;
+		}
 		map.put(SIM_STARTTIME_INTERPRETATION, "`"
 				+ MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END + "' (default behavior) or `"
 				+ ONLY_USE_STARTTIME + "'" );
@@ -211,20 +215,20 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 		map.put(USE_DEFAULT_VEHICLES, "If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties.");
 		map.put(USING_THREADPOOL, "if the qsim should use as many runners as there are threads (Christoph's dissertation version)"
 				+ " or more of them, together with a thread pool (seems to be faster in some situations, but is not tested).") ;
-		map.put(FLOW_ACCUMULATION_TO_ZERO, "normally, the qsim accumulates fractional flows up to one flow unit.  This is impractical with "
+		map.put(FAST_CAPACITY_UPDATE, "normally, the qsim accumulates fractional flows up to one flow unit.  This is impractical with "
 				+ " with smaller PCEs.  If this switch is set to true, cars can enter a link if the accumulated flow is >=0, and the accumulated flow can go "
 				+ "into negative.  Will probably become the default eventually.") ;
         return map;
 	}
 	
-	@StringSetter(FLOW_ACCUMULATION_TO_ZERO)
-	public final void setAccumulatingFlowToZero( boolean val ) {
-		this.accumulatingFlowToZero = val ;
+	@StringSetter(FAST_CAPACITY_UPDATE)
+	public final void setUsingFastCapacityUpdate( boolean val ) {
+		this.usingFastCapacityUpdate = val ;
 	}
 	
-	@StringGetter(FLOW_ACCUMULATION_TO_ZERO)
-	public final boolean isAccumulatingFlowToZero() {
-		return this.accumulatingFlowToZero ;
+	@StringGetter(FAST_CAPACITY_UPDATE)
+	public final boolean isUsingFastCapacityUpdate() {
+		return this.usingFastCapacityUpdate ;
 	}
 
 	public void setStartTime(final double startTime) {
@@ -333,17 +337,12 @@ public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConf
 	}
 
     @StringSetter(TRAFFIC_DYNAMICS)
-	public void setTrafficDynamics(final String str) {
+	public void setTrafficDynamics(final TrafficDynamics str) {
 		this.trafficDynamics = str;
-		if ( !TRAFF_DYN_QUEUE.equals(this.trafficDynamics) && !TRAFF_DYN_W_HOLES.equals(this.trafficDynamics) 
-				&& !"withHolesExperimental".equals(this.snapshotStyle) ) {
-			log.warn("The trafficDynamics \"" + str + "\" is ot one of the known ones. "
-					+ "See comment in config dump in log file for allowed styles." );
-		}
 	}
 
     @StringGetter(TRAFFIC_DYNAMICS)
-	public String getTrafficDynamics() {
+	public TrafficDynamics getTrafficDynamics() {
 		return this.trafficDynamics;
 	}
 

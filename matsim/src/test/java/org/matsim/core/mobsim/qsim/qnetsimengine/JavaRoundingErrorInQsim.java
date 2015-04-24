@@ -168,7 +168,7 @@ public class JavaRoundingErrorInQsim {
 
 		public PseudoInputs(){
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			scenario.getConfig().qsim().setAccumulatingFlowToZero(true);
+			scenario.getConfig().qsim().setUsingFastCapacityUpdate(true);
 			population = scenario.getPopulation();
 		}
 

@@ -164,7 +164,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private final VisData visData = new VisDataImpl() ;
 	private final double timeStepSize;
 
-	private boolean accumulatingFlowToZero;
+	private boolean fastCapacityUpdate;
 
 	static class Builder {
 		private VehicleQ<QVehicle> vehicleQueue = null ;
@@ -246,7 +246,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		final QSimConfigGroup qsimConfig = this.network.simEngine.getMobsim().getScenario().getConfig().qsim();
 
 		this.timeStepSize = qsimConfig.getTimeStepSize() ;
-		this.accumulatingFlowToZero = qsimConfig.isAccumulatingFlowToZero() ;
+		this.fastCapacityUpdate = qsimConfig.isUsingFastCapacityUpdate() ;
 		
 		String isSeeping = this.network.simEngine.getMobsim().getScenario().getConfig().findParam("seepage", "isSeepageAllowed");
 
@@ -260,9 +260,9 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		//following are copied part from QNetSimEngine instead of copying the whole class.
 		QSimConfigGroup qsimConfigGroup = qsimConfig;
-		if ( QSimConfigGroup.TRAFF_DYN_QUEUE.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+		if ( QSimConfigGroup.TrafficDynamics.queue.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			QueueWithBuffer.HOLES=false ;
-		} else if ( QSimConfigGroup.TRAFF_DYN_W_HOLES.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+		} else if ( QSimConfigGroup.TrafficDynamics.withHoles.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			QueueWithBuffer.HOLES = true ;
 		} else {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
@@ -286,7 +286,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		this.calculateFlowCapacity();
 		this.calculateStorageCapacity();
 
-		if(this.accumulatingFlowToZero){
+		if(this.fastCapacityUpdate){
 			flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 		} else {
 			flowcap_accumulate.setValue((flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0) );
@@ -309,7 +309,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
 		
-		if(this.accumulatingFlowToZero){
+		if(this.fastCapacityUpdate){
 			updateFlowAccumulation(now);
 			if (flowcap_accumulate.getValue() >= 0.0  ) {
 				flowcap_accumulate.addValue(-veh.getSizeInEquivalents(), now);
@@ -351,7 +351,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
 		final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
-		if(this.accumulatingFlowToZero){
+		if(this.fastCapacityUpdate){
 			updateFlowAccumulation(now);
 			return (
 					usedBufferStorageCapacity < bufferStorageCapacity
@@ -386,7 +386,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	public final void updateRemainingFlowCapacity() {
-		if(!this.accumulatingFlowToZero){
+		if(!this.fastCapacityUpdate){
 			remainingflowCap = flowCapacityPerTimeStep;
 			if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
 				final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
@@ -547,7 +547,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	@Override
 	public final boolean isActive() {
-		if(this.accumulatingFlowToZero){
+		if(this.fastCapacityUpdate){
 		return /*(this.remainingflowCap < 0.0) // still accumulating, thus active
 				|| */(!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
 		} else {

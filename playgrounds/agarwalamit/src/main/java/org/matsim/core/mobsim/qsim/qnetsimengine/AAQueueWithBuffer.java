@@ -246,7 +246,7 @@ final class AAQueueWithBuffer extends QLaneI implements SignalizeableItem {
 		final QSimConfigGroup qsimConfig = this.network.simEngine.getMobsim().getScenario().getConfig().qsim();
 
 		this.timeStepSize = qsimConfig.getTimeStepSize() ;
-		this.newCapacityUpdate = qsimConfig.isAccumulatingFlowToZero() ;
+		this.newCapacityUpdate = qsimConfig.isUsingFastCapacityUpdate() ;
 		
 		String isSeeping = this.network.simEngine.getMobsim().getScenario().getConfig().findParam("seepage", "isSeepageAllowed");
 
@@ -260,9 +260,9 @@ final class AAQueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 		//following are copied part from QNetSimEngine instead of copying the whole class.
 		QSimConfigGroup qsimConfigGroup = qsimConfig;
-		if ( QSimConfigGroup.TRAFF_DYN_QUEUE.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+		if ( QSimConfigGroup.queue.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			AAQueueWithBuffer.HOLES=false ;
-		} else if ( QSimConfigGroup.TRAFF_DYN_W_HOLES.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+		} else if ( QSimConfigGroup.withHoles.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			AAQueueWithBuffer.HOLES = true ;
 		} else {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "

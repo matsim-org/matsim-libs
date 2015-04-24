@@ -142,9 +142,9 @@ public class QNetsimEngine implements MobsimEngine {
 		}
 		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior);
 
-		if ( QSimConfigGroup.TRAFF_DYN_QUEUE.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+		if ( QSimConfigGroup.TrafficDynamics.queue.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			QueueWithBuffer.HOLES=false ;
-		} else if ( QSimConfigGroup.TRAFF_DYN_W_HOLES.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+		} else if ( QSimConfigGroup.TrafficDynamics.withHoles.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			QueueWithBuffer.HOLES = true ;
 		} else {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "

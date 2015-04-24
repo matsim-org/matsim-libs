@@ -82,7 +82,7 @@ public class MyFirstControler {
 			sc.getVehicles().addVehicle(vehicle);
 		}
 
-		sc.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
+		sc.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.withHoles);
 		
 		Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);

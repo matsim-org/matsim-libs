@@ -29,6 +29,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 
@@ -53,6 +54,19 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		boolean problem = false ; // ini
 		
+		// added apr'15
+		if ( !config.qsim().isUsingFastCapacityUpdate() ) {
+			log.warn( " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
+		}
+		switch( config.qsim().getTrafficDynamics() ) {
+		case withHoles:
+			break;
+		default:
+			log.warn( " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp should try out `" 
+					+ TrafficDynamics.withHoles + "' and report." ) ;
+			break;
+		}
+		
 		// added apr'15:
 		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
 			switch( params.getTypicalDurationScoreComputation() ) {
@@ -60,7 +74,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 				break;
 			case uniform:
 //				problem = true ;
-				log.warn( "found `typicalDurationScoreComputation == uniform'; vsp should try out `relative'. ") ;
+				log.warn( "found `typicalDurationScoreComputation == uniform'; vsp should try out `relative' and report. ") ;
 				break;
 			default:
 				throw new RuntimeException("unexpected setting; aborting ... ") ;

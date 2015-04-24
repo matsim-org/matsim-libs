@@ -129,7 +129,7 @@ public class CreateAutomatedFD {
 		scenario.getConfig().vspExperimental().addParam("vspDefaultsCheckingLevel",VspExperimentalConfigGroup.ABORT);
 
 		if(useHoles){
-			scenario.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES.toString());
+			scenario.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.withHoles.toString());
 		} 
 		
 		//equal modal split run
