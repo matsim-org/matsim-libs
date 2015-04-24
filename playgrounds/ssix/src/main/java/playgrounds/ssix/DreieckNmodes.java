@@ -33,6 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -260,7 +261,7 @@ public class DreieckNmodes {
 		config.qsim().setMainModes(Arrays.asList(NAMES));
 		config.qsim().setStuckTime(100*3600.);//allows to overcome maximal density regime
 		config.qsim().setEndTime(14*3600);//allows to set agents to abort after getting the wanted data.
-		config.qsim().setTrafficDynamics("withHoles");
+		config.qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 		//todo: is for actual network configurations correct, needs dependency on bigger network length 
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
 		// this may lead to abort during execution.  In such cases, please fix the configuration.  if necessary, talk
