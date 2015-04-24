@@ -98,7 +98,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		
 		RoutingContext routingContext = new RoutingContextImpl(costFactory, super.getTravelTimeCollector(), this.getConfig().planCalcScore());
 		
-		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), this.scenarioData, parkingAgentsTracker,
+		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), this.getScenario(), parkingAgentsTracker,
 				this.getWithinDayTripRouterFactory(), routingContext);
 		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		
 		this.getWithinDayEngine().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
@@ -116,15 +116,15 @@ public class WithinDayParkingController extends WithinDayController implements R
 		super.createAndInitLinkReplanningMap();
 
 		// ensure that all agents' plans have valid mode chains
-		legModeChecker = new LegModeChecker(this.scenarioData, new PlanRouter(
+		legModeChecker = new LegModeChecker(this.getScenario(), new PlanRouter(
 				this.getTripRouterProvider().get(),
 				this.getScenario().getActivityFacilities()
 				));
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk});
 		legModeChecker.setToCarProbability(0.5);
-		legModeChecker.run(this.scenarioData.getPopulation());
+		legModeChecker.run(this.getScenario().getPopulation());
 
-		parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,null,null);
+		parkingInfrastructure = new ParkingInfrastructure(this.getScenario(),null,null);
 
 		// init parking facility capacities
 		IntegerValueHashMap<Id> facilityCapacities = new IntegerValueHashMap<Id>();
@@ -137,13 +137,13 @@ public class WithinDayParkingController extends WithinDayController implements R
 		//		Set<Id> parkingFacilityIds = parkingInfrastructure.getFacilityCapacities().getKeySet();
 		//		for (Id id : parkingFacilityIds) parkingInfrastructure.getFacilityCapacities().incrementBy(id, 1000);
 
-		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 2000.0);
+		parkingAgentsTracker = new ParkingAgentsTracker(this.getScenario(), 2000.0);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 
 		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.getConfig().planCalcScore());
 
-		insertParkingActivities = new InsertParkingActivities(scenarioData, this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
+		insertParkingActivities = new InsertParkingActivities(getScenario(), this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
 
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
 		this.setMobsimFactory(mobsimFactory);
@@ -156,7 +156,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		 * might have been changed. Therefore, we have to ensure that the 
 		 * chains are still valid.
 		 */
-		for (Person person : this.scenarioData.getPopulation().getPersons().values()) {
+		for (Person person : this.getScenario().getPopulation().getPersons().values()) {
 			legModeChecker.run(person.getSelectedPlan());			
 		}
 	}

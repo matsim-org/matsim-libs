@@ -107,15 +107,15 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		
 		ParkingCostCalculator parkingCostCalculator=null;
 		if (GlobalParkingSearchParams.getScenarioId()==1){
-			parkingCostCalculator=new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), scenarioData,parkings);
+			parkingCostCalculator=new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), getScenario(),parkings);
 		} else if (GlobalParkingSearchParams.getScenarioId()==2) {
-			ParkingCostCalculatorZH parkingCostCalculatorZH = new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), scenarioData,parkings);
+			ParkingCostCalculatorZH parkingCostCalculatorZH = new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), getScenario(),parkings);
 			parkingCostCalculator=new ParkingCostOptimizerZH(parkingCostCalculatorZH,this);
 		} else {
 			DebugLib.stopSystemAndReportInconsistency("sceanrio unknown");
 		}
 		
-		parkingInfrastructure=new ParkingInfrastructureZH(this.scenarioData,parkingTypes, parkingCostCalculator,parkings);
+		parkingInfrastructure=new ParkingInfrastructureZH(this.getScenario(),parkingTypes, parkingCostCalculator,parkings);
 		
 	}
 
@@ -128,11 +128,11 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 	protected void startUpFinishing() {
 		
 		
-		HashMap<Id, Double> houseHoldIncome = getHouseHoldIncomeCantonZH(this.scenarioData);
+		HashMap<Id, Double> houseHoldIncome = getHouseHoldIncomeCantonZH(this.getScenario());
 		
 		writeoutHouseholdIncome(houseHoldIncome);
 		
-		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.scenarioData, houseHoldIncome);
+		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.getScenario(), houseHoldIncome);
 
 		ParkingStrategyActivityMapperFW parkingStrategyActivityMapperFW = new ParkingStrategyActivityMapperFW();
 		Collection<ParkingStrategy> parkingStrategies = new LinkedList<ParkingStrategy>();
@@ -156,7 +156,7 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 				
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
-				this.scenarioData, parkingAgentsTracker, this.getWithinDayTripRouterFactory(), routingContext);
+				this.getScenario(), parkingAgentsTracker, this.getWithinDayTripRouterFactory(), routingContext);
 		
 		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, (ParkingInfrastructureZH) parkingInfrastructure, this);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
@@ -261,13 +261,13 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 			i++;
 		}
 		
-		ActivityFacilities facilities = this.scenarioData.getActivityFacilities();
+		ActivityFacilities facilities = this.getScenario().getActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 		for (PParking parking:parkings){
 			
 			ActivityFacility parkingFacility = factory.createActivityFacility(Id.create(parking.getId(), ActivityFacility.class), parking.getCoord());
 			facilities.addActivityFacility(parkingFacility);
-			Link nearestLink = NetworkUtils.getNearestLink(((NetworkImpl) this.scenarioData.getNetwork()), parking.getCoord());
+			Link nearestLink = NetworkUtils.getNearestLink(((NetworkImpl) this.getScenario().getNetwork()), parking.getCoord());
 			
 			((ActivityFacilityImpl)parkingFacility).setLinkId(nearestLink.getId());
 			

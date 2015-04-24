@@ -69,7 +69,7 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 	@Override
 	protected void startUpFinishing() {
 		
-		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.scenarioData, null);
+		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.getScenario(), null);
 
 		ParkingStrategyActivityMapperFW parkingStrategyActivityMapperFW = new ParkingStrategyActivityMapperFW();
 		Collection<ParkingStrategy> parkingStrategies = new LinkedList<ParkingStrategy>();
@@ -93,8 +93,8 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 		
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
-				this.scenarioData, parkingAgentsTracker, this. getWithinDayTripRouterFactory(), routingContext);
-		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure, this.scenarioData );
+				this.getScenario(), parkingAgentsTracker, this. getWithinDayTripRouterFactory(), routingContext);
+		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure, this.getScenario() );
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);
 		ParkingStrategy parkingStrategy = new ParkingStrategy(hupcSearchIdentifier);
@@ -152,14 +152,14 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 	private void initParkingInfrastructure(Controler controler) {
 		parkings = getParkingsForScenario(controler);
 		
-		ActivityFacilities facilities = this.scenarioData.getActivityFacilities();
+		ActivityFacilities facilities = this.getScenario().getActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
 
 		for (PParking parking:parkings){
 			
 			ActivityFacility parkingFacility = factory.createActivityFacility(Id.create(parking.getId(), ActivityFacility.class), parking.getCoord());
 			facilities.addActivityFacility(parkingFacility);
-			Link nearestLink = NetworkUtils.getNearestLink(((NetworkImpl) this.scenarioData.getNetwork()), parking.getCoord());
+			Link nearestLink = NetworkUtils.getNearestLink(((NetworkImpl) this.getScenario().getNetwork()), parking.getCoord());
 			
 			((ActivityFacilityImpl)parkingFacility).setLinkId(nearestLink.getId());
 			

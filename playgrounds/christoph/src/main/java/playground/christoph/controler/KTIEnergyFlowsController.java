@@ -92,7 +92,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
             ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
 
 			
-			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
+			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.getScenario(), this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
 			loader.loadScenario();
 			if (this.getConfig().scenario().isUseHouseholds()) {
 				this.loadHouseholds();
@@ -105,10 +105,10 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 	}
 	
 	private void loadHouseholds() {
-		if ((this.scenarioData.getHouseholds() != null) && (this.getConfig().households() != null) && (this.getConfig().households().getInputFile() != null) ) {
+		if ((this.getScenario().getHouseholds() != null) && (this.getConfig().households() != null) && (this.getConfig().households().getInputFile() != null) ) {
 			String hhFileName = this.getConfig().households().getInputFile();
 			log.info("loading households from " + hhFileName);
-			new HouseholdsReaderV10(this.scenarioData.getHouseholds()).parse(hhFileName);
+			new HouseholdsReaderV10(this.getScenario().getHouseholds()).parse(hhFileName);
 			log.info("households loaded.");
 		}
 		else {
@@ -120,7 +120,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 	protected void setUp() {
 
         KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				this.scenarioData,
+				this.getScenario(),
 				this.ktiConfigGroup,
 				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
                 getScenario().getActivityFacilities());

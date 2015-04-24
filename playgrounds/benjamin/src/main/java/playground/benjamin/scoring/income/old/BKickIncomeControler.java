@@ -57,8 +57,8 @@ public final class BKickIncomeControler extends BkControler {
 	
 	@Override
 	protected void setUp(){	
-    this.scenarioData.getConfig().global().setNumberOfThreads(1);
-		this.hhdb = new PersonHouseholdMapping(this.scenarioData.getHouseholds());
+    this.getScenario().getConfig().global().setNumberOfThreads(1);
+		this.hhdb = new PersonHouseholdMapping(this.getScenario().getHouseholds());
 		this.setTravelDisutilityFactory(new Income1TravelCostCalculatorFactory());
 //		if (this.travelTimeCalculator == null) {
 //			this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());

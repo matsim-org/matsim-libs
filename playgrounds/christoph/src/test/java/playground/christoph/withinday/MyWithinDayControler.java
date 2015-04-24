@@ -73,10 +73,10 @@ class MyWithinDayControler extends Controler {
 
 		RoutingContext routingContext = new RoutingContextImpl(this.createTravelDisutilityCalculator(), this.getLinkTravelTimes());
 
-		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.scenarioData);
+		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.getScenario());
 		// replanning while at activity:
 
-		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory = new ReplannerOldPeopleFactory(this.scenarioData, withinDayEngine,
+		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory = new ReplannerOldPeopleFactory(this.getScenario(), withinDayEngine,
 				tripRouterFactory, routingContext); 
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.  
@@ -91,7 +91,7 @@ class MyWithinDayControler extends Controler {
 		
 		// replanning while on leg:
 		
-		WithinDayDuringLegReplannerFactory duringLegReplannerFactory = new ReplannerYoungPeopleFactory(this.scenarioData, withinDayEngine,
+		WithinDayDuringLegReplannerFactory duringLegReplannerFactory = new ReplannerYoungPeopleFactory(this.getScenario(), withinDayEngine,
 				tripRouterFactory, routingContext);
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity

@@ -130,10 +130,10 @@ public final class TransitControler extends Controler {
 
 	@Override
 	protected void runMobSim() {
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(this.scenarioData, this.events);
+		QSim sim = (QSim) QSimUtils.createDefaultQSim(this.getScenario(), this.events);
 		if (useOTFVis) {
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenarioData.getConfig(), this.scenarioData, events, sim);
-			OTFClientLive.run(this.scenarioData.getConfig(), server);
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.getScenario().getConfig(), this.getScenario(), events, sim);
+			OTFClientLive.run(this.getScenario().getConfig(), server);
 		}
 
 //		this.events.addHandler(new LogOutputEventHandler());

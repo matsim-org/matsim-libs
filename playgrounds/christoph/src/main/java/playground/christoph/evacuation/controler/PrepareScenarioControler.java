@@ -105,7 +105,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		/*
 		 * Remove all un-selected plans from agents' memories
 		 */
-		for (Person person : this.scenarioData.getPopulation().getPersons().values()) {
+		for (Person person : this.getScenario().getPopulation().getPersons().values()) {
 			((PersonImpl) person).removeUnselectedPlans();
 		}
 		
@@ -114,18 +114,18 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 */
 		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getLinkTravelTimes(), this.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getLinkTravelTimes());
-		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.scenarioData);
+		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.getScenario());
 
         legModeChecker = new LegModeChecker(tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), getScenario().getNetwork());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
 		legModeChecker.setToCarProbability(0.5);
-		legModeChecker.run(this.scenarioData.getPopulation());
+		legModeChecker.run(this.getScenario().getPopulation());
 		legModeChecker.printStatistics();
 
 		/*
 		 * Read household-vehicles-assignment files.
 		 */
-		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.scenarioData);
+		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.getScenario());
 		for (String file : this.householdVehicleFiles) this.householdVehicleAssignmentReader.parseFile(file);
 		this.householdVehicleAssignmentReader.createVehiclesForCrossboarderHouseholds();
 		
@@ -134,7 +134,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 * When useVehicles is set to true, the scenario creates a Vehicles container if necessary.
 		 */
 		this.getConfig().scenario().setUseVehicles(true);
-		createVehiclesForHouseholds = new CreateVehiclesForHouseholds(this.scenarioData, this.householdVehicleAssignmentReader.getAssignedVehicles());
+		createVehiclesForHouseholds = new CreateVehiclesForHouseholds(this.getScenario(), this.householdVehicleAssignmentReader.getAssignedVehicles());
 		createVehiclesForHouseholds.run();
 		
 		/*
@@ -142,13 +142,13 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 */
 		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
 		System.exit(-1); 
-		new VehicleWriterV1(scenarioData.getTransitVehicles()).writeFile(this.getControlerIO().getOutputFilename(FILENAME_VEHICLES));
+		new VehicleWriterV1(getScenario().getTransitVehicles()).writeFile(this.getControlerIO().getOutputFilename(FILENAME_VEHICLES));
 		
 		/*
 		 * Assign vehicles to agent's plans.
 		 */
-		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.scenarioData, event.getControler().getTripRouterProvider().get());
-		for (Household household : ((ScenarioImpl) scenarioData).getHouseholds().getHouseholds().values()) {
+		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.getScenario(), event.getControler().getTripRouterProvider().get());
+		for (Household household : ((ScenarioImpl) getScenario()).getHouseholds().getHouseholds().values()) {
 			this.assignVehiclesToPlans.run(household);
 		}
 		this.assignVehiclesToPlans.printStatistics();

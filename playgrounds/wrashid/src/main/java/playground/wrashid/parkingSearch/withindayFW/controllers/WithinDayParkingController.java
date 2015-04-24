@@ -158,27 +158,27 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		super.createAndInitLinkReplanningMap();
 
 		// ensure that all agents' plans have valid mode chains
-		legModeChecker = new LegModeChecker(this.scenarioData, new PlanRouter(
+		legModeChecker = new LegModeChecker(this.getScenario(), new PlanRouter(
 		this.getTripRouterProvider().get(),
 		this.getScenario().getActivityFacilities()
 		));
 		legModeChecker.setValidNonCarModes(new String[] { TransportMode.walk });
 		legModeChecker.setToCarProbability(0.5);
-		ParallelPersonAlgorithmRunner.run(this.scenarioData.getPopulation(), numReplanningThreads, legModeChecker);
+		ParallelPersonAlgorithmRunner.run(this.getScenario().getPopulation(), numReplanningThreads, legModeChecker);
 		//legModeChecker.run(this.scenarioData.getPopulation());
 
 		if (parkingInfrastructure==null){
-			parkingInfrastructure = new ParkingInfrastructure(this.scenarioData,parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
+			parkingInfrastructure = new ParkingInfrastructure(this.getScenario(),parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
 		}
 
-		parkingAgentsTracker = new ParkingAgentsTracker(this.scenarioData, 10000.0, parkingInfrastructure);
+		parkingAgentsTracker = new ParkingAgentsTracker(this.getScenario(), 10000.0, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 		this.addControlerListener(parkingAgentsTracker);
 
 		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.getConfig().planCalcScore());
 		
-		insertParkingActivities = new InsertParkingActivities(scenarioData, this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
+		insertParkingActivities = new InsertParkingActivities(getScenario(), this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
 
 		this.getWithinDayEngine().initializeReplanningModules(numReplanningThreads);
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
@@ -198,7 +198,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 	}
 
 	private void setDesiresIfApplicable() {
-		for (Person p:scenarioData.getPopulation().getPersons().values()){
+		for (Person p:getScenario().getPopulation().getPersons().values()){
 			PersonImpl person=(PersonImpl) p;
 			Desires desires = person.getDesires();
 			if (desires!=null){
@@ -247,7 +247,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		//	legModeChecker.run(person.getSelectedPlan());
 		//}
 		
-		ParallelPersonAlgorithmRunner.run(this.scenarioData.getPopulation(), numReplanningThreads, legModeChecker);
+		ParallelPersonAlgorithmRunner.run(this.getScenario().getPopulation(), numReplanningThreads, legModeChecker);
 	}
 
 	/*

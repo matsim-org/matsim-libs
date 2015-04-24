@@ -58,7 +58,7 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 	@Override
 	protected void startUpFinishing() {
 		
-		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.scenarioData, null);
+		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(this.getScenario(), null);
 
 		ParkingStrategyActivityMapperFW parkingStrategyActivityMapperFW = new ParkingStrategyActivityMapperFW();
 		Collection<ParkingStrategy> parkingStrategies = new LinkedList<ParkingStrategy>();
@@ -83,14 +83,14 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		
 		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.getConfig().planCalcScore());
 		
-		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenarioData, travelTimes,
+		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.getScenario(), travelTimes,
 				this.getTravelDisutilityFactory());
 		this.setWithinDayTripRouterFactory(tripRouterFactory);
 
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
-				this.scenarioData, parkingAgentsTracker, tripRouterFactory, routingContext);
-		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure, this.scenarioData );
+				this.getScenario(), parkingAgentsTracker, tripRouterFactory, routingContext);
+		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure, this.getScenario() );
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);
 		ParkingStrategy parkingStrategy = new ParkingStrategy(hupcSearchIdentifier);
@@ -104,7 +104,7 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		
 		// adding random test strategy
 		RandomSearchReplannerFactory randomReplannerFactory = new RandomSearchReplannerFactory(this.getWithinDayEngine(),
-				this.scenarioData, parkingAgentsTracker, this.getWithinDayTripRouterFactory(), routingContext);
+				this.getScenario(), parkingAgentsTracker, this.getWithinDayTripRouterFactory(), routingContext);
 		RandomSearchIdentifier randomSearchIdentifier = new RandomSearchIdentifier(parkingAgentsTracker, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(randomSearchIdentifier);
 		randomReplannerFactory.addIdentifier(randomSearchIdentifier);

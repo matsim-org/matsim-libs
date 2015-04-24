@@ -251,14 +251,14 @@ public class AgentsReturnHomePostProcessing {
 		public DummyController(Scenario scenario, String outputPath) {
 			super(scenario);
 			
-			if (outputPath == null) outputPath = this.scenarioData.getConfig().controler().getOutputDirectory();
+			if (outputPath == null) outputPath = this.getScenario().getConfig().controler().getOutputDirectory();
 			
 			if (outputPath.endsWith("/")) {
 				outputPath = outputPath.substring(0, outputPath.length() - 1);
 			}
-			if (this.scenarioData.getConfig().controler().getRunId() != null) {
+			if (this.getScenario().getConfig().controler().getRunId() != null) {
 //				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), true);
-				this.setupOutputDirectory(outputPath, this.scenarioData.getConfig().controler().getRunId(), true) ;
+				this.setupOutputDirectory(outputPath, this.getScenario().getConfig().controler().getRunId(), true) ;
 			} else {
 //				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
 				this.setupOutputDirectory(outputPath, null, true) ;

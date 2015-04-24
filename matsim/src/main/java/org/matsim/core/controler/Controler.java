@@ -103,7 +103,7 @@ public class Controler extends AbstractController {
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
 
 	private final Config config; 
-	protected final Scenario scenarioData ;
+	private final Scenario scenario ;
 
 	protected final EventsManager events;
 
@@ -182,7 +182,7 @@ public class Controler extends AbstractController {
         this.controlerListenerManager.setControler(this);
         if (scenario != null) {
 			this.scenarioLoaded = true;
-			this.scenarioData  = scenario;
+			this.scenario  = scenario;
 			this.config = scenario.getConfig();
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		} else {
@@ -195,7 +195,7 @@ public class Controler extends AbstractController {
 				this.config = ConfigUtils.loadConfig(configFileName);
 			}
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
-			this.scenarioData  = ScenarioUtils.createScenario(this.config);
+			this.scenario  = ScenarioUtils.createScenario(this.config);
 		}
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
@@ -264,7 +264,7 @@ public class Controler extends AbstractController {
 		// confirmed as evil. nov'14
 
 		if (!this.scenarioLoaded) {
-			ScenarioUtils.loadScenario(this.scenarioData );
+			ScenarioUtils.loadScenario(this.scenario );
 			this.scenarioLoaded = true;
 		}
 	}
@@ -287,7 +287,7 @@ public class Controler extends AbstractController {
 		 */
 
 		if (this.dumpDataAtEnd) {
-			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData , getControlerIO()));
+			this.addCoreControlerListener(new DumpDataAtEnd(scenario , getControlerIO()));
 		}
 
         this.injector = Injector.createInjector(
@@ -302,7 +302,7 @@ public class Controler extends AbstractController {
                         // Bootstrap it with the Scenario and some controler context.
 						bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
 						bind(IterationStopWatch.class).toInstance(stopwatch);
-						bind(Scenario.class).toInstance(scenarioData);
+						bind(Scenario.class).toInstance(scenario);
 						bind(EventsManager.class).toInstance(events);
 						binder().bind(Integer.class).annotatedWith(Names.named("iteration")).toProvider(new com.google.inject.Provider<Integer>() {
                             @Override
@@ -343,8 +343,8 @@ public class Controler extends AbstractController {
 	@Override
 	protected final void prepareForSim() {
 
-		if ( scenarioData  instanceof ScenarioImpl ) {
-			((ScenarioImpl)scenarioData ).setLocked();
+		if ( scenario  instanceof ScenarioImpl ) {
+			((ScenarioImpl)scenario ).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
 		}
 
@@ -358,7 +358,7 @@ public class Controler extends AbstractController {
 				return new PersonPrepareForSim(new PlanRouter(
 				getTripRouterProvider().get(),
 				getScenario().getActivityFacilities()
-				), Controler.this.scenarioData );
+				), Controler.this.scenario );
 			}
 		});
 	}
@@ -381,7 +381,7 @@ public class Controler extends AbstractController {
 	private RunnableMobsim getNewMobsim() {
 		if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null &&
 				((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
-			ExternalMobsim simulation = new ExternalMobsim(this.scenarioData , this.events);
+			ExternalMobsim simulation = new ExternalMobsim(this.scenario , this.events);
 			simulation.setControlerIO(this.getControlerIO());
 			simulation.setIterationNumber(this.getIterationNumber());
 			return simulation;
@@ -404,7 +404,7 @@ public class Controler extends AbstractController {
 					SnapshotWriterFactory snapshotWriterFactory = this.snapshotWriterRegister.getInstance(snapshotFormat);
 					String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
 					String fileName = this.getControlerIO().getIterationFilename(this.getIterationNumber(), baseFileName);
-					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenarioData );
+					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenario );
 					manager.addSnapshotWriter(snapshotWriter);
 				}
 				((ObservableMobsim) simulation).addQueueSimulationListeners(manager);
@@ -465,16 +465,16 @@ public class Controler extends AbstractController {
 		return this.events;
 	}
 
-	public final Scenario getScenario() {
-		return this.scenarioData;
-	}
-
-    public Config getConfig() {
+    public final Config getConfig() {
 		return config;
 	}
 
-public final Injector getInjector() {
-        return this.injector;
+    public final Scenario getScenario() {
+	    return scenario;
+    }
+
+    public final Injector getInjector() {
+	    return this.injector;
     }
 
 	/**

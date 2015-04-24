@@ -266,13 +266,13 @@ public class EvacuationControler extends WithinDayController implements
 			 */
 			if (!getConfig().scenario().isUseTransit()) {
 				getConfig().scenario().setUseTransit(true);
-				scenarioData.getTransitSchedule();
+				getScenario().getTransitSchedule();
 				getConfig().scenario().setUseTransit(false);
 			}
 			
-			new TransitScheduleReader(scenarioData).readFile(getConfig().transit().getTransitScheduleFile());
+			new TransitScheduleReader(getScenario()).readFile(getConfig().transit().getTransitScheduleFile());
 			routerNetwork = new TransitRouterNetwork();
-			new TransitRouterNetworkReaderMatsimV1(scenarioData, routerNetwork).parse(EvacuationConfig.transitRouterFile);
+			new TransitRouterNetworkReaderMatsimV1(getScenario(), routerNetwork).parse(EvacuationConfig.transitRouterFile);
 		}
 	}
 	
@@ -299,7 +299,7 @@ public class EvacuationControler extends WithinDayController implements
 		}
 		
 		// ensure that NetworkRoutes are created for legs using one of the simulated modes
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenarioData.getPopulation().getFactory()).getModeRouteFactory();
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		for (String mode : CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes())) {
 			routeFactory.setRouteFactory(mode, new LinkNetworkRouteFactory());
 		}
@@ -360,7 +360,7 @@ public class EvacuationControler extends WithinDayController implements
         LegModeChecker legModeChecker = new LegModeChecker(this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), getScenario().getNetwork());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
 		legModeChecker.setToCarProbability(0.5);
-		legModeChecker.run(this.scenarioData.getPopulation());
+		legModeChecker.run(this.getScenario().getPopulation());
 		legModeChecker.printStatistics();	
 		
 		/*
@@ -371,7 +371,7 @@ public class EvacuationControler extends WithinDayController implements
 		 * 	- add pickup facilities
 		 *  - add z Coordinates to network
 		 */
-		new PrepareEvacuationScenario().prepareScenario(this.scenarioData);
+		new PrepareEvacuationScenario().prepareScenario(this.getScenario());
 		
 		/*
 		 * Adapt walk- and bike speed according to car speed reduction.
@@ -401,10 +401,10 @@ public class EvacuationControler extends WithinDayController implements
 		
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);	
 		
-		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getPopulation(), this.scenarioData.getHouseholds());
+		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.getScenario().getPopulation(), this.getScenario().getHouseholds());
 		this.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
 		
-		this.householdsTracker = new HouseholdsTracker(this.scenarioData);
+		this.householdsTracker = new HouseholdsTracker(this.getScenario());
 		this.getEvents().addHandler(householdsTracker);
 		this.addControlerListener(this.householdsTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
@@ -416,10 +416,10 @@ public class EvacuationControler extends WithinDayController implements
 		this.vehiclesTracker = new VehiclesTracker(mobsimDataProvider);
 		this.getEvents().addHandler(vehiclesTracker);
 		
-		this.decisionDataGrabber = new DecisionDataGrabber(this.scenarioData, this.coordAnalyzer.createInstance(), 
+		this.decisionDataGrabber = new DecisionDataGrabber(this.getScenario(), this.coordAnalyzer.createInstance(), 
 				this.householdsTracker, this.householdObjectAttributes);
 				
-		this.decisionModelRunner = new DecisionModelRunner(this.scenarioData, this.decisionDataGrabber, this.informedHouseholdsTracker);
+		this.decisionModelRunner = new DecisionModelRunner(this.getScenario(), this.decisionDataGrabber, this.informedHouseholdsTracker);
 		this.addControlerListener(this.decisionModelRunner);
 		
 		/*
@@ -434,7 +434,7 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * Read household-vehicles-assignment files.
 		 */
-		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.scenarioData);
+		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.getScenario());
 		for (String file : EvacuationConfig.vehicleFleet) this.householdVehicleAssignmentReader.parseFile(file);
 		this.householdVehicleAssignmentReader.createVehiclesForCrossboarderHouseholds();
 		
@@ -446,7 +446,7 @@ public class EvacuationControler extends WithinDayController implements
 		 * When useVehicles is set to true, the scenario creates a Vehicles container if necessary.
 		 */
 		this.getConfig().scenario().setUseVehicles(true);
-		createVehiclesForHouseholds = new CreateVehiclesForHouseholds(this.scenarioData, this.householdVehicleAssignmentReader.getAssignedVehicles());
+		createVehiclesForHouseholds = new CreateVehiclesForHouseholds(this.getScenario(), this.householdVehicleAssignmentReader.getAssignedVehicles());
 		createVehiclesForHouseholds.run();
 		
 		/*
@@ -454,7 +454,7 @@ public class EvacuationControler extends WithinDayController implements
 		 * a household at a given facility.
 		 */
 		this.getFixedOrderSimulationListener().addSimulationListener(mobsimDataProvider);
-		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.scenarioData, mobsimDataProvider);
+		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.getScenario(), mobsimDataProvider);
 		
 		/*
 		 * Select a households meeting point respecting its members positions
@@ -467,13 +467,13 @@ public class EvacuationControler extends WithinDayController implements
 		 */
 		Logger.getLogger(this.getClass()).fatal("cannot say if the following should be vehicles or transit vehicles; aborting ... .  kai, feb'15");
 		System.exit(-1); 
-		new VehicleWriterV1(scenarioData.getTransitVehicles()).writeFile(this.getControlerIO().getOutputFilename(FILENAME_VEHICLES));
+		new VehicleWriterV1(getScenario().getTransitVehicles()).writeFile(this.getControlerIO().getOutputFilename(FILENAME_VEHICLES));
 			
 		/*
 		 * Assign vehicles to agent's plans.
 		 */
-		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.scenarioData, this.getTripRouterProvider().get());
-		for (Household household : ((ScenarioImpl) scenarioData).getHouseholds().getHouseholds().values()) {
+		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.getScenario(), this.getTripRouterProvider().get());
+		for (Household household : ((ScenarioImpl) getScenario()).getHouseholds().getHouseholds().values()) {
 			this.assignVehiclesToPlans.run(household);
 		}
 		this.assignVehiclesToPlans.printStatistics();
@@ -502,7 +502,7 @@ public class EvacuationControler extends WithinDayController implements
 		 */
 		// Create txt and kmz files containing distribution of evacuation times. 
 		if (EvacuationConfig.createEvacuationTimePicture) {
-			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer.createInstance(), householdsTracker, mobsimDataProvider);
+			evacuationTimePicture = new EvacuationTimePicture(getScenario(), coordAnalyzer.createInstance(), householdsTracker, mobsimDataProvider);
 			this.addControlerListener(evacuationTimePicture);
 			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
 			this.events.addHandler(evacuationTimePicture);	
@@ -511,19 +511,19 @@ public class EvacuationControler extends WithinDayController implements
 		// Create and add an AgentsInEvacuationAreaCounter.
 		if (EvacuationConfig.countAgentsInEvacuationArea) {
 			double scaleFactor = 1 / this.getConfig().qsim().getFlowCapFactor();
-			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, analyzedModes, coordAnalyzer.createInstance(), 
+			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.getScenario(), analyzedModes, coordAnalyzer.createInstance(), 
 					this.decisionDataProvider, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
 			this.events.addHandler(agentsInEvacuationAreaCounter);
 			
-			agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(this.scenarioData, coordAnalyzer.createInstance(), 
+			agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(this.getScenario(), coordAnalyzer.createInstance(), 
 					this.decisionDataProvider, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaActivityCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaActivityCounter);
 			this.events.addHandler(agentsInEvacuationAreaActivityCounter);
 			
-			this.agentsReturnHomeCounter = new AgentsReturnHomeCounter(this.scenarioData, analyzedModes, coordAnalyzer.createInstance(), 
+			this.agentsReturnHomeCounter = new AgentsReturnHomeCounter(this.getScenario(), analyzedModes, coordAnalyzer.createInstance(), 
 					this.decisionDataProvider, scaleFactor);
 			this.addControlerListener(this.agentsReturnHomeCounter);
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsReturnHomeCounter);
@@ -559,7 +559,7 @@ public class EvacuationControler extends WithinDayController implements
 		// set the TravelTimeCollector for car mode
 		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
 	
-		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(scenarioData, travelTimes, 
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(getScenario(), travelTimes, 
 				this.coordAnalyzer.createInstance(), this.affectedArea,
 				this.informedHouseholdsTracker, this.decisionModelRunner, null, null);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
@@ -633,7 +633,7 @@ public class EvacuationControler extends WithinDayController implements
 		InformedAgentsFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, null, 
 				InformedAgentsFilter.FilterType.NotInitialReplanning);
 		
-		AffectedAgentsFilterFactory affectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenarioData, this.householdsTracker, 
+		AffectedAgentsFilterFactory affectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.getScenario(), this.householdsTracker, 
 				mobsimDataProvider, coordAnalyzer, AffectedAgentsFilter.FilterType.NotAffected);
 		TransportModeFilterFactory carOnlyTransportModeFilterFactory = new TransportModeFilterFactory(CollectionUtils.stringToSet(TransportMode.car), mobsimDataProvider);
 		TransportModeFilterFactory walkOnlyTransportModeFilterFactory = new TransportModeFilterFactory(CollectionUtils.stringToSet(TransportMode.walk), mobsimDataProvider);
@@ -658,7 +658,7 @@ public class EvacuationControler extends WithinDayController implements
 		duringActivityFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.activityPerformingIdentifier = duringActivityFactory.createIdentifier();
 		
-		duringActivityFactory = new JoinedHouseholdsIdentifierFactory(this.scenarioData, this.selectHouseholdMeetingPoint, 
+		duringActivityFactory = new JoinedHouseholdsIdentifierFactory(this.getScenario(), this.selectHouseholdMeetingPoint, 
 				this.modeAvailabilityChecker.createInstance(), this.jointDepartureOrganizer, mobsimDataProvider, null);
 		duringActivityFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.joinedHouseholdsIdentifier = duringActivityFactory.createIdentifier();
@@ -675,7 +675,7 @@ public class EvacuationControler extends WithinDayController implements
 				earliestLinkExitTimeFilterFactory);
 		this.agentsToDropOffIdentifier = duringLegFactory.createIdentifier();
 	
-		duringLegFactory = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker,
+		duringLegFactory = new AgentsToPickupIdentifierFactory(this.getScenario(), this.coordAnalyzer, this.vehiclesTracker,
 				mobsimDataProvider, earliestLinkExitTimeProvider, this.informedHouseholdsTracker, this.decisionDataProvider, 
 				this.jointDepartureOrganizer, null, affectedAgentsFilterFactory, walkOnlyTransportModeFilterFactory, 
 				notInitialReplanningFilterFactory, activityStartingFilterFactory); 
@@ -707,7 +707,7 @@ public class EvacuationControler extends WithinDayController implements
 		
 		// if fuzzy travel times should be used
 		if (EvacuationConfig.useFuzzyTravelTimes) {
-			FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.getTravelTimeCollector(), this.householdsTracker, mobsimDataProvider);
+			FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.getScenario(), this.getTravelTimeCollector(), this.householdsTracker, mobsimDataProvider);
 			carTravelTime = fuzzyTravelTimeEstimatorFactory.get();
 		} else {
 			carTravelTime = this.getTravelTimeCollector();
@@ -731,24 +731,24 @@ public class EvacuationControler extends WithinDayController implements
 		
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		builder.setLeastCostPathCalculatorFactory(factory);
-		TripRouterFactory delegateFactory = builder.build(this.scenarioData);
-		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenarioData, travelTimes, penaltyCostFactory);
+		TripRouterFactory delegateFactory = builder.build(this.getScenario());
+		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.getScenario(), travelTimes, penaltyCostFactory);
 		
 //		throw new RuntimeException("We have to find a way to set a custom LeastCostPathCalculatorFactory in the TripRouterFactory!");
 //		commented out the subsequent code...
 		
-		TravelDisutility travelDisutility = penaltyCostFactory.createTravelDisutility(carTravelTime, scenarioData.getConfig().planCalcScore()); 
+		TravelDisutility travelDisutility = penaltyCostFactory.createTravelDisutility(carTravelTime, getScenario().getConfig().planCalcScore()); 
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, carTravelTime);
 		
 		/*
 		 * During Activity Replanners
 		 */
-		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, this.getWithinDayEngine(), this.decisionDataProvider, 
+		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(this.getScenario(), this.getWithinDayEngine(), this.decisionDataProvider, 
 				this.modeAvailabilityChecker, (SwissPTTravelTimeCalculator) ptTravelTime, tripRouterFactory, routingContext);
 		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
 		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(this.scenarioData, this.getWithinDayEngine(), decisionDataProvider,
+		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(this.getScenario(), this.getWithinDayEngine(), decisionDataProvider,
 				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, (SwissPTTravelTimeCalculator) this.ptTravelTime, tripRouterFactory, routingContext);
 		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
 		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
@@ -756,21 +756,21 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * During Leg Replanners
 		 */
-		this.currentLegToMeetingPointReplannerFactory = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, this.getWithinDayEngine(), decisionDataProvider, 
+		this.currentLegToMeetingPointReplannerFactory = new CurrentLegToMeetingPointReplannerFactory(this.getScenario(), this.getWithinDayEngine(), decisionDataProvider, 
 				tripRouterFactory, routingContext);
 		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
-		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine(), tripRouterFactory, routingContext,
+		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(this.getScenario(), this.getWithinDayEngine(), tripRouterFactory, routingContext,
 				(AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
 		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine(), (AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
+		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(this.getScenario(), this.getWithinDayEngine(), (AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), tripRouterFactory, routingContext);
+		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(this.getScenario(), this.getWithinDayEngine(), tripRouterFactory, routingContext);
 		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		

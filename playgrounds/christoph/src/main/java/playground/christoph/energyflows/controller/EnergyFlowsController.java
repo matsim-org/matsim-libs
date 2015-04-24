@@ -68,7 +68,7 @@ public class EnergyFlowsController extends Controler {
 		Scenario transitSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population transitPopulation = transitSc.getPopulation();
 		
-		for(Person person : this.scenarioData.getPopulation().getPersons().values()) {
+		for(Person person : this.getScenario().getPopulation().getPersons().values()) {
 			int id = Integer.valueOf(person.getId().toString());
 			if (id < 1000000000) nonTransitPopulation.addPerson(person);
 			else transitPopulation.addPerson(person);

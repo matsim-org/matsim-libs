@@ -127,7 +127,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 			return;
 		}
 		if (travelTimeCollector == null) {
-			travelTimeCollector = new TravelTimeCollector(this.scenarioData, analyzedModes);
+			travelTimeCollector = new TravelTimeCollector(this.getScenario(), analyzedModes);
 			fosl.addSimulationListener(travelTimeCollector);
 			this.events.addHandler(travelTimeCollector);
 		}
@@ -170,7 +170,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	}
 	
 	private void createAndInitEarliestLinkExitTimeProvider() {
-		this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenarioData);
+		this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.getScenario());
 		this.getEvents().addHandler(this.earliestLinkExitTimeProvider);
 		this.earliestLinkExitTimeProvider.getTransportModeProvider();
 	}
@@ -198,7 +198,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 
 	public void initWithinDayTripRouterFactory() {
 		TripRouterFactoryBuilderWithDefaults tripRouterFactoryBuilder = new TripRouterFactoryBuilderWithDefaults();
-		this.withinDayTripRouterFactory = tripRouterFactoryBuilder.build(this.scenarioData);
+		this.withinDayTripRouterFactory = tripRouterFactoryBuilder.build(this.getScenario());
 	}
 	
 	public WithinDayEngine getWithinDayEngine() {
@@ -218,7 +218,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	 */
 	public TripRouter getWithinDayTripRouterInstance() {
 		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getTravelTimeCollector(), 
-				this.scenarioData.getConfig().planCalcScore());
+				this.getScenario().getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getTravelTimeCollector());
 		return this.withinDayTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
 	}

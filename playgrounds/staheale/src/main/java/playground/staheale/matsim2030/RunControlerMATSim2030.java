@@ -81,7 +81,7 @@ public class RunControlerMATSim2030 extends Controler {
 		dcScoringFunctionFactory.setUsingConfigParamsForScoring(false);		
 		
 		TransitRouterConfig conf = new TransitRouterConfig(super.getConfig());
-		NewTransitRouterImplFactory factory = new NewTransitRouterImplFactory(super.scenarioData.getTransitSchedule(), conf, this.getConfig());
+		NewTransitRouterImplFactory factory = new NewTransitRouterImplFactory(super.getScenario().getTransitSchedule(), conf, this.getConfig());
 		
 		
 		
@@ -118,7 +118,7 @@ public class RunControlerMATSim2030 extends Controler {
 		this.addControlerListener(new DestinationChoiceInitializer(this.lcContext));
 		
 		this.addControlerListener(new CalcLegTimesHerbieListener(CALC_LEG_TIMES_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
-		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME, this.scenarioData.getNetwork()));
+		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME, this.getScenario().getNetwork()));
 		this.addControlerListener(new TripModeShares(1, this.getControlerIO(), this.getScenario(),
 				new MainModeIdentifierImpl(), new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE )));
 		super.loadControlerListeners();

@@ -69,7 +69,7 @@ public final class CarSharingControler extends Controler
   @Override
   protected void loadData() {
 	if (!this.isScenarioLoaded()) {
-			FtScenarioLoaderImpl loader = new FtScenarioLoaderImpl(this.scenarioData, this.plansCalcRouteFtInfo, this.ftConfigGroup);
+			FtScenarioLoaderImpl loader = new FtScenarioLoaderImpl(this.getScenario(), this.plansCalcRouteFtInfo, this.ftConfigGroup);
 			loader.loadScenario();
 			this.setScenarioLoaded(true);
 	}
