@@ -4,6 +4,8 @@ package playground.artemc.heterogeneity;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -12,17 +14,14 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.heterogeneity.old.HeterogeneityConfig;
-import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.heterogeneity.scoring.DisaggregatedHeterogeneousScoreAnalyzer;
+import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
 import playground.artemc.heterogeneity.scoring.TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 import playground.artemc.transitRouter.TransitRouterEventsHeteroWSModule;
-import playground.artemc.transitRouter.stopStopTimes.StopStopTimeCalculator;
-import playground.artemc.transitRouter.waitTimes.WaitTimeStuckCalculator;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -22,10 +22,10 @@
 
 package playground.artemc.transitRouter;
 
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.pt.router.TransitRouterFactory;
-import playground.artemc.transitRouter.stopStopTimes.StopStopTime;
-import playground.artemc.transitRouter.waitTimes.WaitTime;
 
 
 public class TransitRouterEventsHeteroWSModule extends AbstractModule {

@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
@@ -34,8 +36,6 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
 import playground.artemc.heterogeneity.IncomeHeterogeneity;
-import playground.artemc.transitRouter.stopStopTimes.StopStopTime;
-import playground.artemc.transitRouter.waitTimes.WaitTime;
 import playground.artemc.transitRouter.TransitRouterNetworkWW.TransitRouterNetworkLink;
 
 import java.util.HashMap;

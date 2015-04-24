@@ -4,6 +4,8 @@ package playground.artemc.heterogeneityWithToll;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -27,8 +29,6 @@ import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillOverModule;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 import playground.artemc.transitRouter.TransitRouterEventsHeteroWSModule;
-import playground.artemc.transitRouter.stopStopTimes.StopStopTimeCalculator;
-import playground.artemc.transitRouter.waitTimes.WaitTimeStuckCalculator;
 
 import java.io.File;
 import java.util.HashSet;

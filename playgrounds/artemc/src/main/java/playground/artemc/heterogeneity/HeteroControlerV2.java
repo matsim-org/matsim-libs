@@ -4,6 +4,8 @@ package playground.artemc.heterogeneity;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -25,8 +27,6 @@ import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeModule;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 import playground.artemc.transitRouter.TransitRouterEventsHeteroWSModule;
-import playground.artemc.transitRouter.stopStopTimes.StopStopTimeCalculator;
-import playground.artemc.transitRouter.waitTimes.WaitTimeStuckCalculator;
 
 import java.io.File;
 import java.util.HashSet;
@@ -74,7 +74,7 @@ public class HeteroControlerV2 {
 		Double newIncomeLambda = heterogeneityFactor * Double.parseDouble(ConfigUtils.addOrGetModule(scenario.getConfig(), HeterogeneityConfigGroup.GROUP_NAME, HeterogeneityConfigGroup.class).getLambdaIncomeTravelcost());
 
 		ConfigUtils.addOrGetModule(scenario.getConfig(),HeterogeneityConfigGroup.GROUP_NAME,HeterogeneityConfigGroup.class).setLambdaIncomeTravelcost(Double.toString(newIncomeLambda));
-		ConfigUtils.addOrGetModule(scenario.getConfig(),HeterogeneityConfigGroup.GROUP_NAME,HeterogeneityConfigGroup.class).setIncomeOnTravelCostType(this.simulationType);
+		ConfigUtils.addOrGetModule(scenario.getConfig(),HeterogeneityConfigGroup.GROUP_NAME,HeterogeneityConfigGroup.class).setIncomeOnTravelCostType(simulationType);
 
 		Controler controler = new Controler(scenario);
 
