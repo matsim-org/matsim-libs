@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -46,6 +47,9 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.util.ShapeUtilities;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -61,7 +65,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
-import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -88,8 +92,36 @@ import org.matsim.vehicles.VehicleUtils;
  * @author amit
  */
 
+@RunWith(Parameterized.class)
 public class CreateAutomatedFD {
 
+	public CreateAutomatedFD(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
+		this.linkDynamics = linkDynamics;
+		this.trafficDynamics = trafficDynamics;
+	}
+
+	private LinkDynamics linkDynamics;
+	private TrafficDynamics trafficDynamics;
+	
+	@Parameters
+	public static Collection<Object[]> createFds() {
+		Object[] [] fdData = new Object [][] { 
+				{LinkDynamics.FIFO, TrafficDynamics.queue}, 
+				{LinkDynamics.PassingQ,TrafficDynamics.queue},
+				{LinkDynamics.PassingQ,TrafficDynamics.withHoles}
+				};
+		return Arrays.asList(fdData);
+	}
+	
+	@Test
+	public void FDs(){
+		run(this.linkDynamics, this.trafficDynamics,false);
+	}
+	
+	@Test public void Fds_fastCapacityUpdate(){
+		run(this.linkDynamics,this.trafficDynamics,true);
+	}
+	
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 	
 	private  final String [] travelModes = {"car","bike"};
@@ -101,22 +133,7 @@ public class CreateAutomatedFD {
 	
 	private final Logger log = Logger.getLogger(CreateAutomatedFD.class);
 	
-	@Test
-	public void holesExperiment(){
-		run(LinkDynamics.PassingQ.name(),true);
-	}
-	
-	@Test
-	public void fifo(){
-		run(LinkDynamics.FIFO.name(), false);
-	}
-
-	@Test
-	public void passing(){
-		run(LinkDynamics.PassingQ.name(), false);
-	}
-	
-	private void run(String linkDynamics, final boolean useHoles) {
+	private void run(final LinkDynamics linkDynamics, final TrafficDynamics trafficDynamics, final boolean isUsingFastCapacityUpdate) {
 		
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		createNetwork();
@@ -125,12 +142,11 @@ public class CreateAutomatedFD {
 		
 		scenario.getConfig().qsim().setMainModes(Arrays.asList(travelModes));
 		scenario.getConfig().qsim().setEndTime(14*3600);
-		scenario.getConfig().qsim().setLinkDynamics(linkDynamics);
+		scenario.getConfig().qsim().setLinkDynamics(linkDynamics.name());
 		scenario.getConfig().vspExperimental().addParam("vspDefaultsCheckingLevel",VspExperimentalConfigGroup.ABORT);
-
-		if(useHoles){
-			scenario.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
-		} 
+		scenario.getConfig().qsim().setTrafficDynamics(trafficDynamics);
+		
+		scenario.getConfig().qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
 		
 		//equal modal split run
 		Map<String, Integer> minSteps = new HashMap<String, Integer>();
@@ -204,10 +220,28 @@ public class CreateAutomatedFD {
 			}
 		}
 		
+		/*
+		 *	Basically overriding the helper.getOutputDirectory() method, such that,
+		 *	if file directory does not exists or same file already exists, remove and re-creates the whole dir hierarchy so that
+		 *	all existing files are re-written but 
+		 *	else, just keep adding files in the directory.	
+		 *	This is necessary in order to allow writing different tests results from JUnit parameterization.
+		 */
+		
+		String outDir  = "test/output/" + CreateAutomatedFD.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
+		String fileName = linkDynamics+"_"+trafficDynamics+".png";
+		String outFile ;
+		
+		if(!new File(outDir).exists() || new File(outDir+fileName).exists()){
+			outFile = helper.getOutputDirectory()+fileName;
+		} else {
+			outFile = outDir+fileName;
+		}
+		
 		//plotting data
-		scatterPlot(outData,helper.getOutputDirectory()+linkDynamics+".png");
+		scatterPlot(outData,outFile);
 	}
-
+	
 	private void createPopulationAndVehicles(Map<String, Integer> point2run){
 		Population pop = scenario.getPopulation();
 		pop.getPersons().clear();
@@ -307,10 +341,13 @@ public class CreateAutomatedFD {
 		speedDataset.addSeries(carSpeed);
 		speedDataset.addSeries(bikeSpeed);
 
-
 		XYPlot plot = chart.getXYPlot();
 
+		NumberAxis axis1 = (NumberAxis) plot.getRangeAxis();
+        axis1.setRange(0.0, 2100.0);
+		
 		NumberAxis axis2 = new NumberAxis("Speed (m/s)");
+		axis2.setRange(0.0, 17.0);
 		axis2.setLabelFont(new Font("SansSerif", Font.BOLD, 15));
 		plot.setRangeAxisLocation(1,AxisLocation.BOTTOM_OR_RIGHT);
 		plot.setRangeAxis(1, axis2);
