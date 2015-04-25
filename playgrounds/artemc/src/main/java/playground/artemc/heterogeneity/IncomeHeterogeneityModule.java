@@ -5,12 +5,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import playground.artemc.heterogeneity.routing.TravelDisutilityIncludingIncome;
 import playground.artemc.utils.MapWriter;
@@ -72,6 +72,7 @@ public class IncomeHeterogeneityModule extends AbstractModule {
 			String incomeFile = heterogeneityConfig.getIncomeFile();
 			String lambdaIncomeTravelCost = heterogeneityConfig.getLambdaIncomeTravelcost();
 			String incomeType = heterogeneityConfig.getIncomeOnTravelCostType();
+			Population population = scenario.getPopulation();
 
 			log.info("Adding income heterogeneity and parcing income data... Heterogeneity type: " + incomeType);
 
@@ -87,27 +88,51 @@ public class IncomeHeterogeneityModule extends AbstractModule {
 			if(heterogeneityConfig.getIncomeOnTravelCostType().equals("homo")){
 				log.info("Simulation with homogeneuos users. No income information added.");
 			}else {
-				log.info("Reading income file...");
-				IncomePopulationReader incomesReader = new IncomePopulationReader(incomeHeterogeneityImpl, this.scenario.getPopulation());
-				incomesReader.parse(incomeFile);
+				log.info("Calculating incomeAlphaFactors based on income in personAttributes...");
+//				IncomePopulationReader incomesReader = new IncomePopulationReader(incomeHeterogeneityImpl, this.scenario.getPopulation());
+//				incomesReader.parse(incomeFile);
 
+				/*Calculate Income Statistics*/
+				Integer incomeSum=0;
+				Double incomeMean = 0.0;
+
+				for(Id<Person> personId:population.getPersons().keySet()){
+					incomeSum = incomeSum + (int) population.getPersonAttributes().getAttribute(personId.toString(), "income");
+				}
+				incomeMean = (double) incomeSum / (double) population.getPersons().size();
+
+				/*Create map of personal income factors*/
+				Double factorSum=0.0;
+				for(Id<Person> personId:population.getPersons().keySet()){
+					Integer personIncome = (int) population.getPersonAttributes().getAttribute(personId.toString(), "income");
+
+					double incomeFactor = Math.pow((double) personIncome/incomeMean,(incomeHeterogeneityImpl.getLambda_income()));
+
+					population.getPersonAttributes().putAttribute(personId.toString(),"incomeAlphaFactor",incomeFactor);
+
+					incomeHeterogeneityImpl.getIncomeFactors().put(personId, incomeFactor);
+					factorSum = factorSum + incomeFactor;
+				}
+
+				/*Write personal income factors to file*/
 				MapWriter writer = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/incomeFactors.csv");
 				writer.write(incomeHeterogeneityImpl.getIncomeFactors(), "PersonId", "IncomeFactor;");
 
-				if (incomeHeterogeneityImpl.getType().equals("heteroAlphaProp")) {
-				for (Id<Person> personId : this.scenario.getPopulation().getPersons().keySet()) {
-
-						double randomFactor = 0.0;
-						do {
-							randomFactor = (MatsimRandom.getRandom().nextGaussian() * 0.2) + 1;
-						} while (randomFactor < 0 && randomFactor > 2);
-						System.out.println();
-						incomeHeterogeneityImpl.getBetaFactors().put(personId, randomFactor);
-					}
-
-					MapWriter writerBetaFactors = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/betaNormalFactors.csv");
-					writerBetaFactors.write(incomeHeterogeneityImpl.getBetaFactors(), "PersonId", "BetaFactor;");
-				}
+				/*Looks like is is not a meaningful case*/
+//				if (incomeHeterogeneityImpl.getType().equals("heteroAlphaProp")) {
+//				for (Id<Person> personId : this.scenario.getPopulation().getPersons().keySet()) {
+//
+//						double randomFactor = 0.0;
+//						do {
+//							randomFactor = (MatsimRandom.getRandom().nextGaussian() * 0.2) + 1;
+//						} while (randomFactor < 0 && randomFactor > 2);
+//						System.out.println();
+//						incomeHeterogeneityImpl.getBetaFactors().put(personId, randomFactor);
+//					}
+//
+//					MapWriter writerBetaFactors = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/betaNormalFactors.csv");
+//					writerBetaFactors.write(incomeHeterogeneityImpl.getBetaFactors(), "PersonId", "BetaFactor;");
+//				}
 
 			}
 

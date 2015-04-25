@@ -32,6 +32,7 @@ import playground.artemc.transitRouter.TransitRouterEventsHeteroWSModule;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class ControlerWithHeteroAndToll {
@@ -72,8 +73,6 @@ public class ControlerWithHeteroAndToll {
 		Scenario scenario = initScenario();
 		//System.setProperty("matsim.preferLocalDtds", "true");
 
-
-
 		Controler controler = new Controler(scenario);
 
 		Initializer initializer = new Initializer();
@@ -110,7 +109,6 @@ public class ControlerWithHeteroAndToll {
 			throw new RuntimeException("Unknown income heterogeneity type");
 		}
 
-
 		//Routing PT
         WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
@@ -128,7 +126,16 @@ public class ControlerWithHeteroAndToll {
 		// Additional analysis
 		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
-		controler.addControlerListener(new DisaggregatedHeterogeneousScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
+		controler.addControlerListener(new DisaggregatedHeterogeneousScoreAnalyzer((ScenarioImpl) controler.getScenario(), analysisControlerListener.getTripAnalysisHandler()));
+
+
+		//Adjust parameters from input arguments
+		Map<String, String> params = scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams();
+		Double adjustedIncomeOnTravelCostLambda = Double.valueOf(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams().get("incomeOnTravelCostLambda"))*heterogeneityFactor;
+		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostLambda", adjustedIncomeOnTravelCostLambda.toString());
+		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostType", simulationType);
+		System.out.println();
+
 		controler.run();
 
 		//Logger root = Logger.getRootLogger();
@@ -147,8 +154,15 @@ public class ControlerWithHeteroAndToll {
 			config.plans().setInputFile(input+"population.xml");
 		}
 
+		boolean isPersonAttributesZipped = new File(input+"personAttributes.xml.gz").isFile();
+		if(isPersonAttributesZipped){
+			config.plans().setInputPersonAttributeFile(input+"personAttributes.xml.gz");
+		}else{
+			config.plans().setInputPersonAttributeFile(input+"personAttributes.xml");
+		}
+
 		config.transit().setTransitScheduleFile(input+"transitSchedule.xml");
-		config.transit().setVehiclesFile(input+"vehicles.xml");
+		config.transit().setVehiclesFile(input + "vehicles.xml");
 
 		if(output!=null){
 			config.controler().setOutputDirectory(output);
@@ -158,15 +172,6 @@ public class ControlerWithHeteroAndToll {
 		ConfigUtils.addOrGetModule(config,
 		                           RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(input+"roadpricing.xml");
 
-		//Heterogeneity module config
-		Double newIncomeLambda = heterogeneityFactor * Double.parseDouble(ConfigUtils.addOrGetModule(config, HeterogeneityConfigGroup.GROUP_NAME, HeterogeneityConfigGroup.class).getLambdaIncomeTravelcost());
-
-		ConfigUtils.addOrGetModule(config,HeterogeneityConfigGroup.GROUP_NAME,HeterogeneityConfigGroup.class).setIncomeFile(input+ConfigUtils.addOrGetModule(config,HeterogeneityConfigGroup.GROUP_NAME,HeterogeneityConfigGroup.class).getIncomeFile());
-		ConfigUtils.addOrGetModule(config,HeterogeneityConfigGroup.GROUP_NAME,HeterogeneityConfigGroup.class).setLambdaIncomeTravelcost(Double.toString(newIncomeLambda));
-		ConfigUtils.addOrGetModule(config,HeterogeneityConfigGroup.GROUP_NAME,HeterogeneityConfigGroup.class).setIncomeOnTravelCostType(simulationType);
-
-
-		//config.controler().setLastIteration(10);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		return scenario;

@@ -15,10 +15,8 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.analysis.IndividualScoreFromPopulationSQLWriter;
-import playground.artemc.heterogeneity.HeterogeneityConfigGroup;
 import playground.artemc.heterogeneity.IncomeHeterogeneityWithoutTravelDisutilityModule;
 import playground.artemc.heterogeneity.TravelDisutilityIncomeHeterogeneityProviderWrapper;
 import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
@@ -26,7 +24,6 @@ import playground.artemc.heterogeneityWithToll.TravelDisutilityTollAndIncomeHete
 import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillOverModule;
-import playground.artemc.scenarios.scenarioInitializer;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 
 import java.util.ArrayList;
@@ -67,9 +64,9 @@ public class ChoiceSetGenerator implements ShutdownListener
 		String outputDirectory = args[1];
 		String eventFilePath = args[2];
 
-		Config config = scenarioInitializer.initScenario(inputDirectory, outputDirectory);
-		ChoiceSetGenerator choiceSetGenerator = new ChoiceSetGenerator(config, eventFilePath);
+		Config config = ScenarioInitializerFromOutput.initScenario(inputDirectory, outputDirectory);
 
+		ChoiceSetGenerator choiceSetGenerator = new ChoiceSetGenerator(config, eventFilePath);
 		choiceSetGenerator.IncomeHeterogeneityAndTollInitializer();
 		choiceSetGenerator.CreateChoiceSets();
 
@@ -118,11 +115,6 @@ public class ChoiceSetGenerator implements ShutdownListener
 
 		PopulationFactory populationFactory = population.getFactory();
 		ArrayList<Person> newPersons = new ArrayList<>();
-
-		/*Read original personalAttributes file*/
-		HeterogeneityConfigGroup heterogeneityConfig = ConfigUtils.addOrGetModule(controler.getConfig(), HeterogeneityConfigGroup.GROUP_NAME, HeterogeneityConfigGroup.class);
-		String personalAttributesFile = heterogeneityConfig.getIncomeFile();
-		new ObjectAttributesXmlReader(population.getPersonAttributes()).parse(personalAttributesFile);
 
 		for (Id<Person> personId : population.getPersons().keySet()) {
 

@@ -8,10 +8,6 @@ package playground.artemc.scenarioTools;
  */
 
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
@@ -19,18 +15,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.PopulationWriter;
+import org.matsim.core.population.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
 import playground.artemc.utils.Writer;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Random;
 
 public class SimplePopulationGenerator {
 
@@ -56,9 +51,8 @@ public class SimplePopulationGenerator {
 		population.setIsStreaming(true);
 		PopulationWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
 		popWriter.startStreaming(outputPath+"/corridorPopulation_"+populationSize+".xml");
-		
 
-		Random generator = new Random();	
+		Random generator = new Random();
 
 		/*Assign random home zone*/
 		for(Integer i=0;i<populationSize;i++){	
@@ -100,8 +94,6 @@ public class SimplePopulationGenerator {
 			}
 			person.setEmployed(true);
 			simplePopulationGenerator.createIncome(person);
-			
-
 
 			//Add home location to the plan
 			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", homeLocation);
@@ -133,7 +125,7 @@ public class SimplePopulationGenerator {
 		//Values from working population of Sioux Falls Scenario
 		Double mean=10.954092187;
 		Double std= 0.730406478;
-		Integer income = (int) Math.round(Math.exp(mean+std*random.nextGaussian()));			
+		Integer income = (int) Math.round(Math.exp(mean+std*random.nextGaussian()));
 		incomes.putAttribute(person.getId().toString(), "income", income);	
 		incomeData.put(person.getId(), income);
 		incomeBins.addVal(income, 1.0);

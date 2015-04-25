@@ -1,12 +1,8 @@
 package playground.artemc.scenarioTools;
 
-import java.io.IOException;
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReaderMatsimV5;
@@ -18,6 +14,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
+import java.io.IOException;
+import java.util.HashMap;
 
 public class PopulationTransitStopDistanceCalculator {
 
@@ -37,8 +36,6 @@ public class PopulationTransitStopDistanceCalculator {
 
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
 		TransitScheduleImpl schedule = (TransitScheduleImpl) scenario.getTransitSchedule();
-
-
 		
 		for(TransitLine line:schedule.getTransitLines().values()){
 			for(TransitRoute route:line.getRoutes().values()){

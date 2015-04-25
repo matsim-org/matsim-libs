@@ -5,14 +5,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.gbl.MatsimRandom;
 import playground.artemc.utils.MapWriter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.Map;
 
 /**
  * Created by artemc on 28/1/15.
@@ -55,55 +55,54 @@ public class IncomeHeterogeneityWithoutTravelDisutilityModule extends AbstractMo
 
 		@Override
 		public IncomeHeterogeneity get() {
-			HeterogeneityConfigGroup heterogeneityConfig = ConfigUtils.addOrGetModule(config, HeterogeneityConfigGroup.GROUP_NAME, HeterogeneityConfigGroup.class);
-			String incomeFile = heterogeneityConfig.getIncomeFile();
-			String lambdaIncomeTravelCost = heterogeneityConfig.getLambdaIncomeTravelcost();
-			String incomeType = heterogeneityConfig.getIncomeOnTravelCostType();
+			log.info("Loading heterogeneity config group...");
 
-			log.info("Adding income heterogeneity and parcing income data... Heterogeneity type: " + incomeType);
+			Population population = scenario.getPopulation();
 
-			if (incomeFile == null) {
-				throw new RuntimeException("No income file path given.");
-			} else if (lambdaIncomeTravelCost == null) { throw new RuntimeException("No sensitivity parameter for income dependent travel cost is given.");}
+			/*Check if personAttributes has been loaded*/
+			if(population.getPersonAttributes().equals(null))
+			{
+				log.error("Person attributes are empty!");
+			}
 
-			IncomeHeterogeneityImpl incomeHeterogeneityImpl = new IncomeHeterogeneityImpl(this.scenario.getPopulation());
+			Map<String, String> params = scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams();
+
+			IncomeHeterogeneityImpl incomeHeterogeneityImpl = new IncomeHeterogeneityImpl(population);
 			incomeHeterogeneityImpl.setName("Income dependent heterogeneity in perception of travel cost");
-			incomeHeterogeneityImpl.setType(heterogeneityConfig.getIncomeOnTravelCostType());
-			incomeHeterogeneityImpl.setLambda_income(Double.valueOf(heterogeneityConfig.getLambdaIncomeTravelcost()));
+			incomeHeterogeneityImpl.setType(params.get("incomeOnTravelCostType"));
+			incomeHeterogeneityImpl.setLambda_income(Double.valueOf(params.get("incomeOnTravelCostLambda")));
 
-			if (heterogeneityConfig.getIncomeOnTravelCostType().equals("homo")) {
-				log.info("Simulation with homogeneuos users. No income information added.");
+			if (incomeHeterogeneityImpl.getType().equals("homo")) {
+				log.info("Simulation with homogeneuos agents...");
 			} else {
-				log.info("Reading income file...");
-				IncomePopulationReader incomesReader = new IncomePopulationReader(incomeHeterogeneityImpl, this.scenario.getPopulation());
-				incomesReader.parse(incomeFile);
+				log.info("Simulation with "+incomeHeterogeneityImpl.getType()+" heterogeneity: calculating income factors.");
 
-/* Copy income file - not required, as saved in output_personAttributes.xml */
-/*				File orgIncomeFile = new File(incomeFile);
-				File outputIncomeFile = new File(this.scenario.getConfig().controler().getOutputDirectory() + "/incomes.csv");
-				try {
-					FileUtils.copyFile(orgIncomeFile, outputIncomeFile);
-				} catch (IOException e) {
-					e.printStackTrace();
+				/*Calculate Income Statistics*/
+				Integer incomeSum=0;
+				Double incomeMean = 0.0;
+
+				for(Id<Person> personId:population.getPersons().keySet()){
+					incomeSum = incomeSum + (int) population.getPersonAttributes().getAttribute(personId.toString(), "income");
 				}
-*/
+				incomeMean = (double) incomeSum / (double) population.getPersons().size();
 
+				/*Create map of personal income factors*/
+				Double factorSum=0.0;
+				for(Id<Person> personId:population.getPersons().keySet()){
+					Integer personIncome = (int) population.getPersonAttributes().getAttribute(personId.toString(), "income");
+
+					double incomeFactor = Math.pow((double) personIncome/incomeMean,(incomeHeterogeneityImpl.getLambda_income()));
+
+					population.getPersonAttributes().putAttribute(personId.toString(),"incomeAlphaFactor",incomeFactor);
+
+					incomeHeterogeneityImpl.getIncomeFactors().put(personId, incomeFactor);
+					factorSum = factorSum + incomeFactor;
+				}
+
+				/*Write personal income factors to file*/
 				MapWriter writer = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/incomeFactors.csv");
 				writer.write(incomeHeterogeneityImpl.getIncomeFactors(), "PersonId", "IncomeFactor;");
 
-				if (incomeHeterogeneityImpl.getType().equals("heteroAlphaProp")) {
-					for (Id<Person> personId : this.scenario.getPopulation().getPersons().keySet()) {
-
-						double randomFactor = 0.0;
-						do {
-							randomFactor = (MatsimRandom.getRandom().nextGaussian() * 0.2) + 1;
-						} while (randomFactor < 0 && randomFactor > 2);
-						incomeHeterogeneityImpl.getBetaFactors().put(personId, randomFactor);
-					}
-
-					MapWriter writerBetaFactors = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/betaNormalFactors.csv");
-					writerBetaFactors.write(incomeHeterogeneityImpl.getBetaFactors(), "PersonId", "BetaFactor;");
-				}
 			}
 			return incomeHeterogeneityImpl;
 		}

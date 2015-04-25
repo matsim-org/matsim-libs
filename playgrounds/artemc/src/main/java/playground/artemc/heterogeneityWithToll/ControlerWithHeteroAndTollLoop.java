@@ -140,6 +140,7 @@ public class ControlerWithHeteroAndTollLoop {
 		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
 		controler.addControlerListener(new DisaggregatedHeterogeneousScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
+
 		controler.run();
 
 		//Logger root = Logger.getRootLogger();
