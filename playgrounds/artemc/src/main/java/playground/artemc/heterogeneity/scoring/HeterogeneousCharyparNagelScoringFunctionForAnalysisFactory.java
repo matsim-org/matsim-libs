@@ -56,6 +56,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 	private HashMap<Id, ScoringFunction> personScoringFunctions;
 	private HashMap<Id<Person>, Double> incomeFactors = null;
 	private HashMap<Id<Person>, Double> betaFactors = null;
+
 	private String simulationType;
 	private IncomeHeterogeneity incomeHeterogeneity;
 
@@ -64,6 +65,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 		this.config = config;
 		this.network = network;
 		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
+		this.simulationType = "homo";
 	}
 
 	//setter method injector
@@ -81,7 +83,7 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
 
-		this.init();
+		//this.init();
 		PersonalScoringParameters params = new PersonalScoringParameters(this.config);
 		
 		//Adjust individuals scoring parameters for heterogeneity simulation. If simulationType is set to "homo" (default setting) no adjustment takes place.
@@ -89,9 +91,9 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 
 		DisaggregatedSumScoringFunction sumScoringFunction = new DisaggregatedSumScoringFunction();
 		sumScoringFunction.setParams(params);
-		
+
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));		
-		for(String mode:config.getModes().keySet()){
+		for(String mode:params.modeParams.keySet()){
 			sumScoringFunction.addLegScoringFunction(mode, new CharyparNagelLegScoring(params, this.network));
 		}
 		sumScoringFunction.addLegScoringFunction("transit_walk", new CharyparNagelLegScoring(params, this.network));
@@ -111,78 +113,83 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 	
 	public PersonalScoringParameters adjustParametersForHeterogeneity(String simulationType, Person person, PersonalScoringParameters params){
 
-		if(incomeFactors!=null && !simulationType.equals("homo")){
-			
-			/*Calculate the mean in order to adjust the utility parameters*/
-			Double factorSum=0.0;
-			Double factorMean = 0.0;
-			Double inverseFactorSum=0.0;
-			Double inverseFactorMean=0.0;
-			for(Double incomeFactor:this.incomeFactors.values()){
-				factorSum = factorSum + incomeFactor;
-				inverseFactorSum = inverseFactorSum + (1.0/incomeFactor);
-			}
-			factorMean = factorSum / (double) incomeFactors.size();
-			inverseFactorMean = inverseFactorSum / (double) incomeFactors.size();
+		if(person.getCustomAttributes().containsKey("incomeAlphaFactor") && !simulationType.equals("homo")){
+
+			Double incomeAlphaFactor = (Double) person.getCustomAttributes().get("incomeAlphaFactor");
+
+//			/*Calculate the mean in order to adjust the utility parameters*/
+//			Double factorSum=0.0;
+//			Double factorMean = 0.0;
+//			Double inverseFactorSum=0.0;
+//			Double inverseFactorMean=0.0;
+//			for(Double incomeFactor:this.incomeFactors.values()){
+//				factorSum = factorSum + incomeFactor;
+//				inverseFactorSum = inverseFactorSum + (1.0/incomeFactor);
+//			}
+//			factorMean = factorSum / (double) incomeFactors.size();
+//			inverseFactorMean = inverseFactorSum / (double) incomeFactors.size();
 			
 
 		if(simulationType.equals("hetero")){
 
 			    /* Adjust alpha - value of time*/
-				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * incomeAlphaFactor;
 
 				for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
-					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * incomeAlphaFactor;
 				}
 
 				/* Adjust beta - schedule delay early*/
-				params.marginalUtilityOfWaiting_s =  params.marginalUtilityOfWaiting_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+				params.marginalUtilityOfWaiting_s =  params.marginalUtilityOfWaiting_s * incomeAlphaFactor;
 
 				/* Adjust gamma - schedule delay late*/
-				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
-				params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s * incomeAlphaFactor;
+				params.marginalUtilityOfEarlyDeparture_s= params.marginalUtilityOfEarlyDeparture_s * incomeAlphaFactor;
 
 		}
 		else if(simulationType.equals("heteroAlpha") ){
-			
+
+				Double sdBetaFactor = (Double) person.getCustomAttributes().get("sdBetaFactor");
+
 				double performingConst = 	params.marginalUtilityOfPerforming_s;
 
 				/* Adjust alpha - value of time*/
-				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+				params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * incomeAlphaFactor;
 
 				for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
-					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * incomeAlphaFactor;
 				}
 
-				/* Adjust beta - schedule delay early*/
-				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - performingConst / 2;
+				/* Adjust beta - schedule delay early (sdBeta = marginalUtilityOfWaiting - marginalUtilityOfPerforming*/
+				/*relation beta/alpha  = 0.5 for beta_mean is also used by van den Berg and Verhoef (2011)*/
+				params.marginalUtilityOfWaiting_s = params.marginalUtilityOfPerforming_s - performingConst * 0.5 * sdBetaFactor;
 
 				/* Adjust gamma - schedule delay late*/
-				params.marginalUtilityOfLateArrival_s =  params.marginalUtilityOfLateArrival_s;
-				params.marginalUtilityOfEarlyDeparture_s =  params.marginalUtilityOfEarlyDeparture_s;
+				/*relation gamma/beta  = 3.9 as in Arnott, de Palma, Lindsey (1990) and later used by van den Berg and Verhoef (2011)*/
 				params.marginalUtilityOfLateArrival_s =  (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s)*3.9;
 				params.marginalUtilityOfEarlyDeparture_s =  (params.marginalUtilityOfWaiting_s - params.marginalUtilityOfPerforming_s)*3.9;
 
-				/*ration gamma/beta  = 3.9 as in Arnott, de Palma, Lindsey (1990) and later used by van den Berg and Verhoef (2011)*/
 
 		}
 		else if(simulationType.equals("heteroGamma") ){
 
+			Double incomeGammaFactor = (Double) person.getCustomAttributes().get("incomeAlphaFactor");
+
 			double performingConst = 	params.marginalUtilityOfPerforming_s;
 			double waitingConst = 	params.marginalUtilityOfWaiting_s;
 			/* Adjust alpha - value of time*/
-			params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+			params.marginalUtilityOfPerforming_s =  params.marginalUtilityOfPerforming_s * incomeAlphaFactor;
 
 			for (Entry<String, Mode> mode : params.modeParams.entrySet()) {
-				mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+				mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * incomeAlphaFactor;
 			}
 
 			/* Adjust beta - schedule delay early*/
-			params.marginalUtilityOfWaiting_s =  params.marginalUtilityOfWaiting_s * (1.0/incomeFactors.get(person.getId())) / inverseFactorMean;
+			params.marginalUtilityOfWaiting_s =  params.marginalUtilityOfWaiting_s * incomeAlphaFactor;
 
 			/* Adjust gamma - schedule delay late*/
-			params.marginalUtilityOfLateArrival_s =  (waitingConst - performingConst) * 3.9 * (incomeFactors.get(person.getId())/factorMean);
-			params.marginalUtilityOfEarlyDeparture_s =  (waitingConst- performingConst) * 3.9 * (incomeFactors.get(person.getId())/factorMean);
+			params.marginalUtilityOfLateArrival_s =  (waitingConst - performingConst) * 3.9 * incomeGammaFactor;
+			params.marginalUtilityOfEarlyDeparture_s =  (waitingConst- performingConst) * 3.9 * incomeGammaFactor;
 
 
 			/*  OLD VERSION (before April 24, 2015)
@@ -228,6 +235,10 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory impleme
 	@Override
 	public HashMap<Id, ScoringFunction> getPersonScoringFunctions() {
 		return personScoringFunctions;
+	}
+
+	public void setSimulationType(String simulationType) {
+		this.simulationType = simulationType;
 	}
 
 }

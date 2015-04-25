@@ -1,24 +1,19 @@
 package playground.artemc.heterogeneity.scoring;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
-import org.matsim.core.scoring.SumScoringFunction.AgentStuckScoring;
-import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
-import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
-import org.matsim.core.scoring.SumScoringFunction.LegScoring;
-import org.matsim.core.scoring.SumScoringFunction.MoneyScoring;
+import org.matsim.core.scoring.SumScoringFunction.*;
 import org.matsim.core.utils.misc.Time;
-
 import playground.artemc.heterogeneity.scoring.functions.PersonalScoringParameters;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class DisaggregatedSumScoringFunction implements ScoringFunction {
 	
@@ -55,7 +50,12 @@ public class DisaggregatedSumScoringFunction implements ScoringFunction {
 
 	@Override
     public final void handleLeg(Leg leg) {
-		legScoringFunctions.get(leg.getMode()).handleLeg(leg);
+		if(legScoringFunctions.containsKey(leg.getMode())) {
+			legScoringFunctions.get(leg.getMode()).handleLeg(leg);
+		}
+		else{
+			legScoringFunctions.get(TransportMode.other).handleLeg(leg);
+		}
     }
 	
 	@Override

@@ -12,6 +12,7 @@ import playground.artemc.utils.MapWriter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -86,21 +87,45 @@ public class IncomeHeterogeneityWithoutTravelDisutilityModule extends AbstractMo
 				}
 				incomeMean = (double) incomeSum / (double) population.getPersons().size();
 
-				/*Create map of personal income factors*/
+
+				/*Create map of personal income factors and calculate the mean in order to adjust the utility parameters*/
+				HashMap<Id<Person>, Double> incomeCostSensitivityFactors = new HashMap<Id<Person>, Double>();
 				Double factorSum=0.0;
-				for(Id<Person> personId:population.getPersons().keySet()){
+				Double factorMean;
+				Double inverseFactorSum=0.0;
+				Double inverseFactorMean;
+
+				for(Id<Person> personId:population.getPersons().keySet()) {
 					Integer personIncome = (int) population.getPersonAttributes().getAttribute(personId.toString(), "income");
+					double incomeCostSensitivity = Math.pow((double) personIncome / incomeMean, (incomeHeterogeneityImpl.getLambda_income()));
+					incomeCostSensitivityFactors.put(personId, incomeCostSensitivity);
+					factorSum = factorSum + incomeCostSensitivity;
+					inverseFactorSum = inverseFactorSum + (1.0/incomeCostSensitivity);
+				}
 
-					double incomeFactor = Math.pow((double) personIncome/incomeMean,(incomeHeterogeneityImpl.getLambda_income()));
+				factorMean = factorSum / (double) incomeCostSensitivityFactors.size();
+				inverseFactorMean = inverseFactorSum / (double) incomeCostSensitivityFactors.size();
 
-					population.getPersonAttributes().putAttribute(personId.toString(),"incomeAlphaFactor",incomeFactor);
+				/*Add normalized income dependent value of time (alpha) factors (= 1/incomeCostSensitivityFactor) to the agent population*/
+				/*Add schedule delays beta factors*/
+				for(Id<Person> personId:population.getPersons().keySet()){
 
-					incomeHeterogeneityImpl.getIncomeFactors().put(personId, incomeFactor);
-					factorSum = factorSum + incomeFactor;
+					double incomeAlphaFactor = (1.0/incomeCostSensitivityFactors.get(personId))/inverseFactorMean;
+					population.getPersonAttributes().putAttribute(personId.toString(),"incomeAlphaFactor",incomeAlphaFactor);
+					population.getPersons().get(personId).getCustomAttributes().put("incomeAlphaFactor", incomeAlphaFactor);
+
+					double incomeGammaFactor = incomeCostSensitivityFactors.get(personId)/factorMean;
+					population.getPersons().get(personId).getCustomAttributes().put("incomeGammaFactor", incomeGammaFactor);
+
+					double sdBetaFactor = (double) population.getPersonAttributes().getAttribute(personId.toString(),"betaFactor");
+					population.getPersons().get(personId).getCustomAttributes().put("sdBetaFactor",sdBetaFactor);
+
+					//TODO remove incomeHeterogeneityImpl
+					incomeHeterogeneityImpl.getIncomeFactors().put(personId, incomeAlphaFactor);
 				}
 
 				/*Write personal income factors to file*/
-				MapWriter writer = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/incomeFactors.csv");
+				MapWriter writer = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/incomeCostSensitivityFactors.csv");
 				writer.write(incomeHeterogeneityImpl.getIncomeFactors(), "PersonId", "IncomeFactor;");
 
 			}

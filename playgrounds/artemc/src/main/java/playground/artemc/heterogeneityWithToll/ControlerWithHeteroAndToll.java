@@ -74,9 +74,14 @@ public class ControlerWithHeteroAndToll {
 		//System.setProperty("matsim.preferLocalDtds", "true");
 
 		Controler controler = new Controler(scenario);
-
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
+
+		//Adjust heterogeneity parameters from input arguments
+		Map<String, String> params = scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams();
+		Double adjustedIncomeOnTravelCostLambda = Double.valueOf(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams().get("incomeOnTravelCostLambda"))*heterogeneityFactor;
+		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostLambda", adjustedIncomeOnTravelCostLambda.toString());
+		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostType", simulationType);
 
 		log.info("Adding Simple Annealer...");
 		controler.addControlerListener(new SimpleAnnealer());
@@ -120,7 +125,10 @@ public class ControlerWithHeteroAndToll {
 		controler.addOverridingModule(new TransitRouterEventsHeteroWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 
 		//Scoring
-        controler.setScoringFunctionFactory(new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork()));
+		HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory customScoringFunctionFactory = new HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork());
+		customScoringFunctionFactory.setSimulationType(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams().get("incomeOnTravelCostType"));
+        controler.setScoringFunctionFactory(customScoringFunctionFactory);
+
 		controler.setOverwriteFiles(true);
 		
 		// Additional analysis
@@ -129,12 +137,7 @@ public class ControlerWithHeteroAndToll {
 		controler.addControlerListener(new DisaggregatedHeterogeneousScoreAnalyzer((ScenarioImpl) controler.getScenario(), analysisControlerListener.getTripAnalysisHandler()));
 
 
-		//Adjust parameters from input arguments
-		Map<String, String> params = scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams();
-		Double adjustedIncomeOnTravelCostLambda = Double.valueOf(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams().get("incomeOnTravelCostLambda"))*heterogeneityFactor;
-		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostLambda", adjustedIncomeOnTravelCostLambda.toString());
-		scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).addParam("incomeOnTravelCostType", simulationType);
-		System.out.println();
+
 
 		controler.run();
 
@@ -170,7 +173,8 @@ public class ControlerWithHeteroAndToll {
 
 		//Roadpricing module config
 		ConfigUtils.addOrGetModule(config,
-		                           RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(input+"roadpricing.xml");
+		                           RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(input + "roadpricing.xml");
+
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
