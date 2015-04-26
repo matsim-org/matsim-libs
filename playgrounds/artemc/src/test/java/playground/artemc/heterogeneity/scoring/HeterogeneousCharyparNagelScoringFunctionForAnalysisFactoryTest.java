@@ -204,8 +204,14 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		f.config.planCalcScore().setTraveling_utils_hr(-6.0);
 		assertEquals(-3.0, calcScore(f), EPSILON);
 		assertEquals(-6.0, calcScore(f,"hetero"), EPSILON);
+		assertEquals(-6.0, calcScore(f, "heteroAlpha"), EPSILON);
+		assertEquals(-6.0, calcScore(f,"heteroGamma"), EPSILON);
+
 		f.config.planCalcScore().setConstantCar(-6.0);
 		assertEquals(-9.0, calcScore(f), EPSILON);
+		assertEquals(-12.0, calcScore(f,"hetero"), EPSILON);
+		assertEquals(-12.0, calcScore(f, "heteroAlpha"), EPSILON);
+		assertEquals(-12.0, calcScore(f,"heteroGamma"), EPSILON);
 	}
 
 	@Test
@@ -213,8 +219,15 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		Fixture f = new Fixture();
 		f.config.planCalcScore().setTravelingPt_utils_hr(-9.0);
 		assertEquals(-2.25, calcScore(f), EPSILON);
+		assertEquals(-4.5, calcScore(f,"hetero"), EPSILON);
+		assertEquals(-4.5, calcScore(f, "heteroAlpha"), EPSILON);
+		assertEquals(-4.5, calcScore(f,"heteroGamma"), EPSILON);
+
 		f.config.planCalcScore().setConstantPt(-3.0);
 		assertEquals(-5.25, calcScore(f), EPSILON);
+		assertEquals(-7.5, calcScore(f,"hetero"), EPSILON);
+		assertEquals(-7.5, calcScore(f, "heteroAlpha"), EPSILON);
+		assertEquals(-7.5, calcScore(f,"heteroGamma"), EPSILON);
 	}
 
 	@Test
@@ -222,8 +235,15 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		Fixture f = new Fixture();
 		f.config.planCalcScore().setTravelingWalk_utils_hr(-18.0);
 		assertEquals(-9.0, calcScore(f), EPSILON);
+		assertEquals(-18.0, calcScore(f,"hetero"), EPSILON);
+		assertEquals(-18.0, calcScore(f, "heteroAlpha"), EPSILON);
+		assertEquals(-18.0, calcScore(f,"heteroGamma"), EPSILON);
+
 		f.config.planCalcScore().setConstantWalk(-1.0);
 		assertEquals(-10.0, calcScore(f), EPSILON);
+		assertEquals(-19.0, calcScore(f,"hetero"), EPSILON);
+		assertEquals(-19.0, calcScore(f, "heteroAlpha"), EPSILON);
+		assertEquals(-19.0, calcScore(f,"heteroGamma"), EPSILON);
 	}
 
 	@Test
@@ -231,8 +251,15 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		Fixture f = new Fixture();
 		f.config.planCalcScore().setTravelingBike_utils_hr(-6.0);
 		assertEquals(-1.5, calcScore(f), EPSILON);
+		assertEquals(-3.0, calcScore(f,"hetero"), EPSILON);
+		assertEquals(-3.0, calcScore(f, "heteroAlpha"), EPSILON);
+		assertEquals(-3.0, calcScore(f,"heteroGamma"), EPSILON);
+
 		f.config.planCalcScore().setConstantBike(-2.0);
 		assertEquals(-3.5, calcScore(f), EPSILON);
+		assertEquals(-5.0, calcScore(f,"hetero"), EPSILON);
+		assertEquals(-5.0, calcScore(f, "heteroAlpha"), EPSILON);
+		assertEquals(-5.0, calcScore(f,"heteroGamma"), EPSILON);
 	}
 
 	/**
@@ -247,7 +274,14 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		double zeroUtilDurH = getZeroUtilDuration_hrs(15.0, 1.0);
 
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
-		assertEquals(perf * 3.0 * Math.log(2.5 / zeroUtilDurW) + perf * 3.0 * Math.log(2.75 / zeroUtilDurW) + perf * 3.0 * Math.log(2.5 / zeroUtilDurW) + perf * 15.0 * Math.log(14.75 / zeroUtilDurH), calcScore(f), EPSILON);
+		double score = perf * 3.0 * Math.log(2.5 / zeroUtilDurW) + perf * 3.0 * Math.log(2.75 / zeroUtilDurW) + perf * 3.0 * Math.log(2.5 / zeroUtilDurW) + perf * 15.0 * Math.log(14.75 / zeroUtilDurH);
+		assertEquals(score, calcScore(f), EPSILON);
+
+		perf = perf * testee_incomeAlphaFactor;
+		score = perf * 3.0 * Math.log(2.5 / zeroUtilDurW) + perf * 3.0 * Math.log(2.75 / zeroUtilDurW) + perf * 3.0 * Math.log(2.5 / zeroUtilDurW) + perf * 15.0 * Math.log(14.75 / zeroUtilDurH);
+		assertEquals(score, calcScore(f,"hetero"), EPSILON);
+		assertEquals(score, calcScore(f, "heteroAlpha"), EPSILON);
+		assertEquals(score, calcScore(f,"heteroGamma"), EPSILON);
 
 		//		perf = +3.0;
 		//		f.config.planCalcScore().setPerforming_utils_hr(perf);
@@ -362,6 +396,19 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 
 		// the agent spends 1.5h waiting at the work place
 		assertEquals(waiting * 1.5, calcScore(f), EPSILON);
+
+
+		assertEquals(testee_incomeAlphaFactor * waiting * 1.5, calcScore(f, "hetero"), EPSILON);
+		assertEquals(testee_incomeAlphaFactor * waiting * 1.5, calcScore(f, "heteroGamma"), EPSILON);
+
+		double perf = +6.0;
+		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
+		double zeroUtilDurH = getZeroUtilDuration_hrs(15.0, 1.0);
+		f.config.planCalcScore().setPerforming_utils_hr(perf);
+		perf = perf * testee_incomeAlphaFactor;
+		double score = perf * 3.0 * Math.log(2 / zeroUtilDurW) + perf * 3.0 * Math.log(2.75 / zeroUtilDurW) + perf * 3.0 * Math.log(1.5 / zeroUtilDurW) + perf * 15.0 * Math.log(14.75 / zeroUtilDurH);
+
+		assertEquals(score + (perf - testee_sdFactor * 0.5 * perf/testee_incomeAlphaFactor) * 1.5, calcScore(f, "heteroAlpha"), EPSILON);
 	}
 
 	/**
@@ -613,10 +660,10 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		public Fixture() {
 			firstLegStartTime = 7 * 3600;
 			firstLegTravelTime = 30 * 60;
-			thirdLegTravelTime = 30 * 60;
 			secondLegStartTime = 10 * 3600;
 			secondLegTravelTime = 15 * 60;
 			thirdLegStartTime = 13 * 3600;
+			thirdLegTravelTime = 30 * 60;
 			fourthLegStartTime = 16 * 3600;
 			fourthLegTravelTime = 15 * 60;
 			// home act end 7am
