@@ -42,8 +42,8 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 
 	private double samplingRateForClusteringEstimation = 0.1;
 
-	private double powellMinAbsoluteChange = 1E-5;
-	private double powellMinRelativeChange = 1E-5;
+	private double powellMinAbsoluteChange = 1E-9;
+	private double powellMinRelativeChange = 1E-9;
 
 	private int maxIterations = 10000;
 

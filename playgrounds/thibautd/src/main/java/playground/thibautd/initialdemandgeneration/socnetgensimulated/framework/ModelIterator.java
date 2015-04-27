@@ -94,6 +94,8 @@ public class ModelIterator {
 			final Thresholds initialThresholds ) {
 		final MultivariateOptimizer optimizer =
 			new PowellOptimizer(
+					2 * Math.ulp( 1d ),
+					Double.MIN_VALUE,
 					powellMinRelativeChange,
 					powellMinAbsoluteChange,
 					new Convergence() );
@@ -176,7 +178,28 @@ public class ModelIterator {
 		@Override
 		public boolean converged( final int i , final PointValuePair prev , final PointValuePair curr ) {
 			// not really satisfying...
-			return curr.getValue().doubleValue() < 1;
+			final boolean conv = curr.getValue().doubleValue() < 1;
+
+			if ( conv ) {
+				log.info( "convergence checker considers convergenced is reached." );
+			}
+			else {
+				final double prevVal = prev.getValue();
+				final double currVal = curr.getValue();
+
+				final double abs = Math.abs( currVal - prevVal );
+				final double rel = Math.abs( (currVal - prevVal) / prevVal );
+
+				if ( abs <= powellMinAbsoluteChange || rel <= powellMinRelativeChange ) {
+					// never printed: optimizer calls this class after line search,
+					// if and only if the optimizer does not itself considers it converged...
+					log.warn( "considered non converged, but too flat: Powell will abort!" );
+					log.warn( "absolute change: "+abs );
+					log.warn( "relative change: "+rel );
+				}
+			}
+
+			return conv;
 		}
 	}
 }
