@@ -20,10 +20,12 @@
 package playground.vsp.analysis.modules.monetaryTransferPayments;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
@@ -33,22 +35,49 @@ import org.matsim.api.core.v01.population.Person;
  * @author ikaddoura, benjamin
  *
  */
-public class MoneyEventHandler implements PersonMoneyEventHandler{
-	private SortedMap<Id<Person>, Double> id2amount = new TreeMap<Id<Person>, Double>();
+public class MoneyEventHandler implements PersonMoneyEventHandler {
+	private static final Logger log = Logger.getLogger(MoneyEventHandler.class);
 
+	private SortedMap<Id<Person>, Double> id2amount = new TreeMap<Id<Person>, Double>();
+	private List<Id<Person>> stuckingAgents = null;
+
+	public MoneyEventHandler(List<Id<Person>> stuckingAgents) {
+		this.stuckingAgents = stuckingAgents;
+		log.info("Providing the person Ids of stucking agents. These agents will be excluded from this analysis.");
+	}
+	
+	public MoneyEventHandler() {
+		log.info("Considering all persons even though they may stuck in the base case or policy case.");
+	}
+	
+	private boolean isStucking(Id<Person> personId) {
+		if (this.stuckingAgents == null) {
+			return false;
+		} else if (this.stuckingAgents.contains(personId)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	@Override
 	public void handleEvent(PersonMoneyEvent event) {
 
-		Id<Person> id = event.getPersonId();
-		Double amountByEvent = event.getAmount();
-		Double amountSoFar = id2amount.get(id);
-		
-		if(amountSoFar == null){
-			id2amount.put(id, amountByEvent);
-		}
-		else{
-			amountSoFar += amountByEvent;
-			id2amount.put(id, amountSoFar);
+		if (isStucking(event.getPersonId())) {
+			// ignore this person
+			
+		} else {
+			Id<Person> id = event.getPersonId();
+			Double amountByEvent = event.getAmount();
+			Double amountSoFar = id2amount.get(id);
+			
+			if(amountSoFar == null){
+				id2amount.put(id, amountByEvent);
+			}
+			else{
+				amountSoFar += amountByEvent;
+				id2amount.put(id, amountSoFar);
+			}
 		}	
 	}
 
