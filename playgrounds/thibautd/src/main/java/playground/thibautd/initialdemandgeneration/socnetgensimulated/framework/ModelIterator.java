@@ -52,6 +52,9 @@ public class ModelIterator {
 
 	private final int maxIterations;
 
+	private final double powellMinAbsoluteChange;
+	private final double powellMinRelativeChange;
+
 	// TODO: make adaptive (the closer to the target value,
 	// the more precise is should get)
 	private double samplingRateClustering = 1;
@@ -66,6 +69,9 @@ public class ModelIterator {
 		setSamplingRateClustering( config.getSamplingRateForClusteringEstimation() );
 		this.precisionClustering = config.getPrecisionClustering();
 		this.precisionDegree = config.getPrecisionDegree();
+
+		this.powellMinAbsoluteChange = config.getPowellMinAbsoluteChange();
+		this.powellMinRelativeChange = config.getPowellMinRelativeChange();
 
 		this.maxIterations = config.getMaxIterations();
 	}
@@ -88,7 +94,8 @@ public class ModelIterator {
 			final Thresholds initialThresholds ) {
 		final MultivariateOptimizer optimizer =
 			new PowellOptimizer(
-					1E-5,1E-5,
+					powellMinRelativeChange,
+					powellMinAbsoluteChange,
 					new Convergence() );
 
 		final double x = initialThresholds.getPrimaryThreshold();

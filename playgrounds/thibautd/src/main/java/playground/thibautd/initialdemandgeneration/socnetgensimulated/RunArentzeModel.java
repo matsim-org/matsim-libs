@@ -133,13 +133,10 @@ public class RunArentzeModel {
 		}
 		write( distr, config.getOutputDirectory() + "/scoresHistogrammPrimary.dat" );
 		final Thresholds initialPoint =
-			!config.getInitialPoints().isEmpty() ?
-				getInitialPoint( config ) :
 				generateInitialPoint(
 						distr,
 						population.size(),
-						config.getTargetDegree() );
-		// TODO: add initial points from config?
+						config );
 		distr = null; // dirty! should be in a subfunction
 
 		final ModelIterator modelIterator = new ModelIterator( config );
@@ -155,13 +152,23 @@ public class RunArentzeModel {
 		MoreIOUtils.closeOutputDirLogging();
 	}
 
-	private static Thresholds getInitialPoint(
+	private static Thresholds generateInitialPoint(
+			final TiesWeightDistribution distr ,
+			final int populationSize,
 			final SocialNetworkGenerationConfigGroup config ) {
-		if ( config.getInitialPoints().size() > 1 ) log.warn( "only one intial point from the "+config.getInitialPoints().size()+" defined in the config will be used!" );
-		return config.getInitialPoints().iterator().next();
+		final double primary = Double.isNaN( config.getInitialPrimaryThreshold() ) ?
+			generateHeuristicPrimaryThreshold( distr , populationSize , config.getTargetDegree() ) :
+			config.getInitialPrimaryThreshold();
+		final double secondary = Double.isNaN( config.getInitialSecondaryReduction() ) ?
+			0 : config.getInitialPrimaryThreshold();
+
+		final Thresholds thresholds = new Thresholds( primary , secondary );
+		log.info( "initial thresholds: "+thresholds );
+		return thresholds;
 	}
 
-	private static Thresholds generateInitialPoint(
+
+	private static double generateHeuristicPrimaryThreshold(
 			final TiesWeightDistribution distr ,
 			final int populationSize,
 			final double targetDegree ) {
@@ -169,11 +176,7 @@ public class RunArentzeModel {
 
 		// rationale: sqrt(n) alters * sqrt(n) alters_of_alter
 		final double target = Math.sqrt( targetDegree );
-		final double threshold = distr.findLowerBound( (long) (populationSize * target) );
-
-		final Thresholds thresholds = new Thresholds( threshold , 0 );
-		log.info( "generated thresholds: "+thresholds );
-		return thresholds;
+		return distr.findLowerBound( (long) (populationSize * target) );
 	}
 
 	private static void write(

@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
@@ -36,8 +31,8 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 	private String inputPopulationFile = null;
 	private String outputDirectory = null;
 
-	private double initialPrimaryStep = 10;
-	private double initialSecondaryStep = 10;
+	private double initialPrimaryThreshold = Double.NaN;
+	private double initialSecondaryReduction = Double.NaN;
 
 	private double precisionClustering = 1E-3;
 	private double precisionDegree = 1E-2;
@@ -47,7 +42,9 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 
 	private double samplingRateForClusteringEstimation = 0.1;
 
-	private int stagnationLimit = 100;
+	private double powellMinAbsoluteChange = 1E-5;
+	private double powellMinRelativeChange = 1E-5;
+
 	private int maxIterations = 10000;
 
 	public SocialNetworkGenerationConfigGroup( ) {
@@ -105,20 +102,6 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 		this.samplingRateForClusteringEstimation = rate;
 	}
 
-	@Override
-	public ConfigGroup createParameterSet( final String type ) {
-		if ( !type.equals( InitialPointParameterSet.SET_TYPE ) ) throw new IllegalArgumentException( type );
-		return new InitialPointParameterSet();
-	}
-
-	public Collection<Thresholds> getInitialPoints() {
-		final List<Thresholds> ts = new ArrayList< >();
-		for ( InitialPointParameterSet set : (Collection<InitialPointParameterSet>) getParameterSets( InitialPointParameterSet.SET_TYPE ) ) {
-			ts.add( new Thresholds( set.getInitialPrimaryThreshold() , set.getInitialSecondaryReduction() ) );
-		}
-		return ts;
-	}
-
 	@StringGetter( "precisionClustering" )
 	public double getPrecisionClustering() {
 		return precisionClustering;
@@ -139,36 +122,6 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 		this.precisionDegree = precisionDegree;
 	}
 
-	@StringGetter( "initialPrimaryStep" )
-	public double getInitialPrimaryStep() {
-		return initialPrimaryStep;
-	}
-
-	@StringSetter( "initialPrimaryStep" )
-	public void setInitialPrimaryStep( double initialPrimaryStep ) {
-		this.initialPrimaryStep = initialPrimaryStep;
-	}
-
-	@StringGetter( "initialSecondaryStep" )
-	public double getInitialSecondaryStep() {
-		return initialSecondaryStep;
-	}
-
-	@StringSetter( "initialSecondaryStep" )
-	public void setInitialSecondaryStep( double initialSecondaryStep ) {
-		this.initialSecondaryStep = initialSecondaryStep;
-	}
-
-	@StringGetter( "stagnationLimit" )
-	public int getStagnationLimit() {
-		return stagnationLimit;
-	}
-
-	@StringSetter( "stagnationLimit" )
-	public void setStagnationLimit( int stagnationLimit ) {
-		this.stagnationLimit = stagnationLimit;
-	}
-
 	@StringGetter( "maxIterations" )
 	public int getMaxIterations() {
 		return maxIterations;
@@ -179,36 +132,44 @@ public class SocialNetworkGenerationConfigGroup extends ReflectiveConfigGroup {
 		this.maxIterations = maxIterations;
 	}
 
-	public static class InitialPointParameterSet extends ReflectiveConfigGroup {
-		public static final String SET_TYPE = "initialPoint";
+	@StringGetter( "initialPrimaryThreshold" )
+	public double getInitialPrimaryThreshold() {
+		return initialPrimaryThreshold;
+	}
 
-		public InitialPointParameterSet( ) {
-			super( SET_TYPE );
-		}
+	@StringSetter( "initialPrimaryThreshold" )
+	public void setInitialPrimaryThreshold( double initialPrimaryThreshold ) {
+		this.initialPrimaryThreshold = initialPrimaryThreshold;
+	}
 
-		private double initialPrimaryThreshold = -8.8;
-		private double initialSecondaryReduction = 230;
+	@StringGetter( "initialSecondaryReduction" )
+	public double getInitialSecondaryReduction() {
+		return initialSecondaryReduction;
+	}
 
-		@StringGetter( "initialPrimaryThreshold" )
-		public double getInitialPrimaryThreshold() {
-			return initialPrimaryThreshold;
-		}
+	@StringSetter( "initialSecondaryReduction" )
+	public void setInitialSecondaryReduction( double initialSecondaryReduction ) {
+		this.initialSecondaryReduction = initialSecondaryReduction;
+	}
 
-		@StringSetter( "initialPrimaryThreshold" )
-		public void setInitialPrimaryThreshold( double initialPrimaryThreshold ) {
-			this.initialPrimaryThreshold = initialPrimaryThreshold;
-		}
+	@StringGetter( "powellMinAbsoluteChange" )
+	public double getPowellMinAbsoluteChange() {
+		return powellMinAbsoluteChange;
+	}
 
-		@StringGetter( "initialSecondaryReduction" )
-		public double getInitialSecondaryReduction() {
-			return initialSecondaryReduction;
-		}
+	@StringSetter( "powellMinAbsoluteChange" )
+	public void setPowellMinAbsoluteChange( double powellMinAbsoluteChange ) {
+		this.powellMinAbsoluteChange = powellMinAbsoluteChange;
+	}
 
-		@StringSetter( "initialSecondaryReduction" )
-		public void setInitialSecondaryReduction( double initialSecondaryReduction ) {
-			this.initialSecondaryReduction = initialSecondaryReduction;
-		}
+	@StringGetter( "powellMinRelativeChange" )
+	public double getPowellMinRelativeChange() {
+		return powellMinRelativeChange;
+	}
 
+	@StringSetter( "powellMinRelativeChange" )
+	public void setPowellMinRelativeChange( double powellMinRelativeChange ) {
+		this.powellMinRelativeChange = powellMinRelativeChange;
 	}
 }
 
