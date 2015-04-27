@@ -9,10 +9,10 @@ public class RunCL {
 	
 	public static void main(String args[]){
 		
-		String inputDir = "C:/Users/Daniel/Desktop/work/cl/santiago_pt_demand_matrix/network/";
-		String inputDirCSV = "C:/Users/Daniel/Desktop/work/cl/Kai_und_Daniel/";
-		String outputDir = "C:/Users/Daniel/Desktop/work/cl/Kai_und_Daniel/network_transformed/";
-		String outputDirShp = "C:/Users/Daniel/Desktop/work/cl/Kai_und_Daniel/Visualisierungen/";
+//		String inputDir = "C:/Users/Daniel/Desktop/work/cl/santiago_pt_demand_matrix/network/";
+//		String inputDirCSV = "C:/Users/Daniel/Desktop/work/cl/Kai_und_Daniel/";
+//		String outputDir = "C:/Users/Daniel/Desktop/work/cl/Kai_und_Daniel/network_transformed/";
+//		String outputDirShp = "C:/Users/Daniel/Desktop/work/cl/Kai_und_Daniel/Visualisierungen/";
 		
 //		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 //		new NetworkReaderMatsimV1(scenario).parse(outputDir + "santiago_tertiary_19S.xml.gz");
@@ -24,7 +24,7 @@ public class RunCL {
 //		new NetConverter().convertNet2Shape(scenario.getNetwork(), outputDirShp + "santiago_tertiary.shp");
 		
 		//for conversion of raw datas into matsim plans
-		new CSVToPlans(inputDirCSV + "Viaje_Coord.csv").run(inputDirCSV + "plans.xml");
+//		new CSVToPlans(inputDirCSV + "Viaje_Coord.csv").run(inputDirCSV + "plans.xml");
 		
 //		new NetConverter().convertCounts2Shape(inputDirCSV + "puntos.csv", outputDirShp + "puntos.shp");
 		

@@ -284,21 +284,4 @@ public class CSVToPlans {
 		
 	}
 	
-	class PersonTemplate{
-		
-		//pattern means sequence of activities and legs the person performs during the day
-		//formatted like this:
-		// actType_coordX-coordY_startTime-endTime===legMode===actType_...
-		private StringBuffer pattern;
-		
-		public PersonTemplate(StringBuffer activityAndTravelPattern){
-			this.pattern = activityAndTravelPattern;
-		}
-		
-		public StringBuffer getPattern(){
-			return this.pattern;
-		}
-		
-	}
-	
 }
