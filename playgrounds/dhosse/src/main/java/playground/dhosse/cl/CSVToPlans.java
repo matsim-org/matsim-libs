@@ -22,6 +22,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 
 public class CSVToPlans {
 	
@@ -32,11 +33,28 @@ public class CSVToPlans {
 	private final int idxOriginY = 11;
 	private final int idxDestinationX = 12;
 	private final int idxDestinationY = 13;
-	private final int idxActType = 16;
+	private final int idxActType = 14;
 	private final int idxModes = 17;
 	private final int idxStartTime = 21;
 	private final int idxEndTime = 22;
 
+	/*
+	 * proposito
+	 * 1 al trabajo = zur Arbeit
+	 * 2 por trabajo = geschäftlich
+	 * 3 al estudio = zur Ausbildung
+	 * 4 por estudio = wg. d. Ausbildung
+	 * 5 de salud = Gesundheit (evtl. Arzt)
+	 * 6 visitar al alguien = jmd. besuchen
+	 * 7 volver a casa = nach Hause
+	 * 8 buscar o dejar a alguien
+	 * 9 comer o tomar algo = essen & trinken
+	 * 10 buscar o dejar algo
+	 * 11 de compras = Einkaufen
+	 * 12 tramites = Formalitäten
+	 * 13 recreacion = Erholung
+	 * 14 otra actividados = andere...
+	 */
 	//actividad destino
 	//work
 	private final int actTypeIndustria = 1;
@@ -84,7 +102,7 @@ public class CSVToPlans {
 		
 	}
 	
-	public void run(){
+	public void run(String outputFile){
 		
 		BufferedReader reader = IOUtils.getBufferedReader(this.filename);
 		
@@ -113,16 +131,38 @@ public class CSVToPlans {
 					Coord coord = new CoordImpl(splittedLine[this.idxOriginX], splittedLine[this.idxOriginY]);
 					Activity act1 = popFactory.createActivityFromCoord("h", coord);
 					
+					double endTime = Time.parseTime(splittedLine[this.idxStartTime]);
+					act1.setEndTime(endTime);
+					
 					Coord coord2 = new CoordImpl(splittedLine[this.idxDestinationX], splittedLine[this.idxDestinationY]);
 					String actTypeIdx = splittedLine[this.idxActType];
 					String actType = !actTypeIdx.equals("") ? this.getActType(Integer.parseInt(actTypeIdx)) : "o";
 					Activity act2 = popFactory.createActivityFromCoord(actType, coord2);
 					
+					double startTimeAct2 = Time.parseTime(splittedLine[this.idxEndTime]);
+					act2.setStartTime(startTimeAct2);
+					
 					Set<Leg> legs = new HashSet<Leg>();
 					String[] modes = splittedLine[this.idxModes].split("_");
+					String lastMode = null;
+					
 					for(int i = 0; i < modes.length; i++){
+						
 						Leg leg = popFactory.createLeg(this.getLegMode(Integer.parseInt(modes[i])));
+						
+						if(lastMode != null){
+							
+							if(lastMode.equals(leg.getMode())){
+								
+								continue;
+								
+							}
+							
+						}
+						
 						legs.add(leg);
+						lastMode = leg.getMode();
+						
 					}
 					
 					plan.addActivity(act1);
@@ -143,10 +183,18 @@ public class CSVToPlans {
 					Person person = personsMap.get(personId);
 					Plan selectedPlan = person.getSelectedPlan();
 					
+					Activity lastActivity = (Activity) selectedPlan.getPlanElements().get(selectedPlan.getPlanElements().size()-1);
+					
+					double endTime = Time.parseTime(splittedLine[this.idxStartTime]);
+					lastActivity.setEndTime(endTime);
+					
 					Coord coord = new CoordImpl(splittedLine[this.idxDestinationX], splittedLine[this.idxDestinationY]);
 					String actTypeIdx = splittedLine[this.idxActType];
 					String actType = !actTypeIdx.equals("") ? this.getActType(Integer.parseInt(actTypeIdx)) : "o";
 					Activity act2 = popFactory.createActivityFromCoord(actType, coord);
+					
+					double startTime = Time.parseTime(splittedLine[this.idxEndTime]);
+					act2.setStartTime(startTime);
 					
 					Set<Leg> legs = new HashSet<Leg>();
 					String[] modes = splittedLine[this.idxModes].split("_");
@@ -155,8 +203,17 @@ public class CSVToPlans {
 						legs.add(leg);
 					}
 					
+					String lastMode = null;
 					for(Leg leg : legs){
+						
+						if(lastMode != null){
+							if(lastMode.equalsIgnoreCase(leg.getMode())){
+								continue;
+							}
+						}
+						lastMode = leg.getMode();
 						selectedPlan.addLeg(leg);
+						
 					}
 					
 					selectedPlan.addActivity(act2);
@@ -175,7 +232,7 @@ public class CSVToPlans {
 			population.addPerson(person);
 		}
 		
-		new PopulationWriter(population).write("C:/Users/Daniel/Documents/work/shared-svn/studies/countries/cl/plans.xml");
+		new PopulationWriter(population).write(outputFile);
 		
 	}
 	
@@ -183,13 +240,19 @@ public class CSVToPlans {
 		
 		switch(index){
 			case 1:
-			case 2:
+			case 2: return "w";
 			case 3:
-			case 5:
-			case 7: return "w";
 			case 4: return "e";
-			case 6: return "h";
+			case 7: return "h";
+			case 11: return "s";
+			case 13: return "l";
+			case 5:
+			case 6: 
 			case 8:
+			case 9:
+			case 10:
+			case 12:
+			case 14:
 			default: return "o"; //not specified
 		}
 		
@@ -217,6 +280,23 @@ public class CSVToPlans {
 			case 15:
 			case 18: return TransportMode.ride;
 			default: return null;
+		}
+		
+	}
+	
+	class PersonTemplate{
+		
+		//pattern means sequence of activities and legs the person performs during the day
+		//formatted like this:
+		// actType_coordX-coordY_startTime-endTime===legMode===actType_...
+		private StringBuffer pattern;
+		
+		public PersonTemplate(StringBuffer activityAndTravelPattern){
+			this.pattern = activityAndTravelPattern;
+		}
+		
+		public StringBuffer getPattern(){
+			return this.pattern;
 		}
 		
 	}
