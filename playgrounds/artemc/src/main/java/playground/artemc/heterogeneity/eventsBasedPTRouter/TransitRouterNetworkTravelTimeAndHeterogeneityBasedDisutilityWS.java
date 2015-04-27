@@ -114,14 +114,14 @@ public class TransitRouterNetworkTravelTimeAndHeterogeneityBasedDisutilityWS ext
 		TransitRouterNetworkWW.TransitRouterNetworkLink wrapped = (TransitRouterNetworkWW.TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
 			return -(cachedTravelDisutility?cachedLinkTime:linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)])*this.config.getMarginalUtilityOfTravelTimePt_utl_s() * (Double) person.getCustomAttributes().get("incomeAlphaFactor")
-					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m());
+					- link.getLength() * marginalUtilityOfDistancePt;
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
 			return -(cachedTravelDisutility?cachedLinkTime:linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)])*this.config.getMarginalUtilityOfWaitingPt_utl_s() * (Double) person.getCustomAttributes().get("incomeAlphaFactor")
-					- this.config.getUtilityOfLineSwitch_utl();
+					-  marginalUtilityOfLineSwitch;
 		else if(wrapped.fromNode.route==null)
 			// it's a transfer link (walk)
-			return -(cachedTravelDisutility?cachedLinkTime:wrapped.getLength()/this.config.getBeelineWalkSpeed())*this.config.getMarginalUtilityOfTravelTimeWalk_utl_s() * (Double) person.getCustomAttributes().get("incomeAlphaFactor");
+			return -(cachedTravelDisutility?cachedLinkTime:wrapped.getLength()/this.config.getBeelineWalkSpeed())*marginalUtilityOfTravelTimeWalk * (Double) person.getCustomAttributes().get("incomeAlphaFactor");
 		else
 			//inside link
 			return 0;
@@ -130,15 +130,15 @@ public class TransitRouterNetworkTravelTimeAndHeterogeneityBasedDisutilityWS ext
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 		TransitRouterNetworkWW.TransitRouterNetworkLink wrapped = (TransitRouterNetworkWW.TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
-			return - linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]*this.config.getMarginalUtilityOfTravelTimePt_utl_s() * (Double) person.getCustomAttributes().get("incomeAlphaFactor")
+			return - linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]*marginalUtilityOfTravelTimePt * (Double) person.getCustomAttributes().get("incomeAlphaFactor")
 					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m());
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
-			return - linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]*this.config.getMarginalUtilityOfWaitingPt_utl_s() * (Double) person.getCustomAttributes().get("incomeAlphaFactor")
+			return - linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]*marginalUtilityOfWaitingPt * (Double) person.getCustomAttributes().get("incomeAlphaFactor")
 					- this.config.getUtilityOfLineSwitch_utl();
 		else if(wrapped.fromNode.route==null)
 			// it's a transfer link (walk)
-			return -wrapped.getLength()/this.config.getBeelineWalkSpeed()*this.config.getMarginalUtilityOfTravelTimeWalk_utl_s() * (Double) person.getCustomAttributes().get("incomeAlphaFactor");
+			return -wrapped.getLength()/this.config.getBeelineWalkSpeed()*marginalUtilityOfTravelTimeWalk * (Double) person.getCustomAttributes().get("incomeAlphaFactor");
 		else
 			//inside link
 			return 0;

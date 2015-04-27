@@ -82,7 +82,6 @@ public class ControlerWithHeteroAndToll {
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
 
-
 		//Adjust heterogeneity parameters from input arguments
 		Map<String, String> params = scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams();
 		Double adjustedIncomeOnTravelCostLambda = Double.valueOf(scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams().get("incomeOnTravelCostLambda"))*heterogeneityFactor;
@@ -133,7 +132,7 @@ public class ControlerWithHeteroAndToll {
 		{
 			controler.addOverridingModule(new TransitRouterEventsAndHeterogeneityBasedWSModule(waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		}
-		
+
 		// Additional analysis
 		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
 		controler.addControlerListener(analysisControlerListener);
