@@ -27,10 +27,12 @@ import org.apache.commons.math3.optim.ConvergenceChecker;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
+import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.optim.nonlinear.scalar.MultivariateOptimizer;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
-import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.PowellOptimizer;
+import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.CMAESOptimizer;
+import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.log4j.Logger;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
@@ -91,11 +93,14 @@ public class ModelIterator {
 			final ModelRunner runner,
 			final Thresholds initialThresholds ) {
 		final MultivariateOptimizer optimizer =
-			new PowellOptimizer(
-					2 * Math.ulp( 1d ),
-					Double.MIN_VALUE,
-					powellMinRelativeChange,
-					powellMinAbsoluteChange,
+			new CMAESOptimizer(
+					maxIterations,
+					1E-9,
+					true,
+					0,
+					0,
+					new MersenneTwister( 42 ),
+					false,
 					new Convergence() );
 
 		final double x = initialThresholds.getPrimaryThreshold();
@@ -106,7 +111,12 @@ public class ModelIterator {
 					GoalType.MINIMIZE,
 					new MaxEval( maxIterations ),
 					new InitialGuess( new double[]{ x , y } ),
-					new ObjectiveFunction( new Function( runner ) )
+					new ObjectiveFunction( new Function( runner ) ),
+					new CMAESOptimizer.Sigma( new double[]{ 5 , 5 } ),
+					new CMAESOptimizer.PopulationSize( 7 ),
+					new SimpleBounds(
+						new double[]{ Double.NEGATIVE_INFINITY , 0 }, // lower bounds: constrain secondary reduction to be positive
+						new double[]{ Double.POSITIVE_INFINITY , Double.POSITIVE_INFINITY } ) // upper bounds
 					);
 
 		final Thresholds bestThresholds = new Thresholds( result.getPoint()[ 0 ] , result.getPoint()[ 1 ] );
