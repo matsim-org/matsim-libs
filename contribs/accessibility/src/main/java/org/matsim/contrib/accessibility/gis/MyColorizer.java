@@ -23,11 +23,10 @@
  */
 package org.matsim.contrib.accessibility.gis;
 
-import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectDoubleIterator;
+import gnu.trove.iterator.TObjectDoubleIterator;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 import java.awt.Color;
-
 
 /**
  * @author illenberger
@@ -81,7 +80,7 @@ public final class MyColorizer implements Colorizable{
 			double max2 = Math.log(max + 1);
 			color = (Math.log(val + 1) - min2) / (max2 - min2);
 		} else {
-			color = (val - min) / (double) (max - min);
+			color = (val - min) / (max - min);
 		}
 
 		return ColorUtils.getGRBColor(color);
