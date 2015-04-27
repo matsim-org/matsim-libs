@@ -158,6 +158,8 @@ public class SnaUtils {
 		}
 		wedgeCounter.printCounter();
 
+		executor.shutdown();
+
 		return ((double) nTriangles) / k;
 	}
 
