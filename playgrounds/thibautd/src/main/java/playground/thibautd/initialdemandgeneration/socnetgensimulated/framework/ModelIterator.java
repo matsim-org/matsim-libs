@@ -159,8 +159,8 @@ public class ModelIterator {
 			final Thresholds thr = new Thresholds( args[ 0 ] , args[ 1 ] );
 	 		generate( runner , thr );
 
-			final double fitness = distDegree( thr ) / precisionDegree +
-				distClustering( thr ) / precisionClustering;
+			final double fitness = Math.pow( distDegree( thr ) / precisionDegree , 10 )+
+				Math.pow( distClustering( thr ) / precisionClustering , 10 );
 
 			for ( EvolutionListener l : listeners ) l.handleMove( thr , fitness );
 
