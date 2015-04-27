@@ -48,7 +48,7 @@ public class KStraightLineNearestRequestFilter
     public List<TaxiRequest> filterRequestsForVehicle(Iterable<TaxiRequest> requests,
             Vehicle vehicle)
     {
-        Link fromLink = scheduler.getEarliestIdleness(vehicle).link;
+        Link fromLink = scheduler.getImmediateDiversionOrEarliestIdleness(vehicle).link;
         PartialSort<TaxiRequest> nearestRequestSort = new PartialSort<TaxiRequest>(k);
 
         for (TaxiRequest req : requests) {

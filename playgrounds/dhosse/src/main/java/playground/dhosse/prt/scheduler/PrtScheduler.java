@@ -84,8 +84,8 @@ public class PrtScheduler extends TaxiScheduler {
       bestSched.addTask(new NPersonsPickupStayTask(best.path.getArrivalTime(), t3, req));
 
       if (params.destinationKnown) {
-          appendDropoffAfterPickup(bestSched);
-          appendWaitAfterDropoff(bestSched);
+          appendDriveAndDropoffAfterPickup(bestSched);
+          appendTasksAfterDropoff(bestSched);
       }
 		
 	}
@@ -110,7 +110,7 @@ public class PrtScheduler extends TaxiScheduler {
 	}
 
 	@Override
-	protected void appendDropoffAfterPickup(Schedule<TaxiTask> schedule)
+	protected void appendDriveAndDropoffAfterPickup(Schedule<TaxiTask> schedule)
     {
         NPersonsPickupStayTask pickupStayTask = (NPersonsPickupStayTask)Schedules.getLastTask(schedule);
 
@@ -130,7 +130,7 @@ public class PrtScheduler extends TaxiScheduler {
     }
 
 	@Override
-	protected void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
+	protected void appendTasksAfterDropoff(Schedule<TaxiTask> schedule)
     {
         NPersonsDropoffStayTask dropoffStayTask = (NPersonsDropoffStayTask)Schedules.getLastTask(schedule);
 

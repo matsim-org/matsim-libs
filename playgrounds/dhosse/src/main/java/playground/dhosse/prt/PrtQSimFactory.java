@@ -75,7 +75,7 @@ public class PrtQSimFactory implements MobsimFactory{
 		
 		LegCreator legCreator = this.prtConfig.getUseOnlineVehicleTracker() ? 
 				VrpLegs.createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer()) :
-					VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR;
+				    VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
 		
 		if(this.prtConfig.getVehicleCapacity() > 1){
 			

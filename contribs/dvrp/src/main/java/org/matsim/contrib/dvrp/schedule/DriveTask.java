@@ -35,5 +35,5 @@ public interface DriveTask
      * - random walk, roaming/crusing around <br/>
      * - ...
      */
-    void divertPath(DivertedVrpPath divertedPath, double newEndTime);
+    void pathDiverted(DivertedVrpPath divertedPath, double newEndTime);
 }

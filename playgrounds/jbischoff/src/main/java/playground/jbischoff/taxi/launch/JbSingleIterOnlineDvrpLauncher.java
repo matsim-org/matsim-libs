@@ -206,7 +206,8 @@ import playground.michalm.util.MovingAgentsRegister;
                 TaxiUtils.TAXI_MODE, new TaxiRequestCreator(), optimizer, context, qSim);
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new TaxiActionCreator(
-                passengerEngine, VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR, pickupDuration));
+                passengerEngine, VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer()),
+                pickupDuration));
 
         EventsManager events = qSim.getEventsManager();
 

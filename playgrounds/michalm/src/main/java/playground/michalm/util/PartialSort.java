@@ -50,14 +50,13 @@ public class PartialSort<T>
         @Override
         public int compareTo(ElementValuePair<T> o)
         {
-            return -Double.compare(value, o.value);// reversed comparison
+            return -Double.compare(value, o.value);// reversed comparison (the smallest is the last in the queue)
         }
     }
 
 
     private final int size;
-    private final PriorityQueue<ElementValuePair<T>> kSmallestElements;// descending order: from
-                                                                       // k-th to 1-st
+    private final PriorityQueue<ElementValuePair<T>> kSmallestElements;// descending order: from k-th to 1-st
 
 
     public PartialSort(int size)

@@ -25,16 +25,6 @@ class AlgorithmConfigs
             RULE_DSE_15M //
             );
 
-    static final EnumSet<AlgorithmConfig> FIFO_1_S_TW_xx = EnumSet.of(//
-            FIFO_1_S_TW_FF, //
-            FIFO_1_S_TW_15M//
-            );
-
-    static final EnumSet<AlgorithmConfig> FIFO_1_S_TP_xx = EnumSet.of(//
-            FIFO_1_S_TP_FF, //
-            FIFO_1_S_TP_15M//
-            );
-
     static final EnumSet<AlgorithmConfig> FIFO_RES_TW_xx = EnumSet.of(//
             FIFO_RES_TW_FF, //
             FIFO_RES_TW_15M//

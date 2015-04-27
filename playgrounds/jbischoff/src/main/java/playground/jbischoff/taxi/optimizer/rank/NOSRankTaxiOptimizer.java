@@ -132,7 +132,7 @@ public class NOSRankTaxiOptimizer
 
 
         @Override
-        protected void appendWaitAfterDropoff(Schedule<TaxiTask> schedule)
+        protected void appendTasksAfterDropoff(Schedule<TaxiTask> schedule)
         {
             if (rankmode) {
                 TaxiDropoffTask dropoffStayTask = (TaxiDropoffTask)Schedules
@@ -145,19 +145,10 @@ public class NOSRankTaxiOptimizer
                     double t5 = dropoffStayTask.getEndTime();
                     VrpPathWithTravelData path = calculator.calcPath(link, startLink, t5);
                     schedule.addTask(new TaxiDriveTask(path));
-
-                    double t6 = path.getArrivalTime();
-                    double tEnd = Math.max(t6, schedule.getVehicle().getT1());
-                    schedule.addTask(new TaxiStayTask(t6, tEnd, schedule.getVehicle()
-                            .getStartLink()));
-                }
-                else {
-                    super.appendWaitAfterDropoff(schedule);
                 }
             }
-            else {
-                super.appendWaitAfterDropoff(schedule);
-            }
+            
+            appendStayTask(schedule);
         }
     }
 

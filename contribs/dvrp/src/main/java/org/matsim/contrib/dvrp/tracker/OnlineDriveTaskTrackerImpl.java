@@ -28,14 +28,6 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 
-/**
- * Assumption: vehicle (drive) cannot be redirected from (aborted at) the current link (n).
- * Redirection/abortion is always on next link (n+1). Thus the new and old paths may differ at
- * earliest from link n+2 on...
- * <p>
- * Therefore always use "fresh" Path object, i.e. driveTask.getPath() to get: total travel
- * time&cost, arrival time, or next link and its travel time
- */
 class OnlineDriveTaskTrackerImpl
     implements OnlineDriveTaskTracker
 {
@@ -45,14 +37,10 @@ class OnlineDriveTaskTrackerImpl
     private final VrpOptimizerWithOnlineTracking optimizer;
     private final MobsimTimer timer;
 
-    private double linkEnterTime;
-
-    private double plannedTTAtPrevNode;
-    private double plannedLinkTT;
-    private double plannedEndTime;
-
+    private VrpPath path;
     private int currentLinkIdx;
-    private Link currentLink;
+    private double linkEnterTime;
+    private double[] remainingTTs;//excluding the current link 
 
 
     OnlineDriveTaskTrackerImpl(DriveTask driveTask, VrpLeg vrpDynLeg,
@@ -63,105 +51,86 @@ class OnlineDriveTaskTrackerImpl
         this.optimizer = optimizer;
         this.timer = timer;
 
-        VrpPath path = driveTask.getPath();
-
+        initForPath(driveTask.getPath());
         currentLinkIdx = 0;
-        currentLink = path.getLink(0);
-
         linkEnterTime = driveTask.getBeginTime();
+    }
 
-        plannedTTAtPrevNode = 0;
-        plannedLinkTT = path.getLinkTravelTime(0);
-        plannedEndTime = driveTask.getEndTime();
+
+    private void initForPath(VrpPath path)
+    {
+        this.path = path;
+        remainingTTs = new double[path.getLinkCount()];
+
+        double tt = 0;
+        for (int i = remainingTTs.length - 1; i >= 0; i--) {
+            remainingTTs[i] = tt;
+            tt += path.getLinkTravelTime(i);
+        }
     }
 
 
     @Override
     public void movedOverNode()
     {
-        VrpPath path = vrpDynLeg.getPath();
-
         currentLinkIdx++;
-        currentLink = path.getLink(currentLinkIdx);
-
         linkEnterTime = timer.getTimeOfDay();
-
-        plannedTTAtPrevNode += plannedLinkTT;//add previous link TT
-        plannedLinkTT = path.getLinkTravelTime(currentLinkIdx);
-
         optimizer.nextLinkEntered(driveTask);
     }
 
 
+    /**
+     * Assumption: vehicle is diverted as soon as possible, i.e.:
+     * <ul>
+     * <li>if the next link can be changed: after the current link</li>
+     * <li>If not then, (a) if the current link is not the last one, after the next link, or</li>
+     * <li>(b) no diversion possible (the leg ends on the current link)</li>
+     * </ul>
+     */
     @Override
-    public LinkTimePair getDiversionPoint(double currentTime)
+    public LinkTimePair getDiversionPoint()
     {
         if (vrpDynLeg.canChangeNextLink()) {
-            return new LinkTimePair(currentLink, predictLinkExitTime(currentTime));
+            return new LinkTimePair(path.getLink(currentLinkIdx), predictLinkExitTime());
         }
 
-        VrpPath path = vrpDynLeg.getPath();
-
-        if (path.getLinkCount() == currentLinkIdx + 1) {
-            return null;//the current link is the last one, but it is too late to divert the vehicle
+        if (path.getLinkCount() == currentLinkIdx + 1) {//the current link is the last one
+            return null;//too late to divert (reason: cannot change the next link) 
         }
-
-        Link nextLink = path.getLink(currentLinkIdx + 1);
 
         double nextLinkTT = path.getLinkTravelTime(currentLinkIdx + 1);
-        double predictedDiversionTime = predictLinkExitTime(currentTime) + nextLinkTT;
-
-        return new LinkTimePair(nextLink, predictedDiversionTime);
+        double predictedNextLinkExitTime = predictLinkExitTime() + nextLinkTT;
+        return new LinkTimePair(path.getLink(currentLinkIdx + 1), predictedNextLinkExitTime);
     }
 
 
-    public void divertPath(VrpPathWithTravelData newSubPath, double currentTime)
+    public void divertPath(VrpPathWithTravelData newSubPath)
     {
-        LinkTimePair diversionPoint = getDiversionPoint(currentTime);
+        LinkTimePair diversionPoint = getDiversionPoint();
 
         if (!newSubPath.getFromLink().equals(diversionPoint.link)
-                || newSubPath.getDepartureTime() != diversionPoint.time) {//TODO this time check may not work with cached VrpPaths??
+                || newSubPath.getDepartureTime() != diversionPoint.time) {
             throw new IllegalArgumentException();
         }
 
-        VrpPath originalPath = vrpDynLeg.getPath();
-
         int diversionLinkIdx = currentLinkIdx + (vrpDynLeg.canChangeNextLink() ? 0 : 1);
-        DivertedVrpPath divertedPath = new DivertedVrpPath(originalPath, newSubPath,
-                diversionLinkIdx);
+        DivertedVrpPath divertedPath = new DivertedVrpPath(path, newSubPath, diversionLinkIdx);
+        initForPath(divertedPath);
 
-        double newEndTime = newSubPath.getArrivalTime();
         vrpDynLeg.pathDiverted(divertedPath);
-
-        //=====================================================================================
-
-        //ASSUMPTION: newSubPath has been calculated at currentTime given that the vehicle will
-        //exit the current link at predictLinkExitTime(currentTime)
-        //[see getImmediateDiversionPoint() above]. Therefore:
-
-        //1. If vehicle really reaches the end of the link at predictLinkExitTime(currentTime),
-        // it means no delays/speedups, i.e. everything happens just on time, as if planned
-        plannedTTAtPrevNode = linkEnterTime - newEndTime;
-        plannedLinkTT = predictLinkExitTime(currentTime) - linkEnterTime;
-
-        //2. Additionally, memorize the planned end time
-        plannedEndTime = newEndTime;
+        driveTask.pathDiverted(divertedPath, newSubPath.getArrivalTime());
     }
 
 
     @Override
-    public double predictEndTime(double currentTime)
+    public double predictEndTime()
     {
-        double plannedTotalTT = plannedEndTime - driveTask.getBeginTime();
-        double predictedRemainingTTFromNextNode = plannedTotalTT
-                - (plannedTTAtPrevNode + plannedLinkTT);
-
-        return predictLinkExitTime(currentTime) + predictedRemainingTTFromNextNode;
+        return predictLinkExitTime() + remainingTTs[currentLinkIdx];
     }
 
 
-    private double predictLinkExitTime(double currentTime)
+    private double predictLinkExitTime()
     {
-        return Math.max(currentTime, linkEnterTime + plannedLinkTT);
+        return Math.max(timer.getTimeOfDay(), linkEnterTime + path.getLinkTravelTime(currentLinkIdx));
     }
 }

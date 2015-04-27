@@ -29,8 +29,10 @@ public class Tasks
         switch (task.getType()) {
             case DRIVE:
                 return ((DriveTask)task).getPath().getFromLink();
+
             case STAY:
                 return ((StayTask)task).getLink();
+
             default:
                 throw new IllegalStateException("Only: DRIVE or STAY");
         }
@@ -42,8 +44,10 @@ public class Tasks
         switch (task.getType()) {
             case DRIVE:
                 return ((DriveTask)task).getPath().getToLink();
+
             case STAY:
                 return ((StayTask)task).getLink();
+
             default:
                 throw new IllegalStateException("Only: DRIVE or STAY");
         }

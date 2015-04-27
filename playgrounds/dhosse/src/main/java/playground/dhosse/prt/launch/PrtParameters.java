@@ -154,11 +154,7 @@ public class PrtParameters {
 
 //	    NOS_DSE_15M(AlgorithmType.NO_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS, TIME),
 
-	    OTS_TW_FF(AlgorithmType.ONE_TIME_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
-
 //	    OTS_TW_15M(AlgorithmType.ONE_TIME_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
-
-	    OTS_TP_FF(AlgorithmType.ONE_TIME_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
 
 //	    OTS_TP_15M(AlgorithmType.ONE_TIME_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
 
@@ -193,7 +189,6 @@ public class PrtParameters {
 	    static enum AlgorithmType
 	    {
 	        NO_SCHEDULING, //
-	        ONE_TIME_SCHEDULING, //
 	        RE_SCHEDULING, //
 	        AP_SCHEDULING, //
 	        MIP_SCHEDULING,
@@ -222,11 +217,8 @@ public class PrtParameters {
 	            case NO_SCHEDULING:
 	                return new RuleBasedTaxiOptimizer(optimConfig);
 
-	            case ONE_TIME_SCHEDULING:
-	                return FifoTaxiOptimizer.createOptimizerWithoutRescheduling(optimConfig);
-
 	            case RE_SCHEDULING:
-	                return FifoTaxiOptimizer.createOptimizerWithRescheduling(optimConfig);
+	                return new FifoTaxiOptimizer(optimConfig);
 
 	            case AP_SCHEDULING:
 	                return new AssignmentTaxiOptimizer(optimConfig);

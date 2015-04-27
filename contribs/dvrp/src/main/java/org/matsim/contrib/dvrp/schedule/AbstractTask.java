@@ -109,6 +109,10 @@ public abstract class AbstractTask
     @Override
     public TaskTracker getTaskTracker()
     {
+        if (status != TaskStatus.STARTED) {
+            throw new IllegalStateException("Allowed only for STARTED tasks");
+        }
+
         return taskTracker;
     }
 
@@ -118,6 +122,10 @@ public abstract class AbstractTask
     {
         if (this.taskTracker != null) {
             throw new IllegalStateException("Tracking already initialized");
+        }
+        
+        if (status != TaskStatus.STARTED) {
+            throw new IllegalStateException("Allowed only for STARTED tasks");
         }
 
         this.taskTracker = taskTracker;

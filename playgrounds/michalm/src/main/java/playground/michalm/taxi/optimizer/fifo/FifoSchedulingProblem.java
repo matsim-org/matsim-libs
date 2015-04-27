@@ -47,7 +47,7 @@ public class FifoSchedulingProblem
             VehicleRequestPath best = optimConfig.vrpFinder.findBestVehicleForRequest(req,
                     optimConfig.context.getVrpData().getVehicles(), vrpCost);
 
-            if (best == null) {//TODO won't work with req filtering
+            if (best == null) {//TODO won't work with req filtering; use VehicleData to find out when to exit???
                 return;
             }
 

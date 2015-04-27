@@ -51,16 +51,11 @@ public class DriveTaskImpl
 
 
     @Override
-    public void divertPath(DivertedVrpPath divertedPath, double newEndTime)
+    public void pathDiverted(DivertedVrpPath divertedPath, double newEndTime)
     {
         //can only divert an ongoing task
         if (getStatus() != TaskStatus.STARTED) {
             throw new IllegalStateException();
-        }
-
-        //divertedPath must be derived from the original one 
-        if (divertedPath.getOriginalPath() != path) {
-            throw new IllegalArgumentException();
         }
 
         path = divertedPath;

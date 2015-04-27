@@ -26,9 +26,9 @@ public class MultiRunMielecTaxiLauncher
         TaxiLauncherParams params = new TaxiLauncherParams(generalParams);
 
         MultiRunTaxiLauncher.runAll(runs, params, //
-                RULE_TW_xx, RULE_TP_xx, RULE_DSE_xx,//
-                FIFO_1_S_TW_xx, FIFO_1_S_TP_xx,//
+                //RULE_TW_xx, RULE_TP_xx, RULE_DSE_xx,//
                 FIFO_RES_TW_xx, FIFO_RES_TP_xx,//
-                ASSIGN_TW_xx, ASSIGN_TP_xx, ASSIGN_DSE_xx);
+                ASSIGN_TW_xx, ASSIGN_TP_xx, ASSIGN_DSE_xx//
+                );
     }
 }

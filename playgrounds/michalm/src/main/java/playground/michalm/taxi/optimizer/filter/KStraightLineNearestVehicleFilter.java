@@ -50,7 +50,7 @@ public class KStraightLineNearestVehicleFilter
         PartialSort<Vehicle> nearestVehicleSort = new PartialSort<Vehicle>(k);
 
         for (Vehicle veh : vehicles) {
-            Link fromLink = scheduler.getEarliestIdleness(veh).link;
+            Link fromLink = scheduler.getImmediateDiversionOrEarliestIdleness(veh).link;
             double squaredDistance = DistanceUtils.calculateSquaredDistance(fromLink, toLink);
             nearestVehicleSort.add(veh, squaredDistance);
         }

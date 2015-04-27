@@ -27,10 +27,10 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 
 public class VrpLegs
 {
-    public static VrpLeg createLegWithOfflineTracker(DriveTask driveTask)
+    public static VrpLeg createLegWithOfflineTracker(DriveTask driveTask, MobsimTimer timer)
     {
         VrpLeg leg = new VrpLeg(driveTask.getPath());
-        TaskTrackers.initOfflineTaskTracking(driveTask);
+        TaskTrackers.initOfflineTaskTracking(driveTask, timer);
         return leg;
     }
 
@@ -50,12 +50,16 @@ public class VrpLegs
     }
 
 
-    public static final LegCreator LEG_WITH_OFFLINE_TRACKER_CREATOR = new LegCreator() {
-        public VrpLeg createLeg(DriveTask driveTask)
-        {
-            return createLegWithOfflineTracker(driveTask);
+    public static LegCreator createLegWithOfflineTrackerCreator(final MobsimTimer timer)
+    {
+        return new LegCreator() {
+            @Override
+            public VrpLeg createLeg(DriveTask driveTask)
+            {
+                return createLegWithOfflineTracker(driveTask, timer);
+            }
         };
-    };
+    }
 
 
     public static LegCreator createLegWithOnlineTrackerCreator(

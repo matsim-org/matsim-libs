@@ -77,11 +77,11 @@ public class RunOneTaxiExample
         QSim qSim = DynAgentLauncherUtils.initQSim(scenario);
         context.setMobsimTimer(qSim.getSimTimer());
 
-        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(
-                TaxiUtils.TAXI_MODE, new OneTaxiRequestCreator(), optimizer, context, qSim);
+        PassengerEngine passengerEngine = VrpLauncherUtils.initPassengerEngine(TaxiUtils.TAXI_MODE,
+                new OneTaxiRequestCreator(), optimizer, context, qSim);
 
         VrpLauncherUtils.initAgentSources(qSim, context, optimizer, new OneTaxiActionCreator(
-                passengerEngine));
+                passengerEngine, qSim.getSimTimer()));
 
         EventsManager events = qSim.getEventsManager();
 

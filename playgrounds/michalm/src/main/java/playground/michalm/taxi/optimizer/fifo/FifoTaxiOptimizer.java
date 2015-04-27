@@ -30,25 +30,9 @@ import playground.michalm.taxi.optimizer.*;
 public class FifoTaxiOptimizer
     extends AbstractTaxiOptimizer
 {
-    public static FifoTaxiOptimizer createOptimizerWithoutRescheduling(
-            TaxiOptimizerConfiguration optimConfig)
+    public FifoTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
-        return new FifoTaxiOptimizer(optimConfig, false);
-    }
-
-
-    public static FifoTaxiOptimizer createOptimizerWithRescheduling(
-            TaxiOptimizerConfiguration optimConfig)
-    {
-        return new FifoTaxiOptimizer(optimConfig, true);
-    }
-
-
-    private FifoTaxiOptimizer(TaxiOptimizerConfiguration optimConfig,
-            boolean rescheduleAwaitingRequests)
-    {
-        super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR),
-                rescheduleAwaitingRequests);
+        super(optimConfig, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), true);
     }
 
 

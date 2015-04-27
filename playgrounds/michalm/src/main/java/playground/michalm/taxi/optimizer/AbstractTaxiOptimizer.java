@@ -35,7 +35,10 @@ public abstract class AbstractTaxiOptimizer
 {
     protected final TaxiOptimizerConfiguration optimConfig;
     protected final Collection<TaxiRequest> unplannedRequests;
+
     private final boolean doUnscheduleAwaitingRequests;
+    private final boolean destinationKnown;
+    private final boolean vehicleDiversion;
 
     protected boolean requiresReoptimization = false;
 
@@ -46,6 +49,9 @@ public abstract class AbstractTaxiOptimizer
         this.optimConfig = optimConfig;
         this.unplannedRequests = unplannedRequests;
         this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
+
+        destinationKnown = optimConfig.scheduler.getParams().destinationKnown;
+        vehicleDiversion = optimConfig.scheduler.getParams().vehicleDiversion;
     }
 
 
@@ -62,6 +68,11 @@ public abstract class AbstractTaxiOptimizer
             }
 
             scheduleUnplannedRequests();
+            
+            if (doUnscheduleAwaitingRequests && vehicleDiversion) {
+                handleAimlessDriveTasks();
+            }
+            
             requiresReoptimization = false;
         }
     }
@@ -77,6 +88,12 @@ public abstract class AbstractTaxiOptimizer
 
     protected abstract void scheduleUnplannedRequests();
 
+    
+    protected void handleAimlessDriveTasks()
+    {
+        optimConfig.scheduler.stopAllAimlessDriveTasks();
+    }
+    
 
     @Override
     public void requestSubmitted(Request request)
@@ -102,8 +119,8 @@ public abstract class AbstractTaxiOptimizer
 
     protected boolean doReoptimizeAfterNextTask(TaxiTask newCurrentTask)
     {
-        return !optimConfig.scheduler.getParams().destinationKnown
-                && (newCurrentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_WITH_PASSENGER);
+        return !destinationKnown
+                && newCurrentTask.getTaxiTaskType() == TaxiTaskType.DRIVE_WITH_PASSENGER;
     }
 
 

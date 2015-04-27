@@ -143,9 +143,9 @@ class TaxiLauncher
             qSim.addQueueSimulationListeners(new BeforeSimulationTripPrebooker(passengerEngine));
         }
 
-        LegCreator legCreator = params.onlineVehicleTracker ? VrpLegs
-                .createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer())
-                : VrpLegs.LEG_WITH_OFFLINE_TRACKER_CREATOR;
+        LegCreator legCreator = params.onlineVehicleTracker ? //
+                VrpLegs.createLegWithOnlineTrackerCreator(optimizer, qSim.getSimTimer()) : //
+                VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
 
         TaxiActionCreator actionCreator = new TaxiActionCreator(passengerEngine, legCreator,
                 params.pickupDuration);

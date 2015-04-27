@@ -55,21 +55,13 @@ enum AlgorithmConfig
 
     RULE_DSE_15M(RULES, DEMAND_SUPPLY_EQUIL, EVENTS, TIME),
 
-    FIFO_1_S_TW_FF(FIFO_1_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+    FIFO_RES_TW_FF(FIFO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
 
-    FIFO_1_S_TW_15M(FIFO_1_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
+    FIFO_RES_TW_15M(FIFO_SCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
 
-    FIFO_1_S_TP_FF(FIFO_1_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
+    FIFO_RES_TP_FF(FIFO_SCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
 
-    FIFO_1_S_TP_15M(FIFO_1_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
-
-    FIFO_RES_TW_FF(FIFO_FIFO_RESCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
-
-    FIFO_RES_TW_15M(FIFO_FIFO_RESCHEDULING, MIN_WAIT_TIME, EVENTS, TIME),
-
-    FIFO_RES_TP_FF(FIFO_FIFO_RESCHEDULING, MIN_PICKUP_TIME, FREE_FLOW_SPEED, TIME),
-
-    FIFO_RES_TP_15M(FIFO_FIFO_RESCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
+    FIFO_RES_TP_15M(FIFO_SCHEDULING, MIN_PICKUP_TIME, EVENTS, TIME),
 
     ASSIGN_TW_FF(ASSIGNMENT, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
 
@@ -88,8 +80,7 @@ enum AlgorithmConfig
     static enum AlgorithmType
     {
         RULES, //
-        FIFO_1_SCHEDULING, //
-        FIFO_FIFO_RESCHEDULING, //
+        FIFO_SCHEDULING, //
         ASSIGNMENT, //
         MIP;
     }
@@ -117,11 +108,8 @@ enum AlgorithmConfig
             case RULES:
                 return new RuleBasedTaxiOptimizer(optimConfig);
 
-            case FIFO_1_SCHEDULING:
-                return FifoTaxiOptimizer.createOptimizerWithoutRescheduling(optimConfig);
-
-            case FIFO_FIFO_RESCHEDULING:
-                return FifoTaxiOptimizer.createOptimizerWithRescheduling(optimConfig);
+            case FIFO_SCHEDULING:
+                return new FifoTaxiOptimizer(optimConfig);
 
             case ASSIGNMENT:
                 return new AssignmentTaxiOptimizer(optimConfig);

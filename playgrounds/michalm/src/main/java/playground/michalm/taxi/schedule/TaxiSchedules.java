@@ -62,4 +62,16 @@ public class TaxiSchedules
         Iterable<TaxiTask> pickupTasks = Iterables.filter(schedule.getTasks(), IS_PICKUP);
         return Iterables.transform(pickupTasks, TAXI_TASK_TO_REQUEST);
     }
+
+
+    public static TaxiTask getNextTaxiTask(TaxiTask task)
+    {
+        return asTaxiSchedule(task.getSchedule()).getTasks().get(task.getTaskIdx() + 1);
+    }
+
+
+    public static TaxiTask getPreviousTaxiTask(TaxiTask task)
+    {
+        return asTaxiSchedule(task.getSchedule()).getTasks().get(task.getTaskIdx() - 1);
+    }
 }

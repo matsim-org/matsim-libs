@@ -87,9 +87,13 @@ public class VrpLeg
     public void pathDiverted(DivertedVrpPath divertedPath)
     {
         int immediateDiversionLinkIdx = currentLinkIdx + (canChangeNextLink() ? 0 : 1);
-
         if (divertedPath.getDiversionLinkIdx() < immediateDiversionLinkIdx) {
             throw new IllegalStateException();
+        }
+        
+        //divertedPath must be derived from the original one 
+        if (divertedPath.getOriginalPath() != path) {
+            throw new IllegalArgumentException();
         }
 
         path = divertedPath;

@@ -42,9 +42,9 @@ public class RuleBasedTaxiOptimizer
     public RuleBasedTaxiOptimizer(TaxiOptimizerConfiguration optimConfig)
     {
         super(optimConfig, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false);
-        
+
         if (optimConfig.scheduler.getParams().vehicleDiversion) {
-            throw new IllegalArgumentException("Diversion not supported");
+            throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
         }
 
         this.vehicleFilter = optimConfig.filterFactory.createVehicleFilter();

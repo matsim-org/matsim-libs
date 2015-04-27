@@ -29,14 +29,12 @@ public class VehicleRequestPathFinder
 
         for (Vehicle veh : vehicles) {
             VrpPathWithTravelData path = calculateVrpPath(veh, req);
-
             if (path == null) {
                 continue;
             }
 
             VehicleRequestPath vrp = new VehicleRequestPath(veh, req, path);
             double cost = vrpCost.getCost(vrp);
-
             if (cost < bestCost) {
                 bestVrp = vrp;
                 bestCost = cost;
@@ -55,14 +53,12 @@ public class VehicleRequestPathFinder
 
         for (TaxiRequest req : unplannedRequests) {
             VrpPathWithTravelData path = calculateVrpPath(veh, req);
-
             if (path == null) {
                 continue;
             }
 
             VehicleRequestPath vrp = new VehicleRequestPath(veh, req, path);
             double cost = vrpCost.getCost(vrp);
-
             if (cost < bestCost) {
                 bestVrp = vrp;
                 bestCost = cost;
@@ -75,8 +71,8 @@ public class VehicleRequestPathFinder
 
     private VrpPathWithTravelData calculateVrpPath(Vehicle veh, TaxiRequest req)
     {
-        LinkTimePair departure = scheduler.getEarliestIdleness(veh);
-        return departure == null ? null : calculator.calcPath(departure.link, req.getFromLink(),
-                departure.time);
+        LinkTimePair departure = scheduler.getImmediateDiversionOrEarliestIdleness(veh);
+        return departure == null ? //
+                null : calculator.calcPath(departure.link, req.getFromLink(), departure.time);
     }
 }

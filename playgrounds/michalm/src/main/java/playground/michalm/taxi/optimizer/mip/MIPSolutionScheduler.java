@@ -39,25 +39,25 @@ class MIPSolutionScheduler
 
         for (int k = 0; k < m; k++) {
             currentVeh = vData.entries.get(k).vehicle;
-            addSubsequentRequestsToCurrentVehicle(k);
+            appendSubsequentRequestsToCurrentVehicle(k);
         }
     }
 
 
-    private void addSubsequentRequestsToCurrentVehicle(int u)
+    private void appendSubsequentRequestsToCurrentVehicle(int u)
     {
         boolean[] x_u = solution.x[u];
         for (int i = 0; i < n; i++) {
             if (x_u[m + i]) {
-                addRequestToCurrentVehicle(i);
-                addSubsequentRequestsToCurrentVehicle(m + i);
+                appendRequestToCurrentVehicle(i);
+                appendSubsequentRequestsToCurrentVehicle(m + i);
                 return;
             }
         }
     }
 
 
-    private void addRequestToCurrentVehicle(int i)
+    private void appendRequestToCurrentVehicle(int i)
     {
         LinkTimePair earliestDeparture = optimConfig.scheduler.getEarliestIdleness(currentVeh);
         TaxiRequest req = rData.requests[i];

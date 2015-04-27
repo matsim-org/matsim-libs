@@ -64,8 +64,7 @@ public class TaxiStatsCalculator
 
             switch (t.getTaxiTaskType()) {
                 case DRIVE:
-                    TaxiTaskType nextTaskType = ((TaxiTask)Schedules.getNextTask(t))
-                            .getTaxiTaskType();
+                    TaxiTaskType nextTaskType = TaxiSchedules.getNextTaxiTask(t).getTaxiTaskType();
                     (nextTaskType == TaxiTaskType.PICKUP ? //
                             stats.pickupDriveTimes : stats.otherDriveTimes).addValue(time);
 
