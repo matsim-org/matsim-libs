@@ -41,12 +41,12 @@ import playground.michalm.zone.Zones;
 public class TaxiDemandGenerator
 {
 //    private static final String DATADIR = "C:/local_jb/data/";
-    private static final String DATADIR = "/Users/jb/sustainability-w-michal-and-dlr/data/";
-    private static final String NETWORKFILE = DATADIR+"scenarios/2015_02_strike/berlin_brb.xml";
+    private static final String DATADIR = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/";
+    private static final String NETWORKFILE = DATADIR+"scenarios/subfleets_v7/berlin_brb.xml";
     private static final String ZONESSHP = DATADIR+"/shp_merged/zones.shp";
     private static final String ZONESXML = DATADIR+"/shp_merged/zones.xml";
-    private static final String ODMATRIX = DATADIR+"taxi_berlin/2014_10_bahnstreik/OD_BRB_2014-10/oct/demandMatrices.xml";
-    private static final String PLANSFILE = DATADIR+"scenarios/2015_02_strike/plans4to3";
+    private static final String ODMATRIX = DATADIR+"taxi_berlin/2013/OD/demandMatrices.xml";
+    private static final String PLANSFILE = DATADIR+"scenarios/subfleets_v7/plans4to2";
     private ODDemandGenerator odd;
     private Map<Id<Zone>, Zone> zones;
     private Scenario scenario;
@@ -58,7 +58,8 @@ public class TaxiDemandGenerator
 
         for (double i = 1.0; i<5.1; i = i+0.1){
         TaxiDemandGenerator tdg = new TaxiDemandGenerator();
-        tdg.generateDemand("20141015040000", "20141016030000",i);
+//        tdg.generateDemand("20141015040000", "20141016030000",i);
+        tdg.generateDemand("20130416040000", "20130417020000",i);
         tdg.writeDemand(i);
         }
     }

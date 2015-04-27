@@ -93,47 +93,20 @@ import playground.michalm.util.MovingAgentsRegister;
     /*package*/JbSingleIterOnlineDvrpLauncher()
     {
 
-        // michalm - testing config (may be removed...)////////////////////////////////////
 
-        //        dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\joschka\\mielec-2-peaks-new-15-50\\";
-        //        plansFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.plans.xml.gz";
-        //        netFileName = dirName + "..\\mielec-2-peaks-new\\network.xml";
-        //        eventsFileName = dirName + "..\\mielec-2-peaks-new\\output\\ITERS\\it.20\\20.events.xml.gz";
+        dirName = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/subfleets_v7/";
 
-        //    	   dirName = "/Users/jb/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/2014_02_basic_scenario_v1/";
-        //    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v1\\";
-        //           plansFileName = dirName + "OD_20130417_SCALE_2.0_plans.xml.gz";
-        //           taxisFileName = dirName + "taxis-3000.xml";
+        plansFileName = dirName + "plans/plans4to2_1.0.xml.gz";
 
-        //    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_02_basic_scenario_v2\\";
-        //    	   dirName = "C:\\local_jb\\data\\scenarios\\2014_05_basic_scenario_v3\\";
-        dirName = "C:\\local_jb\\data\\scenarios\\2014_10_basic_scenario_v4\\";
-
-        //           plansFileName = dirName + "1.0plans4to3.xml";
-        //           plansFileName = dirName + "plans4to3.xml";
-        plansFileName = dirName + "plans/plans4to3_1.0.xml.gz";
-        //           plansFileName = dirName + "1.5plans4to3.xml.gz";
-        //    	   	plansFileName = dirName + "1.5plans4to3.xml.gz";
-
-        //           plansFileName = dirName + "2.0plans4to4.xml.gz";
-
-        //           taxisFileName = dirName + "taxis4to4_EV0.5.xml";
-        //           taxisFileName = dirName + "taxis4to4_EV0.6.xml";
-        //           taxisFileName = dirName + "taxis4to4_EV0.7.xml";
-        //           taxisFileName = dirName + "taxis4to4_EV0.8.xml";
-        //           taxisFileName = dirName + "taxis4to4_EV0.9.xml";
-        //             taxisFileName = dirName + "taxis4to4_EV1.0.xml";
-        //             taxisFileName = dirName + "taxis4to4_EVonezone.xml";
         taxisFileName = dirName + "taxis4to4_EV0.0.xml";
-        //           taxisFileName = dirName + "oldtaxis4to4.xml";
 
-        changeEventsFilename = dirName + "changeevents_min.xml";
-        eventsFileName = dirName + "2kW.15.1000.events.xml.gz";
+        changeEventsFilename = dirName + "changeevents_min1.xml";
+        eventsFileName = dirName + "../2kW.15.1000/2kW.15.1000.events.xml.gz";
         netFileName = dirName + "berlin_brb.xml";
 
         ////////////////////////////////////////////////////////         
 
-        electricStatsDir = dirName + "test/";
+        electricStatsDir = dirName + "/test/";
 
         //        plansFileName = dirName + "20.plans.xml.gz";
         //
