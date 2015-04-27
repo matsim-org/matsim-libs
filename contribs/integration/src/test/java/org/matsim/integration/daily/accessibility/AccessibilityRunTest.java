@@ -86,6 +86,46 @@ public class AccessibilityRunTest {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../../../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../../../../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../../../../../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../../../../../../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../../../../../../../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../../../../../../../../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../../../../../../../../../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../../../../../../../../../../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 
 		Assert.assertTrue(true);
