@@ -109,7 +109,12 @@ public class ModelIterator {
 					new ObjectiveFunction( new Function( runner ) )
 					);
 
-		return runner.runModel( new Thresholds( result.getPoint()[ 0 ] , result.getPoint()[ 1 ] ) );
+		final Thresholds bestThresholds = new Thresholds( result.getPoint()[ 0 ] , result.getPoint()[ 1 ] );
+		final SocialNetwork bestSn = generate( runner , bestThresholds );
+
+		log.info( "best social network found for thresholds: "+bestThresholds );
+
+		return bestSn;
 	}
 
 	private double estimateClustering( final SocialNetwork sn ) {
