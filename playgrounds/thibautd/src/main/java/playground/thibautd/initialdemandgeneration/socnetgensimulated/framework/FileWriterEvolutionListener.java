@@ -43,7 +43,7 @@ public class FileWriterEvolutionListener implements ModelIterator.EvolutionListe
 		this.writer = IOUtils.getBufferedWriter( fileName );
 		
 		try {
-			this.writer.write( "primaryThreshold\tsecondaryReduction\tavgDegree\tclustering" );
+			this.writer.write( "primaryThreshold\tsecondaryReduction\tavgDegree\tclustering\tfitness" );
 		}
 		catch ( IOException e ) {
 			log.error( "problem while opening file "+fileName , e );
@@ -53,7 +53,7 @@ public class FileWriterEvolutionListener implements ModelIterator.EvolutionListe
 	}
 
 	@Override
-	public void handleMove( final Thresholds m ) {
+	public void handleMove( final Thresholds m , final double fitness ) {
 		if ( !doAnalyse ) return;
 		try {
 			writer.newLine();
@@ -61,7 +61,8 @@ public class FileWriterEvolutionListener implements ModelIterator.EvolutionListe
 					m.getPrimaryThreshold()+"\t"+
 					m.getSecondaryReduction()+"\t"+
 					m.getResultingAverageDegree()+"\t"+
-					m.getResultingClustering() );
+					m.getResultingClustering()+"\t"+
+					fitness );
 			// make sure results are immediately available
 			writer.flush();
 		}

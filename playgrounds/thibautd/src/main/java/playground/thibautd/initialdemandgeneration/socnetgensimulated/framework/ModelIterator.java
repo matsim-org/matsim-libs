@@ -88,7 +88,7 @@ public class ModelIterator {
 			final Thresholds initialThresholds ) {
 		final MultivariateOptimizer optimizer =
 			new PowellOptimizer(
-					1E-9,1E-9,
+					1E-5,1E-5,
 					new Convergence() );
 
 		final double x = initialThresholds.getPrimaryThreshold();
@@ -129,13 +129,13 @@ public class ModelIterator {
 	}
 
 	public static interface EvolutionListener {
-		public void handleMove( Thresholds m );
+		public void handleMove( Thresholds m , double fitness );
 	}
 
 	private static class EvolutionLogger implements EvolutionListener {
 		@Override
-		public void handleMove( final Thresholds m ) {
-			log.info( "generated network for "+m );
+		public void handleMove( final Thresholds m , final double fitness ) {
+			log.info( "generated network for "+m+" -> fitness="+fitness );
 		}
 	}
 
@@ -151,10 +151,12 @@ public class ModelIterator {
 			final Thresholds thr = new Thresholds( args[ 0 ] , args[ 1 ] );
 	 		generate( runner , thr );
 
-			for ( EvolutionListener l : listeners ) l.handleMove( thr );
-
-			return distDegree( thr ) / precisionDegree +
+			final double fitness = distDegree( thr ) / precisionDegree +
 				distClustering( thr ) / precisionClustering;
+
+			for ( EvolutionListener l : listeners ) l.handleMove( thr , fitness );
+
+			return fitness;
 		}
 	}
 
