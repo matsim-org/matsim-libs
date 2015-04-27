@@ -22,7 +22,7 @@ public class IncomeHeterogeneityWithoutTravelDisutilityModuleTest {
 		Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
 		config.plans().setInputPersonAttributeFile(utils.getClassInputDirectory() + "/personAttributes.xml");
 		Controler controler = new Controler(config);
-		controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule());
+		controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule());
 		config.controler().setLastIteration(nIterations-1);
 		controler.run();
 	}

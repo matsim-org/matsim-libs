@@ -7,17 +7,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerDefaults;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import playground.artemc.heterogeneity.routing.TravelDisutilityIncludingIncome;
 import playground.artemc.utils.MapWriter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by artemc on 28/1/15.
@@ -45,14 +42,6 @@ public class IncomeHeterogeneityModule extends AbstractModule {
 		} else {
 			bind(IncomeHeterogeneity.class).toProvider(IncomeHeterogeneityProvider.class).in(Singleton.class);
 		}
-
-		// use ControlerDefaults configuration, replacing the TravelDisutility with a income-dependent one
-				install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
-					@Override
-					public void install() {
-						bind(TravelDisutilityFactory.class).toProvider(TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider.class);
-					}
-				}));
 	}
 
 	private static class IncomeHeterogeneityProvider implements Provider<IncomeHeterogeneity> {
@@ -68,29 +57,27 @@ public class IncomeHeterogeneityModule extends AbstractModule {
 
 		@Override
 		public IncomeHeterogeneity get() {
-			HeterogeneityConfigGroup heterogeneityConfig = ConfigUtils.addOrGetModule(config, HeterogeneityConfigGroup.GROUP_NAME, HeterogeneityConfigGroup.class);
-			String incomeFile = heterogeneityConfig.getIncomeFile();
-			String lambdaIncomeTravelCost = heterogeneityConfig.getLambdaIncomeTravelcost();
-			String incomeType = heterogeneityConfig.getIncomeOnTravelCostType();
+			log.info("Loading heterogeneity config group...");
+
 			Population population = scenario.getPopulation();
 
-			log.info("Adding income heterogeneity and parcing income data... Heterogeneity type: " + incomeType);
+			/*Check if personAttributes has been loaded*/
+			if(population.getPersonAttributes().equals(null))
+			{
+				log.error("Person attributes are empty!");
+			}
 
-			if (incomeFile == null) {
-				throw new RuntimeException("No income file path given.");
-			} else if (lambdaIncomeTravelCost == null) { throw new RuntimeException("No sensitivity parameter for income dependent travel cost is given.");}
+			Map<String, String> params = scenario.getConfig().getModule(HeterogeneityConfigGroup.GROUP_NAME).getParams();
 
-			IncomeHeterogeneityImpl incomeHeterogeneityImpl = new IncomeHeterogeneityImpl(this.scenario.getPopulation());
+			IncomeHeterogeneityImpl incomeHeterogeneityImpl = new IncomeHeterogeneityImpl(population);
 			incomeHeterogeneityImpl.setName("Income dependent heterogeneity in perception of travel cost");
-			incomeHeterogeneityImpl.setType(heterogeneityConfig.getIncomeOnTravelCostType());
-			incomeHeterogeneityImpl.setLambda_income(Double.valueOf(heterogeneityConfig.getLambdaIncomeTravelcost()));
+			incomeHeterogeneityImpl.setType(params.get("incomeOnTravelCostType"));
+			incomeHeterogeneityImpl.setLambda_income(Double.valueOf(params.get("incomeOnTravelCostLambda")));
 
-			if(heterogeneityConfig.getIncomeOnTravelCostType().equals("homo")){
-				log.info("Simulation with homogeneuos users. No income information added.");
-			}else {
-				log.info("Calculating incomeAlphaFactors based on income in personAttributes...");
-//				IncomePopulationReader incomesReader = new IncomePopulationReader(incomeHeterogeneityImpl, this.scenario.getPopulation());
-//				incomesReader.parse(incomeFile);
+			if (incomeHeterogeneityImpl.getType().equals("homo")) {
+				log.info("Simulation with homogeneuos agents...");
+			} else {
+				log.info("Simulation with "+incomeHeterogeneityImpl.getType()+" heterogeneity: calculating income factors.");
 
 				/*Calculate Income Statistics*/
 				Integer incomeSum=0;
@@ -101,63 +88,64 @@ public class IncomeHeterogeneityModule extends AbstractModule {
 				}
 				incomeMean = (double) incomeSum / (double) population.getPersons().size();
 
-				/*Create map of personal income factors*/
+				/*Create map of personal income factors and calculate the mean in order to adjust the utility parameters*/
+				HashMap<Id<Person>, Double> incomeCostSensitivityFactors = new HashMap<Id<Person>, Double>();
 				Double factorSum=0.0;
-				for(Id<Person> personId:population.getPersons().keySet()){
+				Double factorMean;
+				Double inverseFactorSum=0.0;
+				Double inverseFactorMean;
+
+				for(Id<Person> personId:population.getPersons().keySet()) {
 					Integer personIncome = (int) population.getPersonAttributes().getAttribute(personId.toString(), "income");
+					double incomeCostSensitivity = Math.pow((double) personIncome / incomeMean, (incomeHeterogeneityImpl.getLambda_income()));
+					incomeCostSensitivityFactors.put(personId, incomeCostSensitivity);
+					factorSum = factorSum + incomeCostSensitivity;
+					inverseFactorSum = inverseFactorSum + (1.0/incomeCostSensitivity);
+				}
 
-					double incomeFactor = Math.pow((double) personIncome/incomeMean,(incomeHeterogeneityImpl.getLambda_income()));
+				factorMean = factorSum / (double) incomeCostSensitivityFactors.size();
+				inverseFactorMean = inverseFactorSum / (double) incomeCostSensitivityFactors.size();
 
-					population.getPersonAttributes().putAttribute(personId.toString(),"incomeAlphaFactor",incomeFactor);
+				/*Add normalized income dependent value of time (alpha) factors (= 1/incomeCostSensitivityFactor) to the agent population*/
+				/*Add schedule delays beta factors*/
+				for(Id<Person> personId:population.getPersons().keySet()){
 
-					incomeHeterogeneityImpl.getIncomeFactors().put(personId, incomeFactor);
-					factorSum = factorSum + incomeFactor;
+					double incomeAlphaFactor = (1.0/incomeCostSensitivityFactors.get(personId))/inverseFactorMean;
+					population.getPersonAttributes().putAttribute(personId.toString(),"incomeAlphaFactor",incomeAlphaFactor);
+					population.getPersons().get(personId).getCustomAttributes().put("incomeAlphaFactor", incomeAlphaFactor);
+
+					double sdBetaFactor = (double) population.getPersonAttributes().getAttribute(personId.toString(),"betaFactor");
+					population.getPersons().get(personId).getCustomAttributes().put("sdBetaFactor",sdBetaFactor);
+
+					double incomeGammaFactor = incomeCostSensitivityFactors.get(personId)/factorMean;
+					population.getPersonAttributes().putAttribute(personId.toString(),"incomeGammaFactor",incomeGammaFactor);
+					population.getPersons().get(personId).getCustomAttributes().put("incomeGammaFactor", incomeGammaFactor);
+
+					//TODO remove incomeHeterogeneityImpl
+					incomeHeterogeneityImpl.getIncomeFactors().put(personId, incomeAlphaFactor);
 				}
 
 				/*Write personal income factors to file*/
-				MapWriter writer = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/incomeFactors.csv");
-				writer.write(incomeHeterogeneityImpl.getIncomeFactors(), "PersonId", "IncomeFactor;");
+				HashMap<Id<Person>, ArrayList<String>> factors = new HashMap<Id<Person>, ArrayList<String>>();
+				for(Id<Person> personId:population.getPersons().keySet()){
+					factors.put(personId, new ArrayList<String>());
+					factors.get(personId).add(incomeCostSensitivityFactors.get(personId).toString());
+					factors.get(personId).add((population.getPersons().get(personId).getCustomAttributes().get("incomeAlphaFactor")).toString());
+					factors.get(personId).add((population.getPersons().get(personId).getCustomAttributes().get("sdBetaFactor")).toString());
+					factors.get(personId).add((population.getPersons().get(personId).getCustomAttributes().get("incomeGammaFactor")).toString());
+				}
 
-				/*Looks like is is not a meaningful case*/
-//				if (incomeHeterogeneityImpl.getType().equals("heteroAlphaProp")) {
-//				for (Id<Person> personId : this.scenario.getPopulation().getPersons().keySet()) {
-//
-//						double randomFactor = 0.0;
-//						do {
-//							randomFactor = (MatsimRandom.getRandom().nextGaussian() * 0.2) + 1;
-//						} while (randomFactor < 0 && randomFactor > 2);
-//						System.out.println();
-//						incomeHeterogeneityImpl.getBetaFactors().put(personId, randomFactor);
-//					}
-//
-//					MapWriter writerBetaFactors = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/betaNormalFactors.csv");
-//					writerBetaFactors.write(incomeHeterogeneityImpl.getBetaFactors(), "PersonId", "BetaFactor;");
-//				}
+				MapWriter writer = new MapWriter(this.scenario.getConfig().controler().getOutputDirectory() + "/incomeCostSensitivityFactors.csv");
+				ArrayList<String> head = new ArrayList<String>();
+				head.add("PersonId");
+				head.add("incomeCostSensitivity");
+				head.add("incomeAlpha");
+				head.add("sdBetaFactor");
+				head.add("incomeGamma");
+				writer.writeArray(factors, head);
 
 			}
-
 			return incomeHeterogeneityImpl;
 		}
-	}
-
-	private static class TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider implements Provider<TravelDisutilityFactory> {
-
-		private final Scenario scenario;
-		private final IncomeHeterogeneity incomeHeterogeneity;
-
-		@Inject
-		TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider(Scenario scenario, IncomeHeterogeneity incomeHeterogeneity) {
-			this.scenario = scenario;
-			this.incomeHeterogeneity = incomeHeterogeneity;
-		}
-
-		@Override
-		public TravelDisutilityFactory get() {
-			HeterogeneityConfigGroup heterogeneityConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), HeterogeneityConfigGroup.GROUP_NAME, HeterogeneityConfigGroup.class);
-			TravelDisutilityIncludingIncome.Builder travelDisutilityFactory =
-					new TravelDisutilityIncludingIncome.Builder( ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), this.incomeHeterogeneity);
-			return travelDisutilityFactory;
-		}
-
 	}
 }

@@ -17,10 +17,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.analysis.IndividualScoreFromPopulationSQLWriter;
-import playground.artemc.heterogeneity.IncomeHeterogeneityWithoutTravelDisutilityModule;
-import playground.artemc.heterogeneity.TravelDisutilityIncomeHeterogeneityProviderWrapper;
+import playground.artemc.heterogeneity.IncomeHeterogeneityModule;
+import playground.artemc.heterogeneity.routing.TimeDistanceAndHeterogeneityBasedTravelDisutilityFactory;
+import playground.artemc.heterogeneity.routing.TimeDistanceTollAndHeterogeneityBasedTravelDisutilityProviderWrapper;
 import playground.artemc.heterogeneity.scoring.HeterogeneousCharyparNagelScoringFunctionForAnalysisFactory;
-import playground.artemc.heterogeneityWithToll.TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper;
 import playground.artemc.pricing.LinkOccupancyAnalyzerModule;
 import playground.artemc.pricing.RoadPricingWithoutTravelDisutilityModule;
 import playground.artemc.pricing.UpdateSocialCostPricingSchemeWithSpillOverModule;
@@ -81,19 +81,22 @@ public class ChoiceSetGenerator implements ShutdownListener
 		if(roadpricing==true) {
 			log.info("First-best roadpricing enabled!");
 //			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(),new UpdateSocialCostPricingSchemeModule());
-			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillOverModule());
-			controler.addOverridingModule( new AbstractModule() {
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule(), new RoadPricingWithoutTravelDisutilityModule(), new LinkOccupancyAnalyzerModule(), new UpdateSocialCostPricingSchemeWithSpillOverModule());
+			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-					bind(TravelDisutilityFactory.class).toProvider(TravelDisutilityTollAndIncomeHeterogeneityProviderWrapper.TravelDisutilityWithPricingAndHeterogeneityProvider.class);
-				}});
+					bind(TravelDisutilityFactory.class).toProvider(TimeDistanceTollAndHeterogeneityBasedTravelDisutilityProviderWrapper.TimeDistanceTollAndHeterogeneityBasedTravelDisutilityProvider.class);
+
+				}
+			});
+
 		}else{
 			log.info("No roadpricing!");
-			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityWithoutTravelDisutilityModule());
+			controler.setModules(new ControlerDefaultsModule(), new IncomeHeterogeneityModule());
 			controler.addOverridingModule( new AbstractModule() {
 				@Override
 				public void install() {
-					bind(TravelDisutilityFactory.class).toProvider(TravelDisutilityIncomeHeterogeneityProviderWrapper.TravelDisutilityIncludingIncomeHeterogeneityFactoryProvider.class);
+					bind(TravelDisutilityFactory.class).to(TimeDistanceAndHeterogeneityBasedTravelDisutilityFactory.class);
 				}});
 		}
 
