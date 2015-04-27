@@ -55,47 +55,47 @@ public class AccessibilityRunTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
 	
-//	@SuppressWarnings("static-method")
-//	@Test
-//	public void doTest() {
-//		System.out.println("available ram: " + (Runtime.getRuntime().maxMemory() / 1024/1024));
-//
-//		final String FN = "matsimExamples/tutorial/lesson-3/network.xml" ;
-//
-//		Config config = ConfigUtils.createConfig();
-//		Scenario sc = ScenarioUtils.createScenario( config ) ;
-//
-//		try {
-//			new MatsimNetworkReader(sc).readFile(FN);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		try {
-//			new MatsimNetworkReader(sc).readFile("../" + FN);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		try {
-//			new MatsimNetworkReader(sc).readFile("../../" + FN);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		try {
-//			new MatsimNetworkReader(sc).readFile("../../../" + FN);
-//			// this is the one that works locally
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//
-//
-//		Assert.assertTrue(true);
-//	}
+	@SuppressWarnings("static-method")
+	@Test
+	public void doTest() {
+		System.out.println("available ram: " + (Runtime.getRuntime().maxMemory() / 1024/1024));
+
+		final String FN = "matsimExamples/tutorial/lesson-3/network.xml" ;
+
+		Config config = ConfigUtils.createConfig();
+		Scenario sc = ScenarioUtils.createScenario( config ) ;
+
+		try {
+			new MatsimNetworkReader(sc).readFile(FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../" + FN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			new MatsimNetworkReader(sc).readFile("../../../" + FN);
+			// this is the one that works locally
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+
+		Assert.assertTrue(true);
+	}
 	
 
 	@Test
 	public void doAccessibilityTest() {
 //		String folderStructure = "../../"; // local
-		String folderStructure = "../../../"; // server
+		String folderStructure = "../"; // server
 			
 		String networkFile = folderStructure + "matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
