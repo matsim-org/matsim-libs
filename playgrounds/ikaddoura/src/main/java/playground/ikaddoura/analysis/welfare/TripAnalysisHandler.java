@@ -23,6 +23,7 @@
 package playground.ikaddoura.analysis.welfare;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -45,13 +46,26 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 	private final static Logger log = Logger.getLogger(TripAnalysisHandler.class);
 
 	private Map<Id<Person>, Double> personId2departureTime = new HashMap<Id<Person>, Double>();
+	
 	private double totalTravelTimeAllModes = 0.;
 	private double totalTravelTimeCarMode = 0.;
 	private int agentStuckEvents = 0;
 	private int carLegs = 0;
 	private int ptLegs = 0;
 	private int walkLegs = 0;
+
+	private List<Id<Person>> stuckingAgents;
 	
+	public TripAnalysisHandler(List<Id<Person>> stuckingAgents) {
+		this.stuckingAgents = stuckingAgents;
+		log.info("Providing the person Ids of stucking agents. These agents will be excluded from this analysis.");
+	}
+
+	public TripAnalysisHandler() {
+		stuckingAgents = null;
+		log.info("Considering all persons even though they may stuck in the base case or policy case.");
+	}
+
 	@Override
 	public void reset(int iteration) {
 		this.personId2departureTime.clear();
@@ -65,29 +79,53 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		double travelTime = event.getTime() - this.personId2departureTime.get(event.getPersonId());
-		
-		totalTravelTimeAllModes = totalTravelTimeAllModes + travelTime;
-		
-		if (event.getLegMode().toString().equals(TransportMode.car)) {
-			totalTravelTimeCarMode = totalTravelTimeCarMode + travelTime;
-			this.carLegs++;
+				
+		if (isStucking(event.getPersonId())) {
+			// ignore this person
 			
-		} else if (event.getLegMode().toString().equals(TransportMode.pt)) {
-			this.ptLegs++;
-	
-		} else if (event.getLegMode().toString().equals(TransportMode.walk)) {
-			this.walkLegs++;
+		} else {
+			double travelTime = event.getTime() - this.personId2departureTime.get(event.getPersonId());
+			
+			totalTravelTimeAllModes = totalTravelTimeAllModes + travelTime;
+			
+			if (event.getLegMode().toString().equals(TransportMode.car)) {
+				totalTravelTimeCarMode = totalTravelTimeCarMode + travelTime;
+				this.carLegs++;
+				
+			} else if (event.getLegMode().toString().equals(TransportMode.pt)) {
+				this.ptLegs++;
 		
-		} else if (event.getLegMode().toString().equals(TransportMode.transit_walk)) {
-			log.warn("For the simulated public transport, e.g. 'transit_walk' this analysis has to be revised.");
+			} else if (event.getLegMode().toString().equals(TransportMode.walk)) {
+				this.walkLegs++;
+			
+			} else if (event.getLegMode().toString().equals(TransportMode.transit_walk)) {
+				log.warn("For the simulated public transport, e.g. 'transit_walk' this analysis has to be revised.");
+			
+			} else {
+				// ...
+			}
 		}
 	
 	}
 
+	private boolean isStucking(Id<Person> personId) {
+		if (this.stuckingAgents == null) {
+			return false;
+		} else if (this.stuckingAgents.contains(personId)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		this.personId2departureTime.put(event.getPersonId(), event.getTime());
+		if (isStucking(event.getPersonId())) {
+			// ignore this person
+			
+		} else {
+			this.personId2departureTime.put(event.getPersonId(), event.getTime());
+		}
 	}
 
 	@Override
