@@ -96,7 +96,6 @@
 		<module>dvrp</module>
 		<module>emissions</module>
 		<module>freight</module>
-		<module>freightChainsFromTravelDiaries</module>
 		<module>gtfs2matsimtransitschedule</module>
 		<module>grips</module>
 		<module>signals</module>

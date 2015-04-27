@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Main-Class: pwvm.Pwvm
-Class-Path: postgresql-8.3-603.jdbc3.jar
