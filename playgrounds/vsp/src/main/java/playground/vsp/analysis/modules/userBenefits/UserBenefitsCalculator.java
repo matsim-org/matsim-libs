@@ -20,6 +20,7 @@
 package playground.vsp.analysis.modules.userBenefits;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -49,6 +50,7 @@ public class UserBenefitsCalculator {
 	private final Map<Id<Person>, Double> personId2Utility = new HashMap<Id<Person>, Double>();
 	private final Map<Id<Person>, Double> personId2MonetizedUtility = new HashMap<Id<Person>, Double>();
 
+	private final List<Id<Person>> stuckingAgents;
 
 	public UserBenefitsCalculator(Config config, WelfareMeasure wm, boolean considerAllPlans) {
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore();
@@ -57,9 +59,30 @@ public class UserBenefitsCalculator {
 		this.welfareMeasure = wm;
 		this.considerAllPlans = considerAllPlans;
 		
+		logger.warn("There is no list of person IDs provided to be excluded from the user benefit calculation.");
+		this.stuckingAgents = null;
+		
 		if (considerAllPlans) {
 			logger.warn("All plans are considered for the calculation of user benefits. For an economic interpretation invalid plans (score <= 0.0 or score == null) should not be considered.");
+		} else {
+			logger.warn("Invalid plans that will not be considered for the calculation of user benefits are defined to have either a null score or a negative score.");
 		}
+	}
+	
+	public UserBenefitsCalculator(Config config, List<Id<Person>> stuckingAgents) {
+		logger.info("Providing the IDs of agents that are stucking in the final iteration (selected plans).");
+
+		PlanCalcScoreConfigGroup pcs = config.planCalcScore();
+		this.betaLogit = pcs.getBrainExpBeta();
+		this.marginalUtlOfMoney = pcs.getMarginalUtilityOfMoney();
+		this.stuckingAgents = stuckingAgents;
+
+		logger.info("A list of person IDs of stucking agents is provided. These persons will be excluded from the user benefit calculation."
+				+ "All other plans will be considered.");
+		this.considerAllPlans = false;
+		
+		logger.info("The welfare measure is set to " + WelfareMeasure.SELECTED.toString() + ".");
+		this.welfareMeasure = WelfareMeasure.SELECTED;
 	}
 
 	public void reset() {
@@ -160,23 +183,37 @@ public class UserBenefitsCalculator {
 	}
 
 	private boolean testScore(Plan plan, Id<Person> personId) {
-		if(plan.getScore() == null){
-			nullScore++;
-			if(nullScore <= maxWarnCnt) {
-				logger.warn("Score for person " + personId + " is " + plan.getScore() 
-						+ ". A null score cannot be used for utility calculation.");
-				if(nullScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+		if (this.stuckingAgents == null){
+			if(plan.getScore() == null){
+				nullScore++;
+				if(nullScore <= maxWarnCnt) {
+					logger.warn("Score for person " + personId + " is " + plan.getScore() 
+							+ ". A null score cannot be used for utility calculation.");
+					if(nullScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+				}
+				return false;
+			} else if(plan.getScore() <= 0.0){
+				minusScore++;
+				if(minusScore <= maxWarnCnt) {
+					logger.warn("Score for person " + personId + " is " + plan.getScore() 
+							+ ". A score <= 0.0 cannot be used for utility calculation.");
+					if(minusScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+				}
+				return false;
+			} else return true;
+		} else {
+			if (plan.getScore() == null){
+				throw new RuntimeException("Score for person " + personId + " is " + plan.getScore() 
+						+ ". A null score cannot be used for utility calculation. This person has to be excluded.");
+			} else {
+				if (this.stuckingAgents.contains(personId)) {
+					logger.info("Person " + personId + " is stucking and therefore cannot be used for utility calculation.");
+					minusScore++;
+					return false;
+				} else return true;
 			}
-			return false;
-		} else if(plan.getScore() <= 0.0){
-			minusScore++;
-			if(minusScore <= maxWarnCnt) {
-				logger.warn("Score for person " + personId + " is " + plan.getScore() 
-						+ ". A score <= 0.0 cannot be used for utility calculation.");
-				if(minusScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
-			}
-			return false;
-		} else return true;
+
+		}
 	}
 
 	private double convertToMoney(double logsumOfPerson) {
