@@ -21,6 +21,7 @@ package playground.thibautd.initialdemandgeneration.socnetgen.framework;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -81,15 +82,27 @@ public class SnaUtils {
 			return calcClusteringCoefficient( socialNetwork );
 		}
 
-		final List<Id<Person>> egos = new ArrayList< >( socialNetwork.getEgos() );
+		final List<Id<Person>> egos = new ArrayList< >( socialNetwork.getEgos().size() );
+		final long[] cumulatedWeight = new long[ socialNetwork.getEgos().size() ];
 		log.info( "estimating clustering for precision "+precision+" with probability "+probabilityPrecision+":" );
 		log.info( "sampling "+k+" wedges for social network with "+socialNetwork.getEgos().size()+" egos" );
-		final Counter counter = new Counter( "consider wedge # " );
+
+		final Counter egoCounter = new Counter( "compute weight of ego # " );
+		for ( Map.Entry< Id<Person> , Set<Id<Person>> > ego : socialNetwork.getMapRepresentation().entrySet() ) {
+			egoCounter.incCounter();
+			egos.add( ego.getKey() );
+			final int deg = ego.getValue().size();
+			final long prev = egos.size() == 1 ? 0 : cumulatedWeight[ egos.size() - 2 ];
+			cumulatedWeight[ egos.size() - 1 ] = prev +( deg * (deg - 1) / 2 );
+		}
+		egoCounter.printCounter();
+		final long sum = cumulatedWeight[ cumulatedWeight.length - 1 ];
 
 		final ExecutorService executor = Executors.newFixedThreadPool( nThreads );
 
 		final List<Future<Integer>> results = new ArrayList< >();
 
+		final Counter wedgeCounter = new Counter( "evaluate wedge # " );
 		final int nCallables = nThreads * 4;
 		for ( int call=0; call < nCallables; call++ ) {
 			final int nSamples =
@@ -107,14 +120,18 @@ public class SnaUtils {
 							int nTriangles = 0;
 
 							for ( int i=0; i < nSamples; ) {
-								final Id<Person> ego = egos.get( random.nextInt( egos.size() ) );
+								final long sampledWeight = (long) (random.nextDouble() * sum);
+								final int ins = Arrays.binarySearch( cumulatedWeight , sampledWeight );
+								final int index = ins >= 0 ? ins : -ins - 1;
+
+								final Id<Person> ego = egos.get( index );
 
 								alters.clear();
 								alters.addAll( socialNetwork.getAlters( ego ) );
 
 								if ( alters.size() < 2 ) continue;
 								i++;
-								counter.incCounter();
+								wedgeCounter.incCounter();
 
 								final Id<Person> alters1 = alters.remove( random.nextInt( alters.size() ) );
 								final Id<Person> alters2 = alters.remove( random.nextInt( alters.size() ) );
@@ -134,34 +151,24 @@ public class SnaUtils {
 			}
 		}
 		catch ( InterruptedException | ExecutionException e ) {
+			// avoid wrapping a wrapper exception...
+			if ( e.getCause() instanceof RuntimeException ) throw (RuntimeException) e.getCause();
+			else if ( e.getCause() != null ) throw new RuntimeException( e.getCause() );
 			throw new RuntimeException( e );
 		}
-		counter.printCounter();
+		wedgeCounter.printCounter();
 
 		return ((double) nTriangles) / k;
 	}
-		
-	public static double estimateClusteringCoefficient(
-			final double samplingRate,
-			final SocialNetwork socialNetwork) {
-		return estimateClusteringCoefficient( new Random( 20150130 ) , samplingRate , socialNetwork );
-	}
 
-	public static double estimateClusteringCoefficient(
-			final Random random,
-			final double samplingRate,
+	public static double calcClusteringCoefficient(
 			final SocialNetwork socialNetwork) {
-		if ( samplingRate <= 0 ) throw new IllegalArgumentException( "sampling rate must be positive, got "+samplingRate );
-		if ( samplingRate > 1 ) throw new IllegalArgumentException( "sampling rate must lower than 1, got "+samplingRate );
-
-		log.info( "estimate clustering coefficient with sampling rate "+samplingRate );
+		log.info( "compute clustering coefficient with full enumeration" );
 		final Counter tripleCounter = new Counter( "clustering calculation: look at triple # " );
 		long nTriples = 0;
 		long nTriangles = 0;
 
 		for ( Id<Person> ego : socialNetwork.getEgos() ) {
-			if ( random != null && random.nextDouble() > samplingRate ) continue;
-
 			final Set<Id<Person>> alterSet = socialNetwork.getAlters( ego );
 			final Id<Person>[] alters = alterSet.toArray( new Id[ alterSet.size() ] ); 
 
@@ -185,11 +192,6 @@ public class SnaUtils {
 		assert nTriples >= 0 : nTriples;
 		assert nTriangles >= 0 : nTriangles;
 		return nTriples > 0 ? (1d * nTriangles) / nTriples : 0;
-	}
-
-	public static double calcClusteringCoefficient(
-			final SocialNetwork socialNetwork) {
-		return estimateClusteringCoefficient( null , 1 , socialNetwork );
 	}
 
 	public static double calcAveragePersonalNetworkSize(final SocialNetwork socialNetwork) {

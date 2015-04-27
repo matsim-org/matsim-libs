@@ -54,10 +54,9 @@ public class ModelIterator {
 
 	private final double powellMinAbsoluteChange;
 	private final double powellMinRelativeChange;
+	
+	private final int nThreads = 4;
 
-	// TODO: make adaptive (the closer to the target value,
-	// the more precise is should get)
-	private double samplingRateClustering = 1;
 	private final List<EvolutionListener> listeners = new ArrayList< >();
 
 	public ModelIterator( final SocialNetworkGenerationConfigGroup config ) {
@@ -66,7 +65,6 @@ public class ModelIterator {
 
 		listeners.add( new EvolutionLogger() );
 
-		setSamplingRateClustering( config.getSamplingRateForClusteringEstimation() );
 		this.precisionClustering = config.getPrecisionClustering();
 		this.precisionDegree = config.getPrecisionDegree();
 
@@ -120,18 +118,14 @@ public class ModelIterator {
 	}
 
 	private double estimateClustering( final SocialNetwork sn ) {
-		final double estimate = SnaUtils.estimateClusteringCoefficient( samplingRateClustering , sn );
+		//final double estimate = SnaUtils.estimateClusteringCoefficient( samplingRateClustering , sn );
 
-		return Math.abs( targetClustering - estimate ) > 10 * precisionClustering ? estimate : SnaUtils.calcClusteringCoefficient( sn );
+		//return Math.abs( targetClustering - estimate ) > 10 * precisionClustering ? estimate : SnaUtils.calcClusteringCoefficient( sn );
+		return SnaUtils.estimateClusteringCoefficient( 1900 , nThreads , precisionClustering , 0.95 , sn );
 	}
 
 	public void addListener( final EvolutionListener l ) {
 		listeners.add( l );
-	}
-
-	public void setSamplingRateClustering( final double rate ) {
-		if ( rate < 0 || rate > 1 ) throw new IllegalArgumentException( rate+" is not in [0;1]" );
-		this.samplingRateClustering = rate;
 	}
 
 	private double distClustering( final Thresholds thresholds ) {
