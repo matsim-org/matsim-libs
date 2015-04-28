@@ -19,11 +19,8 @@
 
 package playground.gregor.external;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-
+import com.google.protobuf.RpcController;
+import com.google.protobuf.ServiceException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -31,29 +28,19 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.External2QAdapterLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-
-import playground.gregor.proto.ProtoMATSimInterface.AgentsStuck;
-import playground.gregor.proto.ProtoMATSimInterface.Extern2MATSim;
-import playground.gregor.proto.ProtoMATSimInterface.ExternAfterSim;
-import playground.gregor.proto.ProtoMATSimInterface.ExternAfterSimConfirmed;
-import playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStep;
-import playground.gregor.proto.ProtoMATSimInterface.ExternDoSimStepReceived;
+import playground.gregor.proto.ProtoMATSimInterface.*;
 import playground.gregor.proto.ProtoMATSimInterface.ExternInterfaceService.BlockingInterface;
-import playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSim;
-import playground.gregor.proto.ProtoMATSimInterface.ExternOnPrepareSimConfirmed;
-import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternHasSpace;
-import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternHasSpaceConfirmed;
-import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgent;
 import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgent.Agent;
-import playground.gregor.proto.ProtoMATSimInterface.MATSim2ExternPutAgentConfirmed;
 
-import com.google.protobuf.RpcController;
-import com.google.protobuf.ServiceException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 public class ExternalEngine implements MobsimEngine {
 
@@ -64,9 +51,9 @@ public class ExternalEngine implements MobsimEngine {
 	private final Map<Id<Person>, QVehicle> vehicles = new HashMap<>();
 	private final Map<Id<Link>, External2QAdapterLink> adapters = new HashMap<>();
 	private final EventsManager em;
-	private final Mobsim sim;
+	private final ObservableMobsim sim;
 
-	public ExternalEngine(EventsManager eventsManager, Mobsim sim,RpcController rpcCtr,BlockingInterface clientService, CyclicBarrier simStepBarrier) {
+	public ExternalEngine(EventsManager eventsManager, ObservableMobsim sim,RpcController rpcCtr,BlockingInterface clientService, CyclicBarrier simStepBarrier) {
 		this.em = eventsManager;
 		this.sim = sim;
 		this.rpcCtr = rpcCtr;
@@ -182,7 +169,7 @@ public class ExternalEngine implements MobsimEngine {
 		return this.em;
 	}
 
-	public Mobsim getMobsim() {
+	public ObservableMobsim getMobsim() {
 		return this.sim;
 	}
 

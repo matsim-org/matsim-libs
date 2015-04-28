@@ -20,27 +20,19 @@
 
 package org.matsim.core.mobsim.external;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.AbstractPopulationWriterHandler;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -49,7 +41,11 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 
-public class ExternalMobsim implements RunnableMobsim {
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+public class ExternalMobsim implements Mobsim {
 
 	private static final String CONFIG_MODULE = "simulation";
 

@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *         <p/>
  *         Extended for transit simulation.
  */
-class PSim implements RunnableMobsim {
+class PSim implements Mobsim {
 
     private final Scenario scenario;
     private final EventsManager eventManager;

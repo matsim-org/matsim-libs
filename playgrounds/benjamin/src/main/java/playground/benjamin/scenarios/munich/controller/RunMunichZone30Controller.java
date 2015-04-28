@@ -232,13 +232,13 @@ public class RunMunichZone30Controller extends AbstractController {
 	@Override
 	protected void runMobSim() {
 		QSim qSim = new QSim( this.scenario, this.eventsManager ) ;
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
         PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);

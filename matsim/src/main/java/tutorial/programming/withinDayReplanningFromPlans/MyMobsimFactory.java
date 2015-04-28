@@ -21,7 +21,7 @@ package tutorial.programming.withinDayReplanningFromPlans;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -42,7 +42,7 @@ public class MyMobsimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public RunnableMobsim createMobsim(Scenario sc, EventsManager events) {
+	public Mobsim createMobsim(Scenario sc, EventsManager events) {
 		QSim qSim = QSimUtils.createDefaultQSim(sc, events);
 		qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.tripRouterFactory.get())) ;
 		return qSim;

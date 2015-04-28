@@ -16,7 +16,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -57,7 +57,7 @@ public class Visualiser {
 
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
 
-		RunnableMobsim mobsim = mobsimFactory.get();
+		Mobsim mobsim = mobsimFactory.get();
 		
 		SnapshotGenerator visualizer = new SnapshotGenerator(scenario.getNetwork(), snapshotInterval, scenario.getConfig().qsim());
 		visualizer.addSnapshotWriter(otfFileWriter);
@@ -87,7 +87,7 @@ public class Visualiser {
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
 
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-		RunnableMobsim mobsim = mobsimFactory.get();
+		Mobsim mobsim = mobsimFactory.get();
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, (QSim) mobsim);
 		OTFClientLive.run(config, server);

@@ -52,25 +52,25 @@ public class MyQSimFactory implements MobsimFactory {
 	private final static Logger log = Logger.getLogger(MyQSimFactory.class);
 
 	@Override
-	public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Netsim createMobsim(Scenario scenario, EventsManager eventsManager) {
 
-		QSimConfigGroup conf = sc.getConfig().qsim();
+		QSimConfigGroup conf = scenario.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		QSim qSim = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine();
+		QSim qSim = new QSim(scenario, eventsManager);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
         QNetsimEngine netsimEngine = new MyParallelQNetsimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;
-		if (sc.getConfig().scenario().isUseTransit()) {
+		if (scenario.getConfig().scenario().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
@@ -80,10 +80,10 @@ public class MyQSimFactory implements MobsimFactory {
 		} else {
 			agentFactory = new DefaultAgentFactory(qSim);
 		}
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
+		if (scenario.getConfig().network().isTimeVariantNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
 		}
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}

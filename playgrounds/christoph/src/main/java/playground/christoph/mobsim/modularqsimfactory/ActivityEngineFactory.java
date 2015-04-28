@@ -21,6 +21,7 @@
 package playground.christoph.mobsim.modularqsimfactory;
 
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
@@ -28,7 +29,7 @@ public class ActivityEngineFactory implements MobsimEngineFactory {
 
 	@Override
 	public MobsimEngine createMobsimSimEngine(Netsim sim) {
-		return new ActivityEngine();
+		return new ActivityEngine(sim.getEventsManager(), sim.getAgentCounter());
 	}
 
 }

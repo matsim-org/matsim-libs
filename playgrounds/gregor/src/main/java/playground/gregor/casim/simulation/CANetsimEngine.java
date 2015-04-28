@@ -26,9 +26,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-
 import playground.gregor.casim.simulation.physics.CANetwork;
 import playground.gregor.casim.simulation.physics.CANetworkFactory;
 import playground.gregor.casim.simulation.physics.CAVehicle;
@@ -86,8 +84,8 @@ public class CANetsimEngine implements MobsimEngine {
 	public void letVehicleArrive(CAVehicle veh) {
 		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		MobsimDriverAgent driver = veh.getDriver();
-		internalInterface
-				.getMobsim()
+		((QSim) internalInterface
+				.getMobsim())
 				.getEventsManager()
 				.processEvent(
 						new PersonLeavesVehicleEvent(now, driver.getId(), veh
@@ -106,7 +104,7 @@ public class CANetsimEngine implements MobsimEngine {
 		return this.caNet;
 	}
 
-	public Mobsim getMobsim() {
+	public QSim getMobsim() {
 		return this.sim;
 	}
 

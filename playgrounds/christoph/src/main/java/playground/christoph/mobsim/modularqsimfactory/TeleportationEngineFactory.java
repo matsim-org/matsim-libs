@@ -28,7 +28,7 @@ public class TeleportationEngineFactory implements MobsimEngineFactory {
 
 	@Override
 	public MobsimEngine createMobsimSimEngine(Netsim sim) {
-		return new TeleportationEngine();
+		return new TeleportationEngine(sim.getScenario(), sim.getEventsManager());
 	}
 
 }

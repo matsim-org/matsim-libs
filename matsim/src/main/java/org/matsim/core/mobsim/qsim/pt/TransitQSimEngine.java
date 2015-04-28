@@ -75,13 +75,14 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 
-	private TransitDriverAgentFactory transitDriverFactory = new DefaultTransitDriverAgentFactory();
+	private TransitDriverAgentFactory transitDriverFactory;
 
 	private InternalInterface internalInterface = null ;
 
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
+		transitDriverFactory = new DefaultTransitDriverAgentFactory(internalInterface, agentTracker);
 	}
 
 	public TransitQSimEngine(QSim queueSimulation) {
@@ -123,7 +124,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		for (Umlauf umlauf : umlaufCache.getUmlaeufe()) {
 			Vehicle basicVehicle = vehicles.getVehicles().get(umlauf.getVehicleId());
 			if (!umlauf.getUmlaufStuecke().isEmpty()) {
-				MobsimAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle, thisAgentTracker);
+				MobsimAgent driver = createAndScheduleVehicleAndDriver(umlauf, basicVehicle);
 				drivers.add(driver);
 			}
 		}
@@ -145,10 +146,9 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		return umlaufCache;
 	}
 
-	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(Umlauf umlauf,
-			Vehicle vehicle, TransitStopAgentTracker thisAgentTracker) {
+	private AbstractTransitDriverAgent createAndScheduleVehicleAndDriver(Umlauf umlauf, Vehicle vehicle) {
 		TransitQVehicle veh = new TransitQVehicle(vehicle);
-		AbstractTransitDriverAgent driver = this.transitDriverFactory.createTransitDriver(umlauf, thisAgentTracker, internalInterface );
+		AbstractTransitDriverAgent driver = this.transitDriverFactory.createTransitDriver(umlauf);
 		veh.setDriver(driver);
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 		driver.setVehicle(veh);

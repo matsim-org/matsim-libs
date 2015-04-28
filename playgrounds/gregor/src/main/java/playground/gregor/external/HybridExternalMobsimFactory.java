@@ -19,13 +19,10 @@
 
 package playground.gregor.external;
 
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -39,6 +36,9 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSimExternalNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 public class HybridExternalMobsimFactory implements MobsimFactory {
 
@@ -64,7 +64,7 @@ public class HybridExternalMobsimFactory implements MobsimFactory {
 	
 	
 	@Override
-	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException(
@@ -72,7 +72,7 @@ public class HybridExternalMobsimFactory implements MobsimFactory {
 		}
 
 		QSim qSim = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
@@ -87,7 +87,7 @@ public class HybridExternalMobsimFactory implements MobsimFactory {
 
 		qSim.addMobsimEngine(e);
 
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;

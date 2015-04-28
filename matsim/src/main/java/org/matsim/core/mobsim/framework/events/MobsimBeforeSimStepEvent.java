@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 
 /**
  * @author dgrether
  */
-public class MobsimBeforeSimStepEvent<T extends RunnableMobsim> extends AbstractMobsimEvent<T> {
+public class MobsimBeforeSimStepEvent<T extends Mobsim> extends AbstractMobsimEvent<T> {
 
 	private final double time;
 

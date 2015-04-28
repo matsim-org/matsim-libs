@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
@@ -66,7 +67,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		this.agentTracker = agentTracker;
 		if ( this.internalInterface != null ) {
 			this.isGeneratingDeniedBoardingEvents = 
-					this.internalInterface.getMobsim().getScenario().getConfig().vspExperimental().isGeneratingBoardingDeniedEvents() ;
+					((QSim) this.internalInterface.getMobsim()).getScenario().getConfig().vspExperimental().isGeneratingBoardingDeniedEvents() ;
 			if (this.isGeneratingDeniedBoardingEvents){
 				this.agentsDeniedToBoard = new HashSet<PTPassengerAgent>();
 			}
@@ -99,7 +100,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		Id<Vehicle> vehicleId = vehicle.getId() ;
 		for (PTPassengerAgent agent : this.agentsDeniedToBoard){
 			Id<Person> agentId = agent.getId() ;
-			this.internalInterface.getMobsim().getEventsManager().processEvent(
+			((QSim) this.internalInterface.getMobsim()).getEventsManager().processEvent(
 					new BoardingDeniedEvent(now, agentId, vehicleId)
 					) ;
 		}
@@ -161,7 +162,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 				this.internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId) ;
 			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
-			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
+			EventsManager events = ((QSim) this.internalInterface.getMobsim()).getEventsManager();
 			events.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
 		}
 		return handled;
@@ -172,7 +173,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		boolean handled = vehicle.removePassenger(passenger);
 		if(handled){
 //			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
-			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
+			EventsManager events = ((QSim) this.internalInterface.getMobsim()).getEventsManager();
 			events.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
 			
 			// from here on works only if PassengerAgent can be cast into MobsimAgent ... but this is how it was before.

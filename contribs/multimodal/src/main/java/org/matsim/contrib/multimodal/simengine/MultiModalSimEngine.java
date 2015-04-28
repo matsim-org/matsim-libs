@@ -20,15 +20,6 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.Phaser;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,11 +28,15 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.Phaser;
 
 class MultiModalSimEngine implements MobsimEngine {
 
@@ -76,12 +71,12 @@ class MultiModalSimEngine implements MobsimEngine {
 		this.internalInterface = internalInterface;
 	}
 
-	/*package*/ Mobsim getMobsim() {
-		return this.internalInterface.getMobsim();
+	QSim getMobsim() {
+		return (QSim) this.internalInterface.getMobsim();
 	}
 
 	/*package*/ EventsManager getEventsManager() {
-        return this.internalInterface.getMobsim().getEventsManager();
+        return ((QSim) this.internalInterface.getMobsim()).getEventsManager();
 	}
 	
 	@Override
@@ -93,7 +88,7 @@ class MultiModalSimEngine implements MobsimEngine {
 			log.info("\t" + entry.getKey() + "\t" + entry.getValue().getClass().toString());
 		}
 		
-		Scenario scenario = this.internalInterface.getMobsim().getScenario();
+		Scenario scenario = ((QSim) this.internalInterface.getMobsim()).getScenario();
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 		Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		
@@ -270,7 +265,7 @@ class MultiModalSimEngine implements MobsimEngine {
 		int links[] = new int[this.runners.length];
 		
 		int roundRobin = 0;
-		Scenario scenario = this.internalInterface.getMobsim().getScenario();
+		Scenario scenario = ((QSim) this.internalInterface.getMobsim()).getScenario();
 		
 		for (Node node : scenario.getNetwork().getNodes().values()) {
 			MultiModalQNodeExtension multiModalQNodeExtension = this.getMultiModalQNodeExtension(node.getId());

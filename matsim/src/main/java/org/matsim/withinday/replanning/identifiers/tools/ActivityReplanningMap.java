@@ -20,13 +20,6 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -42,11 +35,14 @@ import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.events.handler.ReplanningEventHandler;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class tracks agents and their activity end times. It can be used to identify
@@ -108,7 +104,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 
-		MobsimTimer mobsimTimer = ((Mobsim) e.getQueueSimulation()).getSimTimer();
+		MobsimTimer mobsimTimer = ((QSim) e.getQueueSimulation()).getSimTimer();
 		this.simStartTime = mobsimTimer.getSimStartTime();
 		this.timeStepSize = mobsimTimer.getSimTimestepSize();
 

@@ -64,13 +64,13 @@ public class PatnaQSimFactory implements MobsimFactory {
 		//        }
 
 		QSim qSim = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 

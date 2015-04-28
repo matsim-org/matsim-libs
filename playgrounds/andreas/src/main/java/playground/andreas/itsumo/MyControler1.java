@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -375,7 +375,7 @@ public class MyControler1 extends Controler {
 		
 		controler.setMobsimFactory(new MobsimFactory(){
 			@Override
-			public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 				ItsumoSim sim = new ItsumoSim(sc, eventsManager);
 				sim.setControlerIO(controlerIO);
 				sim.setIteration(-1); // not directly available; if truly necessary, something else needs to be done (e.g. events handler). kai, feb'13

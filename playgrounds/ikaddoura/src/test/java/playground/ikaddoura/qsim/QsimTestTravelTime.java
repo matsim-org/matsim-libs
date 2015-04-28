@@ -22,11 +22,6 @@
  */
 package playground.ikaddoura.qsim;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,11 +33,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -60,6 +51,11 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author ikaddoura, lkroeger
@@ -255,11 +251,11 @@ public class QsimTestTravelTime {
 	
 	private QSim createQSim(Scenario sc, EventsManager events) {
 		QSim qSim1 = new QSim(sc, events);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
         QNetsimEngineModule.configure(qSim1);
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, events);
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);

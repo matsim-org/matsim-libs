@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
@@ -92,7 +92,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
 
-		RunnableMobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
+		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
 		qsim.run();
 
 		// check that we get the expected result
@@ -154,7 +154,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
-		RunnableMobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
+		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
         qsim.run();
 		/*
 		 * The last person of the first wave should have taken 20 s to travel
@@ -239,7 +239,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		});
 
 
-		RunnableMobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
+		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
         qsim.run();
 
 	}

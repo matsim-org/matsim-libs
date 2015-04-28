@@ -15,11 +15,14 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
+import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -32,9 +35,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *         <p/>
  *         Extended for transit simulation.
  */
-public class PSim implements RunnableMobsim {
+public class PSim implements Mobsim {
 
     private final Scenario scenario;
     private final EventsManager eventManager;

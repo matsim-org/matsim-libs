@@ -64,7 +64,7 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 			new QSim(
 					sc, eventsManager );
 
-		final ActivityEngine activityEngine = new ActivityEngine();
+		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
@@ -87,7 +87,7 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 
 		qSim.addMobsimEngine( netsim );
 
-		final TeleportationEngine teleportationEngine = new TeleportationEngine();
+		final TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		final AgentFactory agentFactory = 

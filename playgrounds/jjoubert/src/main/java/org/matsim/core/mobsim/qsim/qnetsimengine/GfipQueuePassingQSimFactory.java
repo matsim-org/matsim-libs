@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -67,7 +67,7 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 	}
 
 	@Override
-	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		QSimConfigGroup configGroup = sc.getConfig().qsim();
 		if(configGroup == null){
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
@@ -75,7 +75,7 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 		
 		/* Set up the QSim */
 		QSim qsim = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qsim.getAgentCounter());
 		qsim.addMobsimEngine(activityEngine);
 		qsim.addActivityHandler(activityEngine);
 		
@@ -130,7 +130,7 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 		
 		qsim.addMobsimEngine(netsimEngine);
 		qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qsim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory = new DefaultAgentFactory(qsim);
 		

@@ -87,7 +87,7 @@ public class EvacuationQSimFactory implements MobsimFactory, IterationStartsList
         
 		QSim qSim = new QSim(sc, eventsManager);
 		
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
@@ -105,7 +105,7 @@ public class EvacuationQSimFactory implements MobsimFactory, IterationStartsList
 
         new MultiModalQSimModule(sc.getConfig(), this.multiModalTravelTimes).configure(qSim);
 		
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 		
 		qSim.addMobsimEngine(new HouseholdsInformer(((ScenarioImpl) sc).getHouseholds(), EvacuationConfig.informAgentsRayleighSigma, 

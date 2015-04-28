@@ -103,7 +103,7 @@ public class BikeSharingEngineTest {
 					facilities );
 		final BikeSharingEngine engine =
 			new BikeSharingEngine(
-					manager );
+					manager, EventsUtils.createEventsManager());
 
 		// create agent
 		final Leg leg = new LegImpl( BikeSharingConstants.MODE );

@@ -15,7 +15,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -69,7 +69,7 @@ class MyControler {
 		private boolean useOTFVis = false ;
 
 		@Override
-		public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 			
 	        QSimConfigGroup conf = sc.getConfig().qsim();
 	        if (conf == null) {
@@ -80,7 +80,7 @@ class MyControler {
 			QSim qSim = new QSim(sc, eventsManager);
 
 			// add the actsim engine:
-			ActivityEngine activityEngine = new ActivityEngine();
+			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
 
@@ -91,7 +91,7 @@ class MyControler {
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-			TeleportationEngine teleportationEngine = new TeleportationEngine();
+			TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 			qSim.addMobsimEngine(teleportationEngine);
 	        
 			AgentFactory agentFactory;

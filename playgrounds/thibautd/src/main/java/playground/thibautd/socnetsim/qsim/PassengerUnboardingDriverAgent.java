@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
@@ -99,7 +100,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 				}
 			}
 
-			final EventsManager events = internalInterface.getMobsim().getEventsManager();
+			final EventsManager events = ((QSim) internalInterface.getMobsim()).getEventsManager();
 			for (PassengerAgent p : passengersToUnboard) {
 				assert p != this;
 				assert !p.getId().equals( getId() );
@@ -130,7 +131,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 		// It remains however problematic, as it is not clear whether agents will continue
 		// to be given the vehicle or not...
 		final MobsimVehicle vehicle = getVehicle();// vehicleProvider.getVehicle( delegate.getPlannedVehicleId() );
-		final EventsManager events = internalInterface.getMobsim().getEventsManager();
+		final EventsManager events = ((QSim) internalInterface.getMobsim()).getEventsManager();
 		for ( PassengerAgent passenger : passengersToBoard ) {
 			assert passenger.getCurrentLinkId().equals( getCurrentLinkId() ) : passenger+" is at "+passenger.getCurrentLinkId()+" instead of "+getCurrentLinkId()+" for driver "+this;
 			assert ((Leg) getCurrentPlanElement()).getMode().equals( JointActingTypes.DRIVER ) : getCurrentPlanElement();

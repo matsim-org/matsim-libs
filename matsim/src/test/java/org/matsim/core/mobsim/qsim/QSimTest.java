@@ -77,11 +77,11 @@ public class QSimTest {
 
 	private QSim createQSim(ScenarioImpl scenario, EventsManager events) {
 		QSim qSim1 = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
         QNetsimEngineModule.configure(qSim1);
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
@@ -93,11 +93,11 @@ public class QSimTest {
 	private QSim createQSim(Fixture f, EventsManager events) {
 		Scenario sc = f.scenario;
 		QSim qSim1 = new QSim(sc, events);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
         QNetsimEngineModule.configure(qSim1);
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, events);
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);

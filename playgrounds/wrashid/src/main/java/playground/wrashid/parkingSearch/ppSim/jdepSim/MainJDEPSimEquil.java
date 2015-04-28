@@ -25,7 +25,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.DummyTTMatrix;
 
 public class MainJDEPSimEquil {
@@ -52,7 +52,7 @@ public class MainJDEPSimEquil {
 		eventsWriter.init("events.xml");
 		
 
-		RunnableMobsim sim = new JDEPSim(scenario, eventsManager);
+		Mobsim sim = new JDEPSim(scenario, eventsManager);
 		//Mobsim sim = new PPSim(scenario, eventsManager);
 		
 		Message.ttMatrix=new DummyTTMatrix();

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.signals.mobsim.SignalizeableItem;
@@ -92,7 +93,7 @@ public class SimpleAdaptiveControl implements MobsimEngine, LinkEnterEventHandle
 	}
 	
 	public Netsim getMobsim() {
-		return this.internalInterface.getMobsim();
+		return ((QSim) this.internalInterface.getMobsim());
 	}
 
 	@Override

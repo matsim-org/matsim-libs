@@ -1,16 +1,5 @@
 package playground.mzilske.d4d;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -23,16 +12,15 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.TeleportationVisData;
-import org.matsim.vis.snapshotwriters.VisData;
-import org.matsim.vis.snapshotwriters.VisLink;
-import org.matsim.vis.snapshotwriters.VisMobsim;
+import org.matsim.vis.snapshotwriters.*;
+
+import java.util.*;
 
 public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisData {
 	/**
@@ -83,7 +71,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 			return act.getCoord();
 		} else {
 			Leg leg = (Leg) fromAct;
-			return internalInterface.getMobsim().getNetsimNetwork().getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getToNode().getCoord();
+			return ((QSim) internalInterface.getMobsim()).getNetsimNetwork().getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getToNode().getCoord();
 		}
 	}
 	
@@ -94,7 +82,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 			return act.getCoord();
 		} else {
 			Leg leg = (Leg) toAct;
-			return internalInterface.getMobsim().getNetsimNetwork().getNetwork().getLinks().get(leg.getRoute().getStartLinkId()).getToNode().getCoord();
+			return ((QSim) internalInterface.getMobsim()).getNetsimNetwork().getNetwork().getLinks().get(leg.getRoute().getStartLinkId()).getToNode().getCoord();
 		}
 	}
 
@@ -112,7 +100,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 		for (Id personId : trackedAgents) {
 			Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 			MobsimAgent agent = agents.get(personId);
-			VisLink visLink = internalInterface.getMobsim().getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
+			VisLink visLink = ((QSim) internalInterface.getMobsim()).getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
 			visLink.getVisData().addAgentSnapshotInfo(positions);
 			for (AgentSnapshotInfo position : positions) {
 				if (position.getId().equals(personId)) {
@@ -144,7 +132,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 			} else {
 				Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
 				MobsimAgent agent = agents.get(personId);
-				VisLink visLink = internalInterface.getMobsim().getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
+				VisLink visLink = ((QSim) internalInterface.getMobsim()).getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
 				visLink.getVisData().addAgentSnapshotInfo(positions);
 				for (AgentSnapshotInfo position : positions) {
 					if (position.getId().equals(personId)) {
@@ -164,7 +152,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 				MobsimAgent personAgent = entry.getSecond();
 				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent.getDestinationLinkId());
 				double distance = ((Leg) ((PlanAgent) personAgent).getCurrentPlanElement()).getRoute().getDistance();
-				this.internalInterface.getMobsim().getEventsManager().processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance));
+				((QSim) internalInterface.getMobsim()).getEventsManager().processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance));
 				personAgent.endLegAndComputeNextState(now);
 				this.teleportationData.remove(personAgent.getId());
 				internalInterface.arrangeNextAgentState(personAgent) ;
@@ -176,7 +164,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 
 	@Override
 	public void onPrepareSim() {
-		this.doVisualizeTeleportedAgents = ConfigUtils.addOrGetModule(internalInterface.getMobsim().getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).isShowTeleportedAgents();
+		this.doVisualizeTeleportedAgents = ConfigUtils.addOrGetModule(((QSim) internalInterface.getMobsim()).getScenario().getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).isShowTeleportedAgents();
 		for (MobsimAgent agent : ((VisMobsim) internalInterface.getMobsim()).getAgents()) {
 			agents.put(agent.getId(), agent);
 		}
@@ -187,7 +175,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (Tuple<Double, MobsimAgent> entry : teleportationList) {
 			MobsimAgent agent = entry.getSecond();
-			EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
+			EventsManager eventsManager = ((QSim) internalInterface.getMobsim()).getEventsManager();
 			eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
 		}
 		teleportationList.clear();

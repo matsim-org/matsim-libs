@@ -51,7 +51,6 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -143,14 +142,14 @@ public class VehVsNetworkSpeedTest {
 	private QSim createQSim (SimpleNetwork net, EventsManager manager, double maxVelocity){
 		Scenario sc = net.scenario;
 		QSim qSim1 = new QSim(sc, manager);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(manager, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
 
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
 		qSim1.addMobsimEngine(netsimEngine);
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, manager);
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);

@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -73,13 +73,13 @@ public class ControlerMobsimIntegrationTest {
 		/*package*/ int callCount = 0;
 
 		@Override
-		public RunnableMobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
 			this.callCount++;
 			return new FakeSimulation();
 		}
 	}
 
-	private static class FakeSimulation implements RunnableMobsim {
+	private static class FakeSimulation implements Mobsim {
 		@Override
 		public void run() {
 		}

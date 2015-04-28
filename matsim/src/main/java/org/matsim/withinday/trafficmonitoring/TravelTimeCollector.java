@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkImpl;
@@ -253,8 +253,8 @@ public class TravelTimeCollector implements TravelTime,
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 
-		if (e.getQueueSimulation() instanceof Mobsim) {
-			double simStartTime = ((Mobsim) e.getQueueSimulation()).getSimTimer().getSimStartTime();
+		if (e.getQueueSimulation() instanceof QSim) {
+			double simStartTime = ((QSim) e.getQueueSimulation()).getSimTimer().getSimStartTime();
 
 			/*
 			 * infoTime may be < simStartTime, this ensures to print 

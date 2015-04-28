@@ -1,20 +1,9 @@
 package playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
@@ -25,13 +14,15 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.agenda.PassivePlannerAgendaAgent;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.agenda.PassivePlannerTransitAgendaAgent;
 import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
 import playground.sergioo.passivePlanning2012.core.population.socialNetwork.SocialNetwork;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSocialNetwork;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 public class PlanningEngine implements MobsimEngine, DepartureHandler {
 
@@ -132,10 +123,9 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 	}
 	@Override
 	public void afterSim() {
-		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+		double now = qSim.getSimTimer().getTimeOfDay();
 		for (PassivePlannerDriverAgent planningAgent:planningAgents.values()) {
-			EventsManager eventsManager = internalInterface.getMobsim()
-					.getEventsManager();
+			EventsManager eventsManager = qSim.getEventsManager();
 			eventsManager.processEvent(new PersonStuckEvent(now, planningAgent.getId(), planningAgent.getState().equals(State.ACTIVITY)?planningAgent.getCurrentLinkId():planningAgent.getDestinationLinkId(), "empty"));
 		}
 		planningAgents.clear();

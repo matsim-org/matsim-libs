@@ -44,6 +44,7 @@ import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
@@ -200,7 +201,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 			vehicle.setDriver(agent);
 			agent.setVehicle(vehicle) ;
 
-			final EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
+			final EventsManager eventsManager = ((QSim) internalInterface.getMobsim()).getEventsManager();
 			eventsManager.processEvent(
 					new PersonEntersVehicleEvent(
 						now,
@@ -352,14 +353,14 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 		public void afterSim() {
 			for (InternalArrivalEvent event : arrivalQueue) {
 				final QVehicle veh = event.vehicle;
-				internalInterface.getMobsim().getEventsManager().processEvent(
+				((QSim) internalInterface.getMobsim()).getEventsManager().processEvent(
 						new PersonStuckEvent(
 							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
 							veh.getDriver().getId(),
 							veh.getDriver().getCurrentLinkId(),
 							veh.getDriver().getMode()));
-				internalInterface.getMobsim().getAgentCounter().incLost();
-				internalInterface.getMobsim().getAgentCounter().decLiving();
+				((QSim) internalInterface.getMobsim()).getAgentCounter().incLost();
+				((QSim) internalInterface.getMobsim()).getAgentCounter().decLiving();
 			}
 		}
 
@@ -401,7 +402,7 @@ public class PseudoQsimEngine implements MobsimEngine, DepartureHandler {
 			final MobsimDriverAgent agent = event.vehicle.getDriver();
 
 			final EventsManager eventsManager =
-				internalInterface.getMobsim().getEventsManager();
+					((QSim) internalInterface.getMobsim()).getEventsManager();
 
 			if ( agent instanceof TransitDriverAgent ) {
 				final TransitDriverAgent transitDriver = (TransitDriverAgent) agent;

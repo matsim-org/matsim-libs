@@ -51,7 +51,6 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -118,20 +117,20 @@ public class FlowCapacityVariationTest {
 		Assert.assertEquals(travelMode +" entered at same time but not leaving the link at the same time.", 0, linkLeaveTime1-linkLeaveTime2);
 	}
 	
-	private QSim createQSim (PseudoInputs net, EventsManager manager){
-		Scenario sc = net.scenario;
-		QSim qSim1 = new QSim(sc, manager);
-		ActivityEngine activityEngine = new ActivityEngine();
+	private QSim createQSim (PseudoInputs net, EventsManager eventsManager){
+		Scenario scenario = net.scenario;
+		QSim qSim1 = new QSim(scenario, eventsManager);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
 		qSim1.addMobsimEngine(netsimEngine);
 		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}

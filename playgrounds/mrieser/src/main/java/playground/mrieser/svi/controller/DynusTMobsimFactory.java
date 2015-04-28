@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 
 import playground.mrieser.svi.data.analysis.DynamicTravelTimeMatrix;
@@ -46,7 +46,7 @@ public class DynusTMobsimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public RunnableMobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+	public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
 		return new DynusTMobsim(this.dc, this.ttMatrix, sc, eventsManager, this.dynusTnet, this.controler, this.controler.getIterationNumber());
 	}
 

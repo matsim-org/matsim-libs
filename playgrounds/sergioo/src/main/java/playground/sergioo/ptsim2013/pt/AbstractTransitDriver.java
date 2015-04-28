@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -172,10 +173,10 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	protected final void sendTransitDriverStartsEvent(final double now) {
 		// check if "Wenden"
 		if(getTransitLine() == null){
-			this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+			((QSim) this.internalInterface.getMobsim()).getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 					this.vehicle.getId(), Id.create("Wenden", TransitLine.class), Id.create("Wenden", TransitRoute.class), Id.create("Wenden", Departure.class)));
 		} else {
-			this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+			((QSim) this.internalInterface.getMobsim()).getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 					this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
 		}
 	}
@@ -185,7 +186,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	}
 
 	final Netsim getSimulation(){
-		return this.internalInterface.getMobsim();
+		return ((QSim) this.internalInterface.getMobsim());
 	}
 
 	/**Design comments:<ul>
@@ -212,7 +213,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 
 	private void processEventVehicleArrives(final TransitStopFacility stop,
 			final double now) {
-		EventsManager events = this.internalInterface.getMobsim().getEventsManager();
+		EventsManager events = ((QSim) this.internalInterface.getMobsim()).getEventsManager();
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
 			double delay = now - this.getDeparture().getDepartureTime();
@@ -256,7 +257,7 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 	}
 	
 	private void depart(final double now) {
-		EventsManager events = this.internalInterface.getMobsim().getEventsManager();
+		EventsManager events = ((QSim) this.internalInterface.getMobsim()).getEventsManager();
 		double delay = now - this.getDeparture().getDepartureTime();
 		if (this.isBadDouble(this.getDeparture().getDepartureTime())){ //this is the case if the next stop is null
 			delay = 0;

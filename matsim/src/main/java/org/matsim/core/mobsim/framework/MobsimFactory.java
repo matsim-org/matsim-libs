@@ -32,6 +32,6 @@ import org.matsim.core.api.internal.MatsimFactory;
 @Deprecated
 public interface MobsimFactory extends MatsimFactory {
   
-  RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager);
+  Mobsim createMobsim(Scenario sc, EventsManager eventsManager);
 
 }

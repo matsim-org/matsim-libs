@@ -83,7 +83,7 @@ public class JointPseudoSimFactory implements MobsimFactory {
         final QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		final QVehicleProvider vehicles = new NetsimWrappingQVehicleProvider( netsimEngine );
 
-		final ActivityEngine activityEngine = new ActivityEngine();
+		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine( activityEngine );
 		qSim.addActivityHandler( activityEngine );
 
@@ -108,7 +108,7 @@ public class JointPseudoSimFactory implements MobsimFactory {
 		qSim.addDepartureHandler( jointDepHandler );
 		qSim.addMobsimEngine( jointDepHandler );
 
-		final TeleportationEngine teleportationEngine = new TeleportationEngine();
+		final TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine( teleportationEngine );
 
         if (sc.getConfig().scenario().isUseTransit()) {

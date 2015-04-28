@@ -23,7 +23,7 @@ package playground.kai.usecases.ownmobsim;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 
 public class Main {
@@ -35,7 +35,7 @@ public class Main {
 
 		final MobsimFactory mobsimFactory = new MobsimFactory() {
 			@Override
-			public RunnableMobsim createMobsim(Scenario sc, EventsManager events) {
+			public Mobsim createMobsim(Scenario sc, EventsManager events) {
 				return new MyMobsim(sc,events) ;
 			}
 			

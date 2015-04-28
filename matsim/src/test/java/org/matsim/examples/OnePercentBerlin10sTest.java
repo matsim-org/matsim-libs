@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.gbl.MatsimRandom;
@@ -74,13 +73,13 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		events.addHandler(writer);
 
 		QSim qSim = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
 		qSim.addMobsimEngine(teleportationEngine);
 		qSim.addDepartureHandler(teleportationEngine) ;
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
@@ -114,25 +113,25 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		config.qsim().setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
 		
-		config.controler().setOutputDirectory( this.getOutputDirectory() );
+		config.controler().setOutputDirectory(this.getOutputDirectory());
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		new MatsimNetworkReader(scenario).readFile(netFileName);
 		new MatsimPopulationReader(scenario).readFile(popFileName);
 
-		EventsManager events = EventsUtils.createEventsManager();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventWriterTXT writer = new EventWriterTXT(eventsFileName);
-		events.addHandler(writer);
+		eventsManager.addHandler(writer);
 
-		QSim qSim = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine();
+		QSim qSim = new QSim(scenario, eventsManager);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 		qSim.addDepartureHandler(teleportationEngine) ;
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);

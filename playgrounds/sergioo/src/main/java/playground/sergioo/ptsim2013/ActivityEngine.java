@@ -19,11 +19,6 @@
 
 package playground.sergioo.ptsim2013;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -34,6 +29,11 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
@@ -110,7 +110,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.UNDEFINED_TIME) {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination 
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
-				EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
+				EventsManager eventsManager = ((QSim) internalInterface.getMobsim()).getEventsManager();
 				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));
 			}
 		}
@@ -129,7 +129,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		 * agents counter by one.
 		 */
 		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
-			internalInterface.getMobsim().getAgentCounter().decLiving();
+			((QSim) internalInterface.getMobsim()).getAgentCounter().decLiving();
 		} else {
 			activityEndsList.add(new AgentEntry(agent, agent.getActivityEndTime()));
 			internalInterface.registerAdditionalAgentOnLink(agent);			
@@ -158,7 +158,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 				// re-activate the agent
 				activityEndsList.add(new AgentEntry(agent, newActivityEndTime));
 				internalInterface.registerAdditionalAgentOnLink(agent);
-				((AgentCounter) internalInterface.getMobsim().getAgentCounter()).incLiving();				
+				((AgentCounter) ((QSim) internalInterface.getMobsim()).getAgentCounter()).incLiving();
 			}
 		} else if (newActivityEndTime == Double.POSITIVE_INFINITY) {
 			/*
@@ -166,7 +166,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			 * Therefore the agent is de-activated. cdobler, oct'11
 			 */
 			unregisterAgentAtActivityLocation(agent);
-			internalInterface.getMobsim().getAgentCounter().decLiving();
+			((QSim) internalInterface.getMobsim()).getAgentCounter().decLiving();
 		} else {
 			/*
 			 *  The activity is just rescheduled during the day, so we keep the agent active. cdobler, oct'11

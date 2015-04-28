@@ -1,11 +1,10 @@
 package matsimConnector.engine;
 
 import matsimConnector.utility.Constants;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -20,7 +19,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 public class CAMobsimFactory implements MobsimFactory{
 
 	@Override
-	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
 		if (!sc.getConfig().controler().getMobsim().equals(Constants.CA_MOBSIM_MODE)) {
 			throw new RuntimeException("This factory does not make sense for " + sc.getConfig().controler().getMobsim()  );
@@ -38,7 +37,7 @@ public class CAMobsimFactory implements MobsimFactory{
 		
 		qSim.addMobsimEngine(engineCA);
 		
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 	

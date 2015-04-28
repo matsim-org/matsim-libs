@@ -1,23 +1,11 @@
 package playground.ssix;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -36,12 +24,7 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.FIFOVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
+import org.matsim.core.mobsim.qsim.qnetsimengine.*;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -50,9 +33,12 @@ import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
 import playgrounds.ssix.MZilskePassingVehicleQ;
 import playgrounds.ssix.ModeData;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.*;
 
 /**
  * @author ssix
@@ -274,15 +260,15 @@ public class LangeStreckeSzenario{
 		}
 	}
 	
-	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
+	private Netsim createModifiedQSim(Scenario scenario, EventsManager eventsManager) {
 		//From QSimFactory inspired code
-		QSimConfigGroup conf = sc.getConfig().qsim();
+		QSimConfigGroup conf = scenario.getConfig().qsim();
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }
         /**/
-        QSim qSim = new QSim(sc, events);
-        ActivityEngine activityEngine = new ActivityEngine();
+        QSim qSim = new QSim(scenario, eventsManager);
+        ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
@@ -310,11 +296,11 @@ public class LangeStreckeSzenario{
 		
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(this.scenario, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
         
 		AgentFactory agentFactory;
-		if (sc.getConfig().scenario().isUseTransit()) {
+		if (scenario.getConfig().scenario().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
@@ -325,10 +311,10 @@ public class LangeStreckeSzenario{
 			agentFactory = new DefaultAgentFactory(qSim);
 		}
 		
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
+		if (scenario.getConfig().network().isTimeVariantNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 		}
-        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
         
         //Second modification: Mobsim needs to know the different vehicle types (and their respective speeds)
         Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();

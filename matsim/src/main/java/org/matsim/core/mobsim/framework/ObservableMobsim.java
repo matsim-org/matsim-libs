@@ -27,7 +27,10 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
  *
  * @author dgrether
  */
-public interface ObservableMobsim extends RunnableMobsim {
+public interface ObservableMobsim extends Mobsim {
 
   public void addQueueSimulationListeners(final MobsimListener listener);
+
+  MobsimTimer getSimTimer();
+
 }

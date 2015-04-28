@@ -27,7 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -107,11 +107,11 @@ public class PassengerControlerHandler implements StartupListener {
 		}
 		
 		@Override
-		public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
 			QSim qSim = new QSim(sc, eventsManager);
 			
-			ActivityEngine activityEngine = new ActivityEngine();
+			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
 			
@@ -128,7 +128,7 @@ public class PassengerControlerHandler implements StartupListener {
 
             new MultiModalQSimModule(sc.getConfig(), this.multiModalTravelTimes).configure(qSim);
 			
-			TeleportationEngine teleportationEngine = new TeleportationEngine();
+			TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 			qSim.addMobsimEngine(teleportationEngine);
 			
 	        AgentFactory agentFactory = new DefaultAgentFactory(qSim);

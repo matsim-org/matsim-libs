@@ -36,7 +36,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkImpl;
@@ -240,11 +240,11 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		 * to also use the multi-modal simulation.
 		 */
 
-		event.getControler().setMobsimFactory(new Provider<RunnableMobsim>() {
+		event.getControler().setMobsimFactory(new Provider<Mobsim>() {
 			@Override
-			public RunnableMobsim get() {
+			public Mobsim get() {
 				MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, withinDayControlerListener.getWithinDayEngine(), parkingAgentsTracker);
-				RunnableMobsim mobsim = mobsimFactory.createMobsim(scenario, event.getControler().getEvents());
+				Mobsim mobsim = mobsimFactory.createMobsim(scenario, event.getControler().getEvents());
 				if (multiModalTravelTimes != null) {
 					new MultiModalQSimModule(scenario.getConfig(), multiModalTravelTimes).configure((QSim) mobsim);
 				}

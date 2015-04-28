@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 /**
  * An abstract superclass for all classes implementing the
@@ -27,7 +27,7 @@ import org.matsim.core.mobsim.framework.RunnableMobsim;
  *
  * @author dgrether
  */
-abstract class AbstractMobsimEvent<T extends RunnableMobsim> {
+abstract class AbstractMobsimEvent<T extends Mobsim> {
 	
 	private final T queuesim;
 

@@ -34,7 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -386,7 +386,7 @@ public class CountsControlerListenerTest {
 		return Double.parseDouble(parts[1]);
 	}
 	
-	private static class DummyMobsim implements RunnableMobsim {
+	private static class DummyMobsim implements Mobsim {
 		private final EventsManager eventsManager;
 		private final int nOfEvents;
 		public DummyMobsim(EventsManager eventsManager, final int nOfEvents) {
@@ -406,12 +406,12 @@ public class CountsControlerListenerTest {
 	private static class DummyMobsimFactory implements MobsimFactory {
 		private int count = 1;
 		@Override
-		public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 			return new DummyMobsim(eventsManager, count++);
 		}
 	}
 	
-	private static class DummyMobsim2 implements RunnableMobsim {
+	private static class DummyMobsim2 implements Mobsim {
 		private final EventsManager eventsManager;
 		public DummyMobsim2(EventsManager eventsManager) {
 			this.eventsManager = eventsManager;
@@ -436,7 +436,7 @@ public class CountsControlerListenerTest {
 	private static class DummyMobsim2Factory implements MobsimFactory {
 		
 		@Override
-		public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 			return new DummyMobsim2(eventsManager);
 		}
 	}

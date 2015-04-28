@@ -120,13 +120,13 @@ public class SimplifiedControlerUtils {
 	 */
 	static void runMobsimDefault(Scenario sc, EventsManager ev, int iteration, OutputDirectoryHierarchy controlerIO ) {
 		QSim qSim = new QSim( sc, ev ) ;
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(ev, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, ev);
 		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 	    PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);

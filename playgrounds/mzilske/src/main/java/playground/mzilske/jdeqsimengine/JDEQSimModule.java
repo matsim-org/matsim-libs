@@ -9,7 +9,7 @@ public class JDEQSimModule {
 
     public static void configure(QSim qsim) {
         SteppableScheduler scheduler = new SteppableScheduler(new MessageQueue());
-        JDEQSimEngine jdeqSimEngine = new JDEQSimEngine(qsim.getScenario(), qsim.getEventsManager(), scheduler);
+        JDEQSimEngine jdeqSimEngine = new JDEQSimEngine(qsim.getScenario(), qsim.getEventsManager(), qsim.getAgentCounter(), scheduler);
         qsim.addMobsimEngine(jdeqSimEngine);
         qsim.addActivityHandler(jdeqSimEngine);
     }

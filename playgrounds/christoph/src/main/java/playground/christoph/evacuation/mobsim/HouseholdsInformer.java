@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.households.Household;
@@ -147,7 +148,7 @@ public class HouseholdsInformer implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		this.eventsManager = internalInterface.getMobsim().getEventsManager();
+		this.eventsManager = ((QSim) internalInterface.getMobsim()).getEventsManager();
 	}
 	
 	private class InformationTimeComparator implements Comparator<Tuple<Id, Double>>, Serializable, MatsimComparator {

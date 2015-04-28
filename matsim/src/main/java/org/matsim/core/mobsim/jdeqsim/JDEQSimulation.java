@@ -28,8 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.utils.misc.Time;
 
@@ -43,7 +42,7 @@ import java.util.HashMap;
  * @see <a href="http://www.matsim.org/docs/jdeqsim">http://www.matsim.org/docs/jdeqsim</a>
  * @author rashid_waraich
  */
-public class JDEQSimulation implements RunnableMobsim {
+public class JDEQSimulation implements Mobsim {
 
 	private final static Logger log = Logger.getLogger(JDEQSimulation.class);
 

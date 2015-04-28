@@ -26,7 +26,7 @@ import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -40,7 +40,7 @@ class MyQSimFactory implements MobsimFactory {
     TravelTime carTravelTime;
 
     @Override
-    public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+    public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
         QSim qSim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
         HashMap<String, TravelTime> multiModalTravelTimes = new HashMap<>();
         multiModalTravelTimes.put("car", carTravelTime);

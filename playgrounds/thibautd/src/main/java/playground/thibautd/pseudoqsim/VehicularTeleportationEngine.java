@@ -19,29 +19,25 @@
  * *********************************************************************** */
 package playground.thibautd.pseudoqsim;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.*;
 
 /**
  * Handles vehicular modes using teleportation.
@@ -100,7 +96,7 @@ public class VehicularTeleportationEngine implements DepartureHandler, MobsimEng
 					if ( teleported == 10 ) log.warn( "future occurences of this warning are suppressed" );
 				}
 				final QVehicle veh = vehicleProvider.getVehicle( vehicleId );
-				veh.setCurrentLink( internalInterface.getMobsim().getScenario().getNetwork().getLinks().get( linkId ) );
+				veh.setCurrentLink( ((QSim) internalInterface.getMobsim()).getScenario().getNetwork().getLinks().get( linkId ) );
 				handleDeparture( now , (MobsimDriverAgent) agent );
 				return true;
 			case wait:
@@ -159,14 +155,14 @@ public class VehicularTeleportationEngine implements DepartureHandler, MobsimEng
 			((MobsimDriverAgent) personAgent).setVehicle( null );
 			veh.setDriver( null );
 			veh.setCurrentLink(
-					internalInterface.getMobsim().getScenario().getNetwork().getLinks().get(
+					((QSim) internalInterface.getMobsim()).getScenario().getNetwork().getLinks().get(
 						personAgent.getDestinationLinkId() ) );
 			vehicleProvider.park( veh.getId() , personAgent.getDestinationLinkId() );
 
 			personAgent.notifyArrivalOnLinkByNonNetworkMode(
 					personAgent.getDestinationLinkId());
 			final double distance = ((Leg) ((PlanAgent) personAgent).getCurrentPlanElement()).getRoute().getDistance();
-			this.internalInterface.getMobsim().getEventsManager().processEvent(
+			((QSim) this.internalInterface.getMobsim()).getEventsManager().processEvent(
 					new TeleportationArrivalEvent(
 						this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
 						personAgent.getId(),
@@ -185,7 +181,7 @@ public class VehicularTeleportationEngine implements DepartureHandler, MobsimEng
 		for (Tuple<Double, MobsimAgent> entry : teleportationList) {
 			final MobsimAgent agent = entry.getSecond();
 			final EventsManager eventsManager =
-				internalInterface.getMobsim().getEventsManager();
+					((QSim) internalInterface.getMobsim()).getEventsManager();
 			eventsManager.processEvent(
 					new PersonStuckEvent(
 						now,

@@ -29,6 +29,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -38,6 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -1047,16 +1049,16 @@ public class TransitQueueNetworkTest extends TestCase {
             Departure dep = builder.createDeparture(Id.create("1", Departure.class), 100);
             tRoute.addDeparture(dep);
             tLine.addRoute(tRoute);
-			QSim qSim1 = new QSim(scenario, EventsUtils.createEventsManager());
-			ActivityEngine activityEngine = new ActivityEngine();
-			qSim1.addMobsimEngine(activityEngine);
-			qSim1.addActivityHandler(activityEngine);
-            QNetsimEngineModule.configure(qSim1);
-			TeleportationEngine teleportationEngine = new TeleportationEngine();
-			qSim1.addMobsimEngine(teleportationEngine);
+            EventsManager eventsManager = EventsUtils.createEventsManager();
+            QSim qSim = new QSim(scenario, eventsManager);
+			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
+			qSim.addMobsimEngine(activityEngine);
+			qSim.addActivityHandler(activityEngine);
+            QNetsimEngineModule.configure(qSim);
+			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
+			qSim.addMobsimEngine(teleportationEngine);
 
             // setup: simulation
-            QSim qSim = qSim1;
             AgentFactory agentFactory = new TransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());

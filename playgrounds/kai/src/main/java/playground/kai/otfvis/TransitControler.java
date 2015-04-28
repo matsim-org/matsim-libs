@@ -28,7 +28,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -79,7 +79,7 @@ public class TransitControler {
 	static class MyMobsimFactory implements MobsimFactory {
 
 		@Override
-		public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 			QSim qSim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
 			
 

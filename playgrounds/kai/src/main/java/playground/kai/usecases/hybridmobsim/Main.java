@@ -23,7 +23,7 @@ package playground.kai.usecases.hybridmobsim;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -41,10 +41,10 @@ public class Main {
 		
 		final MobsimFactory mobsimFactory = new MobsimFactory() {
 			@Override
-			public RunnableMobsim createMobsim(Scenario sc, EventsManager events) {
+			public Mobsim createMobsim(Scenario sc, EventsManager events) {
 				QSim qsim = new QSim(sc, events);
 
-				ActivityEngine activityEngine = new ActivityEngine();
+				ActivityEngine activityEngine = new ActivityEngine(events, qsim.getAgentCounter());
 				qsim.addMobsimEngine(activityEngine);
 				qsim.addActivityHandler(activityEngine);
 				
@@ -55,7 +55,7 @@ public class Main {
 				qsim.addMobsimEngine(netsimEngine);
 				qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-				TeleportationEngine teleportationEngine = new TeleportationEngine();
+				TeleportationEngine teleportationEngine = new TeleportationEngine(sc, events);
 				qsim.addMobsimEngine(teleportationEngine);
 				qsim.addDepartureHandler(teleportationEngine) ;
 

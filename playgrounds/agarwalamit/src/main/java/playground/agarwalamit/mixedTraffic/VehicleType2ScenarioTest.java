@@ -39,7 +39,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -213,13 +213,13 @@ public class VehicleType2ScenarioTest {
 
 	public static class modifiedMobsimFactory implements MobsimFactory {
 		@Override
-		public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
 			// construct the QSim:
 			QSim qSim = new QSim(sc, eventsManager);
 
 			// add the actsim engine:
-			ActivityEngine activityEngine = new ActivityEngine();
+			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
 
@@ -227,7 +227,7 @@ public class VehicleType2ScenarioTest {
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-			TeleportationEngine teleportationEngine = new TeleportationEngine();
+			TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 			qSim.addMobsimEngine(teleportationEngine);
 
 			AgentFactory agentFactory = new DefaultAgentFactory(qSim);

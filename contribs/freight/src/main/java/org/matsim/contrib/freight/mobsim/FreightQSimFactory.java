@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.freight.CarrierConfig;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -42,7 +42,7 @@ import javax.inject.Inject;
 import java.util.Collection;
 
 
-public class FreightQSimFactory implements Provider<RunnableMobsim> {
+public class FreightQSimFactory implements Provider<Mobsim> {
 
 	private final Scenario scenario;
 	private EventsManager eventsManager;
@@ -58,7 +58,7 @@ public class FreightQSimFactory implements Provider<RunnableMobsim> {
 	}
 
 	@Override
-	public RunnableMobsim get() {
+	public Mobsim get() {
 		QSimConfigGroup conf = scenario.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException(

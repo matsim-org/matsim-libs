@@ -40,6 +40,7 @@ public class PassengerEngine
 {
     private final String mode;
 
+    private EventsManager eventsManager;
     private InternalInterface internalInterface;
     private final MatsimVrpContext context;
     private final PassengerRequestCreator requestCreator;
@@ -49,10 +50,11 @@ public class PassengerEngine
     private final AwaitingPickupStorage awaitingPickupStorage;
 
 
-    public PassengerEngine(String mode, PassengerRequestCreator requestCreator,
-            VrpOptimizer optimizer, MatsimVrpContext context)
+    public PassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
+                           VrpOptimizer optimizer, MatsimVrpContext context)
     {
         this.mode = mode;
+        this.eventsManager = eventsManager;
         this.requestCreator = requestCreator;
         this.optimizer = optimizer;
         this.context = context;
@@ -204,8 +206,7 @@ public class PassengerEngine
         mobVehicle.addPassenger(passenger);
         passenger.setVehicle(mobVehicle);
 
-        EventsManager events = internalInterface.getMobsim().getEventsManager();
-        events.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
+        eventsManager.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
 
         return true;
     }
@@ -219,8 +220,7 @@ public class PassengerEngine
         mobVehicle.removePassenger(passenger);
         passenger.setVehicle(null);
 
-        EventsManager events = internalInterface.getMobsim().getEventsManager();
-        events.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
+        eventsManager.processEvent(new PersonLeavesVehicleEvent(now, passenger.getId(), mobVehicle.getId()));
 
         passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
         passenger.endLegAndComputeNextState(now);

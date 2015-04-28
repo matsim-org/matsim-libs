@@ -65,8 +65,6 @@ import java.util.*;
  */
 
 public class DreieckNmodes {
-	
-	private static Integer[] TEST_DISTRIBUTION = {0,0,140};
 
 	private static final Logger log = Logger.getLogger(DreieckNmodes.class);
 	
@@ -86,8 +84,6 @@ public class DreieckNmodes {
 	public final static Double[] Probabilities = {0.5, 0.5}; //modal split
 	public final static Double[] Pcus = {1., 3.}; 			//PCUs of the different possible modes
 	public final static Double[] Speeds = {16.67, 8.33};		//maximum velocities of the vehicle types, in m/s
-	private final static Integer[] MaxAgentDistribution = {450, 150};
-	private final static Integer[] Steps = {10, 5};
 	private final static Integer[] startingPoint = {0, 0};
 
 	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
@@ -418,7 +414,7 @@ public class DreieckNmodes {
 	private void singleRun(List<Integer> pointToRun) {
 		this.createWantedPopulation(pointToRun, 2);
 		for (int i=0; i<NAMES.length; i++){
-			this.modesData.get(NAMES[i]).setnumberOfAgents(pointToRun.get(i).intValue());
+			this.modesData.get(NAMES[i]).setnumberOfAgents(pointToRun.get(i));
 		}
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -559,7 +555,7 @@ public class DreieckNmodes {
 			Map<String, Object> customMap = person.getCustomAttributes();
 			
 			Plan plan = population.getFactory().createPlan();
-			plan.addActivity(createHome(sekundenAbstand, i+1, numberOfPeople));
+			plan.addActivity(createHome(sekundenAbstand, numberOfPeople));
 			
 			//Assigning mode
 			String transportMode="";
@@ -597,15 +593,15 @@ public class DreieckNmodes {
 		}
 	}
 	
-	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
+	private Netsim createModifiedQSim(Scenario sc, EventsManager eventsManager) {
 		//From QSimFactory inspired code
 		QSimConfigGroup conf = sc.getConfig().qsim();
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }
         /**/
-        QSim qSim = new QSim(sc, events);
-        ActivityEngine activityEngine = new ActivityEngine();
+        QSim qSim = new QSim(sc, eventsManager);
+        ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
@@ -633,7 +629,7 @@ public class DreieckNmodes {
 		
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
         
 		//Second modification: Mobsim needs to create my own used agents
@@ -648,7 +644,7 @@ public class DreieckNmodes {
         //Third modification: Mobsim needs to know the different vehicle types (and their respective speeds)
         Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
         for (int i=0; i<modesData.size(); i++){
-        	String id = modesData.get(NAMES[i]).getModeId().toString();
+        	String id = modesData.get(NAMES[i]).getModeId();
         	VehicleType vT = modesData.get(NAMES[i]).getVehicleType();
         	modeVehicleTypes.put(id, vT);
         }
@@ -667,25 +663,25 @@ public class DreieckNmodes {
 		}
 		writer.print("n\t");
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			String str = this.modesData.get(NAMES[i]).getModeId().toString().substring(0, 3);
+			String str = this.modesData.get(NAMES[i]).getModeId().substring(0, 3);
 			String strn = "n_"+str;
 			writer.print(strn+"\t");
 		}
 		writer.print("\tk\t");
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			String str = this.modesData.get(NAMES[i]).getModeId().toString().substring(0, 3);
+			String str = this.modesData.get(NAMES[i]).getModeId().substring(0, 3);
 			String strk = "k_"+str;
 			writer.print(strk+"\t");
 		}
 		writer.print("\tq\t");
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			String str = this.modesData.get(NAMES[i]).getModeId().toString().substring(0, 3);
+			String str = this.modesData.get(NAMES[i]).getModeId().substring(0, 3);
 			String strq = "q_"+str;
 			writer.print(strq+"\t");
 		}
 		writer.print("\tv\t");
 		for (int i=0; i < NUMBER_OF_MODES; i++){
-			String str = this.modesData.get(NAMES[i]).getModeId().toString().substring(0, 3);
+			String str = this.modesData.get(NAMES[i]).getModeId().substring(0, 3);
 			String strv = "v_"+str;
 			writer.print(strv+"\t");
 		}
@@ -696,7 +692,7 @@ public class DreieckNmodes {
 		writer.close();
 	}
 	
-	private Activity createHome(int sekundenFrequenz, long identifier, long numberOfPeople){
+	private Activity createHome(int sekundenFrequenz, long numberOfPeople){
 		Id<Link> homeLinkId = Id.create(-1, Link.class);
 		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", homeLinkId);
 		
@@ -733,34 +729,11 @@ public class DreieckNmodes {
 	private static String Arraytostring(Integer[] list){
 		int n = list.length;
 		String str = "";
-		for (int i=0; i<n; i++){
-			str += list[i].intValue();
+		for (Integer aList : list) {
+			str += aList;
 			str += " ";
 		}
 		return str;
 	}//*/
-	
-	private static int ppcm(int n1, int n2){
-		int n1n2 = n1*n2;
-		int rest = n1%n2;
-		while (rest != 0){
-			n1 = n2;
-			n2 = rest;
-			rest = n1%n2;
-		}
-		return n1n2/n2;
-	}
-	
-	private static int pgcd(List<Integer> list){
-		int i, x, y, pgcd;
-		
-		x = list.get(0);
-		pgcd = 1;
-		for (i = 1; i < list.size(); i++){
-		    y = list.get(i);
-		    pgcd = x*y/ppcm(x, y);
-		    x = pgcd;
-		}
-		return pgcd;
-	}
+
 }

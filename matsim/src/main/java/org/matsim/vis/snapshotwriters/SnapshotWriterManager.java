@@ -20,19 +20,19 @@
 
 package org.matsim.vis.snapshotwriters;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class SnapshotWriterManager implements MobsimBeforeCleanupListener, MobsimAfterSimStepListener, MobsimInitializedListener {
 	
@@ -60,7 +60,7 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		Mobsim mobsim = (Mobsim) e.getQueueSimulation();
+		ObservableMobsim mobsim = (ObservableMobsim) e.getQueueSimulation();
 		this.snapshotTime = Math.floor(mobsim.getSimTimer().getSimStartTime()
 				/ this.snapshotPeriod)
 				* this.snapshotPeriod;

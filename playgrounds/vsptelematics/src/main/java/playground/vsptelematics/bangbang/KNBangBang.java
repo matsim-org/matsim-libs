@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -46,10 +46,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
@@ -65,13 +63,13 @@ public class KNBangBang {
 	static private final Id<Link> accidentLinkId = Id.createLinkId( "4706699_484108_484109-4706699_484109_26662372");
 	static List<Id<Link>> replanningLinkIds = new ArrayList<>() ; 
 
-	private static final class KNMobsimProvider implements Provider<RunnableMobsim> {
+	private static final class KNMobsimProvider implements Provider<Mobsim> {
 		@Inject private Scenario scenario;
 		@Inject private EventsManager events ;
 		@Inject private Provider<TripRouter> tripRouterFactory;
 
 		@Override
-		public RunnableMobsim get() {
+		public Mobsim get() {
 			QSim qsim = QSimUtils.createDefaultQSim( scenario, events ) ;
 			
 			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouterFactory.get()));
@@ -162,7 +160,7 @@ public class KNBangBang {
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bind( RunnableMobsim.class ).toProvider(KNMobsimProvider.class) ;
+				this.bind( Mobsim.class ).toProvider(KNMobsimProvider.class) ;
 			}
 		});
 

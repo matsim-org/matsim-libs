@@ -13,13 +13,11 @@ import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -55,7 +53,7 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 		}
 	}
 
-	private boolean doReplanning(MobsimAgent mobsimAgent, double time, RunnableMobsim mobsim) {
+	private boolean doReplanning(MobsimAgent mobsimAgent, double time, Mobsim mobsim) {
 		PlanAgent planAgent = (PlanAgent) mobsimAgent;
 		Id agentId = planAgent.getCurrentPlan().getPerson().getId();
 		PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(mobsimAgent);

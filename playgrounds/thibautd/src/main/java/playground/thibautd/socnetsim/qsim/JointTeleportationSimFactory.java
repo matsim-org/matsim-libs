@@ -74,7 +74,7 @@ public class JointTeleportationSimFactory implements MobsimFactory {
 					vehicles,
 					VehicleBehavior.valueOf( conf.getVehicleBehavior() ) );
 
-		final ActivityEngine activityEngine = new ActivityEngine();
+		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine( activityEngine );
 		qSim.addActivityHandler( activityEngine );
 
@@ -91,7 +91,7 @@ public class JointTeleportationSimFactory implements MobsimFactory {
 		qSim.addDepartureHandler( jointDepHandler );
 		qSim.addMobsimEngine( jointDepHandler );
 
-		final TeleportationEngine teleportationEngine = new TeleportationEngine();
+		final TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine( teleportationEngine );
 
         if (sc.getConfig().scenario().isUseTransit()) {

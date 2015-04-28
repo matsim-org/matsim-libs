@@ -204,7 +204,7 @@ public class SimplisticRelocatorManagerEngine implements MobsimEngine, ActivityH
 
 			final SimplisticRelocationAgent agent =
 				new SimplisticRelocationAgent(
-						internalInterface.getMobsim().getEventsManager(),
+						((QSim) internalInterface.getMobsim()).getEventsManager(),
 						agentId,
 						linkId );
 

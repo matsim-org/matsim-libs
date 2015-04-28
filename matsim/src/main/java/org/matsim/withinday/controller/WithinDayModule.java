@@ -23,7 +23,7 @@
 package org.matsim.withinday.controller;
 
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 
@@ -31,6 +31,6 @@ public class WithinDayModule extends AbstractModule {
     @Override
     public void install() {
         binder().bind(WithinDayEngine.class);
-        bind(RunnableMobsim.class).toProvider(WithinDayQSimFactory.class);
+        bind(Mobsim.class).toProvider(WithinDayQSimFactory.class);
     }
 }

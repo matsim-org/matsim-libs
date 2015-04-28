@@ -25,7 +25,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -67,29 +67,29 @@ public class GuidanceMobsimFactory implements MobsimFactory, ShutdownListener {
 	}
 
 	@Override
-	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		QSimConfigGroup conf = sc.getConfig().qsim();
+	public Mobsim createMobsim(Scenario scenario, EventsManager eventsManager) {
+		QSimConfigGroup conf = scenario.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-        QSim qSim = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine();
+        QSim qSim = new QSim(scenario, eventsManager);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
         QNetsimEngineModule.configure(qSim);
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
+		if (scenario.getConfig().network().isTimeVariantNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
 		}
 
-		this.initGuidance(sc.getNetwork());
+		this.initGuidance(scenario.getNetwork());
 		eventsManager.addHandler(this.guidance);
 		qSim.addQueueSimulationListeners(this.guidance);
 		AgentFactory agentFactory = new GuidanceAgentFactory(qSim, equipmentFraction, this.guidance, this.ttObserver);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory,
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory,
 				qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;

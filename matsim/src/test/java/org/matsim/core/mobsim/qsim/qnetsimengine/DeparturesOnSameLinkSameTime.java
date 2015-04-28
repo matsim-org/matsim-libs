@@ -48,7 +48,6 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -138,19 +137,18 @@ public class DeparturesOnSameLinkSameTime {
 	}
 
 
-	private QSim createQSim (Scenario sc, EventsManager manager){
-		QSim qSim1 = new QSim(sc, manager);
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
+	private QSim createQSim (Scenario scenario, EventsManager eventsManager){
+		QSim qSim = new QSim(scenario, eventsManager);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
+		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}

@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
@@ -90,7 +91,7 @@ public class PassivePlanningActivityEngine implements MobsimEngine, ActivityHand
 			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.UNDEFINED_TIME) {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination 
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
-				EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
+				EventsManager eventsManager = ((QSim) internalInterface.getMobsim()).getEventsManager();
 				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));
 			}
 		}
@@ -109,7 +110,7 @@ public class PassivePlanningActivityEngine implements MobsimEngine, ActivityHand
 		 * agents counter by one.
 		 */
 		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
-			internalInterface.getMobsim().getAgentCounter().decLiving();
+			((QSim) internalInterface.getMobsim()).getAgentCounter().decLiving();
 		} else if (agent.getActivityEndTime() <= internalInterface.getMobsim().getSimTimer().getTimeOfDay()) {
 			// This activity is already over (planned for 0 duration)
 			// So we proceed immediately.

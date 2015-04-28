@@ -46,7 +46,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
@@ -266,8 +266,8 @@ public class CadytsFreightChainTest {
 
 	private static class DummyMobsimFactory implements MobsimFactory {
 		@Override
-		public RunnableMobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-			return new RunnableMobsim() {
+		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+			return new Mobsim() {
 				@Override
 				public void run() {
 					// (dummy)

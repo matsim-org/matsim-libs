@@ -22,12 +22,6 @@
  */
 package playground.kai.usecases.ownmobsim;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -36,13 +30,18 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
+
+import java.util.Comparator;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.TreeMap;
 
 /**
  * @author nagel
  *
  */
-class MyMobsim implements RunnableMobsim {
+class MyMobsim implements Mobsim {
 	
 	private Scenario sc;
 	private EventsManager ev;

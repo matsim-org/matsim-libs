@@ -134,7 +134,7 @@ public class VrpLauncherUtils
             PassengerRequestCreator requestCreator, VrpOptimizer optimizer,
             MatsimVrpContext context, QSim qSim)
     {
-        PassengerEngine passengerEngine = new PassengerEngine(mode, requestCreator, optimizer,
+        PassengerEngine passengerEngine = new PassengerEngine(mode, qSim.getEventsManager(), requestCreator, optimizer,
                 context);
         qSim.addMobsimEngine(passengerEngine);
         qSim.addDepartureHandler(passengerEngine);

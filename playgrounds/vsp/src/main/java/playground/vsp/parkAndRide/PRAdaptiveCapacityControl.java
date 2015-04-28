@@ -19,19 +19,20 @@
  * *********************************************************************** */
 package playground.vsp.parkAndRide;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.signals.mobsim.SignalizeableItem;
 import org.matsim.signals.model.SignalGroupState;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An adaptive traffic light observing the number of vehicles per park-and-ride facility.
@@ -87,7 +88,7 @@ public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHa
 	}
 
 	public Netsim getMobsim() {
-		return this.internalInterface.getMobsim();
+		return ((QSim) this.internalInterface.getMobsim());
 	}
 
 	@Override

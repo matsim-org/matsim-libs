@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -169,7 +169,7 @@ public class MainPPSimZurich30km {
 			RandomNumbers.reset();
 
 			log.info("simulation-" + iter + " starts");
-			RunnableMobsim sim = new ParkingPSim(scenario, eventsManager, agentsMessage);
+			Mobsim sim = new ParkingPSim(scenario, eventsManager, agentsMessage);
 			sim.run();
 			eventsManager.finishProcessing();
 

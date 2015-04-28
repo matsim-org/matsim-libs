@@ -7,7 +7,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -63,18 +63,18 @@ class RunMobsimWithMultipleModeVehiclesExample {
 	static class MultipleModeVehiclesQSimFactory implements MobsimFactory {
 
 		@Override
-		public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim createMobsim(Scenario scenario, EventsManager eventsManager) {
 
-			QSimConfigGroup conf = sc.getConfig().qsim();
+			QSimConfigGroup conf = scenario.getConfig().qsim();
 			if (conf == null) {
 				throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 			}
 
 			// construct the QSim:
-			QSim qSim = new QSim(sc, eventsManager);
+			QSim qSim = new QSim(scenario, eventsManager);
 
 			// add the activity engine:
-			ActivityEngine activityEngine = new ActivityEngine();
+			ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
 
@@ -83,12 +83,12 @@ class RunMobsimWithMultipleModeVehiclesExample {
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-			TeleportationEngine teleportationEngine = new TeleportationEngine();
+			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 			qSim.addMobsimEngine(teleportationEngine);
 
 			AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 
-			PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 			Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
 
 			VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));

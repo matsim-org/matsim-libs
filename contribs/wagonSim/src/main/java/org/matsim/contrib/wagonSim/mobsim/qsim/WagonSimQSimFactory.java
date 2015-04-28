@@ -27,7 +27,7 @@ import org.matsim.contrib.wagonSim.mobsim.qsim.framework.listeners.WagonSimVehic
 import org.matsim.contrib.wagonSim.mobsim.qsim.pt.WagonSimTransitStopHandlerFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -69,15 +69,15 @@ public class WagonSimQSimFactory implements MobsimFactory {
 	// those that are inserted here. Hence, QSim will try to create TransitAgents AND 
 	//	WagonSimAgents. 
 	@Override
-	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario scenario, EventsManager eventsManager) {
 
-		QSimConfigGroup conf = sc.getConfig().qsim();
+		QSimConfigGroup conf = scenario.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		QSim qSim = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine();
+		QSim qSim = new QSim(scenario, eventsManager);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
         QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
@@ -85,23 +85,23 @@ public class WagonSimQSimFactory implements MobsimFactory {
 		netsimEngine.setLinkSpeedCalculator(new LocomotiveLinkSpeedCalculator(vehicleLinkSpeedAttributes));
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		// use an own TransitStopHandlerFactory here
 		AgentFactory agentFactory = new TransitAgentFactory(qSim);
 		TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 		// use an own transitStopHandler.
-		transitEngine.setTransitStopHandlerFactory(new WagonSimTransitStopHandlerFactory(vehicleLoadListener, 
-				sc.getPopulation().getPersonAttributes(), 
+		transitEngine.setTransitStopHandlerFactory(new WagonSimTransitStopHandlerFactory(vehicleLoadListener,
+				scenario.getPopulation().getPersonAttributes(),
 				vehicleLinkSpeedAttributes));
 		qSim.addDepartureHandler(transitEngine);
 		qSim.addAgentSource(transitEngine);
 		qSim.addMobsimEngine(transitEngine);
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
+		if (scenario.getConfig().network().isTimeVariantNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
 		}
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}

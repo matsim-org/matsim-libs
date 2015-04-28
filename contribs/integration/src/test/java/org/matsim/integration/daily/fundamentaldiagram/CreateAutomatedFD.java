@@ -186,13 +186,13 @@ public class CreateAutomatedFD {
 			events.addHandler(globalFlowDynamicsUpdator);
 			
 			QSim qSim = new QSim(scenario, events);
-			ActivityEngine activityEngine = new ActivityEngine();
+			ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
 			QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-			TeleportationEngine teleportationEngine = new TeleportationEngine();
+			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
 			qSim.addMobsimEngine(teleportationEngine);
 
 			AgentFactory agentFactory = new MyAgentFactory(qSim);

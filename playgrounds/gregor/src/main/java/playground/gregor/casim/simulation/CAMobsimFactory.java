@@ -21,7 +21,7 @@ package playground.gregor.casim.simulation;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -33,7 +33,6 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-
 import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
 import playground.gregor.casim.simulation.physics.CANetworkFactory;
 
@@ -42,7 +41,7 @@ public class CAMobsimFactory implements MobsimFactory {
 	private CANetworkFactory fac = new CAMultiLaneNetworkFactory();
 
 	@Override
-	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException(
@@ -50,13 +49,13 @@ public class CAMobsimFactory implements MobsimFactory {
 		}
 
 		QSim qSim = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
 		CANetsimEngineModule.configure(qSim, fac);
 
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;

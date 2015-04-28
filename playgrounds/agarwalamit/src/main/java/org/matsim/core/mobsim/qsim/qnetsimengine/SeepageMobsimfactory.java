@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -53,7 +53,7 @@ public class SeepageMobsimfactory  implements MobsimFactory{
 	}
 
 	@Override
-	public RunnableMobsim createMobsim(Scenario sc, EventsManager events) {
+	public Mobsim createMobsim(Scenario sc, EventsManager events) {
 		//From QSimFactory inspired code
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
@@ -61,7 +61,7 @@ public class SeepageMobsimfactory  implements MobsimFactory{
 		}
 		/**/
 		QSim qSim = new QSim(sc, events);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		
@@ -71,7 +71,7 @@ public class SeepageMobsimfactory  implements MobsimFactory{
 
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, events);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;

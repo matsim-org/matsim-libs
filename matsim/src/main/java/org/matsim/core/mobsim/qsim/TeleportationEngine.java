@@ -1,12 +1,8 @@
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.PriorityQueue;
-import java.util.Queue;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -22,6 +18,11 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 public final class TeleportationEngine implements DepartureHandler, MobsimEngine,
 VisData {
 	/**
@@ -32,8 +33,15 @@ VisData {
 			30, new TeleportationArrivalTimeComparator());
 	private final LinkedHashMap<Id<Person>, TeleportationVisData> teleportationData = new LinkedHashMap<>();
 	private InternalInterface internalInterface;
+	private Scenario scenario;
+	private EventsManager eventsManager;
 
-    @Override
+	public TeleportationEngine(Scenario scenario, EventsManager eventsManager) {
+		this.scenario = scenario;
+		this.eventsManager = eventsManager;
+	}
+
+	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
     	if ( agent.getExpectedTravelTime()==null || agent.getExpectedTravelTime()==Time.UNDEFINED_TIME ) {
     		throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
@@ -43,9 +51,9 @@ VisData {
 		this.teleportationList.add(new Tuple<>(arrivalTime,
 				agent));
 		Id<Person> agentId = agent.getId();
-		Link currLink = this.internalInterface.getMobsim().getScenario()
+		Link currLink = this.scenario
 				.getNetwork().getLinks().get(linkId);
-		Link destLink = this.internalInterface.getMobsim().getScenario()
+		Link destLink = this.scenario
 				.getNetwork().getLinks().get(agent.getDestinationLinkId());
 		double travTime = agent.getExpectedTravelTime();
 		Coord fromCoord = currLink.getToNode().getCoord();
@@ -81,7 +89,7 @@ VisData {
 				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent
 						.getDestinationLinkId());
 				double distance = personAgent.getExpectedTravelDistance();
-				this.internalInterface.getMobsim().getEventsManager().processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance));
+				this.eventsManager.processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance));
 				personAgent.endLegAndComputeNextState(now);
 				this.teleportationData.remove(personAgent.getId());
 				internalInterface.arrangeNextAgentState(personAgent);
@@ -101,8 +109,6 @@ VisData {
 		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		for (Tuple<Double, MobsimAgent> entry : teleportationList) {
 			MobsimAgent agent = entry.getSecond();
-			EventsManager eventsManager = internalInterface.getMobsim()
-					.getEventsManager();
 			eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
 		}
 		teleportationList.clear();

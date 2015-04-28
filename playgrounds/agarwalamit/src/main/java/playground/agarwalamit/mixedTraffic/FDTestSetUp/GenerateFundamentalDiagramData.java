@@ -470,7 +470,7 @@ public class GenerateFundamentalDiagramData {
 
 	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
 		QSim qSim = new QSim(sc, events);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
@@ -486,7 +486,7 @@ public class GenerateFundamentalDiagramData {
 
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		log.info("=======================");

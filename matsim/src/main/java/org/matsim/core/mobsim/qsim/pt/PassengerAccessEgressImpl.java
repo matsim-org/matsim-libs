@@ -26,6 +26,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -55,19 +56,19 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	private final InternalInterface internalInterface;
 	private final TransitStopAgentTracker agentTracker;
 	private final boolean isGeneratingDeniedBoardingEvents ;
-	private Set<PTPassengerAgent> agentsDeniedToBoard = null; 
+	private Set<PTPassengerAgent> agentsDeniedToBoard = null;
+	private Scenario scenario;
+	private EventsManager eventsManager;
 	
-	PassengerAccessEgressImpl(InternalInterface internalInterface, TransitStopAgentTracker agentTracker) {
+	PassengerAccessEgressImpl(InternalInterface internalInterface, TransitStopAgentTracker agentTracker, Scenario scenario, EventsManager eventsManager) {
 		this.internalInterface = internalInterface;
 		this.agentTracker = agentTracker;
-		if ( this.internalInterface != null ) {
-			this.isGeneratingDeniedBoardingEvents = 
-					this.internalInterface.getMobsim().getScenario().getConfig().vspExperimental().isGeneratingBoardingDeniedEvents() ;
-			if (this.isGeneratingDeniedBoardingEvents){
-				this.agentsDeniedToBoard = new HashSet<>();
-			}
-		} else {
-			this.isGeneratingDeniedBoardingEvents = false ;
+		this.scenario = scenario;
+		this.eventsManager = eventsManager;
+		this.isGeneratingDeniedBoardingEvents =
+				this.scenario.getConfig().vspExperimental().isGeneratingBoardingDeniedEvents() ;
+		if (this.isGeneratingDeniedBoardingEvents){
+			this.agentsDeniedToBoard = new HashSet<>();
 		}
 	}
 	
@@ -95,7 +96,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 		Id<Vehicle> vehicleId = vehicle.getId() ;
 		for (PTPassengerAgent agent : this.agentsDeniedToBoard){
 			Id<Person> agentId = agent.getId() ;
-			this.internalInterface.getMobsim().getEventsManager().processEvent(
+			this.eventsManager.processEvent(
 					new BoardingDeniedEvent(now, agentId, vehicleId)
 					) ;
 		}
@@ -162,8 +163,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 				this.internalInterface.unregisterAdditionalAgentOnLink(agentId, linkId) ;
 			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
-			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
-			events.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
+			eventsManager.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
 		}
 		return handled;
 	}
@@ -172,9 +172,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	public boolean handlePassengerLeaving(PTPassengerAgent passenger, MobsimVehicle vehicle, Id<Link> toLinkId, double time) {
 		boolean handled = vehicle.removePassenger(passenger);
 		if(handled){
-//			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
-			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
-			events.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
+			eventsManager.processEvent(new PersonLeavesVehicleEvent(time, passenger.getId(), vehicle.getVehicle().getId()));
 			
 			// from here on works only if PassengerAgent can be cast into MobsimAgent ... but this is how it was before.
 			// kai, sep'12

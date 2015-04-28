@@ -19,6 +19,10 @@
 
 package org.matsim.core.mobsim.qsim.interfaces;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 
 
@@ -27,8 +31,11 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
  * 
  * @author nagel
  */
-public interface Netsim extends Mobsim {
+public interface Netsim extends ObservableMobsim {
 
 	NetsimNetwork getNetsimNetwork();
-	
+
+	EventsManager getEventsManager();
+
+	AgentCounterI getAgentCounter();Scenario getScenario();MobsimTimer getSimTimer();
 }

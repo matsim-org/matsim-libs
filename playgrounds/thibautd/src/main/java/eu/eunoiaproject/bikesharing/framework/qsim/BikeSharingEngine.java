@@ -19,14 +19,12 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.framework.qsim;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-
+import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.framework.events.AgentStartsWaitingForBikeEvent;
+import eu.eunoiaproject.bikesharing.framework.events.AgentStartsWaitingForFreeBikeSlotEvent;
+import eu.eunoiaproject.bikesharing.framework.events.AgentStopsWaitingForBikeEvent;
+import eu.eunoiaproject.bikesharing.framework.events.AgentStopsWaitingForFreeBikeSlotEvent;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Leg;
@@ -39,14 +37,9 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-
 import playground.ivt.utils.MapUtils;
-import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
-import eu.eunoiaproject.bikesharing.framework.events.AgentStartsWaitingForBikeEvent;
-import eu.eunoiaproject.bikesharing.framework.events.AgentStartsWaitingForFreeBikeSlotEvent;
-import eu.eunoiaproject.bikesharing.framework.events.AgentStopsWaitingForBikeEvent;
-import eu.eunoiaproject.bikesharing.framework.events.AgentStopsWaitingForFreeBikeSlotEvent;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingRoute;
+
+import java.util.*;
 
 /**
  * A {@link MobsimEngine} and {@link DepartureHandler} for bike sharing simulations.
@@ -59,6 +52,7 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 	
 	private final BikeSharingManager bikeSharingManager;
 	private InternalInterface internalInterface = null;
+	private EventsManager eventsManager;
 
 	private final ArrivalQueue arrivalQueue = new ArrivalQueue();
 
@@ -72,8 +66,9 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 	private final Map<Id, Queue<MobsimAgent>> agentsWaitingForDeparturePerStation = new HashMap<Id, Queue<MobsimAgent>>();
 	private final Map<Id, Queue<MobsimAgent>> agentsWaitingForArrivalPerStation = new HashMap<Id, Queue<MobsimAgent>>();
 
-	public BikeSharingEngine( final BikeSharingManager manager ) {
+	public BikeSharingEngine(final BikeSharingManager manager, EventsManager eventsManager) {
 		this.bikeSharingManager = manager;
+		this.eventsManager = eventsManager;
 		bikeSharingManager.addListener( new Listener() );
 	}
 
@@ -99,11 +94,11 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 						facilityInNewState.getLinkId() );
 				if ( !departed ) throw new RuntimeException( "agent "+agent+" could not depart from "+facilityInNewState );
 
-				internalInterface.getMobsim().getEventsManager().processEvent(
+				eventsManager.processEvent(
 						new AgentStopsWaitingForBikeEvent(
-							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-							agent.getId(),
-							facilityInNewState.getId() ) );
+								internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+								agent.getId(),
+								facilityInNewState.getId()));
 
 			}
 		}
@@ -121,11 +116,11 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 						agent,
 						facilityInNewState );
 
-				internalInterface.getMobsim().getEventsManager().processEvent(
+				eventsManager.processEvent(
 						new AgentStopsWaitingForFreeBikeSlotEvent(
-							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-							agent.getId(),
-							facilityInNewState.getId() ) );
+								internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+								agent.getId(),
+								facilityInNewState.getId()));
 			}
 		}
 	}
@@ -142,11 +137,11 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 			else {
 				addAgentToWaitingList( agent , arrivalFacility , agentsWaitingForArrivalPerStation );
 
-				internalInterface.getMobsim().getEventsManager().processEvent(
+				eventsManager.processEvent(
 						new AgentStartsWaitingForFreeBikeSlotEvent(
-							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-							agent.getId(),
-							arrivalFacility.getId() ) );
+								internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+								agent.getId(),
+								arrivalFacility.getId()));
 			}
 		}
 	}
@@ -168,9 +163,6 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 	@Override
 	public void afterSim() {
 		final double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
-
-		final EventsManager eventsManager =
-			internalInterface.getMobsim().getEventsManager();
 
 		for ( MobsimAgent travelingAgent : arrivalQueue.retrieveAgentsForArrivalTime( Double.POSITIVE_INFINITY ) ) {
 			eventsManager.processEvent(
@@ -215,11 +207,11 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 
 		addAgentToWaitingList( agent , departureFacility , agentsWaitingForDeparturePerStation );
 
-		internalInterface.getMobsim().getEventsManager().processEvent(
+		eventsManager.processEvent(
 				new AgentStartsWaitingForBikeEvent(
-					internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-					agent.getId(),
-					departureFacility.getId() ) );
+						internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+						agent.getId(),
+						departureFacility.getId()));
 
 		return true;
 	}

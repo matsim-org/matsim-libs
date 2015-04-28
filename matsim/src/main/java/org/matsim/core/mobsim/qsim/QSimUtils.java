@@ -41,24 +41,24 @@ public class QSimUtils {
 	 // should only contain static methods; should thus not be instantiated
 	private QSimUtils() {}
 
-	public static QSim createDefaultQSim(Scenario sc, EventsManager eventsManager) {
-		QSimConfigGroup conf = sc.getConfig().qsim();
+	public static QSim createDefaultQSim(Scenario scenario, EventsManager eventsManager) {
+		QSimConfigGroup conf = scenario.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		QSim qSim = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine();
+		QSim qSim = new QSim(scenario, eventsManager);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
 		QNetsimEngineModule.configure(qSim);
 
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;
-		if (sc.getConfig().scenario().isUseTransit()) {
+		if (scenario.getConfig().scenario().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
@@ -68,10 +68,10 @@ public class QSimUtils {
 		} else {
 			agentFactory = new DefaultAgentFactory(qSim);
 		}
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
+		if (scenario.getConfig().network().isTimeVariantNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
 		}
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}

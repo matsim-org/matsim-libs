@@ -111,19 +111,18 @@ public class FlowStorageSpillbackTest {
 		
 	}
 	
-	private QSim createQSim(Scenario sc, EventsManager events) {
-		QSim qSim1 = new QSim(sc, events);
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-        QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
+	private QSim createQSim(Scenario scenario, EventsManager events) {
+		QSim qSim = new QSim(scenario, events);
+		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+        QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
+		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}

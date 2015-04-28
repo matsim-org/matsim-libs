@@ -16,6 +16,7 @@ import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 class JDEQSimEngine implements MobsimEngine, ActivityHandler {
@@ -27,9 +28,9 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
     private Timer t;
     private SteppableScheduler scheduler;
     private int numberOfAgents = 0;
-    private InternalInterface internalInterface;
+    private AgentCounterI agentCounter;
 
-    public JDEQSimEngine(Scenario scenario, EventsManager eventsManager, SteppableScheduler scheduler) {
+    public JDEQSimEngine(Scenario scenario, EventsManager eventsManager, AgentCounterI agentCounter, SteppableScheduler scheduler) {
         this.scheduler = scheduler;
         this.scenario = scenario;
         this.eventsManager = eventsManager;
@@ -69,7 +70,7 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
 
     @Override
     public void setInternalInterface(InternalInterface internalInterface) {
-        this.internalInterface = internalInterface;
+        InternalInterface internalInterface1 = internalInterface;
     }
 
     @Override
@@ -80,7 +81,7 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
         // for which we are responsible go to sleep at once.
         if (scheduler.isFinished()) {
             while (numberOfAgents > 0) {
-                internalInterface.getMobsim().getAgentCounter().decLiving();
+                agentCounter.decLiving();
                 numberOfAgents--;
             }
         }

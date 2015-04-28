@@ -71,11 +71,11 @@ public class ParkingQSimFactory implements MobsimFactory {
 
 
 		QSim qSim1 = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
         QNetsimEngineModule.configure(qSim1);
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim1.addMobsimEngine(teleportationEngine);
 		qSim1.addMobsimEngine(replanningManager);
         QSim qSim = qSim1;

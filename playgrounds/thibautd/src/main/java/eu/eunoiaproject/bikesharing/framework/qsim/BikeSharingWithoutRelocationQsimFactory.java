@@ -24,7 +24,7 @@ import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -59,7 +59,7 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 	}
 
 	@Override
-	public RunnableMobsim createMobsim(
+	public Mobsim createMobsim(
 			final Scenario sc,
 			final EventsManager eventsManager) {
 		final QSimConfigGroup conf = sc.getConfig().qsim();
@@ -69,7 +69,7 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 
         final QSim qSim = new QSim( sc, eventsManager );
 
-		final ActivityEngine activityEngine = new ActivityEngine();
+		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
@@ -92,7 +92,7 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 							BikeSharingFacilities.ELEMENT_NAME ) );
 		final BikeSharingEngine bikeSharingEngine =
 			new BikeSharingEngine(
-					bikeSharingManager );
+					bikeSharingManager, eventsManager);
 		qSim.addDepartureHandler( bikeSharingEngine );
 		qSim.addMobsimEngine( bikeSharingEngine );
 
@@ -104,7 +104,7 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 		// or even as agents driving around to relocate bikes.
 		// ---------------------------------------------------------------------
 
-		final TeleportationEngine teleportationEngine = new TeleportationEngine();
+		final TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		final AgentFactory agentFactory = createAgentFactory( qSim , sc );

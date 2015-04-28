@@ -431,9 +431,9 @@ public class QNetsimEngine implements MobsimEngine {
 	}
 
 	void letVehicleArrive(QVehicle veh) {
-		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+		double now = this.qsim.getSimTimer().getTimeOfDay();
 		MobsimDriverAgent driver = veh.getDriver();
-		internalInterface.getMobsim().getEventsManager().processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
+		this.qsim.getEventsManager().processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
 		// reset vehicles driver
 		veh.setDriver(null);
 		driver.endLegAndComputeNextState(now);

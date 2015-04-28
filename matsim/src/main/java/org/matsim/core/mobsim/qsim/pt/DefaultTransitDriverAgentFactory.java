@@ -28,9 +28,18 @@ import org.matsim.pt.Umlauf;
  */
 public class DefaultTransitDriverAgentFactory implements TransitDriverAgentFactory {
 
+	private final InternalInterface internalInterface;
+	private final TransitStopAgentTracker transitStopAgentTracker;
+
+	public DefaultTransitDriverAgentFactory(InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker) {
+		this.internalInterface = internalInterface;
+		this.transitStopAgentTracker = transitStopAgentTracker;
+	}
+
+
 	@Override
-	public AbstractTransitDriverAgent createTransitDriver(Umlauf umlauf, TransitStopAgentTracker thisAgentTrackerVehicle, InternalInterface internalInterface) {
-		return new TransitDriverAgentImpl(umlauf, TransportMode.car, thisAgentTrackerVehicle, internalInterface);
+	public AbstractTransitDriverAgent createTransitDriver(Umlauf umlauf) {
+		return new TransitDriverAgentImpl(umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
 	}
 
 }

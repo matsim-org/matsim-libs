@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.johannes.gsv.sim.cadyts.CadytsContext;
@@ -40,7 +40,7 @@ import playground.johannes.gsv.sim.cadyts.CadytsContext;
  * @author johannes
  *
  */
-public class MobsimConnector implements RunnableMobsim {
+public class MobsimConnector implements Mobsim {
 	
 	private static final Logger logger = Logger.getLogger(MobsimConnector.class);
 

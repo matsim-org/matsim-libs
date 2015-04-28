@@ -1,24 +1,11 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim;
 
-import java.util.List;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.utils.misc.Time;
+import org.matsim.core.mobsim.framework.Mobsim;
 
-import playground.wrashid.parkingSearch.ppSim.ttmatrix.DummyTTMatrix;
-import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
-
-public class JDEPSim implements RunnableMobsim{
+public class JDEPSim implements Mobsim {
 
 	private Scenario sc;
 	private EventsManager eventsManager;

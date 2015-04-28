@@ -78,7 +78,7 @@ public class BikeSharingWithSimplisticRelocationQSimFactory implements MobsimFac
 						BikeSharingFacilities.ELEMENT_NAME ) );
 		final BikeSharingEngine bikeSharingEngine =
 			new BikeSharingEngine(
-					bikeSharingManager );
+					bikeSharingManager, eventsManager);
 		qSim.addDepartureHandler( bikeSharingEngine );
 		qSim.addMobsimEngine( bikeSharingEngine );
 
@@ -99,13 +99,13 @@ public class BikeSharingWithSimplisticRelocationQSimFactory implements MobsimFac
 		// ---------------------------------------------------------------------
 
 		// this needs to be added AFTER the relocator manager
-		final ActivityEngine activityEngine = new ActivityEngine();
+		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
 
 
-		final TeleportationEngine teleportationEngine = new TeleportationEngine();
+		final TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		final AgentFactory agentFactory = createAgentFactory( qSim , sc );

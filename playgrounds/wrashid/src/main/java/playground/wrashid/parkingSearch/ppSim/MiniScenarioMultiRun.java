@@ -36,7 +36,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -181,7 +181,7 @@ public class MiniScenarioMultiRun {
 		eventsManager.resetHandlers(0);
 		eventsWriter.init(Controler.FILENAME_EVENTS_XML);
 
-		RunnableMobsim sim = new PPSim(scenario, eventsManager);
+		Mobsim sim = new PPSim(scenario, eventsManager);
 		sim.run();
 
 	}

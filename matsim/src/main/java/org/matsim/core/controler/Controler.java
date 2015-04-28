@@ -42,7 +42,7 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.external.ExternalMobsim;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -380,11 +380,11 @@ public class Controler extends AbstractController {
 	@Override
 	protected void runMobSim() {
 		// yyyy cannot make this final: overridden at about 15 locations.  kai, jan'13
-		RunnableMobsim sim = getNewMobsim();
+		Mobsim sim = getNewMobsim();
 		sim.run();
 	}
 
-	private RunnableMobsim getNewMobsim() {
+	private Mobsim getNewMobsim() {
 		if (this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null &&
 				((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
 			ExternalMobsim simulation = new ExternalMobsim(this.scenario , this.events);
@@ -392,13 +392,13 @@ public class Controler extends AbstractController {
 			simulation.setIterationNumber(this.getIterationNumber());
 			return simulation;
 		} else {
-			RunnableMobsim simulation = injector.getInstance(RunnableMobsim.class);
+			Mobsim simulation = injector.getInstance(Mobsim.class);
 			enrichSimulation(simulation);
 			return simulation;
 		}
 	}
 
-	private void enrichSimulation(final RunnableMobsim simulation) {
+	private void enrichSimulation(final Mobsim simulation) {
 		if (simulation instanceof ObservableMobsim) {
 			for (MobsimListener l : this.getMobsimListeners()) {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
@@ -538,29 +538,29 @@ public class Controler extends AbstractController {
 		});
 	}
 
-	public final void setMobsimFactory(final Provider<RunnableMobsim> mobsimProvider) {
+	public final void setMobsimFactory(final Provider<Mobsim> mobsimProvider) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(RunnableMobsim.class).toProvider(mobsimProvider);
+				bind(Mobsim.class).toProvider(mobsimProvider);
 			}
 		});
 	}
 
-	public final void setMobsimFactory(final Class<? extends Provider<RunnableMobsim>> mobsimProvider) {
+	public final void setMobsimFactory(final Class<? extends Provider<Mobsim>> mobsimProvider) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(RunnableMobsim.class).toProvider(mobsimProvider);
+				bind(Mobsim.class).toProvider(mobsimProvider);
 			}
 		});
 	}
 
 	@Deprecated // use other version of this method, please
 	public final void setMobsimFactory(final MobsimFactory mobsimFactory) {
-		setMobsimFactory(new Provider<RunnableMobsim>() {
+		setMobsimFactory(new Provider<Mobsim>() {
 			@Override
-			public RunnableMobsim get() {
+			public Mobsim get() {
 				return mobsimFactory.createMobsim(getScenario(), getEvents());
 			}
 		});
@@ -675,21 +675,21 @@ public class Controler extends AbstractController {
 	 *
 	 * @see ControlerConfigGroup#getMobsim()
 	 */
-	public final void addMobsimFactory(final String mobsimName, final Provider<RunnableMobsim> mobsimProvider) {
+	public final void addMobsimFactory(final String mobsimName, final Provider<Mobsim> mobsimProvider) {
 		this.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				if (getConfig().controler().getMobsim().equals(mobsimName)) {
-					bind(RunnableMobsim.class).toProvider(mobsimProvider);
+					bind(Mobsim.class).toProvider(mobsimProvider);
 				}
 			}
 		});
 	}
 	@Deprecated // use provider version
 	public final void addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {
-		addMobsimFactory(mobsimName, new Provider<RunnableMobsim>() {
+		addMobsimFactory(mobsimName, new Provider<Mobsim>() {
 			@Override
-			public RunnableMobsim get() {
+			public Mobsim get() {
 				return mobsimFactory.createMobsim(getScenario(), getEvents());
 			}
 		});

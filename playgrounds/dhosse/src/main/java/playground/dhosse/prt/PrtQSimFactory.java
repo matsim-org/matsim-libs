@@ -11,9 +11,8 @@ import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.dynagent.run.DynActivityEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -34,7 +33,6 @@ import playground.michalm.taxi.optimizer.filter.FilterFactory;
 import playground.michalm.taxi.scheduler.TaxiScheduler;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
-import playground.michalm.util.MovingAgentsRegister;
 
 public class PrtQSimFactory implements MobsimFactory{
 	
@@ -54,7 +52,7 @@ public class PrtQSimFactory implements MobsimFactory{
 	}
 
 	@Override
-	public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		
 		TaxiOptimizerConfiguration taxiConfig = initOptimizerConfiguration(prtConfig, context, calculator, algorithmConfig);
 		TaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(taxiConfig);
@@ -69,7 +67,7 @@ public class PrtQSimFactory implements MobsimFactory{
 		qSim.addQueueSimulationListeners(optimizer);
 		
 		PassengerEngine passengerEngine = new PassengerEngine(PrtRequestCreator.MODE,
-				new PrtRequestCreator(), optimizer, this.context);
+				eventsManager, new PrtRequestCreator(), optimizer, this.context);
 		qSim.addMobsimEngine(passengerEngine);
 		qSim.addDepartureHandler(passengerEngine);
 		
@@ -101,13 +99,13 @@ public class PrtQSimFactory implements MobsimFactory{
 		
 		QSim qSim = new QSim(scenario,events);
 		
-		DynActivityEngine dynActivityEngine = new DynActivityEngine();
+		DynActivityEngine dynActivityEngine = new DynActivityEngine(events, qSim.getAgentCounter());
 		qSim.addMobsimEngine(dynActivityEngine);
 		qSim.addActivityHandler(dynActivityEngine);
 		
 		QNetsimEngineModule.configure(qSim);
 		
-		qSim.addMobsimEngine(new TeleportationEngine());
+		qSim.addMobsimEngine(new TeleportationEngine(scenario, events));
 		
 		if(scenario.getConfig().network().isTimeVariantNetwork()){
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());

@@ -31,10 +31,19 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
 
 public class ActivityEngine implements MobsimEngine, ActivityHandler {
+
+	private EventsManager eventsManager;
+	private AgentCounterI agentCounter;
+
+	public ActivityEngine(EventsManager eventsManager, AgentCounterI agentCounter) {
+		this.eventsManager = eventsManager;
+		this.agentCounter = agentCounter;
+	}
 
 	/**
 	 * Agents cannot be added directly to the activityEndsList since that would
@@ -112,7 +121,6 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.UNDEFINED_TIME) {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
-				EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
 				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));
 			}
 		}
@@ -140,7 +148,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
 			// This is the last planned activity.
 			// So the agent goes to sleep.
-			internalInterface.getMobsim().getAgentCounter().decLiving();
+			agentCounter.decLiving();
 		} else if (agent.getActivityEndTime() <= internalInterface.getMobsim().getSimTimer().getTimeOfDay() && !beforeFirstSimStep) {
 			// This activity is already over (planned for 0 duration)
 			// So we proceed immediately.
@@ -185,7 +193,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 				// re-activate the agent
 				activityEndsList.add(new AgentEntry(agent, newActivityEndTime));
 				internalInterface.registerAdditionalAgentOnLink(agent);
-				((AgentCounter) internalInterface.getMobsim().getAgentCounter()).incLiving();
+				((AgentCounter) agentCounter).incLiving();
 			}
 		} else if (newActivityEndTime == Double.POSITIVE_INFINITY) {
 			/*
@@ -193,7 +201,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			 * Therefore the agent is de-activated. cdobler, oct'11
 			 */
 			unregisterAgentAtActivityLocation(agent);
-			internalInterface.getMobsim().getAgentCounter().decLiving();
+			agentCounter.decLiving();
 		} else {
 			/*
 			 *  The activity is just rescheduled during the day, so we keep the agent active. cdobler, oct'11

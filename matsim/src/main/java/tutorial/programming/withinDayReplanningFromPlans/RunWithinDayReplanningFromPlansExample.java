@@ -25,7 +25,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.util.TravelTime;
@@ -45,12 +45,12 @@ public class RunWithinDayReplanningFromPlansExample {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(RunnableMobsim.class).toProvider(new Provider<RunnableMobsim>() {
+				bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
 
 					private MyMobsimFactory myMobsimFactory = new MyMobsimFactory(new WithinDayTripRouterFactory(controler, travelTime));
 
 					@Override
-					public RunnableMobsim get() {
+					public Mobsim get() {
 						return myMobsimFactory.createMobsim(controler.getScenario(), controler.getEvents());
 					}
 				});

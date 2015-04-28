@@ -23,8 +23,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.PtConstants;
@@ -42,6 +44,8 @@ import java.util.ListIterator;
  * @author michaz
  */
 public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
+
+	private final EventsManager eventsManager;
 
 	private static class PlanBuilder {
 
@@ -86,6 +90,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 			TransitStopAgentTracker thisAgentTracker, InternalInterface internalInterface) {
 		super(internalInterface, thisAgentTracker);
 		this.umlauf = umlauf;
+		this.eventsManager = ((QSim) internalInterface.getMobsim()).getEventsManager();
 		this.iUmlaufStueck = this.umlauf.getUmlaufStuecke().iterator();
 		PersonImpl driverPerson = new PersonImpl(Id.create("pt_"+umlauf.getId(), Person.class)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		PlanBuilder planBuilder = new PlanBuilder();
@@ -114,7 +119,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 
 	@Override
 	public void endLegAndComputeNextState(final double now) {
-		this.getSimulation().getEventsManager().processEvent(
+		eventsManager.processEvent(
 				new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 		this.currentPlanElement = iPlanElement.next();
 		if (this.iUmlaufStueck.hasNext()) {

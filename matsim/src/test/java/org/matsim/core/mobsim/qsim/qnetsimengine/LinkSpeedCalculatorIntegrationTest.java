@@ -136,7 +136,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		QSim qsim = new QSim(f.scenario, f.events);
 		
 		// handle activities
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(f.events, qsim.getAgentCounter());
 		qsim.addMobsimEngine(activityEngine);
 		qsim.addActivityHandler(activityEngine);
 

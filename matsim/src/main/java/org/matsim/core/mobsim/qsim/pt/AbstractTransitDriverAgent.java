@@ -24,6 +24,7 @@ import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -35,6 +36,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -50,6 +52,9 @@ import org.matsim.vehicles.Vehicle;
 public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
 
 	private static final Logger log = Logger.getLogger(AbstractTransitDriverAgent.class);
+
+	private Scenario scenario;
+	private EventsManager eventsManager;
 
 	private TransitVehicle vehicle = null;
 
@@ -81,7 +86,9 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	AbstractTransitDriverAgent(InternalInterface internalInterface, TransitStopAgentTracker agentTracker2) {
 		super();
 		this.internalInterface = internalInterface;
-		accessEgress = new PassengerAccessEgressImpl(this.internalInterface, agentTracker2);
+		this.scenario = ((QSim) internalInterface.getMobsim()).getScenario();
+		this.eventsManager = ((QSim) internalInterface.getMobsim()).getEventsManager();
+		accessEgress = new PassengerAccessEgressImpl(this.internalInterface, agentTracker2, this.scenario, eventsManager);
 	}
 
 	final void init() {
@@ -175,16 +182,16 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	final void sendTransitDriverStartsEvent(final double now) {
-		// A test initializes this Agent without internalInterface. 
+		// A test initializes this Agent without internalInterface.
 		// Actually, I am not sure if agents should send Events (or just be reactive, so they can be
 		// tested / exercised as a unit, without a QSim.  michaz
-		if (internalInterface != null) { 
+		if (internalInterface != null) {
 			// check if "Wenden"
 			if(getTransitLine() == null){
-				this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+				eventsManager.processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 						this.vehicle.getId(), Id.create("Wenden", TransitLine.class), Id.create("Wenden", TransitRoute.class), Id.create("Wenden", Departure.class)));
 			} else {
-				this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
+				eventsManager.processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 						this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
 			}
 		}
@@ -192,10 +199,6 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	@Override
 	public void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
-	}
-
-	final Netsim getSimulation(){
-		return this.internalInterface.getMobsim();
 	}
 
 	/**Design comments:<ul>
@@ -222,7 +225,6 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	private void processEventVehicleArrives(final TransitStopFacility stop,
 			final double now) {
-		EventsManager events = this.internalInterface.getMobsim().getEventsManager();
 		if (this.currentStop == null) {
 			this.currentStop = this.nextStop;
 			double delay = now - this.getDeparture().getDepartureTime();
@@ -236,7 +238,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 			else {
 				log.warn("Could not calculate delay!");
 			}
-			events.processEvent(new VehicleArrivesAtFacilityEvent(now, this.vehicle.getVehicle().getId(), stop.getId(),
+			eventsManager.processEvent(new VehicleArrivesAtFacilityEvent(now, this.vehicle.getVehicle().getId(), stop.getId(),
 					delay));
 		}
 	}
@@ -266,7 +268,6 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	private void depart(final double now) {
-		EventsManager events = this.internalInterface.getMobsim().getEventsManager();
 		double delay = now - this.getDeparture().getDepartureTime();
 		if (this.isBadDouble(this.getDeparture().getDepartureTime())){ //this is the case if the next stop is null
 			delay = 0;
@@ -280,7 +281,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		else {
 			log.warn("Could not calculate delay!");
 		}
-		events.processEvent(new VehicleDepartsAtFacilityEvent(now, this.vehicle.getVehicle().getId(),
+		eventsManager.processEvent(new VehicleDepartsAtFacilityEvent(now, this.vehicle.getVehicle().getId(),
 				this.currentStop.getStopFacility().getId(),
 				delay));
 		this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);

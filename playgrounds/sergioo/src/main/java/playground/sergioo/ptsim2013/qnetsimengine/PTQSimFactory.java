@@ -77,7 +77,7 @@ public class PTQSimFactory implements MobsimFactory {
 			netsimEngFactory = new PTQSimEngineFactory();
 		}
 		QSim qSim = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		PTQNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
@@ -85,7 +85,7 @@ public class PTQSimFactory implements MobsimFactory {
 			netsimEngine.setStopStopTime(stopStopTime);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;

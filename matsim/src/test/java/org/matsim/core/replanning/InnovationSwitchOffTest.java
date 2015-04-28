@@ -36,7 +36,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.mobsim.framework.RunnableMobsim;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
@@ -133,8 +133,8 @@ public class InnovationSwitchOffTest {
 		}) ;
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
-			public RunnableMobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				return new RunnableMobsim(){
+			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+				return new Mobsim(){
 					@Override
 					public void run() {
 					}} ;

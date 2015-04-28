@@ -50,11 +50,11 @@ public class TransitLiveSimMain {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim qSim1 = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine();
+		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
         QNetsimEngineModule.configure(qSim1);
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
 		qSim1.addMobsimEngine(teleportationEngine);
         QSim qSim = qSim1;
         AgentFactory agentFactory;
