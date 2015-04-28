@@ -5,7 +5,6 @@ package playground.jjoubert.projects.capeTownFreight;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -22,6 +21,14 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.nmviljoen.network.NmvLink;
+import playground.nmviljoen.network.NmvNode;
+import playground.nmviljoen.network.salience.SampleNetworkBuilder;
+import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v2;
+import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
+import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork.PathDependentNode;
+import playground.southafrica.utilities.Header;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -30,13 +37,6 @@ import com.vividsolutions.jts.geom.Point;
 
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Graph;
-import playground.nmviljoen.network.NmvLink;
-import playground.nmviljoen.network.NmvNode;
-import playground.nmviljoen.network.salience.SampleNetworkBuilder;
-import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v2;
-import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
-import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork.PathDependentNode;
-import playground.southafrica.utilities.Header;
 
 /**
  * Class to read in a {@link PathDependentNetwork} and only keep those nodes
