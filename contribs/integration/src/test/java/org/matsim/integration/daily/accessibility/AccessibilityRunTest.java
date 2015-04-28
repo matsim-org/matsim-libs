@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -36,7 +35,6 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -55,87 +53,14 @@ public class AccessibilityRunTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
 	
-	@SuppressWarnings("static-method")
-	@Test
-	public void doTest() {
-		System.out.println("available ram: " + (Runtime.getRuntime().maxMemory() / 1024/1024));
-
-		final String FN = "matsimExamples/tutorial/lesson-3/network.xml" ;
-
-		Config config = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario( config ) ;
-
-		try {
-			new MatsimNetworkReader(sc).readFile(FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../" + FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../../" + FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../../../" + FN);
-			// this is the one that works locally
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../../../../" + FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../../../../../" + FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../../../../../../" + FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../../../../../../../" + FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../../../../../../../../" + FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../../../../../../../../../" + FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../../../../../../../../../../" + FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
-			new MatsimNetworkReader(sc).readFile("../../../../../../../../../../../" + FN);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-
-		Assert.assertTrue(true);
-	}
-	
-
 	@Test
 	public void doAccessibilityTest() {
-//		String folderStructure = "../../"; // local
-		String folderStructure = "../"; // server
+		System.out.println("Working Directory = " + System.getProperty("user.dir"));
+		System.out.println("package input directory = " + utils.getPackageInputDirectory());
+		System.out.println("class input directory = " + utils.getClassInputDirectory());
+		System.out.println("input directory = " + utils.getInputDirectory());
+
+		String folderStructure = "../../"; // local
 			
 		String networkFile = folderStructure + "matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
