@@ -20,6 +20,7 @@
 package playground.thibautd.utils;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -37,9 +38,23 @@ public class ObjectPool<T extends Object> {
 	private static final Logger log =
 		Logger.getLogger(ObjectPool.class);
 
-	private final Map<T, WeakReference<T>> pool = new WeakHashMap<T, WeakReference<T>>();
+	private final Map<T, WeakReference<T>> pool;
 	private long queries = 0;
 	private long unknown = 0;
+
+	public ObjectPool() {
+		this( true );
+	}
+
+	/**
+	 * @param weaklyReference if true, pooled instances can be garbage collected if not
+	 * referenced anywhere anymore (default)
+	 */
+	public ObjectPool( final boolean weaklyReference ) {
+		this.pool = weaklyReference ?
+			new WeakHashMap<T, WeakReference<T>>() :
+			new HashMap<T, WeakReference<T>>();
+	}
 
 	public T getPooledInstance( final T object ) {
 		queries++;
