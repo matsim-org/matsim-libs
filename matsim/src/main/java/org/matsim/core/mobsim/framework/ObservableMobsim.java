@@ -31,6 +31,4 @@ public interface ObservableMobsim extends Mobsim {
 
   public void addQueueSimulationListeners(final MobsimListener listener);
 
-  MobsimTimer getSimTimer();
-
 }

@@ -19,17 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework;
 
-/**
- * Interface to make a simulation work together with
- * simulation events and a Control(l)er
- * <p/>
- * Comments:<ul>
- * <li> The Mobsim interface exists twice.  This one should be renamed e.g. "RunnableMobsim", but I don't want to combine this
- * with the set of changes that I am currently working on. 
- * </ul>
- *
- * @author dgrether
- */
 public interface Mobsim {
 
   /**

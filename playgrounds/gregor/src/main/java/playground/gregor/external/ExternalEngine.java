@@ -31,6 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.External2QAdapterLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import playground.gregor.proto.ProtoMATSimInterface.*;
@@ -51,9 +52,9 @@ public class ExternalEngine implements MobsimEngine {
 	private final Map<Id<Person>, QVehicle> vehicles = new HashMap<>();
 	private final Map<Id<Link>, External2QAdapterLink> adapters = new HashMap<>();
 	private final EventsManager em;
-	private final ObservableMobsim sim;
+	private final Netsim sim;
 
-	public ExternalEngine(EventsManager eventsManager, ObservableMobsim sim,RpcController rpcCtr,BlockingInterface clientService, CyclicBarrier simStepBarrier) {
+	public ExternalEngine(EventsManager eventsManager, Netsim sim,RpcController rpcCtr,BlockingInterface clientService, CyclicBarrier simStepBarrier) {
 		this.em = eventsManager;
 		this.sim = sim;
 		this.rpcCtr = rpcCtr;
@@ -169,7 +170,7 @@ public class ExternalEngine implements MobsimEngine {
 		return this.em;
 	}
 
-	public ObservableMobsim getMobsim() {
+	public Netsim getMobsim() {
 		return this.sim;
 	}
 

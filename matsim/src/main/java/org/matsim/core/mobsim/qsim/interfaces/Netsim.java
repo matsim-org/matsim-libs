@@ -25,17 +25,15 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 
-
-/**Mobsim could, at least in theory, also operate without a network (e.g. based on activities with
- * coordinates).  Netsim has a NetsimNetwork.
- * 
- * @author nagel
- */
 public interface Netsim extends ObservableMobsim {
 
 	NetsimNetwork getNetsimNetwork();
 
 	EventsManager getEventsManager();
 
-	AgentCounterI getAgentCounter();Scenario getScenario();MobsimTimer getSimTimer();
+	AgentCounterI getAgentCounter();
+
+	Scenario getScenario();
+
+	MobsimTimer getSimTimer();
 }
