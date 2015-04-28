@@ -11,6 +11,10 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -113,6 +117,43 @@ public class NetConverter {
 			reader.close();
 			
 		} catch(IOException e){
+			
+		}
+		
+		ShapeFileWriter.writeGeometries(features, outputFile);
+		
+	}
+	
+	public void plans2Shape(Population population, String outputFile){
+	
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setName("shape");
+		typeBuilder.add("geometry", Point.class);
+		typeBuilder.add("id", String.class);
+		typeBuilder.add("actType", String.class);
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
+		
+		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		for(Person person : population.getPersons().values()){
+			
+			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
+				
+				if(pe instanceof Activity){
+					
+					Activity act = (Activity)pe;
+					Coord coord = act.getCoord();
+					
+					SimpleFeature feature = builder.buildFeature(null, new Object[]{
+							new GeometryFactory().createPoint(new Coordinate(coord.getX(), coord.getY())),
+							person.getId().toString(),
+							act.getType()
+						});
+						features.add(feature);
+					
+				}
+				
+			}
 			
 		}
 		

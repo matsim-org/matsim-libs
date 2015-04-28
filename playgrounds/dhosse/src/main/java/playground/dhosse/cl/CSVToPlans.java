@@ -2,8 +2,12 @@ package playground.dhosse.cl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -17,18 +21,32 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 public class CSVToPlans {
 	
-	private final String filename;
+	private final String shapefile;
+	private final String ouputPlansFile;
+	
+	private Scenario scenario;
+	private String comunasFile;
 	
 	private final int idxPersonId = 1;
+	private final int idxComunaOrigen = 4;
+	private final int idxComunaDestino = 5;
 	private final int idxOriginX = 10;
 	private final int idxOriginY = 11;
 	private final int idxDestinationX = 12;
@@ -55,24 +73,14 @@ public class CSVToPlans {
 	 * 13 recreacion = Erholung
 	 * 14 otra actividados = andere...
 	 */
-	//actividad destino
-	//work
-	private final int actTypeIndustria = 1;
-	private final int actTypeComercio = 2;
-	private final int actTypeSalud = 3;
-	private final int actTypeServicios = 5;
-	private final int actTypeSectorPublico = 7;
-	//education
-	private final int actTypeEducacion = 4;
-	//home
-	private final int actTypeHabitacional = 6;
-	//other
-	private final int actTypeOther = 8;
 	
-	//modo
+	//modes
+	//network modes
 	//car
 	private final int modeAutoChofer = 1; //Auto als Fahrer
 	private final int modeAutoAcompanante = 17; //Auto Beifahrer
+	
+	//teleported modes
 	//walk
 	private final int modeEntramenteAPie = 8; //Fuß
 	//pt
@@ -90,28 +98,78 @@ public class CSVToPlans {
 	private final int modeTaxiORadioTaxi = 7; //Taxi oder Ruftaxi
 	//bike
 	private final int modeBicicleta = 9; //Fahrrad
-	//ride
+	//motorcycle
 	private final int modeMotocicleta = 10; //Motorrad
-	private final int modeServicioInformal = 15; //
 	private final int modeMotocicletaAcompanante = 18; //Motorrad Beifahrer
+	//other
+	private final int modeServicioInformal = 15; //
 	
 
-	public CSVToPlans(String filename){
+	public CSVToPlans(String outputFile){
 		
-		this.filename = filename;
+		this.shapefile = null;
+		this.ouputPlansFile = outputFile;
 		
 	}
 	
-	public void run(String outputFile){
+	public CSVToPlans(String outputFile, String shapefileName){
 		
-		BufferedReader reader = IOUtils.getBufferedReader(this.filename);
+		this.shapefile = shapefileName;
+		this.ouputPlansFile = outputFile;
 		
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		//Network
+	}
+	
+	public void run(String travelDataFilename,String comunasFile){
+		
+		Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(this.shapefile);
+		Map<String, Geometry> geometries = new HashMap<String, Geometry>();
+		
+		for(SimpleFeature feature : features){
+			
+			geometries.put((String) feature.getAttribute("NAME"),(Geometry) feature.getDefaultGeometry());
+			
+		}
+		
+		BufferedReader r = IOUtils.getBufferedReader(comunasFile);
+		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:32719");
+		
+		Map<Integer,Geometry> comunaId2Geometry = new HashMap<Integer, Geometry>();
+		
+		try{
+			
+			String line = r.readLine();
+			
+			while((line = r.readLine()) != null){
+				
+				String[] splittedLine = line.split(";");
+				int id = Integer.parseInt(splittedLine[0]);
+				String name = splittedLine[1];
+				
+				for(String s : geometries.keySet()){
+					if(s.equalsIgnoreCase(name)){
+						comunaId2Geometry.put(id, geometries.get(s));
+					}
+				}
+				
+			}
+			
+		} catch(IOException e){
+			
+			e.printStackTrace();
+			
+		}
+		
+		if(this.scenario == null){
+			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		}
+
 		Population population = scenario.getPopulation();
 		PopulationFactoryImpl popFactory = (PopulationFactoryImpl) population.getFactory();
 		
 		Map<Id<Person>, Person> personsMap = new TreeMap<Id<Person>, Person>();
+		
+		BufferedReader reader = IOUtils.getBufferedReader(travelDataFilename);
 		
 		try {
 			
@@ -128,18 +186,79 @@ public class CSVToPlans {
 					Person person = popFactory.createPerson(personId);
 					Plan plan = popFactory.createPlan();
 					
-					Coord coord = new CoordImpl(splittedLine[this.idxOriginX], splittedLine[this.idxOriginY]);
+					String xOrigin = splittedLine[this.idxOriginX];
+					String yOrigin = splittedLine[this.idxOriginY];
+					
+					Coord coord = null;
+					if(xOrigin.equals("")||yOrigin.equals("")){
+						
+						String idString = splittedLine[this.idxComunaDestino];
+						
+						if(idString.equals("")) continue;
+						
+						int id = Integer.parseInt(idString);
+						
+						Geometry comuna = comunaId2Geometry.get(id);
+						
+						if(comuna == null){
+							continue;
+						}
+						
+						Coord tempCoord = shoot(comuna);
+
+						coord = ct.transform(tempCoord);
+
+					} else{
+						
+						coord = new CoordImpl(splittedLine[this.idxOriginX], splittedLine[this.idxOriginY]);
+						
+					}
+					
 					Activity act1 = popFactory.createActivityFromCoord("h", coord);
 					
 					double endTime = Time.parseTime(splittedLine[this.idxStartTime]);
 					act1.setEndTime(endTime);
 					
-					Coord coord2 = new CoordImpl(splittedLine[this.idxDestinationX], splittedLine[this.idxDestinationY]);
+					String xDest = splittedLine[this.idxDestinationX];
+					String yDest = splittedLine[this.idxDestinationY];
+					
+					Coord coord2 = null;
+					
+					if(xDest.equals("")||yDest.equals("")){
+						
+						String idString = splittedLine[this.idxComunaDestino];
+						
+						if(idString.equals("")) continue;
+						
+						int id = Integer.parseInt(idString);
+						
+						Geometry comuna = comunaId2Geometry.get(id);
+						
+						if(comuna == null){
+							continue;
+						}
+						
+						Coord tempCoord = shoot(comuna);
+
+						coord2 = ct.transform(tempCoord);
+						
+					} else{
+						
+						coord2 = new CoordImpl(splittedLine[this.idxDestinationX], splittedLine[this.idxDestinationY]);
+						
+					}
+					
 					String actTypeIdx = splittedLine[this.idxActType];
 					String actType = !actTypeIdx.equals("") ? this.getActType(Integer.parseInt(actTypeIdx)) : "o";
 					Activity act2 = popFactory.createActivityFromCoord(actType, coord2);
 					
-					double startTimeAct2 = Time.parseTime(splittedLine[this.idxEndTime]);
+					String startTimeString = splittedLine[this.idxEndTime];
+					double startTimeAct2 = 0.;
+					if(startTimeString.equals("")){
+						startTimeAct2 = act1.getEndTime();
+					} else{
+						startTimeAct2 = Time.parseTime(startTimeString);
+					}
 					act2.setStartTime(startTimeAct2);
 					
 					Set<Leg> legs = new HashSet<Leg>();
@@ -185,10 +304,41 @@ public class CSVToPlans {
 					
 					Activity lastActivity = (Activity) selectedPlan.getPlanElements().get(selectedPlan.getPlanElements().size()-1);
 					
-					double endTime = Time.parseTime(splittedLine[this.idxStartTime]);
+					String endTimeString = splittedLine[this.idxStartTime];
+					double endTime = 0.;
+					if(endTimeString.equals("")){
+						endTime = Time.parseTime(splittedLine[this.idxEndTime]);
+					}else{
+						endTime = Time.parseTime(endTimeString);
+					}
 					lastActivity.setEndTime(endTime);
 					
-					Coord coord = new CoordImpl(splittedLine[this.idxDestinationX], splittedLine[this.idxDestinationY]);
+					String xDest = splittedLine[this.idxDestinationX];
+					String yDest = splittedLine[this.idxDestinationY];
+					
+					Coord coord = null;
+					
+					if(xDest.equals("")||yDest.equals("")){
+						
+						int id = Integer.parseInt(splittedLine[this.idxComunaDestino]);
+						
+						Geometry comuna = comunaId2Geometry.get(id);
+						
+						if(comuna == null){
+							continue;
+						}
+						
+						Coord tempCoord = shoot(comuna);
+
+						coord = ct.transform(tempCoord);
+
+						
+					} else{
+					
+						coord = new CoordImpl(splittedLine[this.idxDestinationX], splittedLine[this.idxDestinationY]);
+						
+					}
+					
 					String actTypeIdx = splittedLine[this.idxActType];
 					String actType = !actTypeIdx.equals("") ? this.getActType(Integer.parseInt(actTypeIdx)) : "o";
 					Activity act2 = popFactory.createActivityFromCoord(actType, coord);
@@ -232,7 +382,11 @@ public class CSVToPlans {
 			population.addPerson(person);
 		}
 		
-		new PopulationWriter(population).write(outputFile);
+	}
+	
+	public void finalize(){
+		
+		new PopulationWriter(this.scenario.getPopulation()).write(this.ouputPlansFile);
 		
 	}
 	
@@ -277,10 +431,27 @@ public class CSVToPlans {
 			case 7: return "taxi";
 			case 9: return TransportMode.bike;
 			case 10:
+			case 18: return "motorcycle";
 			case 15:
-			case 18: return TransportMode.ride;
-			default: return null;
+			default: return TransportMode.other;
 		}
+		
+	}
+	
+	private Coord shoot(Geometry comuna){
+		
+		Random random = MatsimRandom.getRandom();
+	
+  	   com.vividsolutions.jts.geom.Point p;
+  	   double x, y;
+  	   do {
+  	      x = comuna.getEnvelopeInternal().getMinX() + random.nextDouble() * (comuna.getEnvelopeInternal().getMaxX() - comuna.getEnvelopeInternal().getMinX());
+  	      y = comuna.getEnvelopeInternal().getMinY() + random.nextDouble() * (comuna.getEnvelopeInternal().getMaxY() - comuna.getEnvelopeInternal().getMinY());
+  	      p = MGC.xy2Point(x, y);
+  	   } while (!comuna.contains(p));
+  	   Coord coord = new CoordImpl(p.getX(), p.getY());
+		
+		return coord;
 		
 	}
 	
