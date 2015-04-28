@@ -19,11 +19,13 @@
  * *********************************************************************** */
 package playground.vsp.randomizedtransitrouter;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -64,17 +66,28 @@ public class RunOTFVisDebugRandomizedTransitRouterTravelTimeAndDisutility {
 		ctrl.addOverridingModule(new RandomizedTransitRouterModule());
 		
 		if (doVisualization){
-		ctrl.setMobsimFactory(new MobsimFactory(){
+			ctrl.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new MobsimFactory() {
 
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				QSim qSim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
-				
-				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
-				OTFClientLive.run(sc.getConfig(), server);
-				
-				return qSim ;
-			}}) ;
+								@Override
+								public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+									final QSim qSim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
+
+									final OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
+									OTFClientLive.run(sc.getConfig(), server);
+
+									return qSim;
+								}
+							}.createMobsim(ctrl.getScenario(), ctrl.getEvents());
+						}
+					});
+				}
+			});
 		}
 		ctrl.run() ;
 		

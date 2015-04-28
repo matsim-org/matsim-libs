@@ -1,5 +1,6 @@
 package org.matsim.contrib.pseudosimulation;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -9,11 +10,13 @@ import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
@@ -70,7 +73,17 @@ public ChoiceGenerationControler(String[] args) {
     reader.parse(args[1]);
 
     pSimFactory = new PSimFactory();
-    controler.setMobsimFactory(pSimFactory);
+    controler.addOverridingModule(new AbstractModule() {
+        @Override
+        public void install() {
+            bindMobsim().toProvider(new Provider<Mobsim>() {
+                @Override
+                public Mobsim get() {
+                    return pSimFactory.createMobsim(controler.getScenario(), controler.getEvents());
+                }
+            });
+        }
+    });
     controler.addControlerListener(this);
 }
     public void run(){

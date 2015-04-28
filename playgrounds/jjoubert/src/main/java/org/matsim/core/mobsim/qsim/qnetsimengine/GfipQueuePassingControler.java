@@ -19,6 +19,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,12 +41,14 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
@@ -86,7 +89,7 @@ public class GfipQueuePassingControler {
 //		buildTriLegScenario(outputDirectory);
 
 		/* Set up the specific queue type. */
-		QueueType queueType = QueueType.valueOf(args[1]);
+		final QueueType queueType = QueueType.valueOf(args[1]);
 
 		Config config = getDefaultConfig(outputDirectory, queueType);
 		config.parallelEventHandling().setNumberOfThreads(1);
@@ -98,10 +101,20 @@ public class GfipQueuePassingControler {
 		
 		// ---
 
-		Controler controler = new Controler(sc) ;
-		
-		controler.setMobsimFactory(new GfipQueuePassingQSimFactory(queueType));
-		
+		final Controler controler = new Controler(sc) ;
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new GfipQueuePassingQSimFactory(queueType).createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
+
 		LinkCounter linkCounter = new LinkCounter(sc, queueType);
 		controler.getEvents().addHandler(linkCounter);
 		controler.addControlerListener(linkCounter);

@@ -20,6 +20,7 @@
 
 package playground.christoph.evacuation.controler;
 
+import com.google.inject.Provider;
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,11 +32,13 @@ import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
@@ -482,9 +485,19 @@ public class EvacuationControler extends WithinDayController implements
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household and adds the replanning Manager as mobsim engine.
 		 */
-		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.getWithinDayEngine(), this.householdObjectAttributes, 
+		final MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.getWithinDayEngine(), this.householdObjectAttributes,
 				this.jointDepartureOrganizer, travelTimes);
-		this.setMobsimFactory(mobsimFactory);
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return mobsimFactory.createMobsim(getScenario(), getEvents());
+					}
+				});
+			}
+		});
 		
 		/*
 		 * Create the set of analyzed modes.

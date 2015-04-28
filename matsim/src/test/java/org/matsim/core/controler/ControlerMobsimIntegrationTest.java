@@ -19,6 +19,7 @@
 
 package org.matsim.core.controler;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -44,10 +45,22 @@ public class ControlerMobsimIntegrationTest {
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("counting");
 		cfg.controler().setWritePlansInterval(0);
-		Controler c = new Controler(cfg);
-		CountingMobsimFactory mf = new CountingMobsimFactory();
-		c.addMobsimFactory("counting", mf);
-        c.getConfig().controler().setCreateGraphs(false);
+		final Controler c = new Controler(cfg);
+		final CountingMobsimFactory mf = new CountingMobsimFactory();
+		c.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals("counting")) {
+					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return mf.createMobsim(c.getScenario(), c.getEvents());
+						}
+					});
+				}
+			}
+		});
+		c.getConfig().controler().setCreateGraphs(false);
         c.setDumpDataAtEnd(false);
 		c.getConfig().controler().setWriteEventsInterval(0);
 		c.run();

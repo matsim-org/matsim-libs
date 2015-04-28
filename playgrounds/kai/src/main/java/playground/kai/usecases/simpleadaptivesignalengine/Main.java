@@ -20,10 +20,12 @@
 
 package playground.kai.usecases.simpleadaptivesignalengine;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -39,7 +41,7 @@ public class Main {
 	public static void main(String[] args) {
 		final boolean useOTFVis = false ;
 		
-		Controler controler = new Controler( "examples/config/daganzo-config.xml" ) ;
+		final Controler controler = new Controler( "examples/config/daganzo-config.xml" ) ;
 
 		final SimpleAdaptiveSignal simpleAdaptiveSignalEngine = new SimpleAdaptiveSignal(controler) ;
 
@@ -59,7 +61,17 @@ public class Main {
 		} ;
 		
 		controler.setOverwriteFiles(true) ;
-		controler.setMobsimFactory(mobsimFactory) ;
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return mobsimFactory.createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
 		if ( useOTFVis ) {
 			ConfigUtils.addOrGetModule(controler.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setColoringScheme( ColoringScheme.byId ) ;
 		}

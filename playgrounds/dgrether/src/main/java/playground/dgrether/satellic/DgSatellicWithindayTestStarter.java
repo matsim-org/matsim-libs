@@ -21,13 +21,16 @@ package playground.dgrether.satellic;
 
 import java.util.Arrays;
 
+import com.google.inject.Provider;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 
+import org.matsim.core.mobsim.framework.Mobsim;
 import playground.dgrether.DgOTFVisConfigWriter;
 import playground.dgrether.DgPaths;
 
@@ -48,14 +51,18 @@ public class DgSatellicWithindayTestStarter {
 		config.qsim().setSnapshotStyle("queue");
 		
 		
-		Controler controler = new Controler(config);
+		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		
-		controler.addControlerListener(new BeforeMobsimListener() {
-			
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-				event.getControler().setMobsimFactory(new DgWithindayMobsimFactory());
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new DgWithindayMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
 			}
 		});
 		

@@ -20,6 +20,7 @@
 
 package org.matsim.core.controler;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -212,7 +213,17 @@ public class ControlerTest {
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
 
-		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -276,7 +287,17 @@ public class ControlerTest {
 		Controler controler = new Controler(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
@@ -358,7 +379,17 @@ public class ControlerTest {
 		Controler controler = new Controler(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 		/* if something goes wrong, there will be an exception we don't catch and the test fails,
@@ -400,7 +431,17 @@ public class ControlerTest {
 		controler.getConfig().controler().setWriteEventsInterval(3);
 		assertEquals(3, controler.getConfig().controler().getWriteEventsInterval());
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -430,7 +471,17 @@ public class ControlerTest {
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
 				3 == controler.getConfig().controler().getWriteEventsInterval());
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 		assertEquals(4, controler.getConfig().controler().getWriteEventsInterval());
@@ -463,7 +514,17 @@ public class ControlerTest {
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		assertEquals(0, controler.getConfig().controler().getWriteEventsInterval());
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -486,7 +547,17 @@ public class ControlerTest {
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -508,7 +579,17 @@ public class ControlerTest {
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -530,7 +611,17 @@ public class ControlerTest {
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -552,7 +643,17 @@ public class ControlerTest {
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
@@ -572,7 +673,17 @@ public class ControlerTest {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(0);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 
 		controler.setDumpDataAtEnd(true);
 		controler.run();
@@ -592,31 +703,23 @@ public class ControlerTest {
 		final Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(0);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setMobsimFactory(new FakeMobsimFactory());
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new FakeMobsim();
+					}
+				});
+			}
+		});
 
 		controler.setDumpDataAtEnd(false);
 		controler.run();
 
+
 		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
-	public void testSetMobsimFactory() {
-		final Config config = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(1);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
-
-		final Controler controler = new Controler(config);
-		FakeMobsimFactory testFactory = new FakeMobsimFactory();
-		controler.setMobsimFactory(testFactory);
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
-		controler.run();
-		assertEquals(2, testFactory.counter);
 	}
 
 	/**
@@ -644,9 +747,19 @@ public class ControlerTest {
 			config.controler().setLastIteration(1);
 
 			controler = new Controler(config);
-			CrashingMobsimFactory testFactory = new CrashingMobsimFactory();
-			controler.setMobsimFactory(testFactory);
-            controler.getConfig().controler().setCreateGraphs(false);
+			final CrashingMobsimFactory testFactory = new CrashingMobsimFactory();
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return testFactory.createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			});
+			controler.getConfig().controler().setCreateGraphs(false);
             controler.setDumpDataAtEnd(false);
 			controler.run();
 		}
@@ -662,7 +775,17 @@ public class ControlerTest {
 
 		try {
 			Controler controler = new Controler(config);
-			controler.setMobsimFactory(new FakeMobsimFactory());
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new FakeMobsim();
+						}
+					});
+				}
+			});
 			controler.getConfig().controler().setCreateGraphs(false);
 			controler.setDumpDataAtEnd(false);
 			controler.run();
@@ -687,8 +810,18 @@ public class ControlerTest {
 		config.network().setInputFile("dummy/non-existing/network.xml");
 
 		final Controler controler = new Controler(config);
-		controler.setMobsimFactory(new FakeMobsimFactory());
-        controler.getConfig().controler().setCreateGraphs(false);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new FakeMobsim();
+						}
+					});
+				}
+			});
+			controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
 			controler.run();
 			Assert.fail("expected exception, got none.");
@@ -712,8 +845,18 @@ public class ControlerTest {
 		config.facilities().setInputFile("dummy/non-existing/network.xml");
 
 		final Controler controler = new Controler(config);
-		controler.setMobsimFactory(new FakeMobsimFactory());
-        controler.getConfig().controler().setCreateGraphs(false);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new FakeMobsim();
+						}
+					});
+				}
+			});
+			controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
 			controler.run();
 			Assert.fail("expected exception, got none.");
@@ -790,15 +933,6 @@ public class ControlerTest {
 		@Override
 		public void run() {
 			// nothing to do
-		}
-	}
-
-	/*package*/ static class FakeMobsimFactory implements MobsimFactory {
-		/*package*/ int counter = 0;
-		@Override
-		public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-			this.counter++;
-			return new FakeMobsim();
 		}
 	}
 

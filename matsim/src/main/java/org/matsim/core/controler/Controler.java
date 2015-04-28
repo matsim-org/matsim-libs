@@ -538,34 +538,6 @@ public class Controler extends AbstractController {
 		});
 	}
 
-	public final void setMobsimFactory(final Provider<Mobsim> mobsimProvider) {
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Mobsim.class).toProvider(mobsimProvider);
-			}
-		});
-	}
-
-	public final void setMobsimFactory(final Class<? extends Provider<Mobsim>> mobsimProvider) {
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Mobsim.class).toProvider(mobsimProvider);
-			}
-		});
-	}
-
-	@Deprecated // use other version of this method, please
-	public final void setMobsimFactory(final MobsimFactory mobsimFactory) {
-		setMobsimFactory(new Provider<Mobsim>() {
-			@Override
-			public Mobsim get() {
-				return mobsimFactory.createMobsim(getScenario(), getEvents());
-			}
-		});
-	}
-
 	public final void setScoringFunctionFactory(
 			final ScoringFunctionFactory scoringFunctionFactory) {
         this.addOverridingModule(new AbstractModule() {
@@ -668,32 +640,6 @@ public class Controler extends AbstractController {
         }
         this.modules = Arrays.asList(modules);
     }
-
-	/**
-	 * Register a {@link MobsimFactory} with a given name.
-	 *
-	 *
-	 * @see ControlerConfigGroup#getMobsim()
-	 */
-	public final void addMobsimFactory(final String mobsimName, final Provider<Mobsim> mobsimProvider) {
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				if (getConfig().controler().getMobsim().equals(mobsimName)) {
-					bind(Mobsim.class).toProvider(mobsimProvider);
-				}
-			}
-		});
-	}
-	@Deprecated // use provider version
-	public final void addMobsimFactory(final String mobsimName, final MobsimFactory mobsimFactory) {
-		addMobsimFactory(mobsimName, new Provider<Mobsim>() {
-			@Override
-			public Mobsim get() {
-				return mobsimFactory.createMobsim(getScenario(), getEvents());
-			}
-		});
-	}
 
 	public final void addSnapshotWriterFactory(final String snapshotWriterName, final SnapshotWriterFactory snapshotWriterFactory) {
 		this.snapshotWriterRegister.register(snapshotWriterName, snapshotWriterFactory);

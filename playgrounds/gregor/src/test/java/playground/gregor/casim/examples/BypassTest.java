@@ -22,6 +22,7 @@ package playground.gregor.casim.examples;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.inject.Provider;
 import org.jfree.util.Log;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -41,7 +42,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.AStarLandmarksFactory;
@@ -127,16 +130,28 @@ public class BypassTest extends MatsimTestCase {
 
 		createPopulation(sc);
 
-		Controler controller = new Controler(sc);
+		final Controler controller = new Controler(sc);
 
 		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
 		CATripRouterFactory tripRouter = new CATripRouterFactory(sc, cost);
 
 		controller.setTripRouterFactory(tripRouter);
 
-		CAMobsimFactory factory = new CAMobsimFactory();
+		final CAMobsimFactory factory = new CAMobsimFactory();
 		factory.setCANetworkFactory(new CASingleLaneNetworkFactory());
-		controller.addMobsimFactory("casim", factory);
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals("casim")) {
+					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return factory.createMobsim(controller.getScenario(), controller.getEvents());
+						}
+					});
+				}
+			}
+		});
 
 		// AbstractCANetwork.EMIT_VIS_EVENTS = true;
 		//

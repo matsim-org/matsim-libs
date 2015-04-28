@@ -20,16 +20,19 @@
 
 package playground.sergioo.passivePlanning2012.run;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
@@ -80,11 +83,21 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 		}
 	}
 	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
+	public void notifyIterationStarts(final IterationStartsEvent event) {
 		if(event.getIteration() == 0) {
-			PassivePlannerManager passivePlannerManager = new PassivePlannerManager(event.getControler().getConfig().global().getNumberOfThreads()-event.getControler().getConfig().qsim().getNumberOfThreads());
+			final PassivePlannerManager passivePlannerManager = new PassivePlannerManager(event.getControler().getConfig().global().getNumberOfThreads()-event.getControler().getConfig().qsim().getNumberOfThreads());
 			event.getControler().addControlerListener(passivePlannerManager);
-			event.getControler().setMobsimFactory(new PassivePlanningAgendaFactory(passivePlannerManager, event.getControler().getTripRouterProvider().get()));
+			event.getControler().addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new PassivePlanningAgendaFactory(passivePlannerManager, event.getControler().getTripRouterProvider().get()).createMobsim(event.getControler().getScenario(), event.getControler().getEvents());
+						}
+					});
+				}
+			});
 		}
 	}
 	//Main

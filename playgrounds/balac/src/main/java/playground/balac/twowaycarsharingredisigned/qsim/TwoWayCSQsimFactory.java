@@ -37,12 +37,16 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 	private final Controler controler;
 	private final ArrayList<TwoWayCSStation> twvehiclesLocation;
 
-	public TwoWayCSQsimFactory(final Scenario scenario, final Controler controler) throws IOException {
+	public TwoWayCSQsimFactory(final Scenario scenario, final Controler controler) {
 		
 		this.scenario = scenario;
 		this.controler = controler;
 		this.twvehiclesLocation = new ArrayList<TwoWayCSStation>();
-		readVehicleLocations();
+		try {
+			readVehicleLocations();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	public void readVehicleLocations() throws IOException {
 		

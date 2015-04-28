@@ -19,14 +19,15 @@
  * *********************************************************************** */
 package playground.vsptelematics.ha2;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -35,23 +36,33 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+
 /**
  * @author dgrether
  * 
  */
-public class GuidanceMobsimFactory implements MobsimFactory, ShutdownListener {
+@Singleton
+public class GuidanceMobsimFactory implements Provider<Mobsim>, ShutdownListener {
 
 	private double equipmentFraction;
 	private Guidance guidance = null;
 	private String type;
 	private String outfile;
 	private GuidanceRouteTTObserver ttObserver;
+	private Scenario scenario;
+	private EventsManager eventsManager;
 
-	public GuidanceMobsimFactory(String type, double equipmentFraction, String outfile, GuidanceRouteTTObserver ttObserver) {
-		this.equipmentFraction = equipmentFraction;
-		this.type = type;
-		this.outfile = outfile;
+	@Inject
+	GuidanceMobsimFactory(GuidanceRouteTTObserver ttObserver, Scenario scenario, EventsManager eventsManager, OutputDirectoryHierarchy outputDirectoryHierarchy) {
+		this.equipmentFraction = Double.parseDouble(scenario.getConfig().getParam("telematics", "equipmentRate"));
+		this.type = scenario.getConfig().getParam("telematics", "infotype");
+		this.outfile = outputDirectoryHierarchy.getOutputFilename("guidance.txt");
 		this.ttObserver = ttObserver;
+		this.scenario = scenario;
+		this.eventsManager = eventsManager;
 	}
 	
 	private void initGuidance(Network network){
@@ -66,8 +77,7 @@ public class GuidanceMobsimFactory implements MobsimFactory, ShutdownListener {
 		}
 	}
 
-	@Override
-	public Mobsim createMobsim(Scenario scenario, EventsManager eventsManager) {
+	Mobsim createMobsim(Scenario scenario, EventsManager eventsManager) {
 		QSimConfigGroup conf = scenario.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException(
@@ -101,4 +111,8 @@ public class GuidanceMobsimFactory implements MobsimFactory, ShutdownListener {
 		this.guidance.notifyShutdown();
 	}
 
+	@Override
+	public Mobsim get() {
+		return createMobsim(scenario, eventsManager);
+	}
 }

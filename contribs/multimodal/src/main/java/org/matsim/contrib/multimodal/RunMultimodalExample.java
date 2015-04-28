@@ -27,6 +27,7 @@ import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.router.TripRouterFactory;
@@ -64,9 +65,14 @@ public class RunMultimodalExample {
 		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(controler.getScenario(), multiModalTravelTimes,
                 ControlerDefaults.createDefaultTravelDisutilityFactory(scenario), defaultDelegateFactory, new FastDijkstraFactory());
 
-		MultimodalQSimFactory qSimFactory = new MultimodalQSimFactory(scenario, controler.getEvents(), multiModalTravelTimes);
+		final MultimodalQSimFactory qSimFactory = new MultimodalQSimFactory(scenario, controler.getEvents(), multiModalTravelTimes);
 		controler.setTripRouterFactory(multiModalTripRouterFactory);
-		controler.setMobsimFactory(qSimFactory);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(qSimFactory);
+			}
+		});
 
 		controler.run();
 	}

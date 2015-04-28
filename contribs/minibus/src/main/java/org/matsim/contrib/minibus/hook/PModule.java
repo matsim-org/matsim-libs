@@ -22,11 +22,14 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import com.google.inject.Provider;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.stats.PStatsModule;
 import org.matsim.contrib.minibus.stats.abtractPAnalysisModules.PtMode2LineSetter;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.TripRouterFactory;
 
 public class PModule {
@@ -48,11 +51,21 @@ public class PModule {
     public void setTripRouterFactory(Class<? extends TripRouterFactory> tripRouterFactory) {
         this.tripRouterFactory = tripRouterFactory;
     }
-    public void configureControler(Controler controler) {
+    public void configureControler(final Controler controler) {
         PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
         pConfig.validate();
         PBox pBox = new PBox(pConfig);
-        controler.setMobsimFactory(new PQSimFactory());
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindMobsim().toProvider(new Provider<Mobsim>() {
+                    @Override
+                    public Mobsim get() {
+                        return new PQSimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+                    }
+                });
+            }
+        });
 
         if (pTransitRouterFactory == null) {
             pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler(), pConfig.getPtRouter(), pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);

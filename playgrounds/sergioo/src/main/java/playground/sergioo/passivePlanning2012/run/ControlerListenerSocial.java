@@ -20,16 +20,19 @@
 
 package playground.sergioo.passivePlanning2012.run;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
@@ -98,12 +101,22 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 		}
 	}
 	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
+	public void notifyIterationStarts(final IterationStartsEvent event) {
 		if(event.getIteration() == 0)
 			if(event.getControler().getConfig().scenario().isUseHouseholds()) {
-				PassivePlannerManager passivePlannerManager = new PassivePlannerManager(1);
+				final PassivePlannerManager passivePlannerManager = new PassivePlannerManager(1);
 				event.getControler().addControlerListener(passivePlannerManager);
-				event.getControler().setMobsimFactory(new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((ScenarioImpl) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterProvider().get()));
+				event.getControler().addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						bindMobsim().toProvider(new Provider<Mobsim>() {
+							@Override
+							public Mobsim get() {
+								return new PassivePlanningSocialFactory(passivePlannerManager, new PersonHouseholdMapping(((ScenarioImpl) event.getControler().getScenario()).getHouseholds()), event.getControler().getTripRouterProvider().get()).createMobsim(event.getControler().getScenario(), event.getControler().getEvents());
+							}
+						});
+					}
+				});
 			}
 			else
 				log.error("Households information is neccesary for passive planning with social");

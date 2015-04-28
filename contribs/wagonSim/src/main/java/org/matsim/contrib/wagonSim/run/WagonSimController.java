@@ -25,6 +25,7 @@ package org.matsim.contrib.wagonSim.run;
 import java.io.IOException;
 import java.util.Map;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.wagonSim.Utils;
@@ -34,8 +35,10 @@ import org.matsim.contrib.wagonSim.mobsim.qsim.framework.listeners.WagonSimVehic
 import org.matsim.contrib.wagonSim.pt.router.WagonSimRouterFactoryImpl;
 import org.matsim.contrib.wagonSim.pt.router.WagonSimTripRouterFactoryImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -57,11 +60,21 @@ public class WagonSimController extends Controler {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public WagonSimController(Scenario scenario,ObjectAttributes vehicleLinkSpeedAttributes, Map<Id<TransitStopFacility>, Double> minShuntingTimes) {
+	public WagonSimController(Scenario scenario, final ObjectAttributes vehicleLinkSpeedAttributes, Map<Id<TransitStopFacility>, Double> minShuntingTimes) {
 		super(scenario);
 		
-		WagonSimVehicleLoadListener listener = new WagonSimVehicleLoadListener(scenario.getPopulation().getPersonAttributes());
-		this.setMobsimFactory(new WagonSimQSimFactory(vehicleLinkSpeedAttributes, listener));
+		final WagonSimVehicleLoadListener listener = new WagonSimVehicleLoadListener(scenario.getPopulation().getPersonAttributes());
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new WagonSimQSimFactory(vehicleLinkSpeedAttributes, listener).createMobsim(getScenario(), getEvents());
+					}
+				});
+			}
+		});
 		this.addControlerListener(listener);
 		TransitRouterFactory routerFactory = 
 				new WagonSimRouterFactoryImpl(

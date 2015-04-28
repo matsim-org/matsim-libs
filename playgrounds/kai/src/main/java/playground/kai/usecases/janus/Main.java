@@ -18,12 +18,14 @@
  * *********************************************************************** */
 package playground.kai.usecases.janus;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.janusproject.kernel.agent.Kernels;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -57,31 +59,41 @@ public class Main {
 		final Controler ctrl = new Controler(scenario) ;
 		ctrl.setOverwriteFiles(true);
 
-		ctrl.setMobsimFactory(new MobsimFactory(){
+		ctrl.addOverridingModule(new AbstractModule() {
 			@Override
-			public Mobsim createMobsim(final Scenario sc, EventsManager eventsManager) {
-				final QSim qsim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
-				
-				qsim.addAgentSource(new AgentSource(){
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
 					@Override
-					public void insertAgentsIntoMobsim() {
-						Logger.getLogger(this.getClass()).warn("here");
-						
-						final MobsimDriverAgent ag = new MyMobsimAgent(sc.getNetwork()) ;
+					public Mobsim get() {
+						return new MobsimFactory() {
+							@Override
+							public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+								final QSim qsim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
 
-						// insert vehicle:
-						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(ag.getPlannedVehicleId(), VehicleUtils.getDefaultVehicleType() );
-						qsim.createAndParkVehicleOnLink(vehicle, ag.getCurrentLinkId());
+								qsim.addAgentSource(new AgentSource() {
+									@Override
+									public void insertAgentsIntoMobsim() {
+										Logger.getLogger(this.getClass()).warn("here");
 
-						// insert traveler agent:
-						qsim.insertAgentIntoMobsim(ag) ;
+										final MobsimDriverAgent ag = new MyMobsimAgent(sc.getNetwork());
+
+										// insert vehicle:
+										final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(ag.getPlannedVehicleId(), VehicleUtils.getDefaultVehicleType());
+										qsim.createAndParkVehicleOnLink(vehicle, ag.getCurrentLinkId());
+
+										// insert traveler agent:
+										qsim.insertAgentIntoMobsim(ag);
+									}
+								});
+
+								return qsim;
+							}
+						}.createMobsim(ctrl.getScenario(), ctrl.getEvents());
 					}
-				}) ;
-
-				return qsim ;
+				});
 			}
-		}) ;
-		
+		});
+
 		ctrl.addControlerListener(new ShutdownListener(){
 			@Override
 			public void notifyShutdown(ShutdownEvent event) {

@@ -24,9 +24,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -100,10 +102,17 @@ public class Sim2DRunner implements IterationStartsListener{
 		
 //		controller.getEvents().addHandler(new SimSpeedObserver());
 
-		HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory(sc, controller.getEvents());
-		controller.addMobsimFactory("hybridQ2D", factory);
+		final HybridQ2DMobsimFactory factory = new HybridQ2DMobsimFactory(sc, controller.getEvents());
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals("hybridQ2D")) {
+					bind(Mobsim.class).toProvider(factory);
+				}
+			}
+		});
 
-		
+
 //		ShapeFileReader sr = new ShapeFileReader();
 //		sr.readFileAndInitialize("/Users/laemmel/devel/gct/analysis/measurement_areas.shp");
 //		

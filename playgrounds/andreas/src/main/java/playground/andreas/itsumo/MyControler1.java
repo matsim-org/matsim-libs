@@ -20,6 +20,7 @@
 
 package playground.andreas.itsumo;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,6 +32,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
@@ -372,18 +374,28 @@ public class MyControler1 extends Controler {
 		controler.setOverwriteFiles(true);
 		
 		final OutputDirectoryHierarchy controlerIO = controler.getControlerIO() ;
-		
-		controler.setMobsimFactory(new MobsimFactory(){
+
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				ItsumoSim sim = new ItsumoSim(sc, eventsManager);
-				sim.setControlerIO(controlerIO);
-				sim.setIteration(-1); // not directly available; if truly necessary, something else needs to be done (e.g. events handler). kai, feb'13
-				throw new RuntimeException("inserted this factory instead of overriding runMobSim above.  not tested, this aborting ...") ;
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new MobsimFactory() {
+							@Override
+							public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+								final ItsumoSim sim = new ItsumoSim(sc, eventsManager);
+								sim.setControlerIO(controlerIO);
+								sim.setIteration(-1); // not directly available; if truly necessary, something else needs to be done (e.g. events handler). kai, feb'13
+								throw new RuntimeException("inserted this factory instead of overriding runMobSim above.  not tested, this aborting ...");
 //				return sim ;
+							}
+						}.createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
 			}
-		}) ;
-		
+		});
+
 		controler.run();
 
 		controler.makeVis();

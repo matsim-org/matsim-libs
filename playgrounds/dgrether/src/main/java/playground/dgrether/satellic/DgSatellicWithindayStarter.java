@@ -19,30 +19,35 @@
  * *********************************************************************** */
 package playground.dgrether.satellic;
 
+import com.google.inject.Provider;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 
 /**
  * @author dgrether
- *
  */
 public class DgSatellicWithindayStarter {
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Controler controler = new Controler(args);
-		controler.addControlerListener(new BeforeMobsimListener() {
-			
-			@Override
-			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-				event.getControler().setMobsimFactory(new DgWithindayMobsimFactory());
-			}
-		});
-		controler.run();
-	}
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        final Controler controler = new Controler(args);
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindMobsim().toProvider(new Provider<Mobsim>() {
+                    @Override
+                    public Mobsim get() {
+                        return new DgWithindayMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+                    }
+                });
+            }
+        });
 
+        controler.run();
+
+    }
 }

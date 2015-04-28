@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
@@ -60,7 +61,7 @@ public class PassengerControlerHandler implements StartupListener {
 	}
 
 	@Override
-	public void notifyStartup(StartupEvent event) {
+	public void notifyStartup(final StartupEvent event) {
 		
 		JointDepartureOrganizer jointDepartureOrganizer = new JointDepartureOrganizer();
 		MissedJointDepartureWriter jointDepartureWriter = new MissedJointDepartureWriter(jointDepartureOrganizer);
@@ -88,9 +89,19 @@ public class PassengerControlerHandler implements StartupListener {
 		
 		this.withinDayControlerListener.getWithinDayEngine().addIntialReplannerFactory(replannerFactory);
 		
-		MobsimFactory mobsimFactory = new PassengerQSimFactory(this.multiModalTravelTimes.get(),
+		final MobsimFactory mobsimFactory = new PassengerQSimFactory(this.multiModalTravelTimes.get(),
 				this.withinDayControlerListener.getWithinDayEngine(), jointDepartureOrganizer);
-		event.getControler().setMobsimFactory(mobsimFactory);
+		event.getControler().addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new com.google.inject.Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return mobsimFactory.createMobsim(event.getControler().getScenario(), event.getControler().getEvents());
+					}
+				});
+			}
+		});
 	}
 
 	private static class PassengerQSimFactory implements MobsimFactory {

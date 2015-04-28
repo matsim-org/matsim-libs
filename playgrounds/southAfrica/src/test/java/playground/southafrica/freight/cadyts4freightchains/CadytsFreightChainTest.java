@@ -22,6 +22,7 @@ package playground.southafrica.freight.cadyts4freightchains;
 
 import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -45,6 +46,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -135,8 +137,18 @@ public class CadytsFreightChainTest {
 				return sum ; 
 			}
 		}) ;
-		
-		controler.setMobsimFactory( new DummyMobsimFactory() );
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new DummyMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
 
 		controler.run();
 

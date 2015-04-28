@@ -1,5 +1,6 @@
 package playground.dhosse.prt;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.router.LeastCostPathCalculatorWithCache;
@@ -11,7 +12,9 @@ import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
@@ -36,7 +39,7 @@ public class PrtModule {
 	private TravelDisutility tdis;
 	private VrpPathCalculator calculator;
 	
-	public void configureControler(Controler controler){
+	public void configureControler(final Controler controler){
 		
 		prtConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PrtConfigGroup.GROUP_NAME, PrtConfigGroup.class);
 		
@@ -83,8 +86,18 @@ public class PrtModule {
 		PrtTripRouterFactoryImpl factory = new PrtTripRouterFactoryImpl(context, ttime, tdis, prtData);
 		controler.setTripRouterFactory(factory);
 
-		controler.setMobsimFactory(new PrtQSimFactory(prtConfig, context, calculator, algorithmConfig));
-		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new PrtQSimFactory(prtConfig, context, calculator, algorithmConfig).createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
+
 		controler.addControlerListener(new PrtControllerListener(prtConfig, controler, context, prtData));
 		
 	}

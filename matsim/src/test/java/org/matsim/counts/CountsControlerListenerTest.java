@@ -19,6 +19,7 @@
 
 package org.matsim.counts;
 
+import com.google.inject.Provider;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,6 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.CountsConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -248,8 +250,20 @@ public class CountsControlerListenerTest {
 		cConfig.setOutputFormat("txt");
 		cConfig.setCountsFileName("test/scenarios/triangle/counts.xml"); // just any file to activate the counts feature
 		
-		Controler controler = new Controler(ScenarioUtils.createScenario(config));
-		controler.addMobsimFactory("dummy", new DummyMobsimFactory());
+		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals("dummy")) {
+					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new DummyMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			}
+		});
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);
@@ -282,8 +296,20 @@ public class CountsControlerListenerTest {
 		cConfig.setOutputFormat("txt");
 		cConfig.setCountsFileName("test/scenarios/triangle/counts.xml"); // just any file to activate the counts feature
 		
-		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.addMobsimFactory("dummy", new DummyMobsimFactory());
+		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals("dummy")) {
+					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new DummyMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			}
+		});
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);
@@ -323,58 +349,52 @@ public class CountsControlerListenerTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(3);
 
-		// create and run controler
-		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		controler.run();
+		createAndRunControler(config);
 		Assert.assertEquals(150, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
 		
 		// enable modes filtering and count only car
 		cConfig.setAnalyzedModes(TransportMode.car);
 		cConfig.setFilterModes(true);
-		controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.setOverwriteFiles(true);
-		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		controler.run();
+		createAndRunControler(config);
 		Assert.assertEquals(100, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
 
 		// enable modes filtering and count only walk
 		cConfig.setAnalyzedModes(TransportMode.walk);
 		cConfig.setFilterModes(true);
-		controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.setOverwriteFiles(true);
-		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		controler.run();
+		createAndRunControler(config);
 		Assert.assertEquals(50, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
 		
 		// enable modes filtering and count only bike
 		cConfig.setAnalyzedModes(TransportMode.bike);
 		cConfig.setFilterModes(true);
-		controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.setOverwriteFiles(true);
-		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		controler.run();
+		createAndRunControler(config);
 		Assert.assertEquals(0, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
 
 
 	}
-	
+
+	private void createAndRunControler(Config config) {
+		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals("dummy")) {
+					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new DummyMobsim2Factory().createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			}
+		});
+		controler.getConfig().controler().setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		controler.run();
+	}
+
 	private double getVolume(final String filename) throws IOException {
 		BufferedReader reader = IOUtils.getBufferedReader(filename);
 		reader.readLine(); // header

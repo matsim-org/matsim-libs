@@ -20,13 +20,16 @@
 
 package playground.telaviv.controler;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.core.mobsim.qsim.TTAQSimFactory;
@@ -48,8 +51,18 @@ public class TelAvivRunner {
         controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 
         // use an adapted MobsimFactory
-		controler.setMobsimFactory(new TTAQSimFactory());
-		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new TTAQSimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
+
 		controler.addControlerListener(new TelAvivControlerListener());
 		
 		/*

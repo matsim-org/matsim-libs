@@ -21,6 +21,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -28,7 +29,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory.QueueWithBufferType;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -127,7 +130,17 @@ public class EvacPatnaControler {
 		controler.setDumpDataAtEnd(true);
 
 		if(isUsingSeepage){
-			controler.setMobsimFactory(new SeepageMobsimfactory(QueueWithBufferType.amit));
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new SeepageMobsimfactory(QueueWithBufferType.amit).createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			});
 		}
 		
 		if(congestionPricing) {

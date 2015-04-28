@@ -22,6 +22,7 @@
  */
 package playground.johannes.gsv.sim;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -44,6 +45,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.DefaultMobsimModule;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -88,13 +90,23 @@ public class Simulator {
 	private static final Logger logger = Logger.getLogger(Simulator.class);
 	
 	public static void main(String[] args) throws IOException {
-		Controler controler = new Controler(args);
+		final Controler controler = new Controler(args);
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(false);
 		
 		boolean replanCandidates = Boolean.parseBoolean(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "replanCandidates"));
-		MobsimConnectorFactory mobSimFac = new MobsimConnectorFactory(replanCandidates);
-		controler.setMobsimFactory(mobSimFac);
+		final MobsimConnectorFactory mobSimFac = new MobsimConnectorFactory(replanCandidates);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return mobSimFac.createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
 		
 		/*
 		 * setup mutation module

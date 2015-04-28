@@ -27,17 +27,15 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.testcases.MatsimTestUtils;
@@ -131,15 +129,18 @@ public class InnovationSwitchOffTest {
 				System.err.flush();
 			}
 		}) ;
-		ctrl.setMobsimFactory(new MobsimFactory(){
+		ctrl.addOverridingModule(new AbstractModule() {
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				return new Mobsim(){
+			public void install() {
+				bindMobsim().toInstance(new Mobsim() {
 					@Override
 					public void run() {
-					}} ;
-			}}) ;
+					}
+				});
+			}
+		});
 		ctrl.run() ;
+
 		
 	}
 

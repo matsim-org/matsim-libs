@@ -248,7 +248,12 @@ public class PSimControler {
         this.matsimControler = new Controler(scenario);
         DistributedPlanStrategyTranslationAndRegistration.registerStrategiesWithControler(this.matsimControler, plancatcher, QuickReplanning, IterationsPerCycle);
         mobSimSwitcher = new MobSimSwitcher(IterationsPerCycle);
-        matsimControler.setMobsimFactory(SwitchingMobsimProvider.class);
+        matsimControler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindMobsim().toProvider(SwitchingMobsimProvider.class);
+            }
+        });
         matsimControler.addControlerListener(mobSimSwitcher);
         matsimControler.addOverridingModule(new AbstractModule() {
             @Override

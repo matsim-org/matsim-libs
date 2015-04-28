@@ -1,5 +1,6 @@
 package playground.mzilske.teach.tasks2012;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
@@ -8,6 +9,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -65,10 +67,20 @@ public class OwnMobsim {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
+		final Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
-		MobsimFactory mobsimFactory = new MyMobsimFactory();
-		controler.setMobsimFactory(mobsimFactory );
+		final MobsimFactory mobsimFactory = new MyMobsimFactory();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return mobsimFactory.createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
 		controler.run();
 		OTFVis.playMVI("output/movie.mvi");
 	}

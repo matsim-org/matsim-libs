@@ -19,6 +19,7 @@
 
 package org.matsim.core.controler.corelisteners;
 
+import com.google.inject.Provider;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,6 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -270,8 +272,20 @@ public class LinkStatsControlerListenerTest {
 		lsConfig.setWriteLinkStatsInterval(3);
 		lsConfig.setAverageLinkStatsOverIterations(1);
 		
-		Controler controler = new Controler(ScenarioUtils.createScenario(config));
-		controler.addMobsimFactory("dummy", new DummyMobsimFactory());
+		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals("dummy")) {
+					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new DummyMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			}
+		});
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);
@@ -308,8 +322,20 @@ public class LinkStatsControlerListenerTest {
 		Link link = scenario.getNetwork().getFactory().createLink(Id.create("100", Link.class), node1, node2);
 		scenario.getNetwork().addLink(link);
 		
-		Controler controler = new Controler(scenario);
-		controler.addMobsimFactory("dummy", new DummyMobsimFactory());
+		final Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals("dummy")) {
+					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new DummyMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			}
+		});
 		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);

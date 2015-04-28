@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import com.google.inject.Provider;
 import matsimConnector.congestionpricing.MSACongestionHandler;
 import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
 import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
@@ -24,9 +25,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import pedCA.output.FundamentalDiagramWriter;
@@ -69,7 +72,7 @@ public class CASimulationRunner implements IterationStartsListener{
 		c.controler().setLastIteration(Constants.SIMULATION_ITERATIONS-1);
 		c.qsim().setEndTime(Constants.SIMULATION_DURATION);
 
-		Controler controller = new Controler(scenario);
+		final Controler controller = new Controler(scenario);
 
 
 		if (Constants.MARGINAL_SOCIAL_COST_OPTIMIZATION) {
@@ -87,8 +90,20 @@ public class CASimulationRunner implements IterationStartsListener{
 		CATripRouterFactory tripRouterFactoryCA = new CATripRouterFactory(scenario);
 		controller.setTripRouterFactory(tripRouterFactoryCA);
 
-		CAMobsimFactory factoryCA = new CAMobsimFactory();
-		controller.addMobsimFactory(Constants.CA_MOBSIM_MODE, factoryCA);
+		final CAMobsimFactory factoryCA = new CAMobsimFactory();
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals(Constants.CA_MOBSIM_MODE)) {
+					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return factoryCA.createMobsim(controller.getScenario(), controller.getEvents());
+						}
+					});
+				}
+			}
+		});
 
 		if (Constants.VIS) {
 			dbg = new EventBasedVisDebuggerEngine(scenario);

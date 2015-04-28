@@ -19,6 +19,7 @@
 
 package tutorial.programming.withinDayReplanningAgents;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,6 +30,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -45,51 +47,60 @@ import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
+import javax.inject.Inject;
+
 public class RunWithinDayReplanningAgentExample {
 
 	public static void main(String[] args) {
-		
+
 		// I want a config out of nothing:
 		Config config = ConfigUtils.createConfig() ;
-		
+
 		// set some config stuff:
-		config.network().setInputFile("../../../matsim/trunk/examples/siouxfalls/network-wo-dummy-node.xml") ; 
+		config.network().setInputFile("../../../matsim/trunk/examples/siouxfalls/network-wo-dummy-node.xml") ;
 		config.controler().setLastIteration(0) ;
 		config.qsim().setEndTime(26.*3600) ;
 		config.qsim().setSnapshotStyle( QSimConfigGroup.SNAPSHOT_AS_QUEUE ) ;
-		
+
 		// base the controler on that:
 		Controler ctrl = new Controler( config ) ;
-		ctrl.setMobsimFactory(new MobsimFactory(){
+		ctrl.addOverridingModule(new AbstractModule() {
 			@Override
-			public Mobsim createMobsim(final Scenario sc, final EventsManager ev) {
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
 
-				// take the default mobsim factory, but since the population is empty, it will not be filled with demand:
-				final QSim qsim = (QSim) QSimUtils.createDefaultQSim(sc, ev);
-				
-				// add my own agent(s):
-				qsim.addAgentSource(new AgentSource() {
-					VehicleType basicVehicleType = new VehicleTypeImpl(Id.create("basicVehicleType", VehicleType.class)) ; 
+					@Inject Scenario sc;
+					@Inject EventsManager ev;
+
 					@Override
-					public void insertAgentsIntoMobsim() {
-						Id<Link> startLinkId = (Id<Link>) (sc.getNetwork().getLinks().keySet().toArray())[0] ;
-						MobsimVehicle veh = new QVehicle(new VehicleImpl(Id.create("testVehicle", Vehicle.class), basicVehicleType));
-						qsim.addParkedVehicle(veh, startLinkId) ;
-						qsim.insertAgentIntoMobsim(new MyAgent(sc,ev,qsim,startLinkId,veh) ) ;
-						// (the Id of the parked vehicle needs to be known to the agent, otherwise it will not work!)
+					public Mobsim get() {
+						// take the default mobsim, but since the population is empty, it will not be filled with demand:
+						final QSim qsim = QSimUtils.createDefaultQSim(sc, ev);
+
+						// add my own agent(s):
+						qsim.addAgentSource(new AgentSource() {
+							VehicleType basicVehicleType = new VehicleTypeImpl(Id.create("basicVehicleType", VehicleType.class));
+
+							@Override
+							public void insertAgentsIntoMobsim() {
+								final Id<Link> startLinkId = (Id<Link>) (sc.getNetwork().getLinks().keySet().toArray())[0];
+								final MobsimVehicle veh = new QVehicle(new VehicleImpl(Id.create("testVehicle", Vehicle.class), basicVehicleType));
+								qsim.addParkedVehicle(veh, startLinkId);
+								qsim.insertAgentIntoMobsim(new MyAgent(sc, ev, qsim, startLinkId, veh));
+								// (the Id of the parked vehicle needs to be known to the agent, otherwise it will not work!)
+							}
+						});
+
+						// add otfvis live.  Can't do this in core since otfvis is not accessible from there.
+						// OTFClientLive.run(sc.getConfig(), OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, ev, qsim));
+
+						return qsim;
 					}
-				} ) ;
-				
-				// add otfvis live.  Can't do this in core since otfvis is not accessible from there.
-//				OTFClientLive.run(sc.getConfig(), OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, ev, qsim));
-				
-				// return the whole thing:
-				return qsim ;
+				});
 			}
-		}) ;
-		
+		});
 		ctrl.run();
-		
+
 	}
 
 }
@@ -97,7 +108,7 @@ public class RunWithinDayReplanningAgentExample {
 /**
  * See {@link tutorial.programming.ownMobsimAgentWithPerception} and {@link tutorial.programming.ownMobsimAgentUsingRouter} for
  * more complete examples.
- * 
+ *
  * @author nagel
  *
  */
@@ -115,7 +126,7 @@ class MyAgent implements MobsimDriverAgent {
 	private Id<Vehicle> plannedVehicleId ;
 
 	private double activityEndTime = 1. ;
-	
+
 	MyAgent( Scenario sc, EventsManager ev, Netsim netsim, Id<Link> startLinkId, MobsimVehicle veh ) {
 		log.info( "calling MyAgent" ) ;
 		this.sc = sc ;
@@ -156,12 +167,12 @@ class MyAgent implements MobsimDriverAgent {
 		return 0. ;  // what does this matter for?
 	}
 
-    @Override
-    public Double getExpectedTravelDistance() {
-        return null;
-    }
+	@Override
+	public Double getExpectedTravelDistance() {
+		return null;
+	}
 
-    @Override
+	@Override
 	public String getMode() {
 		return TransportMode.car ; // either car or nothing
 	}
@@ -230,5 +241,5 @@ class MyAgent implements MobsimDriverAgent {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}
-	
+
 }

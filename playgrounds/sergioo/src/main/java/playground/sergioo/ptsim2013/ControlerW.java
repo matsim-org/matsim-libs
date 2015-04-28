@@ -23,12 +23,15 @@ package playground.sergioo.ptsim2013;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.google.inject.Provider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.sergioo.ptsim2013.qnetsimengine.PTQSimFactory;
@@ -46,16 +49,36 @@ public class ControlerW {
 	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException {
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, args[0]);
-		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
 		if(args.length>1) {
-			StopStopTimeCalculator stopStopTimeCalculatorEvents = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
+			final StopStopTimeCalculator stopStopTimeCalculatorEvents = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 			EventsManager eventsManager = EventsUtils.createEventsManager(controler.getConfig());
 			eventsManager.addHandler(stopStopTimeCalculatorEvents);
 			(new MatsimEventsReader(eventsManager)).readFile(args[1]);
-			controler.setMobsimFactory(new PTQSimFactory(stopStopTimeCalculatorEvents.getStopStopTimes()));
+			controler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bindMobsim().toProvider(new Provider<Mobsim>() {
+                        @Override
+                        public Mobsim get() {
+                            return new PTQSimFactory(stopStopTimeCalculatorEvents.getStopStopTimes()).createMobsim(controler.getScenario(), controler.getEvents());
+                        }
+                    });
+                }
+            });
 		}
 		else
-			controler.setMobsimFactory(new PTQSimFactory());
+			controler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bindMobsim().toProvider(new Provider<Mobsim>() {
+                        @Override
+                        public Mobsim get() {
+                            return new PTQSimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+                        }
+                    });
+                }
+            });
 		controler.setOverwriteFiles(true);
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));
 		controler.run();

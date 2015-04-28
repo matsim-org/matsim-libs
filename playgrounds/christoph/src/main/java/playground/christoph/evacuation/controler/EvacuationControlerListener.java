@@ -27,9 +27,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
@@ -186,7 +188,7 @@ public class EvacuationControlerListener implements StartupListener {
 	}
 	
 	@Override
-	public void notifyStartup(StartupEvent event) {
+	public void notifyStartup(final StartupEvent event) {
 		
 		// register FixedOrderControlerListener
 		event.getControler().addControlerListener(this.fixedOrderControlerListener);
@@ -203,11 +205,21 @@ public class EvacuationControlerListener implements StartupListener {
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household and adds the replanning Manager as mobsim engine.
 		 */
-		Scenario scenario = event.getControler().getScenario();
-		EvacuationQSimFactory mobsimFactory = new EvacuationQSimFactory(this.withinDayControlerListener.getWithinDayEngine(), 
+		final Scenario scenario = event.getControler().getScenario();
+		final EvacuationQSimFactory mobsimFactory = new EvacuationQSimFactory(this.withinDayControlerListener.getWithinDayEngine(),
 				scenario.getHouseholds().getHouseholdAttributes(), this.jointDepartureOrganizer,
 				this.multiModalControlerListener.get());
-		event.getControler().setMobsimFactory(mobsimFactory);
+		event.getControler().addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new com.google.inject.Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return mobsimFactory.createMobsim(scenario, event.getControler().getEvents());
+					}
+				});
+			}
+		});
 		event.getControler().addControlerListener(mobsimFactory);	// only to write some files for debugging
 	}
 

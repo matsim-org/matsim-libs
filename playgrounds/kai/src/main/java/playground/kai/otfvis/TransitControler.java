@@ -20,6 +20,7 @@
 
 package playground.kai.otfvis;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -27,6 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -62,14 +64,24 @@ public class TransitControler {
 //		config.otfVis().setShowTeleportedAgents(true) ;
 		
 
-		Controler tc = new Controler(config) ;
+		final Controler tc = new Controler(config) ;
 		tc.setOverwriteFiles(true);
 		tc.setDirtyShutdown(true);
 		
 //		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;
 //		tc.addOverridingModule(new RandomizedTransitRouterModule());
 
-		tc.setMobsimFactory(new MyMobsimFactory()) ;
+		tc.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new MyMobsimFactory().createMobsim(tc.getScenario(), tc.getEvents());
+					}
+				});
+			}
+		});
 		tc.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		//		tc.setCreateGraphs(false);
 		

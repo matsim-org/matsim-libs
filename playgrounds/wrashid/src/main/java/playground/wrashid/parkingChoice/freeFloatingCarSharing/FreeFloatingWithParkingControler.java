@@ -1,5 +1,6 @@
 package playground.wrashid.parkingChoice.freeFloatingCarSharing;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -9,7 +10,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -105,7 +108,7 @@ public class FreeFloatingWithParkingControler extends Controler {
 				s = reader.readLine();
 				int i = 1;
 
-				ArrayList<ParkingCoordInfo> freefloatingCars = new ArrayList<ParkingCoordInfo>();
+				final ArrayList<ParkingCoordInfo> freefloatingCars = new ArrayList<ParkingCoordInfo>();
 				while (s != null) {
 
 					String[] arr = s.split("\t", -1);
@@ -122,11 +125,21 @@ public class FreeFloatingWithParkingControler extends Controler {
 
 				}
 
-				ParkingModuleWithFFCarSharingZH parkingModule = new ParkingModuleWithFFCarSharingZH(controler, freefloatingCars);
+				final ParkingModuleWithFFCarSharingZH parkingModule = new ParkingModuleWithFFCarSharingZH(controler, freefloatingCars);
 				// ParkingModuleWithFreeFloatingCarSharing parkingModule = new
 				// ParkingModuleWithFFCarSharing();
 
-				controler.setMobsimFactory(new FreeFloatingQsimFactory(sc, controler, parkingModule, freefloatingCars));
+				controler.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						bindMobsim().toProvider(new Provider<Mobsim>() {
+							@Override
+							public Mobsim get() {
+								return new FreeFloatingQsimFactory(sc, controler, parkingModule, freefloatingCars).createMobsim(controler.getScenario(), controler.getEvents());
+							}
+						});
+					}
+				});
 			}
 
 			controler.setOverwriteFiles(true);

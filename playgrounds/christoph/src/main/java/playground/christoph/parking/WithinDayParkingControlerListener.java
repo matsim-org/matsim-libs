@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -240,15 +241,20 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		 * to also use the multi-modal simulation.
 		 */
 
-		event.getControler().setMobsimFactory(new Provider<Mobsim>() {
+		event.getControler().addOverridingModule(new AbstractModule() {
 			@Override
-			public Mobsim get() {
-				MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, withinDayControlerListener.getWithinDayEngine(), parkingAgentsTracker);
-				Mobsim mobsim = mobsimFactory.createMobsim(scenario, event.getControler().getEvents());
-				if (multiModalTravelTimes != null) {
-					new MultiModalQSimModule(scenario.getConfig(), multiModalTravelTimes).configure((QSim) mobsim);
-				}
-				return mobsim;
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						final MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, withinDayControlerListener.getWithinDayEngine(), parkingAgentsTracker);
+						final Mobsim mobsim = mobsimFactory.createMobsim(scenario, event.getControler().getEvents());
+						if (multiModalTravelTimes != null) {
+							new MultiModalQSimModule(scenario.getConfig(), multiModalTravelTimes).configure((QSim) mobsim);
+						}
+						return mobsim;
+					}
+				});
 			}
 		});
 		this.initIdentifiers();

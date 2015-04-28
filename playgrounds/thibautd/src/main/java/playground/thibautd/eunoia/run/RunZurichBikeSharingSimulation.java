@@ -22,6 +22,7 @@ package playground.thibautd.eunoia.run;
 import java.io.File;
 import java.util.Map;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,10 +33,12 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -135,10 +138,30 @@ public class RunZurichBikeSharingSimulation {
 
 		switch ( relocationGroup.getStrategy() ) {
 		case noRelocation:
-			controler.setMobsimFactory( new BikeSharingWithoutRelocationQsimFactory( false ) );
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new BikeSharingWithoutRelocationQsimFactory(false).createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			});
 			break;
 		case systemWideCapacities:
-			controler.setMobsimFactory( new BikeSharingWithoutRelocationQsimFactory( true ) );
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new BikeSharingWithoutRelocationQsimFactory(true).createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			});
 			break;
 		default:
 			throw new RuntimeException();

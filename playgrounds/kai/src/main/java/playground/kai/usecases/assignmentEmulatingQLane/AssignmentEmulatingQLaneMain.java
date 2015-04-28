@@ -18,11 +18,13 @@
  * *********************************************************************** */
 package playground.kai.usecases.assignmentEmulatingQLane;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -47,19 +49,29 @@ public class AssignmentEmulatingQLaneMain {
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
-		Controler controler = new Controler( scenario ) ;
-		controler.setMobsimFactory(new MobsimFactory() {
+		final Controler controler = new Controler( scenario ) ;
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				String mobsim = config.controler().getMobsim();
-				if ( MobsimType.qsim.toString().equals(mobsim) ) {
-					throw new RuntimeException("the following will only work for " + MobsimType.qsim.toString() ) ;
-				}
-				// ===
-				QSim simulation = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
-				simulation.addMobsimEngine(new QNetsimEngine(simulation, new AssignmentEmulatingQLaneNetworkFactory() ) );
-				return simulation ;
-				// note: this is called before "enrichSimulation" so we do not need to worry about that.
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new MobsimFactory() {
+							@Override
+							public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+								final String mobsim = config.controler().getMobsim();
+								if (MobsimType.qsim.toString().equals(mobsim)) {
+									throw new RuntimeException("the following will only work for " + MobsimType.qsim.toString());
+								}
+								// ===
+								final QSim simulation = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
+								simulation.addMobsimEngine(new QNetsimEngine(simulation, new AssignmentEmulatingQLaneNetworkFactory()));
+								return simulation;
+								// note: this is called before "enrichSimulation" so we do not need to worry about that.
+							}
+						}.createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
 			}
 		});
 	}

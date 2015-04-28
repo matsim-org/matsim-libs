@@ -3,6 +3,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.old;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -10,7 +11,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -84,14 +87,24 @@ public class MyFirstControler {
 
 		sc.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
 		
-		Controler controler = new Controler(sc);
+		final Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
 		controler.setDumpDataAtEnd(true);
         controler.getConfig().controler().setCreateGraphs(true);
         controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 
 		if(seepage){
-			controler.setMobsimFactory(new SeepageMobsimfactory());
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new SeepageMobsimfactory().createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			});
 		}
 		
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl)controler.getScenario()));

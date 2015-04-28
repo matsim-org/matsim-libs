@@ -1,6 +1,7 @@
 package playground.artemc.scenarios;
 
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -8,9 +9,11 @@ import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculat
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -83,8 +86,19 @@ public class CorridorRun {
 		controler.addControlerListener(analysisControlerListener);
 		controler.addControlerListener(new DisaggregatedHeterogeneousScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
 		controler.run();
-		
-		controler.setMobsimFactory(new QSimFactory());
+
+		final Controler finalControler = controler;
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new QSimFactory().createMobsim(finalControler.getScenario(), finalControler.getEvents());
+					}
+				});
+			}
+		});
 
 
 		//Routing PT

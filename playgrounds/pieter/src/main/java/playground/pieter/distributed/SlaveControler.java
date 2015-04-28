@@ -1,5 +1,6 @@
 package playground.pieter.distributed;
 
+import com.google.inject.Provider;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -23,6 +24,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.DefaultMobsimModule;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
@@ -346,7 +348,17 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     @Override
     public void run() {
         pSimFactory = new PSimFactory();
-        matsimControler.setMobsimFactory(pSimFactory);
+        matsimControler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bindMobsim().toProvider(new Provider<Mobsim>() {
+                    @Override
+                    public Mobsim get() {
+                        return pSimFactory.createMobsim(matsimControler.getScenario(), matsimControler.getEvents());
+                    }
+                });
+            }
+        });
         matsimControler.run();
     }
 

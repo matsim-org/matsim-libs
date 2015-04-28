@@ -1,5 +1,6 @@
 package playground.singapore.run;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -8,7 +9,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
@@ -74,8 +77,18 @@ public class ControlerSingapore {
                 return new TransitLocationChoiceStrategy(controler.getScenario());
             }
         });
-		controler.setMobsimFactory(new PTQSimFactory());
-		/*dcContext = new DestinationChoiceBestResponseContext(controler.getScenario());	
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new PTQSimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
+	/*dcContext = new DestinationChoiceBestResponseContext(controler.getScenario());
 		dcContext.init();
 		controler.addControlerListener(new DestinationChoiceInitializer(dcContext));
 		if (Double.parseDouble(controler.getConfig().findParam("locationchoice", "restraintFcnExp")) > 0.0 &&

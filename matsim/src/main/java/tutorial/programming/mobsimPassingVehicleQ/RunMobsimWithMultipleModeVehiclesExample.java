@@ -1,14 +1,15 @@
 package tutorial.programming.mobsimPassingVehicleQ;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -20,6 +21,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +49,12 @@ class RunMobsimWithMultipleModeVehiclesExample {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-		controler.setMobsimFactory(new MultipleModeVehiclesQSimFactory()) ;
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(MultipleModeVehiclesQSimFactory.class);
+			}
+		});
 
 		// run everything:
 		controler.run();
@@ -60,10 +67,13 @@ class RunMobsimWithMultipleModeVehiclesExample {
 	 * @author nagel
 	 *
 	 */
-	static class MultipleModeVehiclesQSimFactory implements MobsimFactory {
+	static class MultipleModeVehiclesQSimFactory implements Provider<Mobsim> {
+
+		@Inject Scenario scenario;
+		@Inject EventsManager eventsManager;
 
 		@Override
-		public Mobsim createMobsim(Scenario scenario, EventsManager eventsManager) {
+		public Mobsim get() {
 
 			QSimConfigGroup conf = scenario.getConfig().qsim();
 			if (conf == null) {

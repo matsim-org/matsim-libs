@@ -35,7 +35,7 @@ public class FreeFloatingQsimFactory implements MobsimFactory{
 	private ParkingModuleWithFreeFloatingCarSharing parkingModule;
 	public FreeFloatingQsimFactory(final Scenario scenario, final Controler controler,
 			ParkingModuleWithFreeFloatingCarSharing parkingModule,
-			ArrayList<ParkingCoordInfo> freefloatingCars) throws IOException {
+			ArrayList<ParkingCoordInfo> freefloatingCars) {
 
 		this.scenario = scenario;
 		this.controler = controler;

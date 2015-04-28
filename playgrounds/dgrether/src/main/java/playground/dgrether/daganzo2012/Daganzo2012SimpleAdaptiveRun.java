@@ -23,6 +23,7 @@ import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -61,15 +62,20 @@ public class Daganzo2012SimpleAdaptiveRun {
         final SimpleAdaptiveControl adaptiveControl = new SimpleAdaptiveControl();
 		addControlerListener(controler, adaptiveControl);
 
-		controler.setMobsimFactory(new Provider<Mobsim>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public Mobsim get() {
-				QSim mobsim = QSimUtils.createDefaultQSim(controler.getScenario(), controler.getEvents());
-				mobsim.addMobsimEngine(adaptiveControl);
-				return mobsim;
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						final QSim mobsim = QSimUtils.createDefaultQSim(controler.getScenario(), controler.getEvents());
+						mobsim.addMobsimEngine(adaptiveControl);
+						return mobsim;
+					}
+				});
 			}
 		});
-		
+
 		controler.run();
 	}
 

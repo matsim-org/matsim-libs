@@ -33,12 +33,16 @@ public class FreeFloatingQsimFactory implements MobsimFactory{
 	private final Controler controler;
 	private final ArrayList<FreeFloatingStation> ffvehiclesLocation;
 
-	public FreeFloatingQsimFactory(final Scenario scenario, final Controler controler) throws IOException {
+	public FreeFloatingQsimFactory(final Scenario scenario, final Controler controler) {
 		ffvehiclesLocation = new ArrayList<FreeFloatingStation>();
 
 		this.scenario = scenario;
 		this.controler = controler;
-		readVehicleLocations();
+		try {
+			readVehicleLocations();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	public void readVehicleLocations() throws IOException {
 		final FreeFloatingConfigGroup configGroupff = (FreeFloatingConfigGroup)

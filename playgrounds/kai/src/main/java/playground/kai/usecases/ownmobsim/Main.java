@@ -20,8 +20,10 @@
 
 package playground.kai.usecases.ownmobsim;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -30,7 +32,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		Controler controler = new Controler( "examples/config/hybrid-config.xml" ) ;
+		final Controler controler = new Controler( "examples/config/hybrid-config.xml" ) ;
 		controler.setOverwriteFiles(true) ;
 
 		final MobsimFactory mobsimFactory = new MobsimFactory() {
@@ -40,7 +42,17 @@ public class Main {
 			}
 			
 		} ;
-		controler.setMobsimFactory(mobsimFactory) ;
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return mobsimFactory.createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
 
 		controler.run();
 	

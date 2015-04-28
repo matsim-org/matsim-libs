@@ -33,7 +33,7 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 	
 	private CarSharingVehicles carSharingVehicles;
 	
-	public AllCSModesQsimFactory(final Scenario scenario, final Controler controler) throws IOException {
+	public AllCSModesQsimFactory(final Scenario scenario, final Controler controler) {
 		
 		this.scenario = scenario;
 		this.controler = controler;

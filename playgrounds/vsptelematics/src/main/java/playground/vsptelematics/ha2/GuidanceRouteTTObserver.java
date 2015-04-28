@@ -28,16 +28,19 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import playground.vsptelematics.common.ListUtils;
 
+import javax.inject.Singleton;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.*;
 
+@Singleton
 public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 		LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
 
@@ -73,8 +76,8 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 
 	private HashMap<Id, Double> guidedPersonTTs;
 
-	public GuidanceRouteTTObserver(String filename) {
-		this.filename = filename;
+	public GuidanceRouteTTObserver(OutputDirectoryHierarchy controlerIO) {
+		this.filename = controlerIO.getOutputFilename("routeTravelTimes.txt");
 		this.reset(0);
 	}
 

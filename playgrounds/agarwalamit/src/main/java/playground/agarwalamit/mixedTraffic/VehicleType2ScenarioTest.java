@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.mixedTraffic;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,6 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -91,11 +93,21 @@ public class VehicleType2ScenarioTest {
 		runTest.createPlans();
 		runTest.createConfig();
 
-		Controler cont = new Controler(runTest.scenario);
+		final Controler cont = new Controler(runTest.scenario);
 		cont.setOverwriteFiles(true);
 		
 		if(useModifiedMobsimFactory){
-			cont.setMobsimFactory(new modifiedMobsimFactory());
+			cont.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new modifiedMobsimFactory().createMobsim(cont.getScenario(), cont.getEvents());
+						}
+					});
+				}
+			});
 		}
 		cont.run();
 		runTestHandler();

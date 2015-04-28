@@ -26,11 +26,13 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -38,6 +40,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -68,11 +71,21 @@ public class RailSimulator {
 	 */
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		Controler controler = new Controler(args);
+		final Controler controler = new Controler(args);
 		controler.setOverwriteFiles(true);
 //		generateFacilities(controler);
-		controler.setMobsimFactory(new MobsimConnectorFactory());
-		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new MobsimConnectorFactory().createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
+
 		TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
         task.addTask(new TripGeoDistanceTask(controler.getScenario().getActivityFacilities()));
 		task.addTask(new ModeShareTask());

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -14,7 +15,9 @@ import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWit
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingContext;
@@ -44,7 +47,7 @@ public class FreeFloatingWithParkingControler {
 		
 		final Controler controler = new Controler( sc );
 					
-		DummyParkingModuleWithFreeFloatingCarSharing parkingModule;
+		final DummyParkingModuleWithFreeFloatingCarSharing parkingModule;
 		
 		final FreeFloatingConfigGroup configGroupff = (FreeFloatingConfigGroup)
 				sc.getConfig().getModule( FreeFloatingConfigGroup.GROUP_NAME );
@@ -59,7 +62,7 @@ public class FreeFloatingWithParkingControler {
 		    s = reader.readLine();
 		    int i = 1;
 		    
-		    ArrayList<ParkingCoordInfo> freefloatingCars = new ArrayList<ParkingCoordInfo>();
+		    final ArrayList<ParkingCoordInfo> freefloatingCars = new ArrayList<ParkingCoordInfo>();
 		    while(s != null) {
 		    	
 		    	String[] arr = s.split("\t", -1);
@@ -77,9 +80,19 @@ public class FreeFloatingWithParkingControler {
 		    }
 		    
 		    parkingModule = new DummyParkingModuleWithFreeFloatingCarSharing(controler, freefloatingCars);
-		    
-		    controler.setMobsimFactory( new FreeFloatingQsimFactory(sc, controler, 
-		    		parkingModule,  freefloatingCars) );
+
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new FreeFloatingQsimFactory(sc, controler,
+									parkingModule, freefloatingCars).createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			});
 		}
 		
 		controler.setTripRouterFactory(

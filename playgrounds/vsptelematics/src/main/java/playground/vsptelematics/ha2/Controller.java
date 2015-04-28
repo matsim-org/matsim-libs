@@ -19,11 +19,15 @@
  * *********************************************************************** */
 package playground.vsptelematics.ha2;
 
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 
 /**
@@ -41,19 +45,17 @@ public class Controller {
 	}
 
 	private static void addListener(Controler c){
-		c.addControlerListener(new StartupListener(){
+		c.addOverridingModule(new AbstractModule() {
 			@Override
-			public void notifyStartup(StartupEvent event) {
-				Controler con = event.getControler();
-				double equipmentFraction = Double.parseDouble(event.getControler().getConfig().getParam("telematics", "equipmentRate"));
-				String type = event.getControler().getConfig().getParam("telematics", "infotype");
-				final GuidanceRouteTTObserver observer = new GuidanceRouteTTObserver(con.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
-				con.addControlerListener(observer);
-				con.getEvents().addHandler(observer);
-				GuidanceMobsimFactory mobsimFactory = new GuidanceMobsimFactory(type, equipmentFraction, event.getControler().getControlerIO().getOutputFilename("guidance.txt"), observer);
-				event.getControler().addControlerListener(mobsimFactory);
-				event.getControler().setMobsimFactory(mobsimFactory);
-			}});
+			public void install() {
+				bind(GuidanceRouteTTObserver.class).in(Singleton.class); // only create one instance of these
+				bind(GuidanceMobsimFactory.class).in(Singleton.class); // only create one instance of these
+				bindMobsim().toProvider(GuidanceMobsimFactory.class); // bind these instances here
+				addControlerListenerBinding().to(GuidanceRouteTTObserver.class);
+				addControlerListenerBinding().to(GuidanceMobsimFactory.class);
+				addEventHandlerBinding().to(GuidanceRouteTTObserver.class);
+			}
+		});
 	}
 
 	public static void main(String[] args) {

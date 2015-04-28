@@ -19,12 +19,15 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.examples.example01runwithoutrelocation.run;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
 import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingWithoutRelocationQsimFactory;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 /**
  * The simplest bike-sharing-simulation-script possible:
@@ -40,7 +43,17 @@ public class RunSimpleBikeSharingSimulation {
 		final Controler controler = new Controler( sc );
 
 		controler.setTripRouterFactory( new BikeSharingTripRouterFactory( sc , null ) );
-		controler.setMobsimFactory( new BikeSharingWithoutRelocationQsimFactory() );
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new BikeSharingWithoutRelocationQsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
 
 		controler.run();
 	}

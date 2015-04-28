@@ -19,13 +19,16 @@
 
 package playground.gregor.casim.run;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -59,7 +62,7 @@ public class CARunner implements IterationStartsListener {
 		// c.qsim().setEndTime(23*3600);
 		// c.qsim().setEndTime(41*60);//+30*60);
 
-		Controler controller = new Controler(sc);
+		final Controler controller = new Controler(sc);
 
 		controller.setOverwriteFiles(true);
 		LeastCostPathCalculatorFactory cost = createDefaultLeastCostPathCalculatorFactory(sc);
@@ -67,11 +70,23 @@ public class CARunner implements IterationStartsListener {
 
 		controller.setTripRouterFactory(tripRouter);
 
-		CAMobsimFactory factory = new CAMobsimFactory();
+		final CAMobsimFactory factory = new CAMobsimFactory();
 		if (args[1].equals("false")) {
 			factory.setCANetworkFactory(new CASingleLaneNetworkFactory());
 		}
-		controller.addMobsimFactory("casim", factory);
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				if (getConfig().controler().getMobsim().equals("casim")) {
+					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return factory.createMobsim(controller.getScenario(), controller.getEvents());
+						}
+					});
+				}
+			}
+		});
 
 		if (args[2].equals("true")) {
 			AbstractCANetwork.EMIT_VIS_EVENTS = true;

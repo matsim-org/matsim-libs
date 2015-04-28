@@ -20,10 +20,12 @@
 
 package tutorial.programming.ownMobsimAgentWithPerception;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -54,34 +56,44 @@ public class RunOwnMobsimAgentWithPerceptionExample {
 		
 		// guidance.  Will need one instance per agent in order to be thread safe
 		final MyGuidance guidance = new MyGuidance( eventsObserver, ctrl.getScenario() ) ;
-		
-		ctrl.setMobsimFactory(new MobsimFactory(){
+
+		ctrl.addOverridingModule(new AbstractModule() {
 			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				final QSim qsim = QSimUtils.createDefaultQSim(sc, eventsManager) ;
-				
-				// Why agent source instead of inserting them directly?  Inserting agents into activities is, in fact possible just
-				// after the QSim constructor.  However, inserting vehicles or agents into links is not.  Agentsource makes
-				// sure that this is appropriately delayed.
-				qsim.addAgentSource(new AgentSource(){
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
 					@Override
-					public void insertAgentsIntoMobsim() {
-						// insert traveler agent:
-						final MobsimAgent ag = new MyMobsimAgent( guidance ) ;
-						qsim.insertAgentIntoMobsim(ag) ;
-						
-						// insert vehicle:
-						final Id<Vehicle> vehId = Id.create(ag.getId(), Vehicle.class);
-						final VehicleType vehType = VehicleUtils.getDefaultVehicleType();
-						final VehiclesFactory vehFactory = VehicleUtils.getFactory();
-						final Vehicle vehicle = vehFactory.createVehicle(vehId, vehType );
-						Id<Link> linkId4VehicleInsertion = null ; // replace by something meaningful
-						qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+					public Mobsim get() {
+						return new MobsimFactory() {
+							@Override
+							public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+								final QSim qsim = QSimUtils.createDefaultQSim(sc, eventsManager);
+
+								// Why agent source instead of inserting them directly?  Inserting agents into activities is, in fact possible just
+								// after the QSim constructor.  However, inserting vehicles or agents into links is not.  Agentsource makes
+								// sure that this is appropriately delayed.
+								qsim.addAgentSource(new AgentSource() {
+									@Override
+									public void insertAgentsIntoMobsim() {
+										// insert traveler agent:
+										final MobsimAgent ag = new MyMobsimAgent(guidance);
+										qsim.insertAgentIntoMobsim(ag);
+
+										// insert vehicle:
+										final Id<Vehicle> vehId = Id.create(ag.getId(), Vehicle.class);
+										final VehicleType vehType = VehicleUtils.getDefaultVehicleType();
+										final VehiclesFactory vehFactory = VehicleUtils.getFactory();
+										final Vehicle vehicle = vehFactory.createVehicle(vehId, vehType);
+										final Id<Link> linkId4VehicleInsertion = null; // replace by something meaningful
+										qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+									}
+								});
+								return qsim;
+							}
+						}.createMobsim(ctrl.getScenario(), ctrl.getEvents());
 					}
-				}) ;
-				return qsim ;
+				});
 			}
-		}) ;
+		});
 	}
 
 }

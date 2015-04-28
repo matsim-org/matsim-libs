@@ -20,32 +20,21 @@
 package playground.jbischoff.energy;
 
 import java.util.HashMap;
-import java.util.Map;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
-import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
-import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
-import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.jbischoff.energy.charging.Charger;
-import playground.jbischoff.energy.charging.ChargerImpl;
 import playground.jbischoff.energy.charging.ChargingHandler;
 
 public class ElectricCBMain
@@ -89,11 +78,23 @@ public class ElectricCBMain
 //        }
 //        ch.addVehicles(bevs);
         EnergyConsumptionTracker ect = new EnergyConsumptionTracker(bevs, scenario.getNetwork());
-        EVehQSimFactory ev = new EVehQSimFactory(ch,ect);
+        final EVehQSimFactory ev = new EVehQSimFactory(ch,ect);
         
-        Controler c = new Controler(scenario);
+        final Controler c = new Controler(scenario);
         c.setOverwriteFiles(true);
-        c.addMobsimFactory("eveh", ev);
+        c.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                if (getConfig().controler().getMobsim().equals("eveh")) {
+                    bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
+                        @Override
+                        public Mobsim get() {
+                            return ev.createMobsim(c.getScenario(), c.getEvents());
+                        }
+                    });
+                }
+            }
+        });
         config.controler().setMobsim("eveh");
         c.run();
         ch.getChargerLog().writeToFiles(config.controler().getOutputDirectory());

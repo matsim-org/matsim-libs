@@ -19,10 +19,13 @@
 
 package playground.mrieser.svi.controller;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.StringUtils;
@@ -41,7 +44,7 @@ public abstract class DynusTUtils {
 	
 	public static final void integrate(final Controler controler) {
 		log.info("Integrate functionality required for Dynus-T-Support in MATSim");
-		DynusTConfig dc = new DynusTConfig();
+		final DynusTConfig dc = new DynusTConfig();
 		
 		Config config = controler.getConfig();
 		dc.setDynusTDirectory(config.getParam("dynus-t", "dynusTDirectory"));
@@ -70,14 +73,24 @@ public abstract class DynusTUtils {
 		final DynamicTravelTimeMatrix ttMatrix = new DynamicTravelTimeMatrix(600, 30*3600.0); // 10min time bins, at most 30 hours
 		
 		log.info("Reading DynusT-network..." + dc.getModelDirectory());
-		Network dynusTNetwork = NetworkImpl.createNetwork();
+		final Network dynusTNetwork = NetworkImpl.createNetwork();
 		new DynusTNetworkReader(dynusTNetwork).readFiles(dc.getModelDirectory() + "/xy.dat", dc.getModelDirectory()+ "/network.dat");
 		
 		controler.addControlerListener(new DynusTControlerListener(dc, ttMatrix, dynusTNetwork));
 
 		boolean useOnlyDynusT = Boolean.parseBoolean(controler.getConfig().getParam("dynus-t", "useOnlyDynusT"));
 		if (useOnlyDynusT) {
-			controler.setMobsimFactory(new DynusTMobsimFactory(dc, ttMatrix, dynusTNetwork, controler));
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new DynusTMobsimFactory(dc, ttMatrix, dynusTNetwork, controler).createMobsim(controler.getScenario(), controler.getEvents());
+						}
+					});
+				}
+			});
 			log.info("DynusT will be used as exclusive mobility simulation. Make sure that re-routing is *not* enabled as replanning strategy, as it will have no effect.");
 			controler.setScoringFunctionFactory(new DynusTScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), new CharyparNagelScoringParameters(config.planCalcScore())));
 		} else {

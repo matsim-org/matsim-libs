@@ -19,10 +19,12 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.run;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
 import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.config.RandomRelocatorConfigGroup;
@@ -30,6 +32,7 @@ import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qs
 import eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim.SimplisticRelocatorManagerEngine;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
 import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingScenarioUtils;
+import org.matsim.core.mobsim.framework.Mobsim;
 
 /**
  * A script which builds a simulation with relocation agents.
@@ -53,9 +56,18 @@ public class RunBikeSharingSimulationWithSimplisticRelocator {
 		final Controler controler = new Controler( sc );
 
 		controler.setTripRouterFactory( new BikeSharingTripRouterFactory( sc , null ) );
-		controler.setMobsimFactory(
-				new BikeSharingWithSimplisticRelocationQSimFactory(
-					configGroup.getNVehicles() ) );
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new BikeSharingWithSimplisticRelocationQSimFactory(
+								configGroup.getNVehicles()).createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
 
 		controler.run();
 	}

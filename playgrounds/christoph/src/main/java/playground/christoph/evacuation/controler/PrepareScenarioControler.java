@@ -20,9 +20,11 @@
 
 package playground.christoph.evacuation.controler;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
@@ -31,6 +33,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.RoutingContext;
@@ -157,8 +160,18 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household.
 		 */
-		MobsimFactory mobsimFactory = new EvacuationQSimFactory(null, null, null, null);
-		this.setMobsimFactory(mobsimFactory);
+		final MobsimFactory mobsimFactory = new EvacuationQSimFactory(null, null, null, null);
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return mobsimFactory.createMobsim(getScenario(), getEvents());
+					}
+				});
+			}
+		});
 	}
 	
 	/*

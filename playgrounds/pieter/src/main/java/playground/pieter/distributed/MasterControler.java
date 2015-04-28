@@ -1,6 +1,7 @@
 package playground.pieter.distributed;
 
 
+import com.google.inject.Provider;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
@@ -9,6 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -19,16 +21,14 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationUtils;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStats;
 import playground.pieter.distributed.listeners.controler.GenomeAnalysis;
 import playground.pieter.distributed.listeners.controler.SlaveScoreWriter;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformanceRecorder;
-import playground.pieter.distributed.plans.PersonForPlanGenomes;
 import playground.pieter.distributed.plans.router.DefaultTripRouterFactoryForPlanGenomesModule;
-import playground.pieter.distributed.scoring.CharyparNagelOpenTimesScoringFunctionFactoryForPlanGenomes;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -360,7 +360,17 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), matsimControler.getScenario()));
             //this qsim engine uses our boarding and alighting model, derived from smart card data
             masterInitialLogString.append("SG boarding and alighting model.");
-            matsimControler.setMobsimFactory(new PTQSimFactory());
+            matsimControler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bindMobsim().toProvider(new Provider<Mobsim>() {
+                        @Override
+                        public Mobsim get() {
+                            return new PTQSimFactory().createMobsim(matsimControler.getScenario(), matsimControler.getEvents());
+                        }
+                    });
+                }
+            });
         }
         masterLogger.warn(masterInitialLogString);
         String outputDirectory = config.controler().getOutputDirectory();

@@ -19,6 +19,7 @@
 
 package playground.jbischoff.commuterDemand;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,6 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -61,36 +63,47 @@ public class Main {
 		config.qsim().setSnapshotStyle( QSimConfigGroup.SNAPSHOT_AS_QUEUE ) ;
 		
 		// base the controler on that:
-		Controler ctrl = new Controler( config ) ;
+		final Controler ctrl = new Controler( config ) ;
 		ctrl.setOverwriteFiles(true);
-		ctrl.setMobsimFactory(new MobsimFactory(){
+		ctrl.addOverridingModule(new AbstractModule() {
 			@Override
-			public Mobsim createMobsim(final Scenario sc, final EventsManager ev) {
-
-				// take the default mobsim factory, but since the population is empty, it will not be filled with demand:
-				final QSim qsim = (QSim) QSimUtils.createDefaultQSim(sc, ev);
-				
-				// add my own agent(s):
-				qsim.addAgentSource(new AgentSource() {
-					VehicleType basicVehicleType = new VehicleTypeImpl(Id.create("basicVehicleType", VehicleType.class)) ; 
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
 					@Override
-					public void insertAgentsIntoMobsim() {
-						Id<Link> startLinkId = (Id<Link>) (sc.getNetwork().getLinks().keySet().toArray())[0] ;
-						MobsimVehicle veh = new QVehicle(new VehicleImpl(Id.create("testVehicle", Vehicle.class), basicVehicleType));
-						qsim.addParkedVehicle(veh, startLinkId) ;
-						qsim.insertAgentIntoMobsim(new MyAgent(sc,ev,qsim,startLinkId,veh) ) ;
-						// (the Id of the parked vehicle needs to be known to the agent, otherwise it will not work!)
+					public Mobsim get() {
+						return new MobsimFactory() {
+							@Override
+							public Mobsim createMobsim(final Scenario sc, final EventsManager ev) {
+
+								// take the default mobsim factory, but since the population is empty, it will not be filled with demand:
+								final QSim qsim = (QSim) QSimUtils.createDefaultQSim(sc, ev);
+
+								// add my own agent(s):
+								qsim.addAgentSource(new AgentSource() {
+									VehicleType basicVehicleType = new VehicleTypeImpl(Id.create("basicVehicleType", VehicleType.class));
+
+									@Override
+									public void insertAgentsIntoMobsim() {
+										final Id<Link> startLinkId = (Id<Link>) (sc.getNetwork().getLinks().keySet().toArray())[0];
+										final MobsimVehicle veh = new QVehicle(new VehicleImpl(Id.create("testVehicle", Vehicle.class), basicVehicleType));
+										qsim.addParkedVehicle(veh, startLinkId);
+										qsim.insertAgentIntoMobsim(new MyAgent(sc, ev, qsim, startLinkId, veh));
+										// (the Id of the parked vehicle needs to be known to the agent, otherwise it will not work!)
+									}
+								});
+
+								// add otfvis live.  Can't do this in core since otfvis is not accessible from there.
+								OTFClientLive.run(sc.getConfig(), OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, ev, qsim));
+
+								// return the whole thing:
+								return qsim;
+							}
+						}.createMobsim(ctrl.getScenario(), ctrl.getEvents());
 					}
-				} ) ;
-				
-				// add otfvis live.  Can't do this in core since otfvis is not accessible from there.
-				OTFClientLive.run(sc.getConfig(), OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, ev, qsim));
-				
-				// return the whole thing:
-				return qsim ;
+				});
 			}
-		}) ;
-		
+		});
+
 		ctrl.run();
 		
 	}
