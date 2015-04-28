@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.core.config.Config;
@@ -93,6 +94,7 @@ public class Matsim2030Utils {
 	public static void addDefaultGroups( final Config config ) {
 		config.addModule( new ScenarioMergingConfigGroup() );
 		config.addModule( new KtiLikeScoringConfigGroup() );
+		config.addModule( new DestinationChoiceConfigGroup() );
 	}
 
 	public static Scenario loadScenario( final Config config ) {
