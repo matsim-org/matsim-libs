@@ -22,6 +22,7 @@ package playground.ivt.teaching;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.core.config.Config;
@@ -62,8 +63,8 @@ public class RunZurichScenario {
 				configFile,
 				// this adds a new config group, used by the specific scoring function
 				// we use
-				new KtiLikeScoringConfigGroup() );
-
+				new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup() );
+		
 		// This is currently needed for location choice: initializing
 		// the location choice writes K-values files to the output directory, which:
 		// - fails if the directory does not exist
