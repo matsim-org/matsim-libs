@@ -35,7 +35,7 @@
     <param name="signalgroups" value="&INPUTBASE;/testSignalGroups_v2.0.xml" />
     <param name="useAmbertimes" value="true" />
     <param name="ambertimes" value="&INPUTBASE;/testAmberTimes_v1.0.xml" />
-    <param name="useIntergreenTimes" value="true" />
+    <param name="useIntergreentimes" value="true" />
   </module>
   
   <module name="planCalcScore">
