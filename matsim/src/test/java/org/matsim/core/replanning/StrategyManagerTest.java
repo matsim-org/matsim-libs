@@ -131,6 +131,14 @@ public class StrategyManagerTest {
 		assertEquals(498, strategy4.getCounter());
 	}
 
+	@Test( expected=IllegalStateException.class )
+	public void testAddTwiceStrategy() {
+		final StrategyManager manager = new StrategyManager();
+		final PlanStrategy s = new PlanStrategyImpl.Builder( new RandomPlanSelector() ).build();
+		manager.addStrategy( s , null , 1 );
+		manager.addStrategy( s , null , 10 );
+	}
+
 	/**
 	 * Tests the removal of strategies. Ensures that after removal, no plan is given to the removed strategy.
 	 * Also checks that the removal of strategies not known to the StrategyManager doesn't have any side-effects.

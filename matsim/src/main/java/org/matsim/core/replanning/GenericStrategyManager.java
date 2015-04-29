@@ -18,6 +18,15 @@
  * *********************************************************************** */
 package org.matsim.core.replanning;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -28,8 +37,6 @@ import org.matsim.core.replanning.selectors.GenericWorstPlanForRemovalSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import java.util.*;
 
 /**
  * Notes:<ul>
@@ -43,6 +50,9 @@ import java.util.*;
  *
  */
 public class GenericStrategyManager<T extends BasicPlan, I> implements MatsimManager {
+	private static final Logger log =
+		Logger.getLogger(GenericStrategyManager.class);
+
 
 	static class StrategyWeights<T extends BasicPlan, I> {
 		 final List<GenericPlanStrategy<T, I>> strategies = new ArrayList<>();
@@ -80,6 +90,11 @@ public class GenericStrategyManager<T extends BasicPlan, I> implements MatsimMan
 			final String subpopulation,
 			final double weight) {
 		final StrategyWeights<T, I> weights = getStrategyWeights( subpopulation );
+		if ( weights.strategies.contains( strategy ) ) {
+			log.error( "Strategy "+strategy+" is already defined for subpopulation "+subpopulation  );
+			log.error( "This can lead to undefined behavior. Please only specify each strategy once" );
+			throw new IllegalStateException( "Strategy "+strategy+" is already defined for subpopulation "+subpopulation  );
+		}
 		weights.strategies.add(strategy);
 		weights.weights.add(weight);
 		weights.totalWeights += weight;
