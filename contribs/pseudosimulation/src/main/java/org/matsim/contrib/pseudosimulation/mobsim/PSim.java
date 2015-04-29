@@ -62,11 +62,12 @@ public class PSim implements Mobsim {
     private final static double MIN_LEG_DURATION = 0.0;
 
     private final SimThread[] threads;
+    private final double beelineDistanceFactor;
     private TransitPerformance transitPerformance;
     private boolean isUseTransit;
     AtomicInteger numThreads;
 
-    private final double beelineWalkSpeed;
+    private final double walkSpeed;
 
     private final TravelTime carLinkTravelTimes;
     private WaitTime waitTimes;
@@ -88,8 +89,8 @@ public class PSim implements Mobsim {
 
 
         PlansCalcRouteConfigGroup pcrConfig = sc.getConfig().plansCalcRoute();
-        this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) 
-        		/ pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
+        this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();
+        this.walkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) ;
         this.carLinkTravelTimes = carLinkTravelTimes;
         this.plans = plans;
     }
@@ -386,8 +387,8 @@ public class PSim implements Mobsim {
         final double distance;
 
         public TransitWalkTimeAndDistance(Coord startCoord, Coord endCoord) {
-            distance = CoordUtils.calcDistance(startCoord, endCoord);
-            time = distance / beelineWalkSpeed;
+            distance = beelineDistanceFactor * CoordUtils.calcDistance(startCoord, endCoord);
+            time = distance / walkSpeed;
         }
 
     }
