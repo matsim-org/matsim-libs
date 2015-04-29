@@ -67,7 +67,7 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	PlanToPlanStepBasedOnEvents(final Scenario scenario) {
 		this.scenario = scenario;
 		this.calibratedLinks = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
-		this.driverAgents = new HashSet<Id>();
+		this.driverAgents = new HashSet<>();
 	}
 
 	private long plansFound = 0;
@@ -113,7 +113,7 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 		if (!driverAgents.contains(event.getPersonId())) return;
 		
 		// if only a subset of links is calibrated but the link is not contained, ignore the event
-		if (calibratedLinks != null && !calibratedLinks.contains(event.getLinkId())) return;
+		if (!calibratedLinks.contains(event.getLinkId())) return;
 		
 		// get the "Person" behind the id:
 		Person person = this.scenario.getPopulation().getPersons().get(event.getPersonId());

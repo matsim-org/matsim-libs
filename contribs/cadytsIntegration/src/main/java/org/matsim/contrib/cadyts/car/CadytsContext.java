@@ -60,17 +60,16 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	private final double countsScaleFactor;
 	private final Counts counts;
 	private final boolean writeAnalysisFile;
-	private final CadytsConfigGroup cadytsConfig;
-	
+
 	private AnalyticalCalibrator<Link> calibrator;
-	private PlanToPlanStepBasedOnEvents ptStep;
+	private PlanToPlanStepBasedOnEvents planToPlanStep;
 	private SimResultsContainerImpl simResults;
 	
 	public CadytsContext(Config config, Counts counts ) {
 		
 		this.countsScaleFactor = config.counts().getCountsScaleFactor();
-		
-		this.cadytsConfig = new CadytsConfigGroup();
+
+		CadytsConfigGroup cadytsConfig = new CadytsConfigGroup();
 		config.addModule(cadytsConfig);
 		// addModule() also initializes the config group with the values read from the config file
 		cadytsConfig.setWriteAnalysisFile(true);
@@ -99,7 +98,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 
 	@Override
 	public PlansTranslator<Link> getPlansTranslator() {
-		return this.ptStep;
+		return this.planToPlanStep;
 	}
 	
 	@Override
@@ -112,16 +111,21 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.simResults = new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor);
 		
 		// this collects events and generates cadyts plans from it
-		this.ptStep = new PlanToPlanStepBasedOnEvents(scenario);
-		event.getControler().getEvents().addHandler(ptStep);
+		this.planToPlanStep = new PlanToPlanStepBasedOnEvents(scenario);
+		event.getControler().getEvents().addHandler(planToPlanStep);
 
 		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);
 	}
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		// Register demand for this iteration with Cadyts.
+		// Note that planToPlanStep will return null for plans which have never been executed.
+		// This is fine, since the number of these plans will go to zero in normal simulations,
+		// and Cadyts can handle this "noise". Checked this with Gunnar.
+		// mz 2015
         for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
-            this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
+            this.calibrator.addToDemand(planToPlanStep.getPlanSteps(person.getSelectedPlan()));
         }
     }
 
