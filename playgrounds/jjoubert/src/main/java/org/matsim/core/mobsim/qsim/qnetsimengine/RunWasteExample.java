@@ -31,6 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -61,8 +62,12 @@ public class RunWasteExample {
 		MclarpifPlanStrategyFactory mclarpifPlanStrategyFactory = new MclarpifPlanStrategyFactory(sc);
 		controler.addPlanStrategyFactory("mclarpifSolver", mclarpifPlanStrategyFactory);
 		controler.addControlerListener(new MclarpifReplanner());
-		controler.setMobsimFactory(new MclarpifMobsimFactory(sc, controler.getEvents()));
-		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(MclarpifMobsimFactory.class);
+			}
+		});
 		controler.run();
 		
 		Header.printFooter();

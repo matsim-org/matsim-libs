@@ -32,6 +32,8 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 
 import com.google.inject.Provider;
 
+import javax.inject.Inject;
+
 /**
  *
  * @author jwjoubert
@@ -41,7 +43,8 @@ public class MclarpifMobsimFactory implements Provider<Mobsim> {
 	final private Scenario sc;
 	final private EventsManager em;
 	
-	public MclarpifMobsimFactory(Scenario sc, EventsManager em) {
+	@Inject
+	MclarpifMobsimFactory(Scenario sc, EventsManager em) {
 		this.sc = sc;
 		this.em = em;
 	}
