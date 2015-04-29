@@ -56,6 +56,10 @@ public class StrategyConfigGroup extends ConfigGroup {
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
 	// yy could you please describe why this indirect design was done?  Was ist just because it made refactoring easier, or does it provide
 	// an advantage or is even necessary?  Thanks ...  kai, oct'14
+	// To maintain backwards compatibility (underscored parameters), one needs to override the "getValue" and "add_param" methods,
+	// which are final in ReflectiveModule. However, using reflective module for the 
+	// rest of the parameters still made refactoring much easier. So let's call
+	// this "necessary". td, apr'15
 
 	public static class StrategySettings extends ReflectiveConfigGroup implements MatsimParameters {
 		public static final String SET_NAME = "strategysettings";
