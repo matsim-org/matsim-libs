@@ -23,9 +23,9 @@ import java.util.*;
 
 
 public class TqSumoRoutesWriter extends MatsimXmlWriter{
-	
+
 	private List<Person> persons;
-	private List<VehicleType> vehicleTypes = new ArrayList<>();
+	private Collection<VehicleType> vehicleTypes = new ArrayList<>();
 	private Map<Id<Vehicle>, Vehicle> vehicles = new HashMap<>();
 	private Map<Id<Vehicle>, VehicleInformation> vehicles2BSorted = new HashMap<>();
 	private TransitSchedule transitSchedule;
@@ -33,9 +33,9 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 	private String outputAdditional;
 	private List<Tuple<String,String>> vType = new ArrayList<>();
 	private List<Tuple<String,String>> list = new ArrayList<>();
-	
-	public TqSumoRoutesWriter(List<Person> persons, List<VehicleType> vehicleTypes,
-								Map<Id<Vehicle>, Vehicle> vehicles, TransitSchedule transitSchedule, String outputRoute, String outputAdditional){
+
+	public TqSumoRoutesWriter(List<Person> persons, Collection<VehicleType> vehicleTypes,
+							  Map<Id<Vehicle>, Vehicle> vehicles, TransitSchedule transitSchedule, String outputRoute, String outputAdditional){
 		this.persons = persons;
 		this.vehicleTypes = vehicleTypes;
 		this.vehicles = vehicles;
@@ -43,9 +43,9 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 		this.outputRoute = outputRoute;
 		this.outputAdditional = outputAdditional;
 	}
-	
-	public void writeFile(){
-		
+
+	public void writeFiles(){
+
 		try {
 			//write routesFile
 			FileOutputStream os = new FileOutputStream(outputRoute);
@@ -59,12 +59,12 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			System.out.println("writing Persons completed");
 			super.writeEndTag("routes");
 			super.writer.close();
-			
+
 			//write additionalFile
 			FileOutputStream add = new FileOutputStream(outputAdditional);
 			this.writer = new BufferedWriter(new OutputStreamWriter(add));
 			super.writeStartTag("additional", null);
-			writeVTypes();	
+			writeVTypes();
 			System.out.println("writing vTypes completed");
 			writeBusStops();
 			System.out.println("writing busStops completed");
@@ -72,19 +72,19 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			System.out.println("writing Vehicles completed");
 			super.writeEndTag("additional");
 			super.writer.close();
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
+		}
 	}
-	
-	public void writeVTypes(){
+
+	void writeVTypes(){
 		vType.add(new Tuple<String, String>("id", "car"));
 		vType.add(new Tuple<String, String>("vClass", "passenger")); // defaultValues -> http://sumo.dlr.de/wiki/Vehicle_Type_Parameter_Defaults		
 		super.writeStartTag("vType", vType, true);
 		vType.clear();
-		
+
 		for (VehicleType vehType : vehicleTypes){
 			String type = vehType.getId().toString();
 			String length = Double.toString(vehType.getLength());
@@ -100,8 +100,8 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 		super.writeStartTag("vType", vType, true);
 		vType.clear();
 	}
-	
-	public void writeBusStops(){
+
+	void writeBusStops(){
 		for (TransitStopFacility transStop : transitSchedule.getFacilities().values()){
 			Id<TransitStopFacility> id = transStop.getId();
 			String lane = transStop.getLinkId().toString();
@@ -113,55 +113,53 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			list.clear();
 		}
 	}
-	
-	public void writePersons(){
+
+	void writePersons(){
 		for (Person p : persons) {
 			Id<Person> id = p.getId();
 			PlanImpl pli = (PlanImpl) p.getSelectedPlan();
 			String departure = String.valueOf(pli.getFirstActivity().getEndTime());
-			
+
 			list.clear();
 			list.add(new Tuple<String, String>("id", id.toString()));
 			list.add(new Tuple<String, String>("depart", departure));
 			super.writeStartTag("person", list);
 			list.clear();
-			
+
 			Activity act = pli.getFirstActivity();
 			Activity lastAct = pli.getLastActivity();
 			Leg leg = pli.getNextLeg(act);
 			Activity nextAct = pli.getNextActivity(leg);
-			
+
 			while (act != lastAct){
 				list.add(new Tuple<String, String>("from", act.getLinkId().toString()));
 				list.add(new Tuple<String, String>("to", nextAct.getLinkId().toString()));
 				if (leg.getMode().equals("car")){
 					list.add(new Tuple<String, String>("lines", "car_" + id.toString() + "_" + nextAct.getType()));
 					super.writeStartTag("ride", list, true);
-				}else 
-					if (leg.getMode().contains("walk")){
-						list.add(new Tuple<String, String>("duration", String.valueOf((leg.getTravelTime()))));
-						super.writeStartTag("walk", list, true);
-					}else 
-						if (leg.getMode().equals("pt")){ //add pt
-							String routeInfo = ((GenericRouteImpl) leg.getRoute()).getRouteDescription();
-							String line = routeInfo.split("===")[2];
-							String route = routeInfo.split("===")[3];
-							Id<TransitLine> lineId = Id.create(line, TransitLine.class);
-							Id<TransitRoute> routeId = Id.create(route, TransitRoute.class);
-							
-							String lines = "";
-							Collection<Departure> departures = transitSchedule.getTransitLines().get(lineId).getRoutes().get(routeId).getDepartures().values(); 
-							for (Departure dep : departures){
-							    lines = lines.concat(dep.getVehicleId().toString() + " ");
-							}
-							if (lines.endsWith(" "))
-								lines = lines.substring(0, lines.length() - 1);
+				}else if (leg.getMode().contains("walk")){
+					list.add(new Tuple<String, String>("duration", String.valueOf((leg.getTravelTime()))));
+					super.writeStartTag("walk", list, true);
+				}else if (leg.getMode().equals("pt")){ //add pt
+					String routeInfo = ((GenericRouteImpl) leg.getRoute()).getRouteDescription();
+					String line = routeInfo.split("===")[2];
+					String route = routeInfo.split("===")[3];
+					Id<TransitLine> lineId = Id.create(line, TransitLine.class);
+					Id<TransitRoute> routeId = Id.create(route, TransitRoute.class);
 
-							list.add(new Tuple<String, String>("lines", lines));
-							super.writeStartTag("ride", list, true); //muss noch angepasst werden
-						}
+					String lines = "";
+					Collection<Departure> departures = transitSchedule.getTransitLines().get(lineId).getRoutes().get(routeId).getDepartures().values();
+					for (Departure dep : departures){
+						lines = lines.concat(dep.getVehicleId().toString() + " ");
+					}
+					if (lines.endsWith(" "))
+						lines = lines.substring(0, lines.length() - 1);
+
+					list.add(new Tuple<String, String>("lines", lines));
+					super.writeStartTag("ride", list, true); //muss noch angepasst werden
+				}
 				list.clear();
-				
+
 				if (nextAct != lastAct){
 					list.add(new Tuple<String, String>("lane", nextAct.getLinkId().toString() + "_1"));
 					if (nextAct.getEndTime() > 0)
@@ -181,8 +179,8 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			super.writeEndTag("person");
 		}
 	}
-	
-	public void writeVehicles(){
+
+	void writeVehicles(){
 
 		for (Id<Vehicle> vehicleId : getVehiclesSortedByDeparture()){
 			VehicleInformation vehInfo = vehicles2BSorted.get(vehicleId);
@@ -193,11 +191,11 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 				list.add(new Tuple<String, String>("departLane", "best"));
 				super.writeStartTag("vehicle", list);
 				list.clear();
-				
+
 				list.add(new Tuple<String, String>("edges", vehInfo.getRoute()));
 				super.writeStartTag("route", list, true);
 				list.clear();
-				
+
 				super.writeEndTag("vehicle");
 			}else if (vehicles2BSorted.get(vehicleId).getType().getId().toString().contains("Bus")){
 				list.add(new Tuple<String, String>("id", vehicleId.toString()));
@@ -205,51 +203,51 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 				list.add(new Tuple<String, String>("depart", Double.toString(vehInfo.getDeparture())));
 				super.writeStartTag("vehicle", list);
 				list.clear();
-				
+
 				list.add(new Tuple<String, String>("edges", vehInfo.getRoute()));
 				super.writeStartTag("route", list, true);
 				list.clear();
-				
+
 				for (String busStopFacility : vehInfo.getBusStopFacilities()){
 					list.add(new Tuple<String, String>("busStop", busStopFacility));
 					list.add(new Tuple<String, String>("duration", "20"));
 					super.writeStartTag("stop", list, true);
-					list.clear();	
+					list.clear();
 				}
-				
+
 				super.writeEndTag("vehicle");
 			}
 		}
 	}
-	
-	public List<Id<Vehicle>> getVehiclesSortedByDeparture(){
+
+	List<Id<Vehicle>> getVehiclesSortedByDeparture(){
 		Id<VehicleType> vehTypeIdCar = Id.create("car", VehicleType.class);
 		VehicleType vehTypeCar = new VehicleTypeImpl(vehTypeIdCar);
-		
+
 		for (Person p : persons) {
 			Id<Person> id = p.getId();
 			PlanImpl pli = (PlanImpl) p.getSelectedPlan();
-			
+
 			Activity act = pli.getFirstActivity();
 			Activity lastAct = pli.getLastActivity();
 			Leg leg = pli.getNextLeg(act);
 			Activity nextAct = pli.getNextActivity(leg);
-			
+
 			while (act != lastAct){
 				if (leg.getMode().equals("car")){
 					Id<Vehicle> idV = Id.create("car_" + id.toString() + "_" + nextAct.getType(), Vehicle.class);
-										
+
 					String route = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().toString();
 					if (act.getLinkId().equals(nextAct.getLinkId()))
 						route = act.getLinkId().toString();
 					else
-						route = act.getLinkId().toString() + " " + route.substring(1, route.length()-1).replace(",", "") + 
+						route = act.getLinkId().toString() + " " + route.substring(1, route.length()-1).replace(",", "") +
 								" " + nextAct.getLinkId().toString();
 					VehicleInformation vehInfo = new VehicleInformation(idV, vehTypeCar, act.getEndTime(), route, null);
-					
+
 					vehicles2BSorted.put(idV, vehInfo);
 				}
-				
+
 				act = nextAct;
 				if (act != lastAct){
 					leg = pli.getNextLeg(act);
@@ -257,7 +255,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 				}
 			}
 		}
-				
+
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
 
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
@@ -267,45 +265,45 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 					busStopFacilities.add(busStopFacility);
 				}
 				for (Departure departure : transitRoute.getDepartures().values()) {
-					
+
 					Id<Vehicle> vehId = departure.getVehicleId();
 					VehicleType vehType = vehicles.get(vehId).getType();
 					NetworkRoute tRoute = transitRoute.getRoute();
 					String route = tRoute.getLinkIds().toString();
-					
+
 					if (tRoute.getStartLinkId().equals(tRoute.getEndLinkId()))
 						route = tRoute.getStartLinkId().toString();
 					else
-						route = tRoute.getStartLinkId().toString() + " " + route.substring(1, route.length()-1).replace(",", "") + 
-								" " + tRoute.getEndLinkId().toString();	
+						route = tRoute.getStartLinkId().toString() + " " + route.substring(1, route.length()-1).replace(",", "") +
+								" " + tRoute.getEndLinkId().toString();
 					VehicleInformation vehInfo = new VehicleInformation(vehId, vehType, departure.getDepartureTime(), route, busStopFacilities);
-					
+
 					vehicles2BSorted.put(vehId, vehInfo);
 				}
 			}
 		}
 		List<Id<Vehicle>> vehiclesSorted = new ArrayList<Id<Vehicle>>(vehicles2BSorted.keySet()); //id's sorted by end_times of first activity of selectedPlans
-	    Collections.sort(vehiclesSorted, new Comparator<Id<Vehicle>>() {
-	        @Override
-	        public int compare(Id<Vehicle> o1, Id<Vehicle> o2) {
-	            return Double.compare(firstDeparture(o1), firstDeparture(o2));
-	        }
+		Collections.sort(vehiclesSorted, new Comparator<Id<Vehicle>>() {
+			@Override
+			public int compare(Id<Vehicle> o1, Id<Vehicle> o2) {
+				return Double.compare(firstDeparture(o1), firstDeparture(o2));
+			}
 
-	        private double firstDeparture(Id<Vehicle> o1) {
-	            return vehicles2BSorted.get(o1).getDeparture();
-	        }
-	    });
-	    
+			private double firstDeparture(Id<Vehicle> o1) {
+				return vehicles2BSorted.get(o1).getDeparture();
+			}
+		});
+
 		return vehiclesSorted;
 	}
-	
-	public class VehicleInformation implements Vehicle{
+
+	class VehicleInformation implements Vehicle{
 		private double departure;
 		private String route;
 		private Id<Vehicle> id;
 		private VehicleType vehicleType;
-		private List<String> busStopFacilities = new ArrayList<>(); 
-		
+		private List<String> busStopFacilities = new ArrayList<>();
+
 		public VehicleInformation(Id<Vehicle> id, VehicleType vehicleType, Double departure, String route, List<String> busStopFacilities){
 			this.id = id;
 			this.vehicleType = vehicleType;
