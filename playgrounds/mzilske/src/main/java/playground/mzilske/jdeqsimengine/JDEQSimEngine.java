@@ -34,6 +34,7 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
         this.scheduler = scheduler;
         this.scenario = scenario;
         this.eventsManager = eventsManager;
+        this.agentCounter = agentCounter;
     }
 
     @Override
@@ -70,7 +71,6 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
 
     @Override
     public void setInternalInterface(InternalInterface internalInterface) {
-        InternalInterface internalInterface1 = internalInterface;
     }
 
     @Override

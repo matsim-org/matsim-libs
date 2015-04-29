@@ -19,12 +19,6 @@
 
 package org.matsim.contrib.cadyts.pt;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -46,8 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
-import cadyts.measurements.SingleLinkMeasurement.TYPE;
-import cadyts.supply.SimResults;
+import java.util.*;
 
 /**
  * Collects occupancy data of transit-line stations
@@ -57,18 +50,16 @@ import cadyts.supply.SimResults;
  * counting method and leave it here. kai, sep'13 
  */
 class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
-		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler 
-		, SimResults<TransitStopFacility> {
+		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
-	private static final long serialVersionUID = 1L;
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
 	private Map<Id<TransitStopFacility>, int[]> occupancies; // Map< stopFacilityId,value[]>
 	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehStops = new HashMap<>(); // Map< vehId,stopFacilityId>
 	private final Map<Id<Vehicle>, Integer> vehPassengers = new HashMap<>(); // Map<vehId,passengersNo.in Veh>
 	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
-	private final Set<Id> analyzedTransitDrivers = new HashSet<Id>();
-	private final Set<Id> analyzedTransitVehicles = new HashSet<Id>();
+	private final Set<Id> analyzedTransitDrivers = new HashSet<>();
+	private final Set<Id> analyzedTransitVehicles = new HashSet<>();
 	private final Set<Id<TransitLine>> calibratedLines;
 
 	public CadytsPtOccupancyAnalyzer(final Set<Id<TransitLine>> calibratedLines, int timeBinSize_s ) {
@@ -113,8 +104,7 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 		double time = event.getTime();
 		Integer nPassengers = this.vehPassengers.get(vehId);
 		this.vehPassengers.put(vehId, (nPassengers != null) ? (nPassengers + 1) : 1);
-		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId + " has Passenger\t" + this.vehPassengers.get(vehId)
-				+ " \tat stop :\t" + stopId + " ENTERING PERSON :\t" + event.getPersonId() + "\n");
+		this.occupancyRecord.append("time :\t").append(time).append(" veh :\t").append(vehId).append(" has Passenger\t").append(this.vehPassengers.get(vehId)).append(" \tat stop :\t").append(stopId).append(" ENTERING PERSON :\t").append(event.getPersonId()).append("\n");
 	}
 
 	@Override
@@ -131,12 +121,11 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 			throw new RuntimeException("null passenger-No. in vehicle ?");
 		}
 		this.vehPassengers.put(vehId, nPassengers - 1);
-		if (this.vehPassengers.get(vehId).intValue() == 0) {
+		if (this.vehPassengers.get(vehId) == 0) {
 			this.vehPassengers.remove(vehId);
 		}
 		Integer passengers = this.vehPassengers.get(vehId);
-		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId + " has Passenger\t"
-				+ ((passengers != null) ? passengers : 0) + "\n");
+		this.occupancyRecord.append("time :\t").append(time).append(" veh :\t").append(vehId).append(" has Passenger\t").append((passengers != null) ? passengers : 0).append("\n");
 	}
 
 	@Override
@@ -243,8 +232,8 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 					writer.write("n/a" + TAB);
 				}
 			}
-			for (int i = 0; i < ocuppancy.length; i++) {
-				writer.write((ocuppancy != null ? ocuppancy[i] : 0) + TAB);
+			for (int anOcuppancy : ocuppancy) {
+				writer.write((anOcuppancy) + TAB);
 			}
 			writer.write(count.getCoord().toString() + TAB + count.getCsId() + NL);
 		}
@@ -253,37 +242,15 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 	}
 
 	@Override
-	public double getSimValue(TransitStopFacility link, int startTimeS, int endTimeS, TYPE type) {
-		final int tmp = (endTimeS - startTimeS) % 3600;
-		if ( tmp != 0  || tmp != 1 ){ // the specification is that it should go from, say, 3600(inc.) to 7200(excl.), but I am finding 7199 as well. kai, sep'14
-			throw new RuntimeException("this only works for time spans that are multiples of hours. kai, sep'14") ;
-		}
-		double sum = 0. ;
-		int cnt = 0 ;
-		for ( int sec = startTimeS ; sec < endTimeS ; sec += 3600 ) { // no second contribution both for endTimeS=7199 and 7200
-			sum += this.getOccupancyVolumeForStopAndTime(link.getId(), startTimeS) ;
-			cnt++ ;
-		}
-		switch (type){
-		case COUNT_VEH:
-			return sum ;
-		case FLOW_VEH_H:
-			return sum / cnt ; 
-		default:
-			throw new RuntimeException("not implemented") ;
-		}
-	}
-
-	@Override
 	public String toString() {
-		final StringBuffer stringBuffer2 = new StringBuffer();
+		final StringBuilder stringBuffer2 = new StringBuilder();
 		final String STOPID = "stopId: ";
 		final String VALUES = "; values:";
 		final char TAB = '\t';
 		final char RETURN = '\n';
 
 		for (Id<TransitStopFacility> stopId : this.getOccupancyStopIds()) { // Only occupancy!
-			StringBuffer stringBuffer = new StringBuffer();
+			StringBuilder stringBuffer = new StringBuilder();
 			stringBuffer.append(STOPID);
 			stringBuffer.append(stopId);
 			stringBuffer.append(VALUES);
@@ -291,11 +258,11 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 			boolean hasValues = false; // only prints stops with volumes > 0
 			int[] values = this.getOccupancyVolumesForStop(stopId);
 
-			for (int ii = 0; ii < values.length; ii++) {
-				hasValues = hasValues || (values[ii] > 0);
+			for (int value : values) {
+				hasValues = hasValues || (value > 0);
 
 				stringBuffer.append(TAB);
-				stringBuffer.append(values[ii]);
+				stringBuffer.append(value);
 			}
 			stringBuffer.append(RETURN);
 			if (hasValues)

@@ -112,7 +112,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		this.simResults = new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor);
 		
 		// this collects events and generates cadyts plans from it
-		this.ptStep = new PlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedItems());
+		this.ptStep = new PlanToPlanStepBasedOnEvents(scenario);
 		event.getControler().getEvents().addHandler(ptStep);
 
 		this.calibrator = CadytsBuilder.buildCalibrator(scenario.getConfig(), this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/, Link.class);

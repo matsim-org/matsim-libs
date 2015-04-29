@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -151,6 +152,9 @@ CadytsContextI<TransitStopFacility> {
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		this.cadytsPtOccupAnalyzer.reset(event.getIteration());
+		for (Person person : event.getControler().getScenario().getPopulation().getPersons().values()) {
+			this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
+		}
 	}
 
 	@Override

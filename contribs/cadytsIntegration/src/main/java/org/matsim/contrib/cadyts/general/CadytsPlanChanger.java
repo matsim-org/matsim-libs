@@ -54,7 +54,7 @@ public class CadytsPlanChanger<T> implements PlanSelector {
 		}
 
 		// random plan:
-		Plan otherPlan = null;
+		Plan otherPlan;
 		do {
 			otherPlan = new RandomPlanSelector<Plan, Person>().selectPlan((person));
 		} while (otherPlan == currentPlan);
@@ -65,11 +65,11 @@ public class CadytsPlanChanger<T> implements PlanSelector {
 
 		cadyts.demand.Plan<T> currentPlanSteps = this.cadytsContext.getPlansTranslator().getPlanSteps(currentPlan);
 		double currentPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(currentPlanSteps) / this.beta;
-		double currentScore = currentPlan.getScore().doubleValue() + cadytsWeight * currentPlanCadytsCorrection;
+		double currentScore = currentPlan.getScore() + cadytsWeight * currentPlanCadytsCorrection;
 
 		cadyts.demand.Plan<T> otherPlanSteps = this.cadytsContext.getPlansTranslator().getPlanSteps(otherPlan);
 		double otherPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(otherPlanSteps) / this.beta;
-		double otherScore = otherPlan.getScore().doubleValue() + cadytsWeight * otherPlanCadytsCorrection;
+		double otherScore = otherPlan.getScore() + cadytsWeight * otherPlanCadytsCorrection;
 
 		Map<String,Object> planAttributes = currentPlan.getCustomAttributes() ;
 		planAttributes.put(CadytsPlanChanger.CADYTS_CORRECTION,currentPlanCadytsCorrection) ;
@@ -80,16 +80,10 @@ public class CadytsPlanChanger<T> implements PlanSelector {
 		double weight = Math.exp(0.5 * this.beta * (otherScore - currentScore));
 
 		Plan selectedPlan = currentPlan;
-		cadyts.demand.Plan<T> selectedPlanSteps = currentPlanSteps;
 		if (MatsimRandom.getRandom().nextDouble() < 0.01 * weight) {
 			// as of now, 0.01 is hardcoded (proba to change when both scores are the same)
 			selectedPlan = otherPlan;
-			selectedPlanSteps = otherPlanSteps;
-		} 
-
-		this.cadytsContext.getCalibrator().addToDemand(selectedPlanSteps);
-		// is this a problem that they are not added during the purely explorative phase (score==null, see above)? kai, feb'13
-
+		}
 		return selectedPlan;
 	}
 

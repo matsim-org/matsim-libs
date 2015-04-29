@@ -36,9 +36,13 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 
 import cadyts.demand.PlanBuilder;
+import org.matsim.core.config.ConfigUtils;
+
+import javax.inject.Inject;
 
 public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkLeaveEventHandler, 
 		PersonDepartureEventHandler, PersonArrivalEventHandler {
@@ -52,17 +56,17 @@ public class PlanToPlanStepBasedOnEvents implements PlansTranslator<Link>, LinkL
 	private int iteration = -1;
 
 	// this is _only_ there for output:
-	Set<Plan> plansEverSeen = new HashSet<Plan>();
+	Set<Plan> plansEverSeen = new HashSet<>();
 
 	private static final String STR_PLANSTEPFACTORY = "planStepFactory";
 	private static final String STR_ITERATION = "iteration";
 
 	private final Set<Id<Link>> calibratedLinks;
 
-	PlanToPlanStepBasedOnEvents(final Scenario scenario, final Set<Id<Link>> calibratedLinks) {
+	@Inject
+	PlanToPlanStepBasedOnEvents(final Scenario scenario) {
 		this.scenario = scenario;
-		this.calibratedLinks = calibratedLinks;
-		
+		this.calibratedLinks = ConfigUtils.addOrGetModule(scenario.getConfig(), CadytsConfigGroup.GROUP_NAME, CadytsConfigGroup.class).getCalibratedItems();
 		this.driverAgents = new HashSet<Id>();
 	}
 
