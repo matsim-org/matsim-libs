@@ -325,7 +325,16 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup {
 				// This *is* safe.
 				final boolean accessible = getter.isAccessible();
 				getter.setAccessible( true );
-				final String value =  ""+getter.invoke( this );
+				final Object result = getter.invoke( this );
+				if ( result == null ) {
+					log.error( "getter for parameter "+param_name+" of module "+getName()+" returned null." );
+					log.error( "This is not allowed (anymore). Modules should handle null by themselves: " );
+					log.error( "if the \"null\" string should be handled specially, please do it from within the module" );
+					log.error( "If you are not the implementor of this config group, please contact the corresponding developper or mailing list, as applicable." );
+
+					throw new NullPointerException( "getter for parameter "+param_name+" of module "+getClass().getName()+" ("+getName()+") returned null." );
+				}
+				final String value = ""+result;
 				getter.setAccessible( accessible );
 
 				return value;
