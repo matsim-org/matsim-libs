@@ -80,7 +80,7 @@ public class IncomeHeterogeneityModule extends AbstractModule {
 				log.info("Simulation with "+incomeHeterogeneityImpl.getType()+" heterogeneity: calculating income factors.");
 
 				/*Calculate Income Statistics*/
-				Integer incomeSum=0;
+				Long incomeSum= Long.valueOf(0);
 				Double incomeMean = 0.0;
 
 				for(Id<Person> personId:population.getPersons().keySet()){

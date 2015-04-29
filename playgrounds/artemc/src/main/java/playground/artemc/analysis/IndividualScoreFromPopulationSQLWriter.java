@@ -49,7 +49,7 @@ public class IndividualScoreFromPopulationSQLWriter {
 			if (person.getSelectedPlan().getCustomAttributes().containsKey("toll")) {
 				dataMap.get(person.getId().toString()).add((String) person.getSelectedPlan().getCustomAttributes().get("toll"));
 			} else {
-				dataMap.get(person.getId().toString()).add("");
+				dataMap.get(person.getId().toString()).add("0");
 			}
 
 			for (Plan plan : person.getPlans()) {
@@ -58,7 +58,7 @@ public class IndividualScoreFromPopulationSQLWriter {
 					if (plan.getCustomAttributes().containsKey("toll")) {
 						dataMap.get(person.getId().toString()).add((String) plan.getCustomAttributes().get("toll"));
 					} else {
-						dataMap.get(person.getId().toString()).add("");
+						dataMap.get(person.getId().toString()).add("0");
 					}
 
 				}
