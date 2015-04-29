@@ -348,19 +348,23 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup {
 				final boolean accessible = getter.isAccessible();
 				getter.setAccessible( true );
 				final Object result = getter.invoke( this );
-				if ( result == null && getter.isAnnotationPresent( DoNotConvertNull.class ) ) {
-					log.error( "getter for parameter "+param_name+" of module "+getName()+" returned null." );
-					log.error( "This is not allowed for this getter." );
+				getter.setAccessible( accessible );
 
-					throw new NullPointerException( "getter for parameter "+param_name+" of module "+getClass().getName()+" ("+getName()+") returned null." );
+				if ( result == null ) {
+					if ( getter.isAnnotationPresent( DoNotConvertNull.class ) ) {
+						log.error( "getter for parameter "+param_name+" of module "+getName()+" returned null." );
+						log.error( "This is not allowed for this getter." );
+
+						throw new NullPointerException( "getter for parameter "+param_name+" of module "+getClass().getName()+" ("+getName()+") returned null." );
+					}
+					return null;
 				}
+
 				final String value = ""+result;
 
-				if ( value.equals( "null" ) && result != null && !getter.isAnnotationPresent( DoNotConvertNull.class ) ) {
+				if ( value.equals( "null" ) && !getter.isAnnotationPresent( DoNotConvertNull.class ) ) {
 					throw new RuntimeException( "parameter "+param_name+" understands null pointers for IO. As a consequence, the \"null\" String is not a valid value for "+getter.getName() );
 				}
-
-				getter.setAccessible( accessible );
 
 				return value;
 			}
