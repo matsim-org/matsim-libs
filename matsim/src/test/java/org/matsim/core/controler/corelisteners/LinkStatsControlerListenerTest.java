@@ -41,6 +41,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -277,12 +279,7 @@ public class LinkStatsControlerListenerTest {
 			@Override
 			public void install() {
 				if (getConfig().controler().getMobsim().equals("dummy")) {
-					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return new DummyMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
-						}
-					});
+					bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
 				}
 			}
 		});
@@ -309,11 +306,14 @@ public class LinkStatsControlerListenerTest {
 	@Test
 	public void testReset_CorrectlyExecuted() throws IOException {
 		Config config = this.util.loadConfig(null);
+		config.controler().setMobsim("dummy");
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(7);
+		config.controler().setWritePlansInterval(0);
 		LinkStatsConfigGroup lsConfig = config.linkStats();
 		
 		lsConfig.setWriteLinkStatsInterval(3);
 		lsConfig.setAverageLinkStatsOverIterations(2);
-		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0, 0));
 		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(1000, 0));
@@ -321,29 +321,19 @@ public class LinkStatsControlerListenerTest {
 		scenario.getNetwork().addNode(node2);
 		Link link = scenario.getNetwork().getFactory().createLink(Id.create("100", Link.class), node1, node2);
 		scenario.getNetwork().addLink(link);
-		
 		final Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				if (getConfig().controler().getMobsim().equals("dummy")) {
-					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return new DummyMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
-						}
-					});
+					bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
 				}
 			}
 		});
-		config.controler().setMobsim("dummy");
-		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(7);
 
         controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
 		controler.run();
 		
 		Assert.assertFalse(new File(config.controler().getOutputDirectory() + "ITERS/it.0/0.linkstats.txt.gz").exists());
@@ -396,13 +386,16 @@ public class LinkStatsControlerListenerTest {
 			}
 		}
 	}
-	
-	private static class DummyMobsimFactory implements MobsimFactory {
+
+	@Singleton
+	private static class DummyMobsimFactory implements Provider<Mobsim> {
 		private int count = 1;
+
+		@Inject EventsManager eventsManager;
+
 		@Override
-		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim get() {
 			return new DummyMobsim(eventsManager, count++);
 		}
-		
 	}
 }
