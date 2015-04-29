@@ -21,14 +21,17 @@
 package org.matsim.withinday.controller;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
@@ -47,6 +50,9 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 /**
  * This class should give an example what is needed to run
  * simulations with WithinDayReplanning.
@@ -60,6 +66,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
  *
  * @author Christoph Dobler
  */
+@Singleton
 public class ExampleWithinDayController implements StartupListener {
 
 	/*
@@ -100,22 +107,29 @@ public class ExampleWithinDayController implements StartupListener {
 			System.out.println();
 		} else {
 			final Controler controler = new Controler(args);
-			controler.addControlerListener(new ExampleWithinDayController(controler));
+			configure(controler);
 			controler.run();
 		}
 		System.exit(0);
 	}
-	
-	public ExampleWithinDayController(Controler controler) {
-		
-		this.scenario = controler.getScenario();
+
+	static void configure(Controler controler) {
+		controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                install(new WithinDayModule());
+                addControlerListenerBinding().to(ExampleWithinDayController.class);
+                // Use a Scoring Function, that only scores the travel times!
+                bind(ScoringFunctionFactory.class).toInstance(new OnlyTravelTimeDependentScoringFunctionFactory());
+                bind(TravelDisutilityFactory.class).toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+            }
+        });
+	}
+
+	@Inject
+	ExampleWithinDayController(Scenario scenario) {
+		this.scenario = scenario;
 		this.withinDayControlerListener = new WithinDayControlerListener();
-		
-		// Use a Scoring Function, that only scores the travel times!
-		controler.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
-		controler.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
-		
-		// workaround
 		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());
 	}
 
