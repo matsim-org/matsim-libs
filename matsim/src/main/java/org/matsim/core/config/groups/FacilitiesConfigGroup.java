@@ -20,14 +20,12 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.TreeMap;
-
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author mrieser / Senozon AG
  */
-public class FacilitiesConfigGroup extends ConfigGroup {
+public class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "facilities";
 
@@ -41,49 +39,23 @@ public class FacilitiesConfigGroup extends ConfigGroup {
 		super(GROUP_NAME);
 	}
 
-	@Override
-	public String getValue(final String key) {
-		if (INPUT_FILE.equals(key)) {
-			return getInputFile();
-		} else if (INPUT_FACILITY_ATTRIBUTES_FILE.equals(key)) {
-			return getInputFacilitiesAttributesFile();
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		if (INPUT_FILE.equals(key)) {
-			setInputFile(value);
-		} else if (INPUT_FACILITY_ATTRIBUTES_FILE.equals(key)) {
-			setInputFacilitiesAttributesFile(value);
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-		addParameterToMap(map, INPUT_FILE);
-		addParameterToMap(map, INPUT_FACILITY_ATTRIBUTES_FILE);
-		return map;
-	}
-
 	/* direct access */
 
+	@StringGetter( INPUT_FILE )
 	public String getInputFile() {
 		return this.inputFile;
 	}
+	@StringSetter( INPUT_FILE )
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
 	}
 
+	@StringGetter( INPUT_FACILITY_ATTRIBUTES_FILE )
 	public String getInputFacilitiesAttributesFile() {
 		return this.inputFacilitiesAttributesFile;
 	}
 
+	@StringSetter( INPUT_FACILITY_ATTRIBUTES_FILE )
 	public void setInputFacilitiesAttributesFile(String inputFacilitiesAttributesFile) {
 		this.inputFacilitiesAttributesFile = inputFacilitiesAttributesFile;
 	}

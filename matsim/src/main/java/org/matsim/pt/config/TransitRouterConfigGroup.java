@@ -21,9 +21,9 @@ package org.matsim.pt.config;
 
 import java.util.Map;
 
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-public class TransitRouterConfigGroup extends ConfigGroup {
+public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "transitRouter";
 
@@ -42,36 +42,6 @@ public class TransitRouterConfigGroup extends ConfigGroup {
 	}
 
 	@Override
-	public void addParam(final String paramName, final String value) {
-		if (SEARCH_RADIUS.equals(paramName)) {
-			setSearchRadius(Double.parseDouble(value));
-		} else if (EXTENSION_RADIUS.equals(paramName)) {
-			setExtensionRadius(Double.parseDouble(value));
-		} else if (MAX_BEELINE_WALK_CONNECTION_DISTANCE.equals(paramName)) {
-			setMaxBeelineWalkConnectionDistance(Double.parseDouble(value));
-		} else if (ADDITIONAL_TRANSFER_TIME.equals(paramName)) {
-			setAdditionalTransferTime(Double.parseDouble(value));
-		} else {
-			throw new IllegalArgumentException(paramName);
-		}
-	}
-
-	@Override
-	public String getValue(final String paramName) {
-		throw new RuntimeException("use direct access to values.");
-	}
-
-	@Override
-	public Map<String, String> getParams() {
-		Map<String, String> params = super.getParams();
-		params.put(SEARCH_RADIUS, Double.toString(this.searchRadius));
-		params.put(EXTENSION_RADIUS, Double.toString(this.extensionRadius));
-		params.put(MAX_BEELINE_WALK_CONNECTION_DISTANCE, Double.toString(this.maxBeelineWalkConnectionDistance));
-		params.put(ADDITIONAL_TRANSFER_TIME, Double.toString(this.additionalTransferTime));
-		return params;
-	}
-
-	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(SEARCH_RADIUS, "the radius in which stop locations are searched, given a start or target coordinate");
@@ -81,34 +51,42 @@ public class TransitRouterConfigGroup extends ConfigGroup {
 		return comments;
 	}
 
+	@StringSetter( SEARCH_RADIUS )
 	public void setSearchRadius(final double searchRadius) {
 		this.searchRadius = searchRadius;
 	}
 
+	@StringGetter( SEARCH_RADIUS )
 	public double getSearchRadius() {
 		return this.searchRadius;
 	}
 
+	@StringSetter( EXTENSION_RADIUS )
 	public void setExtensionRadius(final double extensionRadius) {
 		this.extensionRadius = extensionRadius;
 	}
 
+	@StringGetter( EXTENSION_RADIUS )
 	public double getExtensionRadius() {
 		return this.extensionRadius;
 	}
 
+	@StringSetter( MAX_BEELINE_WALK_CONNECTION_DISTANCE )
 	public void setMaxBeelineWalkConnectionDistance(final double maxBeelineWalkConnectionDistance) {
 		this.maxBeelineWalkConnectionDistance = maxBeelineWalkConnectionDistance;
 	}
 
+	@StringGetter( MAX_BEELINE_WALK_CONNECTION_DISTANCE )
 	public double getMaxBeelineWalkConnectionDistance() {
 		return this.maxBeelineWalkConnectionDistance;
 	}
 
+	@StringSetter( ADDITIONAL_TRANSFER_TIME )
 	public void setAdditionalTransferTime(final double additionalTransferTime) {
 		this.additionalTransferTime = additionalTransferTime;
 	}
 
+	@StringGetter( ADDITIONAL_TRANSFER_TIME )
 	public double getAdditionalTransferTime() {
 		return this.additionalTransferTime;
 	}

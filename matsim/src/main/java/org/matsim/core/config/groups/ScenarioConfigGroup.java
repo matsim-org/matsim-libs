@@ -19,21 +19,20 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import org.matsim.core.config.ConfigGroup;
-
 import java.util.Map;
-import java.util.TreeMap;
+
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author dgrether
  *
  */
-public class ScenarioConfigGroup extends ConfigGroup {
+public class ScenarioConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "scenario";
 
 	private static final String USE_LANES = "useLanes";
-	private static final String USE_SIGNALSYSTMES = "useSignalsystems";
+	private static final String USE_SIGNALSYSTEMS = "useSignalsystems";
 	private static final String USE_VEHICLES = "useVehicles";
 	private static final String USE_HOUSEHOLDS = "useHouseholds";
 	private static final String USE_TRANSIT = "useTransit";
@@ -50,107 +49,62 @@ public class ScenarioConfigGroup extends ConfigGroup {
 	}
 
 	@Override
-	public void addParam(final String key, final String value) {
-		if (USE_LANES.equalsIgnoreCase(key)){
-			this.useLanes = Boolean.parseBoolean(value.trim());
-		}
-		else if (USE_SIGNALSYSTMES.equalsIgnoreCase(key)){
-			this.useSignalSystems = Boolean.parseBoolean(value.trim());
-		}
-		else if (USE_VEHICLES.equalsIgnoreCase(key)){
-			this.useVehicles = Boolean.parseBoolean(value.trim());
-		}
-		else if (USE_HOUSEHOLDS.equalsIgnoreCase(key)){
-			this.useHouseholds = Boolean.parseBoolean(value.trim());
-		}
-		else if (USE_TRANSIT.equalsIgnoreCase(key)){
-			this.useTransit = Boolean.parseBoolean(value.trim());
-		}
-		else {
-			throw new IllegalArgumentException(key + " is not a valid parameter of config group " + GROUP_NAME);
-		}
-	}
-
-	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
-		map.put(USE_SIGNALSYSTMES, "Set this parameter to true if signal systems should be used, false if not.");
+		map.put(USE_SIGNALSYSTEMS, "Set this parameter to true if signal systems should be used, false if not.");
 		map.put(USE_HOUSEHOLDS, "Set this parameter to true if households should be used, false if not.");
 		map.put(USE_VEHICLES, "Set this parameter to true if vehicles should be used, false if not.");
 		map.put(USE_TRANSIT, "Set this parameter to true if transit should be simulated, false if not.");
 		return map;
 	}
 
-	@Override
-	public String getValue(final String key) {
-		if (USE_LANES.equalsIgnoreCase(key)){
-			return Boolean.toString(this.isUseLanes());
-		}
-		else if (USE_SIGNALSYSTMES.equalsIgnoreCase(key)){
-			return Boolean.toString(this.isUseSignalSystems());
-		}
-		else if (USE_VEHICLES.equalsIgnoreCase(key)){
-			return Boolean.toString(this.isUseVehicles());
-		}
-		else if (USE_HOUSEHOLDS.equalsIgnoreCase(key)){
-			return Boolean.toString(this.isUseHouseholds());
-		}
-		else if (USE_TRANSIT.equalsIgnoreCase(key)){
-			return Boolean.toString(this.isUseTransit());
-		}
-		else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public Map<String, String> getParams() {
-		TreeMap<String, String> m = new TreeMap<>();
-		m.put(USE_LANES, getValue(USE_LANES));
-		m.put(USE_SIGNALSYSTMES, getValue(USE_SIGNALSYSTMES));
-		m.put(USE_VEHICLES, this.getValue(USE_VEHICLES));
-		m.put(USE_HOUSEHOLDS, this.getValue(USE_HOUSEHOLDS));
-		m.put(USE_TRANSIT, this.getValue(USE_TRANSIT));
-		return m;
-	}
-
+	@StringGetter( USE_LANES )
 	public boolean isUseLanes() {
 		return this.useLanes;
 	}
 
+	@StringSetter( USE_LANES )
 	public void setUseLanes(final boolean useLanes) {
 		this.useLanes = useLanes;
 	}
 
+	@StringGetter( USE_SIGNALSYSTEMS )
 	public boolean isUseSignalSystems() {
 		return this.useSignalSystems;
 	}
 
+	@StringSetter( USE_SIGNALSYSTEMS )
 	public void setUseSignalSystems(final boolean useSignalSystems) {
 		this.useSignalSystems = useSignalSystems;
 	}
 
+	@StringGetter( USE_HOUSEHOLDS )
 	public boolean isUseHouseholds() {
 		return this.useHouseholds;
 	}
 
+	@StringGetter( USE_VEHICLES )
 	public boolean isUseVehicles() {
 		return this.useVehicles;
 	}
 
+	@StringGetter( USE_TRANSIT )
 	public boolean isUseTransit() {
 		return this.useTransit;
 	}
 
+	@StringSetter( USE_HOUSEHOLDS )
 	public void setUseHouseholds(final boolean b) {
 		this.useHouseholds = b;
 	}
 
+	@StringSetter( USE_VEHICLES )
 	public void setUseVehicles(final boolean b) {
 		this.useVehicles = b;
 	}
 
+	@StringSetter( USE_TRANSIT )
     public void setUseTransit(final boolean b) {
 		this.useTransit = b;
 	}

@@ -20,14 +20,13 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author mrieser
  */
-public class LinkStatsConfigGroup extends ConfigGroup {
+public class LinkStatsConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "linkStats";
 
@@ -42,36 +41,6 @@ public class LinkStatsConfigGroup extends ConfigGroup {
 	}
 
 	@Override
-	public String getValue(final String key) {
-		if (WRITELINKSTATSINTERVAL.equals(key)) {
-			return Integer.toString(getWriteLinkStatsInterval());
-		} else if (AVERAGELINKSTATSOVERITERATIONS.equals(key)) {
-			return Integer.toString(getAverageLinkStatsOverIterations());
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		if (WRITELINKSTATSINTERVAL.equals(key)) {
-			this.setWriteLinkStatsInterval(Integer.parseInt(value));
-		} else if (AVERAGELINKSTATSOVERITERATIONS.equals(key)) {
-			this.setAverageLinkStatsOverIterations(Integer.parseInt(value));
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-		this.addParameterToMap(map, WRITELINKSTATSINTERVAL);
-		this.addParameterToMap(map, AVERAGELINKSTATSOVERITERATIONS);
-		return map;
-	}
-	
-	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(WRITELINKSTATSINTERVAL, "Specifies how often the link stats should be calculated and written. Use 0 to disable the generation of link stats.");
@@ -80,18 +49,22 @@ public class LinkStatsConfigGroup extends ConfigGroup {
 		return comments;
 	}
 
+	@StringGetter( WRITELINKSTATSINTERVAL )
 	public int getWriteLinkStatsInterval() {
 		return this.writeLinkStatsInterval;
 	}
 	
+	@StringSetter( WRITELINKSTATSINTERVAL )
 	public void setWriteLinkStatsInterval(int writeCountsInterval) {
 		this.writeLinkStatsInterval = writeCountsInterval;
 	}
 	
+	@StringGetter( AVERAGELINKSTATSOVERITERATIONS )
 	public int getAverageLinkStatsOverIterations() {
 		return this.averageLinkStatsOverIterations;
 	}
 	
+	@StringSetter( AVERAGELINKSTATSOVERITERATIONS )
 	public void setAverageLinkStatsOverIterations(int averageLinkStatsOverIterations) {
 		this.averageLinkStatsOverIterations = averageLinkStatsOverIterations;
 	}

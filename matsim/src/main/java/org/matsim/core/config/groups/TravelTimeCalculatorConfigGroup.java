@@ -24,14 +24,14 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 
 /**
  * @author dgrether
  *
  */
-public class TravelTimeCalculatorConfigGroup extends ConfigGroup {
+public class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUPNAME = "travelTimeCalculator";
 	
@@ -64,68 +64,6 @@ public class TravelTimeCalculatorConfigGroup extends ConfigGroup {
 	}
 
 	@Override
-	public String getValue(final String key){
-		if (TRAVEL_TIME_CALCULATOR.equals(key)) {
-			return getTravelTimeCalculatorType().toString();
-		} else if (TRAVEL_TIME_AGGREGATOR.equals(key)) {
-			return getTravelTimeAggregatorType();
-		} else if (TRAVEL_TIME_GETTER.equals(key)) {
-			return getTravelTimeGetterType();
-		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
-			return Integer.toString(getTraveltimeBinSize());
-		} else if (CALCULATE_LINK_TRAVELTIMES.equals(key)){
-			return Boolean.toString(isCalculateLinkTravelTimes());
-		} else if (CALCULATE_LINKTOLINK_TRAVELTIMES.equals(key)){
-			return Boolean.toString(isCalculateLinkToLinkTravelTimes());
-		} else if (ANALYZEDMODES.equals(key)){
-			return getAnalyzedModes();
-		} else if (FILTERMODES.equals(key)){
-			return Boolean.toString(isFilterModes());
-		}
-		else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		if (TRAVEL_TIME_CALCULATOR.equals(key)) {
-			setTravelTimeCalculatorType(value);
-		} else if (TRAVEL_TIME_AGGREGATOR.equals(key)) {
-			setTravelTimeAggregatorType(value);
-		} else if (TRAVEL_TIME_GETTER.equals(key)) {
-			setTravelTimeGetterType(value);
-		} else if (TRAVEL_TIME_BIN_SIZE.equals(key)) {
-			setTraveltimeBinSize(Integer.parseInt(value));
-		} else if (CALCULATE_LINK_TRAVELTIMES.equals(key)){
-			this.setCalculateLinkTravelTimes(Boolean.parseBoolean(value));
-		} else if (CALCULATE_LINKTOLINK_TRAVELTIMES.equals(key)){
-			this.setCalculateLinkToLinkTravelTimes(Boolean.parseBoolean(value));
-		} else if (ANALYZEDMODES.equals(key)){
-			this.setAnalyzedModes(value);
-		} else if (FILTERMODES.equals(key)){
-			this.setFilterModes(Boolean.parseBoolean(value));
-		}
-		else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(TRAVEL_TIME_CALCULATOR, getValue(TRAVEL_TIME_CALCULATOR));
-		map.put(TRAVEL_TIME_AGGREGATOR, getValue(TRAVEL_TIME_AGGREGATOR));
-		map.put(TRAVEL_TIME_GETTER, getValue(TRAVEL_TIME_GETTER));
-		map.put(TRAVEL_TIME_BIN_SIZE, getValue(TRAVEL_TIME_BIN_SIZE));
-		map.put(CALCULATE_LINK_TRAVELTIMES, getValue(CALCULATE_LINK_TRAVELTIMES));
-		map.put(CALCULATE_LINKTOLINK_TRAVELTIMES, getValue(CALCULATE_LINKTOLINK_TRAVELTIMES));
-		map.put(ANALYZEDMODES, getValue(ANALYZEDMODES));
-		map.put(FILTERMODES, getValue(FILTERMODES));
-		return map;
-	}
-
-	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for " +
@@ -146,26 +84,32 @@ public class TravelTimeCalculatorConfigGroup extends ConfigGroup {
 		return map;
 	}
 
+	@StringSetter( TRAVEL_TIME_CALCULATOR )
 	public void setTravelTimeCalculatorType(final String travelTimeCalculator){
 		this.travelTimeCalculator = TravelTimeCalculatorType.valueOf( travelTimeCalculator ) ;
 	}
 
+	@StringGetter( TRAVEL_TIME_CALCULATOR )
 	public TravelTimeCalculatorType getTravelTimeCalculatorType(){
 		return this.travelTimeCalculator;
 	}
 
+	@StringSetter( TRAVEL_TIME_AGGREGATOR )
 	public void setTravelTimeAggregatorType(final String travelTimeAggregator){
 		this.travelTimeAggregator = travelTimeAggregator;
 	}
 
+	@StringSetter( TRAVEL_TIME_GETTER )
 	public void setTravelTimeGetterType(final String travelTimeGetter){
 		this.travelTimeGetter = travelTimeGetter;
 	}
 	 
+	@StringGetter( TRAVEL_TIME_AGGREGATOR )
 	public String getTravelTimeAggregatorType(){
 		return this.travelTimeAggregator;
 	}
 
+	@StringGetter( TRAVEL_TIME_GETTER )
 	public String getTravelTimeGetterType(){
 		return this.travelTimeGetter;
 	}
@@ -176,6 +120,7 @@ public class TravelTimeCalculatorConfigGroup extends ConfigGroup {
 	 *
 	 * @param binSize The size of the time-window in seconds.
 	 */
+	@StringSetter( TRAVEL_TIME_BIN_SIZE )
 	public final void setTraveltimeBinSize(final int binSize) {
 		this.traveltimeBinSize = binSize;
 	}
@@ -185,39 +130,48 @@ public class TravelTimeCalculatorConfigGroup extends ConfigGroup {
 	 *
 	 * @return The size of the time-window in seconds.
 	 */
+	@StringGetter( TRAVEL_TIME_BIN_SIZE )
 	public final int getTraveltimeBinSize() {
 		return this.traveltimeBinSize;
 	}
 
+	@StringGetter( CALCULATE_LINK_TRAVELTIMES )
 	public boolean isCalculateLinkTravelTimes() {
 		return this.calculateLinkTravelTimes;
 	}
 
+	@StringSetter( CALCULATE_LINK_TRAVELTIMES )
 	public void setCalculateLinkTravelTimes(final boolean calculateLinkTravelTimes) {
 		this.calculateLinkTravelTimes = calculateLinkTravelTimes;
 	}
 
+	@StringGetter( CALCULATE_LINKTOLINK_TRAVELTIMES )
 	public boolean isCalculateLinkToLinkTravelTimes() {
 		return this.calculateLinkToLinkTravelTimes;
 	}
 
+	@StringSetter( CALCULATE_LINKTOLINK_TRAVELTIMES )
 	public void setCalculateLinkToLinkTravelTimes(
 			final boolean calculateLinkToLinkTravelTimes) {
 		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
 	}
 	
+	@StringGetter( FILTERMODES )
 	public boolean isFilterModes() {
 		return this.filterModes;
 	}
-	
+
+	@StringSetter( FILTERMODES )
 	public void setFilterModes(final boolean filterModes) {
 		this.filterModes = filterModes;
 	}
 	
+	@StringGetter( ANALYZEDMODES )
 	public String getAnalyzedModes() {
 		return this.analyzedModes;
 	}
 	
+	@StringSetter( ANALYZEDMODES )
 	public void setAnalyzedModes(final String analyzedModes) {
 		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
 	}

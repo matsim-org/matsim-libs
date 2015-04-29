@@ -27,13 +27,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author mrieser
  */
-public class TransitConfigGroup extends ConfigGroup {
+public class TransitConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "transit";
 
@@ -57,59 +57,23 @@ public class TransitConfigGroup extends ConfigGroup {
 		this.transitModes = Collections.unmodifiableSet(modes);
 	}
 
-	@Override
-	public void addParam(final String paramName, final String value) {
-		if (TRANSIT_SCHEDULE_FILE.equals(paramName)) {
-			setTransitScheduleFile(value);
-		} else if (VEHICLES_FILE.equals(paramName)) {
-				setVehiclesFile(value);
-		} else if (TRANSIT_MODES.equals(paramName)) {
-			this.transitModes = Collections.unmodifiableSet(CollectionUtils.stringToSet(value));
-		} else if (TRANSIT_LINES_ATTRIBUTES.equals(paramName)) {
-			this.transitLinesAttributesFile = value;
-		} else if (TRANSIT_STOPS_ATTRIBUTES.equals(paramName)) {
-			this.transitStopsAttributesFile = value;
-		} else {
-			throw new IllegalArgumentException(paramName);
-		}
+	@StringSetter( TRANSIT_MODES )
+	private void setTransitModes( final String value ) {
+		this.transitModes = Collections.unmodifiableSet(CollectionUtils.stringToSet(value));
 	}
 
-	@Override
-	public String getValue(final String paramName) {
-		if (TRANSIT_SCHEDULE_FILE.equals(paramName)) {
-			return getTransitScheduleFile();
-		}
-		if (VEHICLES_FILE.equals(paramName)) {
-			return getVehiclesFile();
-		}
-		if (TRANSIT_MODES.equals(paramName)) {
-			boolean isFirst = true;
-			StringBuilder str = new StringBuilder();
-			for (String mode : this.transitModes) {
-				if (!isFirst) {
-					str.append(',');
-				}
-				str.append(mode);
-				isFirst = false;
+	@StringGetter( TRANSIT_MODES )
+	private String getTransitModeString() {
+		boolean isFirst = true;
+		StringBuilder str = new StringBuilder();
+		for (String mode : this.transitModes) {
+			if (!isFirst) {
+				str.append(',');
 			}
-			return str.toString();
+			str.append(mode);
+			isFirst = false;
 		}
-		throw new IllegalArgumentException(paramName);
-	}
-
-	@Override
-	public Map<String, String> getParams() {
-		Map<String, String> params = super.getParams();
-		addParameterToMap(params, TRANSIT_SCHEDULE_FILE);
-		addParameterToMap(params, VEHICLES_FILE);
-		addParameterToMap(params, TRANSIT_MODES);
-		if (this.transitLinesAttributesFile != null) {
-			params.put(TRANSIT_LINES_ATTRIBUTES, this.transitLinesAttributesFile);
-		}
-		if (this.transitStopsAttributesFile != null) {
-			params.put(TRANSIT_STOPS_ATTRIBUTES, this.transitStopsAttributesFile);
-		}
-		return params;
+		return str.toString();
 	}
 
 	@Override
@@ -123,18 +87,22 @@ public class TransitConfigGroup extends ConfigGroup {
 		return comments;
 	}
 
+	@StringSetter( TRANSIT_SCHEDULE_FILE )
 	public void setTransitScheduleFile(final String filename) {
 		this.transitScheduleFile = filename;
 	}
 
+	@StringGetter( TRANSIT_SCHEDULE_FILE )
 	public String getTransitScheduleFile() {
 		return this.transitScheduleFile;
 	}
 
+	@StringSetter( VEHICLES_FILE )
 	public void setVehiclesFile(final String filename) {
 		this.vehiclesFile = filename;
 	}
 
+	@StringGetter( VEHICLES_FILE )
 	public String getVehiclesFile() {
 		return this.vehiclesFile;
 	}
@@ -147,18 +115,22 @@ public class TransitConfigGroup extends ConfigGroup {
 		return this.transitModes;
 	}
 
+	@StringGetter( TRANSIT_LINES_ATTRIBUTES )
 	public String getTransitLinesAttributesFile() {
 		return transitLinesAttributesFile;
 	}
 	
+	@StringSetter( TRANSIT_LINES_ATTRIBUTES )
 	public void setTransitLinesAttributesFile(final String transitLinesAttributesFile) {
 		this.transitLinesAttributesFile = transitLinesAttributesFile;
 	}
 
+	@StringGetter( TRANSIT_STOPS_ATTRIBUTES )
 	public String getTransitStopsAttributesFile() {
 		return this.transitStopsAttributesFile;
 	}
 	
+	@StringSetter( TRANSIT_STOPS_ATTRIBUTES )
 	public void setTransitStopsAttributesFile(final String transitStopsAttributesFile) {
 		this.transitStopsAttributesFile = transitStopsAttributesFile;
 	}

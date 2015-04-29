@@ -63,6 +63,7 @@ public class SimulationConfigGroup extends ConfigGroup implements MobsimConfigGr
 
 	@Override
 	public final void addParam(final String key, final String value) {
+		if ( "value".equalsIgnoreCase( value ) ) return;
 		if (START_TIME.equals(key)) {
 			setStartTime(Time.parseTime(value));
 		} else if (END_TIME.equals(key)) {

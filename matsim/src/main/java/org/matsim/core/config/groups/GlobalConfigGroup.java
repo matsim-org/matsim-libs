@@ -21,12 +21,11 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-public class GlobalConfigGroup extends ConfigGroup {
+public class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
 	public static final String GROUP_NAME = "global";
@@ -52,61 +51,32 @@ public class GlobalConfigGroup extends ConfigGroup {
 		return map ;
 	}
 
-	@Override
-	public String getValue(final String key) {
-		if (RANDOM_SEED.equals(key)) {
-			return Long.toString(getRandomSeed());
-		} else if (NUMBER_OF_THREADS.equals(key)) {
-			return Integer.toString(getNumberOfThreads());
-		} else if (COORDINATE_SYSTEM.equals(key)) {
-			return getCoordinateSystem();
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		if (RANDOM_SEED.equals(key)) {
-			setRandomSeed(Long.parseLong(value));
-		} else if (NUMBER_OF_THREADS.equals(key)) {
-			setNumberOfThreads(Integer.parseInt(value));
-		} else if (COORDINATE_SYSTEM.equals(key)) {
-			setCoordinateSystem(value);
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(RANDOM_SEED, getValue(RANDOM_SEED));
-		addParameterToMap(map, COORDINATE_SYSTEM);
-		addParameterToMap(map, NUMBER_OF_THREADS);
-		return map;
-	}
-
 	/* direct access */
 
+	@StringGetter( RANDOM_SEED )
 	public long getRandomSeed() {
 		return this.randomSeed;
 	}
+	@StringSetter( RANDOM_SEED )
 	public void setRandomSeed(final long randomSeed) {
 		this.randomSeed = randomSeed;
 	}
 
+	@StringGetter( NUMBER_OF_THREADS )
 	public int getNumberOfThreads() {
 		return this.numberOfThreads;
 	}
+	@StringSetter( NUMBER_OF_THREADS )
 	public void setNumberOfThreads(final int numberOfThreads) {
 		log.info("setting number of threads to: " + numberOfThreads ) ; // might not be so bad to do this everywhere?  benjamin/kai, oct'10
 		this.numberOfThreads = numberOfThreads;
 	}
 
+	@StringGetter( COORDINATE_SYSTEM )
 	public String getCoordinateSystem() {
 		return this.coordinateSystem;
 	}
+	@StringSetter( COORDINATE_SYSTEM )
 	public void setCoordinateSystem(final String coordinateSystem) {
 		this.coordinateSystem = coordinateSystem;
 	}

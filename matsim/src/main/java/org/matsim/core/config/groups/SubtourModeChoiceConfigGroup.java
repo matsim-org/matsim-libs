@@ -23,13 +23,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 
 /**
  * @author thibautd
  */
-public class SubtourModeChoiceConfigGroup extends ConfigGroup {
+public class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "subtourModeChoice";
 	
@@ -46,20 +46,14 @@ public class SubtourModeChoiceConfigGroup extends ConfigGroup {
 		super(GROUP_NAME);
 	}
 
-	@Override
-	public String getValue(final String key) {
-		if ( MODES.equals( key ) ) {
-			return toString( allModes );
-		}
-		else if ( CHAINBASEDMODES.equals( key ) ) {
-			return toString( chainBasedModes );
-		}
-		else if ( CARAVAIL.equals( key ) ) {
-			return ""+considerCarAvailability;
-		}
-		else {
-			throw new IllegalArgumentException(key);
-		}
+	@StringGetter( MODES )
+	private String getModesString() {
+		return toString( allModes );
+	}
+
+	@StringGetter( CHAINBASEDMODES )
+	private String getChainBaseModesString() {
+		return toString( chainBasedModes );
 	}
 
 	private String toString( final String[] modes ) {
@@ -84,22 +78,15 @@ public class SubtourModeChoiceConfigGroup extends ConfigGroup {
 		return parts;
 	}
 
-	@Override
-	public void addParam(final String key, final String value) {
-		if ( MODES.equals( key ) ) {
-			setModes( toArray( value ) );
-		}
-		else if ( CHAINBASEDMODES.equals( key ) ) {
-			setChainBasedModes( toArray( value ) );
-		}
-		else if ( CARAVAIL.equals( key ) ) {
-			setConsiderCarAvailability( Boolean.valueOf( value ) );
-		}
-		else {
-			throw new IllegalArgumentException( key );
-		}
+	@StringSetter( MODES )
+	private void setModes( final String value ) {
+		setModes( toArray( value ) );
 	}
 
+	@StringSetter( CHAINBASEDMODES )
+	private void setChainBasedModes( final String value ) {
+		setChainBasedModes( toArray( value ) );
+	}
 
 	@Override
 	public Map<String, String> getComments() {
@@ -108,15 +95,6 @@ public class SubtourModeChoiceConfigGroup extends ConfigGroup {
 		comments.put(CHAINBASEDMODES, "Defines the chain-based modes, seperated by commas" );
 		comments.put(CARAVAIL, "Defines whether car availability must be considered or not. A agent has no car only if it has no license, or never access to a car" );
 		return comments;
-	}
-
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put( MODES , getValue( MODES ) );
-		map.put( CHAINBASEDMODES , getValue( CHAINBASEDMODES ) );
-		map.put( CARAVAIL , getValue( CARAVAIL ) );
-		return map;
 	}
 
 	/* direct access */
@@ -137,10 +115,12 @@ public class SubtourModeChoiceConfigGroup extends ConfigGroup {
 		return this.chainBasedModes;
 	}
 
+	@StringSetter( CARAVAIL )
 	public void setConsiderCarAvailability(final boolean value) {
 		this.considerCarAvailability = value;
 	}
 
+	@StringGetter( CARAVAIL )
 	public boolean considerCarAvailability() {
 		return considerCarAvailability;
 	}
