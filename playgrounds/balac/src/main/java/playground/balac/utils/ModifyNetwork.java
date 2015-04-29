@@ -35,13 +35,13 @@ public class ModifyNetwork {
 					link.setFreespeed(link.getFreespeed());
 				
 				else
-					link.setFreespeed(link.getFreespeed() * 0.85);
+					link.setFreespeed(link.getFreespeed() * 0.70);
 				
 			}
 			
 		}
 		
-		new NetworkWriter(scenario.getNetwork()).write(outputFilePath + "/network" + "_reduced_15perc.xml");
+		new NetworkWriter(scenario.getNetwork()).write(outputFilePath + "/network" + "_reduced_30perc.xml");
 	}
 	
 	

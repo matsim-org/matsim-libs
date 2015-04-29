@@ -156,7 +156,7 @@ public class MembershipAssigner {
 	}
 	
 	
-	public void run() {
+	public void run(String name) {
 		int count = 0;
 		for (Person p : this.scenario.getPopulation().getPersons().values()) {
 			
@@ -175,7 +175,7 @@ public class MembershipAssigner {
 			}
 		}
 		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(this.personAtt);
-		betaWriter.writeFile("/cluster/work/ivt_vpl/balacm/ScenarioPreparation/input/desires_rt_memb_100perc_5x.xml.gz");
+		betaWriter.writeFile("./desires_rt_memb_100perc_" + name + ".xml.gz");
 		System.out.println(count);
 		
 	}	
@@ -250,7 +250,7 @@ public class MembershipAssigner {
 		MembershipAssigner assigner = new MembershipAssigner(stations, scenario, bla);
 		
 		assigner.init();
-		assigner.run();
+		assigner.run(args[5]);
 
 	}
 

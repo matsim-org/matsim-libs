@@ -13,18 +13,22 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class TravelTimeRealPT {
 	
-	public void run(String[] input)  {
+	public void run(String input, String attributes)  {
 		double centerX = 683217.0; 
-		double centerY = 247300.0;		
-		for (String plansFilePath : input) {
+		double centerY = 247300.0;	
+ObjectAttributes bla = new ObjectAttributes();
+		
+		new ObjectAttributesXmlReader(bla).parse(attributes);	
 			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 			PopulationReader populationReader = new MatsimPopulationReader(scenario);
 			MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
-		populationReader.readFile(plansFilePath);
+		populationReader.readFile(input);
 	//	networkReader.readFile(networkFilePath);
 		double travelTimeCar = 0.0;
 		int countC = 0;
@@ -76,17 +80,18 @@ public class TravelTimeRealPT {
 								countB++;
 								count++;
 							}
-							else if (previousLeg.getMode().equals( "walk" )) {
-								travelTimeWalk += previousLeg.getTravelTime();
-								countW++;
-								count++;
-							}
+							
 							else if (pt) {
 								travelTimePt += tempTTPT;
 								tempTTPT = 0.0;
 								countPt++;
 								count++;
 								pt = false;
+							}
+							else {
+								travelTimeWalk += previousLeg.getTravelTime();
+								countW++;
+								count++;
 							}
 						}
 					}
@@ -102,12 +107,12 @@ public class TravelTimeRealPT {
 		System.out.println(travelTimeBike/(double) countB);
 		System.out.println(travelTimeWalk/(double) countW);
 		System.out.println(travelTimePt/(double) countPt);
-		}
+		
 	}
 	
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		TravelTimeRealPT m = new TravelTimeRealPT();
-		m.run(args);
+		//m.run(args);
 	}
 }

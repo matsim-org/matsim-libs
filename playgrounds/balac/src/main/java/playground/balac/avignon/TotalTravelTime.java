@@ -20,6 +20,8 @@ public class TotalTravelTime {
 	PopulationReader populationReader = new MatsimPopulationReader(scenario);
 	MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 	public void run(String plansFilePath, String networkFilePath) throws IOException {
+		
+		
 		populationReader.readFile(plansFilePath);
 		networkReader.readFile(networkFilePath);
 		double distanceCar = 0.0;
