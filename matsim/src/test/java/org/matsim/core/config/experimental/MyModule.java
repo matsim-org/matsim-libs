@@ -42,6 +42,8 @@ public class MyModule extends ReflectiveConfigGroup {
 	private Coord coordField = null;
 	// enum: handled especially
 	private MyEnum enumField = null;
+	// field without null conversion
+	private String nonNull = "some arbitrary default value.";
 
 	public MyModule() {
 		super( GROUP_NAME );
@@ -86,7 +88,8 @@ public class MyModule extends ReflectiveConfigGroup {
 	 */
 	@StringSetter( "idField" )
 	private void setIdField(String s) {
-		this.idField = Id.create( s, Link.class );
+		// Null handling needs to be done manually if conversion "by hand"
+		this.idField = s == null ? null : Id.create( s, Link.class );
 	}
 
 	// /////////////////////////////////////////////////////////////////////
@@ -104,17 +107,47 @@ public class MyModule extends ReflectiveConfigGroup {
 	// interface: the user just sees the "typed" getter and setter.
 	@StringGetter( "coordField" )
 	private String getCoordFieldString() {
-		return this.coordField.getX()+","+this.coordField.getY();
+		// Null handling needs to be done manually if conversion "by hand"
+		// Note that one *needs" to return a null pointer, not the "null"
+		// String, which is reserved word.
+		return this.coordField == null ? null : this.coordField.getX()+","+this.coordField.getY();
 	}
 
 	@StringSetter( "coordField" )
 	private void setCoordField(String coordField) {
+		if ( coordField == null ) {
+			// Null handling needs to be done manually if conversion "by hand"
+			this.coordField = null;
+			return;
+		}
+
 		final String[] coords = coordField.split( "," );
 		if ( coords.length != 2 ) throw new IllegalArgumentException( coordField );
 
 		this.coordField = new CoordImpl(
 				Double.parseDouble( coords[ 0 ] ),
 				Double.parseDouble( coords[ 1 ] ) );
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// Non-null string: standard setter and getter
+	@StringGetter( "nonNullField" )
+	@DoNotConvertNull
+	public String getNonNull() {
+		return nonNull;
+	}
+
+	@StringSetter( "nonNullField" )
+	@DoNotConvertNull
+	public void setNonNull( String nonNull ) {
+		// in case the setter is called from user code, we need to check for nullity ourselves.
+		if ( nonNull == null ) throw new IllegalArgumentException();
+		this.nonNull = nonNull;
+	}
+
+	// XXX for test, should not appear in tutorial
+	void setNonNullToNull( ) {
+		this.nonNull = null;
 	}
 
 	// /////////////////////////////////////////////////////////////////////
@@ -126,6 +159,7 @@ public class MyModule extends ReflectiveConfigGroup {
 
 	@StringSetter( "enumField" )
 	public void setTestEnumField(final MyEnum enumField) {
+		// no need to test for null: the parent class does it for us
 		this.enumField = enumField;
 	}
 }

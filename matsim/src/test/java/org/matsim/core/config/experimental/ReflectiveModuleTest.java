@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.config.experimental;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -37,6 +38,9 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author thibautd
  */
 public class ReflectiveModuleTest {
+	private static final Logger log =
+		Logger.getLogger(ReflectiveModuleTest.class);
+
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -47,6 +51,7 @@ public class ReflectiveModuleTest {
 		dumpedModule.setIdField( Id.create( 123, Link.class ) );
 		dumpedModule.setCoordField( new CoordImpl( 265 , 463 ) );
 		dumpedModule.setTestEnumField( MyEnum.VALUE2 );
+		dumpedModule.setNonNull( "null" );
 
 		final Config dumpedConfig = new Config();
 		dumpedConfig.addModule( dumpedModule );
@@ -60,6 +65,42 @@ public class ReflectiveModuleTest {
 		readConfig.addModule( readModule );
 
 		assertSame( dumpedModule , readModule );
+	}
+
+	@Test
+	public void testDumpAndReadNulls() {
+		final MyModule dumpedModule = new MyModule();
+		dumpedModule.setIdField( null );
+		dumpedModule.setCoordField( null );
+		dumpedModule.setTestEnumField( null );
+
+		final Config dumpedConfig = new Config();
+		dumpedConfig.addModule( dumpedModule );
+
+		final String fileName = utils.getOutputDirectory() + "/dump.xml";
+
+		new ConfigWriter( dumpedConfig ).write( fileName );
+		final Config readConfig = ConfigUtils.loadConfig( fileName );
+		final MyModule readModule = new MyModule();
+		// as a side effect, this loads the information
+		readConfig.addModule( readModule );
+
+		assertSame( dumpedModule , readModule );
+	}
+
+	@Test
+	public void testFailsWritingNullIfNoConversion() {
+		final MyModule dumpedModule = new MyModule();
+		dumpedModule.setNonNullToNull();
+		try {
+			dumpedModule.getParams();
+		}
+		catch (RuntimeException e) {
+			log.info( "got exception, as expected" , e );
+			return;
+		}
+
+		Assert.fail( "no failure when non-authorized null value." );
 	}
 
 	@Test
