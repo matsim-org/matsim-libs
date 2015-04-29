@@ -33,11 +33,13 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import com.google.inject.Provider;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  *
  * @author jwjoubert
  */
+@Singleton
 public class MclarpifMobsimFactory implements Provider<Mobsim> {
 	final private Logger log = Logger.getLogger(MclarpifMobsimFactory.class);
 	final private Scenario sc;

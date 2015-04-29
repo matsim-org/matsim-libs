@@ -27,11 +27,17 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
 
-public class MclarpifPlanStrategyFactory implements PlanStrategyFactory {
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+@Singleton
+public class MclarpifPlanStrategyFactory implements Provider<PlanStrategy> {
 	private final Logger log = Logger.getLogger(MclarpifPlanStrategyFactory.class);
 	private Scenario sc;
 	
-	public MclarpifPlanStrategyFactory(Scenario sc) {
+	@Inject
+	MclarpifPlanStrategyFactory(Scenario sc) {
 		this.sc = sc;
 	}
 	

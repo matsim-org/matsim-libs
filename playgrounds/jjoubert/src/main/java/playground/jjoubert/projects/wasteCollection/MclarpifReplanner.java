@@ -27,10 +27,13 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 
+import javax.inject.Singleton;
+
 /**
  *
  * @author jwjoubert
  */
+@Singleton
 public class MclarpifReplanner implements ReplanningListener {
 	final private Logger log = Logger.getLogger(MclarpifReplanner.class);
 	@Override

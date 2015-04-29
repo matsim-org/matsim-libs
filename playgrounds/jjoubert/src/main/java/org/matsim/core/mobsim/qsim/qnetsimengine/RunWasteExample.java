@@ -59,12 +59,11 @@ public class RunWasteExample {
 		Scenario sc = setupScenario();
 		
 		Controler controler = new Controler(sc);
-		MclarpifPlanStrategyFactory mclarpifPlanStrategyFactory = new MclarpifPlanStrategyFactory(sc);
-		controler.addPlanStrategyFactory("mclarpifSolver", mclarpifPlanStrategyFactory);
-		controler.addControlerListener(new MclarpifReplanner());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
+				addControlerListenerBinding().to(MclarpifReplanner.class);
+				addPlanStrategyBinding("mclarpifSolver").toProvider(MclarpifPlanStrategyFactory.class);
 				bindMobsim().toProvider(MclarpifMobsimFactory.class);
 			}
 		});
