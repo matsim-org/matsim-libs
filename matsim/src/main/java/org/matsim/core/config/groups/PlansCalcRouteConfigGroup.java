@@ -131,7 +131,7 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 		@StringSetter( "teleportedModeSpeed" )
 		public void setTeleportedModeSpeed(Double teleportedModeSpeed) {
-			if ( getTeleportedModeFreespeedFactor() != null ) {
+			if ( getTeleportedModeFreespeedFactor() != null && teleportedModeSpeed != null ) {
 				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
 			}
 			this.teleportedModeSpeed = teleportedModeSpeed;
@@ -145,7 +145,7 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 		@StringSetter( "teleportedModeFreespeedFactor" )
 		public void setTeleportedModeFreespeedFactor(
 				Double teleportedModeFreespeedFactor) {
-			if ( getTeleportedModeSpeed() != null ) {
+			if ( getTeleportedModeSpeed() != null && teleportedModeFreespeedFactor != null ) {
 				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
 			}
 			this.teleportedModeFreespeedFactor = teleportedModeFreespeedFactor;

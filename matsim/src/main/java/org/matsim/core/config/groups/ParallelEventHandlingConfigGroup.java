@@ -20,16 +20,16 @@
 
 package org.matsim.core.config.groups;
 
-import org.matsim.core.config.ConfigGroup;
-
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author nagel
  *
  */
-public class ParallelEventHandlingConfigGroup extends ConfigGroup {
+public class ParallelEventHandlingConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "parallelEventHandling";
 
@@ -49,32 +49,6 @@ public class ParallelEventHandlingConfigGroup extends ConfigGroup {
 	}
 
 	@Override
-	public String getValue(final String key) {
-		if ( NUMBER_OF_THREADS.equals(key) || ESTIMATED_NUMBER_OF_EVENTS.equals(key) ) {
-			throw new RuntimeException("getValue access disabled; use direct getter");
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-        switch (key) {
-            case NUMBER_OF_THREADS:
-                this.setNumberOfThreads(Integer.parseInt(value));
-                break;
-            case ESTIMATED_NUMBER_OF_EVENTS:
-                this.setEstimatedNumberOfEvents(Long.parseLong(value));
-                break;
-            case SYNCHRONIZE_ON_SIMSTEPS:
-                this.setSynchronizeOnSimSteps(Boolean.parseBoolean(value));
-                break;
-            default:
-                throw new IllegalArgumentException(key);
-        }
-	}
-
-	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		comments.put(NUMBER_OF_THREADS, "Number of threads for parallel events handler. 0 or null means the framework decides by itself.");
@@ -82,19 +56,12 @@ public class ParallelEventHandlingConfigGroup extends ConfigGroup {
 		return comments;
 	}
 
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<>();
-		map.put(NUMBER_OF_THREADS, this.getNumberOfThreads() == null ? null : this.getNumberOfThreads().toString());
-		map.put(ESTIMATED_NUMBER_OF_EVENTS, this.getEstimatedNumberOfEvents() == null ? null : this.getEstimatedNumberOfEvents().toString());
-		return map;
-	}
-
-	/* direct access */
+	@StringGetter( NUMBER_OF_THREADS )
 	public Integer getNumberOfThreads() {
 		return numberOfThreads;
 	}
 
+	@StringSetter( NUMBER_OF_THREADS )
 	public void setNumberOfThreads(Integer numberOfThreads) {
 		if ( !this.locked ) {
 			this.numberOfThreads = numberOfThreads;
@@ -103,10 +70,12 @@ public class ParallelEventHandlingConfigGroup extends ConfigGroup {
 		}
 	}
 
+	@StringGetter( ESTIMATED_NUMBER_OF_EVENTS )
 	public Long getEstimatedNumberOfEvents() {
 		return estimatedNumberOfEvents;
 	}
 
+	@StringSetter( ESTIMATED_NUMBER_OF_EVENTS )
 	public void setEstimatedNumberOfEvents(Long estimatedNumberOfEvents) {
 		if ( !this.locked ) {
 			this.estimatedNumberOfEvents = estimatedNumberOfEvents;
@@ -115,10 +84,12 @@ public class ParallelEventHandlingConfigGroup extends ConfigGroup {
 		}
 	}
 	
+	@StringGetter( SYNCHRONIZE_ON_SIMSTEPS )
 	public Boolean getSynchronizeOnSimSteps() {
 		return this.synchronizeOnSimSteps;
 	}
 
+	@StringSetter( SYNCHRONIZE_ON_SIMSTEPS )
 	public void setSynchronizeOnSimSteps(Boolean synchronizeOnSimSteps) {
 		if ( !this.locked ) {
 			this.synchronizeOnSimSteps = synchronizeOnSimSteps;

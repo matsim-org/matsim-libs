@@ -25,13 +25,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * @author dgrether
  * @author mrieser
  */
-public class CountsConfigGroup extends ConfigGroup {
+public class CountsConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "counts";
 
@@ -76,78 +76,6 @@ public class CountsConfigGroup extends ConfigGroup {
 		super(GROUP_NAME);
 	}
 
-	@Override
-	public String getValue(final String key) {
-		if (OUTPUTFORMAT.equals(key)) {
-			return getOutputFormat();
-		} else if (DISTANCEFILTER.equals(key)) {
-			if (getDistanceFilter() == null) {
-				return null;
-			}
-			return getDistanceFilter().toString();
-		} else if (DISTANCEFILTERCENTERNODE.equals(key)) {
-			return getDistanceFilterCenterNode();
-		} else if (COUNTSINPUTFILENAME.equals(key)) {
-			return getCountsFileName();
-		} else if (COUNTSSCALEFACTOR.equals(key)) {
-			return Double.toString(getCountsScaleFactor());
-		} else if (WRITECOUNTSINTERVAL.equals(key)) {
-			return Integer.toString(getWriteCountsInterval());
-		} else if (AVERAGECOUNTSOVERITERATIONS.equals(key)) {
-			return Integer.toString(getAverageCountsOverIterations());
-		} else if (ANALYZEDMODES.equals(key)){
-			return getAnalyzedModes();
-		} else if (FILTERMODES.equals(key)){
-			return Boolean.toString(isFilterModes());
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		if (OUTPUTFORMAT.equals(key)) {
-			setOutputFormat(value);
-		} else if (DISTANCEFILTER.equals(key)) {
-			if (value == null) {
-				setDistanceFilter(null);
-			} else {
-				setDistanceFilter(Double.valueOf(value));
-			}
-		} else if (DISTANCEFILTERCENTERNODE.equals(key)) {
-			setDistanceFilterCenterNode(value);
-		} else if (COUNTSINPUTFILENAME.equals(key)) {
-			setCountsFileName(value);
-		} else if (COUNTSSCALEFACTOR.equals(key)) {
-			this.setCountsScaleFactor(Double.parseDouble(value));
-		} else if (WRITECOUNTSINTERVAL.equals(key)) {
-			this.setWriteCountsInterval(Integer.parseInt(value));
-		} else if (AVERAGECOUNTSOVERITERATIONS.equals(key)) {
-			this.setAverageCountsOverIterations(Integer.parseInt(value));
-		} else if (ANALYZEDMODES.equals(key)){
-			this.setAnalyzedModes(value);
-		} else if (FILTERMODES.equals(key)){
-			this.setFilterModes(Boolean.parseBoolean(value));
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-		this.addParameterToMap(map, OUTPUTFORMAT);
-		this.addParameterToMap(map, DISTANCEFILTER);
-		this.addParameterToMap(map, DISTANCEFILTERCENTERNODE);
-		this.addParameterToMap(map, COUNTSINPUTFILENAME);
-		this.addParameterToMap(map, COUNTSSCALEFACTOR);
-		this.addParameterToMap(map, WRITECOUNTSINTERVAL);
-		this.addParameterToMap(map, AVERAGECOUNTSOVERITERATIONS);
-		map.put(ANALYZEDMODES, getValue(ANALYZEDMODES));
-		map.put(FILTERMODES, getValue(FILTERMODES));
-		return map;
-	}
-	
 	// the following are public so they can be re-used in PtCountsComparisonConfigGroup.  Once that group is moved into the same
 	// package, they can be made package-private.  kai, oct'10
 	public static final String COUNTS_OUTPUTFORMAT_COMMENT = "possible values: `html', `kml', `txt', `all'"  ;
@@ -175,26 +103,32 @@ public class CountsConfigGroup extends ConfigGroup {
 		return comments;
 	}
 
+	@StringGetter( OUTPUTFORMAT )
 	public String getOutputFormat() {
 		return this.outputFormat;
 	}
 
+	@StringSetter( OUTPUTFORMAT )
 	public void setOutputFormat(final String outputFormat) {
 		this.outputFormat = outputFormat;
 	}
 
+	@StringGetter( DISTANCEFILTER )
 	public Double getDistanceFilter() {
 		return this.distanceFilter;
 	}
 
+	@StringSetter( DISTANCEFILTER )
 	public void setDistanceFilter(final Double distanceFilter) {
 		this.distanceFilter = distanceFilter;
 	}
 
+	@StringGetter( DISTANCEFILTERCENTERNODE )
 	public String getDistanceFilterCenterNode() {
 		return this.distanceFilterCenterNode;
 	}
 
+	@StringSetter( DISTANCEFILTERCENTERNODE )
 	public void setDistanceFilterCenterNode(final String distanceFilterCenterNode) {
 		this.distanceFilterCenterNode = distanceFilterCenterNode;
 	}
@@ -202,6 +136,7 @@ public class CountsConfigGroup extends ConfigGroup {
 	/**
 	 * @return the filename of the counts file to be read in
 	 */
+	@StringGetter( COUNTSINPUTFILENAME )
 	public String getCountsFileName() {
 		return this.countsFileName;
 	}
@@ -209,46 +144,57 @@ public class CountsConfigGroup extends ConfigGroup {
 	/**
 	 * @param countsFileName the filename of the counts file to be read in
 	 */
+	@StringSetter( COUNTSINPUTFILENAME )
 	public void setCountsFileName(final String countsFileName) {
 		this.countsFileName = countsFileName;
 	}
 
+	@StringGetter( COUNTSSCALEFACTOR )
 	public double getCountsScaleFactor() {
 		return this.countsScaleFactor;
 	}
 
+	@StringSetter( COUNTSSCALEFACTOR )
 	public void setCountsScaleFactor(final double countsScaleFactor) {
 		this.countsScaleFactor = countsScaleFactor;
 	}
 	
+	@StringGetter( WRITECOUNTSINTERVAL )
 	public int getWriteCountsInterval() {
 		return writeCountsInterval;
 	}
 	
+	@StringSetter( WRITECOUNTSINTERVAL )
 	public void setWriteCountsInterval(int writeCountsInterval) {
 		this.writeCountsInterval = writeCountsInterval;
 	}
 	
+	@StringGetter( AVERAGECOUNTSOVERITERATIONS )
 	public int getAverageCountsOverIterations() {
 		return averageCountsOverIterations;
 	}
 	
+	@StringSetter( AVERAGECOUNTSOVERITERATIONS )
 	public void setAverageCountsOverIterations(int averageCountsOverIterations) {
 		this.averageCountsOverIterations = averageCountsOverIterations;
 	}
 	
+	@StringGetter( FILTERMODES )
 	public boolean isFilterModes() {
 		return this.filterModes;
 	}
 	
+	@StringSetter( FILTERMODES )
 	public void setFilterModes(final boolean filterModes) {
 		this.filterModes = filterModes;
 	}
 	
+	@StringGetter( ANALYZEDMODES )
 	public String getAnalyzedModes() {
 		return this.analyzedModes;
 	}
 	
+	@StringSetter( ANALYZEDMODES )
 	public void setAnalyzedModes(final String analyzedModes) {
 		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
 	}

@@ -200,23 +200,24 @@ public class StrategyConfigGroup extends ConfigGroup {
 		// adding underscore parameters is still supported for backward compatibility.
 		if (key != null && key.startsWith(MODULE)) {
 			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE.length()), StrategySettings.class), true);
-			settings.setStrategyName(value);
+			settings.addParam( "strategyName" , value);
 		}
 		else if (key != null && key.startsWith(MODULE_PROBABILITY)) {
 			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_PROBABILITY.length()), StrategySettings.class), true);
-			settings.setWeight(Double.parseDouble(value));
+			settings.addParam( "weight" , value );
 		}
 		else if (key != null && key.startsWith(MODULE_DISABLE_AFTER_ITERATION)) {
 			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_DISABLE_AFTER_ITERATION.length()), StrategySettings.class), true);
 			settings.setDisableAfter(Integer.parseInt(value));
+			settings.addParam( "disableAfterIteration" , value );
 		}
 		else if (key != null && key.startsWith(MODULE_EXE_PATH)) {
 			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_EXE_PATH.length()), StrategySettings.class), true);
-			settings.setExePath(value);
+			settings.addParam( "executionPath" , value );
 		}
 		else if (key != null && key.startsWith(MODULE_SUBPOPULATION)) {
 			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_SUBPOPULATION.length()), StrategySettings.class), true);
-			settings.setSubpopulation(value);
+			settings.addParam( "subpopulation" , value );
 		}
 		else {
 			delegate.addParam( key , value );
