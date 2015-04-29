@@ -119,6 +119,25 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup {
 		if ( !setters.keySet().equals( stringGetters.keySet() ) ) {
 			throw new InconsistentModuleException( "setters and getters inconsistent" );
 		}
+
+		checkConvertNullAnnotations();
+	}
+
+	private void checkConvertNullAnnotations() {
+		final Class<? extends ReflectiveConfigGroup> c = getClass();
+
+		final Method[] allMethods = c.getDeclaredMethods();
+
+		for (Method m : allMethods) {
+			final StringGetter annotation = m.getAnnotation( StringGetter.class );
+			if ( annotation != null ) {
+				final Method g = getStringGetters().get( annotation.value() );
+
+				if ( m.isAnnotationPresent( DoNotConvertNull.class ) != g.isAnnotationPresent( DoNotConvertNull.class ) ) {
+					throw new InconsistentModuleException( "Inconsistent annotation of getter and setter with ConvertNull in "+getClass().getName() );
+				}
+			}
+		}
 	}
 
 	private Map<String, Method> getStringGetters() {
@@ -251,7 +270,10 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup {
 
 		final Class<?> type = params[ 0 ];
 
-		if ( type.equals( String.class ) ) {
+		if ( value.equals( "null" ) && !setter.isAnnotationPresent( DoNotConvertNull.class ) ) {
+			setter.invoke( this , new Object[]{ null } );
+		}
+		else if ( type.equals( String.class ) ) {
 			setter.invoke( this , value );
 		}
 		else if ( type.equals( Float.class ) || type.equals( Float.TYPE ) ) {
@@ -326,15 +348,18 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup {
 				final boolean accessible = getter.isAccessible();
 				getter.setAccessible( true );
 				final Object result = getter.invoke( this );
-				if ( result == null ) {
+				if ( result == null && getter.isAnnotationPresent( DoNotConvertNull.class ) ) {
 					log.error( "getter for parameter "+param_name+" of module "+getName()+" returned null." );
-					log.error( "This is not allowed (anymore). Modules should handle null by themselves: " );
-					log.error( "if the \"null\" string should be handled specially, please do it from within the module" );
-					log.error( "If you are not the implementor of this config group, please contact the corresponding developper or mailing list, as applicable." );
+					log.error( "This is not allowed for this getter." );
 
 					throw new NullPointerException( "getter for parameter "+param_name+" of module "+getClass().getName()+" ("+getName()+") returned null." );
 				}
 				final String value = ""+result;
+
+				if ( value.equals( "null" ) && result != null && !getter.isAnnotationPresent( DoNotConvertNull.class ) ) {
+					throw new RuntimeException( "parameter "+param_name+" understands null pointers for IO. As a consequence, the \"null\" String is not a valid value for "+getter.getName() );
+				}
+
 				getter.setAccessible( accessible );
 
 				return value;
@@ -461,6 +486,20 @@ public abstract class ReflectiveConfigGroup extends ConfigGroup {
 		 */
 		String value();
 	}
+
+	/**
+	 * Setters for which the "null" string should NOT be converted
+	 * to the <tt>null</tt> pointer, and getter from which a <tt>null</tt>
+	 * pointer should NOT be accepted and converted to the "null" string,
+	 * should be annotated with this.
+	 * <br>
+	 * Note that both the setter and the getter for a given parameter,
+	 * or none of them, must be annotated. If not, an {@link InconsistentModuleException}
+	 * will be thrown.
+	 */
+	@Documented
+	@Retention( RetentionPolicy.RUNTIME )
+	public static @interface DoNotConvertNull {}
 
 	public static class InconsistentModuleException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
