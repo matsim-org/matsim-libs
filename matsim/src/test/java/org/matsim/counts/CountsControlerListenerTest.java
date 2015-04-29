@@ -42,6 +42,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -254,17 +256,9 @@ public class CountsControlerListenerTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				if (getConfig().controler().getMobsim().equals("dummy")) {
-					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return new DummyMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
-						}
-					});
-				}
+				bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
 			}
 		});
-		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);
 
@@ -300,17 +294,9 @@ public class CountsControlerListenerTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				if (getConfig().controler().getMobsim().equals("dummy")) {
-					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return new DummyMobsimFactory().createMobsim(controler.getScenario(), controler.getEvents());
-						}
-					});
-				}
+				bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
 			}
 		});
-		config.controler().setMobsim("dummy");
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(7);
 
@@ -378,18 +364,12 @@ public class CountsControlerListenerTest {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				if (getConfig().controler().getMobsim().equals("dummy")) {
-					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return new DummyMobsim2Factory().createMobsim(controler.getScenario(), controler.getEvents());
-						}
-					});
-				}
+				bind(Mobsim.class).to(DummyMobsim2.class);
 			}
 		});
 		controler.getConfig().controler().setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
+		controler.setOverwriteFiles(true);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		controler.run();
@@ -422,21 +402,21 @@ public class CountsControlerListenerTest {
 			}
 		}
 	}
-	
-	private static class DummyMobsimFactory implements MobsimFactory {
+
+	@Singleton
+	private static class DummyMobsimFactory implements Provider<Mobsim> {
 		private int count = 1;
+		@Inject EventsManager eventsManager;
+
 		@Override
-		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+		public Mobsim get() {
 			return new DummyMobsim(eventsManager, count++);
 		}
 	}
 	
 	private static class DummyMobsim2 implements Mobsim {
-		private final EventsManager eventsManager;
-		public DummyMobsim2(EventsManager eventsManager) {
-			this.eventsManager = eventsManager;
-		}
-		
+		@Inject EventsManager eventsManager;
+
 		@Override
 		public void run() {
 			Id<Link> linkId = Id.create("100", Link.class);
@@ -453,11 +433,4 @@ public class CountsControlerListenerTest {
 		}
 	}
 	
-	private static class DummyMobsim2Factory implements MobsimFactory {
-		
-		@Override
-		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-			return new DummyMobsim2(eventsManager);
-		}
-	}
 }
