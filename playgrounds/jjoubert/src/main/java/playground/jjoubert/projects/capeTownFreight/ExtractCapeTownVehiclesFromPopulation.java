@@ -63,6 +63,8 @@ public class ExtractCapeTownVehiclesFromPopulation {
 		new MatsimPopulationReader(scInput).parse(inputPopulationFile);
 		/* Read in the population attributes. */
 		new ObjectAttributesXmlReader(scInput.getPopulation().getPersonAttributes()).parse(inputAttributeFile);
+		LOG.info("Total number in population before extraction: " + scInput.getPopulation().getPersons().size());
+		
 		
 		/* Read in the shapefile. */
 		ShapeFileReader sfr = new ShapeFileReader();
@@ -109,6 +111,7 @@ public class ExtractCapeTownVehiclesFromPopulation {
 		counter.printCounter();
 		
 		/* Write the population to file. */
+		LOG.info("Total number in population after extraction: " + scOutput.getPopulation().getPersons().size());
 		new PopulationWriter(scOutput.getPopulation()).write(outputPopulationfile);
 		new ObjectAttributesXmlWriter(scOutput.getPopulation().getPersonAttributes()).writeFile(outputAttributeFile);
 		

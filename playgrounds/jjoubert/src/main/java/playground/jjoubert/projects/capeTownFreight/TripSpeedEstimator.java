@@ -24,8 +24,11 @@
 package playground.jjoubert.projects.capeTownFreight;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -37,9 +40,16 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.southafrica.freight.digicore.containers.DigicoreActivity;
+import playground.southafrica.freight.digicore.containers.DigicoreChain;
+import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+import playground.southafrica.freight.digicore.io.DigicoreVehicleReader;
+import playground.southafrica.freight.digicore.utils.DigicoreUtils;
+import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -56,13 +66,17 @@ public class TripSpeedEstimator{
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		estimateFromChains(args);
+	}
+	
+	public static void estimateFromPlans(String[] args){
 		Header.printHeader(TripSpeedEstimator.class.toString(), args);
 		String plans = args[0];
 		String output = args[1];
-		
+
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimPopulationReader(sc).parse(plans);
-		
+
 		LOG.info("Processing plans to extract trip times as a function of distance...");
 		BufferedWriter bw = IOUtils.getBufferedWriter(output);
 		Counter counter = new Counter(" persons # ");
@@ -101,8 +115,69 @@ public class TripSpeedEstimator{
 			}
 		}
 		counter.printCounter();
-		
+
 		Header.printFooter();
 	}
 
+	public static void estimateFromChains(String[] args){
+		Header.printHeader(TripSpeedEstimator.class.toString(), args);
+		String xmlfolder = args[0];
+		String output = args[1];
+		String date = args[2];
+		
+		List<File> files = FileUtils.sampleFiles(new File(xmlfolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+		LOG.info("Processing activity chains to extract trip times as a function of distance...");
+		BufferedWriter bw = IOUtils.getBufferedWriter(output);
+		Counter counter = new Counter(" vehicles # ");
+		try{
+			bw.write("id,leg,startHour,crowDistKm,timeS");
+			bw.newLine();
+			
+			for(File file : files){
+				DigicoreVehicleReader dvr = new DigicoreVehicleReader();
+				dvr.parse(file.getAbsolutePath());
+				DigicoreVehicle dv = dvr.getVehicle();
+				
+				int legId = 0;
+				for(DigicoreChain chain : dv.getChains()){
+					String chainDate = DigicoreUtils.getShortDate(chain.getFirstMajorActivity().getEndTimeGregorianCalendar());
+					if(chainDate.equalsIgnoreCase(date)){
+						for(int i = 1; i < chain.size(); i++){
+							DigicoreActivity d1 = chain.get(i-1);
+							DigicoreActivity d2 = chain.get(i);
+							
+							/* Get start hour */
+							int hour = d1.getEndTimeGregorianCalendar().get(Calendar.HOUR_OF_DAY);
+							
+							double triptime = (((double)d2.getStartTimeGregorianCalendar().getTimeInMillis()) - ((double)d1.getEndTimeGregorianCalendar().getTimeInMillis()))/1000.0;
+							double crowFlyDistance = ((double)CoordUtils.calcDistance(d1.getCoord(), d2.getCoord()))/1000.0;
+							
+							String s = String.format("%s,%d,%d,%.3f,%.0f\n", 
+									dv.getId().toString(),
+									legId++,
+									hour,
+									crowFlyDistance,
+									triptime);
+							bw.write(s);
+						}
+					}
+				}
+				counter.incCounter();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + output);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + output);
+			}
+		}
+		counter.printCounter();
+		
+		Header.printFooter();
+	}
+	
 }
