@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import java.util.TreeMap;
-
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
 /**
  * This config Module can be used to specify the paths to the
@@ -30,7 +28,7 @@ import org.matsim.core.config.ConfigGroup;
  * @author dgrether
  *
  */
-public class SignalSystemsConfigGroup extends ConfigGroup {
+public class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 
 	public  static final String SIGNALSYSTEM_FILE = "signalsystems";
 	public  static final String SIGNALCONTROL_FILE = "signalcontrol";
@@ -65,136 +63,99 @@ public class SignalSystemsConfigGroup extends ConfigGroup {
 	}
 
 	@Override
-	public String getValue(final String key) {
-		throw new UnsupportedOperationException("This method is only implemented if compatibility with old code is needed, which is not the case for signals");
-	}
-
-	@Override
-	public void addParam(final String key, final String value){
-		if (SIGNALSYSTEM_FILE.equalsIgnoreCase(key)){
-			this.signalSystemFile = value.trim();
-		}
-		else if (SIGNALCONTROL_FILE.equalsIgnoreCase(key)) {
-			this.signalControlFile = value.trim();
-		}
-		else if (SIGNALGROUPS_FILE.equalsIgnoreCase(key)){
-			this.signalGroupsFile = value.trim();
-		}
-		else if (AMBERTIMES_FILE.equalsIgnoreCase(key)){
-			this.amberTimesFile = value.trim();
-		}
-		else if (INTERGREENTIMES_FILE.equalsIgnoreCase(key)){
-			this.intergreenTimesFile = value.trim();
-		}
-		else if (USE_INTERGREEN_TIMES.equalsIgnoreCase(key)){
-			this.setUseIntergreenTimes(Boolean.parseBoolean(value.trim()));
-		}
-		else if (USE_AMBER_TIMES.equalsIgnoreCase(key)){
-			this.setUseAmbertimes(Boolean.parseBoolean(value.trim()));
-		}
-		else if (ACTION_ON_INTERGREEN_VIOLATION.equalsIgnoreCase(key)){
-			if (WARN_ON_INTERGREEN_VIOLATION.equalsIgnoreCase(value.trim())){
-				this.setActionOnIntergreenViolation(WARN_ON_INTERGREEN_VIOLATION);
-			}
-			else if (EXCEPTION_ON_INTERGREEN_VIOLATION.equalsIgnoreCase(value.trim())){
-				this.setActionOnIntergreenViolation(EXCEPTION_ON_INTERGREEN_VIOLATION);
-			}
-			else {
-				throw new IllegalArgumentException("The value " + value.trim() + " for key : " + key + " is not supported by this config group");
-			}
-		}
-		else {
-			throw new IllegalArgumentException("The key : " + key + " is not supported by this config group");
-		}
-	}
-
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(SIGNALSYSTEM_FILE, this.getSignalSystemFile());
-		map.put(SIGNALCONTROL_FILE, this.getSignalControlFile());
-		map.put(SIGNALGROUPS_FILE, this.getSignalGroupsFile());
-		map.put(USE_AMBER_TIMES, Boolean.toString(this.isUseAmbertimes()));
-		map.put(AMBERTIMES_FILE, this.getAmberTimesFile());
-		map.put(USE_INTERGREEN_TIMES, Boolean.toString(this.isUseIntergreenTimes()));
-		map.put(INTERGREENTIMES_FILE, this.getIntergreenTimesFile());
-		return map;
-	}
-
-	@Override
 	protected void checkConsistency() {
 		if ((this.signalSystemFile == null) && (this.signalControlFile != null)) {
 			throw new IllegalStateException("For using a SignalSystemConfiguration a definition of the signal systems must exist!");
 		}
 	}
 
+	@StringGetter( SIGNALSYSTEM_FILE )
 	public String getSignalSystemFile() {
 		return this.signalSystemFile;
 	}
 
-
-
+	@StringSetter( SIGNALSYSTEM_FILE )
 	public void setSignalSystemFile(final String signalSystemFile) {
 		this.signalSystemFile = signalSystemFile;
 	}
 
 
+	@StringGetter( SIGNALGROUPS_FILE )
 	public String getSignalGroupsFile() {
 		return this.signalGroupsFile;
 	}
 	
+	@StringSetter( SIGNALGROUPS_FILE )
 	public void setSignalGroupsFile(String filename){
 		this.signalGroupsFile = filename;
 	}
 
+	@StringGetter( AMBERTIMES_FILE )
 	public String getAmberTimesFile() {
 		return this.amberTimesFile;
 	}
 	
+	@StringSetter( AMBERTIMES_FILE )
 	public void setAmberTimesFile(String filename){
 		this.amberTimesFile = filename;
 	}
 	
+	@StringGetter( INTERGREENTIMES_FILE )
 	public String getIntergreenTimesFile() {
 		return intergreenTimesFile;
 	}
 	
+	@StringSetter( INTERGREENTIMES_FILE )
 	public void setIntergreenTimesFile(String intergreenTimesFile) {
 		this.intergreenTimesFile = intergreenTimesFile;
 	}
 
+	@StringGetter( SIGNALCONTROL_FILE )
 	public String getSignalControlFile() {
 		return this.signalControlFile;
 	}
 	
+	@StringSetter( SIGNALCONTROL_FILE )
 	public void setSignalControlFile(String filename){
 		this.signalControlFile = filename;
 	}
 
+	@StringGetter( USE_INTERGREEN_TIMES )
 	public boolean isUseIntergreenTimes() {
 		return this.useIntergreens;
 	}
 	
+	@StringSetter( USE_INTERGREEN_TIMES )
 	public void setUseIntergreenTimes(boolean useIntergreens){
 		this.useIntergreens = useIntergreens;
 	}
 
 	
+	@StringGetter( ACTION_ON_INTERGREEN_VIOLATION )
 	public String getActionOnIntergreenViolation() {
 		return actionOnIntergreenViolation;
 	}
 
 	
+	@StringSetter( ACTION_ON_INTERGREEN_VIOLATION )
 	public void setActionOnIntergreenViolation(String actionOnIntergreenViolation) {
+		// TODO conceptually, this is an enum... change that?
+		if ( !WARN_ON_INTERGREEN_VIOLATION.equalsIgnoreCase( actionOnIntergreenViolation ) &&
+			 !EXCEPTION_ON_INTERGREEN_VIOLATION.equalsIgnoreCase( actionOnIntergreenViolation ) ){
+			throw new IllegalArgumentException("The value " + actionOnIntergreenViolation + " for key : " + ACTION_ON_INTERGREEN_VIOLATION + " is not supported by this config group");
+		 }
+
 		this.actionOnIntergreenViolation = actionOnIntergreenViolation;
 	}
 
 	
+	@StringGetter( USE_AMBER_TIMES )
 	public boolean isUseAmbertimes() {
 		return useAmbertimes;
 	}
 
 	
+	@StringSetter( USE_AMBER_TIMES )
 	public void setUseAmbertimes(boolean useAmbertimes) {
 		this.useAmbertimes = useAmbertimes;
 	}

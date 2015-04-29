@@ -20,11 +20,9 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.TreeMap;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-import org.matsim.core.config.ConfigGroup;
-
-public class NetworkConfigGroup extends ConfigGroup {
+public class NetworkConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "network";
 
@@ -47,74 +45,41 @@ public class NetworkConfigGroup extends ConfigGroup {
 		super(NetworkConfigGroup.GROUP_NAME);
 	}
 
-	@Override
-	public String getValue(final String key) {
-		if (NetworkConfigGroup.INPUT_FILE.equals(key)) {
-			return getInputFile();
-		} else if (NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE.equals(key)) {
-			return getChangeEventsInputFile();
-		} else if (NetworkConfigGroup.TIME_VARIANT_NETWORK.equals(key)) {
-			return isTimeVariantNetwork() ? "true" : "false";
-		} else if (NetworkConfigGroup.LANEDEFINITIONSINPUTFILE.equals(key)){
-			return getLaneDefinitionsFile();
-		}
-		else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		if (NetworkConfigGroup.INPUT_FILE.equals(key)) {
-			setInputFile(value);
-		} else if (NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE.equals(key)) {
-			setChangeEventInputFile(value);
-		} else if (NetworkConfigGroup.TIME_VARIANT_NETWORK.equals(key)) {
-			setTimeVariantNetwork("true".equals(value) || "yes".equals(value));
-		} else if (NetworkConfigGroup.LANEDEFINITIONSINPUTFILE.equals(key)){
-			setLaneDefinitionsFile(value);
-		}	else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
-		map.put(NetworkConfigGroup.INPUT_FILE, getValue(NetworkConfigGroup.INPUT_FILE));
-		map.put(NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE, getValue(NetworkConfigGroup.CHANGE_EVENTS_INPUT_FILE));
-		map.put(NetworkConfigGroup.TIME_VARIANT_NETWORK, getValue(NetworkConfigGroup.TIME_VARIANT_NETWORK));
-		map.put(NetworkConfigGroup.LANEDEFINITIONSINPUTFILE, getValue(NetworkConfigGroup.LANEDEFINITIONSINPUTFILE));
-		return map;
-	}
-
 	/* direct access */
 
+	@StringGetter( INPUT_FILE )
 	public String getInputFile() {
 		return this.inputFile;
 	}
+	@StringSetter( INPUT_FILE )
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
 	}
 
+	@StringSetter( CHANGE_EVENTS_INPUT_FILE )
 	public void setChangeEventInputFile(final String changeEventsInputFile) {
 		this.changeEventsInputFile = changeEventsInputFile;
 	}
+	@StringGetter( CHANGE_EVENTS_INPUT_FILE )
 	public String getChangeEventsInputFile() {
 		return this.changeEventsInputFile;
 	}
 
+	@StringSetter( TIME_VARIANT_NETWORK )
 	public void setTimeVariantNetwork(final boolean timeVariantNetwork) {
 		this.timeVariantNetwork = timeVariantNetwork;
 	}
+	@StringGetter( TIME_VARIANT_NETWORK )
 	public boolean isTimeVariantNetwork() {
 		return this.timeVariantNetwork;
 	}
 
+	@StringSetter( LANEDEFINITIONSINPUTFILE )
 	public void setLaneDefinitionsFile(final String laneDefinitions) {
 		this.laneDefinitionsFile = laneDefinitions;
 	}
 
+	@StringGetter( LANEDEFINITIONSINPUTFILE )
 	public String getLaneDefinitionsFile(){
 		return this.laneDefinitionsFile;
 	}

@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ConfigGroup;
@@ -40,9 +39,6 @@ import org.matsim.core.utils.collections.CollectionUtils;
  * @author mrieser
  */
 public class PlansCalcRouteConfigGroup extends ConfigGroup {
-	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger( PlansCalcRouteConfigGroup.class ) ;
-
 	public static final String GROUP_NAME = "planscalcroute";
 
 	private static final String BEELINE_DISTANCE_FACTOR = "beelineDistanceFactor";
@@ -283,6 +279,7 @@ public class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	@Override
 	public void addParam(final String key, final String value) {
+		if( value.equals( "null" ) ) return; // old behavior of reader: keep defaults if null
 		if (PT_SPEED_FACTOR.equals(key)) {
 			setTeleportedModeFreespeedFactor(TransportMode.pt, Double.parseDouble(value));
 		} else if (BEELINE_DISTANCE_FACTOR.equals(key)) {

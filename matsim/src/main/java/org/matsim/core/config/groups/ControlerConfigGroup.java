@@ -20,13 +20,20 @@
 
 package org.matsim.core.config.groups;
 
-import org.matsim.core.config.ConfigGroup;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-import java.util.*;
-
-public class ControlerConfigGroup extends ConfigGroup {
+public class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
 
@@ -74,138 +81,6 @@ public class ControlerConfigGroup extends ConfigGroup {
 	}
 
 	@Override
-	public String getValue(final String key) {
-        switch (key) {
-            case OUTPUT_DIRECTORY:
-                return getOutputDirectory();
-            case FIRST_ITERATION:
-                return Integer.toString(getFirstIteration());
-            case LAST_ITERATION:
-                return Integer.toString(getLastIteration());
-            case ROUTINGALGORITHM_TYPE:
-                return this.getRoutingAlgorithmType().toString();
-            case RUNID:
-                return this.getRunId();
-            case LINKTOLINK_ROUTING_ENABLED:
-                return Boolean.toString(this.linkToLinkRoutingEnabled);
-            case EVENTS_FILE_FORMAT: {
-                boolean isFirst = true;
-                StringBuilder str = new StringBuilder();
-                for (EventsFileFormat format : this.eventsFileFormats) {
-                    if (!isFirst) {
-                        str.append(',');
-                    }
-                    str.append(format.toString());
-                    isFirst = false;
-                }
-                return str.toString();
-            }
-            case WRITE_EVENTS_INTERVAL:
-                throw new RuntimeException("use direct getter.  Aborting ...");
-//			return Integer.toString(getWriteEventsInterval());
-            case MOBSIM:
-                return getMobsim();
-            case SNAPSHOT_FORMAT: {
-                boolean isFirst = true;
-                StringBuilder str = new StringBuilder();
-                for (String format : this.snapshotFormat) {
-                    if (!isFirst) {
-                        str.append(',');
-                    }
-                    str.append(format);
-                    isFirst = false;
-                }
-                return str.toString();
-            }
-            case WRITE_SNAPSHOTS_INTERVAL:
-                return Integer.toString(this.getWriteSnapshotsInterval());
-            default:
-                throw new IllegalArgumentException(key);
-        }
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		if (OUTPUT_DIRECTORY.equals(key)) {
-			setOutputDirectory(value);
-		} else if (FIRST_ITERATION.equals(key)) {
-			setFirstIteration(Integer.parseInt(value));
-		} else if (LAST_ITERATION.equals(key)) {
-			setLastIteration(Integer.parseInt(value));
-		} else if (ROUTINGALGORITHM_TYPE.equals(key)){
-			if (RoutingAlgorithmType.Dijkstra.toString().equalsIgnoreCase(value)){
-				setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
-			}
-			else if (RoutingAlgorithmType.AStarLandmarks.toString().equalsIgnoreCase(value)){
-				setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
-			}
-			else if (RoutingAlgorithmType.FastDijkstra.toString().equalsIgnoreCase(value)){
-				setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
-			}
-			else if (RoutingAlgorithmType.FastAStarLandmarks.toString().equalsIgnoreCase(value)){
-				setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
-			}
-			else {
-				throw new IllegalArgumentException(value + " is not a valid parameter value for key: "+ key + " of config group " + GROUP_NAME);
-			}
-		} else if (RUNID.equals(key)){
-			this.setRunId(value.trim());
-		} else if (LINKTOLINK_ROUTING_ENABLED.equalsIgnoreCase(key)){
-			if (value != null) {
-				this.linkToLinkRoutingEnabled = Boolean.parseBoolean(value.trim());
-			}
-		} else if (EVENTS_FILE_FORMAT.equals(key)) {
-			String[] parts = StringUtils.explode(value, ',');
-			Set<EventsFileFormat> formats = EnumSet.noneOf(EventsFileFormat.class);
-			for (String part : parts) {
-				String trimmed = part.trim();
-				if (trimmed.length() > 0) {
-					formats.add(EventsFileFormat.valueOf(trimmed));
-				}
-			}
-			this.eventsFileFormats = formats;
-		} else if (WRITE_EVENTS_INTERVAL.equals(key)) {
-			setWriteEventsInterval(Integer.parseInt(value));
-		} else if (WRITE_PLANS_INTERVAL.equals(key)) {
-			setWritePlansInterval(Integer.parseInt(value));
-		} else if (MOBSIM.equals(key)) {
-			setMobsim(value);
-		} else if (SNAPSHOT_FORMAT.equals(key)) {
-			String[] parts = StringUtils.explode(value, ',');
-			Set<String> formats = new HashSet<>();
-			for (String part : parts) {
-				String trimmed = part.trim();
-				if (trimmed.length() > 0) {
-					formats.add(trimmed);
-				}
-			}
-			this.snapshotFormat = formats;
-		} else if (WRITE_SNAPSHOTS_INTERVAL.equals(key)) {
-			setWriteSnapshotsInterval(Integer.parseInt(value));
-		} else {
-			throw new IllegalArgumentException(key);
-		}
-	}
-
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<>();
-		map.put(OUTPUT_DIRECTORY, getValue(OUTPUT_DIRECTORY));
-		map.put(FIRST_ITERATION, getValue(FIRST_ITERATION));
-		map.put(LAST_ITERATION, getValue(LAST_ITERATION));
-		map.put(ROUTINGALGORITHM_TYPE, getValue(ROUTINGALGORITHM_TYPE));
-		map.put(RUNID, getValue(RUNID));
-		map.put(LINKTOLINK_ROUTING_ENABLED, Boolean.toString(this.isLinkToLinkRoutingEnabled()));
-		map.put(EVENTS_FILE_FORMAT, getValue(EVENTS_FILE_FORMAT));
-		map.put(WRITE_EVENTS_INTERVAL, Integer.toString(this.getWriteEventsInterval()) );
-		map.put(WRITE_PLANS_INTERVAL, Integer.toString(this.getWritePlansInterval()) );
-		map.put(MOBSIM, getValue(MOBSIM));
-		map.put(SNAPSHOT_FORMAT, getValue(SNAPSHOT_FORMAT));
-		map.put(WRITE_SNAPSHOTS_INTERVAL, String.valueOf(getWriteSnapshotsInterval()));
-		return map;
-	}
-
-	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + ", " + 
@@ -236,54 +111,92 @@ public class ControlerConfigGroup extends ConfigGroup {
 		return map;
 	}
 
-	/* direct access */
 
+	@StringSetter( OUTPUT_DIRECTORY )
 	public void setOutputDirectory(final String outputDirectory) {
 		this.outputDirectory = outputDirectory;
 	}
 
+	@StringGetter( OUTPUT_DIRECTORY )
 	public String getOutputDirectory() {
 		return this.outputDirectory;
 	}
 
+	@StringSetter( FIRST_ITERATION )
 	public void setFirstIteration(final int firstIteration) {
 		this.firstIteration = firstIteration;
 	}
 
+	@StringGetter( FIRST_ITERATION )
 	public int getFirstIteration() {
 		return this.firstIteration;
 	}
 
+	@StringSetter( LAST_ITERATION )
 	public void setLastIteration(final int lastIteration) {
 		this.lastIteration = lastIteration;
 	}
 
+	@StringGetter( LAST_ITERATION )
 	public int getLastIteration() {
 		return this.lastIteration;
 	}
 
+	@StringGetter( ROUTINGALGORITHM_TYPE )
 	public RoutingAlgorithmType getRoutingAlgorithmType() {
 		return this.routingAlgorithmType;
 	}
 
+	@StringSetter( ROUTINGALGORITHM_TYPE )
 	public void setRoutingAlgorithmType(final RoutingAlgorithmType type) {
 		this.routingAlgorithmType = type;
 	}
 
+	@StringGetter( RUNID )
 	public String getRunId() {
 		return this.runId;
 	}
 
+	@StringSetter( RUNID )
 	public void setRunId(final String runid) {
 		this.runId = runid;
 	}
 
+	@StringGetter( LINKTOLINK_ROUTING_ENABLED )
 	public boolean isLinkToLinkRoutingEnabled() {
 		return this.linkToLinkRoutingEnabled;
 	}
 
+	@StringSetter( LINKTOLINK_ROUTING_ENABLED )
 	public void setLinkToLinkRoutingEnabled(final boolean enabled) {
 		this.linkToLinkRoutingEnabled = enabled;
+	}
+
+    @StringGetter( EVENTS_FILE_FORMAT )
+	private String getEventsFileFormatAsString() {
+		boolean isFirst = true;
+		StringBuilder str = new StringBuilder();
+		for (EventsFileFormat format : this.eventsFileFormats) {
+			if (!isFirst) {
+				str.append(',');
+			}
+			str.append(format.toString());
+			isFirst = false;
+		}
+		return str.toString();
+	}
+
+	@StringSetter( EVENTS_FILE_FORMAT )
+	private void setEventFileFormats( final String value ) {
+		String[] parts = StringUtils.explode(value, ',');
+		Set<EventsFileFormat> formats = EnumSet.noneOf(EventsFileFormat.class);
+		for (String part : parts) {
+			String trimmed = part.trim();
+			if (trimmed.length() > 0) {
+				formats.add(EventsFileFormat.valueOf(trimmed));
+			}
+		}
+		this.eventsFileFormats = formats;
 	}
 
 	public Set<EventsFileFormat> getEventsFileFormats() {
@@ -294,6 +207,33 @@ public class ControlerConfigGroup extends ConfigGroup {
 		this.eventsFileFormats = Collections.unmodifiableSet(EnumSet.copyOf(eventsFileFormats));
 	}
 
+	@StringSetter( SNAPSHOT_FORMAT )
+	private void setSnapshotFormats( final String value ) {
+		String[] parts = StringUtils.explode(value, ',');
+		Set<String> formats = new HashSet<>();
+		for (String part : parts) {
+			String trimmed = part.trim();
+			if (trimmed.length() > 0) {
+				formats.add(trimmed);
+			}
+		}
+		this.snapshotFormat = formats;
+	}
+
+    @StringGetter( SNAPSHOT_FORMAT )
+	private String getSnapshotFormatAsString() {
+		boolean isFirst = true;
+		StringBuilder str = new StringBuilder();
+		for (String format : this.snapshotFormat) {
+			if (!isFirst) {
+				str.append(',');
+			}
+			str.append(format);
+			isFirst = false;
+		}
+		return str.toString();
+	}
+
 	public void setSnapshotFormat(final Collection<String> snapshotFormat) {
 		this.snapshotFormat = Collections.unmodifiableSet(new HashSet<>(snapshotFormat));
 	}
@@ -302,34 +242,42 @@ public class ControlerConfigGroup extends ConfigGroup {
 		return this.snapshotFormat;
 	}
 
+	@StringGetter( WRITE_EVENTS_INTERVAL )
 	public int getWriteEventsInterval() {
 		return this.writeEventsInterval;
 	}
 
+	@StringSetter( WRITE_EVENTS_INTERVAL )
 	public void setWriteEventsInterval(final int writeEventsInterval) {
 		this.writeEventsInterval = writeEventsInterval;
 	}
 
+	@StringGetter( MOBSIM )
 	public String getMobsim() {
 		return this.mobsim;
 	}
 
+	@StringSetter( MOBSIM )
 	public void setMobsim(final String mobsim) {
 		this.mobsim = mobsim;
 	}
 
+	@StringGetter( WRITE_PLANS_INTERVAL )
 	public int getWritePlansInterval() {
 		return this.writePlansInterval;
 	}
 
+	@StringSetter( WRITE_PLANS_INTERVAL )
 	public void setWritePlansInterval(final int writePlansInterval) {
 		this.writePlansInterval = writePlansInterval;
 	}
 	
+	@StringGetter( WRITE_SNAPSHOTS_INTERVAL )
 	public int getWriteSnapshotsInterval() {
 		return writeSnapshotsInterval;
 	}
 	
+	@StringSetter( WRITE_SNAPSHOTS_INTERVAL )
 	public void setWriteSnapshotsInterval(int writeSnapshotsInterval) {
 		this.writeSnapshotsInterval = writeSnapshotsInterval;
 	}
