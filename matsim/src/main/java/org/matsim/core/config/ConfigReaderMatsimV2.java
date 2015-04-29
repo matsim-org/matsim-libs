@@ -68,14 +68,9 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startParameter(final Attributes atts) {
-		// TODO check if necessary for some default modules
-		// (it is the job of the Module to decide on the meaning of the
-		// "null" string, not the reader...
-		if ( !atts.getValue( VALUE ).equalsIgnoreCase( "null" ) ) {
-			moduleStack.getFirst().addParam(
-					atts.getValue( NAME ),
-					atts.getValue( VALUE ) );
-		}
+		moduleStack.getFirst().addParam(
+				atts.getValue( NAME ),
+				atts.getValue( VALUE ) );
 	}
 
 	private void startParameterSet(final Attributes atts) {

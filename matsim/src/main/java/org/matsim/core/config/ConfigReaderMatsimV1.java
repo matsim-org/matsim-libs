@@ -93,10 +93,7 @@ import org.xml.sax.InputSource;
 
 	private void startParam(final Attributes meta) {
 		String value = meta.getValue("value");
-		if (!"null".equalsIgnoreCase(value)) {
-			// only set the param if it is not "null"
-			this.currmodule.addParam(meta.getValue("name"),meta.getValue("value"));
-		}
+		this.currmodule.addParam(meta.getValue("name"),meta.getValue("value"));
 	}
 
 	/**
