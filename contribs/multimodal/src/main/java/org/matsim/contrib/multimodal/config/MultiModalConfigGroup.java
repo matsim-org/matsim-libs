@@ -56,6 +56,9 @@ public class MultiModalConfigGroup extends ConfigGroup {
 
 	@Override
 	public final void addParam(final String key, final String value) {
+		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
+		if ( "null".equalsIgnoreCase( value ) ) return;
+		
 		if (MULTI_MODAL_SIMULATION_ENABLED.equals(key)) {
 			setMultiModalSimulationEnabled(Boolean.parseBoolean(value.trim()));
 		} else if (NUMBER_OF_THREADS.equals(key)) {

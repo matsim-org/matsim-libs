@@ -52,6 +52,9 @@ public class PRConfigGroup extends ConfigGroup{
 
 	@Override
 	public void addParam(final String key, final String value) {
+		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
+		if ( "null".equalsIgnoreCase( value ) ) return;
+		
 		if (INPUT_FILE.equals(key)) {
 			setInputFile(value);
 		} else if (GRAVITY.equals(key)) {

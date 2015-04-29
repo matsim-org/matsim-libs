@@ -147,6 +147,9 @@ public class KtiConfigGroup extends ConfigGroup {
 	
 	@Override
 	public void addParam(String param_name, String value) {
+		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
+		if ( "null".equalsIgnoreCase( value ) ) return;
+		
 		boolean validParameterName = false;
 
 		for (KtiConfigParameter param : KtiConfigParameter.values()) {

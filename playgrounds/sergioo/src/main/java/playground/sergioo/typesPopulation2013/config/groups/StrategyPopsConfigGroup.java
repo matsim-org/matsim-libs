@@ -111,6 +111,9 @@ public class StrategyPopsConfigGroup extends ConfigGroup {
 
 	@Override
 	public void addParam(final String key, final String value) {
+		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
+		if ( "null".equalsIgnoreCase( value ) ) return;
+		
 		if(key!=null) {
 			String[] parts = key.split("_");
 			if (parts[0].equals(MAX_AGENT_PLAN_MEMORY_SIZE))

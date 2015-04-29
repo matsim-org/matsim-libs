@@ -113,6 +113,9 @@ public class BvgScoringFunctionConfigGroupPR extends ConfigGroup {
 	
 	@Override
 	public void addParam(final String key, final String value) {
+		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
+		if ( "null".equalsIgnoreCase( value ) ) return;
+
 		
 		if (OFFSET_CAR.equals(key)) {
 			this.offsetCar = Double.parseDouble(value);

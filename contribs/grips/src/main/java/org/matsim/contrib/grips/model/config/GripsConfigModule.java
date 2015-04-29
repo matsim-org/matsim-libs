@@ -65,6 +65,10 @@ public class GripsConfigModule extends ConfigGroup {
 
 	@Override
 	public void addParam(String param_name, String value) {
+		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
+		if ( "null".equalsIgnoreCase( value ) ) return;
+
+		
 		if (param_name.equals(NETWORK_FILE_NAME)) {
 			setNetworkFileName(value);
 		} else if (param_name.equals(EVACUATION_AREA_FILE_NAME)) {

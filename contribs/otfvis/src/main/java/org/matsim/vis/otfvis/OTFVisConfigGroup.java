@@ -193,6 +193,8 @@ public class OTFVisConfigGroup extends ConfigGroup {
 	@Override
 	public void addParam(final String key, final String value) {
 		// this is needed since config file parsing uses it.
+		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
+		if ( "null".equalsIgnoreCase( value ) ) return;
 		
 		if (AGENT_SIZE.equals(key)) {
 			this.agentSize = Float.parseFloat(value);

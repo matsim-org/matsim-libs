@@ -60,6 +60,9 @@ public class JointTripsMutatorConfigGroup extends ConfigGroup {
 	public void addParam(
 			final String param_name,
 			final String value) {
+		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
+		if ( "null".equalsIgnoreCase( value ) ) return;
+	
 		if (param_name.equals( START_PROB )) {
 			setStartMutationProbability( value );
 		}
