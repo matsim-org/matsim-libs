@@ -10,7 +10,7 @@ import org.matsim.facilities.ActivityFacility;
 import playground.sergioo.passivePlanning2012.api.population.AgendaBasePerson;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.SinglePlannerAgentImpl;
-import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
+import playground.sergioo.passivePlanning2012.core.population.PlacesSharer;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.AgendaDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.DecisionMaker;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.CurrentTime;
@@ -29,20 +29,20 @@ public class SinglePlannerAgendaAgent extends SinglePlannerAgentImpl {
 		((AgendaDecisionMaker)decisionMakers[0]).setMobsimEnds(mobsimStatus);
 		return ((AgendaDecisionMaker)decisionMakers[0]).decideRoute(startTime, startFacilityId, endFacilityId, null, tripRouter);
 	}
-	public void addKnownPerson(PlaceSharer sharer) {
-		((PlaceSharer)decisionMakers[0]).addKnownPerson(sharer);
+	public void addKnownPerson(PlacesSharer sharer) {
+		((PlacesSharer)decisionMakers[0]).addKnownPerson(sharer);
 	}
 	public void shareKnownPlace(Id<ActivityFacility> facilityId, double startTime, String type) {
-		PlaceSharer sharer = ((PlaceSharer)decisionMakers[0]);
+		PlacesSharer sharer = ((PlacesSharer)decisionMakers[0]);
 		if(!type.equals("home"))
 			sharer.shareKnownPlace(facilityId, startTime, type);
 	}
-	public PlaceSharer getPlaceSharer() {
-		return (PlaceSharer)decisionMakers[0];
+	public PlacesSharer getPlaceSharer() {
+		return (PlacesSharer)decisionMakers[0];
 	}
 
 	public void shareKnownTravelTime(Id<ActivityFacility> prevFacilityId, Id<ActivityFacility> facilityId, String mode, double startTime, double travelTime) {
-		((PlaceSharer)decisionMakers[0]).shareKnownTravelTime(prevFacilityId, facilityId, mode, startTime, travelTime);
+		((PlacesSharer)decisionMakers[0]).shareKnownTravelTime(prevFacilityId, facilityId, mode, startTime, travelTime);
 	}
 
 }

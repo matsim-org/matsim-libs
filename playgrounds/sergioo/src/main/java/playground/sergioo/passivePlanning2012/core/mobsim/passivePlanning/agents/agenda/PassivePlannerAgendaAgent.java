@@ -5,7 +5,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
-import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
+import playground.sergioo.passivePlanning2012.core.population.PlacesSharer;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 
 public class PassivePlannerAgendaAgent extends PassivePlannerDriverAgent  {
@@ -23,10 +23,10 @@ public class PassivePlannerAgendaAgent extends PassivePlannerDriverAgent  {
 		((SinglePlannerAgendaAgent)planner).shareKnownPlace(prevAct.getFacilityId(), prevAct.getStartTime(), prevAct.getType());
 		super.endActivityAndComputeNextState(now);
 	}
-	public void addKnownPerson(PlaceSharer sharer) {
+	public void addKnownPerson(PlacesSharer sharer) {
 		((SinglePlannerAgendaAgent)planner).addKnownPerson(sharer);
 	}
-	public PlaceSharer getPlaceSharer() {
+	public PlacesSharer getPlaceSharer() {
 		return ((SinglePlannerAgendaAgent)planner).getPlaceSharer();
 	}
 }

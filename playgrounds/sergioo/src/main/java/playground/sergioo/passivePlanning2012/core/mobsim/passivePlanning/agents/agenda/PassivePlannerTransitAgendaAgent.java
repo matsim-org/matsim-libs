@@ -31,7 +31,7 @@ import org.matsim.pt.PtConstants;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerTransitAgent;
-import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
+import playground.sergioo.passivePlanning2012.core.population.PlacesSharer;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 
 public class PassivePlannerTransitAgendaAgent extends PassivePlannerTransitAgent  {
@@ -89,10 +89,10 @@ public class PassivePlannerTransitAgendaAgent extends PassivePlannerTransitAgent
 				throw new RuntimeException("Leg finished with a previous valid activity facility");
 		super.endLegAndComputeNextState(now);
 	}
-	public PlaceSharer getPlaceSharer() {
+	public PlacesSharer getPlaceSharer() {
 		return ((SinglePlannerAgendaAgent)planner).getPlaceSharer();
 	}
-	public void addKnownPerson(PlaceSharer placeSharer) {
+	public void addKnownPerson(PlacesSharer placeSharer) {
 		((SinglePlannerAgendaAgent)planner).addKnownPerson(placeSharer);
 	}
 

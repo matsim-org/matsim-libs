@@ -27,7 +27,7 @@ import org.matsim.pt.PtConstants;
 
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
 import playground.sergioo.passivePlanning2012.core.population.EmptyTimeImpl;
-import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
+import playground.sergioo.passivePlanning2012.core.population.PlacesSharer;
 import playground.sergioo.passivePlanning2012.core.population.agenda.Agenda;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.RouteDecisionMaker;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.CurrentTime;
@@ -38,7 +38,7 @@ import playground.sergioo.scheduling2013.SchedulingNetwork.JourneySchedulingLink
 import playground.sergioo.scheduling2013.SchedulingNetwork.SchedulingLink;
 import playground.sergioo.scheduling2013.SchedulingNetwork.SchedulingNode;
 
-public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMaker {
+public class AgendaDecisionMaker extends PlacesSharer implements RouteDecisionMaker {
 	
 	private static final int PLAN_STEP = 900;
 	private static final double WALK_FACTOR = 3.4;

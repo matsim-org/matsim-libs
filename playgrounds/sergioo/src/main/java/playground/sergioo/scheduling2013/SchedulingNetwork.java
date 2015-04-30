@@ -36,7 +36,7 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 
 import playground.sergioo.passivePlanning2012.core.population.PlacesConnoisseur;
 import playground.sergioo.passivePlanning2012.core.population.PlacesConnoisseur.KnownPlace;
-import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
+import playground.sergioo.passivePlanning2012.core.population.PlacesSharer;
 import playground.sergioo.passivePlanning2012.core.population.agenda.Agenda;
 import playground.sergioo.passivePlanning2012.core.population.agenda.Agenda.AgendaElement;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.CurrentTime;
@@ -735,7 +735,7 @@ public class SchedulingNetwork implements Network {
 		int shop = 10;
 		int sport = 10;
 		Id<ActivityFacility> originId = null, destinationId = null;
-		PlaceSharer placeSharer = new PlaceSharer() {
+		PlacesSharer placeSharer = new PlacesSharer() {
 		};
 		double startTime = Double.parseDouble(args[3]);
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities();

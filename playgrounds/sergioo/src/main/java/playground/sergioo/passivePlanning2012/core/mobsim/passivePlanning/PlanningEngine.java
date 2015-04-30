@@ -18,7 +18,7 @@ import org.matsim.vehicles.VehicleUtils;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.agenda.PassivePlannerAgendaAgent;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.agenda.PassivePlannerTransitAgendaAgent;
-import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
+import playground.sergioo.passivePlanning2012.core.population.PlacesSharer;
 import playground.sergioo.passivePlanning2012.core.population.socialNetwork.SocialNetwork;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSocialNetwork;
 
@@ -105,7 +105,7 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 		SocialNetwork socialNetwork = ((ScenarioSocialNetwork)qSim.getScenario()).getSocialNetwork();
 		for(PassivePlannerDriverAgent agent:agents.values())
 			for(Id<Person> alterId:socialNetwork.getAlterIds(agent.getId())) {
-				PlaceSharer placeSharer = getPlaceSharer(agents, alterId);
+				PlacesSharer placeSharer = getPlaceSharer(agents, alterId);
 				if(placeSharer!=null)
 					if(agent instanceof PassivePlannerAgendaAgent)
 						((PassivePlannerAgendaAgent) agent).addKnownPerson(placeSharer);
@@ -113,7 +113,7 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 						((PassivePlannerTransitAgendaAgent) agent).addKnownPerson(placeSharer);
 			}
 	}
-	private PlaceSharer getPlaceSharer(Map<Id<Person>, PassivePlannerDriverAgent> agents, Id<Person> alterId) {
+	private PlacesSharer getPlaceSharer(Map<Id<Person>, PassivePlannerDriverAgent> agents, Id<Person> alterId) {
 		PassivePlannerDriverAgent agent = agents.get(alterId);
 		if(agent instanceof PassivePlannerAgendaAgent)
 			return ((PassivePlannerAgendaAgent)agent).getPlaceSharer();

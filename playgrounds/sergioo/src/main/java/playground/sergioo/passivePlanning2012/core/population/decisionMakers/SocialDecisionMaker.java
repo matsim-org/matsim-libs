@@ -19,14 +19,14 @@ import org.matsim.facilities.OpeningTime;
 import org.matsim.households.Household;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
-import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
+import playground.sergioo.passivePlanning2012.core.population.PlacesSharer;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.EndTimeDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.ModeRouteDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.TypeOfActivityFacilityDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;
 import playground.sergioo.weeklySimulation.util.misc.Time;
 
-public class SocialDecisionMaker extends PlaceSharer implements EndTimeDecisionMaker, TypeOfActivityFacilityDecisionMaker, ModeRouteDecisionMaker {
+public class SocialDecisionMaker extends PlacesSharer implements EndTimeDecisionMaker, TypeOfActivityFacilityDecisionMaker, ModeRouteDecisionMaker {
 
 	//Constants
 	private static final double MAXIMUM_SEARCHING_DISTANCE = 3000;

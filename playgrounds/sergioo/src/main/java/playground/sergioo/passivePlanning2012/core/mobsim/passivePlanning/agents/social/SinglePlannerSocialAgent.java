@@ -14,7 +14,7 @@ import org.matsim.households.Household;
 
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.SinglePlannerAgentImpl;
-import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
+import playground.sergioo.passivePlanning2012.core.population.PlacesSharer;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.SocialDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.DecisionMaker;
 import playground.sergioo.passivePlanning2012.core.router.TripUtils;
@@ -55,14 +55,14 @@ public class SinglePlannerSocialAgent extends SinglePlannerAgentImpl {
 		tripActivityTrip.addAll(trip2);
 		return tripActivityTrip;
 	}
-	public void addKnownPerson(PlaceSharer sharer) {
-		((PlaceSharer)decisionMakers[0]).addKnownPerson(sharer);
+	public void addKnownPerson(PlacesSharer sharer) {
+		((PlacesSharer)decisionMakers[0]).addKnownPerson(sharer);
 	}
 	public void shareKnownPlace(Id<ActivityFacility> facilityId, double startTime, String type) {
-		((PlaceSharer)decisionMakers[0]).shareKnownPlace(facilityId, startTime, type);
+		((PlacesSharer)decisionMakers[0]).shareKnownPlace(facilityId, startTime, type);
 	}
-	public PlaceSharer getPlaceSharer() {
-		return (PlaceSharer)decisionMakers[0];
+	public PlacesSharer getPlaceSharer() {
+		return (PlacesSharer)decisionMakers[0];
 	}
 
 }
