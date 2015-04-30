@@ -20,8 +20,8 @@
 package playground.vsp.analysis.modules.monetaryTransferPayments;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -39,9 +39,9 @@ public class MoneyEventHandler implements PersonMoneyEventHandler {
 	private static final Logger log = Logger.getLogger(MoneyEventHandler.class);
 
 	private SortedMap<Id<Person>, Double> id2amount = new TreeMap<Id<Person>, Double>();
-	private List<Id<Person>> stuckingAgents = null;
+	private Set<Id<Person>> stuckingAgents = null;
 
-	public MoneyEventHandler(List<Id<Person>> stuckingAgents) {
+	public MoneyEventHandler(Set<Id<Person>> stuckingAgents) {
 		this.stuckingAgents = stuckingAgents;
 		log.info("Providing the person Ids of stucking agents. These agents will be excluded from this analysis.");
 	}
