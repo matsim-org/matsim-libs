@@ -20,7 +20,6 @@
 
 package playground.sergioo.weeklySimulation.run;
 
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -38,22 +37,31 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.*;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOption;
+
+import com.google.inject.Provider;
+
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.PassivePlanningAgendaFactory;
 import playground.sergioo.passivePlanning2012.core.population.AgendaBasePersonImpl;
 import playground.sergioo.passivePlanning2012.core.population.socialNetwork.SocialNetworkReader;
 import playground.sergioo.passivePlanning2012.core.replanning.ReRoutePlanStrategyFactory;
 import playground.sergioo.passivePlanning2012.core.replanning.TimeAllocationMutatorPlanStrategyFactory;
 import playground.sergioo.passivePlanning2012.core.replanning.TripSubtourModeChoiceStrategyFactory;
+import playground.sergioo.passivePlanning2012.core.router.PRTripRouterFactory;
 import playground.sergioo.passivePlanning2012.core.router.PRTripRouterModule;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 import playground.sergioo.weeklySimulation.analysis.LegHistogramListener;
 import playground.sergioo.weeklySimulation.scenario.ScenarioUtils;
 import playground.sergioo.weeklySimulation.scoring.CharyparNagelWeekScoringFunctionFactory;
+import playground.sergioo.weeklySimulation.util.misc.Time;
+import playground.sergioo.weeklySimulation.util.misc.Time.Week;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -64,12 +72,50 @@ import java.util.Set;
  *
  * @author sergioo
  */
-public class WeeklyControlerAgendaListener implements StartupListener, IterationStartsListener {
+public class WeeklyControlerAgendaListenerTests implements StartupListener, IterationStartsListener {
 
+	private class Closing {
+		private Time.Week startDay;
+		private int startTimeSeconds;
+		private Time.Week endDay;
+		private int endTimeSeconds;
+		private String type;
+		private double minLat;
+		private double maxLat;
+		private double minLon;
+		private double maxLon;
+		public Closing(Week startDay, int startTimeSeconds, Week endDay,
+				int endTimeSeconds, String type, double minLat, double maxLat,
+				double minLon, double maxLon) {
+			super();
+			this.startDay = startDay;
+			this.startTimeSeconds = startTimeSeconds;
+			this.endDay = endDay;
+			this.endTimeSeconds = endTimeSeconds;
+			this.type = type;
+			this.minLat = minLat;
+			this.maxLat = maxLat;
+			this.minLon = minLon;
+			this.maxLon = maxLon;
+		}
+		
+	}
+	private class ScenarioWeeklyPR {
+		Collection<Closing> closings = new ArrayList<>();
+		Collection<String> mainTypes;
+		public ScenarioWeeklyPR(Collection<String> mainTypes) {
+			super();
+			this.mainTypes = mainTypes;
+		}
+		private void addClosing(Closing closing) {
+			closings.add(closing);
+		}
+	}
+	
 	//Attributes
 	private boolean createPersons;
 	
-	public WeeklyControlerAgendaListener(Boolean createPersons) {
+	public WeeklyControlerAgendaListenerTests(Boolean createPersons) {
 		this.createPersons = createPersons;
 	}
 	//Methods
@@ -83,6 +129,21 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		filter.filter(net, carMode);
 		for(ActivityFacility facility:((ScenarioImpl)controler.getScenario()).getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(((NetworkImpl)net).getNearestLinkExactly(facility.getCoord()).getId());
+		ScenarioWeeklyPR scenario = new ScenarioWeeklyPR(Arrays.asList(new String[]{"shop"}));
+		preparePopulation(controler, scenario);
+		prepareFacilities(controler, scenario);
+	}
+	private void preparePopulation(Controler controler,	ScenarioWeeklyPR scenario) {
+		
+	}
+	private void prepareFacilities(Controler controler, ScenarioWeeklyPR scenario) {
+		for(ActivityFacility facility:((ScenarioImpl)controler.getScenario()).getActivityFacilities().getFacilities().values()) {
+			for(ActivityOption option:facility.getActivityOptions().values())
+				if(scenario.mainTypes.contains(option.getType()))
+					System.out.println();
+		}
+	}
+	private void preparePopulation(Controler controler) {
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		Set<String> modes = new HashSet<String>();
 		modes.addAll(controler.getConfig().plansCalcRoute().getNetworkModes());
@@ -105,18 +166,32 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 	}
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-		
+		if(event.getIteration() == 0) {
+			final PassivePlannerManager passivePlannerManager = new PassivePlannerManager(event.getControler().getConfig().global().getNumberOfThreads()-event.getControler().getConfig().qsim().getNumberOfThreads());
+			event.getControler().addControlerListener(passivePlannerManager);
+			event.getControler().addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindMobsim().toProvider(new Provider<Mobsim>() {
+						@Override
+						public Mobsim get() {
+							return new PassivePlanningAgendaFactory(passivePlannerManager, event.getControler().getTripRouterProvider().get()).createMobsim(event.getControler().getScenario(), event.getControler().getEvents());
+						}
+					});
+				}
+			});
+		}
 	}
 	//Main
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
 		new SocialNetworkReader(scenario).parse(args.length>1 ? args[1] : null);
-		final Controler controler = new Controler(scenario);
+		Controler controler = new Controler(scenario);
 		controler.getConfig().plansCalcRoute().getTeleportedModeFreespeedFactors().put("empty", 0.0);
 		controler.setOverwriteFiles(true);
 		controler.setScoringFunctionFactory(new CharyparNagelWeekScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.addControlerListener(new LegHistogramListener(controler.getEvents()));
-		controler.addControlerListener(new WeeklyControlerAgendaListener(new Boolean(args[2])));
+		controler.addControlerListener(new WeeklyControlerAgendaListenerTests(new Boolean(args[2])));
 		controler.addPlanStrategyFactory("ReRouteBase", new ReRoutePlanStrategyFactory(scenario));
 		controler.addPlanStrategyFactory("TimeAllocationBase", new TimeAllocationMutatorPlanStrategyFactory(scenario));
 		controler.addPlanStrategyFactory("TripSubtourModeChoiceBase", new TripSubtourModeChoiceStrategyFactory(scenario));
@@ -127,19 +202,6 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		TransitRouterFactory transitRouterFactory = new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
 		controler.setTransitRouterFactory(transitRouterFactory);*/
 		controler.addOverridingModule(new PRTripRouterModule());
-		final PassivePlannerManager passivePlannerManager = new PassivePlannerManager(controler.getConfig().global().getNumberOfThreads()-controler.getConfig().qsim().getNumberOfThreads());
-		controler.addControlerListener(passivePlannerManager);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new PassivePlanningAgendaFactory(passivePlannerManager, controler.getTripRouterProvider().get()).createMobsim(controler.getScenario(), controler.getEvents());
-					}
-				});
-			}
-		});
 		controler.run();
 	}
 

@@ -126,7 +126,16 @@ public class TransitRouterVariableImpl implements TransitRouter {
 		// find possible end stops
 		Map<Node, InitialNode> wrappedToNodes  = this.locateWrappedNearestTransitNodes(person, toCoord, departureTime);
 		// find routes between start and end stops
-		return this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
+		Path p = this.dijkstra.calcLeastCostPath(wrappedFromNodes, wrappedToNodes, person);
+		if (p == null) {
+			return null;
+		}
+		double directWalkCost = CoordUtils.calcDistance(fromCoord, toCoord)/this.config.getBeelineWalkSpeed()*(0-this.config.getMarginalUtilityOfTravelTimeWalk_utl_s());
+		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size()-1)).initialCost;
+		if (directWalkCost < pathCost)
+			return new Path(null, null, CoordUtils.calcDistance(fromCoord, toCoord)/this.config.getBeelineWalkSpeed(), directWalkCost);
+		double pathTravelTime = p.travelTime + (CoordUtils.calcDistance(fromCoord, p.nodes.get(0).getCoord())+CoordUtils.calcDistance(p.nodes.get(p.nodes.size()-1).getCoord(),toCoord))/this.config.getBeelineWalkSpeed();
+		return new Path(p.nodes, p.links, pathTravelTime, pathCost);
 	}
 	
 	protected List<Leg> convertPathToLegList( double departureTime, Path p, Coord fromCoord, Coord toCoord, Person person) {

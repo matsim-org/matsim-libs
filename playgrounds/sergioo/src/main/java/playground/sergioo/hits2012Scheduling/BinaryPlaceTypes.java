@@ -33,6 +33,7 @@ import playground.sergioo.hits2012.Household;
 import playground.sergioo.hits2012.Location;
 import playground.sergioo.hits2012.Person;
 import playground.sergioo.hits2012.Location.DetailedType;
+import playground.sergioo.hits2012.Person.Day;
 import playground.sergioo.hits2012.Person.Role;
 import playground.sergioo.hits2012.Trip;
 import playground.sergioo.hits2012.Trip.PlaceType;
@@ -43,12 +44,12 @@ public class BinaryPlaceTypes {
 
 	private static CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 	
-	private static Set<String> FIXED_ACTIVITIES = new HashSet<String>(Arrays.asList(new String[]{Trip.Purpose.HOME.text, Trip.Purpose.WORK.text, Trip.Purpose.EDU.text,
+	private static Set<String> FIXED_ACTIVITIES = new HashSet<>(Arrays.asList(new String[]{Trip.Purpose.HOME.text, Trip.Purpose.WORK.text, Trip.Purpose.EDU.text,
 			Trip.Purpose.WORK_FLEX.text, Trip.Purpose.RELIGION.text, Trip.Purpose.P_U_D_O.text, Trip.Purpose.DRIVE.text, Trip.Purpose.MEDICAL.text}));
-	private static Set<String> FLEX_ATIVITIES = new HashSet<String>(Arrays.asList(new String[]{Trip.Purpose.ACCOMP.text, Trip.Purpose.EAT.text,
+	private static Set<String> FLEX_ATIVITIES = new HashSet<>(Arrays.asList(new String[]{Trip.Purpose.ACCOMP.text, Trip.Purpose.EAT.text,
 			Trip.Purpose.ERRANDS.text, Trip.Purpose.REC.text, Trip.Purpose.SHOP.text, Trip.Purpose.SOCIAL.text}));
-	private static Set<PlaceType> IMPORTANT_TYPES = new HashSet<PlaceType>(Arrays.asList(new PlaceType[]{PlaceType.SHOP, PlaceType.EAT,
-			PlaceType.CIVIC, PlaceType.HOME_OTHER, PlaceType.PARK, PlaceType.REC}));
+	private static Set<PlaceType> IMPORTANT_TYPES = new HashSet<>(Arrays.asList(new PlaceType[]{PlaceType.SHOP, PlaceType.EAT,
+			PlaceType.CIVIC, PlaceType.HOME_OTHER, PlaceType.PARK, PlaceType.REC/*, PlaceType.FUN, PlaceType.FINANTIAL*/}));
 	
 	private static class Observation {
 		private final String zipCode;
@@ -293,7 +294,10 @@ public class BinaryPlaceTypes {
 								printer.print((person.getRole().equals(Role.PARTNER)?1:0)+"\t");
 								printer.print((person.getRole().equals(Role.YOUNGER)?1:0)+"\t");
 								printer.print(trip.getFactor()+"\t");
-								printer.println(detailedType.equals(Household.LOCATIONS.get(trip.getEndPostalCode()).getDetailedType(Trip.PlaceType.getPlaceType(trip.getPlaceType())))?"1":"0");
+								printer.print(detailedType.equals(Household.LOCATIONS.get(trip.getEndPostalCode()).getDetailedType(Trip.PlaceType.getPlaceType(trip.getPlaceType())))?"1":"0");
+								for(Day day:Day.values())
+									printer.print((person.getSurveyDay().equals(day)?1:0)+"\t");
+								printer.println();
 							}
 						}
 				}
@@ -397,6 +401,8 @@ public class BinaryPlaceTypes {
 							params.add((double) (person.getRole().equals(Role.PARTNER)?1:0));
 							params.add((double) (person.getRole().equals(Role.YOUNGER)?1:0));
 							writeLine(params,printer);
+							for(Day day:Day.values())
+								printer.print((person.getSurveyDay().equals(day)?1:0)+"\t");
 							printer.println();
 						}
 						prevPurpose = trip.getPurpose();
@@ -433,6 +439,8 @@ public class BinaryPlaceTypes {
 						params.add((double) (person.getRole().equals(Role.PARTNER)?1:0));
 						params.add((double) (person.getRole().equals(Role.YOUNGER)?1:0));
 						writeLine(params,printer);
+						for(Day day:Day.values())
+							printer.print((person.getSurveyDay().equals(day)?1:0)+"\t");
 						printer.println();
 					}
 					printerB.print(person.getAgeInterval().getCenter()+"\t");
@@ -465,7 +473,10 @@ public class BinaryPlaceTypes {
 					printerB.print((person.getRole().equals(Role.PARTNER)?1:0)+"\t");
 					printerB.print((person.getRole().equals(Role.YOUNGER)?1:0)+"\t");
 					printerB.print(person.getFactor()+"\t");
-					printerB.println(isPurpose?"1":"0");
+					printerB.print((isPurpose?"1":"0")+"\t");
+					for(Day day:Day.values())
+						printerB.print((person.getSurveyDay().equals(day)?1:0)+"\t");
+					printerB.println();
 				}
 			printer.close();
 			printerB.close();
@@ -557,7 +568,10 @@ public class BinaryPlaceTypes {
 		printer.print("PARTNER\t");
 		printer.print("YOUNGER\t");
 		printer.print("WEIGHT\t");
-		printer.println("CHOICE");
+		printer.print("CHOICE");
+		for(Day day:Day.values())
+			printer.print(day.name().toUpperCase()+"\t");
+		printer.println();
 	}
 
 	private static void writeHeaderP(PrintWriter printer, Set<DetailedType> detailedTypes) {
@@ -581,6 +595,8 @@ public class BinaryPlaceTypes {
 		titles.add("PARTNER");
 		titles.add("YOUNGER");
 		writeTitles(titles, printer);
+		for(Day day:Day.values())
+			printer.print(day.name().toUpperCase()+"\t");
 		printer.println();
 	}
 	private static void writeTitles(List<String> params, PrintWriter printer) {
@@ -609,7 +625,10 @@ public class BinaryPlaceTypes {
 		printer.print("PARTNER\t");
 		printer.print("YOUNGER\t");
 		printer.print("WEIGHT\t");
-		printer.println("CHOICE");
+		printer.print("CHOICE");
+		for(Day day:Day.values())
+			printer.print(day.name().toUpperCase()+"\t");
+		printer.println();
 	}
 
 }

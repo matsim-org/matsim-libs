@@ -20,6 +20,8 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
 
+import com.google.inject.Inject;
+
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 
 public class BasePlanStrategy implements PlanStrategy {
@@ -86,6 +88,7 @@ public class BasePlanStrategy implements PlanStrategy {
 	private final ExceptionHandler exceptionHandler = new ExceptionHandler(hadException);
 
 	//Constructors
+	@Inject
 	public BasePlanStrategy(Scenario scenario) {
 		basePlanThreads = new BasePlanThread[scenario.getConfig().global().getNumberOfThreads()];
 	}

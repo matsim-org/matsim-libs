@@ -123,8 +123,10 @@ public class AgendaDecisionMaker extends PlaceSharer implements RouteDecisionMak
 	public List<? extends PlanElement> decideRoute(double time,	Id<ActivityFacility> startFacilityId, Id<ActivityFacility> endFacilityId, String mode,
 			TripRouter tripRouter) {
 		List<PlanElement> planElements = new ArrayList<PlanElement>();
+		if(Math.abs(futureActivityStartTime-followingActivities.get(0).getSecond().getFirst()+followingActivities.get(0).getSecond().getSecond())>0.001)
+			throw new RuntimeException();
 		List<SchedulingLink> path = new SchedulingNetwork().createNetwork(now, facilities, startFacilityId, endFacilityId,
-				futureActivityStartTime, PLAN_STEP, modes, this, agenda, previousActivities, followingActivities, mobsimStatus);
+				PLAN_STEP, modes, this, agenda, previousActivities, followingActivities, mobsimStatus);
 		if(mobsimStatus.isMobsimEnds())
 			return null;
 		Id<ActivityFacility> currentFacilityId = startFacilityId;

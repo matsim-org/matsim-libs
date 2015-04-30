@@ -3,7 +3,7 @@ package playground.sergioo.passivePlanning2012.core.population;
 import java.util.Collection;
 import java.util.Set;
 
-import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -78,7 +78,7 @@ public class AgendaBasePersonImpl extends BasePersonImpl implements	AgendaBasePe
 	}
 	private static Agenda createAgenda(Person person) {
 		Agenda agenda = new Agenda();
-		agenda.addElement("home", new NormalDistributionImpl(0, 0.1), new NormalDistributionImpl(10*3600, 2*3600));
+		agenda.addElement("home", new NormalDistribution(0, 0.1), new NormalDistribution(10*3600, 2*3600));
 		double time = 0;
 		for(Plan plan:person.getPlans())
 			for(PlanElement planElement:plan.getPlanElements()) {

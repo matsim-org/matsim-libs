@@ -162,21 +162,19 @@ public class PlaceTypes {
 					if(nodes.get(location.getPostalCode())==null)
 						nodes.put(location.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(location.getCoord())));
 				}*/
-		for(String purpose:Trip.PURPOSES)
-			if(FLEX_ATIVITIES.contains(purpose)) {
-				for(Household household:households.values()) {
-					for(Person person:household.getPersons().values())
-						for(Trip trip:person.getTrips().values())
-							if(trip.getPurpose().equals(purpose)) {
-								Location startLocation = Household.LOCATIONS.get(trip.getStartPostalCode());
-								Location endLocation = Household.LOCATIONS.get(trip.getEndPostalCode());
-								if(nodes.get(startLocation.getPostalCode())==null)
-									nodes.put(startLocation.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(startLocation.getCoord())).getId().toString());
-								if(nodes.get(endLocation.getPostalCode())==null)
-									nodes.put(endLocation.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(endLocation.getCoord())).getId().toString());
-							}
-				}
-			}
+		
+		for(Household household:households.values()) {
+			for(Person person:household.getPersons().values())
+				for(Trip trip:person.getTrips().values())
+					if(FLEX_ATIVITIES.contains(trip.getPurpose())) {
+						Location startLocation = Household.LOCATIONS.get(trip.getStartPostalCode());
+						Location endLocation = Household.LOCATIONS.get(trip.getEndPostalCode());
+						if(nodes.get(startLocation.getPostalCode())==null)
+							nodes.put(startLocation.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(startLocation.getCoord())).getId().toString());
+						if(nodes.get(endLocation.getPostalCode())==null)
+							nodes.put(endLocation.getPostalCode(), net.getNearestNode(coordinateTransformation.transform(endLocation.getCoord())).getId().toString());
+					}
+		}
 		Map<DetailedType, Map<String, String>> locs = new HashMap<DetailedType, Map<String, String>>();
 		for(DetailedType detailedType:Location.DetailedType.values()) {
 			Map<String, String> los = new HashMap<String, String>();

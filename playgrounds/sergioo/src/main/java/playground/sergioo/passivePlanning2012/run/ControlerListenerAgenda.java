@@ -115,7 +115,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 		controler.setTransitRouterFactory(new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));*/
 		//controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.addControlerListener(new ControlerListenerAgenda());
-		controler.run(); 
+		controler.run();
 	}
 
 }

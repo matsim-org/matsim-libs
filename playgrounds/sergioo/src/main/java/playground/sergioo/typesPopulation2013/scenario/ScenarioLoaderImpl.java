@@ -41,8 +41,6 @@ import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
@@ -149,9 +147,6 @@ public class ScenarioLoaderImpl {
 		}
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
-		}
-		if (this.config.scenario().isUseSignalSystems()){
-			this.loadSignalSystems();
 		}
 		return this.scenario;
 	}
@@ -292,10 +287,6 @@ public class ScenarioLoaderImpl {
 		else {
 			log.info("no lane definition file set in config or feature disabled, not able to load anything");
 		}
-	}
-
-	private void loadSignalSystems() {
-		this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(this.config.signalSystems()).loadSignalsData());
 	}
 
 }

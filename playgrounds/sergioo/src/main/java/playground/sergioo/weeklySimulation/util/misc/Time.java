@@ -94,6 +94,9 @@ public class Time {
 		public double getEndTime() {
 			return endTime;
 		}
+		public double getMiddleTime() {
+			return (startTime+endTime)/2;
+		}
 	}
 
 	private Time() {} // namespace only, do not instantiate

@@ -1,5 +1,6 @@
 package playground.sergioo.hits2012;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
@@ -32,6 +33,7 @@ public class Person {
 		FIXED_WORK_PLACE(59,"BH"),
 		WORK_HOURS(60,"BI"),
 		INCOME(61,"BJ"),
+		DATE(62, "BK"),
 		SURVEY_DAY(63,"BL"),
 		START_HOME(64,"BM"),
 		FIRST_ACTIVITY(66,"BO"),
@@ -53,6 +55,9 @@ public class Person {
 	}
 	public enum Role {
 		MAIN, PARTNER, YOUNGER, OLDER
+	}
+	public static enum Day {
+		Mon,Tue,Wed,Thur,Fri,Sat,Sun;
 	}
 
 	//Classes
@@ -138,7 +143,8 @@ public class Person {
 	private final String workPlacePostalCode;
 	private final String workHours;
 	private IncomeInterval incomeInterval;
-	private final String surveyDay;
+	private final Date date;
+	private final Day surveyDay;
 	private final boolean startHome;
 	private final String firstActivity;
 	private final String noTripReason;
@@ -149,7 +155,7 @@ public class Person {
 	
 	//Constructors
 	public Person(String id, String noEligibleReason, double factor) {
-		this(id, null, null, null, false, false, false, false, false, null, null, null, null, null, null, null, null, null, null, null, false, null, null, null, null, factor);
+		this(id, null, null, null, false, false, false, false, false, null, null, null, null, null, null, null, null, null, null, null, null, false, null, null, null, null, factor);
 		this.noEligibleReason = noEligibleReason;
 	}
 
@@ -159,9 +165,10 @@ public class Person {
 			boolean hasMobility, String aids, String aidsOther,
 			String employment, String education, String school,
 			String occupation, String industry, String workPlacePostalCode,
-			String workHours, IncomeInterval incomeInterval, String surveyDay,
-			boolean startHome, String firstActivity, String noTripReason,
-			String noTripReasonOther, String lastTimeTrip, double factor) {
+			String workHours, IncomeInterval incomeInterval, Date date,
+			Day surveyDay, boolean startHome, String firstActivity,
+			String noTripReason, String noTripReasonOther,
+			String lastTimeTrip, double factor) {
 		super();
 		this.id = id;
 		this.ageInterval = ageInterval;
@@ -182,6 +189,7 @@ public class Person {
 		this.workPlacePostalCode = workPlacePostalCode;
 		this.workHours = workHours;
 		this.incomeInterval = incomeInterval;
+		this.date = date;
 		this.surveyDay = surveyDay;
 		this.startHome = startHome;
 		this.firstActivity = firstActivity;
@@ -268,7 +276,10 @@ public class Person {
 					return incomeInterval.getCenter()+person.getIncomeInterval().getCenter()/2;
 		return incomeInterval.getCenter();
 	}
-	public String getSurveyDay() {
+	public Date getDate() {
+		return date;
+	}
+	public Day getSurveyDay() {
 		return surveyDay;
 	}
 	public boolean isStartHome() {

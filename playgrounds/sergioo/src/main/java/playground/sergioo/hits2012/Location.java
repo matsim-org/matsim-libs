@@ -31,6 +31,10 @@ public class Location {
 		DETAILED_TYPES.put(Trip.PlaceType.PARK, dTypes);
 		dTypes = new DetailedType[] {DetailedType.REC};
 		DETAILED_TYPES.put(Trip.PlaceType.REC, dTypes);
+		/*dTypes = new DetailedType[] {DetailedType.FUN};
+		DETAILED_TYPES.put(Trip.PlaceType.FUN, dTypes);
+		dTypes = new DetailedType[] {DetailedType.FINANTIAL};
+		DETAILED_TYPES.put(Trip.PlaceType.FINANTIAL, dTypes);*/
 	}
 	public static PlaceType getTypeOfDetailedType(DetailedType detailedType) {
 		for(Entry<PlaceType, DetailedType[]> detailedTypes:DETAILED_TYPES.entrySet())
@@ -46,10 +50,12 @@ public class Location {
 		CIVIC,
 		HOME_OTHER,
 		PARK_HIGH, PARK_LOW,
-		REC;
+		REC/*,
+		FUN,
+		FINANTIAL*/;
 	}
 	public static enum Column {
-		POSTAL_CODE(5,"F"),
+		POSTAL_CODE(5, "F"),
 		AREA_CODE(6, "G"),
 		AREA_NAME(7, "H");
 		public int column;

@@ -164,7 +164,6 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 
 		private double now;
 
-
 		public CurrentTime() {
 			now = 0;
 		}

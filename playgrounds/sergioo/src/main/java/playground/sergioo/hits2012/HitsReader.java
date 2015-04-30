@@ -17,8 +17,11 @@ import java.util.Map;
 
 
 
+
+
 import org.matsim.api.core.v01.Coord;
 
+import playground.sergioo.hits2012.Person.Day;
 import playground.sergioo.hits2012.Person.IncomeInterval;
 import playground.sergioo.hits2012.Trip.Purpose;
 import playground.sergioo.hits2012.stages.CycleStage;
@@ -38,7 +41,7 @@ public class HitsReader {
 	
 	public static void main(String[] args) throws IOException, ParseException {
 		Map<String, Household> households = readHits(args[0]);
-		System.out.println(households.size());
+		System.out.println("Households: "+households.size());
 		int numPersons = 0;
 		for(Household household:households.values())
 			numPersons += household.getPersons().size();
@@ -55,7 +58,36 @@ public class HitsReader {
 		for(Household household:households.values())
 			numPersons += household.getPersonsNoSurvey().size();
 		System.out.println("No survey: " + numPersons);
+		int[] numDaysPerson = new int[Day.values().length];
+		double[] numDaysPersonW = new double[Day.values().length];
+		int[] numDaysTrip = new int[Day.values().length];
+		double[] numDaysTripW = new double[Day.values().length];
+		int[] numDaysStage = new int[Day.values().length];
+		for(Household household:households.values())
+			for(Person person:household.getPersons().values()) {
+				int index = person.getSurveyDay().ordinal();
+				numDaysPerson[index]++;
+				numDaysPersonW[index]+=person.getFactor();
+				numDaysTrip[index]+=person.getTrips().size();
+				for(Trip trip:person.getTrips().values()) {
+					numDaysTripW[index]+=trip.getFactor();
+					numDaysStage[index]+=trip.getStages().size();
+				}
+			}
+		for(Day day:Day.values()) {
+			System.out.println(day.name()+": "+numDaysPerson[day.ordinal()]+" people, "+numDaysTrip[day.ordinal()]+" trips, "+numDaysStage[day.ordinal()]+" stages.");
+			System.out.println(day.name()+": "+numDaysPersonW[day.ordinal()]+" people, "+numDaysTripW[day.ordinal()]+" trips.");
+		}
 	}
+	
+	/*public static void main(String[] args) throws IOException, ParseException {
+		Map<String, Household> households = readHits(args[0]);
+		PrintWriter printWriter = new PrintWriter("./data/persons.txt");
+		for(Household household:households.values())
+			for(Person person:household.getPersons().values())
+				printWriter.println(person.getId()+","+household.getLocation().getCoord().getX()+","+household.getLocation().getCoord().getY()+","+person.getAgeInterval().getCenter()+","+(person.getIncomeInterval()==null?0:person.getIncomeInterval().getCenter())+","+person.getTrips().size());
+		printWriter.close();
+	}*/
 	
 	private static void init() {
 		placeTypesMap.put("Place of worship", Trip.PlaceType.TEMPLE.text);
@@ -118,6 +150,7 @@ public class HitsReader {
 		BufferedReader reader = new BufferedReader(new FileReader(fileName));
 		reader.readLine();
 		String line = reader.readLine();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy");
 		SimpleDateFormat timeFormat = new SimpleDateFormat("HHmm");
 		while(line!=null) {
 			String[] lineParts = line.split(",");
@@ -166,6 +199,13 @@ public class HitsReader {
 						}
 					}
 					String income = lineParts[Person.Column.INCOME.column];
+					String sDay = lineParts[Person.Column.SURVEY_DAY.column];
+					Day surveyDay = null;
+					for(Day day:Day.values())
+						if(day.name().equals(sDay)) {
+							surveyDay = day;
+							break;
+						}
 					person = new Person(lineParts[2], new Person.AgeInterval(lineParts[Person.Column.AGE.column]),
 							lineParts[Person.Column.TYPE_NATIONALITY.column], lineParts[Person.Column.GENDER.column],
 							lineParts[Person.Column.HAS_CAR.column].contains("Yes")?true:false,
@@ -177,7 +217,8 @@ public class HitsReader {
 							lineParts[Person.Column.EMPLOYMENT.column], lineParts[Person.Column.EDUCATION.column],
 							school, lineParts[Person.Column.OCCUPATION.column], lineParts[Person.Column.INDUSTRY.column],
 							lineParts[Person.Column.FIXED_WORK_PLACE.column], lineParts[Person.Column.WORK_HOURS.column],
-							income.contains("Refused")?null:income.contains("No Income")?new IncomeInterval():new IncomeInterval(income), lineParts[Person.Column.SURVEY_DAY.column],
+							income.contains("Refused")?null:income.contains("No Income")?new IncomeInterval():new IncomeInterval(income),
+							dateFormat.parse(lineParts[Person.Column.DATE.column]), surveyDay,
 							lineParts[Person.Column.START_HOME.column].contains("Home")?true:false,
 							purposesMap.get(lineParts[Person.Column.FIRST_ACTIVITY.column].replaceAll("^\"|\"$", "")), lineParts[Person.Column.NO_TRIP_REASON.column],
 							lineParts[Person.Column.NO_TRIP_REASON_OTHER.column], lineParts[Person.Column.LAST_TIME_TRIP.column],

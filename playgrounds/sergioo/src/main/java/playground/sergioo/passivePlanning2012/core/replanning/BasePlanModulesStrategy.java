@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.HasPlansAndId;
@@ -53,10 +52,6 @@ public class BasePlanModulesStrategy implements PlanStrategy {
 	@Override
 	public void init(ReplanningContext replanningContext) {
 		counter = new Counter("[BasePlanStrategy] handled person # ");
-//		replanningContext.getTripRouter().setRoutingModule("empty", LegRouterWrapper.createLegRouterWrapper("empty", scenario.getPopulation().getFactory(), new EmptyLegRouter()));
-		Logger.getLogger(this.getClass()).fatal("the above line is no longer possible, sorry.  Should be rather easy to re-write this directly as an"
-				+ " instance of the TripRouter interface (I hope).  Kai, mar'15");
-		System.exit(-1) ;
 		this.replanningContext = replanningContext;
 	}
 	@Override
@@ -64,8 +59,7 @@ public class BasePlanModulesStrategy implements PlanStrategy {
 		Collection<Plan> plans = new ArrayList<Plan>();
 		for(BasePerson person : persons) {
 			Plan plan = new PlanImpl(person);
-			for(int i=0; i<person.getBasePlan().getPlanElements().size(); i++) {
-				PlanElement planElement = person.getBasePlan().getPlanElements().get(i);
+			for(PlanElement planElement:person.getBasePlan().getPlanElements())
 				if(planElement instanceof Activity)
 					plan.addActivity(new ActivityImpl((Activity) planElement));
 				else if(planElement instanceof Leg)
@@ -73,7 +67,6 @@ public class BasePlanModulesStrategy implements PlanStrategy {
 						plan.addLeg(new EmptyTimeImpl((EmptyTime) planElement));
 					else
 						plan.addLeg(new LegImpl((LegImpl)planElement));
-			}
 			if(person.addPlan(plan))
 				((PersonImpl)person).setSelectedPlan(plan);
 			plans.add(plan);
