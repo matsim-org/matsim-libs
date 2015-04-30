@@ -25,6 +25,7 @@ package playground.ikaddoura.analysis.welfare;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -54,10 +55,10 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 	private int ptLegs = 0;
 	private int walkLegs = 0;
 
-	private List<Id<Person>> stuckingAgents;
+	private Set<Id<Person>> stuckingAgents;
 	
-	public TripAnalysisHandler(List<Id<Person>> stuckingAgents) {
-		this.stuckingAgents = stuckingAgents;
+	public TripAnalysisHandler(Set<Id<Person>> invalidPersonIDs) {
+		this.stuckingAgents = invalidPersonIDs;
 		log.info("Providing the person Ids of stucking agents. These agents will be excluded from this analysis.");
 	}
 
