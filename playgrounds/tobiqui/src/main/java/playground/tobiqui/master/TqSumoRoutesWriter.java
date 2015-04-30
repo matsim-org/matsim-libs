@@ -51,7 +51,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			FileOutputStream os = new FileOutputStream(outputRoute);
 			super.openOutputStream(os);
 			super.writeStartTag("routes", null);
-//			writeVTypes();	
+//			writeVTypes();
 //			System.out.println("writing vTypes completed");
 //			writeVehicles();
 //			System.out.println("writing Vehicles completed");
@@ -167,6 +167,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 					else
 						list.add(new Tuple<String, String>("duration", "0"));
 					list.add(new Tuple<String, String>("actType", nextAct.getType()));
+					list.add(new Tuple<String, String>("startPos", "0"));
 					super.writeStartTag("stop", list, true);
 					list.clear();
 				}

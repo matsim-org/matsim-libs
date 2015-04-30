@@ -29,12 +29,12 @@ public class Run {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String configFileName = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/config_renamed.xml";
-		String populationInput = "E:/MA/workspace.bak/matsim/output/siouxfalls-2014_renamed/output_plans.xml.gz";
-		String vehiclesInput = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/Siouxfalls_vehicles.xml";
-		String transitScheduleInput = "E:/MA/workspace.bak/matsim/examples/siouxfalls-2014/Siouxfalls_transitSchedule_renamed.xml";
-		String outputRoutes = "E:/MA/workspace.bak/master/output/siouxfalls-2014/TestFullSumo_.rou.xml";
-		String outputAdditional = "E:/MA/workspace.bak/master/output/siouxfalls-2014/input_additional.add.xml"; //additional data like busstops
+		String configFileName = "../matsim/examples/siouxfalls-2014/config_default.xml";
+		String populationInput = "../matsim/output/siouxfalls-2014/output_plans.xml.gz";
+		String vehiclesInput = "../matsim/examples/siouxfalls-2014/Siouxfalls_vehicles.xml";
+		String transitScheduleInput = "../matsim/examples/siouxfalls-2014/Siouxfalls_transitSchedule.xml";
+		String outputRoutes = "../matsim/output/siouxfalls-2014/TestFullSumo_.rou.xml";
+		String outputAdditional = "../matsim/output/siouxfalls-2014/input_additional.add.xml"; //additional data like busstops
 
 		Config config = ConfigUtils.loadConfig(configFileName);
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -51,6 +51,15 @@ public class Run {
 
 		new MatsimPopulationReader(scenario).readFile(populationInput);
 
+		int i=0;
+		Iterator<? extends Person> iterator = scenario.getPopulation().getPersons().values().iterator();
+		while (iterator.hasNext()) {
+			iterator.next();
+			if (i % 5 != 0) {
+				iterator.remove();
+			}
+			i++;
+		}
 
         List<Person> personsSorted = new ArrayList<Person>(scenario.getPopulation().getPersons().values()); //id's sorted by end_times of first activity of selectedPlans
         Collections.sort(personsSorted, new Comparator<Person>() {
