@@ -20,8 +20,8 @@
 package playground.vsp.analysis.modules.userBenefits;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -50,7 +50,7 @@ public class UserBenefitsCalculator {
 	private final Map<Id<Person>, Double> personId2Utility = new HashMap<Id<Person>, Double>();
 	private final Map<Id<Person>, Double> personId2MonetizedUtility = new HashMap<Id<Person>, Double>();
 
-	private final List<Id<Person>> stuckingAgents;
+	private final Set<Id<Person>> stuckingAgents;
 
 	public UserBenefitsCalculator(Config config, WelfareMeasure wm, boolean considerAllPlans) {
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore();
@@ -69,7 +69,7 @@ public class UserBenefitsCalculator {
 		}
 	}
 	
-	public UserBenefitsCalculator(Config config, List<Id<Person>> stuckingAgents) {
+	public UserBenefitsCalculator(Config config, Set<Id<Person>> stuckingAgents) {
 		logger.info("Providing the IDs of agents that are stucking in the final iteration (selected plans).");
 
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore();
@@ -150,7 +150,7 @@ public class UserBenefitsCalculator {
 				personsWithoutValidPlanScore++;
 				if(personsWithoutValidPlanScore <= maxWarnCnt) {
 					logger.warn("Person " + person.getId() + " has no valid plans. " +
-							"This person's utility is set to " + utilityOfPerson_utils);
+							"This person's utility is " + utilityOfPerson_utils);
 					if(personsWithoutValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 				}
 			} else{
@@ -174,7 +174,7 @@ public class UserBenefitsCalculator {
 				personsWithoutValidPlanScore++;
 				if(personsWithoutValidPlanScore <= maxWarnCnt) {
 					logger.warn("Person " + person.getId() + " has no valid selected plan. " +
-							"This person's utility is set to " + utilityOfPerson_utils);
+							"This person's utility is " + utilityOfPerson_utils);
 					if(personsWithoutValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 				}
 			}
@@ -207,8 +207,12 @@ public class UserBenefitsCalculator {
 						+ ". A null score cannot be used for utility calculation. This person has to be excluded.");
 			} else {
 				if (this.stuckingAgents.contains(personId)) {
-					logger.info("Person " + personId + " is stucking and therefore cannot be used for utility calculation.");
 					minusScore++;
+					if(minusScore <= maxWarnCnt) {
+						logger.warn("Person " + personId + " is stucking and therefore cannot be used for utility calculation.");
+						if(minusScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+					}
+
 					return false;
 				} else return true;
 			}
