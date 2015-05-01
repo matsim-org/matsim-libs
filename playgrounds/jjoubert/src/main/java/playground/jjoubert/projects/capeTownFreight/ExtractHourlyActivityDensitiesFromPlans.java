@@ -23,6 +23,7 @@ import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.SchemaException;
@@ -302,7 +303,7 @@ public class ExtractHourlyActivityDensitiesFromPlans {
 	
 	private static SimpleFeatureCollection createFeatureCollection(){
 		LOG.info("Creating feature collection for shapefile...");
-		SimpleFeatureCollection collection = FeatureCollections.newCollection();
+		DefaultFeatureCollection collection = new DefaultFeatureCollection();
 		
 		Counter counter = new Counter("   feature # ");
 		for(Point p : map.keySet()){

@@ -66,7 +66,6 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outShp);
 		Assert.assertEquals(2235, writtenFeatures.size());
-		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof Point);
 	}
 
 	public void testSelectedPlansLegsShape() throws IOException {
@@ -93,7 +92,6 @@ public class SelectedPlans2ESRIShapeTest extends MatsimTestCase {
 
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outShp);
 		Assert.assertEquals(1431, writtenFeatures.size());
-		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof MultiLineString);
 	}
 
 }

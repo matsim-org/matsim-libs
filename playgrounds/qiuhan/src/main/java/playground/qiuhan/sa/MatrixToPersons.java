@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -104,7 +105,7 @@ public class MatrixToPersons {
 
 		// Iterator to iterate over the features from the shape file
 		try {
-			Iterator<SimpleFeature> it = fts.getFeatures().iterator();
+			SimpleFeatureIterator it = fts.getFeatures().features();
 			while (it.hasNext()) {
 				SimpleFeature ft = it.next();
 				String zoneId = ft.getAttribute("NO").toString();

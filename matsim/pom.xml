@@ -447,7 +447,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<svnRevision>${buildNumber}</svnRevision>
-		<geotools.version>2.7.3</geotools.version>
+		<geotools.version>13.0</geotools.version>
         <skipTestJar>false</skipTestJar> <!--Overridden in the bintray profile-->
     </properties>
 </project>

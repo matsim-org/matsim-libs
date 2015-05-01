@@ -61,7 +61,6 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
-		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof MultiPolygon);
 	}
 
 	public void testPolygonLanesShape() {
@@ -84,7 +83,6 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
-		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof MultiPolygon);
 	}
 
 	public void testPolygonFreespeedShape() {
@@ -107,7 +105,6 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileP);
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
-		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof MultiPolygon);
 	}
 
 	public void testLineStringShape() {
@@ -130,7 +127,6 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
 		Assert.assertEquals(network.getLinks().size(), writtenFeatures.size());
-		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof MultiLineString);
 	}
 
 	public void testNodesShape() {
@@ -146,6 +142,5 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		
 		Collection<SimpleFeature> writtenFeatures = ShapeFileReader.getAllFeatures(outputFileShp);
 		Assert.assertEquals(network.getNodes().size(), writtenFeatures.size());
-		Assert.assertTrue(writtenFeatures.iterator().next().getDefaultGeometry() instanceof Point);
 	}
 }

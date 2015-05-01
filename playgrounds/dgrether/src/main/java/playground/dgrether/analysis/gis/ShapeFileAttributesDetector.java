@@ -22,6 +22,8 @@ package playground.dgrether.analysis.gis;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -44,7 +46,7 @@ public class ShapeFileAttributesDetector {
 		SimpleFeatureSource fts = ShapeFileReader.readDataFile(shapeFile);
 
 		// Iterator to iterate over the features from the shape file
-		Iterator<SimpleFeature> it = fts.getFeatures().iterator();
+		SimpleFeatureIterator it = fts.getFeatures().features();
 		SimpleFeature ft = it.next(); // A feature contains a geometry (in this case a
 														// polygon) and an arbitrary number
 		// of other attributes

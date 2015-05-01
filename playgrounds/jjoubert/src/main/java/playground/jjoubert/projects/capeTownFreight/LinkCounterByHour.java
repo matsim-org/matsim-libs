@@ -39,6 +39,7 @@ import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -119,7 +120,7 @@ public class LinkCounterByHour implements LinkEnterEventHandler, Wait2LinkEventH
 		GeometryFactory gf = new GeometryFactory();
 
 		LOG.info("Creating feature collection for shapefile...");
-		SimpleFeatureCollection collection = FeatureCollections.newCollection();
+		DefaultFeatureCollection collection = new DefaultFeatureCollection();
 		
 		Counter counter = new Counter("   feature # ");
 		for(Id<Link> linkId : map.keySet()){

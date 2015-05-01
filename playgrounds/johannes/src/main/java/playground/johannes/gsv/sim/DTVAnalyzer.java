@@ -37,6 +37,7 @@ import org.geotools.data.shapefile.ShapefileDataStoreFactory;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollections;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -152,8 +153,8 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 		typeBuilder.add("relerror", Double.class);
 		
 		SimpleFeatureType featureType = typeBuilder.buildFeatureType();
-        
-		SimpleFeatureCollection collection = FeatureCollections.newCollection();
+
+		DefaultFeatureCollection collection = new DefaultFeatureCollection();
         SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
 
 //        GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
