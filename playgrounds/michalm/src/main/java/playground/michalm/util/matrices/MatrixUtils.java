@@ -71,6 +71,12 @@ public class MatrixUtils
     }
 
 
+    // TODO add this method when refactoring Matrix 
+    //    public static Matrix createMatrix(String id, Iterable<?> ids, DoubleProvider provider, boolean denseMatrix)
+    //    {
+    //        
+    //    }
+
     public static Matrix getOrCreateMatrix(Matrices matrices, String key)
     {
         Matrix matrix = matrices.getMatrix(key);

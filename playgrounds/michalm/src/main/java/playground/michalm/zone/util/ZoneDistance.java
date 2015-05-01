@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,39 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.mip;
+package playground.michalm.zone.util;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.utils.leastcostpathtree.LeastCostPathTree.NodeData;
+import playground.michalm.zone.Zone;
 
 
-public class PathTreeBasedTravelTimeCalculator
+public interface ZoneDistance
 {
-    private final LeastCostPathTreeStorage leastCostPathTrees;
-
-
-    public PathTreeBasedTravelTimeCalculator(LeastCostPathTreeStorage leastCostPathTrees)
-    {
-        this.leastCostPathTrees = leastCostPathTrees;
-    }
-
-
-    public double calcTravelTime(Link fromLink, Link toLink)
-    {
-        if (fromLink == toLink) {
-            return 0;
-        }
-
-        Map<Id<Node>, NodeData> tree = leastCostPathTrees.getTree(fromLink.getToNode());
-        NodeData nodeData = tree.get(toLink.getFromNode().getId());
-
-        double tt = 1;//getting over the first node
-        tt += nodeData.getTime();//travelling along the path
-        tt += toLink.getLength() / toLink.getFreespeed();//travelling the last link (approx.)
-
-        return tt;
-    }
+    
+    
+    
+    double calcDistance(Zone fromZone, Zone toZone);
 }

@@ -20,7 +20,7 @@
 package playground.michalm.util.matrices;
 
 import java.io.*;
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.matrices.*;
 
@@ -29,17 +29,30 @@ import com.google.common.base.*;
 
 public class MatricesTxtWriter
 {
-    private final Matrices matrices;
+    private final Map<String, Matrix> matrices;
     private String keyHeader = "key";
     private Function<String, String> formatter = Functions.identity();
 
+    
+    public static MatricesTxtWriter createForSingleMatrix(Matrix matrix)
+    {
+        MatricesTxtWriter writer = new MatricesTxtWriter(Collections.singletonMap("", matrix));
+        writer.setKeyHeader(null);
+        return writer;
+    }
+    
 
-    public MatricesTxtWriter(Matrices matrices)
+    public MatricesTxtWriter(Map<String, Matrix> matrices)
     {
         this.matrices = matrices;
     }
 
 
+    /**
+     * to skip displaying the key column, set keyHeader to null
+     * 
+     * @param keyHeader
+     */
     public void setKeyHeader(String keyHeader)
     {
         this.keyHeader = keyHeader;
@@ -55,19 +68,29 @@ public class MatricesTxtWriter
     public void write(String file)
     {
         try (PrintWriter pw = new PrintWriter(file)) {
-            pw.println(keyHeader + "\tfrom\tto\tvalue");
+            writeKey(pw, keyHeader);
+            pw.println("from\tto\tvalue");
 
-            for (Map.Entry<String, Matrix> mapEntry : matrices.getMatrices().entrySet()) {
-                String key = formatter.apply(mapEntry.getKey());
+            for (Map.Entry<String, Matrix> mapEntry : matrices.entrySet()) {
+                String key = keyHeader == null ? null : formatter.apply(mapEntry.getKey());
 
                 for (Entry e : MatrixUtils.createEntryIterable(mapEntry.getValue())) {
-                    pw.printf("%s\t%s\t%s\t%f\n", key, e.getFromLocation(), e.getToLocation(),
+                    writeKey(pw, key);
+                    pw.printf("%s\t%s\t%f\n", e.getFromLocation(), e.getToLocation(),
                             e.getValue());
                 }
             }
         }
         catch (FileNotFoundException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+
+    private void writeKey(PrintWriter pw, String key)
+    {
+        if (keyHeader != null) {
+            pw.print(key + "\t");
         }
     }
 }

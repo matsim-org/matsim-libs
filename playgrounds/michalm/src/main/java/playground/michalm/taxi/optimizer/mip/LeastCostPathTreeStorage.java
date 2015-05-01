@@ -48,13 +48,7 @@ public class LeastCostPathTreeStorage
         treesByRootNodeId = new HashMap<>();
     }
 
-
-    public Map<Id<Node>, NodeData> getTree(Link fromLink)
-    {
-        return getTree(fromLink.getToNode());
-    }
-
-
+    
     public Map<Id<Node>, NodeData> getTree(Node rootNode)
     {
         Map<Id<Node>, NodeData> tree = treesByRootNodeId.get(rootNode.getId());

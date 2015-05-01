@@ -146,7 +146,7 @@ public class TaxiStatusDataAnalyser
     private static void writeMatrices(Matrices matrices, String xmlFile, String txtFile)
     {
         new MatricesWriter(matrices).write(xmlFile);
-        new MatricesTxtWriter(matrices).write(txtFile);
+        new MatricesTxtWriter(matrices.getMatrices()).write(txtFile);
     }
 
 

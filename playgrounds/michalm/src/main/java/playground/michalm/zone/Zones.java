@@ -98,4 +98,10 @@ public class Zones
     {
         return PolygonExtracter.getPolygons(zone.getMultiPolygon());
     }
+
+
+    public static Coord getCentroidCoord(Zone zone)
+    {
+        return MGC.point2Coord(zone.getMultiPolygon().getCentroid());
+    }
 }

@@ -67,7 +67,7 @@ public class ServedRequestsAggregator
         String header = "year\tmonth\tm_day\tw_day\thour";
         final DateFormat tabDateFormat = new SimpleDateFormat("yy\tMM\tdd\tu\tHH");
 
-        MatricesTxtWriter w1 = new MatricesTxtWriter(demandAggregator.getMatrices());
+        MatricesTxtWriter w1 = new MatricesTxtWriter(demandAggregator.getMatrices().getMatrices());
         w1.setKeyHeader(header);
         w1.setKeyFormatter(new Function<String, String>() {
             @Override
@@ -90,7 +90,7 @@ public class ServedRequestsAggregator
                 });
 
         String aggregatedMatricesFile = "d:/PP-rad/taxi/poznan-supply/zlecenia_obsluzone/matrices_workdays_aggregated.txt";
-        MatricesTxtWriter w2 = new MatricesTxtWriter(aggregatedMatrices);
+        MatricesTxtWriter w2 = new MatricesTxtWriter(aggregatedMatrices.getMatrices());
         w2.setKeyHeader("hour");
         w2.write(aggregatedMatricesFile);
     }
