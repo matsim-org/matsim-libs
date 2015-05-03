@@ -56,6 +56,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -124,7 +125,13 @@ public class BetaTravelTest extends MatsimTestCase {
 		 */
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PopulationUtils.sortPersons(scenario.getPopulation());
-		TestControler controler = new TestControler(scenario);
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(StrategyManager.class).toProvider(MyStrategyManagerProvider.class);
+			}
+		});
 		controler.addControlerListener(new TestControlerListener());
         controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
@@ -147,7 +154,13 @@ public class BetaTravelTest extends MatsimTestCase {
 		 */
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PopulationUtils.sortPersons(scenario.getPopulation());
-		TestControler controler = new TestControler(scenario);
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(StrategyManager.class).toProvider(MyStrategyManagerProvider.class);
+			}
+		});
 		controler.addControlerListener(new TestControlerListener());
         controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
@@ -262,44 +275,20 @@ public class BetaTravelTest extends MatsimTestCase {
 		}
 	}
 
-	/**
-	 * A custom Controler for this TestCase that loads special strategies and
-	 * verifies that the loaded settings from the configuration files are
-	 * suitable to test what we want.
-	 *
-	 * @author mrieser
-	 */
-	private static class TestControler extends Controler {
+	private static class MyStrategyManagerProvider implements Provider<StrategyManager> {
 
-		protected TestControler(final Scenario scenario) {
-			super(scenario);
-            addOverridingModule(new AbstractModule() {
-                @Override
-                public void install() {
-					bind(StrategyManager.class).toProvider(new com.google.inject.Provider<StrategyManager>() {
-                        @Override
-                        public StrategyManager get() {
-                            return new Provider<StrategyManager>() {
-                                    @Override
-                                    public StrategyManager get() {
-                                        return myLoadStrategyManager();
-                                    }
-                                }.get();
-                        }
-                    }).in(Singleton.class);
-				}
-            });
-		}
+		@Inject Config config;
 
-		private StrategyManager myLoadStrategyManager() {
+		@Override
+		public StrategyManager get() {
 			StrategyManager manager = new StrategyManager();
 			manager.setMaxPlansPerAgent(5);
 
-			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.getConfig().planCalcScore()));
+			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 			manager.addStrategyForDefaultSubpopulation(strategy1, 0.80);
 
 			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(this.getConfig().global().getNumberOfThreads()));
+			strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(config.global().getNumberOfThreads()));
 			manager.addStrategyForDefaultSubpopulation(strategy2, 0.80);
 
 			// reduce the replanning probabilities over the iterations
