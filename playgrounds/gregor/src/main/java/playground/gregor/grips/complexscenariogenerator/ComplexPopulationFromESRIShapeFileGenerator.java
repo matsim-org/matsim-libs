@@ -22,6 +22,7 @@ package playground.gregor.grips.complexscenariogenerator;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -69,7 +70,7 @@ public class ComplexPopulationFromESRIShapeFileGenerator {
 		SimpleFeatureSource fs = ShapeFileReader.readDataFile(this.populationShapeFile);
 		CoordinateReferenceSystem crs = fs.getSchema().getCoordinateReferenceSystem();
 		try {
-			Iterator<SimpleFeature> it = fs.getFeatures().iterator();
+			SimpleFeatureIterator it = fs.getFeatures().features();
 			while (it.hasNext()) {
 				SimpleFeature ft = it.next();
 				try {
@@ -78,8 +79,8 @@ public class ComplexPopulationFromESRIShapeFileGenerator {
 					throw new RuntimeException(e);
 				} catch (TransformException e) {
 					throw new RuntimeException(e);
-				} 
-				
+				}
+
 				long id = (Long) ft.getAttribute("id");
 				ODRelation odRelation = this.odRelations.get(id);
 				if (odRelation == null) {
