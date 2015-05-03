@@ -1,7 +1,6 @@
 package playground.smeintjes;
 
 import playground.southafrica.utilities.Header;
-import scala.util.parsing.combinator.PackratParsers.Head;
 
 /**
  * This class reads in multiple freight populations, each with 120,000 plans (vehicles).
