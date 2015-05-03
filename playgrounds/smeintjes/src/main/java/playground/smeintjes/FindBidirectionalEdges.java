@@ -77,7 +77,7 @@ public class FindBidirectionalEdges {
 			int reverseSource = reverseEdge.getFirst();
 			int reverseDestination = reverseEdge.getSecond();
 				if(toRemoveList.contains(reverseEdge)){
-					log.info("This edge has already been identified as bidirectional.");	
+					log.info("Edge " + reverseSource + ", " + reverseDestination + " has already been identified as bidirectional.");	
 				} else{	
 					for(int j = 0; j < edgeList.size(); j++){
 					Tuple<Integer, Integer> nextEdge = edgeList.get(j);
