@@ -105,13 +105,13 @@ public class VktEstimatorTest {
 	@Test
 	public void test() {
 		double d1 = VktEstimator.estimateVktFromPlan(plans.get(0), geom);
-		Assert.assertEquals("Wrong length for plan 1.", 2.5*VktEstimator.DISTANCE_MULTIPLIER, d1, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong length for plan 1.", 2.5*VktEstimator.DISTANCE_MULTIPLIER/1000.0, d1, MatsimTestUtils.EPSILON);
 		
 		double d2 = VktEstimator.estimateVktFromPlan(plans.get(1), geom);
-		Assert.assertEquals("Wrong length for plan 2.", 5.0*VktEstimator.DISTANCE_MULTIPLIER, d2, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong length for plan 2.", 5.0*VktEstimator.DISTANCE_MULTIPLIER/1000.0, d2, MatsimTestUtils.EPSILON);
 
 		double d3 = VktEstimator.estimateVktFromPlan(plans.get(2), geom);
-		Assert.assertEquals("Wrong length for plan 3.", (5.0+2.5)*VktEstimator.DISTANCE_MULTIPLIER, d3, MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong length for plan 3.", (5.0+2.5)*VktEstimator.DISTANCE_MULTIPLIER/1000.0, d3, MatsimTestUtils.EPSILON);
 	}
 
 }
