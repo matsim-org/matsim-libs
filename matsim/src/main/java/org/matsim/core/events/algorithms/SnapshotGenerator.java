@@ -86,11 +86,11 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		reset(-1);
 	}
 
-	public void addSnapshotWriter(final SnapshotWriter writer) {
+	public final void addSnapshotWriter(final SnapshotWriter writer) {
 		this.snapshotWriters.add(writer);
 	}
 
-	public boolean removeSnapshotWriter(final SnapshotWriter writer) {
+	public final boolean removeSnapshotWriter(final SnapshotWriter writer) {
 		return this.snapshotWriters.remove(writer);
 	}
 
@@ -203,7 +203,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		return positions;
 	}
 
-	public void finish() {
+	public final void finish() {
 		for (SnapshotWriter writer : this.snapshotWriters) {
 			writer.finish();
 		}
@@ -217,7 +217,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	 *
 	 * @param when The earliest timestep at which the caller will be interested in snapshots again.
 	 */
-	public void skipUntil(final double when) {
+	public final void skipUntil(final double when) {
 		this.skipUntil = when;
 	}
 

@@ -34,23 +34,25 @@ import org.matsim.core.utils.io.IOUtils;
 public class TransimsSnapshotWriter implements SnapshotWriter {
 	private BufferedWriter out = null;
 	private double currentTime = -1;
+	
+	public static enum Labels { TIME, VEHICLE, EASTING, NORTHING, VELOCITY } ;
 
 	public TransimsSnapshotWriter(String filename) {
 		try {
 			this.out = IOUtils.getBufferedWriter(filename, true);
-			String header = "VEHICLE"
-            + "\tTIME"
+			String header = Labels.VEHICLE
+            + "\t" + Labels.TIME
             + "\tLINK"
             + "\tNODE"
             + "\tLANE"
             + "\tDISTANCE"
-            + "\tVELOCITY"
+            + "\t" + Labels.VELOCITY
             + "\tVEHTYPE"
             + "\tACCELER"
             + "\tDRIVER"
             + "\tPASSENGERS"
-            + "\tEASTING"
-            + "\tNORTHING"
+            + "\t" + Labels.EASTING
+            + "\t" + Labels.NORTHING
             + "\tELEVATION"
             + "\tAZIMUTH"
             + "\tUSER\n";
