@@ -5,7 +5,7 @@
  *  *                                                                         *
  *  * *********************************************************************** *
  *  *                                                                         *
- *  * copyright       : (C) 2014 by the members listed in the COPYING, *
+ *  * copyright       : (C) 2015 by the members listed in the COPYING, *
  *  *                   LICENSE and WARRANTY file.                            *
  *  * email           : info at matsim dot org                                *
  *  *                                                                         *
@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.teach;
+package tutorial.programming.multiThreadedPlanStrategy;
 
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Person;
@@ -39,7 +39,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainWithMultithreadedModule {
+public class RunWithMultithreadedModule {
 
     public static void main(String[] args) {
         final Controler controler = new Controler(ConfigUtils.createConfig());
