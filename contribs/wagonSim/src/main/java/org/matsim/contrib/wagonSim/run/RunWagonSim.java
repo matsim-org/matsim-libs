@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.google.inject.Provider;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.wagonSim.Utils;
@@ -50,42 +52,39 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
  * @author balmermi
  *
  */
-public class WagonSimController extends Controler {
-
-	//////////////////////////////////////////////////////////////////////
-	// vars
-	//////////////////////////////////////////////////////////////////////
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
-
-	public WagonSimController(Scenario scenario, final ObjectAttributes vehicleLinkSpeedAttributes, Map<Id<TransitStopFacility>, Double> minShuntingTimes) {
-		super(scenario);
+public final class RunWagonSim {
+	private static final Logger log = Logger.getLogger( RunWagonSim.class ) ;
+	
+	public static final Controler init(Scenario scenario, final ObjectAttributes vehicleLinkSpeedAttributes, Map<Id<TransitStopFacility>, Double> minShuntingTimes) {
+//		super(scenario);
+		final Controler controler = new Controler( scenario ) ;
+		Config config = controler.getConfig() ;
 		
 		final WagonSimVehicleLoadListener listener = new WagonSimVehicleLoadListener(scenario.getPopulation().getPersonAttributes());
-		this.addOverridingModule(new AbstractModule() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bindMobsim().toProvider(new Provider<Mobsim>() {
 					@Override
 					public Mobsim get() {
-						return new WagonSimQSimFactory(vehicleLinkSpeedAttributes, listener).createMobsim(getScenario(), getEvents());
+						return new WagonSimQSimFactory(vehicleLinkSpeedAttributes, listener).createMobsim(controler.getScenario(), controler.getEvents());
 					}
 				});
 			}
 		});
-		this.addControlerListener(listener);
+		controler.addControlerListener(listener);
 		TransitRouterFactory routerFactory = 
 				new WagonSimRouterFactoryImpl(
 						listener, 
 						scenario.getTransitSchedule(), new 
-						TransitRouterConfig(getConfig().planCalcScore(), getConfig().plansCalcRoute(), getConfig().transitRouter(), getConfig().vspExperimental()), 
+						TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental()), 
 						scenario.getPopulation().getPersonAttributes(), 
 						vehicleLinkSpeedAttributes);
-		this.setTripRouterFactory(new WagonSimTripRouterFactoryImpl(scenario, routerFactory, minShuntingTimes));
+		controler.setTripRouterFactory(new WagonSimTripRouterFactoryImpl(scenario, routerFactory, minShuntingTimes));
 		
-		this.addControlerListener(new WagonSimAnalysisListener());
+		controler.addControlerListener(new WagonSimAnalysisListener());
+		
+		return controler ;
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -122,7 +121,7 @@ public class WagonSimController extends Controler {
 		String runId = args[8];
 		
 		OutputDirectoryLogging.catchLogEntries();
-		log.info("Main: "+WagonSimController.class.getCanonicalName());
+		log.info("Main: "+RunWagonSim.class.getCanonicalName());
 		log.info("networkFile: "+networkFile);
 		log.info("scheduleFile: "+scheduleFile);
 		log.info("shuntingTimesFile: "+shuntingTimesFile);
@@ -149,8 +148,8 @@ public class WagonSimController extends Controler {
 		try { minShuntingTimes = Utils.parseShuntingTimes(shuntingTimesFile); }
 		catch (IOException e) { throw new RuntimeException(e); }
 		
-		WagonSimController controller = new WagonSimController(scenario,vehicleLinkSpeedAttributes,minShuntingTimes);
-		controller.run();
+		Controler controler = init(scenario,vehicleLinkSpeedAttributes,minShuntingTimes);
+		controler.run();
 	}
 
 }

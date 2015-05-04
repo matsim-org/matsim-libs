@@ -12,7 +12,7 @@
  * <li> Towards a simulation of minibuses in South Africa, preprint available from <a href="https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2014/14-03/"> VSP, TU Berlin </a>
  * </ul>
  * 
- * Look into {@link org.matsim.contrib.minibus.PMain} to get started.
+ * Look into {@link org.matsim.contrib.minibus.RunMinibus} to get started.
  * <p/>
  * 
  * Quickstart from command line (without eclipse):<ol>
