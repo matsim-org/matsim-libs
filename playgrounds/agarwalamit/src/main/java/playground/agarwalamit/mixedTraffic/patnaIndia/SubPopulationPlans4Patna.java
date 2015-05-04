@@ -21,6 +21,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -86,13 +87,14 @@ public class SubPopulationPlans4Patna {
 	}
 	
 	private void filesReader (String planFile, String zoneFile, Scenario scenario, String subPop) {
-
-		FeatureSource featureSource = ShapeFileReader.readDataFile(zoneFile);
-		Iterator<SimpleFeature> iterator = null;
+		
+		ShapeFileReader reader = new ShapeFileReader();
+		Collection<SimpleFeature> features = reader.readFileAndInitialize(zoneFile);
+		Iterator<SimpleFeature> iterator = features.iterator();
+		
 		BufferedReader bufferedReader = null;
 		String line = null;
 		try {
-			iterator = featureSource.getFeatures().iterator();
 			bufferedReader = new BufferedReader(new FileReader(planFile));
 			line = bufferedReader.readLine();
 		} catch (IOException e1) {
@@ -190,7 +192,7 @@ public class SubPopulationPlans4Patna {
 			//			}
 			try {
 				line = bufferedReader.readLine();
-				iterator = featureSource.getFeatures().iterator();
+				iterator = features.iterator();
 			} catch (IOException e) {
 				
 			}

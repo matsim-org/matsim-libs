@@ -21,6 +21,7 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.old;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
 
@@ -85,16 +86,10 @@ public class createPlans4Patna {
 	}
 	private static void filesReader (String planFile, String zoneFile, Scenario scenario, int startId) throws IOException 	{
 
-		FeatureSource featureSource = ShapeFileReader.readDataFile(zoneFile);
-		//		TODO [AA] Look into error
-		/*
-		 * Oct 11, 2013 4:04:22 PM org.geotools.referencing.factory.DeferredAuthorityFactory disposeBackingStore
-INFO: Disposing class org.geotools.referencing.factory.epsg.ThreadedHsqlEpsgFactory backing store
-Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
-SEVERE: The following locker still has a lock: read on file:/Users/aagarwal/workspace/patnaIndiaSim/./input/wardFile/Wards.dbf by org.geotools.data.shapefile.dbf.IndexedDbaseFileReader
-Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
-		 */
-		Iterator<SimpleFeature> iterator = featureSource.getFeatures().iterator();
+		ShapeFileReader reader = new ShapeFileReader();
+		Collection<SimpleFeature> features = reader.readFileAndInitialize(zoneFile);
+		Iterator<SimpleFeature> iterator = features.iterator();
+		
 		BufferedReader bufferedReader = new BufferedReader(new FileReader(planFile));
 		String line = bufferedReader.readLine();
 
@@ -195,7 +190,7 @@ Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
 			createActivities(scenario, plan, random, workZoneCoordTransform, homeZoneCoordTransform, travelMode, tripPurpose);
 			//			}
 			line = bufferedReader.readLine();
-			iterator = featureSource.getFeatures().iterator();
+			iterator = features.iterator();
 		}
 	}
 
