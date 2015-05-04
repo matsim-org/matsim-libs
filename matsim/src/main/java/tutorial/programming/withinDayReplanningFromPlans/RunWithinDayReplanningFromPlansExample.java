@@ -20,12 +20,15 @@
 package tutorial.programming.withinDayReplanningFromPlans;
 
 import com.google.inject.Provider;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.core.router.util.TravelTime;
@@ -38,56 +41,40 @@ public class RunWithinDayReplanningFromPlansExample {
 
 	public static void main(String[] args){		
 		final Controler controler = new Controler("examples/tutorial/programming/example50VeryExperimentalWithinDayReplanning/withinday-config.xml");
+		controler.setOverwriteFiles(true);
+		
 		// define the travel time collector (/predictor) that you want to use for routing:
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
-		final TravelTime travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
+		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
+		controler.getEvents().addHandler( travelTime );
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
-
-					private MyMobsimFactory myMobsimFactory = new MyMobsimFactory(new WithinDayTripRouterFactory(controler, travelTime));
-
 					@Override
 					public Mobsim get() {
-						return myMobsimFactory.createMobsim(controler.getScenario(), controler.getEvents());
+						// construct necessary trip router:
+						TripRouter router = new TripRouterProviderImpl(
+								controler.getScenario(), 
+								controler.getTravelDisutilityFactory(),
+								travelTime, 
+								controler.getLeastCostPathCalculatorFactory(), 
+								controler.getTransitRouterFactory()).get();
+						
+						// construct qsim and insert listeners:
+						QSim qSim = QSimUtils.createDefaultQSim( controler.getScenario(), controler.getEvents() );
+						qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(router)) ;
+						qSim.addQueueSimulationListeners( travelTime );
+						return qSim;
 					}
 				});
 			}
 		});
-		controler.addControlerListener(new StartupListener() {
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				Controler controler = event.getControler() ;
-				controler.getEvents().addHandler((TravelTimeCollector) travelTime);
-				controler.getMobsimListeners().add((TravelTimeCollector) travelTime);
-				// set the mobsim factory (which insertes the within-day replanning agents):
-			}
-		}) ;
+		
+		// I just made this a lot shorter.  There is, however, no test for functionality, so keep your eyes open. kai, may'15
+
 		controler.run();
 	}
 	
-	private static class WithinDayTripRouterFactory implements Provider<TripRouter> {
-
-		private final Controler controler;
-		private final TravelTime travelTime;
-		
-		public WithinDayTripRouterFactory(Controler controler, TravelTime travelTime) {
-			this.controler = controler;
-			this.travelTime = travelTime;
-		}
-		
-		@Override
-		public TripRouter get() {
-			return new TripRouterProviderImpl(
-					controler.getScenario(), 
-					controler.getTravelDisutilityFactory(),
-					travelTime, 
-					controler.getLeastCostPathCalculatorFactory(), 
-					controler.getTransitRouterFactory()).get();
-		}
-		
-		
-	}
 }

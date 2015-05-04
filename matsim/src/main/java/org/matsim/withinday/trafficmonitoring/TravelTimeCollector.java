@@ -95,6 +95,8 @@ public class TravelTimeCollector implements TravelTime,
 	private final Set<String> analyzedModes;
 	private final boolean filterModes;
 	
+	private int resetCnt = 0 ;
+	boolean problem = true ;
 	
 	public TravelTimeCollector(Scenario scenario, Set<String> analyzedModes) {
 		/*
@@ -172,6 +174,13 @@ public class TravelTimeCollector implements TravelTime,
 	@Override
 	public void reset(int iteration) {
 		init();
+		if ( resetCnt >=1 ) {
+			if ( problem ) {
+				throw new RuntimeException("using TravelTimeCollector, but mobsim notifications not called between two resets.  "
+						+ "Did you really add this as a mobsim listener?") ;
+				// in practice, it seems to fail even earlier with some null pointer exception. kai, may'15
+			}
+		}
 	}
 
 	@Override
@@ -252,6 +261,7 @@ public class TravelTimeCollector implements TravelTime,
 	 */
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+		problem = false ;
 
 		if (e.getQueueSimulation() instanceof QSim) {
 			double simStartTime = ((QSim) e.getQueueSimulation()).getSimTimer().getSimStartTime();
@@ -279,6 +289,8 @@ public class TravelTimeCollector implements TravelTime,
 	// Update Link TravelTimeInfos if link attributes have changed
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+		problem = false ;
+		
 		Collection<Link> links = changedLinks.remove(e.getSimulationTime());
 		
 		if (links != null) {
@@ -294,6 +306,8 @@ public class TravelTimeCollector implements TravelTime,
 	// Update Link TravelTimes
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+		problem = false ;
+
 		// parallel Execution
 		this.run(e.getSimulationTime());
 
@@ -303,6 +317,7 @@ public class TravelTimeCollector implements TravelTime,
 
 	@Override
 	public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
+		problem = false ;
 		
 		/*
 		 * Calling the afterSim Method of the Threads will set their 
@@ -361,7 +376,7 @@ public class TravelTimeCollector implements TravelTime,
 		double dynamicBinSize = 0.0; // size of the time window that is taken into account
 
 		static Counter enlarge = new Counter("TravelTimeCollector: enlarged time bin size: ");
-		static Counter shrink = new Counter("TravelTimeCollector: shrinked time bin size: ");
+		static Counter shrink = new Counter("TravelTimeCollector: shrunk time bin size: ");
 
 		/*package*/ void init(double freeSpeedTravelTime) {
 			this.freeSpeedTravelTime = freeSpeedTravelTime;
