@@ -28,6 +28,8 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import tutorial.programming.multiThreadedPlanStrategy.RunWithMultithreadedModule;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,6 +54,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p/>
  * Design comments/questions:<ul>
  * <li> As a consequence of the design, the instances that getPlanAlgoInstance() returns, need to be thread-safe.  kai, dec'12
+ * For an example with discussions, see {@link RunWithMultithreadedModule}
  * </ul>
  *
  * @author mrieser

@@ -33,6 +33,15 @@ public class SumScoringFunction implements ScoringFunction {
 		void agentStuck(final double time);
 	}
 	
+	/**
+	 * NOTE: Despite its somewhat misleading name, only Events that at the same time implement HasPersonId are passed 
+	 * through this interface.  This excludes, in particular, LinkEnterEvent and LinkLeaveEvent.  This was done for performance reasons,
+	 * since passing those events to all handlers imposes a significant additional burden.  See comments in 
+	 * and implementation of the handleEvent 
+	 * method in {@link EventsToScore}.
+	 * 
+	 * @author nagel
+	 */
 	public interface ArbitraryEventScoring extends BasicScoring {
 		void handleEvent( final Event event ) ;
 	}
