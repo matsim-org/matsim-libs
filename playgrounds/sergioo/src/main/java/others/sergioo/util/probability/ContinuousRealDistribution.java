@@ -31,7 +31,7 @@ public class ContinuousRealDistribution extends AbstractRealDistribution {
 	}
 
 	public void addValue(double value) {
-		if(Double.isFinite(value)) 
+		if(!Double.isNaN(value) && !Double.isInfinite(value)) 
 			values.add(value);
 	}
 	@Override
