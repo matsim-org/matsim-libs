@@ -48,10 +48,12 @@ public class DCControler extends Controler {
 		 *  in this way scoringFunction does not need to create new, identical k-vals by itself    
 		 */
   		DCScoringFunctionFactory dcScoringFunctionFactory = new DCScoringFunctionFactory(this.getConfig(), this, this.dcContext); 	
-		super.setScoringFunctionFactory(dcScoringFunctionFactory);		
+		super.setScoringFunctionFactory(dcScoringFunctionFactory);	
+		
+		this.loadMyControlerListeners();
 	}
 	
-	protected void loadControlerListeners() {
+	private void loadMyControlerListeners() {
 		this.dcContext.init(); // this is an ugly hack, but I somehow need to get the scoring function + context into the controler
 
 		this.addControlerListener(new DestinationChoiceInitializer(this.dcContext));
@@ -61,6 +63,6 @@ public class DCControler extends Controler {
 					this.addControlerListener(new FacilitiesLoadCalculator(this.dcContext.getFacilityPenalties()));
 				}
 		
-		super.loadControlerListeners();
+//		super.loadControlerListeners();
 	}
 }

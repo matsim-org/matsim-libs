@@ -58,9 +58,8 @@ public class EnergyFlowsController extends Controler {
 	/**
 	 * Add ScoreStats and TravelDistancePlots for transit and non-transit Subpopulations.
 	 */
-	@Override
-	protected void loadControlerListeners() {
-		super.loadControlerListeners();
+	private void loadMyControlerListeners() {
+//		super.loadControlerListeners();
 		
 		Scenario nonTransitSc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population nonTransitPopulation = nonTransitSc.getPopulation();
@@ -119,6 +118,8 @@ public class EnergyFlowsController extends Controler {
                 }).in(Singleton.class);
 			}
         });
+        
+        this.loadMyControlerListeners(); 
 	}
 
 	public static void main(final String[] args) {

@@ -32,12 +32,12 @@ public class TestControler extends Controler {
     	controler.run();		   	
     	
 	}
-	@Override
-	protected void loadControlerListeners() {
-		
-
-		super.loadControlerListeners();
-	}	
+//	@Override
+//	protected void loadControlerListeners() {
+//		
+//
+//		super.loadControlerListeners();
+//	}	
 	
 	public void init(Config config, Network network, Scenario sc) {
 		TestScoringFunctionFactory testScoringFunctionFactory = new TestScoringFunctionFactory(

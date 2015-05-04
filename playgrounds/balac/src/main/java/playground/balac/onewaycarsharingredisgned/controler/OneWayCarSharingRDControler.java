@@ -39,12 +39,13 @@ public class OneWayCarSharingRDControler extends Controler{
 				      network, sc);
 	    this.setScoringFunctionFactory(onewayScoringFunctionFactory); 	
 				
+	    this.loadMyControlerListeners();
 		}
 	
-	@Override
-	  protected void loadControlerListeners() {  
+//	@Override
+	  private void loadMyControlerListeners() {  
 		  
-	    super.loadControlerListeners();   
+//	    super.loadControlerListeners();   
 	    this.addControlerListener(new OWListener(this.getConfig().getModule("OneWayCarsharing").getValue("statsFileName")));
 	  }
 	public static void main(final String[] args) {

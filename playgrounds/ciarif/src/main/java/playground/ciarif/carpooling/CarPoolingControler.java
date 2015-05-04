@@ -10,12 +10,12 @@ public class CarPoolingControler extends KTIControler {
 	
 	public CarPoolingControler (String[] args){
 		super(args);
+		this.loadMyControlerListeners();
 		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
-	@Override
-	protected void loadControlerListeners() {
+	private void loadMyControlerListeners() {
 		
-		super.loadControlerListeners();
+//		super.loadControlerListeners();
 		
 		// the scoring function processes facility loads
 		this.addControlerListener(new CarPoolingListener());

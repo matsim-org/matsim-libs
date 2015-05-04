@@ -41,12 +41,12 @@ public class FreeFloatingControler extends Controler{
 				      network, sc);
 	    this.setScoringFunctionFactory(ffScoringFunctionFactory); 	
 				
+	    this.loadMyControlerListeners();
 		}
 	
-	@Override
-	  protected void loadControlerListeners() {  
+	  private void loadMyControlerListeners() {  
 		  
-	    super.loadControlerListeners();   
+//	    super.loadControlerListeners();   
 	    this.addControlerListener(new FFListener( this));
 	  }
 	public static void main(final String[] args) {

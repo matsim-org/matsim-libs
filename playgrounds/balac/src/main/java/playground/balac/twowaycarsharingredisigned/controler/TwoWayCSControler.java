@@ -39,11 +39,12 @@ public class TwoWayCSControler extends Controler{
 				      network);
 	    this.setScoringFunctionFactory(onewayScoringFunctionFactory); 	
 				
+	    this.loadMyControlerListeners();
 		}
 	
-	  protected void loadControlerListeners() {  
+	  private void loadMyControlerListeners() {  
 		  
-		    super.loadControlerListeners();   
+//		    super.loadControlerListeners();   
 		    this.addControlerListener(new TWListener(this.getConfig().getModule("TwoWayCarsharing").getValue("statsFileName")));
 		  }
 	public static void main(final String[] args) {

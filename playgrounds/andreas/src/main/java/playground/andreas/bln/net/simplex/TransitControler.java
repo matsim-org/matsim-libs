@@ -100,11 +100,12 @@ public final class TransitControler extends Controler {
 		transitActivityParams.setTypicalDuration(120.0);
 		this.getConfig().planCalcScore().addActivityParams(transitActivityParams);
         ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+        
+        this.loadMyControlerListeners();
 	}
 
-	@Override
-	protected void loadControlerListeners() {
-		super.loadControlerListeners();
+	private void loadMyControlerListeners() {
+//		super.loadControlerListeners();
 		addTransitControlerListener();
 		if (getConfig().getModule(COUNTS_MODULE_NAME) != null) {
 			addPtCountControlerListener();

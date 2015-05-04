@@ -62,6 +62,7 @@ public final class FlexibleTransportControler extends Controler
       ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.pt, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
       ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
       ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.carsharing, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
+      this.loadMyControlerListeners();
 	throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
   }
 
@@ -94,10 +95,9 @@ public final class FlexibleTransportControler extends Controler
     super.setUp();
   }
 
-  @Override
-	protected void loadControlerListeners()
+	private void loadMyControlerListeners()
   {
-    super.loadControlerListeners();
+//    super.loadControlerListeners();
 
     this.addControlerListener(new FacilitiesLoadCalculator(((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties()));
     this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));

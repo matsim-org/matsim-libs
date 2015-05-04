@@ -38,8 +38,7 @@ import playground.thibautd.hitchiking.spotweights.SpotWeighter;
 public class HitchHikingControler extends Controler {
 	private final SpotWeighter spotWeighter;
 
-	@Override
-	protected void loadControlerListeners() {
+	private void loadMyControlerListeners() {
 		addControlerListener( new StartupListener() {
 			@Override
 			public void notifyStartup(final StartupEvent event) {
@@ -52,7 +51,7 @@ public class HitchHikingControler extends Controler {
 			}
 		});
 
-		super.loadControlerListeners();
+//		super.loadControlerListeners();
 	}
 
 
@@ -61,6 +60,8 @@ public class HitchHikingControler extends Controler {
 			final SpotWeighter spotWeighter) {
 		super(scenario);
 		this.spotWeighter = spotWeighter;
+		
+		this.loadMyControlerListeners(); 
 	}
 
 	@Override

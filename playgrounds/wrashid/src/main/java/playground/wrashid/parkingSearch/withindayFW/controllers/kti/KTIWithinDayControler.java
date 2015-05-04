@@ -57,7 +57,7 @@ public class KTIWithinDayControler extends WithinDayParkingController {
 
         ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
         ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
-
+        this.loadMyControlerListeners();
 		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
@@ -87,10 +87,9 @@ public class KTIWithinDayControler extends WithinDayParkingController {
 	}
 
 
-	@Override
-	protected void loadControlerListeners() {
+	private void loadMyControlerListeners() {
 
-		super.loadControlerListeners();
+//		super.loadControlerListeners();
 
 		// the scoring function processes facility loads
 		//this.addControlerListener(new FacilitiesLoadCalculator(this.getFacilityPenalties()));

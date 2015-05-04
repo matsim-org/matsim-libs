@@ -39,13 +39,13 @@ public class FreeFloatingWithParkingControler extends Controler {
 
 	}
 
-	@Override
-	protected void loadControlerListeners() {
-
-		super.loadControlerListeners();
-		// this.addControlerListener(new FFListener(
-		// this.getConfig().getModule("FreeFloating").getValue("statsFileName")));
-	}
+//	@Override
+//	protected void loadControlerListeners() {
+//
+//		super.loadControlerListeners();
+//		// this.addControlerListener(new FFListener(
+//		// this.getConfig().getModule("FreeFloating").getValue("statsFileName")));
+//	}
 
 	public static void main(final String[] args) {
 

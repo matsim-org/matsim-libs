@@ -29,8 +29,8 @@ public class AvignonControler extends Controler {
     	controler.run();		   	
     	
 	}
-	@Override
-	protected void loadControlerListeners() {
+
+	private void loadMyControlerListeners() {
 		this.dcContext.init(); // this is an ugly hack, but I somehow need to get the scoring function + context into the controler
 		
 		this.addControlerListener(new DestinationChoiceInitializer(this.dcContext));
@@ -42,7 +42,7 @@ public class AvignonControler extends Controler {
 		//this.addControlerListener(new RetailersLocationListener());
 		//this.addControlerListener(new DistanceControlerListener(1.0));
 
-		super.loadControlerListeners();
+//		super.loadControlerListeners();
 	}	
 	
 	public void init() {
@@ -67,6 +67,7 @@ public class AvignonControler extends Controler {
 			log.info("external prefs are not used for scoring!");
 		}	
 		
+		this.loadMyControlerListeners();
 	}
 	public void run(String path) {			
 			

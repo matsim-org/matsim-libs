@@ -344,7 +344,7 @@ public class Controler extends AbstractController {
      * Please do not use. Subclassing Controler is discouraged.
      */
     @Deprecated
-	protected void loadControlerListeners() {}
+	private void loadControlerListeners() {}
 
 	@Override
 	protected final void prepareForSim() {

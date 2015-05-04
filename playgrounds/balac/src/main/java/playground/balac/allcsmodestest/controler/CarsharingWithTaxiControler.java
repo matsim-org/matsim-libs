@@ -49,12 +49,12 @@ public class CarsharingWithTaxiControler extends Controler{
 				      network, sc);
 	    this.setScoringFunctionFactory(allCSModesScoringFunctionFactory); 	
 				
+	    this.loadMyControlerListeners();
 		}
 	
-	@Override
-	  protected void loadControlerListeners() {  
+	  private void loadMyControlerListeners() {  
 		  
-	    super.loadControlerListeners();   
+//	    super.loadControlerListeners();   
 	    Set<String> modes = new TreeSet<String>();
 	    modes.add("freefloating");
 	    modes.add("twowaycarsharing");

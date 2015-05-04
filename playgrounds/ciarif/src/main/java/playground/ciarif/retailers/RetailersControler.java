@@ -29,12 +29,12 @@ public class RetailersControler extends KTIControler {
 
 	public RetailersControler(String[] args) {
 		super(args);
+		this.loadMyControlerListeners();
 		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
-	@Override
-	protected void loadControlerListeners() {
-		super.loadControlerListeners();
+	private void loadMyControlerListeners() {
+//		super.loadControlerListeners();
 		this.addControlerListener(new RetailersLocationListener());
 	}
 	

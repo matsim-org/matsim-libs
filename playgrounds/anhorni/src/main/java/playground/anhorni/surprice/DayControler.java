@@ -48,6 +48,7 @@ public class DayControler extends Controler {
 				new SurpriceScoringFunctionFactory(
 			  			this, this.getConfig().planCalcScore(), getScenario().getNetwork(), this.memories, this.day, this.preferences)
 				);
+        this.loadMyControlerListeners();
 	} 
 				
 	protected void setUp() {
@@ -61,8 +62,8 @@ public class DayControler extends Controler {
 		super.setTerminationCriterion(this.terminationCriterion);
 	}
 	
-	protected void loadControlerListeners() {
-		super.loadControlerListeners();
+	private void loadMyControlerListeners() {
+//		super.loadControlerListeners();
 		//this.addControlerListener(new ScoringFunctionResetter()); TODO: check if really not necessary anymore!
 	  	this.addControlerListener(new Memorizer(this.memories, this.day));
 	  	this.addControlerListener(new ModeSharesControlerListener("times"));

@@ -110,9 +110,10 @@ public class RunControlerMATSim2030 extends Controler {
 				factory);
 		this.setTripRouterFactory(transitTripRouterFactory);
 		
+		this.loadMyControlerListeners();
 	}
 	
-	protected void loadControlerListeners() {
+	private void loadMyControlerListeners() {
 		this.lcContext.init(); // this is an ugly hack, but I somehow need to get the scoring function + context into the controler
 		
 		this.addControlerListener(new DestinationChoiceInitializer(this.lcContext));
@@ -121,7 +122,7 @@ public class RunControlerMATSim2030 extends Controler {
 		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME, this.getScenario().getNetwork()));
 		this.addControlerListener(new TripModeShares(1, this.getControlerIO(), this.getScenario(),
 				new MainModeIdentifierImpl(), new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE )));
-		super.loadControlerListeners();
+//		super.loadControlerListeners();
 	}
 }
 
