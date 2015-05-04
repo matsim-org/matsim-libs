@@ -52,11 +52,12 @@ public class PatnaTravelTimeAnalyzer extends AbstractAnalyisModule {
 	private LegModeTravelTimeHandler travelTimeHandler = new LegModeTravelTimeHandler();
 
 	private String inputEventsFile;
+	private static final int iterationNr = 100;
 	
 	
 	public static void main(String[] args) {
-		String dir = "../../../repos/runs-svn/patnaIndia/run105/evac_seepage/";
-		String eventFile = dir+"/ITERS/it.100/100.events.xml.gz";
+		String dir = "../../../repos/runs-svn/patnaIndia/run105/1pct/evac_passing/";
+		String eventFile = dir+"/ITERS/it."+iterationNr+"/"+iterationNr+".events.xml.gz";
 		String outputFolder = dir+"/analysis/";
 		PatnaTravelTimeAnalyzer timeAnalyzer  = new PatnaTravelTimeAnalyzer(eventFile);
 		timeAnalyzer.preProcessData();
@@ -95,7 +96,7 @@ public class PatnaTravelTimeAnalyzer extends AbstractAnalyisModule {
 	}
 	@Override
 	public void writeResults(String outputFolder) {
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/modalTravelTime.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/modalTravelTime_it."+iterationNr+".txt");
 		try {
 			writer.write("mode \t avgTripTime(min) \t totalTripTime(hr) \n");
 
