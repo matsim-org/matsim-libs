@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DQTransitionLink.java
+ * JuPedSimClient.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,33 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package playground.gregor.grpc.dummyjupedsim;
 
-import org.matsim.api.core.v01.network.Link;
+import io.grpc.ChannelImpl;
+import io.grpc.transport.netty.NegotiationType;
+import io.grpc.transport.netty.NettyChannelBuilder;
 
+import java.util.concurrent.TimeUnit;
 
-public class Sim2DQAdapterLink {
-	
-	private final QLinkInternalI ql;
+import org.matsim.hybrid.MATSimInterfaceServiceGrpc;
+import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceServiceBlockingStub;
 
-	Sim2DQAdapterLink(QLinkInternalI qLinkImpl) {
-		this.ql = qLinkImpl;
+public class JuPedSimClient {
+	private final ChannelImpl channel;
+
+	private final MATSimInterfaceServiceBlockingStub blockingStub;
+
+	public JuPedSimClient(String host, int port) {
+		this.channel = NettyChannelBuilder.forAddress(host, port).negotiationType(NegotiationType.PLAINTEXT).build();
+		this.blockingStub = MATSimInterfaceServiceGrpc.newBlockingStub(this.channel);
 	}
 
-
-	public boolean isAcceptingFromUpstream() {
-		return this.ql.isAcceptingFromUpstream();
+	public void shutdown() throws InterruptedException {
+		this.channel.shutdown().awaitTerminated(5, TimeUnit.SECONDS);
 	}
 
-
-	public Link getLink() {
-		
-		return this.ql.getLink();
+	public MATSimInterfaceServiceBlockingStub getBlockingStub(){
+		return this.blockingStub;
 	}
-	
 
-	public void addFromUpstream(QVehicle veh) {
-		this.ql.addFromUpstream(veh);
-		
-	}
 }

@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * MobsimProvider.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,13 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.external;
+package playground.gregor.hybridsim.factories;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -34,64 +34,70 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSimExternalNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import playground.gregor.casim.simulation.CANetsimEngine;
+import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
+import playground.gregor.casim.simulation.physics.CANetworkFactory;
+import playground.gregor.hybridsim.simulation.ExternalEngine;
 
-public class HybridExternalMobsimFactory implements MobsimFactory {
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
-	private final Server server;
-	private final BlockingMATSimInterfaceService service;
-	private final CyclicBarrier simStepBarrier;
+public class HybridMobsimProvider implements Provider<Mobsim>{
+	
+	private final Scenario sc;
+	private final EventsManager em;
+	private final HybridNetworkFactory netFac;
 
-
-	public HybridExternalMobsimFactory() {
-		CyclicBarrier startupBarrier = new CyclicBarrier(2);
-		this.simStepBarrier = new CyclicBarrier(2);
-		BlockingMATSimInterfaceService service = new BlockingMATSimInterfaceService(startupBarrier,this.simStepBarrier);
-		this.service = service;
-		this.server = new Server(service);
+	@Inject
+	HybridMobsimProvider(Scenario sc, EventsManager eventsManager,HybridNetworkFactory netFac) {
+		this.sc = sc;
+		this.em = eventsManager;
+		this.netFac = netFac;
 		
-		//wait for connection here
-		try {
-			startupBarrier.await();
-		} catch (InterruptedException | BrokenBarrierException e) {
-			throw new RuntimeException(e);
-		}
 	}
-	
-	
+
 	@Override
-	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		QSimConfigGroup conf = sc.getConfig().qsim();
+	public Mobsim get() {
+		QSimConfigGroup conf = this.sc.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
+		
+		
 
-		QSim qSim = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
+		QSim qSim = new QSim(this.sc, this.em);
+		ActivityEngine activityEngine = new ActivityEngine(this.em, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		ExternalEngine e = new ExternalEngine(eventsManager, qSim,this.server.getRpcCtrl(),this.server.getClientService(),this.simStepBarrier);
-		this.service.setSimeEngine(e);
-		HybridQSimExternalNetworkFactory networkFactory = new HybridQSimExternalNetworkFactory(
-				e);
 
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, networkFactory);
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, this.netFac);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
+		ExternalEngine e = new ExternalEngine(this.em, qSim);
 		qSim.addMobsimEngine(e);
 
-		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
+		HybridQSimExternalNetworkFactory eFac = new HybridQSimExternalNetworkFactory(e);
+		this.netFac.putNetsimNetworkFactory("2ext", eFac);
+		this.netFac.putNetsimNetworkFactory("ext2", eFac);
+		
+		CANetworkFactory fac = new CAMultiLaneNetworkFactory();
+		CANetsimEngine cae = new CANetsimEngine(qSim, fac);
+		qSim.addMobsimEngine(cae);
+		qSim.addDepartureHandler(cae.getDepartureHandler());
+
+
+		TeleportationEngine teleportationEngine = new TeleportationEngine(this.sc, this.em);
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;
-		if (sc.getConfig().scenario().isUseTransit()) {
+		if (this.sc.getConfig().scenario().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine
@@ -102,12 +108,13 @@ public class HybridExternalMobsimFactory implements MobsimFactory {
 		} else {
 			agentFactory = new DefaultAgentFactory(qSim);
 		}
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
+		if (this.sc.getConfig().network().isTimeVariantNetwork()) {
 			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(
-				sc.getPopulation(), agentFactory, qSim);
+				this.sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}
+
 }

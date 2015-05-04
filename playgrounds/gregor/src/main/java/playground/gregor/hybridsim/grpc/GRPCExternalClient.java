@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Client.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,38 +18,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package playground.gregor.hybridsim.grpc;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
+import io.grpc.ChannelImpl;
+import io.grpc.transport.netty.NegotiationType;
+import io.grpc.transport.netty.NettyChannelBuilder;
 
-import playground.gregor.hybridsim.simulation.ExternalEngine;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.TimeUnit;
 
-public class HybridQSimExternalNetworkFactory implements
-		NetsimNetworkFactory<QNode, QLinkInternalI> {
+import org.apache.log4j.Logger;
+import org.matsim.hybrid.ExternInterfaceServiceGrpc;
+import org.matsim.hybrid.ExternInterfaceServiceGrpc.ExternInterfaceServiceBlockingStub;
 
-	private final ExternalEngine e;
+public class GRPCExternalClient {
+	private static final Logger log = Logger.getLogger(GRPCExternalClient.class);
 
-	public HybridQSimExternalNetworkFactory(ExternalEngine e) {
-		this.e = e;
+	private final ChannelImpl channel;
+
+	private final ExternInterfaceServiceBlockingStub blockingStub;
+
+	public GRPCExternalClient(String host, int port, CyclicBarrier cb) {
+		this.channel = NettyChannelBuilder.forAddress(host, port).negotiationType(NegotiationType.PLAINTEXT).build();
+	this.blockingStub = ExternInterfaceServiceGrpc.newBlockingStub(this.channel);
+	try {
+		cb.await();
+	} catch (InterruptedException | BrokenBarrierException e) {
+		throw new RuntimeException(e);
+	}
+	log.info("client up and running.");
 	}
 
-	@Override
-	public QNode createNetsimNode(Node node, QNetwork network) {
-		return new QNode(node, network);
+	public void shutdown() throws InterruptedException {
+		this.channel.shutdown().awaitTerminated(5, TimeUnit.SECONDS);
 	}
-
-	@Override
-	public QLinkInternalI createNetsimLink(Link link, QNetwork network,
-			QNode queueNode) {
-		if (link.getAllowedModes().contains("2ext")) {
-			return new QSimExternalTransitionLink(link, network, this.e);
-		}
-		QLinkImpl ret = new QLinkImpl(link, network, queueNode);
-		if (link.getAllowedModes().contains("ext2")) {
-			this.e.registerAdapter(new QLinkInternalIAdapter(ret));
-		}
-		return ret;
+	
+	public ExternInterfaceServiceBlockingStub getBlockingStub(){
+		return this.blockingStub;
 	}
-
+	
 }

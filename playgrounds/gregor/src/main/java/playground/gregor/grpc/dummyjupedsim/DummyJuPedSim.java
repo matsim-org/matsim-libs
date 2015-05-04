@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DQTransitionLink.java
+ * DummyJuPedSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,33 +18,26 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package playground.gregor.grpc.dummyjupedsim;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.hybrid.MATSimInterface;
+import org.matsim.hybrid.MATSimInterface.ExternalConnect;
+import org.matsim.hybrid.MATSimInterface.ExternalConnectConfirmed;
+import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceServiceBlockingStub;
 
+public final class DummyJuPedSim {
 
-public class Sim2DQAdapterLink {
-	
-	private final QLinkInternalI ql;
-
-	Sim2DQAdapterLink(QLinkInternalI qLinkImpl) {
-		this.ql = qLinkImpl;
-	}
-
-
-	public boolean isAcceptingFromUpstream() {
-		return this.ql.isAcceptingFromUpstream();
-	}
-
-
-	public Link getLink() {
+	public static void main(String [] args) {
+		ExternalInterfaceServiceImpl ext = new ExternalInterfaceServiceImpl();
+		JuPedSimServer server = new JuPedSimServer(ext);
+		Thread t1 = new Thread(server);
+		t1.start();
 		
-		return this.ql.getLink();
-	}
-	
-
-	public void addFromUpstream(QVehicle veh) {
-		this.ql.addFromUpstream(veh);
+		JuPedSimClient c = new JuPedSimClient("localhost", 9999);
+		MATSimInterfaceServiceBlockingStub bs = c.getBlockingStub();
+		ExternalConnect req = MATSimInterface.ExternalConnect.newBuilder().setHost("localhost").setPort(9998).build();
+		ExternalConnectConfirmed resp = bs.reqExternalConnect(req);
 		
 	}
+	
 }

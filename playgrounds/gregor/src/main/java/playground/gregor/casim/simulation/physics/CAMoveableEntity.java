@@ -38,7 +38,8 @@ public abstract class CAMoveableEntity {
 	
 	private final double [] laneSpds = new double[8];
 	private final double [] updates = new double[8];
-
+	private int nextLane = 0;
+	
 	public void proceed() {
 		this.pos += this.dir;
 	}
@@ -46,8 +47,8 @@ public abstract class CAMoveableEntity {
 	public void updateSpdOnProceed(double traveled, double time) {
 		double tt = time-this.lastMovementTime;
 		double cSpd = traveled/tt;
-		this.spd *= 0.8;
-		this.spd += 0.2 * cSpd;
+		this.spd *= 0.95;
+		this.spd += 0.05 * cSpd;
 		this.lastMovementTime = time;
 	}
 	
@@ -57,11 +58,14 @@ public abstract class CAMoveableEntity {
 	
 	public void updateLaneSpeed(double spd, int lane) {
 		
-		double oldW = (this.updates[lane]/(this.updates[lane]+1));
-		double newW = (1/(this.updates[lane]+1));
+//		double oldW = (this.updates[lane]/(this.updates[lane]+1));
+//		double newW = (1/(this.updates[lane]+1));
 		
-//		double oldW = 0.9;
-//		double newW = 0.1;
+		double oldW = 0;
+		double newW = 1;
+//		if (this.updates[lane] < 10) {
+//			System.out.println(this.updates[lane]);
+//		}
 		
 		this.laneSpds[lane] *= oldW;
 		this.laneSpds[lane] += newW * spd;
@@ -71,6 +75,17 @@ public abstract class CAMoveableEntity {
 	public double getLaneSpeed(int lane) {
 		return this.laneSpds[lane];
 	}
+	
+	public void setNextLane(int lane) {
+		this.nextLane = lane;
+	}
+	
+	public double getLaneScore(int lane) {
+		return lane == this.nextLane ? 1 : 0;
+//		return this.laneSpds[lane];
+	}
+	
+	
 	
 	public double getMaxSpd(double time, double maxTraveled) {
 		double tt = time-this.lastMovementTime;

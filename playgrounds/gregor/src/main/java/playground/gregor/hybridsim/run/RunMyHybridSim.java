@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * RunMyHybridSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +18,61 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.external;
+package playground.gregor.hybridsim.run;
 
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class ExternalRunner {
+import playground.gregor.hybridsim.factories.HybridMobsimProvider;
 
-	public static void main(String[] args) {
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Provider;
+
+
+
+public class RunMyHybridSim {
+
+	public static void main(String [] args) {
 		String config = "/Users/laemmel/devel/external/input/config.xml";
 		Config c = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(c, config);
 		c.controler().setWriteEventsInterval(1);
 
-		Scenario sc = ScenarioUtils.loadScenario(c);
-		// sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
-
-		// c.qsim().setEndTime(120);
-		// c.qsim().setEndTime(23*3600);
-		// c.qsim().setEndTime(41*60);//+30*60);
+		final Scenario sc = ScenarioUtils.loadScenario(c);
 
 		final Controler controller = new Controler(sc);
-
 		controller.setOverwriteFiles(true);
-		final HybridExternalMobsimFactory fac = new HybridExternalMobsimFactory();
+		
+
+		final HybridNetworkFactory netFac = new HybridNetworkFactory();
+//		netFac.putNetsimNetworkFactory("2ext", netFac);
+		
+		
+		Injector mobsimProviderInjector = Guice.createInjector(new com.google.inject.AbstractModule(){
+			@Override
+			protected void configure() {
+				bind(Scenario.class).toInstance(sc);
+				bind(EventsManager.class).toInstance(controller.getEvents());
+				bind(HybridNetworkFactory.class).toInstance(netFac);
+			}
+			
+		});
+		final Provider<Mobsim> mobsimProvider = mobsimProviderInjector.getInstance(HybridMobsimProvider.class);
 		controller.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				if (getConfig().controler().getMobsim().equals("extsim")) {
-					bind(Mobsim.class).toProvider(new Provider<Mobsim>() {
-						@Override
-						public Mobsim get() {
-							return fac.createMobsim(controller.getScenario(), controller.getEvents());
-						}
-					});
-				}
+				bind(Mobsim.class).toProvider(mobsimProvider);
+				
 			}
 		});
-
 		controller.run();
 	}
 }

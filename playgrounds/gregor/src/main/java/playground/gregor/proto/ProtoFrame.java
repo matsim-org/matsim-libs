@@ -48,37 +48,28 @@ public final class ProtoFrame {
   /**
    * Protobuf type {@code Frame}
    */
-  public static final class Frame extends
+  public  static final class Frame extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:Frame)
       FrameOrBuilder {
     // Use Frame.newBuilder() to construct.
-    private Frame(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    private Frame(com.google.protobuf.GeneratedMessage.Builder builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private Frame(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Frame defaultInstance;
-    public static Frame getDefaultInstance() {
-      return defaultInstance;
+    private Frame() {
+      time_ = 0D;
+      evnt_ = java.util.Collections.emptyList();
     }
 
-    public Frame getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private Frame(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -113,10 +104,11 @@ public final class ProtoFrame {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         if (((mutable_bitField0_ & 0x00000002) == 0x00000002)) {
           evnt_ = java.util.Collections.unmodifiableList(evnt_);
@@ -137,13 +129,22 @@ public final class ProtoFrame {
               playground.gregor.proto.ProtoFrame.Frame.class, playground.gregor.proto.ProtoFrame.Frame.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<Frame> PARSER =
+    public static final com.google.protobuf.Parser<Frame> PARSER =
         new com.google.protobuf.AbstractParser<Frame>() {
       public Frame parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Frame(input, extensionRegistry);
+        try {
+          return new Frame(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -227,37 +228,33 @@ public final class ProtoFrame {
     /**
      * Protobuf type {@code Frame.Event}
      */
-    public static final class Event extends
+    public  static final class Event extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:Frame.Event)
         EventOrBuilder {
       // Use Event.newBuilder() to construct.
-      private Event(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      private Event(com.google.protobuf.GeneratedMessage.Builder builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private Event(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final Event defaultInstance;
-      public static Event getDefaultInstance() {
-        return defaultInstance;
-      }
-
-      public Event getDefaultInstanceForType() {
-        return defaultInstance;
+      private Event() {
+        evntType_ = 0;
+        x_ = 0D;
+        y_ = 0D;
+        vx_ = 0D;
+        vy_ = 0D;
+        id_ = "";
+        nrAgents_ = 0;
       }
 
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private Event(
           com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -283,7 +280,7 @@ public final class ProtoFrame {
                   unknownFields.mergeVarintField(1, rawValue);
                 } else {
                   bitField0_ |= 0x00000001;
-                  evntType_ = value;
+                  evntType_ = rawValue;
                 }
                 break;
               }
@@ -321,10 +318,11 @@ public final class ProtoFrame {
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(this);
+          throw new RuntimeException(e.setUnfinishedMessage(this));
         } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+          throw new RuntimeException(
+              new com.google.protobuf.InvalidProtocolBufferException(
+                  e.getMessage()).setUnfinishedMessage(this));
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -342,13 +340,22 @@ public final class ProtoFrame {
                 playground.gregor.proto.ProtoFrame.Frame.Event.class, playground.gregor.proto.ProtoFrame.Frame.Event.Builder.class);
       }
 
-      public static com.google.protobuf.Parser<Event> PARSER =
+      public static final com.google.protobuf.Parser<Event> PARSER =
           new com.google.protobuf.AbstractParser<Event>() {
         public Event parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Event(input, extensionRegistry);
+          try {
+            return new Event(input, extensionRegistry);
+          } catch (RuntimeException e) {
+            if (e.getCause() instanceof
+                com.google.protobuf.InvalidProtocolBufferException) {
+              throw (com.google.protobuf.InvalidProtocolBufferException)
+                  e.getCause();
+            }
+            throw e;
+          }
         }
       };
 
@@ -382,7 +389,9 @@ public final class ProtoFrame {
         public static final int LINK_INF_VALUE = 1;
 
 
-        public final int getNumber() { return value; }
+        public final int getNumber() {
+          return value;
+        }
 
         public static Type valueOf(int value) {
           switch (value) {
@@ -441,7 +450,7 @@ public final class ProtoFrame {
 
       private int bitField0_;
       public static final int EVNTTYPE_FIELD_NUMBER = 1;
-      private playground.gregor.proto.ProtoFrame.Frame.Event.Type evntType_;
+      private int evntType_;
       /**
        * <code>optional .Frame.Event.Type evntType = 1 [default = POS];</code>
        */
@@ -452,7 +461,8 @@ public final class ProtoFrame {
        * <code>optional .Frame.Event.Type evntType = 1 [default = POS];</code>
        */
       public playground.gregor.proto.ProtoFrame.Frame.Event.Type getEvntType() {
-        return evntType_;
+        playground.gregor.proto.ProtoFrame.Frame.Event.Type result = playground.gregor.proto.ProtoFrame.Frame.Event.Type.valueOf(evntType_);
+        return result == null ? playground.gregor.proto.ProtoFrame.Frame.Event.Type.POS : result;
       }
 
       public static final int X_FIELD_NUMBER = 2;
@@ -572,15 +582,6 @@ public final class ProtoFrame {
         return nrAgents_;
       }
 
-      private void initFields() {
-        evntType_ = playground.gregor.proto.ProtoFrame.Frame.Event.Type.POS;
-        x_ = 0D;
-        y_ = 0D;
-        vx_ = 0D;
-        vy_ = 0D;
-        id_ = "";
-        nrAgents_ = 0;
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -593,9 +594,8 @@ public final class ProtoFrame {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
-          output.writeEnum(1, evntType_.getNumber());
+          output.writeEnum(1, evntType_);
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           output.writeDouble(2, x_);
@@ -615,7 +615,7 @@ public final class ProtoFrame {
         if (((bitField0_ & 0x00000040) == 0x00000040)) {
           output.writeInt32(7, nrAgents_);
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
       private int memoizedSerializedSize = -1;
@@ -626,7 +626,7 @@ public final class ProtoFrame {
         size = 0;
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           size += com.google.protobuf.CodedOutputStream
-            .computeEnumSize(1, evntType_.getNumber());
+            .computeEnumSize(1, evntType_);
         }
         if (((bitField0_ & 0x00000002) == 0x00000002)) {
           size += com.google.protobuf.CodedOutputStream
@@ -652,18 +652,12 @@ public final class ProtoFrame {
           size += com.google.protobuf.CodedOutputStream
             .computeInt32Size(7, nrAgents_);
         }
-        size += getUnknownFields().getSerializedSize();
+        size += unknownFields.getSerializedSize();
         memoizedSerializedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
-      @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
-      }
-
       public static playground.gregor.proto.ProtoFrame.Frame.Event parseFrom(
           com.google.protobuf.ByteString data)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -717,12 +711,17 @@ public final class ProtoFrame {
         return PARSER.parseFrom(input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(playground.gregor.proto.ProtoFrame.Frame.Event prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return defaultInstance.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(playground.gregor.proto.ProtoFrame.Frame.Event prototype) {
+        return defaultInstance.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == defaultInstance
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -763,13 +762,9 @@ public final class ProtoFrame {
           if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
-          evntType_ = playground.gregor.proto.ProtoFrame.Frame.Event.Type.POS;
+          evntType_ = 0;
           bitField0_ = (bitField0_ & ~0x00000001);
           x_ = 0D;
           bitField0_ = (bitField0_ & ~0x00000002);
@@ -784,10 +779,6 @@ public final class ProtoFrame {
           nrAgents_ = 0;
           bitField0_ = (bitField0_ & ~0x00000040);
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -878,7 +869,8 @@ public final class ProtoFrame {
           if (other.hasNrAgents()) {
             setNrAgents(other.getNrAgents());
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
@@ -905,7 +897,7 @@ public final class ProtoFrame {
         }
         private int bitField0_;
 
-        private playground.gregor.proto.ProtoFrame.Frame.Event.Type evntType_ = playground.gregor.proto.ProtoFrame.Frame.Event.Type.POS;
+        private int evntType_ = 0;
         /**
          * <code>optional .Frame.Event.Type evntType = 1 [default = POS];</code>
          */
@@ -916,7 +908,8 @@ public final class ProtoFrame {
          * <code>optional .Frame.Event.Type evntType = 1 [default = POS];</code>
          */
         public playground.gregor.proto.ProtoFrame.Frame.Event.Type getEvntType() {
-          return evntType_;
+          playground.gregor.proto.ProtoFrame.Frame.Event.Type result = playground.gregor.proto.ProtoFrame.Frame.Event.Type.valueOf(evntType_);
+          return result == null ? playground.gregor.proto.ProtoFrame.Frame.Event.Type.POS : result;
         }
         /**
          * <code>optional .Frame.Event.Type evntType = 1 [default = POS];</code>
@@ -926,7 +919,7 @@ public final class ProtoFrame {
             throw new NullPointerException();
           }
           bitField0_ |= 0x00000001;
-          evntType_ = value;
+          evntType_ = value.getNumber();
           onChanged();
           return this;
         }
@@ -935,7 +928,7 @@ public final class ProtoFrame {
          */
         public Builder clearEvntType() {
           bitField0_ = (bitField0_ & ~0x00000001);
-          evntType_ = playground.gregor.proto.ProtoFrame.Frame.Event.Type.POS;
+          evntType_ = 0;
           onChanged();
           return this;
         }
@@ -1179,12 +1172,22 @@ public final class ProtoFrame {
         // @@protoc_insertion_point(builder_scope:Frame.Event)
       }
 
+      // @@protoc_insertion_point(class_scope:Frame.Event)
+      private static final playground.gregor.proto.ProtoFrame.Frame.Event defaultInstance;
       static {
-        defaultInstance = new Event(true);
-        defaultInstance.initFields();
+        defaultInstance = new playground.gregor.proto.ProtoFrame.Frame.Event();
       }
 
-      // @@protoc_insertion_point(class_scope:Frame.Event)
+      public static playground.gregor.proto.ProtoFrame.Frame.Event getDefaultInstance() {
+        return defaultInstance;
+      }
+
+      public playground.gregor.proto.ProtoFrame.Frame.Event getDefaultInstanceForType() {
+        return defaultInstance;
+      }
+
+      static {
+      }
     }
 
     private int bitField0_;
@@ -1238,10 +1241,6 @@ public final class ProtoFrame {
       return evnt_.get(index);
     }
 
-    private void initFields() {
-      time_ = 0D;
-      evnt_ = java.util.Collections.emptyList();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1258,14 +1257,13 @@ public final class ProtoFrame {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeDouble(1, time_);
       }
       for (int i = 0; i < evnt_.size(); i++) {
         output.writeMessage(15, evnt_.get(i));
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -1282,18 +1280,12 @@ public final class ProtoFrame {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(15, evnt_.get(i));
       }
-      size += getUnknownFields().getSerializedSize();
+      size += unknownFields.getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
     public static playground.gregor.proto.ProtoFrame.Frame parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1347,12 +1339,17 @@ public final class ProtoFrame {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(playground.gregor.proto.ProtoFrame.Frame prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoFrame.Frame prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1394,10 +1391,6 @@ public final class ProtoFrame {
           getEvntFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         time_ = 0D;
@@ -1409,10 +1402,6 @@ public final class ProtoFrame {
           evntBuilder_.clear();
         }
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -1494,7 +1483,8 @@ public final class ProtoFrame {
             }
           }
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -1800,12 +1790,22 @@ public final class ProtoFrame {
       // @@protoc_insertion_point(builder_scope:Frame)
     }
 
+    // @@protoc_insertion_point(class_scope:Frame)
+    private static final playground.gregor.proto.ProtoFrame.Frame defaultInstance;
     static {
-      defaultInstance = new Frame(true);
-      defaultInstance.initFields();
+      defaultInstance = new playground.gregor.proto.ProtoFrame.Frame();
     }
 
-    // @@protoc_insertion_point(class_scope:Frame)
+    public static playground.gregor.proto.ProtoFrame.Frame getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public playground.gregor.proto.ProtoFrame.Frame getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    static {
+    }
   }
 
   public interface FrameRqstOrBuilder extends
@@ -1874,37 +1874,32 @@ public final class ProtoFrame {
   /**
    * Protobuf type {@code FrameRqst}
    */
-  public static final class FrameRqst extends
+  public  static final class FrameRqst extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:FrameRqst)
       FrameRqstOrBuilder {
     // Use FrameRqst.newBuilder() to construct.
-    private FrameRqst(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    private FrameRqst(com.google.protobuf.GeneratedMessage.Builder builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private FrameRqst(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final FrameRqst defaultInstance;
-    public static FrameRqst getDefaultInstance() {
-      return defaultInstance;
-    }
-
-    public FrameRqst getDefaultInstanceForType() {
-      return defaultInstance;
+    private FrameRqst() {
+      time_ = 0D;
+      tlX_ = 0D;
+      tlY_ = 0D;
+      brX_ = 0D;
+      brY_ = 0D;
+      id_ = "";
     }
 
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private FrameRqst(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -1957,10 +1952,11 @@ public final class ProtoFrame {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -1978,13 +1974,22 @@ public final class ProtoFrame {
               playground.gregor.proto.ProtoFrame.FrameRqst.class, playground.gregor.proto.ProtoFrame.FrameRqst.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<FrameRqst> PARSER =
+    public static final com.google.protobuf.Parser<FrameRqst> PARSER =
         new com.google.protobuf.AbstractParser<FrameRqst>() {
       public FrameRqst parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new FrameRqst(input, extensionRegistry);
+        try {
+          return new FrameRqst(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -2111,14 +2116,6 @@ public final class ProtoFrame {
       }
     }
 
-    private void initFields() {
-      time_ = 0D;
-      tlX_ = 0D;
-      tlY_ = 0D;
-      brX_ = 0D;
-      brY_ = 0D;
-      id_ = "";
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -2155,7 +2152,6 @@ public final class ProtoFrame {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeDouble(1, time_);
       }
@@ -2174,7 +2170,7 @@ public final class ProtoFrame {
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         output.writeBytes(6, getIdBytes());
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -2207,18 +2203,12 @@ public final class ProtoFrame {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(6, getIdBytes());
       }
-      size += getUnknownFields().getSerializedSize();
+      size += unknownFields.getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
     public static playground.gregor.proto.ProtoFrame.FrameRqst parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -2272,12 +2262,17 @@ public final class ProtoFrame {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(playground.gregor.proto.ProtoFrame.FrameRqst prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoFrame.FrameRqst prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -2318,10 +2313,6 @@ public final class ProtoFrame {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         time_ = 0D;
@@ -2337,10 +2328,6 @@ public final class ProtoFrame {
         id_ = "";
         bitField0_ = (bitField0_ & ~0x00000020);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -2424,7 +2411,8 @@ public final class ProtoFrame {
           id_ = other.id_;
           onChanged();
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -2714,12 +2702,22 @@ public final class ProtoFrame {
       // @@protoc_insertion_point(builder_scope:FrameRqst)
     }
 
+    // @@protoc_insertion_point(class_scope:FrameRqst)
+    private static final playground.gregor.proto.ProtoFrame.FrameRqst defaultInstance;
     static {
-      defaultInstance = new FrameRqst(true);
-      defaultInstance.initFields();
+      defaultInstance = new playground.gregor.proto.ProtoFrame.FrameRqst();
     }
 
-    // @@protoc_insertion_point(class_scope:FrameRqst)
+    public static playground.gregor.proto.ProtoFrame.FrameRqst getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public playground.gregor.proto.ProtoFrame.FrameRqst getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    static {
+    }
   }
 
   public interface CtrlMsgOrBuilder extends
@@ -2752,37 +2750,28 @@ public final class ProtoFrame {
   /**
    * Protobuf type {@code CtrlMsg}
    */
-  public static final class CtrlMsg extends
+  public  static final class CtrlMsg extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:CtrlMsg)
       CtrlMsgOrBuilder {
     // Use CtrlMsg.newBuilder() to construct.
-    private CtrlMsg(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    private CtrlMsg(com.google.protobuf.GeneratedMessage.Builder builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private CtrlMsg(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final CtrlMsg defaultInstance;
-    public static CtrlMsg getDefaultInstance() {
-      return defaultInstance;
+    private CtrlMsg() {
+      ctrlMsgTyp_ = 0;
+      id_ = "";
     }
 
-    public CtrlMsg getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private CtrlMsg(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -2808,7 +2797,7 @@ public final class ProtoFrame {
                 unknownFields.mergeVarintField(1, rawValue);
               } else {
                 bitField0_ |= 0x00000001;
-                ctrlMsgTyp_ = value;
+                ctrlMsgTyp_ = rawValue;
               }
               break;
             }
@@ -2821,10 +2810,11 @@ public final class ProtoFrame {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -2842,13 +2832,22 @@ public final class ProtoFrame {
               playground.gregor.proto.ProtoFrame.CtrlMsg.class, playground.gregor.proto.ProtoFrame.CtrlMsg.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<CtrlMsg> PARSER =
+    public static final com.google.protobuf.Parser<CtrlMsg> PARSER =
         new com.google.protobuf.AbstractParser<CtrlMsg>() {
       public CtrlMsg parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CtrlMsg(input, extensionRegistry);
+        try {
+          return new CtrlMsg(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -2882,7 +2881,9 @@ public final class ProtoFrame {
       public static final int UNREGISTER_VALUE = 1;
 
 
-      public final int getNumber() { return value; }
+      public final int getNumber() {
+        return value;
+      }
 
       public static Type valueOf(int value) {
         switch (value) {
@@ -2941,7 +2942,7 @@ public final class ProtoFrame {
 
     private int bitField0_;
     public static final int CTRLMSGTYP_FIELD_NUMBER = 1;
-    private playground.gregor.proto.ProtoFrame.CtrlMsg.Type ctrlMsgTyp_;
+    private int ctrlMsgTyp_;
     /**
      * <code>required .CtrlMsg.Type ctrlMsgTyp = 1;</code>
      */
@@ -2952,7 +2953,8 @@ public final class ProtoFrame {
      * <code>required .CtrlMsg.Type ctrlMsgTyp = 1;</code>
      */
     public playground.gregor.proto.ProtoFrame.CtrlMsg.Type getCtrlMsgTyp() {
-      return ctrlMsgTyp_;
+      playground.gregor.proto.ProtoFrame.CtrlMsg.Type result = playground.gregor.proto.ProtoFrame.CtrlMsg.Type.valueOf(ctrlMsgTyp_);
+      return result == null ? playground.gregor.proto.ProtoFrame.CtrlMsg.Type.REGISTER : result;
     }
 
     public static final int ID_FIELD_NUMBER = 2;
@@ -2997,10 +2999,6 @@ public final class ProtoFrame {
       }
     }
 
-    private void initFields() {
-      ctrlMsgTyp_ = playground.gregor.proto.ProtoFrame.CtrlMsg.Type.REGISTER;
-      id_ = "";
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -3021,14 +3019,13 @@ public final class ProtoFrame {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeEnum(1, ctrlMsgTyp_.getNumber());
+        output.writeEnum(1, ctrlMsgTyp_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         output.writeBytes(2, getIdBytes());
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -3039,24 +3036,18 @@ public final class ProtoFrame {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, ctrlMsgTyp_.getNumber());
+          .computeEnumSize(1, ctrlMsgTyp_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(2, getIdBytes());
       }
-      size += getUnknownFields().getSerializedSize();
+      size += unknownFields.getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
     public static playground.gregor.proto.ProtoFrame.CtrlMsg parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3110,12 +3101,17 @@ public final class ProtoFrame {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(playground.gregor.proto.ProtoFrame.CtrlMsg prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoFrame.CtrlMsg prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -3156,21 +3152,13 @@ public final class ProtoFrame {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
-        ctrlMsgTyp_ = playground.gregor.proto.ProtoFrame.CtrlMsg.Type.REGISTER;
+        ctrlMsgTyp_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
         id_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -3226,7 +3214,8 @@ public final class ProtoFrame {
           id_ = other.id_;
           onChanged();
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -3261,7 +3250,7 @@ public final class ProtoFrame {
       }
       private int bitField0_;
 
-      private playground.gregor.proto.ProtoFrame.CtrlMsg.Type ctrlMsgTyp_ = playground.gregor.proto.ProtoFrame.CtrlMsg.Type.REGISTER;
+      private int ctrlMsgTyp_ = 0;
       /**
        * <code>required .CtrlMsg.Type ctrlMsgTyp = 1;</code>
        */
@@ -3272,7 +3261,8 @@ public final class ProtoFrame {
        * <code>required .CtrlMsg.Type ctrlMsgTyp = 1;</code>
        */
       public playground.gregor.proto.ProtoFrame.CtrlMsg.Type getCtrlMsgTyp() {
-        return ctrlMsgTyp_;
+        playground.gregor.proto.ProtoFrame.CtrlMsg.Type result = playground.gregor.proto.ProtoFrame.CtrlMsg.Type.valueOf(ctrlMsgTyp_);
+        return result == null ? playground.gregor.proto.ProtoFrame.CtrlMsg.Type.REGISTER : result;
       }
       /**
        * <code>required .CtrlMsg.Type ctrlMsgTyp = 1;</code>
@@ -3282,7 +3272,7 @@ public final class ProtoFrame {
           throw new NullPointerException();
         }
         bitField0_ |= 0x00000001;
-        ctrlMsgTyp_ = value;
+        ctrlMsgTyp_ = value.getNumber();
         onChanged();
         return this;
       }
@@ -3291,7 +3281,7 @@ public final class ProtoFrame {
        */
       public Builder clearCtrlMsgTyp() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        ctrlMsgTyp_ = playground.gregor.proto.ProtoFrame.CtrlMsg.Type.REGISTER;
+        ctrlMsgTyp_ = 0;
         onChanged();
         return this;
       }
@@ -3375,12 +3365,22 @@ public final class ProtoFrame {
       // @@protoc_insertion_point(builder_scope:CtrlMsg)
     }
 
+    // @@protoc_insertion_point(class_scope:CtrlMsg)
+    private static final playground.gregor.proto.ProtoFrame.CtrlMsg defaultInstance;
     static {
-      defaultInstance = new CtrlMsg(true);
-      defaultInstance.initFields();
+      defaultInstance = new playground.gregor.proto.ProtoFrame.CtrlMsg();
     }
 
-    // @@protoc_insertion_point(class_scope:CtrlMsg)
+    public static playground.gregor.proto.ProtoFrame.CtrlMsg getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public playground.gregor.proto.ProtoFrame.CtrlMsg getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    static {
+    }
   }
 
   public interface CtrlMsgRspOrBuilder extends
@@ -3390,37 +3390,26 @@ public final class ProtoFrame {
   /**
    * Protobuf type {@code CtrlMsgRsp}
    */
-  public static final class CtrlMsgRsp extends
+  public  static final class CtrlMsgRsp extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:CtrlMsgRsp)
       CtrlMsgRspOrBuilder {
     // Use CtrlMsgRsp.newBuilder() to construct.
-    private CtrlMsgRsp(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    private CtrlMsgRsp(com.google.protobuf.GeneratedMessage.Builder builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private CtrlMsgRsp(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final CtrlMsgRsp defaultInstance;
-    public static CtrlMsgRsp getDefaultInstance() {
-      return defaultInstance;
+    private CtrlMsgRsp() {
     }
 
-    public CtrlMsgRsp getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private CtrlMsgRsp(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -3441,10 +3430,11 @@ public final class ProtoFrame {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -3462,13 +3452,22 @@ public final class ProtoFrame {
               playground.gregor.proto.ProtoFrame.CtrlMsgRsp.class, playground.gregor.proto.ProtoFrame.CtrlMsgRsp.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<CtrlMsgRsp> PARSER =
+    public static final com.google.protobuf.Parser<CtrlMsgRsp> PARSER =
         new com.google.protobuf.AbstractParser<CtrlMsgRsp>() {
       public CtrlMsgRsp parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CtrlMsgRsp(input, extensionRegistry);
+        try {
+          return new CtrlMsgRsp(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -3477,8 +3476,6 @@ public final class ProtoFrame {
       return PARSER;
     }
 
-    private void initFields() {
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -3491,8 +3488,7 @@ public final class ProtoFrame {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -3501,18 +3497,12 @@ public final class ProtoFrame {
       if (size != -1) return size;
 
       size = 0;
-      size += getUnknownFields().getSerializedSize();
+      size += unknownFields.getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
     public static playground.gregor.proto.ProtoFrame.CtrlMsgRsp parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3566,12 +3556,17 @@ public final class ProtoFrame {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(playground.gregor.proto.ProtoFrame.CtrlMsgRsp prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoFrame.CtrlMsgRsp prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -3612,17 +3607,9 @@ public final class ProtoFrame {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -3659,7 +3646,8 @@ public final class ProtoFrame {
 
       public Builder mergeFrom(playground.gregor.proto.ProtoFrame.CtrlMsgRsp other) {
         if (other == playground.gregor.proto.ProtoFrame.CtrlMsgRsp.getDefaultInstance()) return this;
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -3688,12 +3676,22 @@ public final class ProtoFrame {
       // @@protoc_insertion_point(builder_scope:CtrlMsgRsp)
     }
 
+    // @@protoc_insertion_point(class_scope:CtrlMsgRsp)
+    private static final playground.gregor.proto.ProtoFrame.CtrlMsgRsp defaultInstance;
     static {
-      defaultInstance = new CtrlMsgRsp(true);
-      defaultInstance.initFields();
+      defaultInstance = new playground.gregor.proto.ProtoFrame.CtrlMsgRsp();
     }
 
-    // @@protoc_insertion_point(class_scope:CtrlMsgRsp)
+    public static playground.gregor.proto.ProtoFrame.CtrlMsgRsp getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public playground.gregor.proto.ProtoFrame.CtrlMsgRsp getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    static {
+    }
   }
 
   /**

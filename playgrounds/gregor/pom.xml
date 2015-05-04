@@ -24,30 +24,6 @@
 			<scope>system</scope>
 			<systemPath>${basedir}/lib/jmatio/jamtio.jar</systemPath>
 		</dependency>
-		<!--<dependency> <groupId>Jama</groupId> <artifactId>Jama</artifactId> 
-			<version>1.0.2</version> </dependency> -->
-		<dependency>
-			<groupId>com.vividsolutions</groupId>
-			<artifactId>jts</artifactId>
-			<version>1.11</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>iso-19139-d_2007_04_17-schema</artifactId>
-			<version>1.0.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jvnet.ogc</groupId>
-			<artifactId>wfs-v_1_1_0-schema</artifactId>
-			<version>1.0.3</version>
-		</dependency>
-		<dependency><!-- xerces import needed since org.jvnet.ogc imports an older 
-				version and so ``overwrites'' the actual version needed by matsim so please 
-				don't remove this gl(nov. 2012) -->
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.7.1</version>
-		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>grips</artifactId>
@@ -89,8 +65,6 @@
 			<version>0.4</version>
 			<systemPath>${basedir}/lib/kabeja/kabeja-0.4.jar</systemPath>
 		</dependency>
-		<!-- <dependency> <groupId>org.matsim.contrib</groupId> <artifactId>multimodal</artifactId> 
-			<version>0.7.0-SNAPSHOT</version> </dependency> -->
 		<dependency>
 			<groupId>be.humphreys</groupId>
 			<artifactId>simplevoronoi</artifactId>
@@ -106,23 +80,124 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-referencing</artifactId>
-			<version>2.7.3</version>
+			<version>13.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-epsg-hsql</artifactId>
-			<version>2.7.3</version>
+			<version>13.0</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
-			<version>2.6.0</version>
+			<version>3.0.0-alpha-2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.googlecode.protobuf-rpc-pro</groupId>
 			<artifactId>protobuf-rpc-pro-duplex</artifactId>
-			<version>3.3</version>
+			<version>3.3.1</version>
 		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-core</artifactId>
+			<scope>system</scope>
+			<version>0.1.0-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/grpc/grpc-core-0.1.0-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-stub</artifactId>
+			<scope>system</scope>
+			<version>0.1.0-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/grpc/grpc-stub-0.1.0-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-netty</artifactId>
+			<scope>system</scope>
+			<version>0.1.0-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/grpc/grpc-netty-0.1.0-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.grpc</groupId>
+			<artifactId>grpc-protobuf</artifactId>
+			<scope>system</scope>
+			<version>0.1.0-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/grpc/grpc-protobuf-0.1.0-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-buffer</artifactId>
+			<scope>system</scope>
+			<version>4.1.0.Beta5-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/netty/netty-buffer-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-codec</artifactId>
+			<scope>system</scope>
+			<version>4.1.0.Beta5-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/netty/netty-codec-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty--codec-http</artifactId>
+			<scope>system</scope>
+			<version>4.1.0.Beta5-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/netty/netty-codec-http-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-codec-http2</artifactId>
+			<scope>system</scope>
+			<version>4.1.0.Beta5-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/netty/netty-codec-http2-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-common</artifactId>
+			<scope>system</scope>
+			<version>4.1.0.Beta5-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/netty/netty-common-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-handler</artifactId>
+			<scope>system</scope>
+			<version>4.1.0.Beta5-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/netty/netty-handler-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-resolver</artifactId>
+			<scope>system</scope>
+			<version>4.1.0.Beta5-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/netty/netty-resolver-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-transport</artifactId>
+			<scope>system</scope>
+			<version>4.1.0.Beta5-SNAPSHOT</version>
+			<systemPath>${basedir}/lib/netty/netty-transport-4.1.0.Beta5-SNAPSHOT.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.twitter</groupId>
+			<artifactId>hpack</artifactId>
+			<version>0.10.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>vsp</artifactId>
@@ -132,6 +207,21 @@
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>signals</artifactId>
 			<version>0.7.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId>
+			<version>1.11</version>
+		</dependency>
+				<dependency>
+			<groupId>org.jvnet.ogc</groupId>
+			<artifactId>iso-19139-d_2007_04_17-schema</artifactId>
+			<version>1.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jvnet.ogc</groupId>
+			<artifactId>wfs-v_1_1_0-schema</artifactId>
+			<version>1.0.3</version>
 		</dependency>
 	</dependencies>
 </project>

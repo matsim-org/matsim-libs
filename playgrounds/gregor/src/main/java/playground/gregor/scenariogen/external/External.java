@@ -58,6 +58,7 @@ public class External {
 		Scenario sc = ScenarioUtils.createScenario(c);
 
 		createNetwork(sc);
+		
 
 		((NetworkImpl) sc.getNetwork()).setEffectiveCellSize(.26);
 		((NetworkImpl) sc.getNetwork()).setEffectiveLaneWidth(.71);

@@ -42,37 +42,27 @@ public final class ProtoScenario {
   /**
    * Protobuf type {@code Scenario}
    */
-  public static final class Scenario extends
+  public  static final class Scenario extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:Scenario)
       ScenarioOrBuilder {
     // Use Scenario.newBuilder() to construct.
-    private Scenario(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    private Scenario(com.google.protobuf.GeneratedMessage.Builder builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private Scenario(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final Scenario defaultInstance;
-    public static Scenario getDefaultInstance() {
-      return defaultInstance;
+    private Scenario() {
+      crs_ = "";
     }
 
-    public Scenario getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private Scenario(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -113,10 +103,11 @@ public final class ProtoScenario {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -134,13 +125,22 @@ public final class ProtoScenario {
               playground.gregor.proto.ProtoScenario.Scenario.class, playground.gregor.proto.ProtoScenario.Scenario.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<Scenario> PARSER =
+    public static final com.google.protobuf.Parser<Scenario> PARSER =
         new com.google.protobuf.AbstractParser<Scenario>() {
       public Scenario parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Scenario(input, extensionRegistry);
+        try {
+          return new Scenario(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -204,37 +204,28 @@ public final class ProtoScenario {
     /**
      * Protobuf type {@code Scenario.Network}
      */
-    public static final class Network extends
+    public  static final class Network extends
         com.google.protobuf.GeneratedMessage implements
         // @@protoc_insertion_point(message_implements:Scenario.Network)
         NetworkOrBuilder {
       // Use Network.newBuilder() to construct.
-      private Network(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      private Network(com.google.protobuf.GeneratedMessage.Builder builder) {
         super(builder);
-        this.unknownFields = builder.getUnknownFields();
       }
-      private Network(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-      private static final Network defaultInstance;
-      public static Network getDefaultInstance() {
-        return defaultInstance;
+      private Network() {
+        nodes_ = java.util.Collections.emptyList();
+        links_ = java.util.Collections.emptyList();
       }
 
-      public Network getDefaultInstanceForType() {
-        return defaultInstance;
-      }
-
-      private final com.google.protobuf.UnknownFieldSet unknownFields;
       @java.lang.Override
       public final com.google.protobuf.UnknownFieldSet
-          getUnknownFields() {
+      getUnknownFields() {
         return this.unknownFields;
       }
       private Network(
           com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        initFields();
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+        this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
             com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -272,10 +263,11 @@ public final class ProtoScenario {
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(this);
+          throw new RuntimeException(e.setUnfinishedMessage(this));
         } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+          throw new RuntimeException(
+              new com.google.protobuf.InvalidProtocolBufferException(
+                  e.getMessage()).setUnfinishedMessage(this));
         } finally {
           if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
             nodes_ = java.util.Collections.unmodifiableList(nodes_);
@@ -299,13 +291,22 @@ public final class ProtoScenario {
                 playground.gregor.proto.ProtoScenario.Scenario.Network.class, playground.gregor.proto.ProtoScenario.Scenario.Network.Builder.class);
       }
 
-      public static com.google.protobuf.Parser<Network> PARSER =
+      public static final com.google.protobuf.Parser<Network> PARSER =
           new com.google.protobuf.AbstractParser<Network>() {
         public Network parsePartialFrom(
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Network(input, extensionRegistry);
+          try {
+            return new Network(input, extensionRegistry);
+          } catch (RuntimeException e) {
+            if (e.getCause() instanceof
+                com.google.protobuf.InvalidProtocolBufferException) {
+              throw (com.google.protobuf.InvalidProtocolBufferException)
+                  e.getCause();
+            }
+            throw e;
+          }
         }
       };
 
@@ -353,37 +354,29 @@ public final class ProtoScenario {
       /**
        * Protobuf type {@code Scenario.Network.Node}
        */
-      public static final class Node extends
+      public  static final class Node extends
           com.google.protobuf.GeneratedMessage implements
           // @@protoc_insertion_point(message_implements:Scenario.Network.Node)
           NodeOrBuilder {
         // Use Node.newBuilder() to construct.
-        private Node(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+        private Node(com.google.protobuf.GeneratedMessage.Builder builder) {
           super(builder);
-          this.unknownFields = builder.getUnknownFields();
         }
-        private Node(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-        private static final Node defaultInstance;
-        public static Node getDefaultInstance() {
-          return defaultInstance;
+        private Node() {
+          x_ = 0D;
+          y_ = 0D;
+          id_ = "";
         }
 
-        public Node getDefaultInstanceForType() {
-          return defaultInstance;
-        }
-
-        private final com.google.protobuf.UnknownFieldSet unknownFields;
         @java.lang.Override
         public final com.google.protobuf.UnknownFieldSet
-            getUnknownFields() {
+        getUnknownFields() {
           return this.unknownFields;
         }
         private Node(
             com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          initFields();
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+          this();
           int mutable_bitField0_ = 0;
           com.google.protobuf.UnknownFieldSet.Builder unknownFields =
               com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -421,10 +414,11 @@ public final class ProtoScenario {
               }
             }
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-            throw e.setUnfinishedMessage(this);
+            throw new RuntimeException(e.setUnfinishedMessage(this));
           } catch (java.io.IOException e) {
-            throw new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this);
+            throw new RuntimeException(
+                new com.google.protobuf.InvalidProtocolBufferException(
+                    e.getMessage()).setUnfinishedMessage(this));
           } finally {
             this.unknownFields = unknownFields.build();
             makeExtensionsImmutable();
@@ -442,13 +436,22 @@ public final class ProtoScenario {
                   playground.gregor.proto.ProtoScenario.Scenario.Network.Node.class, playground.gregor.proto.ProtoScenario.Scenario.Network.Node.Builder.class);
         }
 
-        public static com.google.protobuf.Parser<Node> PARSER =
+        public static final com.google.protobuf.Parser<Node> PARSER =
             new com.google.protobuf.AbstractParser<Node>() {
           public Node parsePartialFrom(
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new Node(input, extensionRegistry);
+            try {
+              return new Node(input, extensionRegistry);
+            } catch (RuntimeException e) {
+              if (e.getCause() instanceof
+                  com.google.protobuf.InvalidProtocolBufferException) {
+                throw (com.google.protobuf.InvalidProtocolBufferException)
+                    e.getCause();
+              }
+              throw e;
+            }
           }
         };
 
@@ -530,11 +533,6 @@ public final class ProtoScenario {
           }
         }
 
-        private void initFields() {
-          x_ = 0D;
-          y_ = 0D;
-          id_ = "";
-        }
         private byte memoizedIsInitialized = -1;
         public final boolean isInitialized() {
           byte isInitialized = memoizedIsInitialized;
@@ -559,7 +557,6 @@ public final class ProtoScenario {
 
         public void writeTo(com.google.protobuf.CodedOutputStream output)
                             throws java.io.IOException {
-          getSerializedSize();
           if (((bitField0_ & 0x00000001) == 0x00000001)) {
             output.writeDouble(1, x_);
           }
@@ -569,7 +566,7 @@ public final class ProtoScenario {
           if (((bitField0_ & 0x00000004) == 0x00000004)) {
             output.writeBytes(3, getIdBytes());
           }
-          getUnknownFields().writeTo(output);
+          unknownFields.writeTo(output);
         }
 
         private int memoizedSerializedSize = -1;
@@ -590,18 +587,12 @@ public final class ProtoScenario {
             size += com.google.protobuf.CodedOutputStream
               .computeBytesSize(3, getIdBytes());
           }
-          size += getUnknownFields().getSerializedSize();
+          size += unknownFields.getSerializedSize();
           memoizedSerializedSize = size;
           return size;
         }
 
         private static final long serialVersionUID = 0L;
-        @java.lang.Override
-        protected java.lang.Object writeReplace()
-            throws java.io.ObjectStreamException {
-          return super.writeReplace();
-        }
-
         public static playground.gregor.proto.ProtoScenario.Scenario.Network.Node parseFrom(
             com.google.protobuf.ByteString data)
             throws com.google.protobuf.InvalidProtocolBufferException {
@@ -655,12 +646,17 @@ public final class ProtoScenario {
           return PARSER.parseFrom(input, extensionRegistry);
         }
 
-        public static Builder newBuilder() { return Builder.create(); }
         public Builder newBuilderForType() { return newBuilder(); }
-        public static Builder newBuilder(playground.gregor.proto.ProtoScenario.Scenario.Network.Node prototype) {
-          return newBuilder().mergeFrom(prototype);
+        public static Builder newBuilder() {
+          return defaultInstance.toBuilder();
         }
-        public Builder toBuilder() { return newBuilder(this); }
+        public static Builder newBuilder(playground.gregor.proto.ProtoScenario.Scenario.Network.Node prototype) {
+          return defaultInstance.toBuilder().mergeFrom(prototype);
+        }
+        public Builder toBuilder() {
+          return this == defaultInstance
+              ? new Builder() : new Builder().mergeFrom(this);
+        }
 
         @java.lang.Override
         protected Builder newBuilderForType(
@@ -701,10 +697,6 @@ public final class ProtoScenario {
             if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
             }
           }
-          private static Builder create() {
-            return new Builder();
-          }
-
           public Builder clear() {
             super.clear();
             x_ = 0D;
@@ -714,10 +706,6 @@ public final class ProtoScenario {
             id_ = "";
             bitField0_ = (bitField0_ & ~0x00000004);
             return this;
-          }
-
-          public Builder clone() {
-            return create().mergeFrom(buildPartial());
           }
 
           public com.google.protobuf.Descriptors.Descriptor
@@ -780,7 +768,8 @@ public final class ProtoScenario {
               id_ = other.id_;
               onChanged();
             }
-            this.mergeUnknownFields(other.getUnknownFields());
+            this.mergeUnknownFields(other.unknownFields);
+            onChanged();
             return this;
           }
 
@@ -962,12 +951,22 @@ public final class ProtoScenario {
           // @@protoc_insertion_point(builder_scope:Scenario.Network.Node)
         }
 
+        // @@protoc_insertion_point(class_scope:Scenario.Network.Node)
+        private static final playground.gregor.proto.ProtoScenario.Scenario.Network.Node defaultInstance;
         static {
-          defaultInstance = new Node(true);
-          defaultInstance.initFields();
+          defaultInstance = new playground.gregor.proto.ProtoScenario.Scenario.Network.Node();
         }
 
-        // @@protoc_insertion_point(class_scope:Scenario.Network.Node)
+        public static playground.gregor.proto.ProtoScenario.Scenario.Network.Node getDefaultInstance() {
+          return defaultInstance;
+        }
+
+        public playground.gregor.proto.ProtoScenario.Scenario.Network.Node getDefaultInstanceForType() {
+          return defaultInstance;
+        }
+
+        static {
+        }
       }
 
       public interface LinkOrBuilder extends
@@ -1055,37 +1054,33 @@ public final class ProtoScenario {
       /**
        * Protobuf type {@code Scenario.Network.Link}
        */
-      public static final class Link extends
+      public  static final class Link extends
           com.google.protobuf.GeneratedMessage implements
           // @@protoc_insertion_point(message_implements:Scenario.Network.Link)
           LinkOrBuilder {
         // Use Link.newBuilder() to construct.
-        private Link(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+        private Link(com.google.protobuf.GeneratedMessage.Builder builder) {
           super(builder);
-          this.unknownFields = builder.getUnknownFields();
         }
-        private Link(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-        private static final Link defaultInstance;
-        public static Link getDefaultInstance() {
-          return defaultInstance;
-        }
-
-        public Link getDefaultInstanceForType() {
-          return defaultInstance;
+        private Link() {
+          id_ = "";
+          fromNodeId_ = "";
+          toNodeId_ = "";
+          length_ = 0D;
+          capacity_ = 0D;
+          lanes_ = 0D;
+          freespeed_ = 0D;
         }
 
-        private final com.google.protobuf.UnknownFieldSet unknownFields;
         @java.lang.Override
         public final com.google.protobuf.UnknownFieldSet
-            getUnknownFields() {
+        getUnknownFields() {
           return this.unknownFields;
         }
         private Link(
             com.google.protobuf.CodedInputStream input,
-            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-            throws com.google.protobuf.InvalidProtocolBufferException {
-          initFields();
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+          this();
           int mutable_bitField0_ = 0;
           com.google.protobuf.UnknownFieldSet.Builder unknownFields =
               com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -1145,10 +1140,11 @@ public final class ProtoScenario {
               }
             }
           } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-            throw e.setUnfinishedMessage(this);
+            throw new RuntimeException(e.setUnfinishedMessage(this));
           } catch (java.io.IOException e) {
-            throw new com.google.protobuf.InvalidProtocolBufferException(
-                e.getMessage()).setUnfinishedMessage(this);
+            throw new RuntimeException(
+                new com.google.protobuf.InvalidProtocolBufferException(
+                    e.getMessage()).setUnfinishedMessage(this));
           } finally {
             this.unknownFields = unknownFields.build();
             makeExtensionsImmutable();
@@ -1166,13 +1162,22 @@ public final class ProtoScenario {
                   playground.gregor.proto.ProtoScenario.Scenario.Network.Link.class, playground.gregor.proto.ProtoScenario.Scenario.Network.Link.Builder.class);
         }
 
-        public static com.google.protobuf.Parser<Link> PARSER =
+        public static final com.google.protobuf.Parser<Link> PARSER =
             new com.google.protobuf.AbstractParser<Link>() {
           public Link parsePartialFrom(
               com.google.protobuf.CodedInputStream input,
               com.google.protobuf.ExtensionRegistryLite extensionRegistry)
               throws com.google.protobuf.InvalidProtocolBufferException {
-            return new Link(input, extensionRegistry);
+            try {
+              return new Link(input, extensionRegistry);
+            } catch (RuntimeException e) {
+              if (e.getCause() instanceof
+                  com.google.protobuf.InvalidProtocolBufferException) {
+                throw (com.google.protobuf.InvalidProtocolBufferException)
+                    e.getCause();
+              }
+              throw e;
+            }
           }
         };
 
@@ -1368,15 +1373,6 @@ public final class ProtoScenario {
           return freespeed_;
         }
 
-        private void initFields() {
-          id_ = "";
-          fromNodeId_ = "";
-          toNodeId_ = "";
-          length_ = 0D;
-          capacity_ = 0D;
-          lanes_ = 0D;
-          freespeed_ = 0D;
-        }
         private byte memoizedIsInitialized = -1;
         public final boolean isInitialized() {
           byte isInitialized = memoizedIsInitialized;
@@ -1417,7 +1413,6 @@ public final class ProtoScenario {
 
         public void writeTo(com.google.protobuf.CodedOutputStream output)
                             throws java.io.IOException {
-          getSerializedSize();
           if (((bitField0_ & 0x00000001) == 0x00000001)) {
             output.writeBytes(1, getIdBytes());
           }
@@ -1439,7 +1434,7 @@ public final class ProtoScenario {
           if (((bitField0_ & 0x00000040) == 0x00000040)) {
             output.writeDouble(7, freespeed_);
           }
-          getUnknownFields().writeTo(output);
+          unknownFields.writeTo(output);
         }
 
         private int memoizedSerializedSize = -1;
@@ -1476,18 +1471,12 @@ public final class ProtoScenario {
             size += com.google.protobuf.CodedOutputStream
               .computeDoubleSize(7, freespeed_);
           }
-          size += getUnknownFields().getSerializedSize();
+          size += unknownFields.getSerializedSize();
           memoizedSerializedSize = size;
           return size;
         }
 
         private static final long serialVersionUID = 0L;
-        @java.lang.Override
-        protected java.lang.Object writeReplace()
-            throws java.io.ObjectStreamException {
-          return super.writeReplace();
-        }
-
         public static playground.gregor.proto.ProtoScenario.Scenario.Network.Link parseFrom(
             com.google.protobuf.ByteString data)
             throws com.google.protobuf.InvalidProtocolBufferException {
@@ -1541,12 +1530,17 @@ public final class ProtoScenario {
           return PARSER.parseFrom(input, extensionRegistry);
         }
 
-        public static Builder newBuilder() { return Builder.create(); }
         public Builder newBuilderForType() { return newBuilder(); }
-        public static Builder newBuilder(playground.gregor.proto.ProtoScenario.Scenario.Network.Link prototype) {
-          return newBuilder().mergeFrom(prototype);
+        public static Builder newBuilder() {
+          return defaultInstance.toBuilder();
         }
-        public Builder toBuilder() { return newBuilder(this); }
+        public static Builder newBuilder(playground.gregor.proto.ProtoScenario.Scenario.Network.Link prototype) {
+          return defaultInstance.toBuilder().mergeFrom(prototype);
+        }
+        public Builder toBuilder() {
+          return this == defaultInstance
+              ? new Builder() : new Builder().mergeFrom(this);
+        }
 
         @java.lang.Override
         protected Builder newBuilderForType(
@@ -1587,10 +1581,6 @@ public final class ProtoScenario {
             if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
             }
           }
-          private static Builder create() {
-            return new Builder();
-          }
-
           public Builder clear() {
             super.clear();
             id_ = "";
@@ -1608,10 +1598,6 @@ public final class ProtoScenario {
             freespeed_ = 0D;
             bitField0_ = (bitField0_ & ~0x00000040);
             return this;
-          }
-
-          public Builder clone() {
-            return create().mergeFrom(buildPartial());
           }
 
           public com.google.protobuf.Descriptors.Descriptor
@@ -1706,7 +1692,8 @@ public final class ProtoScenario {
             if (other.hasFreespeed()) {
               setFreespeed(other.getFreespeed());
             }
-            this.mergeUnknownFields(other.getUnknownFields());
+            this.mergeUnknownFields(other.unknownFields);
+            onChanged();
             return this;
           }
 
@@ -2120,12 +2107,22 @@ public final class ProtoScenario {
           // @@protoc_insertion_point(builder_scope:Scenario.Network.Link)
         }
 
+        // @@protoc_insertion_point(class_scope:Scenario.Network.Link)
+        private static final playground.gregor.proto.ProtoScenario.Scenario.Network.Link defaultInstance;
         static {
-          defaultInstance = new Link(true);
-          defaultInstance.initFields();
+          defaultInstance = new playground.gregor.proto.ProtoScenario.Scenario.Network.Link();
         }
 
-        // @@protoc_insertion_point(class_scope:Scenario.Network.Link)
+        public static playground.gregor.proto.ProtoScenario.Scenario.Network.Link getDefaultInstance() {
+          return defaultInstance;
+        }
+
+        public playground.gregor.proto.ProtoScenario.Scenario.Network.Link getDefaultInstanceForType() {
+          return defaultInstance;
+        }
+
+        static {
+        }
       }
 
       public static final int NODES_FIELD_NUMBER = 15;
@@ -2198,10 +2195,6 @@ public final class ProtoScenario {
         return links_.get(index);
       }
 
-      private void initFields() {
-        nodes_ = java.util.Collections.emptyList();
-        links_ = java.util.Collections.emptyList();
-      }
       private byte memoizedIsInitialized = -1;
       public final boolean isInitialized() {
         byte isInitialized = memoizedIsInitialized;
@@ -2226,14 +2219,13 @@ public final class ProtoScenario {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         for (int i = 0; i < nodes_.size(); i++) {
           output.writeMessage(15, nodes_.get(i));
         }
         for (int i = 0; i < links_.size(); i++) {
           output.writeMessage(16, links_.get(i));
         }
-        getUnknownFields().writeTo(output);
+        unknownFields.writeTo(output);
       }
 
       private int memoizedSerializedSize = -1;
@@ -2250,18 +2242,12 @@ public final class ProtoScenario {
           size += com.google.protobuf.CodedOutputStream
             .computeMessageSize(16, links_.get(i));
         }
-        size += getUnknownFields().getSerializedSize();
+        size += unknownFields.getSerializedSize();
         memoizedSerializedSize = size;
         return size;
       }
 
       private static final long serialVersionUID = 0L;
-      @java.lang.Override
-      protected java.lang.Object writeReplace()
-          throws java.io.ObjectStreamException {
-        return super.writeReplace();
-      }
-
       public static playground.gregor.proto.ProtoScenario.Scenario.Network parseFrom(
           com.google.protobuf.ByteString data)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -2315,12 +2301,17 @@ public final class ProtoScenario {
         return PARSER.parseFrom(input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return Builder.create(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(playground.gregor.proto.ProtoScenario.Scenario.Network prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return defaultInstance.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(playground.gregor.proto.ProtoScenario.Scenario.Network prototype) {
+        return defaultInstance.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == defaultInstance
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -2363,10 +2354,6 @@ public final class ProtoScenario {
             getLinksFieldBuilder();
           }
         }
-        private static Builder create() {
-          return new Builder();
-        }
-
         public Builder clear() {
           super.clear();
           if (nodesBuilder_ == null) {
@@ -2382,10 +2369,6 @@ public final class ProtoScenario {
             linksBuilder_.clear();
           }
           return this;
-        }
-
-        public Builder clone() {
-          return create().mergeFrom(buildPartial());
         }
 
         public com.google.protobuf.Descriptors.Descriptor
@@ -2493,7 +2476,8 @@ public final class ProtoScenario {
               }
             }
           }
-          this.mergeUnknownFields(other.getUnknownFields());
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
           return this;
         }
 
@@ -3015,12 +2999,22 @@ public final class ProtoScenario {
         // @@protoc_insertion_point(builder_scope:Scenario.Network)
       }
 
+      // @@protoc_insertion_point(class_scope:Scenario.Network)
+      private static final playground.gregor.proto.ProtoScenario.Scenario.Network defaultInstance;
       static {
-        defaultInstance = new Network(true);
-        defaultInstance.initFields();
+        defaultInstance = new playground.gregor.proto.ProtoScenario.Scenario.Network();
       }
 
-      // @@protoc_insertion_point(class_scope:Scenario.Network)
+      public static playground.gregor.proto.ProtoScenario.Scenario.Network getDefaultInstance() {
+        return defaultInstance;
+      }
+
+      public playground.gregor.proto.ProtoScenario.Scenario.Network getDefaultInstanceForType() {
+        return defaultInstance;
+      }
+
+      static {
+      }
     }
 
     private int bitField0_;
@@ -3078,19 +3072,15 @@ public final class ProtoScenario {
      * <code>required .Scenario.Network net = 2;</code>
      */
     public playground.gregor.proto.ProtoScenario.Scenario.Network getNet() {
-      return net_;
+      return net_ == null ? playground.gregor.proto.ProtoScenario.Scenario.Network.getDefaultInstance() : net_;
     }
     /**
      * <code>required .Scenario.Network net = 2;</code>
      */
     public playground.gregor.proto.ProtoScenario.Scenario.NetworkOrBuilder getNetOrBuilder() {
-      return net_;
+      return net_ == null ? playground.gregor.proto.ProtoScenario.Scenario.Network.getDefaultInstance() : net_;
     }
 
-    private void initFields() {
-      crs_ = "";
-      net_ = playground.gregor.proto.ProtoScenario.Scenario.Network.getDefaultInstance();
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -3115,14 +3105,13 @@ public final class ProtoScenario {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, getCrsBytes());
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(2, net_);
+        output.writeMessage(2, getNet());
       }
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -3137,20 +3126,14 @@ public final class ProtoScenario {
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, net_);
+          .computeMessageSize(2, getNet());
       }
-      size += getUnknownFields().getSerializedSize();
+      size += unknownFields.getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
     public static playground.gregor.proto.ProtoScenario.Scenario parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3204,12 +3187,17 @@ public final class ProtoScenario {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(playground.gregor.proto.ProtoScenario.Scenario prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoScenario.Scenario prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -3251,25 +3239,17 @@ public final class ProtoScenario {
           getNetFieldBuilder();
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         crs_ = "";
         bitField0_ = (bitField0_ & ~0x00000001);
         if (netBuilder_ == null) {
-          net_ = playground.gregor.proto.ProtoScenario.Scenario.Network.getDefaultInstance();
+          net_ = null;
         } else {
           netBuilder_.clear();
         }
         bitField0_ = (bitField0_ & ~0x00000002);
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -3329,7 +3309,8 @@ public final class ProtoScenario {
         if (other.hasNet()) {
           mergeNet(other.getNet());
         }
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -3444,7 +3425,7 @@ public final class ProtoScenario {
         return this;
       }
 
-      private playground.gregor.proto.ProtoScenario.Scenario.Network net_ = playground.gregor.proto.ProtoScenario.Scenario.Network.getDefaultInstance();
+      private playground.gregor.proto.ProtoScenario.Scenario.Network net_ = null;
       private com.google.protobuf.SingleFieldBuilder<
           playground.gregor.proto.ProtoScenario.Scenario.Network, playground.gregor.proto.ProtoScenario.Scenario.Network.Builder, playground.gregor.proto.ProtoScenario.Scenario.NetworkOrBuilder> netBuilder_;
       /**
@@ -3458,7 +3439,7 @@ public final class ProtoScenario {
        */
       public playground.gregor.proto.ProtoScenario.Scenario.Network getNet() {
         if (netBuilder_ == null) {
-          return net_;
+          return net_ == null ? playground.gregor.proto.ProtoScenario.Scenario.Network.getDefaultInstance() : net_;
         } else {
           return netBuilder_.getMessage();
         }
@@ -3499,6 +3480,7 @@ public final class ProtoScenario {
       public Builder mergeNet(playground.gregor.proto.ProtoScenario.Scenario.Network value) {
         if (netBuilder_ == null) {
           if (((bitField0_ & 0x00000002) == 0x00000002) &&
+              net_ != null &&
               net_ != playground.gregor.proto.ProtoScenario.Scenario.Network.getDefaultInstance()) {
             net_ =
               playground.gregor.proto.ProtoScenario.Scenario.Network.newBuilder(net_).mergeFrom(value).buildPartial();
@@ -3517,7 +3499,7 @@ public final class ProtoScenario {
        */
       public Builder clearNet() {
         if (netBuilder_ == null) {
-          net_ = playground.gregor.proto.ProtoScenario.Scenario.Network.getDefaultInstance();
+          net_ = null;
           onChanged();
         } else {
           netBuilder_.clear();
@@ -3540,7 +3522,8 @@ public final class ProtoScenario {
         if (netBuilder_ != null) {
           return netBuilder_.getMessageOrBuilder();
         } else {
-          return net_;
+          return net_ == null ?
+              playground.gregor.proto.ProtoScenario.Scenario.Network.getDefaultInstance() : net_;
         }
       }
       /**
@@ -3563,12 +3546,22 @@ public final class ProtoScenario {
       // @@protoc_insertion_point(builder_scope:Scenario)
     }
 
+    // @@protoc_insertion_point(class_scope:Scenario)
+    private static final playground.gregor.proto.ProtoScenario.Scenario defaultInstance;
     static {
-      defaultInstance = new Scenario(true);
-      defaultInstance.initFields();
+      defaultInstance = new playground.gregor.proto.ProtoScenario.Scenario();
     }
 
-    // @@protoc_insertion_point(class_scope:Scenario)
+    public static playground.gregor.proto.ProtoScenario.Scenario getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public playground.gregor.proto.ProtoScenario.Scenario getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    static {
+    }
   }
 
   public interface ScnReqOrBuilder extends
@@ -3578,37 +3571,26 @@ public final class ProtoScenario {
   /**
    * Protobuf type {@code ScnReq}
    */
-  public static final class ScnReq extends
+  public  static final class ScnReq extends
       com.google.protobuf.GeneratedMessage implements
       // @@protoc_insertion_point(message_implements:ScnReq)
       ScnReqOrBuilder {
     // Use ScnReq.newBuilder() to construct.
-    private ScnReq(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    private ScnReq(com.google.protobuf.GeneratedMessage.Builder builder) {
       super(builder);
-      this.unknownFields = builder.getUnknownFields();
     }
-    private ScnReq(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
-
-    private static final ScnReq defaultInstance;
-    public static ScnReq getDefaultInstance() {
-      return defaultInstance;
+    private ScnReq() {
     }
 
-    public ScnReq getDefaultInstanceForType() {
-      return defaultInstance;
-    }
-
-    private final com.google.protobuf.UnknownFieldSet unknownFields;
     @java.lang.Override
     public final com.google.protobuf.UnknownFieldSet
-        getUnknownFields() {
+    getUnknownFields() {
       return this.unknownFields;
     }
     private ScnReq(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      initFields();
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
       try {
@@ -3629,10 +3611,11 @@ public final class ProtoScenario {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -3650,13 +3633,22 @@ public final class ProtoScenario {
               playground.gregor.proto.ProtoScenario.ScnReq.class, playground.gregor.proto.ProtoScenario.ScnReq.Builder.class);
     }
 
-    public static com.google.protobuf.Parser<ScnReq> PARSER =
+    public static final com.google.protobuf.Parser<ScnReq> PARSER =
         new com.google.protobuf.AbstractParser<ScnReq>() {
       public ScnReq parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ScnReq(input, extensionRegistry);
+        try {
+          return new ScnReq(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -3665,8 +3657,6 @@ public final class ProtoScenario {
       return PARSER;
     }
 
-    private void initFields() {
-    }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -3679,8 +3669,7 @@ public final class ProtoScenario {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
-      getUnknownFields().writeTo(output);
+      unknownFields.writeTo(output);
     }
 
     private int memoizedSerializedSize = -1;
@@ -3689,18 +3678,12 @@ public final class ProtoScenario {
       if (size != -1) return size;
 
       size = 0;
-      size += getUnknownFields().getSerializedSize();
+      size += unknownFields.getSerializedSize();
       memoizedSerializedSize = size;
       return size;
     }
 
     private static final long serialVersionUID = 0L;
-    @java.lang.Override
-    protected java.lang.Object writeReplace()
-        throws java.io.ObjectStreamException {
-      return super.writeReplace();
-    }
-
     public static playground.gregor.proto.ProtoScenario.ScnReq parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
@@ -3754,12 +3737,17 @@ public final class ProtoScenario {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return Builder.create(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(playground.gregor.proto.ProtoScenario.ScnReq prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(playground.gregor.proto.ProtoScenario.ScnReq prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -3800,17 +3788,9 @@ public final class ProtoScenario {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
         }
       }
-      private static Builder create() {
-        return new Builder();
-      }
-
       public Builder clear() {
         super.clear();
         return this;
-      }
-
-      public Builder clone() {
-        return create().mergeFrom(buildPartial());
       }
 
       public com.google.protobuf.Descriptors.Descriptor
@@ -3847,7 +3827,8 @@ public final class ProtoScenario {
 
       public Builder mergeFrom(playground.gregor.proto.ProtoScenario.ScnReq other) {
         if (other == playground.gregor.proto.ProtoScenario.ScnReq.getDefaultInstance()) return this;
-        this.mergeUnknownFields(other.getUnknownFields());
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
         return this;
       }
 
@@ -3876,12 +3857,22 @@ public final class ProtoScenario {
       // @@protoc_insertion_point(builder_scope:ScnReq)
     }
 
+    // @@protoc_insertion_point(class_scope:ScnReq)
+    private static final playground.gregor.proto.ProtoScenario.ScnReq defaultInstance;
     static {
-      defaultInstance = new ScnReq(true);
-      defaultInstance.initFields();
+      defaultInstance = new playground.gregor.proto.ProtoScenario.ScnReq();
     }
 
-    // @@protoc_insertion_point(class_scope:ScnReq)
+    public static playground.gregor.proto.ProtoScenario.ScnReq getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public playground.gregor.proto.ProtoScenario.ScnReq getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    static {
+    }
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor

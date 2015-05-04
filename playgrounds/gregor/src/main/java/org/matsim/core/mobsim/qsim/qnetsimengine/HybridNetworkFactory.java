@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Sim2DQTransitionLink.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,31 +19,38 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
+public class HybridNetworkFactory implements
+		NetsimNetworkFactory<QNode, QLinkInternalI> {
 
-public class Sim2DQAdapterLink {
+	private final Map<String, NetsimNetworkFactory<QNode, QLinkInternalI>> facs = new LinkedHashMap<>();
 	
-	private final QLinkInternalI ql;
-
-	Sim2DQAdapterLink(QLinkInternalI qLinkImpl) {
-		this.ql = qLinkImpl;
+	@Override
+	public QNode createNetsimNode(Node node, QNetwork network) {
+		return new QNode(node, network);
 	}
 
-
-	public boolean isAcceptingFromUpstream() {
-		return this.ql.isAcceptingFromUpstream();
-	}
-
-
-	public Link getLink() {
+	@Override
+	public QLinkInternalI createNetsimLink(Link link, QNetwork network,
+			QNode queueNode) {
 		
-		return this.ql.getLink();
+		for (Entry<String, NetsimNetworkFactory<QNode, QLinkInternalI>> e : this.facs.entrySet()) {
+			if (link.getAllowedModes().contains(e.getKey())) {
+				return e.getValue().createNetsimLink(link, network, queueNode);
+			}
+		}
+		//default QLink
+		return new QLinkImpl(link, network, queueNode);
 	}
 	
-
-	public void addFromUpstream(QVehicle veh) {
-		this.ql.addFromUpstream(veh);
-		
+	public void putNetsimNetworkFactory(String key, NetsimNetworkFactory<QNode, QLinkInternalI> fac) {
+		this.facs.put(key, fac);
 	}
+
 }

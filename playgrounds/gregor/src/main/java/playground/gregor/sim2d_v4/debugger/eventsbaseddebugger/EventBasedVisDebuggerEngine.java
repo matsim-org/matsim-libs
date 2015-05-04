@@ -83,10 +83,10 @@ public class EventBasedVisDebuggerEngine implements
 	private final List<ClockedVisDebuggerAdditionalDrawer> drawers = new ArrayList<ClockedVisDebuggerAdditionalDrawer>();
 	private int nrAgents;
 
-	 FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/casim/lanes/",
-	 "png", 20);
+//	 FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/casim/lanes/",
+//	 "png", 20);
 
-//	FrameSaver fs = null;
+	FrameSaver fs = null;
 
 	public EventBasedVisDebuggerEngine(Scenario sc) {
 		this.sc = sc;

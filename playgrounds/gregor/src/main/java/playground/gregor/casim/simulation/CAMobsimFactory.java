@@ -33,12 +33,11 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
 import playground.gregor.casim.simulation.physics.CANetworkFactory;
 
 public class CAMobsimFactory implements MobsimFactory {
 
-	private CANetworkFactory fac = new CAMultiLaneNetworkFactory();
+//	private CANetworkFactory fac = new CAMultiLaneNetworkFactory();
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
@@ -53,7 +52,7 @@ public class CAMobsimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		CANetsimEngineModule.configure(qSim, fac);
+		CANetsimEngineModule.configure(qSim);
 
 		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
@@ -80,7 +79,8 @@ public class CAMobsimFactory implements MobsimFactory {
 	}
 
 	public void setCANetworkFactory(CANetworkFactory caNetworkFactory) {
-		this.fac = caNetworkFactory;
+//		this.fac = caNetworkFactory;
+		throw new RuntimeException("obsolete method");
 
 	}
 

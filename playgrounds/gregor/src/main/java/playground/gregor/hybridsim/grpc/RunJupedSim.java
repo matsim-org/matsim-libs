@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * RunJupedSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,27 +18,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.qnetsimengine;
+package playground.gregor.hybridsim.grpc;
 
-import org.matsim.api.core.v01.network.Link;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
-public class External2QAdapterLink {
-	private final QLinkInternalI ql;
+import org.apache.log4j.Logger;
 
-	External2QAdapterLink(QLinkInternalI qLinkImpl) {
-		this.ql = qLinkImpl;
+public class RunJupedSim implements Runnable{
+	
+	private static final Logger log = Logger.getLogger(RunJupedSim.class);
+	
+	@Override
+	public void run() {
+		try {
+			Process p1 = new ProcessBuilder("/Users/laemmel/svn/jpscore/Debug/jupedsim","/Users/laemmel/svn/jpscore/inputfiles/hybrid/hybrid_hall_ini.xml").start();
+			logToLog(p1);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public boolean isAcceptingFromUpstream() {
-		return this.ql.isAcceptingFromUpstream();
+	private static void logToLog(Process p1) throws IOException {
+		{
+			InputStream is = p1.getInputStream();
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(isr);
+			String l = br.readLine();
+			while (l != null) {
+//				log.info(l);
+				l = br.readLine();
+			}
+		}
+		{
+			InputStream is = p1.getErrorStream();
+			InputStreamReader isr = new InputStreamReader(is);
+			BufferedReader br = new BufferedReader(isr);
+			String l = br.readLine();
+			while (l != null) {
+				log.error(l);
+				l = br.readLine();
+			}
+		}
 	}
 
-	public Link getLink() {
-		return this.ql.getLink();
-	}
-
-	public void addFromUpstream(QVehicle veh) {
-		this.ql.addFromUpstream(veh);
-
-	}
 }

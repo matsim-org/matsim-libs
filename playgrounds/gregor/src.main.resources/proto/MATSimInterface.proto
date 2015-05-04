@@ -1,23 +1,25 @@
 syntax = "proto2";
-option java_generic_services = true;
-option java_outer_classname="ProtoMATSimInterface";
-option java_package = "playground.gregor.proto";
+option java_generic_services = false;
+//option java_outer_classname="ProtoMATSimInterface";
+option java_package = "org.matsim.hybrid";
+
+package org.matsim.hybrid;
 
 message MATSim2ExternPutAgent {
 	message Agent {
-		required string id = 1;
-		required string enterNode = 2;
-		repeated string nodes = 3;
+		optional string id = 1;
+		optional string enterNode = 2;
+		optional string leaveNode = 3;
 	}
 
-	required Agent agent = 1;
+	optional Agent agent = 1;
 }
 
 message MATSim2ExternHasSpace {
-	required string nodeId = 1;
+	optional string nodeId = 1;
 }
 message MATSim2ExternHasSpaceConfirmed {
-	required bool hasSpace = 1;
+	optional bool hasSpace = 1;
 }
 
 message MATSim2ExternPutAgentConfirmed {
@@ -25,27 +27,27 @@ message MATSim2ExternPutAgentConfirmed {
 
 message Extern2MATSim {
 	message Agent {
-		required string id = 1;
-		required string leaveNode = 2;
+		optional string id = 1;
+		optional string leaveNode = 2;
 	}
-
-	required Agent agent = 15;
+	optional Agent agent = 1;
 
 }
 
 message Extern2MATSimConfirmed {
-	required bool accepted = 1;
+
+	optional bool accepted = 1;
 }
 
 message ExternSimStepFinished {
-	required double time = 1;
+	optional double time = 1;
 }
 message ExternSimStepFinishedReceived {
 }
 
 message ExternDoSimStep {
-	required double fromTime = 1;
-	required double toTime = 2;
+	optional double fromTime = 1;
+	optional double toTime = 2;
 }
 
 message ExternDoSimStepReceived {
@@ -53,11 +55,12 @@ message ExternDoSimStepReceived {
 }
 
 message ExternalConnect {
-
+	optional string host = 1;
+	optional int32 port = 2;
 }
 
-message ExternalConnectConfirmed {
 
+message ExternalConnectConfirmed {
 }
 
 message ExternOnPrepareSim {
@@ -91,7 +94,7 @@ service MATSimInterfaceService {
 }
 
 service ExternInterfaceService {
-	rpc reqMATSim2ExternHasSpace(MATSim2ExternHasSpace) returns (MATSim2ExternHasSpaceConfirmed);
+	rpc reqMATSim2ExternHasSpace(MATSim2ExternHasSpace)returns (MATSim2ExternHasSpaceConfirmed);
 	rpc reqMATSim2ExternPutAgent(MATSim2ExternPutAgent) returns (MATSim2ExternPutAgentConfirmed);
 	rpc reqExternDoSimStep(ExternDoSimStep) returns (ExternDoSimStepReceived);
 	rpc reqExternOnPrepareSim(ExternOnPrepareSim) returns (ExternOnPrepareSimConfirmed);

@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
-import playground.gregor.external.ExternalEngine;
+import playground.gregor.hybridsim.simulation.ExternalEngine;
 
 public class QSimExternalTransitionLink extends AbstractQLink {
 

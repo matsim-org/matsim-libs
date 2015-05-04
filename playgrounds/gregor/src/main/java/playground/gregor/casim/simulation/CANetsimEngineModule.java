@@ -20,11 +20,13 @@ package playground.gregor.casim.simulation;
 
 import org.matsim.core.mobsim.qsim.QSim;
 
+import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
 import playground.gregor.casim.simulation.physics.CANetworkFactory;
 
 public final class CANetsimEngineModule {
 
-	public static void configure(QSim qSim, CANetworkFactory fac) {
+	public static void configure(QSim qSim) {
+		CANetworkFactory fac = new CAMultiLaneNetworkFactory();
 		CANetsimEngine cae = new CANetsimEngine(qSim, fac);
 		qSim.addMobsimEngine(cae);
 		qSim.addDepartureHandler(cae.getDepartureHandler());
