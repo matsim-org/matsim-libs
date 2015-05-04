@@ -20,7 +20,10 @@ package playground.agarwalamit.mixedTraffic.patnaIndia.evac;
 
 import java.io.BufferedWriter;
 import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.patnaIndia.analysis.PersonArrivalAnalyzer;
@@ -35,7 +38,7 @@ public class EvacProgress {
 	private int shortestPathRunIteration = 0;
 	private int NERunIteration = 100;
 
-	private String dir = "../../../repos/runs-svn/patnaIndia/run105/1pct/evac_seepage/";
+	private String dir = "../../../repos/runs-svn/patnaIndia/run105/1pct/evac_passing/";
 
 
 	public static void main(String[] args) {
@@ -58,15 +61,32 @@ public class EvacProgress {
 
 		String outFile = dir+"/analysis/evacuationProgress.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(outFile);
+		
+		SortedSet<Integer> timeBins = new TreeSet<>();
+		timeBins.addAll(evacProgress_sp.get(TransportMode.car).keySet());
 
 		try {
-			writer.write("hourOfTheDay \t travelMode \t numberOfEvacueeShortestPath \t numberOfEvacueeNashEq \n");
-
+			writer.write("hourOfTheDay \t");//\t  \t  \n
+			for (Integer ii : timeBins){
+				writer.write(ii+"\t");
+			}
+			writer.newLine();
+			
 			for(String mode : evacProgress_sp.keySet()){
+				writer.write("numberOfEvacueeShortestPath_"+mode+"\t");
 				for (Integer ii : evacProgress_sp.get(mode).keySet()){
-					writer.write(ii+"\t"+mode+"\t"+evacProgress_sp.get(mode).get(ii)+"\t"+evacProgress_ne.get(mode).get(ii));
-					writer.newLine();
+					writer.write(evacProgress_sp.get(mode).get(ii)+"\t");
 				}
+				writer.newLine();
+			}
+			writer.newLine();
+			
+			for(String mode : evacProgress_ne.keySet()){
+				writer.write("numberOfEvacueeNashEq_"+mode+"\t");
+				for (Integer ii : evacProgress_ne.get(mode).keySet()){
+					writer.write(evacProgress_ne.get(mode).get(ii)+"\t");
+				}
+				writer.newLine();
 			}
 
 			writer.close();
