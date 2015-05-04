@@ -116,11 +116,12 @@ public class FileUtils {
 			while(result.size() < number && index < permutation.length){
 				result.add(fileList[permutation[index++]-1]); /* Permutation is from 1... while index is from 0... */
 			}
+			LOG.info("File sampling complete, " + result.size() + " returned.");
+			return result;
 		} else{
-			LOG.warn("The folder contains no relevant files. A null list is returned!");
+			LOG.warn("The folder contains no relevant files. A null object is returned!");
+			return null;
 		}
-		LOG.info("File sampling complete, " + result.size() + " returned.");
-		return result;
 	}
 	
 	
