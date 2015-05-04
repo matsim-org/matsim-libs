@@ -83,14 +83,13 @@ class CadytsControlerListener implements BeforeMobsimListener, AfterMobsimListen
 
     @Override
     public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-
+        for (Person person : scenario.getPopulation().getPersons().values()) {
+            this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
+        }
     }
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        for (Person person : scenario.getPopulation().getPersons().values()) {
-            this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
-        }
         this.calibrator.afterNetworkLoading(new SimResults<Link>() {
 
             @Override
