@@ -67,7 +67,7 @@ public class RunZPopulationGenerator {
 		/*
 		 * Create a Map with the PersonIds as key and a list of CensusEntry as values.
 		 */
-		Map<Integer, List<ZCensusEntry>> personEntryMapping = new TreeMap<Integer, List<ZCensusEntry>>();
+		Map<Integer, List<ZCensusEntry>> personEntryMapping = new TreeMap<>();
 		for (ZCensusEntry censusEntry : censusEntries) {
 			/*
 			 * If the Map already contains an entry for the current person
@@ -79,7 +79,7 @@ public class RunZPopulationGenerator {
 			 * If no mapping exists -> create a new one
 			 */
 			if (entries == null) {
-				entries = new ArrayList<ZCensusEntry>();
+				entries = new ArrayList<>();
 				personEntryMapping.put(censusEntry.id_person, entries);
 			}
 

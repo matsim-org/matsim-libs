@@ -23,7 +23,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  */
 public class RunPPopulationGenerator implements Runnable {
 
-	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
+	private Map<String, Coord> zoneGeometries = new HashMap<>();
 
 	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
 
