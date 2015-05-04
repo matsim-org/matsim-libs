@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
+@Deprecated // this interface is scheduled to go away; the default way will separate routers with appropriately extracted subnetworks. kai & mz, apr'15
 public interface IntermodalLeastCostPathCalculator extends LeastCostPathCalculator {
 
 	/**
