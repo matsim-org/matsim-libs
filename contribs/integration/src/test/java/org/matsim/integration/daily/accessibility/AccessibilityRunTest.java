@@ -60,14 +60,13 @@ public class AccessibilityRunTest {
 		System.out.println("class input directory = " + utils.getClassInputDirectory());
 		System.out.println("input directory = " + utils.getInputDirectory());
 
-		String folderStructure = "../../"; // local
+		String folderStructure = "../../../"; // local
 			
 		String networkFile = folderStructure + "matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
 		String minibusPtTravelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
 		String minibusPtTravelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
 		String measuringPointsAsPtStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/measuringPointsAsStops/stops.csv.gz";
-
 
 //		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
