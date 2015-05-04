@@ -97,13 +97,12 @@ public class TabularFileParser implements MatsimSomeReader {
         boolean ended = false;
         
         // this allows to read compressed files as well // DR feb, '14 
-        BufferedReader reader = IOUtils.getBufferedReader(config.getFile());
 //        try {
 //            reader = new BufferedReader(new FileReader(config.getFile()));
 //        } catch (FileNotFoundException e) {
 //            throw new RuntimeException(e);
 //        }
-        try {
+        try ( BufferedReader reader = IOUtils.getBufferedReader(config.getFile()) ) {
         	String line;
 	        while ((line = reader.readLine()) != null && !ended) {
 	            if (started) {
@@ -117,13 +116,16 @@ public class TabularFileParser implements MatsimSomeReader {
 	        }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            try {
-                reader.close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
         }
+
+        // try-with-resources does not need the following any more. kai, may'15
+//        finally {
+//            try {
+//                reader.close();
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
     }
 
 }
