@@ -78,14 +78,14 @@ public class HerbieControler extends Controler {
 			}
         });
         this.loadMyControlerListeners();
-        throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL) ;
+        throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL + Gbl.LOAD_DATA_IS_NOW_FINAL ) ;
 	}
 
-	@Override
-	protected void loadData() {
-		super.loadData();
-		this.setScenarioLoaded(true);
-	}
+//	@Override
+//	protected void loadData() {
+//		super.loadData();
+//		this.setScenarioLoaded(true);
+//	}
 
 //	@Override
 //	protected void setUp() {

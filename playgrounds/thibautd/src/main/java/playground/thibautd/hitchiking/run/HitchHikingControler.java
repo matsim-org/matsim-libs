@@ -20,13 +20,15 @@
 package playground.thibautd.hitchiking.run;
 
 import com.google.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Mobsim;
+
 import playground.thibautd.hitchiking.HitchHikingUtils;
 import playground.thibautd.hitchiking.qsim.HitchHikingQsimFactory;
 import playground.thibautd.hitchiking.routing.HitchHikingTripRouterFactory;
@@ -62,23 +64,25 @@ public class HitchHikingControler extends Controler {
 		this.spotWeighter = spotWeighter;
 		
 		this.loadMyControlerListeners(); 
+		
+		throw new RuntimeException( Gbl.LOAD_DATA_IS_NOW_FINAL ) ;
 	}
 
-	@Override
-	protected void loadData() {
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return new HitchHikingQsimFactory(HitchHikingControler.this).createMobsim(getScenario(), getEvents());
-					}
-				});
-			}
-		});
-		super.loadData();
-	}
+//	@Override
+//	protected void loadData() {
+//		this.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindMobsim().toProvider(new Provider<Mobsim>() {
+//					@Override
+//					public Mobsim get() {
+//						return new HitchHikingQsimFactory(HitchHikingControler.this).createMobsim(getScenario(), getEvents());
+//					}
+//				});
+//			}
+//		});
+//		super.loadData();
+//	}
 
 }
 

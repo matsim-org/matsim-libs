@@ -65,17 +65,18 @@ public final class CarSharingControler extends Controler
     //this.getNetwork().getFactory().setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
       ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.carsharing, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
       this.loadMyControlerListeners();
-	throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL ) ;
+	throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL
+			+ Gbl.LOAD_DATA_IS_NOW_FINAL ) ;
   }
 
-  @Override
-  protected void loadData() {
-	if (!this.isScenarioLoaded()) {
-			FtScenarioLoaderImpl loader = new FtScenarioLoaderImpl(this.getScenario(), this.plansCalcRouteFtInfo, this.ftConfigGroup);
-			loader.loadScenario();
-			this.setScenarioLoaded(true);
-	}
-  }
+//  @Override
+//  protected void loadData() {
+//	if (!this.isScenarioLoaded()) {
+//			FtScenarioLoaderImpl loader = new FtScenarioLoaderImpl(this.getScenario(), this.plansCalcRouteFtInfo, this.ftConfigGroup);
+//			loader.loadScenario();
+//			this.setScenarioLoaded(true);
+//	}
+//  }
 //  @Override
 //  protected void setUp(){
 //

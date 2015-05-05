@@ -218,12 +218,8 @@ public class Controler extends AbstractController {
 		if (this.config.scenario().isUseTransit()) {
 			setupTransitSimulation();
 		}
-//		loadData();
-		// I find it difficult (to teach) that the behavior between the constructor and controler.run() depends on which constructor
-		// you call. kai, apr'14
 
 		run(config);
-
 		// "run(config)" is:
 		//		loadCoreListeners();
 		//		this.controlerListenerManager.fireControlerStartupEvent();
@@ -263,7 +259,7 @@ public class Controler extends AbstractController {
 	/**
 	 * Loads the Scenario if it was not given in the constructor.
 	 */
-	protected void loadData() {
+	protected final void loadData() {
 		// yyyy cannot make this final since it is overridden about 16 times. kai, jan'13
 		// confirmed as evil. nov'14
 

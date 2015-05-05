@@ -203,5 +203,8 @@ public abstract class Gbl {
 
 	public final static String SET_UP_IS_NOW_FINAL = "controler.setUp() is now final. You should be able to do whatever you need to do with a "
 	+ "ControlerStartupListener. Please talk to MZ or KN if you have difficulties. kai, may'15";
+
+	public static final String LOAD_DATA_IS_NOW_FINAL = "controler.loadData() is now final.  If you need this functionality, use ScenarioUtils.loadScenario(...), "
+	+ "then modify the scenario, then pass it into new Controler( scenario ).  Talk to MZ or KN if you need help.  kai, may'15";
 	
 }

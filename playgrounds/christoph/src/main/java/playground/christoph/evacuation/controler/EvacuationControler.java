@@ -253,36 +253,36 @@ public class EvacuationControler extends WithinDayController implements
 		Map<String, TravelTime> linkReplanningTravelTimes = this.createLinkReplanningMapTravelTimes();
 		super.createAndInitLinkReplanningMap(linkReplanningTravelTimes);
 		
-		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
+		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL + Gbl.LOAD_DATA_IS_NOW_FINAL ) ;
 	}
 
-	@Override
-	protected void loadData() {
-		
-		// load data in super class
-		super.loadData();
-
-		/*
-		 * If enabled, set the evacuation transit router factory here.
-		 */
-		if (EvacuationConfig.useTransitRouter) {
-			
-			/*
-			 * If useTransit is not enabled in the config, no transit schedule object
-			 * is created. Since we need one, we enable transit, call getTransitSchedule
-			 * (which triggers the creation in the scenario) and disable transit again.
-			 */
-			if (!getConfig().scenario().isUseTransit()) {
-				getConfig().scenario().setUseTransit(true);
-				getScenario().getTransitSchedule();
-				getConfig().scenario().setUseTransit(false);
-			}
-			
-			new TransitScheduleReader(getScenario()).readFile(getConfig().transit().getTransitScheduleFile());
-			routerNetwork = new TransitRouterNetwork();
-			new TransitRouterNetworkReaderMatsimV1(getScenario(), routerNetwork).parse(EvacuationConfig.transitRouterFile);
-		}
-	}
+//	@Override
+//	protected void loadData() {
+//		
+//		// load data in super class
+//		super.loadData();
+//
+//		/*
+//		 * If enabled, set the evacuation transit router factory here.
+//		 */
+//		if (EvacuationConfig.useTransitRouter) {
+//			
+//			/*
+//			 * If useTransit is not enabled in the config, no transit schedule object
+//			 * is created. Since we need one, we enable transit, call getTransitSchedule
+//			 * (which triggers the creation in the scenario) and disable transit again.
+//			 */
+//			if (!getConfig().scenario().isUseTransit()) {
+//				getConfig().scenario().setUseTransit(true);
+//				getScenario().getTransitSchedule();
+//				getConfig().scenario().setUseTransit(false);
+//			}
+//			
+//			new TransitScheduleReader(getScenario()).readFile(getConfig().transit().getTransitScheduleFile());
+//			routerNetwork = new TransitRouterNetwork();
+//			new TransitRouterNetworkReaderMatsimV1(getScenario(), routerNetwork).parse(EvacuationConfig.transitRouterFile);
+//		}
+//	}
 	
 	/*
 	 * When the Controller Startup Event is created, the EventsManager

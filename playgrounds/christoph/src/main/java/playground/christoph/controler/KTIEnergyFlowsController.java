@@ -68,44 +68,45 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		this.ktiConfigGroup = new KtiConfigGroup();
 		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(this.ktiConfigGroup);
 		this.loadMyControlerListeners();
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL
+				+ Gbl.LOAD_DATA_IS_NOW_FINAL ) ;
 		
 	}
 	
-	@Override
-	protected void loadData() {
-		if (!this.isScenarioLoaded()) {
-			
-			/*
-			 * The KTIConfigGroup is loaded as generic Module. We replace this
-			 * generic object with a KtiConfigGroup object and copy all its parameter.
-			 */
-			ConfigGroup module = this.getConfig().getModule(KtiConfigGroup.GROUP_NAME);
-			this.getConfig().removeModule(KtiConfigGroup.GROUP_NAME);
-			this.getConfig().addModule(this.ktiConfigGroup);
-			
-			for (Entry<String, String> entry : module.getParams().entrySet()) {
-				this.ktiConfigGroup.addParam(entry.getKey(), entry.getValue());
-			}
-				
-			/*
-			 * Use KTI route factories.
-			 */
-            ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
-            ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
-
-			
-			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.getScenario(), this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
-			loader.loadScenario();
-			if (this.getConfig().scenario().isUseHouseholds()) {
-				this.loadHouseholds();
-			}
-			this.setScenarioLoaded(true);
-		}
-		
-		// connect facilities to links
-        new WorldConnectLocations(this.getConfig()).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
-	}
+//	@Override
+//	protected void loadData() {
+//		if (!this.isScenarioLoaded()) {
+//			
+//			/*
+//			 * The KTIConfigGroup is loaded as generic Module. We replace this
+//			 * generic object with a KtiConfigGroup object and copy all its parameter.
+//			 */
+//			ConfigGroup module = this.getConfig().getModule(KtiConfigGroup.GROUP_NAME);
+//			this.getConfig().removeModule(KtiConfigGroup.GROUP_NAME);
+//			this.getConfig().addModule(this.ktiConfigGroup);
+//			
+//			for (Entry<String, String> entry : module.getParams().entrySet()) {
+//				this.ktiConfigGroup.addParam(entry.getKey(), entry.getValue());
+//			}
+//				
+//			/*
+//			 * Use KTI route factories.
+//			 */
+//            ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
+//            ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
+//
+//			
+//			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.getScenario(), this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
+//			loader.loadScenario();
+//			if (this.getConfig().scenario().isUseHouseholds()) {
+//				this.loadHouseholds();
+//			}
+//			this.setScenarioLoaded(true);
+//		}
+//		
+//		// connect facilities to links
+//        new WorldConnectLocations(this.getConfig()).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
+//	}
 	
 	private void loadHouseholds() {
 		if ((this.getScenario().getHouseholds() != null) && (this.getConfig().households() != null) && (this.getConfig().households().getInputFile() != null) ) {

@@ -65,17 +65,18 @@ public class KTIControler extends Controler {
         ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
         ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
         this.loadMyControlerListeners();
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL ) ;
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL
+				+ Gbl.LOAD_DATA_IS_NOW_FINAL ) ;
 	}
 
-	@Override
-	protected void loadData() {
-		if (!this.isScenarioLoaded()) {
-			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.getScenario(), this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
-			loader.loadScenario();
-			this.setScenarioLoaded(true);
-		}
-	}
+//	@Override
+//	protected void loadData() {
+//		if (!this.isScenarioLoaded()) {
+//			KtiScenarioLoaderImpl loader = new KtiScenarioLoaderImpl(this.getScenario(), this.plansCalcRouteKtiInfo, this.ktiConfigGroup);
+//			loader.loadScenario();
+//			this.setScenarioLoaded(true);
+//		}
+//	}
 
 //	@Override
 //	protected void setUp() {

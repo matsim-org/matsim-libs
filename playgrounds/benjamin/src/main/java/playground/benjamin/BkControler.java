@@ -21,6 +21,7 @@ package playground.benjamin;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
 
 /**
@@ -31,19 +32,22 @@ public class BkControler extends Controler {
 
 	public BkControler(String configFileName) {
 		super(configFileName);
+		throw new RuntimeException(Gbl.LOAD_DATA_IS_NOW_FINAL) ;
 	}
 
 	public BkControler(Config conf){
 		super(conf);
+		throw new RuntimeException(Gbl.LOAD_DATA_IS_NOW_FINAL) ;
 	}
 
 	public BkControler(String[] args) {
 		super(args);
+		throw new RuntimeException(Gbl.LOAD_DATA_IS_NOW_FINAL) ;
 	}
 
-	@Override
-	protected void loadData() {
-		super.loadData();
-		// new PlanCalcType().run(this.population);
-	}
+//	@Override
+//	protected void loadData() {
+//		super.loadData();
+//		// new PlanCalcType().run(this.population);
+//	}
 }
