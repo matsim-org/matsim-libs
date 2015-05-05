@@ -56,10 +56,6 @@ public class AggregateRawDigicoreFiles {
 	public static void main(String[] args) {
 		Header.printHeader(AggregateRawDigicoreFiles.class.toString(), args);
 		
-		String rawFolder = args[0];
-		String processedFolder = args[1];
-		String logFolder = args[2];
-
 		try {
 			moveEventsFile(args);
 		} catch (IOException e) {
@@ -67,6 +63,12 @@ public class AggregateRawDigicoreFiles {
 			throw new RuntimeException("Cannot move the events file.");
 		}
 		checkFileStatus(args);
+		try {
+			processRawFiles(args);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot process raw files.");
+		}
 		
 		Header.printFooter();
 	}
