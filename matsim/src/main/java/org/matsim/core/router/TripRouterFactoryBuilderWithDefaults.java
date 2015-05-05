@@ -26,6 +26,7 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterModule;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import javax.inject.Provider;
 
@@ -63,6 +64,7 @@ public class TripRouterFactoryBuilderWithDefaults {
                 new AbstractModule() {
                     @Override
                     public void install() {
+                        bind(TransitSchedule.class).toInstance(scenario.getTransitSchedule());
                         bind(Scenario.class).toInstance(scenario);
                     }
                 })
