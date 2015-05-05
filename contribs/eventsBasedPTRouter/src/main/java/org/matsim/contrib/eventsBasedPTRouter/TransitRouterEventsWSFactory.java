@@ -29,12 +29,14 @@ import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
  * Factory for the variable transit router
  * 
  * @author sergioo
  */
+@Singleton
 public class TransitRouterEventsWSFactory implements Provider<TransitRouter> {
 
 	private final TransitRouterConfig config;

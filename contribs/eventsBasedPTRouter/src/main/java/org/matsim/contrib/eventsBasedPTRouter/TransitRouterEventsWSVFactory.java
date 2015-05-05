@@ -29,12 +29,14 @@ import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.contrib.eventsBasedPTRouter.vehicleOccupancy.VehicleOccupancy;
 
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 /**
  * Factory for the variable transit router
  * 
  * @author sergioo
  */
+@Singleton
 public class TransitRouterEventsWSVFactory implements Provider<TransitRouter> {
 
 	private final TransitRouterConfig config;

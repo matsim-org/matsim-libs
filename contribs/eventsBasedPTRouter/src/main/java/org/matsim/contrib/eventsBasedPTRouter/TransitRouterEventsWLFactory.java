@@ -28,6 +28,7 @@ import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 
 /**
@@ -35,6 +36,7 @@ import javax.inject.Provider;
  * 
  * @author sergioo
  */
+@Singleton
 public class TransitRouterEventsWLFactory implements Provider<TransitRouter> {
 
 	private final TransitRouterConfig config;
