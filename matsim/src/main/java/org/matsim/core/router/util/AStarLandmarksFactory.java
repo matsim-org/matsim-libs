@@ -23,6 +23,7 @@ package org.matsim.core.router.util;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.AStarLandmarks;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -36,8 +37,8 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 	private PreProcessLandmarks preProcessData;
 
 	@Inject
-	AStarLandmarksFactory(Config config, Network network, TravelDisutility initialTravelDisutility) {
-		this(network, initialTravelDisutility, config.global().getNumberOfThreads());
+	AStarLandmarksFactory(Config config, Network network, TravelTime travelTime, TravelDisutilityFactory travelDisutilityFactory) {
+		this(network, travelDisutilityFactory.createTravelDisutility(travelTime, config.planCalcScore()), config.global().getNumberOfThreads());
 	}
 
 	public AStarLandmarksFactory(Network network, final TravelDisutility fsttc) {

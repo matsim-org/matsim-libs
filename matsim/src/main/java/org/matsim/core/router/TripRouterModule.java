@@ -22,7 +22,9 @@
 
 package org.matsim.core.router;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -39,13 +41,15 @@ public class TripRouterModule extends AbstractModule {
 
     private static class RealTripRouterProvider implements Provider<TripRouter> {
 
+        final Config config;
         final TripRouterFactory tripRouterFactory;
-        final Provider<TravelDisutility> travelDisutility;
+        final TravelDisutilityFactory travelDisutilityFactory;
         final Provider<TravelTime> travelTime;
 
         @Inject
-        RealTripRouterProvider(TripRouterFactory tripRouterFactory, Provider<TravelDisutility> travelDisutility, Provider<TravelTime> travelTime) {
-            this.travelDisutility = travelDisutility;
+        RealTripRouterProvider(Config config, TripRouterFactory tripRouterFactory, TravelDisutilityFactory travelDisutilityFactory, Provider<TravelTime> travelTime) {
+            this.config = config;
+            this.travelDisutilityFactory = travelDisutilityFactory;
             this.tripRouterFactory = tripRouterFactory;
             this.travelTime = travelTime;
         }
@@ -56,7 +60,7 @@ public class TripRouterModule extends AbstractModule {
 
                 @Override
                 public TravelDisutility getTravelDisutility() {
-                    return travelDisutility.get();
+                    return travelDisutilityFactory.createTravelDisutility(travelTime.get(), config.planCalcScore());
                 }
 
                 @Override

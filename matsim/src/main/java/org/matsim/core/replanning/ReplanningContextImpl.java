@@ -22,7 +22,9 @@
 
 package org.matsim.core.replanning;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -34,14 +36,16 @@ import javax.inject.Provider;
 class ReplanningContextImpl implements ReplanningContext {
 
     private int iteration;
-    private Provider<TravelDisutility> travelDisutility;
+    private Config config;
+    private TravelDisutilityFactory travelDisutility;
     private Provider<TravelTime> travelTime;
     private Provider<TripRouter> tripRouter;
     private Provider<ScoringFunctionFactory> scoringFunctionFactory;
 
     @Inject
-    ReplanningContextImpl(@Named("iteration") int iteration, Provider<TravelDisutility> travelDisutility, Provider<TravelTime> travelTime, Provider<TripRouter> tripRouter, Provider<ScoringFunctionFactory> scoringFunctionFactory) {
+    ReplanningContextImpl(@Named("iteration") int iteration, Config config, TravelDisutilityFactory travelDisutility, Provider<TravelTime> travelTime, Provider<TripRouter> tripRouter, Provider<ScoringFunctionFactory> scoringFunctionFactory) {
         this.iteration = iteration;
+        this.config = config;
         this.travelDisutility = travelDisutility;
         this.travelTime = travelTime;
         this.tripRouter = tripRouter;
@@ -50,7 +54,7 @@ class ReplanningContextImpl implements ReplanningContext {
 
     @Override
     public TravelDisutility getTravelDisutility() {
-        return travelDisutility.get();
+        return travelDisutility.createTravelDisutility(travelTime.get(), config.planCalcScore());
     }
 
     @Override

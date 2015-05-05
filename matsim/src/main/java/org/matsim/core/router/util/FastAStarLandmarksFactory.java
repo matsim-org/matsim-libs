@@ -21,10 +21,12 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.FastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterType;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -42,6 +44,10 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 	private final Map<Network, RoutingNetwork> routingNetworks;
 
 	@Inject
+	FastAStarLandmarksFactory(Network network, Config config, TravelTime travelTime, TravelDisutilityFactory fsttc) {
+		this(network, fsttc.createTravelDisutility(travelTime, config.planCalcScore()), FastRouterType.ARRAY);
+	}
+
 	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc) {
 		this(network, fsttc, FastRouterType.ARRAY);
 	}
@@ -51,7 +57,7 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 		this.preProcessData = new PreProcessLandmarks(fsttc);
 		this.preProcessData.run(network);
 		
-		this.routingNetworks = new HashMap<Network, RoutingNetwork>();
+		this.routingNetworks = new HashMap<>();
 		
 		switch (fastRouterType) {
 		case ARRAY:

@@ -35,27 +35,6 @@ public class TravelDisutilityModule extends AbstractModule {
     @Override
     public void install() {
         bind(TravelDisutilityFactory.class).to(TravelTimeAndDistanceBasedTravelDisutilityFactory.class);
-        bind(TravelDisutility.class).toProvider(TravelDisutilityProvider.class);
-    }
-
-    private static class TravelDisutilityProvider implements Provider<TravelDisutility> {
-
-        final TravelDisutilityFactory travelDisutilityFactory;
-        final Config config;
-        final TravelTime travelTime;
-
-        @Inject
-        TravelDisutilityProvider(TravelDisutilityFactory travelDisutilityFactory, Config config, TravelTime travelTime) {
-            this.travelDisutilityFactory = travelDisutilityFactory;
-            this.config = config;
-            this.travelTime = travelTime;
-        }
-
-        @Override
-        public TravelDisutility get() {
-            return travelDisutilityFactory.createTravelDisutility(travelTime, config.planCalcScore());
-        }
-
     }
 
 }
