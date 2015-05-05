@@ -179,9 +179,9 @@ public class RunBraessScenario {
 		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
 		final DgSylviaControlerListenerFactory signalsFactory = 
 				new DgSylviaControlerListenerFactory(sylviaConfig);
-		// note: This will check (in DefaultSignalModelFactory) if the
-		// controllerIdentifier equals sylvia..., otherwise the default
-		// (fixed time) signal controller will be used. kai & theresa, oct'14
+		// this will check (in DefaultSignalModelFactory) if the
+		// controllerIdentifier equals sylvia, otherwise the default
+		// (fixed time) signal controller will be used
 
 //		signalsFactory.setAlwaysSameMobsimSeed(true);
 		controler.addControlerListener(signalsFactory
