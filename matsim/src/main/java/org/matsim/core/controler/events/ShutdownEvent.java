@@ -27,7 +27,7 @@ import org.matsim.core.controler.Controler;
  *
  * @author dgrether
  */
-public class ShutdownEvent extends ControlerEvent {
+public final class ShutdownEvent extends ControlerEvent {
 
 	/**
 	 * Flag to indicate if the controler was shutdown unexpected

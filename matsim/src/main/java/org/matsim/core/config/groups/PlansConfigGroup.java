@@ -28,7 +28,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringSetter;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 
-public class PlansConfigGroup extends ReflectiveConfigGroup {
+public final class PlansConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "plans";
 

@@ -33,7 +33,7 @@ import org.matsim.vehicles.Vehicle;
  * Should be replaced by some more generic VehicleArrivalEvent
  * which supports both links and facilities.
  */
-public class VehicleArrivesAtFacilityEvent extends Event {
+public final class VehicleArrivesAtFacilityEvent extends Event {
 
 	public static final String EVENT_TYPE = "VehicleArrivesAtFacility";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";

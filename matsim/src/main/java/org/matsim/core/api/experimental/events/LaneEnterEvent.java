@@ -38,7 +38,7 @@ import org.matsim.lanes.data.v20.Lane;
  * @author dgrether
  *
  */
-public class LaneEnterEvent extends Event  {
+public final class LaneEnterEvent extends Event  {
 	
 	public static final String EVENT_TYPE = "entered lane";
 

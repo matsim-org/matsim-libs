@@ -49,7 +49,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  *
  * @author mrieser, michaz
  */
-public class PlansScoring implements ScoringListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+public final class PlansScoring implements ScoringListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
 	private EventsToScore eventsToScore;
 

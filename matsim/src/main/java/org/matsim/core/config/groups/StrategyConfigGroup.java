@@ -40,7 +40,7 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
  *
  * @author mrieser
  */
-public class StrategyConfigGroup extends ConfigGroup {
+public final class StrategyConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "strategy";
 	

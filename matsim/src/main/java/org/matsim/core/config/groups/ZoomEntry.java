@@ -26,7 +26,7 @@ import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 
-public class ZoomEntry  implements Serializable {
+public final class ZoomEntry  implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Rectangle2D zoomstart;

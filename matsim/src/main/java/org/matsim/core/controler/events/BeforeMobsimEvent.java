@@ -27,7 +27,7 @@ import org.matsim.core.controler.Controler;
  *
  * @author mrieser
  */
-public class BeforeMobsimEvent extends ControlerEvent {
+public final class BeforeMobsimEvent extends ControlerEvent {
 
 	/** The iteration number */
 	private final int iteration;

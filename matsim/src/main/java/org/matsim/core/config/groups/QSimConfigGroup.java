@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-public class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConfigGroupI {
+public final class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConfigGroupI {
 
 	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
 

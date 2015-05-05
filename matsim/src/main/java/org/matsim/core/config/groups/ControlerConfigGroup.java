@@ -33,7 +33,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
-public class ControlerConfigGroup extends ReflectiveConfigGroup {
+public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
 

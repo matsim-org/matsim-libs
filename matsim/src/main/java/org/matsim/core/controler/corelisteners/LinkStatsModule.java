@@ -31,7 +31,7 @@ import org.matsim.core.controler.AbstractModule;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class LinkStatsModule extends AbstractModule {
+public final class LinkStatsModule extends AbstractModule {
 
     @Override
     public void install() {

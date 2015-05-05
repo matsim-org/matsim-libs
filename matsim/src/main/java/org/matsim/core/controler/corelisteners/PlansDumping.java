@@ -38,7 +38,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
  *
  * @author mrieser
  */
-public class PlansDumping implements BeforeMobsimListener {
+public final class PlansDumping implements BeforeMobsimListener {
 
 	static final private Logger log = Logger.getLogger(PlansDumping.class);
 	private Scenario sc ;

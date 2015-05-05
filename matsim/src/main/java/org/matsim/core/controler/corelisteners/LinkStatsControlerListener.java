@@ -37,7 +37,7 @@ import javax.inject.Provider;
 /**
  * @author mrieser
  */
-public class LinkStatsControlerListener implements IterationEndsListener, IterationStartsListener {
+public final class LinkStatsControlerListener implements IterationEndsListener, IterationStartsListener {
 
 	private final LinkStatsConfigGroup linkStatsConfigGroup;
     private final Config config;

@@ -33,7 +33,7 @@ import org.matsim.pt.PtConstants;
  *
  * @author dgrether
  */
-public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
+public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 
 	private static final Logger log = Logger
 			.getLogger(ConfigConsistencyCheckerImpl.class);

@@ -38,7 +38,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
  * @author dgrether
  * @author mrieser
  */
-public class PlansCalcRouteConfigGroup extends ConfigGroup {
+public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	public static final String GROUP_NAME = "planscalcroute";
 
 	private static final String BEELINE_DISTANCE_FACTOR = "beelineDistanceFactor";

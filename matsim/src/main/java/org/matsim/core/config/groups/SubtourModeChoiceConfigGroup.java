@@ -29,7 +29,7 @@ import org.matsim.core.utils.misc.StringUtils;
 /**
  * @author thibautd
  */
-public class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
+public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "subtourModeChoice";
 	

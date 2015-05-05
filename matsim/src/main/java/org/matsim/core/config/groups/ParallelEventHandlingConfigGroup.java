@@ -29,7 +29,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
  * @author nagel
  *
  */
-public class ParallelEventHandlingConfigGroup extends ReflectiveConfigGroup {
+public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "parallelEventHandling";
 

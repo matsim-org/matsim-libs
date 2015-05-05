@@ -46,7 +46,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 
-public class DumpDataAtEnd implements ShutdownListener {
+public final class DumpDataAtEnd implements ShutdownListener {
 
 	private final Scenario scenarioData;
 

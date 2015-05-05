@@ -31,7 +31,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
  * @author dgrether
  *
  */
-public class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup {
+public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUPNAME = "travelTimeCalculator";
 	

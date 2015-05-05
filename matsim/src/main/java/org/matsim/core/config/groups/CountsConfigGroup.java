@@ -31,7 +31,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
  * @author dgrether
  * @author mrieser
  */
-public class CountsConfigGroup extends ReflectiveConfigGroup {
+public final class CountsConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "counts";
 

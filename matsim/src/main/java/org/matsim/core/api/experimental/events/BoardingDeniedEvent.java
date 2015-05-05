@@ -35,7 +35,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-public class BoardingDeniedEvent extends Event implements HasPersonId 
+public final class BoardingDeniedEvent extends Event implements HasPersonId 
 {
 	public static final String EVENT_TYPE="BoardingDeniedEvent";
 	

@@ -22,7 +22,7 @@ package org.matsim.core.config.groups;
 
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-public class NetworkConfigGroup extends ReflectiveConfigGroup {
+public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "network";
 

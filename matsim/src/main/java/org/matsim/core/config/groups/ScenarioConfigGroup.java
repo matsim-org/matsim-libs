@@ -27,7 +27,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
  * @author dgrether
  *
  */
-public class ScenarioConfigGroup extends ReflectiveConfigGroup {
+public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "scenario";
 

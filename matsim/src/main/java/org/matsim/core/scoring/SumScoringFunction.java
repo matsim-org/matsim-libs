@@ -8,7 +8,7 @@ import org.matsim.core.utils.misc.Time;
 
 import java.util.ArrayList;
 
-public class SumScoringFunction implements ScoringFunction {
+public final class SumScoringFunction implements ScoringFunction {
 
 	public interface BasicScoring {
 		public void finish();

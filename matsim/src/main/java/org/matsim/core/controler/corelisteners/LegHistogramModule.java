@@ -25,7 +25,7 @@ package org.matsim.core.controler.corelisteners;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.core.controler.AbstractModule;
 
-public class LegHistogramModule extends AbstractModule {
+public final class LegHistogramModule extends AbstractModule {
     @Override
     public void install() {
         LegHistogram legHistogram = new LegHistogram(300);

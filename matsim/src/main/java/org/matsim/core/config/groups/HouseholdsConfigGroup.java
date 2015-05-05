@@ -26,7 +26,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
  * Config group for households
  * @author dgrether
  */
-public class HouseholdsConfigGroup extends ReflectiveConfigGroup {
+public final class HouseholdsConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "households";
 

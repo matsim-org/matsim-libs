@@ -27,7 +27,7 @@ import org.matsim.core.controler.Controler;
  *
  * @author dgrether
  */
-public class IterationEndsEvent extends ControlerEvent {
+public final class IterationEndsEvent extends ControlerEvent {
 
 	/**
 	 * The iteration number

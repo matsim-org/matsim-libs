@@ -33,7 +33,7 @@ import org.matsim.core.replanning.StrategyManager;
  *
  * @author mrieser
  */
-public class PlansReplanning implements ReplanningListener {
+public final class PlansReplanning implements ReplanningListener {
 	
 	private Population population ;
 	private StrategyManager strategyManager ;

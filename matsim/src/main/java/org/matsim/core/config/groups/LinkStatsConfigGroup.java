@@ -26,7 +26,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 /**
  * @author mrieser
  */
-public class LinkStatsConfigGroup extends ReflectiveConfigGroup {
+public final class LinkStatsConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "linkStats";
 

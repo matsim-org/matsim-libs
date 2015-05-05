@@ -32,7 +32,7 @@ import org.matsim.signals.model.SignalSystem;
  * @author dgrether
  *
  */
-public class SignalGroupStateChangedEvent extends Event {
+public final class SignalGroupStateChangedEvent extends Event {
 	
 	public final static String EVENT_TYPE = "signalGroupStateChangedEvent";
 	

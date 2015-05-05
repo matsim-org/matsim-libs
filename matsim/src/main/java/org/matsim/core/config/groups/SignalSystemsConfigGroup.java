@@ -28,7 +28,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
  * @author dgrether
  *
  */
-public class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
+public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 
 	public  static final String SIGNALSYSTEM_FILE = "signalsystems";
 	public  static final String SIGNALCONTROL_FILE = "signalcontrol";

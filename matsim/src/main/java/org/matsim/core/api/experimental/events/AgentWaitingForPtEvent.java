@@ -30,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 /**
  * @author mrieser / senozon
  */
-public class AgentWaitingForPtEvent extends Event implements HasPersonId {
+public final class AgentWaitingForPtEvent extends Event implements HasPersonId {
 
 	public static final String EVENT_TYPE = "waitingForPt";
 	public static final String ATTRIBUTE_AGENT = "agent";

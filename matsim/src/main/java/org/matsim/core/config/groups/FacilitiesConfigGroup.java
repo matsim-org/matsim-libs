@@ -25,7 +25,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 /**
  * @author mrieser / Senozon AG
  */
-public class FacilitiesConfigGroup extends ReflectiveConfigGroup {
+public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "facilities";
 

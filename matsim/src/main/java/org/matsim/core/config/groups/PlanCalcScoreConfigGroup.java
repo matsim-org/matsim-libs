@@ -46,7 +46,7 @@ import org.matsim.pt.PtConstants;
  * @author nagel
  *
  */
-public class PlanCalcScoreConfigGroup extends ConfigGroup {
+public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	private static final Logger log = Logger.getLogger(PlanCalcScoreConfigGroup.class);
 

@@ -41,7 +41,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-public class EventsHandling implements BeforeMobsimListener, 
+public final class EventsHandling implements BeforeMobsimListener, 
 	AfterMobsimListener, IterationEndsListener, ShutdownListener {
 
 	final static private Logger log = Logger.getLogger(EventsHandling.class);

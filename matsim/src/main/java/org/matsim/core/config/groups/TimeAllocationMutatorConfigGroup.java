@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-public class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGroup {
+public final class TimeAllocationMutatorConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "TimeAllocationMutator";
 	

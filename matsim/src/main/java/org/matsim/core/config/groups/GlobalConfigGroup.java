@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
-public class GlobalConfigGroup extends ReflectiveConfigGroup {
+public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);
 
 	public static final String GROUP_NAME = "global";

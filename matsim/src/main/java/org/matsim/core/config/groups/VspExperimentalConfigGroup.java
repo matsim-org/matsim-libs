@@ -28,7 +28,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
  * @author dgrether
  * @author nagel
  */
-public class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
+public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(VspExperimentalConfigGroup.class);

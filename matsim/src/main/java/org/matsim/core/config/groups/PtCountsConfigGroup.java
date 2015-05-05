@@ -28,7 +28,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 /**
  * @author nagel
  */
-public class PtCountsConfigGroup extends ReflectiveConfigGroup {
+public final class PtCountsConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "ptCounts";
 

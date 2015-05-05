@@ -28,7 +28,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -37,7 +36,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
  * @author nagel
  *
  */
-public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
+public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 	private static Logger log = Logger.getLogger(VspConfigConsistencyCheckerImpl.class) ;
 	
 	public VspConfigConsistencyCheckerImpl() {

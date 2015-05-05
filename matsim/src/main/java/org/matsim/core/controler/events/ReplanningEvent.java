@@ -28,7 +28,7 @@ import org.matsim.core.replanning.ReplanningContext;
  *
  * @author mrieser
  */
-public class ReplanningEvent extends ControlerEvent {
+public final class ReplanningEvent extends ControlerEvent {
 
 	/**
 	 * The iteration number

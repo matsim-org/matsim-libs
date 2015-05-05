@@ -30,7 +30,7 @@ import java.util.Map;
  * This is similar to the VehicleArrival and PersonArrival events.
  * It is used for scoring teleported legs.
  */
-public class TeleportationArrivalEvent extends Event implements HasPersonId {
+public final class TeleportationArrivalEvent extends Event implements HasPersonId {
 
 	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUT_DISTANCE = "distance";
