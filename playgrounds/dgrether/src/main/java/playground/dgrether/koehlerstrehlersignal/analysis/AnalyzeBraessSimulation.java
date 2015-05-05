@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -37,6 +38,8 @@ public class AnalyzeBraessSimulation {
 	private double[] totalRouteTTs;
 	private double[] avgRouteTTs;
 	private int[] routeUsers;
+	private Map<Double, double[]> routeStartsPerSecond;
+	private Map<Double, double[]> onRoutePerSecond;
 
 	public AnalyzeBraessSimulation(String runDirectory, int lastIteration,
 			String outputDir) {
@@ -46,11 +49,14 @@ public class AnalyzeBraessSimulation {
 	}
 	
 	/**
-	 * starts the analysis without using the main method of this class
+	 * starts the analysis of the last iteration 
+	 * without using the main method of this class
 	 */
-	public void analyze() {
+	public void analyzeLastIt() {
 		calculateResults();
 		writeResults();
+		writeOnRoutes();
+		writeRouteStarts();
 	}
 
 	private void calculateResults() {
@@ -68,10 +74,72 @@ public class AnalyzeBraessSimulation {
 		this.totalRouteTTs = handler.getTotalRouteTTs();
 		this.avgRouteTTs = handler.getAvgRouteTTs();
 		this.routeUsers = handler.getRouteUsers();
+		this.routeStartsPerSecond = handler.getRouteStartsPerSecond();
+		this.onRoutePerSecond = handler.getOnRoutePerSecond();
 		
 		log.info("The total travel time is " + totalTT);
 		log.info(routeUsers[0] + " are using the upper route, " + routeUsers[1] 
 				+ " the middle one and " + routeUsers[2] + " the lower one.");
+	}
+
+	private void writeRouteStarts() {
+		PrintStream stream;
+		try {
+			stream = new PrintStream(new File(outputDir + "startsPerRoute.txt"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		String header = "time\t#starts up\t#starts mid\t#starts low\t#starts total";
+		stream.println(header);
+		for (Double time : this.routeStartsPerSecond.keySet()) {
+			StringBuffer line = new StringBuffer();
+			double[] routeStarts = this.routeStartsPerSecond.get(time);
+			double totalStarts = 0.0;
+			
+			line.append(time);
+			for (int i = 0; i < 3; i++) {
+				line.append("\t" + routeStarts[i]);
+				totalStarts += routeStarts[i];
+			}
+			line.append("\t" + totalStarts);
+			stream.println(line.toString());
+		}
+
+		stream.close();
+		
+		log.info("output written to " + outputDir + "startsPerRoute.txt");
+	}
+
+	private void writeOnRoutes() {
+		PrintStream stream;
+		try {
+			stream = new PrintStream(new File(outputDir + "onRoutes.txt"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		String header = "time\t#users up\t#users mid\t#users low\t#users total";
+		stream.println(header);
+		for (Double time : this.onRoutePerSecond.keySet()) {
+			StringBuffer line = new StringBuffer();
+			double[] onRoutes = this.onRoutePerSecond.get(time);
+			double totalOnRoute = 0.0;
+			
+			line.append(time);
+			for (int i = 0; i < 3; i++) {
+				line.append("\t" + onRoutes[i]);
+				totalOnRoute += onRoutes[i];
+			}
+			line.append("\t" + totalOnRoute);
+			stream.println(line.toString());
+		}
+
+		stream.close();
+		
+		log.info("output written to " + outputDir + "onRoutes.txt");
 	}
 
 	private void writeResults() {
@@ -89,22 +157,71 @@ public class AnalyzeBraessSimulation {
 		line.append("\t");
 		line.append(totalTT);
 		for (int i = 0; i < 3; i++) {
-			line.append("\t");
-			line.append(routeUsers[i]);
+			line.append("\t" + routeUsers[i]);
 		}
 		for (int i = 0; i < 3; i++) {
-			line.append("\t");
-			line.append(avgRouteTTs[i]);
+			line.append("\t" + avgRouteTTs[i]);
 		}
 		for (int i = 0; i < 3; i++) {
-			line.append("\t");
-			line.append(totalRouteTTs[i]);
+			line.append("\t" + totalRouteTTs[i]);
 		}
 		stream.println(line.toString());
 
 		stream.close();
 		
 		log.info("output written to " + outputDir + "results.txt");
+	}
+	
+	/**
+	 * analyzes all iterations in terms of route choice and travel time
+	 */
+	public void analyzeAllIt(){
+		RunResultsLoader runDir = new RunResultsLoader(runDirectory, null);
+		
+		// prepare writing
+		PrintStream stream;
+		try {
+			stream = new PrintStream(new File(outputDir + "results.txt"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+		String header = "it\ttotal tt[s]\t#users up\t#users mid\t#users low\tavg tt[s] up\tavg tt[s] mid\tavg tt[s] low";
+		stream.println(header);
+		StringBuffer line = new StringBuffer();
+		
+		double totalTTIt;
+		double[] avgRouteTTsIt;
+		int[] routeUsersIt;
+		for (int i=0; i<=lastIteration; i++){
+			// analyze single iterations
+			String eventsFilename = runDir.getEventsFilename(i);
+
+			EventsManager eventsManager = new EventsManagerImpl();
+			BraessRouteDistributionAndTT handler = new BraessRouteDistributionAndTT();
+			eventsManager.addHandler(handler);
+
+			MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+			reader.readFile(eventsFilename);
+
+			// get results
+			totalTTIt = handler.getTotalTT();
+			avgRouteTTsIt = handler.getAvgRouteTTs();
+			routeUsersIt = handler.getRouteUsers();
+			
+			// write results
+			line.append(i + "\t" + totalTTIt);
+			for (int j = 0; j < 3; i++) {
+				line.append("\t" + routeUsersIt[j]);
+			}
+			for (int j = 0; j < 3; i++) {
+				line.append("\t" + avgRouteTTsIt[j]);
+			}
+			stream.println(line.toString());			
+		}
+		stream.close();
+		
+		log.info(lastIteration + " Iterations analyzed.");
 	}
 
 	
@@ -114,8 +231,8 @@ public class AnalyzeBraessSimulation {
 	 * start to analyze a braess simulation.
 	 * 
 	 * if args contains information, this tool will analyze the simulation in the
-	 * run directory given from the first entry in the iteration number given in 
-	 * the second entry.
+	 * run directory given by the first entry. the second entry should give the 
+	 * iteration number.
 	 * 
 	 * if args is empty, the simulation will be started via code configuration
 	 * 
@@ -124,9 +241,11 @@ public class AnalyzeBraessSimulation {
 	public static void main(String[] args) {
 		
 		if (args == null || args.length == 0){
+			log.info("run analysis from code");
 			AnalyzeBraessSimulation.runFromCode();
 		}
 		else {
+			log.info("run analysis from args");
 			AnalyzeBraessSimulation.runFromArgs(args);
 		}
 		
@@ -148,6 +267,8 @@ public class AnalyzeBraessSimulation {
 				runDirectory, lastIteration, outputDir);
 		analyzer.calculateResults();
 		analyzer.writeResults();
+		analyzer.writeOnRoutes();
+		analyzer.writeRouteStarts();
 	}
 
 	/**
@@ -157,9 +278,9 @@ public class AnalyzeBraessSimulation {
 	 */
 	private static void runFromCode() {
 		List<String> coordNames = new ArrayList<>();
-		coordNames.add("minCoord");
+//		coordNames.add("minCoord");
 		coordNames.add("greenWaveZ");
-		coordNames.add("maxCoord");
+//		coordNames.add("maxCoord");
 //		coordNames.add("maxCoordEmptyZ");
 //		coordNames.add("maxCoordFullZ");
 //		coordNames.add("minCoordFullZ");
@@ -173,14 +294,19 @@ public class AnalyzeBraessSimulation {
 //		ttZs.add("200s");
 		
 		String cap = "8640";
-		String date = "2015-04-13";
+		String date = "2015-04-15";
 		int tbs = 1;
+		int numberOfAgents = 3600;
+		int lastIterationNonBC = 200;
+		double expBeta = 2.0;
+		double reRoute = 0.1;
 		
 		for (String coordName : coordNames){
 			for (String ttZ : ttZs){
 				String runDirectory = DgPaths.REPOS
 						+ "runs-svn/cottbus/braess/" + date + "_tbs" + tbs + "_net" + cap
-						+ "-" + ttZ + "_" + coordName + "/";
+						+ "-" + ttZ + "_p" + numberOfAgents + "_" + coordName + "_it" 
+						+ lastIterationNonBC + "_expBeta" + expBeta + "_reRoute" + reRoute + "/";
 				String outputDir = runDirectory + "analysis/";
 				new File(outputDir).mkdir();
 
@@ -188,8 +314,9 @@ public class AnalyzeBraessSimulation {
 				if (coordName == "basecase")
 					lastIteration = 100;
 				else
-					lastIteration = 200;
-
+//					lastIteration = 200;
+					lastIteration = lastIterationNonBC;
+					
 				AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(
 						runDirectory, lastIteration, outputDir);
 				analyzer.calculateResults();
