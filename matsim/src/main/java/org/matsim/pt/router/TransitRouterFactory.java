@@ -19,7 +19,8 @@
 
 package org.matsim.pt.router;
 
-import javax.inject.Provider;
+
+import com.google.inject.Provider;
 
 /**
  * @author mrieser

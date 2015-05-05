@@ -25,6 +25,7 @@ package org.matsim.contrib.eventsBasedPTRouter;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterFactory;
 
 public class TransitRouterEventsWSModule extends AbstractModule {
@@ -42,6 +43,6 @@ public class TransitRouterEventsWSModule extends AbstractModule {
     public void install() {
 		bind(WaitTime.class).toInstance(waitTimes);
 		bind(StopStopTime.class).toInstance(stopStopTimes);
-		bind(TransitRouterFactory.class).to(TransitRouterEventsWSFactory.class);
+		bind(TransitRouter.class).toProvider(TransitRouterEventsWSFactory.class);
 	}
 }

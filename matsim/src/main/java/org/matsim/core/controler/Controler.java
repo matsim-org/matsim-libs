@@ -543,7 +543,7 @@ public class Controler extends AbstractController {
 	}
 
 	public final void setTransitRouterFactory(
-			final TransitRouterFactory transitRouterFactory) {
+			final javax.inject.Provider<TransitRouter> transitRouterFactory) {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
