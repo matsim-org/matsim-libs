@@ -28,6 +28,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
@@ -125,9 +129,15 @@ public class AggregateRawDigicoreFiles {
 	public static void processRawFiles(String[] args) throws IOException{
 		String sRegister = args[2] + (args[2].endsWith("/") ? "" : "/") + "registerOfProcessedFiles.csv";
 		File fRegister = new File(sRegister);
-		boolean registerNeedsHeader = true;
-		if(fRegister.exists()){
-			registerNeedsHeader = false;
+		/* If the register does not exist yet, create it by writing the header. */
+		if(!fRegister.exists()){
+			BufferedWriter bwRegister = IOUtils.getBufferedWriter(sRegister);
+			try{
+				bwRegister.write("filename,modified,processed");
+				bwRegister.newLine();
+			} finally{
+				bwRegister.close();
+			}
 		}
 		
 		List<String> register = parseFileRegister(args);
@@ -135,6 +145,17 @@ public class AggregateRawDigicoreFiles {
 		LOG.info("Processing raw input files...");
 		/* Get all the input files to process. */
 		List<File> files = FileUtils.sampleFiles(new File(args[0]), Integer.MAX_VALUE, FileUtils.getFileFilter("csv.gz"));
+		
+		/* Sort the files from smallest record number to highest. */
+		Comparator<File> myIntegerFilenameComparator = new Comparator<File>() {
+			@Override
+			public int compare(File o1, File o2) {
+				int i1 = Integer.parseInt(o1.getName().substring(0, o1.getName().indexOf(".")));
+				int i2 = Integer.parseInt(o2.getName().substring(0, o2.getName().indexOf(".")));
+				return Integer.valueOf(i1).compareTo(Integer.valueOf(i2));
+			}
+		};
+		Collections.sort(files, myIntegerFilenameComparator);
 		
 		Map<File, GregorianCalendar> processedMap;
 
@@ -180,26 +201,22 @@ public class AggregateRawDigicoreFiles {
 						statusOverall = 1;
 					} else{
 						LOG.info("   Processing " + file.getName() + "...");
-						
+
 						/* Do the processing. */
 						int status = 1;
+						BufferedReader br = IOUtils.getBufferedReader(file.getAbsolutePath());
 						try{
-							BufferedReader br = IOUtils.getBufferedReader(file.getAbsolutePath());
-							try{
-								String line = null;
-								while((line = br.readLine()) != null){
-									bw.write(line);
-									bw.newLine();
-								}
-								
-								/* If the code reaches this point, all records were 
-								 * written, and the status can be changed to 0. */
-								status = 0;
-							} finally{
-								br.close();
+							String line = null;
+							while((line = br.readLine()) != null){
+								bw.write(line);
+								bw.newLine();
 							}
+
+							/* If the code reaches this point, all records were 
+							 * written, and the status can be changed to 0. */
+							status = 0;
 						} finally{
-							bw.close();
+							br.close();
 						}
 						if(status != 0){
 							statusOverall = 1;
@@ -227,10 +244,6 @@ public class AggregateRawDigicoreFiles {
 					/* Update the register. */
 					BufferedWriter bwRegister = IOUtils.getAppendingBufferedWriter(sRegister);
 					try{
-						if(registerNeedsHeader){
-							bwRegister.write("filename,modified,processed");
-							bwRegister.newLine();
-						}
 						bwRegister.write(String.format("%s,%s,%s\n", rawFile.getName(), modifiedString, processedString));
 					} finally{
 						bwRegister.close();
@@ -291,20 +304,22 @@ public class AggregateRawDigicoreFiles {
 		}
 		
 		/* Check the file register. */
-		File register = new File(args[2] + "");
+		File register = new File(args[2] + (args[2].endsWith("/") ? "" : "/") + "registerOfProcessedFiles.csv");
 		if(register.exists() && register.isFile()){
-			LOG.info("The file register " + args[2] + "does exist.");
+			LOG.info("The file register " + register.getAbsolutePath() + " does exist.");
 			LOG.info("   The following files have been processed in the past:");
 			
-			/* Report the files already processed. */
+			/* Report the files already processed. List the files in number sequence.*/
+			Map<Integer, String> fileMap = new TreeMap<Integer, String>();
 			BufferedReader br = IOUtils.getBufferedReader(register.getAbsolutePath());
 			try{
 				String line = br.readLine(); /* Header. */
 				while((line = br.readLine()) != null){
 					String[] sa = line.split(",");
 					String filename = sa[0];
-					String date = sa[1];
-					LOG.info(String.format("%s%s (%s);", "      ", filename, date));
+					String filenamePortion = filename.substring(0, filename.indexOf("."));
+					int fileNumber = Integer.parseInt(filenamePortion);
+					fileMap.put(fileNumber, line);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -316,6 +331,14 @@ public class AggregateRawDigicoreFiles {
 					e.printStackTrace();
 					throw new RuntimeException("Cannot close file register " + register.getAbsolutePath());
 				}
+			}
+			for(int i : fileMap.keySet()){
+				String line = fileMap.get(i);
+				String[] sa = line.split(",");
+				String filename = sa[0];
+				String dateModified = sa[1];
+				String dateProcessed = sa[2];
+				LOG.info(String.format("%s%s (modified: %s; processed: %s);", "      ", filename, dateModified, dateProcessed));
 			}
 		} else{
 			LOG.warn("The file register " + args[2] + " does not exist. If needed, a new one will be created.");
