@@ -38,9 +38,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridQSimExternalNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
-import playground.gregor.casim.simulation.CANetsimEngine;
-import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
-import playground.gregor.casim.simulation.physics.CANetworkFactory;
 import playground.gregor.hybridsim.simulation.ExternalEngine;
 
 import com.google.inject.Inject;
@@ -67,30 +64,31 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-		
-		
+
 
 		QSim qSim = new QSim(this.sc, this.em);
 		ActivityEngine activityEngine = new ActivityEngine(this.em, qSim.getAgentCounter());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, this.netFac);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-
 		ExternalEngine e = new ExternalEngine(this.em, qSim);
-		qSim.addMobsimEngine(e);
-
 		HybridQSimExternalNetworkFactory eFac = new HybridQSimExternalNetworkFactory(e);
 		this.netFac.putNetsimNetworkFactory("2ext", eFac);
 		this.netFac.putNetsimNetworkFactory("ext2", eFac);
 		
-		CANetworkFactory fac = new CAMultiLaneNetworkFactory();
-		CANetsimEngine cae = new CANetsimEngine(qSim, fac);
-		qSim.addMobsimEngine(cae);
-		qSim.addDepartureHandler(cae.getDepartureHandler());
+		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, this.netFac);
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+
+
+		qSim.addMobsimEngine(e);
+
+
+		
+//		CANetworkFactory fac = new CAMultiLaneNetworkFactory();
+//		CANetsimEngine cae = new CANetsimEngine(qSim, fac);
+//		qSim.addMobsimEngine(cae);
+//		qSim.addDepartureHandler(cae.getDepartureHandler());
 
 
 		TeleportationEngine teleportationEngine = new TeleportationEngine(this.sc, this.em);

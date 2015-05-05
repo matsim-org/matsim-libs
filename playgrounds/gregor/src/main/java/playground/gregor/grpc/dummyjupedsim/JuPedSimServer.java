@@ -58,7 +58,7 @@ public class JuPedSimServer implements Runnable{
 		});
 	}
 
-	private void stop() {
+	public void stop() {
 		if (this.server != null) {
 			this.server.shutdown();
 		}

@@ -27,15 +27,16 @@ import java.io.InputStreamReader;
 
 import org.apache.log4j.Logger;
 
-public class RunJupedSim implements Runnable{
+public class RunJupedSim implements Runnable, ExternalSim{
 	
 	private static final Logger log = Logger.getLogger(RunJupedSim.class);
+	private Process p1;
 	
 	@Override
 	public void run() {
 		try {
-			Process p1 = new ProcessBuilder("/Users/laemmel/svn/jpscore/Debug/jupedsim","/Users/laemmel/svn/jpscore/inputfiles/hybrid/hybrid_hall_ini.xml").start();
-			logToLog(p1);
+			this.p1 = new ProcessBuilder("/Users/laemmel/svn/jpscore/Debug/jupedsim","/Users/laemmel/svn/jpscore/inputfiles/hybrid/hybrid_hall_ini.xml").start();
+			logToLog(this.p1);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -62,6 +63,11 @@ public class RunJupedSim implements Runnable{
 				l = br.readLine();
 			}
 		}
+	}
+
+	@Override
+	public void shutdown() {
+		this.p1.destroy();
 	}
 
 }

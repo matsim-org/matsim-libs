@@ -29,6 +29,7 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
@@ -64,7 +65,6 @@ import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceService;
 
 import playground.gregor.hybridsim.grpc.GRPCExternalClient;
 import playground.gregor.hybridsim.grpc.GRPCInternalServer;
-import playground.gregor.hybridsim.grpc.RunJupedSim;
 
 public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
@@ -93,11 +93,13 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		try {
 			startupBarrier.await();
 		} catch (InterruptedException | BrokenBarrierException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
-		new Thread(new RunJupedSim()).start();
-		
-		
+//				new Thread(new RunJupedSim()).start();
+		//		DummyJuPedSim.main(null);
+//		new Thread(new DummyJuPedSim()).start();
+
+
 	}
 
 	@Override
@@ -132,15 +134,23 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		QVehicle veh = this.vehicles.get(persId);
 		Id<Link> nextLId = veh.getDriver().chooseNextLinkId();
 		QLinkInternalIAdapter ql = this.adapters.get(nextLId);
-
-		org.matsim.hybrid.MATSimInterface.Extern2MATSimConfirmed.Builder b = Extern2MATSimConfirmed.newBuilder();
-		
-		if (ql.isAcceptingFromUpstream()) {
-			double now = this.sim.getSimTimer().getTimeOfDay();
+		double now = this.sim.getSimTimer().getTimeOfDay();
+		if (ql == null) {
 			this.em.processEvent(new LinkLeaveEvent(now, persId, veh
 					.getDriver().getCurrentLinkId(), veh.getId()));
-
 			veh.getDriver().notifyMoveOverNode(nextLId);
+			nextLId = veh.getDriver().chooseNextLinkId();
+			this.em.processEvent(new LinkEnterEvent(now, persId, nextLId, veh.getId()));
+			ql = this.adapters.get(nextLId);
+		}
+		org.matsim.hybrid.MATSimInterface.Extern2MATSimConfirmed.Builder b = Extern2MATSimConfirmed.newBuilder();
+
+		if (ql.isAcceptingFromUpstream()) {
+
+			this.em.processEvent(new LinkLeaveEvent(now, persId, veh
+					.getDriver().getCurrentLinkId(), veh.getId()));
+			veh.getDriver().notifyMoveOverNode(nextLId);
+
 			ql.addFromUpstream(veh);
 			b.setAccepted(true);
 		} else {
@@ -156,14 +166,17 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 	public void reqAgentStuck(AgentsStuck request,
 			StreamObserver<AgentsStuckConfirmed> responseObserver) {
 		double now = this.sim.getSimTimer().getTimeOfDay();
-		
+
 		for (String id : request.getAgentIdList()){
 			Id<Person> persId = Id.createPersonId(id);
 			QVehicle veh = this.vehicles.get(persId);
 			PersonStuckEvent e = new PersonStuckEvent(now, persId, veh.getDriver().getCurrentLinkId(), veh.getDriver().getMode());
 			this.em.processEvent(e);
 		}
-		
+
+		AgentsStuckConfirmed resp = AgentsStuckConfirmed.newBuilder().build();
+		responseObserver.onValue(resp);
+		responseObserver.onCompleted();
 	}
 
 
@@ -174,8 +187,16 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		String host = request.getHost();
 		int port = request.getPort();
 		log.info("client connected. openning backward channel to host:" + host + " at port:" + port);
-		this.client = new GRPCExternalClient("localhost",port,this.clientBarrier );
-		
+		this.client = new GRPCExternalClient("localhost",port);
+		ExternalConnectConfirmed resp = ExternalConnectConfirmed.newBuilder().build();
+		responseObserver.onValue(resp);
+		responseObserver.onCompleted();
+		log.info("client up and running.");
+		try {
+			this.clientBarrier.await();
+		} catch (InterruptedException | BrokenBarrierException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 
@@ -188,11 +209,13 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		} catch (InterruptedException | BrokenBarrierException e) {
 			e.printStackTrace();
 		}
-		
+		ExternSimStepFinishedReceived resp = ExternSimStepFinishedReceived.newBuilder().build();
+		responseObserver.onValue(resp);
+		responseObserver.onCompleted();
 	}
 
 	//rpc MATSim --> extern
-	
+
 	@Override
 	public void doSimStep(double time) {
 		double to = time + 1;
@@ -215,6 +238,9 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 			throw new RuntimeException(e);
 		}
 		ExternOnPrepareSim prep = ExternOnPrepareSim.newBuilder().build();
+		if (this.client == null){
+			throw new RuntimeException("client is null");
+		}
 		ExternOnPrepareSimConfirmed resp = this.client.getBlockingStub().reqExternOnPrepareSim(prep);
 	}
 
@@ -242,9 +268,9 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		Id<Person> driverId = veh.getDriver().getId();
 		this.vehicles.put(driverId, veh);
 		Builder ab = MATSimInterface.MATSim2ExternPutAgent.Agent.newBuilder();
-		ab.setEnterNode(enterId.toString()).setId(driverId.toString()).setLeaveNode("implement me");
+		ab.setEnterNode(enterId.toString()).setId(driverId.toString()).setLeaveNode(leaveId.toString());
 		MATSim2ExternPutAgent addReq = MATSim2ExternPutAgent.newBuilder().setAgent(ab).build();
 		MATSim2ExternPutAgentConfirmed addReqResp = this.client.getBlockingStub().reqMATSim2ExternPutAgent(addReq);
 	}
-	
+
 }

@@ -38,11 +38,16 @@ import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed;
 public class ExternalInterfaceServiceImpl implements ExternInterfaceService{
 
 	private static final Logger log = Logger.getLogger(ExternalInterfaceServiceImpl.class);
+	private final DummyJuPedSim sim;
 	
+	public ExternalInterfaceServiceImpl(DummyJuPedSim dummyJuPedSim) {
+		this.sim = dummyJuPedSim;
+	}
+
 	@Override
 	public void reqMATSim2ExternHasSpace(MATSim2ExternHasSpace request,
 			StreamObserver<MATSim2ExternHasSpaceConfirmed> responseObserver) {
-		log.info("has space called for node" + request.getNodeId());
+//		log.info("has space called for node" + request.getNodeId());
 		MATSim2ExternHasSpaceConfirmed resp = MATSim2ExternHasSpaceConfirmed.newBuilder().setHasSpace(true).build();
 		responseObserver.onValue(resp);
 		responseObserver.onCompleted();
@@ -51,29 +56,39 @@ public class ExternalInterfaceServiceImpl implements ExternInterfaceService{
 	@Override
 	public void reqMATSim2ExternPutAgent(MATSim2ExternPutAgent request,
 			StreamObserver<MATSim2ExternPutAgentConfirmed> responseObserver) {
-		// TODO Auto-generated method stub
+		this.sim.putAgent(request);
+		MATSim2ExternPutAgentConfirmed resp = MATSim2ExternPutAgentConfirmed.newBuilder().build();
+		responseObserver.onValue(resp);
+		responseObserver.onCompleted();
 		
 	}
 
 	@Override
 	public void reqExternDoSimStep(ExternDoSimStep request,
 			StreamObserver<ExternDoSimStepReceived> responseObserver) {
-		// TODO Auto-generated method stub
-		
+		this.sim.doSimstep(request);
+		ExternDoSimStepReceived resp = ExternDoSimStepReceived.newBuilder().build();
+		responseObserver.onValue(resp);
+		responseObserver.onCompleted();		
 	}
 
 	@Override
 	public void reqExternOnPrepareSim(ExternOnPrepareSim request,
 			StreamObserver<ExternOnPrepareSimConfirmed> responseObserver) {
-		// TODO Auto-generated method stub
+		this.sim.onPrepareSim(request);
+		ExternOnPrepareSimConfirmed resp = ExternOnPrepareSimConfirmed.newBuilder().build();
+		responseObserver.onValue(resp);
+		responseObserver.onCompleted();		
 		
 	}
 
 	@Override
 	public void reqExternAfterSim(ExternAfterSim request,
 			StreamObserver<ExternAfterSimConfirmed> responseObserver) {
-		// TODO Auto-generated method stub
-		
+		this.sim.afterSim(request);
+		ExternAfterSimConfirmed resp = ExternAfterSimConfirmed.newBuilder().build();
+		responseObserver.onValue(resp);
+		responseObserver.onCompleted();		
 	}
 
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Client.java
+ * ExternalSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,34 +20,8 @@
 
 package playground.gregor.hybridsim.grpc;
 
-import io.grpc.ChannelImpl;
-import io.grpc.transport.netty.NegotiationType;
-import io.grpc.transport.netty.NettyChannelBuilder;
-
-import java.util.concurrent.TimeUnit;
-
-import org.apache.log4j.Logger;
-import org.matsim.hybrid.ExternInterfaceServiceGrpc;
-import org.matsim.hybrid.ExternInterfaceServiceGrpc.ExternInterfaceServiceBlockingStub;
-
-public class GRPCExternalClient {
-	private static final Logger log = Logger.getLogger(GRPCExternalClient.class);
-
-	private final ChannelImpl channel;
-
-	private final ExternInterfaceServiceBlockingStub blockingStub;
-
-	public GRPCExternalClient(String host, int port) {
-		this.channel = NettyChannelBuilder.forAddress(host, port).negotiationType(NegotiationType.PLAINTEXT).build();
-	this.blockingStub = ExternInterfaceServiceGrpc.newBlockingStub(this.channel);
-	}
-
-	public void shutdown() throws InterruptedException {
-		this.channel.shutdown().awaitTerminated(5, TimeUnit.SECONDS);
-	}
+public interface ExternalSim extends Runnable{
 	
-	public ExternInterfaceServiceBlockingStub getBlockingStub(){
-		return this.blockingStub;
-	}
-	
+	public void shutdown();
+
 }

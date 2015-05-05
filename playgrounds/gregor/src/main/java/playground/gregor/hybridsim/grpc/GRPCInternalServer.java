@@ -25,6 +25,7 @@ import io.grpc.transport.netty.NettyServerBuilder;
 
 import java.util.concurrent.CyclicBarrier;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.hybrid.MATSimInterfaceServiceGrpc;
 import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceService;
@@ -42,6 +43,7 @@ public class GRPCInternalServer implements Runnable{
 	private final CyclicBarrier startupBarrier;
 
 	public GRPCInternalServer(MATSimInterfaceService mi, CyclicBarrier startupBarrier) {
+		Logger.getLogger("io.netty").setLevel(Level.OFF);
 		this.mi = mi;
 		this.startupBarrier = startupBarrier;
 	}

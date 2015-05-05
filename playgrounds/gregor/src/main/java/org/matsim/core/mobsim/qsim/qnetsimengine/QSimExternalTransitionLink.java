@@ -24,6 +24,8 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
@@ -32,13 +34,15 @@ import playground.gregor.hybridsim.simulation.ExternalEngine;
 
 public class QSimExternalTransitionLink extends AbstractQLink {
 
-	private ExternalEngine e;
-	private EventsManager em;
+	private final ExternalEngine e;
+	private final EventsManager em;
+	private final Network net;
 
 	QSimExternalTransitionLink(Link link, QNetwork network, ExternalEngine e) {
 		super(link, network);
 		this.e = e;
 		this.em = e.getEventsManager();
+		this.net = network.getNetwork();
 	}
 
 	@Override
@@ -49,17 +53,18 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 
 	@Override
 	void addFromUpstream(QVehicle veh) {
-		this.e.addFromUpstream(link.getFromNode().getId(), link.getToNode()
-				.getId(), veh);
+		Id<Link> nextL = veh.getDriver().chooseNextLinkId();
+		Id<Node> leaveId = this.net.getLinks().get(nextL).getToNode().getId();
+		this.e.addFromUpstream(this.link.getFromNode().getId(), leaveId, veh);
 		double now = this.e.getMobsim().getSimTimer().getTimeOfDay();
-		em.processEvent(new LinkEnterEvent(now, veh.getDriver().getId(), link
+		this.em.processEvent(new LinkEnterEvent(now, veh.getDriver().getId(), this.link
 				.getId(), veh.getId()));
 
 	}
 
 	@Override
 	boolean isAcceptingFromUpstream() {
-		return this.e.hasSpace(link.getFromNode().getId());
+		return this.e.hasSpace(this.link.getFromNode().getId());
 	}
 
 	@Override
