@@ -11,11 +11,36 @@
   
 
   <dependencies>
-  	<dependency>
-		<groupId>org.openstreetmap.osmosis</groupId>
-		<artifactId>osmosis</artifactId>
-		<version>0.32.1-SNAPSHOT</version>
-	</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-core</artifactId>
+			<version>0.43-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-xml</artifactId>
+			<version>0.43-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-tagfilter</artifactId>
+			<version>0.43-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-areafilter</artifactId>
+			<version>0.43-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-set</artifactId>
+			<version>0.43-RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-pbf</artifactId>
+			<version>0.43-RELEASE</version>
+		</dependency>
   	<dependency>
       <groupId>de.micromata.jak</groupId>
       <artifactId>JavaAPIforKml</artifactId>
@@ -64,21 +89,4 @@
 	</dependency>
   </dependencies>
 
-		<repositories>
-				<repository>
-					<id>openstreetmap-snapshots</id>
-					<url>https://oss.sonatype.org/content/repositories/openstreetmap-snapshots</url>
-				</repository>
-				<repository>
-						<id>maven2-repository.dev.java.net</id>
-						<name>Java.net Maven 2 Repository</name>
-						<url>http://download.java.net/maven/2</url>
-						<layout>default</layout>
-						<snapshots>
-								<enabled>true</enabled>
-						</snapshots>
-				</repository>
-		</repositories>
-  
-  
 </project>

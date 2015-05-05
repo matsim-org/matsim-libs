@@ -19,7 +19,18 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.osm;
 
-import de.micromata.opengis.kml.v_2_2_0.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.geotools.referencing.GeodeticCalculator;
 import org.matsim.api.core.v01.Coord;
@@ -35,19 +46,25 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
-import org.openstreetmap.osmosis.core.filter.v0_6.TagFilter;
 import org.openstreetmap.osmosis.core.misc.v0_6.NullWriter;
 import org.openstreetmap.osmosis.core.report.v0_6.EntityReporter;
 import org.openstreetmap.osmosis.core.tee.v0_6.EntityTee;
-import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
-import org.openstreetmap.osmosis.core.xml.v0_6.FastXmlReader;
-import org.openstreetmap.osmosis.core.xml.v0_6.XmlWriter;
+import org.openstreetmap.osmosis.tagfilter.v0_6.TagFilter;
+import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.xml.v0_6.FastXmlReader;
+import org.openstreetmap.osmosis.xml.v0_6.XmlWriter;
+
 import playground.dgrether.osm.NetworkSink;
 import playground.dgrether.osm.OSMEntityCollector;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.*;
+import de.micromata.opengis.kml.v_2_2_0.ColorMode;
+import de.micromata.opengis.kml.v_2_2_0.Coordinate;
+import de.micromata.opengis.kml.v_2_2_0.Document;
+import de.micromata.opengis.kml.v_2_2_0.Icon;
+import de.micromata.opengis.kml.v_2_2_0.IconStyle;
+import de.micromata.opengis.kml.v_2_2_0.Kml;
+import de.micromata.opengis.kml.v_2_2_0.Placemark;
+import de.micromata.opengis.kml.v_2_2_0.Point;
+import de.micromata.opengis.kml.v_2_2_0.Style;
 
 
 /**

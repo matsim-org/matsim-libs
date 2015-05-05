@@ -21,6 +21,7 @@ package playground.dgrether.signalsystems.osm;
 
 import java.util.HashSet;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -149,6 +150,12 @@ public class DgOSMJunctionDetector implements SinkSource, EntityProcessor {
 	@Override
 	public void process(RelationContainer container) {
 		this.sink.process(container);
+	}
+
+	@Override
+	public void initialize(Map<String, Object> arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
