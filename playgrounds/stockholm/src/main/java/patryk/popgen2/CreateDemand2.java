@@ -25,6 +25,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import patryk.utils.LinksRemover;
@@ -39,11 +40,14 @@ public class CreateDemand2 {
 	private final String populationFile = "./data/synthetic_population/agentData.csv";
 	private final String zonesShapefile = "./data/shapes/sverige_TZ_EPSG3857.shp";
 	private final String zonesBoundaryShape = "./data/shapes/limit_EPSG3857.shp";
-	private final String buildingsShapefile = "./data/shapes/by_reduc_EPSG3857.shp";
-	private final String networkFile = "./data/network/network_v09.xml";
-	private final String initialPlansFile = "./data/demand_output/initial_plans2.xml";
-	private final String agentHomeXY = "./data/demand_output/agenthomeXY2.txt";
-	private final String agentWorkXY = "./data/demand_output/agentWorkXY2.txt";
+	private final String buildingsShapefile = "./data/shapes/by_full_EPSG3857_2.shp";
+	private final String networkFile = "./data/network/network_v12_utan_forbifart.xml";
+	
+	private final String initialPlansFile = "./data/demand_output/initial_plans_v03.xml";
+	private final String agentHomeXY = "./data/demand_output/agenthomeXY_v03.txt";
+	private final String agentWorkXY = "./data/demand_output/agentWorkXY_v03.txt";
+	private final String agentAttrFile = "./data/demand_output/agent_attributes_v03.xml";
+	
 	private final double scaleFactor = 0.10;
 	private final double workersInHomeBuildings = 0.05;
 	
@@ -80,10 +84,10 @@ public class CreateDemand2 {
 		for (ParsedPerson pPerson : persons) {		
 			if (coveredZones.contains(pPerson.getHomeZone()) && coveredZones.contains(pPerson.getWorkZone())) { 
 				if (pPerson.getMode().equals("car")
-						&& (pPerson.getHomeZone().substring(0, 2).equals("71") || pPerson
+						&& ((pPerson.getHomeZone().substring(0, 2).equals("71") || pPerson
 								.getHomeZone().substring(0, 2).equals("72"))
 						|| (pPerson.getWorkZone().substring(0, 2).equals("71") || pPerson
-								.getWorkZone().substring(0, 2).equals("72"))) {
+								.getWorkZone().substring(0, 2).equals("72")))) {
 					if (processedCarDrivers % everyXthPerson == 0) {
 						createAgent(pPerson, agentAttributes, xy2links);
 					}
@@ -93,6 +97,8 @@ public class CreateDemand2 {
 		}
 		PopulationWriter popwriter = new PopulationWriter(scenario.getPopulation(), scenario.getNetwork());
 		popwriter.write(initialPlansFile);
+		ObjectAttributesXmlWriter attrWriter = new ObjectAttributesXmlWriter(agentAttributes);
+		attrWriter.writeFile(agentAttrFile);
 	}
 	
 	private void createAgent(ParsedPerson pPerson, ObjectAttributes agentAttributes, XY2Links xy2links) {
@@ -102,6 +108,8 @@ public class CreateDemand2 {
 		agentAttributes.putAttribute(agent.getId().toString(), "income", pPerson.getIncome());
 		agentAttributes.putAttribute(agent.getId().toString(), "sex", pPerson.getSex());
 		agentAttributes.putAttribute(agent.getId().toString(), "housingType", pPerson.getHousingType());
+		agentAttributes.putAttribute(agent.getId().toString(), "homeZone", pPerson.getHomeZone());
+		agentAttributes.putAttribute(agent.getId().toString(), "workZone", pPerson.getWorkZone());
 		
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
 		
@@ -119,7 +127,7 @@ public class CreateDemand2 {
 				pPerson.getHousingType(), "work");
 		Activity work = scenario.getPopulation().getFactory()
 				.createActivityFromCoord("work", workCoord);
-		work.setEndTime(workDuration());
+		work.setEndTime(workEndTime());
 		plan.addActivity(work);
 		
 		Leg workToHome = scenario.getPopulation().getFactory().createLeg("car");
@@ -151,8 +159,8 @@ public class CreateDemand2 {
 		return 7*3600;
 	}
 	
-	private int workDuration() {
-		return 9*3600;
+	private int workEndTime() {
+		return 16*3600;
 	}
 	
 	private Coord drawCoordFromBuilding(Zone zone, int housingType, String activity) {
