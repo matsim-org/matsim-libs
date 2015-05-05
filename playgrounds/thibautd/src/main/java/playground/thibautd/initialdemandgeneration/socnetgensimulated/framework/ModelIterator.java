@@ -97,8 +97,8 @@ public class ModelIterator {
 					maxIterations,
 					1E-9,
 					true,
-					0,
-					0,
+					3,
+					50,
 					new MersenneTwister( 42 ),
 					false,
 					new Convergence() );
@@ -112,7 +112,7 @@ public class ModelIterator {
 					new MaxEval( maxIterations ),
 					new InitialGuess( new double[]{ x , y } ),
 					new ObjectiveFunction( new Function( runner ) ),
-					new CMAESOptimizer.Sigma( new double[]{ 5 , 5 } ),
+					new CMAESOptimizer.Sigma( new double[]{ 5 , 500 } ),
 					new CMAESOptimizer.PopulationSize( 7 ),
 					new SimpleBounds(
 						new double[]{ Double.NEGATIVE_INFINITY , 0 }, // lower bounds: constrain secondary reduction to be positive
@@ -182,7 +182,7 @@ public class ModelIterator {
 		@Override
 		public boolean converged( final int i , final PointValuePair prev , final PointValuePair curr ) {
 			// not really satisfying...
-			final boolean conv = curr.getValue().doubleValue() < 1;
+			final boolean conv = curr.getValue().doubleValue() < 1 || Math.abs( prev.getValue() - curr.getValue() ) < 1E-8;
 
 			if ( conv ) {
 				log.info( "convergence checker considers convergenced is reached." );
