@@ -26,15 +26,19 @@ import org.matsim.core.router.FastDijkstra;
 import org.matsim.core.router.FastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterType;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
+@Singleton
 public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 	
 	private final PreProcessDijkstra preProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks;
-	
+
+	@Inject
 	public FastDijkstraFactory() {
 		this(null, FastRouterType.ARRAY);
 	}

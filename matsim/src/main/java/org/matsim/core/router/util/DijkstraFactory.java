@@ -23,10 +23,15 @@ package org.matsim.core.router.util;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.Dijkstra;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class DijkstraFactory implements LeastCostPathCalculatorFactory {
 
 	private final PreProcessDijkstra preProcessData;
 
+	@Inject
 	public DijkstraFactory() {
 		this.preProcessData = null;
 	}

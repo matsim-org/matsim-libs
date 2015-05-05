@@ -26,18 +26,22 @@ import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.FastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterType;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author cdobler
  */
+@Singleton
 public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
 	private final PreProcessLandmarks preProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks;
-	
+
+	@Inject
 	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc) {
 		this(network, fsttc, FastRouterType.ARRAY);
 	}
