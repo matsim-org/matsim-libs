@@ -9,6 +9,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -37,59 +38,61 @@ public class TransitControler extends Controler {
 	
 	public TransitControler(Config config) {
 		super(config);
+		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	}
 	
 	public TransitControler(ScenarioImpl scenario) {
 		super(scenario);
 		// TODO Auto-generated constructor stub
+		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	}
 
-	@Override
-	protected void runMobSim() {
-		
-		log.info("Overriding runMobSim()");
-
-        Scenario sc = this.getScenario();EventsManager eventsManager = this.getEvents();
-
-        QSimConfigGroup conf = sc.getConfig().qsim();
-        if (conf == null) {
-            throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-        }
-
-		QSim qSim1 = new QSim(sc, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-        QNetsimEngineModule.configure(qSim1);
-		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
-		qSim1.addMobsimEngine(teleportationEngine);
-        QSim qSim = qSim1;
-        AgentFactory agentFactory;
-            agentFactory = new TransitAgentFactory(qSim);
-            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-            qSim.addDepartureHandler(transitEngine);
-            qSim.addAgentSource(transitEngine);
-        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
-
-        QSim simulation = (QSim) qSim;
-
-		transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-//		this.events.addHandler(new LogOutputEventHandler());
-
-
-		if (simulation instanceof ObservableMobsim){
-			for (MobsimListener l : this.getMobsimListeners()) {
-				((ObservableMobsim)simulation).addQueueSimulationListeners(l);
-			}
-		}
-		if (this.useOTFVis) {
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(getConfig(),getScenario(), getEvents(), simulation);
-			OTFClientLive.run(getConfig(), server);
-		}
-		simulation.run();
-	}	
+//	@Override
+//	protected void runMobSim() {
+//		
+//		log.info("Overriding runMobSim()");
+//
+//        Scenario sc = this.getScenario();EventsManager eventsManager = this.getEvents();
+//
+//        QSimConfigGroup conf = sc.getConfig().qsim();
+//        if (conf == null) {
+//            throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+//        }
+//
+//		QSim qSim1 = new QSim(sc, eventsManager);
+//		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim1.getAgentCounter());
+//		qSim1.addMobsimEngine(activityEngine);
+//		qSim1.addActivityHandler(activityEngine);
+//        QNetsimEngineModule.configure(qSim1);
+//		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
+//		qSim1.addMobsimEngine(teleportationEngine);
+//        QSim qSim = qSim1;
+//        AgentFactory agentFactory;
+//            agentFactory = new TransitAgentFactory(qSim);
+//            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+//            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+//            qSim.addDepartureHandler(transitEngine);
+//            qSim.addAgentSource(transitEngine);
+//        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+//        qSim.addAgentSource(agentSource);
+//
+//        QSim simulation = (QSim) qSim;
+//
+//		transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+////		this.events.addHandler(new LogOutputEventHandler());
+//
+//
+//		if (simulation instanceof ObservableMobsim){
+//			for (MobsimListener l : this.getMobsimListeners()) {
+//				((ObservableMobsim)simulation).addQueueSimulationListeners(l);
+//			}
+//		}
+//		if (this.useOTFVis) {
+//			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(getConfig(),getScenario(), getEvents(), simulation);
+//			OTFClientLive.run(getConfig(), server);
+//		}
+//		simulation.run();
+//	}	
 	
 	void setUseOTFVis(boolean useOTFVis) {
 		this.useOTFVis = useOTFVis;

@@ -22,6 +22,7 @@ package playground.christoph.withinday;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.RoutingContext;
@@ -36,10 +37,12 @@ class MyWithinDayControler extends Controler {
 
 	MyWithinDayControler(String configFileName) {
 		super(configFileName);
+		throw new RuntimeException(Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE) ;
 	}
 
 	MyWithinDayControler(Config config) {
 		super(config);
+		throw new RuntimeException(Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE) ;
 	}
 
 	static void start(String configFilePath) {
@@ -116,33 +119,33 @@ class MyWithinDayControler extends Controler {
 		withinDayEngine.initializeReplanningModules(numReplanningThreads);
 	}
 
-	@Override
-	protected void runMobSim() {
-		createHandlersAndListeners();
-		// initializes "replanningManager"
-
-//		sim = new WithinDayQSimFactory(withinDayEngine).createMobsim(this.scenarioData, this.events);
-		
-		// a QSim with two differences:
-		// (1) uses WithinDayAgentFactory instead of the regular agent factory
-		// (2) offers "rescheduleActivityEnd" although I am not sure that this is still needed (after some modifications
-		//     that happened in the meantime)
-
-		// Use a FixedOrderQueueSimulationListener to bundle the Listeners and
-		// ensure that they are started in the needed order.
-		FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-		sim.addQueueSimulationListeners(fosl);
-		// essentially, can just imagine the replanningManager as a regular MobsimListener
-
-		log.info("Initialize Replanning Routers");
-		initReplanningRouter();
-
-		//just activitate replanning during an activity
-		withinDayEngine.doDuringActivityReplanning(true);
-		withinDayEngine.doInitialReplanning(false);
-		withinDayEngine.doDuringLegReplanning(true);
-
-		sim.run();
-	}
+//	@Override
+//	protected void runMobSim() {
+//		createHandlersAndListeners();
+//		// initializes "replanningManager"
+//
+////		sim = new WithinDayQSimFactory(withinDayEngine).createMobsim(this.scenarioData, this.events);
+//		
+//		// a QSim with two differences:
+//		// (1) uses WithinDayAgentFactory instead of the regular agent factory
+//		// (2) offers "rescheduleActivityEnd" although I am not sure that this is still needed (after some modifications
+//		//     that happened in the meantime)
+//
+//		// Use a FixedOrderQueueSimulationListener to bundle the Listeners and
+//		// ensure that they are started in the needed order.
+//		FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
+//		sim.addQueueSimulationListeners(fosl);
+//		// essentially, can just imagine the replanningManager as a regular MobsimListener
+//
+//		log.info("Initialize Replanning Routers");
+//		initReplanningRouter();
+//
+//		//just activitate replanning during an activity
+//		withinDayEngine.doDuringActivityReplanning(true);
+//		withinDayEngine.doInitialReplanning(false);
+//		withinDayEngine.doDuringLegReplanning(true);
+//
+//		sim.run();
+//	}
 
 }

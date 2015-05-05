@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -41,6 +42,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
+
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
 
@@ -55,25 +57,26 @@ public class BvgControler extends Controler {
 
     public BvgControler(final Scenario scenario) {
 		super(scenario);
+		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	}
 
-	@Override
-	protected void runMobSim() {
-
-		log.info("Overriding runMobSim()");
-
-		QSim simulation = (QSim) QSimUtils.createDefaultQSim(this.getScenario(), this.getEvents());
-
-		simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-//		this.events.addHandler(new LogOutputEventHandler());
-
-		if (simulation instanceof ObservableMobsim) {
-			for (MobsimListener l : this.getMobsimListeners()) {
-				((ObservableMobsim)simulation).addQueueSimulationListeners(l);
-			}
-		}
-		simulation.run();
-	}
+//	@Override
+//	protected void runMobSim() {
+//
+//		log.info("Overriding runMobSim()");
+//
+//		QSim simulation = (QSim) QSimUtils.createDefaultQSim(this.getScenario(), this.getEvents());
+//
+//		simulation.getTransitEngine().setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+////		this.events.addHandler(new LogOutputEventHandler());
+//
+//		if (simulation instanceof ObservableMobsim) {
+//			for (MobsimListener l : this.getMobsimListeners()) {
+//				((ObservableMobsim)simulation).addQueueSimulationListeners(l);
+//			}
+//		}
+//		simulation.run();
+//	}
 
 	private StrategyManager myLoadStrategyManager() {
 		SubSetStrategyManager manager = new SubSetStrategyManager();

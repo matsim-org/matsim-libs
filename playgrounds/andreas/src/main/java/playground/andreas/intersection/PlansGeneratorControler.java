@@ -46,10 +46,6 @@ public class PlansGeneratorControler extends Controler {
 		super(config);
 	}
 
-	@Override
-	protected void runMobSim() {
-
-	}
 
 //	/** Should be overwritten in case of artificial population */
 //	@Override

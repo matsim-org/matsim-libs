@@ -3,6 +3,7 @@ package playground.wrashid.PHEV.Utility;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumption;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
@@ -11,13 +12,15 @@ import org.matsim.core.mobsim.jdeqsim.util.Timer;
 class DESController extends Controler {
 	public DESController(final String[] args) {
 	    super(args);
+	    
+	    throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	  }
 
-	@Override
-	protected void runMobSim() {
-
-		new JDEQSimulation(this.getScenario(), this.getEvents()).run();
-	}
+//	@Override
+//	protected void runMobSim() {
+//
+//		new JDEQSimulation(this.getScenario(), this.getEvents()).run();
+//	}
 
 	public static void main(final String[] args) {
 		Timer t=new Timer();

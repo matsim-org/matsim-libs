@@ -377,7 +377,7 @@ public class Controler extends AbstractController {
 	}
 
 	@Override
-	protected void runMobSim() {
+	protected final void runMobSim() {
 		// yyyy cannot make this final: overridden at about 15 locations.  kai, jan'13
 		Mobsim sim = getNewMobsim();
 		sim.run();

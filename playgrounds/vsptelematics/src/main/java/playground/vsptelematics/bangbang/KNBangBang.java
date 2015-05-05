@@ -160,7 +160,7 @@ public class KNBangBang {
 		controler.addOverridingModule(new AbstractModule(){
 			@Override
 			public void install() {
-				this.bind( Mobsim.class ).toProvider(KNMobsimProvider.class) ;
+				this.bindMobsim().toProvider(KNMobsimProvider.class) ;
 			}
 		});
 

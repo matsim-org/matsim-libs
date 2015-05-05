@@ -192,5 +192,13 @@ public abstract class Gbl {
 	public static final void printCurrentThreadCpuTime() {
 		printThreadCpuTime(Thread.currentThread());
 	}
+
+	public final static String RUN_MOB_SIM_NO_LONGER_POSSIBLE = "overriding runMobSim() no longer possible.  use the following syntax instead:\n"
+	+ "controler.addOverridingModule(new AbstractModule(){\n"
+	+ "@Override public void install() {\n"
+	+ "this.bindMobsim().toProvider(MyMobsimProvider.class) ;\n"
+	+ "}\n"
+	+ "});\n"
+	+ "See, e.g., the RunMobsimWithMultipleModeVehiclesExample class under tutorial.*.  Talk to MZ or KN if you need help.";
 	
 }

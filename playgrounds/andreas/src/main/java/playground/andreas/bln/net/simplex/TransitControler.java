@@ -70,7 +70,8 @@ public final class TransitControler extends Controler {
 		super(args);
 		this.transitConfig = new TransitConfigGroup();
 		init();
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE 
+				+ Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	}
 
 	public TransitControler(final ScenarioImpl scenario) {
@@ -129,18 +130,18 @@ public final class TransitControler extends Controler {
 		addControlerListener(cl);
 	}
 
-	@Override
-	protected void runMobSim() {
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(this.getScenario(), this.getEvents());
-		if (useOTFVis) {
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.getScenario().getConfig(), this.getScenario(), getEvents(), sim);
-			OTFClientLive.run(this.getScenario().getConfig(), server);
-		}
-
-//		this.events.addHandler(new LogOutputEventHandler());
-
-		sim.run();
-	}
+//	@Override
+//	protected void runMobSim() {
+//		QSim sim = (QSim) QSimUtils.createDefaultQSim(this.getScenario(), this.getEvents());
+//		if (useOTFVis) {
+//			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.getScenario().getConfig(), this.getScenario(), getEvents(), sim);
+//			OTFClientLive.run(this.getScenario().getConfig(), server);
+//		}
+//
+////		this.events.addHandler(new LogOutputEventHandler());
+//
+//		sim.run();
+//	}
 
 //	@Override
 //	public PlanAlgorithm createRoutingAlgorithm() {
