@@ -28,7 +28,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ChangeLegMode;
@@ -142,7 +141,7 @@ public class SubPopControler {
 		controler.setDumpDataAtEnd(true);
         controler.getConfig().controler().setCreateGraphs(true);
 
-        controler.addPlanStrategyFactory("ChangeLegMode_slum", new PlanStrategyFactory() {
+        controler.addPlanStrategyFactory("ChangeLegMode_slum", new javax.inject.Provider<PlanStrategy>() {
 			String [] availableModes_slum = {"slum_bike","slum_motorbike","slum_pt","slum_walk"};
 			@Override
 			public PlanStrategy get() {
@@ -153,7 +152,7 @@ public class SubPopControler {
 			}
 		});
 		
-		controler.addPlanStrategyFactory("ChangeLegMode_nonSlum", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("ChangeLegMode_nonSlum", new javax.inject.Provider<PlanStrategy>() {
 			String [] availableModes_nonSlum = {"nonSlum_car","nonSlum_bike","nonSlum_motorbike","nonSlum_pt","nonSlum_walk"};
 			@Override
 			public PlanStrategy get() {

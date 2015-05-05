@@ -29,7 +29,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -43,7 +42,7 @@ public class RunWithMultithreadedModule {
 
     public static void main(String[] args) {
         final Controler controler = new Controler(ConfigUtils.createConfig());
-        controler.addPlanStrategyFactory("myStrategy", new PlanStrategyFactory() {
+        controler.addPlanStrategyFactory("myStrategy", new javax.inject.Provider<PlanStrategy>() {
             @Override
             public PlanStrategy get() {
 

@@ -24,8 +24,9 @@ import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.replanning.selectors.DistributedPlanSelector;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
+
+import javax.inject.Provider;
 
 /**
  * @author fouriep Creates plan selector for distributed Simulation. Limits the expected value of being selected for PSim execution
@@ -33,7 +34,7 @@ import org.matsim.core.replanning.PlanStrategyImpl;
  *         but preventing excessive repeated execution of plans during the cycle.
  *         .
  */
-public class DistributedPlanSelectorStrategyFactory implements PlanStrategyFactory {
+public class DistributedPlanSelectorStrategyFactory implements Provider<PlanStrategy> {
 
     private final String strategyName;
     private final Controler controler;

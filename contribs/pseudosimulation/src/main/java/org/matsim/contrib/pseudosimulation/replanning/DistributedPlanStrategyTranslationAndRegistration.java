@@ -6,9 +6,10 @@ import org.matsim.contrib.pseudosimulation.replanning.factories.DistributedPlanS
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategyFactory;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.modules.*;
 
+import javax.inject.Provider;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,8 +40,8 @@ import java.util.Map;
  */
 public class DistributedPlanStrategyTranslationAndRegistration {
     public static final String SUFFIX = "PSIM";
-    public static Map<String, Class<? extends PlanStrategyFactory>> SupportedSelectors = new HashMap<>();
-    public static Map<String, Class<? extends PlanStrategyFactory>> SupportedMutators = new HashMap<>();
+    public static Map<String, Class<? extends Provider<PlanStrategy>>> SupportedSelectors = new HashMap<>();
+    public static Map<String, Class<? extends Provider<PlanStrategy>>> SupportedMutators = new HashMap<>();
     public static Map<String, Character> SupportedMutatorGenes = new HashMap<>();
     public static boolean TrackGenome = false;
 
@@ -79,13 +80,13 @@ public class DistributedPlanStrategyTranslationAndRegistration {
     }
 
     public static void registerStrategiesWithControler(Controler controler, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
-        for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedSelectors.entrySet()) {
+        for (Map.Entry<String, Class<? extends Provider<PlanStrategy>>> e : SupportedSelectors.entrySet()) {
             controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
                     new DistributedPlanSelectorStrategyFactory(slave,quickReplanning,selectionInflationFactor,controler,e.getKey()));
 
         }
 
-        for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedMutators.entrySet()) {
+        for (Map.Entry<String, Class<? extends Provider<PlanStrategy>>> e : SupportedMutators.entrySet()) {
             controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
                     new DistributedPlanMutatorStrategyFactory(slave, SupportedMutatorGenes.get(e.getKey()),TrackGenome,controler,e.getKey())
                     );

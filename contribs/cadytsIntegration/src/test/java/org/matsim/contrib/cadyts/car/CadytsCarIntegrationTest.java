@@ -48,7 +48,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -105,7 +104,7 @@ public class CadytsCarIntegrationTest {
 		config.getModule("cadytsCar").addParam("timeBinSize", "3600");
 		controler.addControlerListener(context) ;
 				
-		controler.addPlanStrategyFactory(CADYTS_STRATEGY_NAME, new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory(CADYTS_STRATEGY_NAME, new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				return new PlanStrategyImpl(new CadytsPlanChanger(controler.getScenario(), context));

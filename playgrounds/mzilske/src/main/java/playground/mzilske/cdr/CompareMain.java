@@ -19,7 +19,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -220,7 +219,7 @@ public class CompareMain {
 		final CadytsContext context = new CadytsContext(config, counts) ;
 		Controler controler = new Controler(scenario2);
 		controler.addControlerListener(context);
-		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2,context);

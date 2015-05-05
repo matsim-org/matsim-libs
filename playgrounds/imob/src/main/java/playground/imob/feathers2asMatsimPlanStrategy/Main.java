@@ -28,7 +28,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
@@ -75,7 +74,7 @@ class Main {
 		ctrl.getEvents().addHandler(feathers2);
 		
 		// add it as a PlanStrategy:
-		ctrl.addPlanStrategyFactory( FEATHERS2, new PlanStrategyFactory() {
+		ctrl.addPlanStrategyFactory( FEATHERS2, new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				GenericPlanSelector<Plan, Person> planSelector = new RandomPlanSelector<>() ;

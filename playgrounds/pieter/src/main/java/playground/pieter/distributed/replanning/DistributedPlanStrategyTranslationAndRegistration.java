@@ -3,12 +3,13 @@ package playground.pieter.distributed.replanning;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.PlanStrategyFactory;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.modules.*;
 import playground.pieter.distributed.replanning.factories.DistributedPlanMutatorStrategyFactory;
 import playground.pieter.distributed.replanning.factories.DistributedPlanSelectorStrategyFactory;
 import playground.pieter.distributed.replanning.factories.TransitLocationChoiceFactory;
 
+import javax.inject.Provider;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,9 +40,9 @@ import java.util.Map;
  *         non-QSim iterations.
  */
 public class DistributedPlanStrategyTranslationAndRegistration {
-    public static Map<String, Class<? extends PlanStrategyFactory>> SupportedSelectors = new HashMap<>();
+    public static Map<String, Class<? extends Provider<PlanStrategy>>> SupportedSelectors = new HashMap<>();
 
-    public static Map<String, Class<? extends PlanStrategyFactory>> SupportedMutators = new HashMap<>();
+    public static Map<String, Class<? extends Provider<PlanStrategy>>> SupportedMutators = new HashMap<>();
     public static Map<String, Character> SupportedMutatorGenes = new HashMap<>();
     public static boolean TrackGenome = false;
 
@@ -88,17 +89,17 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     public DistributedPlanStrategyTranslationAndRegistration(Controler  controler, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
 
-        for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedSelectors.entrySet()) {
+        for (Map.Entry<String, Class<? extends Provider<PlanStrategy>>> e : SupportedSelectors.entrySet()) {
             try {
                 controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
                         new DistributedPlanSelectorStrategyFactory<>( slave,
-                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance(), quickReplanning, selectionInflationFactor, controler.getScenario(), controler.getEvents()));
+                                (Provider<PlanStrategy>) e.getValue().getConstructors()[0].newInstance(), quickReplanning, selectionInflationFactor, controler.getScenario(), controler.getEvents()));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
                 e1.printStackTrace();
             }
         }
 
-        for (Map.Entry<String, Class<? extends PlanStrategyFactory>> e : SupportedMutators.entrySet()) {
+        for (Map.Entry<String, Class<? extends Provider<PlanStrategy>>> e : SupportedMutators.entrySet()) {
             if(e.getKey().equals( "TransitLocationChoice")){
                 TransitLocationChoiceFactory factory = new TransitLocationChoiceFactory(slave,SupportedMutatorGenes.get("TransitLocationChoice"),TrackGenome, controler);
                 controler.addPlanStrategyFactory("TransitLocationChoicePSIM", factory);
@@ -107,7 +108,7 @@ public class DistributedPlanStrategyTranslationAndRegistration {
             try {
                 controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
                         new DistributedPlanMutatorStrategyFactory<>(slave,
-                                (PlanStrategyFactory) e.getValue().getConstructors()[0].newInstance(),
+                                (Provider<PlanStrategy>) e.getValue().getConstructors()[0].newInstance(),
                                 SupportedMutatorGenes.get(e.getKey()),TrackGenome,controler));
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
                 e1.printStackTrace();

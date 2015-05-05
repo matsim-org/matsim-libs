@@ -3,13 +3,13 @@ package tutorial.programming.example11PluggablePlanStrategyInCode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 
-class MyPlanStrategyFactory implements PlanStrategyFactory {
+class MyPlanStrategyFactory implements Provider<PlanStrategy> {
 
     private EventsManager eventsManager;
     private Scenario scenario;

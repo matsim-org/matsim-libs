@@ -21,14 +21,14 @@ package playground.pieter.pseudosimulation.replanning.factories;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import playground.pieter.pseudosimulation.replanning.selectors.PSimExpBetaPlanSelector;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 public class PSimSelectExpBetaPlanStrategyFactory implements
-		PlanStrategyFactory {
+        Provider<PlanStrategy> {
 
     private Config config;
 

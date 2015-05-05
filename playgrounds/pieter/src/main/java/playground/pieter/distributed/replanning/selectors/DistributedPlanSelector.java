@@ -25,14 +25,16 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.replanning.PlanStrategyFactory;
+import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import playground.pieter.distributed.replanning.PlanCatcher;
 
+import javax.inject.Provider;
 
-public class DistributedPlanSelector<T extends PlanStrategyFactory>implements PlanSelector {
+
+public class DistributedPlanSelector<T extends Provider<PlanStrategy>>implements PlanSelector {
 
     private double selectionFrequency;
     T delegateFactory;

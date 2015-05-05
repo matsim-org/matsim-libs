@@ -28,12 +28,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.johannes.gsv.synPop.CommonKeys;
 
+import javax.inject.Provider;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -43,7 +43,7 @@ import java.util.*;
  * @author johannes
  * 
  */
-public class ActivityLocationStrategyFactory implements PlanStrategyFactory {
+public class ActivityLocationStrategyFactory implements Provider<PlanStrategy> {
 
 	private static final Logger logger = Logger.getLogger(ActivityLocationStrategyFactory.class);
 

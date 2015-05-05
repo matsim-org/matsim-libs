@@ -31,7 +31,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -58,7 +57,7 @@ public class RunLocationChoiceFrozenEpsilons {
 
         Controler controler = new Controler(scenario);
         controler.setScoringFunctionFactory(scoringFunctionFactory);
-        controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
+        controler.addPlanStrategyFactory("MyLocationChoice", new javax.inject.Provider<PlanStrategy>(){
             @Override
             public PlanStrategy get() {
                 return new BestReplyLocationChoicePlanStrategy(scenario) ;

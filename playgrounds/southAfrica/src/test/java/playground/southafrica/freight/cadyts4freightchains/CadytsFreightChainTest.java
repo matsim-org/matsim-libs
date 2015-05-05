@@ -51,7 +51,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -115,7 +114,7 @@ public class CadytsFreightChainTest {
 		final CadytsFreightChainsContext cContext = new CadytsFreightChainsContext(config, nChainsOfLength );
 		controler.addControlerListener(cContext);
 
-		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 //				return new PlanStrategyImpl(new ExpBetaPlanSelectorWithCadytsPlanRegistration<Item>(

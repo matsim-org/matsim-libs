@@ -53,7 +53,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -127,7 +126,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME , dcScore);
 
 		// add locachoice strategy factory:
-		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
+		controler.addPlanStrategyFactory("MyLocationChoice", new javax.inject.Provider<PlanStrategy>(){
 			@Override
 			public PlanStrategy get() {
 				return new BestReplyLocationChoicePlanStrategy(scenario) ;
@@ -193,7 +192,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME , dcScore);
 
 		// set locachoice strategy:
-		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
+		controler.addPlanStrategyFactory("MyLocationChoice", new javax.inject.Provider<PlanStrategy>(){
 			@Override
 			public PlanStrategy get() {
 				return new BestReplyLocationChoicePlanStrategy(scenario) ;
@@ -289,7 +288,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Controler controler = new Controler(scenario);
 
 		// set locachoice strategy:
-		controler.addPlanStrategyFactory("MyLocationChoice", new PlanStrategyFactory(){
+		controler.addPlanStrategyFactory("MyLocationChoice", new javax.inject.Provider<PlanStrategy>(){
 			@Override
 			public PlanStrategy get() {
 				return new LocationChoicePlanStrategy(scenario) ;

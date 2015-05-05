@@ -21,13 +21,13 @@ package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
-public class SelectPathSizeLogitStrategyFactory implements PlanStrategyFactory {
+public class SelectPathSizeLogitStrategyFactory implements Provider<PlanStrategy> {
 
     private Scenario scenario;
 

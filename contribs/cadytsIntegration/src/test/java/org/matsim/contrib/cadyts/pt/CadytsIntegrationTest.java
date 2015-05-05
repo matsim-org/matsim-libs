@@ -48,7 +48,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -89,7 +88,7 @@ public class CadytsIntegrationTest {
 		final Controler controler = new Controler(scenario);
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
-		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				return new PlanStrategyImpl(new CadytsPlanChanger<TransitStopFacility>(scenario, context));
@@ -152,7 +151,7 @@ public class CadytsIntegrationTest {
 		final CadytsPtContext cContext = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(cContext) ;
 
-		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(controler.getScenario(), cContext);
@@ -315,7 +314,7 @@ public class CadytsIntegrationTest {
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
 
-		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>( scenario, context);
@@ -462,7 +461,7 @@ public class CadytsIntegrationTest {
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
 //		controler.setOverwriteFiles(true);
-		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(controler.getScenario(), context);

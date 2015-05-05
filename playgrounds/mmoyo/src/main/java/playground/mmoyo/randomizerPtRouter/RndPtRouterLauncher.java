@@ -30,7 +30,6 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.*;
@@ -108,7 +107,7 @@ public class RndPtRouterLauncher {
 		final double beta = 30. ;
 		final CadytsPtContext context = new CadytsPtContext(config, controler.getEvents()) ;
 		controler.addControlerListener(context) ;
-		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("myCadyts", new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(), context);

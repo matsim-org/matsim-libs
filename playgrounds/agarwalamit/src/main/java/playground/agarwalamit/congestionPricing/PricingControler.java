@@ -26,7 +26,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -35,7 +34,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
-
 import playground.ikaddoura.analysis.welfare.WelfareAnalysisControlerListener;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -131,7 +129,7 @@ public class PricingControler {
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 		
 		if(usingMunich){
-			controler.addPlanStrategyFactory("SubtourModeChoice_".concat("COMMUTER_REV_COMMUTER"), new PlanStrategyFactory() {
+			controler.addPlanStrategyFactory("SubtourModeChoice_".concat("COMMUTER_REV_COMMUTER"), new javax.inject.Provider<PlanStrategy>() {
 				String [] availableModes = {"car","pt_COMMUTER_REV_COMMUTER"};
 				String [] chainBasedModes = {"car","bike"};
 				@Override
@@ -144,7 +142,7 @@ public class PricingControler {
 			});
 
 			// following is must since, feb15, it is not possible to add two replanning strategies together, even for different sub pop except "ChangeExpBeta"
-			controler.addPlanStrategyFactory("ReRoute_".concat("COMMUTER_REV_COMMUTER"), new PlanStrategyFactory() {
+			controler.addPlanStrategyFactory("ReRoute_".concat("COMMUTER_REV_COMMUTER"), new javax.inject.Provider<PlanStrategy>() {
 
 				@Override
 				public PlanStrategy get() {

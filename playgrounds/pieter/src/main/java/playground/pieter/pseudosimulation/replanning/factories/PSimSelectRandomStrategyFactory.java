@@ -20,11 +20,12 @@
 package playground.pieter.pseudosimulation.replanning.factories;
 
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import playground.pieter.pseudosimulation.replanning.selectors.PSimRandomPlanSelector;
 
-public class PSimSelectRandomStrategyFactory implements PlanStrategyFactory {
+import javax.inject.Provider;
+
+public class PSimSelectRandomStrategyFactory implements Provider<PlanStrategy> {
 
 	@Override
 	public PlanStrategy get() {

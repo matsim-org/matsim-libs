@@ -31,7 +31,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -90,7 +89,7 @@ public class Controler_launcher {
 		
 		controler.addControlerListener(cContext) ;
 		//set cadyts as strategy for plan selector
-		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("myCadyts", new javax.inject.Provider<PlanStrategy>() {
 			
 			@Override
 			public PlanStrategy get() {

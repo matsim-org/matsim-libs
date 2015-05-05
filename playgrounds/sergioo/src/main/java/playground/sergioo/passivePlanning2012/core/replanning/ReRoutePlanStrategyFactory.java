@@ -21,12 +21,12 @@ package playground.sergioo.passivePlanning2012.core.replanning;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.modules.ReRoute;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
-public class ReRoutePlanStrategyFactory implements PlanStrategyFactory {
+public class ReRoutePlanStrategyFactory implements Provider<PlanStrategy> {
 
     private Scenario scenario;
 

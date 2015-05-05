@@ -32,13 +32,15 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.pt.router.*;
+import org.matsim.pt.router.PreparedTransitSchedule;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 import playground.mmoyo.randomizerPtRouter.RndPtRouterFactory;
@@ -125,7 +127,7 @@ public class SolutionsSearch {
 		controler.addControlerListener(cContext) ;
 
 		//set cadyts as strategy for plan selector
-		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("myCadyts", new javax.inject.Provider<PlanStrategy>() {
 			
 			@Override   
 			public PlanStrategy get() {

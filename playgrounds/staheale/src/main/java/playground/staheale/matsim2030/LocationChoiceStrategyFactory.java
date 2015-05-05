@@ -21,15 +21,15 @@ package playground.staheale.matsim2030;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
-public class LocationChoiceStrategyFactory implements PlanStrategyFactory {
+public class LocationChoiceStrategyFactory implements Provider<PlanStrategy> {
 
     private Scenario scenario;
 

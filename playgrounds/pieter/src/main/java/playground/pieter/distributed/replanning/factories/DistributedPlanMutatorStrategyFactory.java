@@ -21,10 +21,11 @@ package playground.pieter.distributed.replanning.factories;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.distributed.replanning.modules.RegisterMutatedPlanForPSim;
+
+import javax.inject.Provider;
 
 /**
  * @author fouriep Creates plan selector of type T for distributed Simulation. Limits the expected value of being selected for PSim execution
@@ -32,8 +33,8 @@ import playground.pieter.distributed.replanning.modules.RegisterMutatedPlanForPS
  * but preventing excessive repeated execution of plans during the cycle.
  *         .
  */
-public class DistributedPlanMutatorStrategyFactory<T extends PlanStrategyFactory> implements
-		PlanStrategyFactory {
+public class DistributedPlanMutatorStrategyFactory<T extends Provider<PlanStrategy>> implements
+        Provider<PlanStrategy> {
     private final PlanCatcher slave;
     private final char gene;
     private final boolean trackGenome;

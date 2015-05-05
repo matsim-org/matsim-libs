@@ -21,14 +21,14 @@ package playground.pieter.pseudosimulation.replanning.factories;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import playground.pieter.pseudosimulation.replanning.selectors.PSimExpBetaPlanChanger;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 public class PSimChangeExpBetaPlanStrategyFactory implements
-		PlanStrategyFactory {
+        Provider<PlanStrategy> {
 
     private Scenario scenario;
 

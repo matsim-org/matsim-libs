@@ -33,14 +33,14 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
-
 import playground.yu.tests.ChangeLegModeWithParkLocation;
+
+import javax.inject.Provider;
 
 /**
  * @author yu
@@ -291,7 +291,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		
 		Controler ctl = new Controler(config);
 		
-		ctl.addPlanStrategyFactory("abc", new PlanStrategyFactory() {
+		ctl.addPlanStrategyFactory("abc", new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector<Plan,Person>() ) ;
@@ -323,8 +323,8 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		public ChangeLegModeWithParkLocationControler(final Config config) {
 			super(config);
 			final Scenario scenario = this.getScenario() ;
-			
-			PlanStrategyFactory planStrategyFactory = new PlanStrategyFactory(){
+
+			Provider<PlanStrategy> planStrategyFactory = new javax.inject.Provider<PlanStrategy>(){
 				@Override public PlanStrategy get() {
 					PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector<Plan,Person>() ) ;
 					builder.addStrategyModule(new ChangeLegModeWithParkLocation(config, scenario.getNetwork()));

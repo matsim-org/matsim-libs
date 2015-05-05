@@ -21,16 +21,16 @@ package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * @author thibautd
  */
-public class TimeAllocationMutatorReRoutePlanStrategyFactory implements PlanStrategyFactory {
+public class TimeAllocationMutatorReRoutePlanStrategyFactory implements Provider<PlanStrategy> {
     private Scenario scenario;
 
     @Inject

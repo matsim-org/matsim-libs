@@ -16,7 +16,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -71,7 +70,7 @@ public class ControlerSingapore {
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		// comment: I would argue that when you add waitTime/stopTime to the router, you also need to adapt the scoring function accordingly.
 		// kai, sep'13
-		controler.addPlanStrategyFactory("TransitLocationChoice",new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("TransitLocationChoice",new javax.inject.Provider<PlanStrategy>() {
             @Override
             public PlanStrategy get() {
                 return new TransitLocationChoiceStrategy(controler.getScenario());

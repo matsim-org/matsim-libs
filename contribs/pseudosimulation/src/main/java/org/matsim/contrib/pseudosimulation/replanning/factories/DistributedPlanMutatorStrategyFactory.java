@@ -19,27 +19,12 @@
 
 package org.matsim.contrib.pseudosimulation.replanning.factories;
 
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
-import org.matsim.api.core.v01.population.HasPlansAndId;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanMutatorStrategy;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
-import org.matsim.contrib.pseudosimulation.replanning.modules.RegisterMutatedPlanForPSim;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
-import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.selectors.BestPlanSelector;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import java.util.Map;
+import javax.inject.Provider;
 
 /**
  * @author fouriep Creates plan selector of type T for distributed Simulation. Limits the expected value of being selected for PSim execution
@@ -48,7 +33,7 @@ import java.util.Map;
  *         .
  */
 public class DistributedPlanMutatorStrategyFactory implements
-        PlanStrategyFactory {
+        Provider<PlanStrategy> {
     private final String strategyName;
     private final PlanCatcher slave;
     private final char gene;

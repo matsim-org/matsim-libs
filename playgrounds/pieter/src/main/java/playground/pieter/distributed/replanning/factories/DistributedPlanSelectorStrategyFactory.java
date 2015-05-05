@@ -22,18 +22,20 @@ package playground.pieter.distributed.replanning.factories;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import playground.pieter.distributed.replanning.PlanCatcher;
 import playground.pieter.distributed.replanning.selectors.DistributedPlanSelector;
+
+import javax.inject.Provider;
+
 /**
  * @author fouriep Creates plan selector of type T for distributed Simulation. Limits the expected value of being selected for PSim execution
  * in a cycle to the value specified in the config for the selector, thus updating plan scores to the latest travel time information
  * but preventing excessive repeated execution of plans during the cycle.
  *         .
  */
-public class DistributedPlanSelectorStrategyFactory<T extends PlanStrategyFactory> implements
-		PlanStrategyFactory {
+public class DistributedPlanSelectorStrategyFactory<T extends Provider<PlanStrategy>> implements
+        Provider<PlanStrategy> {
 
     T delegate;
     PlanCatcher slave;

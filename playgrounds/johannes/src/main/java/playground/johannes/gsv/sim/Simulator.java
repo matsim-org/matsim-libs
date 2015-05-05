@@ -49,7 +49,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManagerModule;
 import org.matsim.core.router.TripRouterModule;
@@ -125,7 +124,7 @@ public class Simulator {
 		settings = new StrategySettings(Id.create(2, StrategySettings.class));
 		settings.setStrategyName("doNothing");
 	
-		controler.addPlanStrategyFactory("doNothing", new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory("doNothing", new javax.inject.Provider<PlanStrategy>() {
 
 			@Override
 			public PlanStrategy get() {

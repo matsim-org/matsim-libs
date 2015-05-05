@@ -20,11 +20,12 @@
 package org.matsim.core.replanning.modules;
 
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-public class SelectRandomStrategyFactory implements PlanStrategyFactory {
+import javax.inject.Provider;
+
+public class SelectRandomStrategyFactory implements Provider<PlanStrategy> {
 
 	@Override
 	public PlanStrategy get() {

@@ -21,13 +21,13 @@ package org.matsim.core.replanning.modules;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
-public class ChangeExpBetaPlanStrategyFactory implements PlanStrategyFactory {
+public class ChangeExpBetaPlanStrategyFactory implements Provider<PlanStrategy> {
 
     private Config config;
 

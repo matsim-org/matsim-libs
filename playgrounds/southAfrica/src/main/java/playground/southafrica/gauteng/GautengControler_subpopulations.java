@@ -46,7 +46,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -234,7 +233,7 @@ public class GautengControler_subpopulations {
 		});
 
 		// ... during replanning (this also needs to be registered as strategy in the config):
-		controler.addPlanStrategyFactory(RE_ROUTE_AND_SET_VEHICLE, new PlanStrategyFactory() {
+		controler.addPlanStrategyFactory(RE_ROUTE_AND_SET_VEHICLE, new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				PlanStrategyImpl planStrategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() ) ; 
