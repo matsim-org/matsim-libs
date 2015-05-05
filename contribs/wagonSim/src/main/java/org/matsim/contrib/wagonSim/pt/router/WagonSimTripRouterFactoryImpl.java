@@ -47,10 +47,11 @@ import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import javax.inject.Provider;
 
 /**
  * @author droeder
@@ -64,7 +65,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 //	private TripRouterFactoryImpl delegate;
 	private RoutingModule walkRouter;
 	private TransitSchedule transitSchedule;
-	private TransitRouterFactory routerFactory;
+	private Provider<TransitRouter> routerFactory;
 	private Map<Id<TransitStopFacility>, Double> minShuntingTimes;
 	private Network network;
 
@@ -73,7 +74,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 //			final TravelDisutilityFactory disutilityFactory,
 //			final TravelTime travelTime,
 //			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
-			final TransitRouterFactory transitRouterFactory,
+			final Provider<TransitRouter> transitRouterFactory,
 			Map<Id<TransitStopFacility>, Double> minShuntingTimes) {
 //		this.delegate = new TripRouterFactoryImpl(scenario, disutilityFactory, travelTime, leastCostAlgoFactory, transitRouterFactory);
 		this.routerFactory = transitRouterFactory;

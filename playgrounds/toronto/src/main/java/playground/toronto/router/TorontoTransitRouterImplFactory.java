@@ -19,15 +19,10 @@
 
 package playground.toronto.router;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.toronto.exceptions.NetworkFormattingException;
 import playground.toronto.router.calculators.TorontoTransitRouterNetworkTravelTimeAndDisutility;
 import playground.toronto.router.calculators.TransitDataCache;
@@ -36,7 +31,7 @@ import playground.toronto.router.routernetwork.TorontoTransitRouterNetworkImprov
 /**
  * @author pkucirek
  */
-public class TorontoTransitRouterImplFactory implements TransitRouterFactory {
+public class TorontoTransitRouterImplFactory implements Provider<TransitRouter> {
 
 	private final TransitSchedule schedule;
 	private final TransitRouterConfig config;

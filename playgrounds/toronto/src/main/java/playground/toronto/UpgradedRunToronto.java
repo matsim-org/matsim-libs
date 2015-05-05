@@ -1,11 +1,6 @@
 package playground.toronto;
 
-import java.io.File;
-import java.util.Locale;
-
-import javax.swing.JFileChooser;
-import javax.swing.filechooser.FileFilter;
-
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -17,15 +12,18 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-
-import playground.toronto.analysis.handlers.AgentTripChainHandler;
 import playground.toronto.analysis.handlers.AggregateBoardingsOverTimePeriodHandler;
 import playground.toronto.exceptions.NetworkFormattingException;
 import playground.toronto.router.TorontoTransitRouterImplFactory;
 import playground.toronto.router.UpgradedTransitRouterFactory;
 import playground.toronto.router.calculators.TransitDataCache;
+
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import java.io.File;
+import java.util.Locale;
 
 public class UpgradedRunToronto {
 
@@ -74,7 +72,7 @@ public class UpgradedRunToronto {
 		//Set up the custom travel-time calculator
 		TransitRouterConfig trConfig = new TransitRouterConfig(config);
 		TransitDataCache transitDataCache = new TransitDataCache(scenario.getTransitSchedule());
-		TransitRouterFactory trFactory;
+		Provider<TransitRouter> trFactory;
 		
 		//Branch: if mode-specific boarding costs are specified, use a different calculator.
 		if (config.getModule("boardingcosts") != null){

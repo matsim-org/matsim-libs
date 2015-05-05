@@ -41,7 +41,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -94,12 +94,12 @@ public class ControlerDefaultsWithMultiModalModule extends AbstractModule {
 
         private Scenario scenario;
         private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-        private TransitRouterFactory transitRouterFactory;
+        private Provider<TransitRouter> transitRouterFactory;
         private Map<String, TravelTime> multiModalTravelTimes;
         private TravelDisutilityFactory travelDisutilityFactory;
 
         @Inject
-        MultiModalTripRouterFactoryProvider(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TransitRouterFactory transitRouterFactory, Map<String, TravelTime> multiModalTravelTimes, TravelDisutilityFactory travelDisutilityFactory) {
+        MultiModalTripRouterFactoryProvider(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, Provider<TransitRouter> transitRouterFactory, Map<String, TravelTime> multiModalTravelTimes, TravelDisutilityFactory travelDisutilityFactory) {
             this.scenario = scenario;
             this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
             this.transitRouterFactory = transitRouterFactory;

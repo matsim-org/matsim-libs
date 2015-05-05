@@ -38,11 +38,13 @@ import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configur
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility.DataCollection;
 
+import javax.inject.Provider;
+
 public class RndPtRouterLauncher {
 
-	private static TransitRouterFactory createRandomizedTransitRouterFactory (final TransitSchedule schedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
+	private static Provider<TransitRouter> createRandomizedTransitRouterFactory (final TransitSchedule schedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
 		return 
-		new TransitRouterFactory() {
+		new Provider<TransitRouter>() {
 			@Override
 			public TransitRouter get() {
 				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = 
@@ -114,7 +116,7 @@ public class RndPtRouterLauncher {
 			}} ) ;
 		
 		//create the factory for rndizedRouter
-		TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (trSchedule, trConfig, routerNetwork);
+		Provider<TransitRouter> randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (trSchedule, trConfig, routerNetwork);
 		controler.setTransitRouterFactory(randomizedTransitRouterFactory);		
 		
 		//add analyzer for specific bus line and stop Zone conversion

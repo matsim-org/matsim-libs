@@ -19,12 +19,11 @@
 
 package playground.sergioo.singapore2012.transitRouterVariable;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTime;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTime;
 
@@ -33,7 +32,7 @@ import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTime
  * 
  * @author sergioo
  */
-public class TransitRouterWSImplFactory implements TransitRouterFactory {
+public class TransitRouterWSImplFactory implements Provider<TransitRouter> {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;

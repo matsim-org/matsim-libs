@@ -1,8 +1,5 @@
 package playground.pieter.pseudosimulation.controler;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -12,8 +9,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
-import org.matsim.pt.router.TransitRouterFactory;
-
+import org.matsim.pt.router.TransitRouter;
 import playground.pieter.pseudosimulation.controler.listeners.AfterScoringSelectedPlanScoreRestoreListener;
 import playground.pieter.pseudosimulation.controler.listeners.BeforePSimSelectedPlanScoreRecorder;
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
@@ -24,6 +20,10 @@ import playground.pieter.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
+
+import javax.inject.Provider;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 
 /**
  * @author fouriep
@@ -164,7 +164,7 @@ public class PSimControler {
 	}
 
 
-	public void setTransitRouterFactory(TransitRouterFactory transitRouterFactory) {
+	public void setTransitRouterFactory(Provider<TransitRouter> transitRouterFactory) {
 		this.matsimControler.setTransitRouterFactory(transitRouterFactory);
 		
 	}

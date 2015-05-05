@@ -37,13 +37,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 import playground.mmoyo.randomizerPtRouter.RndPtRouterFactory;
+
+import javax.inject.Provider;
 
 /**
  * Another launcher for svd values search
@@ -101,7 +100,7 @@ public class SolutionsSearch {
 		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);
 		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(schedule);
 		RndPtRouterFactory rndPtRouterFactory = new RndPtRouterFactory();
-		TransitRouterFactory randomizedTransitRouterFactory = rndPtRouterFactory.createFactory (preparedSchedule, trConfig, routerNetwork, false, false);
+		Provider<TransitRouter> randomizedTransitRouterFactory = rndPtRouterFactory.createFactory (preparedSchedule, trConfig, routerNetwork, false, false);
 		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
 		
 		

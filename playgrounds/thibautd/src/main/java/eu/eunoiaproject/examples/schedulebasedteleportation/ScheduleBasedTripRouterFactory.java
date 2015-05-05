@@ -21,14 +21,9 @@ package eu.eunoiaproject.examples.schedulebasedteleportation;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterFactory;
 
 import javax.inject.Provider;
 

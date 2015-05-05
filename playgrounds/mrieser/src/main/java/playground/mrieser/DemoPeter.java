@@ -27,16 +27,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.CustomDataManager;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
+
+import javax.inject.Provider;
 
 public class DemoPeter {
 
@@ -54,7 +49,7 @@ public class DemoPeter {
 		controler.run();
 	}
 
-	public static class MyTransitRouterFactory implements TransitRouterFactory {
+	public static class MyTransitRouterFactory implements Provider<TransitRouter> {
 
 		private final TransitSchedule schedule;
 		private final TransitRouterConfig config;

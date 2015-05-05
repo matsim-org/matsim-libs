@@ -21,14 +21,11 @@ package org.matsim.contrib.wagonSim.pt.router.deprecated;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.wagonSim.mobsim.qsim.framework.listeners.WagonSimVehicleLoadListener;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import javax.inject.Provider;
 
 /**
  * 
@@ -39,7 +36,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  *
  */
 @Deprecated
-public class WagonSimRouterFactory2Impl implements TransitRouterFactory{
+public class WagonSimRouterFactory2Impl implements Provider<TransitRouter> {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger

@@ -21,12 +21,11 @@ package org.matsim.contrib.eventsBasedPTRouter;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
+import org.matsim.contrib.eventsBasedPTRouter.vehicleOccupancy.VehicleOccupancy;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.contrib.eventsBasedPTRouter.vehicleOccupancy.VehicleOccupancy;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;

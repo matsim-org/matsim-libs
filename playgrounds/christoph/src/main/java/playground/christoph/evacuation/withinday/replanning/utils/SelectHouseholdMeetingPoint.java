@@ -20,6 +20,7 @@
 
 package playground.christoph.evacuation.withinday.replanning.utils;
 
+import com.google.inject.Provider;
 import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -54,7 +55,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -107,7 +108,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 	private final int numOfThreads;
 	private final DecisionDataProvider decisionDataProvider;
 	private final MobsimDataProvider mobsimDataProvider;
-	private final TransitRouterFactory transitRouterFactory;
+	private final Provider<TransitRouter> transitRouterFactory;
 	
 	private TravelDisutilityFactory disutilityFactory;
 	private TripRouterFactory toHomeFacilityRouterFactory;
@@ -139,7 +140,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 	public SelectHouseholdMeetingPoint(Scenario scenario, Map<String,TravelTime> travelTimes,
 			CoordAnalyzer coordAnalyzer, Geometry affectedArea, InformedHouseholdsTracker informedHouseholdsTracker, 
 			DecisionModelRunner decisionModelRunner, MobsimDataProvider mobsimDataProvider,
-			TransitRouterFactory transitRouterFactory) {
+									   Provider<TransitRouter> transitRouterFactory) {
 		this.scenario = scenario;
 		this.travelTimes = travelTimes;
 		this.coordAnalyzer = coordAnalyzer;

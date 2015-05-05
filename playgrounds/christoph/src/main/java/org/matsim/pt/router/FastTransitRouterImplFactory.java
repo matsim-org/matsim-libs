@@ -20,6 +20,7 @@
 
 package org.matsim.pt.router;
 
+import com.google.inject.Provider;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.router.util.FastTransitDijkstraFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -27,7 +28,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 /**
  * @author cdobler
  */
-public class FastTransitRouterImplFactory implements TransitRouterFactory {
+public class FastTransitRouterImplFactory implements Provider<TransitRouter> {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetwork routerNetwork;

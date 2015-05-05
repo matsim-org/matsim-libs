@@ -19,21 +19,16 @@
 
 package playground.pbouman.transitfares;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.pbouman.agentproperties.AgentProperties;
 
-public class TransitFareRouterFactoryImpl implements TransitRouterFactory {
+import javax.inject.Provider;
+import java.util.Map;
+
+public class TransitFareRouterFactoryImpl implements Provider<TransitRouter> {
 
 	private final ScenarioImpl scenario;
 	

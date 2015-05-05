@@ -22,8 +22,8 @@ package org.matsim.contrib.minibus.hook;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.pt.router.TransitRouterFactory;
 
+import javax.inject.Provider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -56,7 +56,7 @@ class PTripRouterFactoryFactory {
 					try {
 						Class<?>[] args = new Class[2];
 						args[0] = Controler.class;
-						args[1] = TransitRouterFactory.class;
+						args[1] = Provider.class;
 						Constructor<? extends TripRouterFactory> c = null;
 						c = tripRouterFactory.getConstructor(args);
 						factory = c.newInstance(controler, pTransitRouterFactory);

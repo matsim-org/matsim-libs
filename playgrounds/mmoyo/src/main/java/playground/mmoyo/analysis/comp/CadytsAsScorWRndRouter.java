@@ -45,12 +45,14 @@ import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
 
+import javax.inject.Provider;
+
 
 public class CadytsAsScorWRndRouter {
 
-	private static TransitRouterFactory createRandomizedTransitRouterFactory (final PreparedTransitSchedule preparedSchedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
+	private static Provider<TransitRouter> createRandomizedTransitRouterFactory (final PreparedTransitSchedule preparedSchedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
 		return 
-		new TransitRouterFactory() {
+		new Provider<TransitRouter>() {
 			@Override
 			public TransitRouter get() {
 				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = 
@@ -152,7 +154,7 @@ public class CadytsAsScorWRndRouter {
 		
 		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.beelineWalkConnectionDistance);
 		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(routerSchedule);
-		TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (preparedSchedule, trConfig, routerNetwork);
+		Provider<TransitRouter> randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (preparedSchedule, trConfig, routerNetwork);
 		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
 		
 		

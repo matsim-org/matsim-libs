@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.droeder.ptSubModes.routing;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -36,15 +37,8 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.DefaultRoutingModules;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.core.router.util.*;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
@@ -66,7 +60,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	private LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory;
 	private ModeRouteFactory modeRouteFactory;
 	private PopulationFactory populationFactory;
-	private TransitRouterFactory transitRouterFactory;
+	private Provider<TransitRouter> transitRouterFactory;
 	private TransitSchedule transitSchedule;
 
 	private Controler controler;
@@ -76,7 +70,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	 * @param controler
 	 * @param transitRouterFactory 
 	 */
-	public PtSubModeTripRouterFactory(final Controler controler, TransitRouterFactory transitRouterFactory) {
+	public PtSubModeTripRouterFactory(final Controler controler, Provider<TransitRouter> transitRouterFactory) {
 		this.controler = controler;
 		this.transitRouterFactory = transitRouterFactory;
 //		this.config = controler.getScenario().getConfig();

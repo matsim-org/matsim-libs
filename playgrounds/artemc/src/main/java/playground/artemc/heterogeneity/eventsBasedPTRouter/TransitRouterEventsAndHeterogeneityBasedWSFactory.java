@@ -20,20 +20,20 @@
 package playground.artemc.heterogeneity.eventsBasedPTRouter;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
 
 /**
  * Factory for the variable transit router
  * 
  * @author sergioo
  */
-public class TransitRouterEventsAndHeterogeneityBasedWSFactory implements TransitRouterFactory {
+public class TransitRouterEventsAndHeterogeneityBasedWSFactory implements Provider<TransitRouter> {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;

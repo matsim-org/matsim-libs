@@ -1,22 +1,16 @@
 package playground.staheale.matsim2030;
 
+import com.google.inject.Provider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-
 import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
 
-public class NewTransitRouterImplFactory implements TransitRouterFactory {
+public class NewTransitRouterImplFactory implements Provider<TransitRouter> {
 
 	private final TransitSchedule schedule;
 	private final TransitRouterConfig configTransit;

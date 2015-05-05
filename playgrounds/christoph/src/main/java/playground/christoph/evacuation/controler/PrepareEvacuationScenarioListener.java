@@ -23,6 +23,7 @@ package playground.christoph.evacuation.controler;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -61,10 +62,7 @@ import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.pt.router.FastTransitRouterImplFactory;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.*;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
@@ -270,7 +268,7 @@ public class PrepareEvacuationScenarioListener {
 		
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(scenario);
-		TransitRouterFactory transitRouterFactory = null;
+		Provider<TransitRouter> transitRouterFactory = null;
 		if (scenario.getConfig().scenario().isUseTransit()) {
 //			transitRouterFactory = builder.createDefaultTransitRouter(scenario);
 			Config config = scenario.getConfig();

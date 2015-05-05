@@ -19,6 +19,7 @@
 
 package eu.eunoiaproject.examples.thinnedtransitrouternetwork;
 
+import eu.eunoiaproject.examples.schedulebasedteleportation.ScheduleBasedTripRouterFactory;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -31,16 +32,15 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.ivt.matsim2030.router.TransitRouterWithThinnedNetworkFactory;
 
-import eu.eunoiaproject.examples.schedulebasedteleportation.ScheduleBasedTripRouterFactory;
+import javax.inject.Provider;
 
 public class RunSimulationWithThinnedRouterNetwork {
 	private static final Logger log =
@@ -80,7 +80,7 @@ public class RunSimulationWithThinnedRouterNetwork {
 		controler.run();
 	}
 
-	private static TransitRouterFactory createTransitRouterFactory(
+	private static Provider<TransitRouter> createTransitRouterFactory(
 			final String routingNetworkFile,
 			final Scenario scenario ) {
 		final TransitRouterConfig conf = new TransitRouterConfig( scenario.getConfig() );

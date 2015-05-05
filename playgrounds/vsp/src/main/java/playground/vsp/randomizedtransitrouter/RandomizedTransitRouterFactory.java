@@ -25,13 +25,14 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility.DataCollection;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 
 /**
  * @author dgrether
  *
  */
-public class RandomizedTransitRouterFactory implements TransitRouterFactory {
+public class RandomizedTransitRouterFactory implements Provider<TransitRouter> {
 
 	private TransitRouterConfig trConfig;
 	private TransitSchedule schedule;

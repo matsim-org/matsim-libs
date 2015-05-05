@@ -25,7 +25,7 @@ package playground.artemc.heterogeneity.eventsBasedPTRouter;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 
 public class TransitRouterEventsAndHeterogeneityBasedWSModule extends AbstractModule {
 	
@@ -41,6 +41,6 @@ public class TransitRouterEventsAndHeterogeneityBasedWSModule extends AbstractMo
     public void install() {
 		bind(WaitTime.class).toInstance(waitTimes);
 		bind(StopStopTime.class).toInstance(stopStopTimes);
-		bind(TransitRouterFactory.class).to(TransitRouterEventsAndHeterogeneityBasedWSFactory.class);
+		bind(TransitRouter.class).toProvider(TransitRouterEventsAndHeterogeneityBasedWSFactory.class);
 	}
 }

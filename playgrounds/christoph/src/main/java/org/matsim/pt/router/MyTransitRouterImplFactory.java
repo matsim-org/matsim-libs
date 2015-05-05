@@ -20,13 +20,14 @@
 
 package org.matsim.pt.router;
 
+import com.google.inject.Provider;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
  * @author cdobler
  */
-public class MyTransitRouterImplFactory implements TransitRouterFactory {
+public class MyTransitRouterImplFactory implements Provider<TransitRouter> {
 
 	private final TransitSchedule schedule;
 	private final TransitRouterConfig config;

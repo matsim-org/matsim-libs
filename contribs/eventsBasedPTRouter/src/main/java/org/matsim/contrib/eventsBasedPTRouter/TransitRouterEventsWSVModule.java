@@ -24,7 +24,6 @@ package org.matsim.contrib.eventsBasedPTRouter;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterFactory;
 
 public class TransitRouterEventsWSVModule extends AbstractModule {
     @Override

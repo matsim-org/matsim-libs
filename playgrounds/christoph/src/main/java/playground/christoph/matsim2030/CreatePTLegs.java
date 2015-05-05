@@ -20,15 +20,10 @@
 
 package playground.christoph.matsim2030;
 
-import java.util.List;
-
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -49,16 +44,17 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
-
 import playground.christoph.evacuation.pt.TransitRouterImplFactory;
 import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
 
+import java.util.List;
+
 public class CreatePTLegs {
 
-	private static TransitRouterFactory transitRouterFactory;
+	private static Provider<TransitRouter> transitRouterFactory;
 	
 	public static void main(String[] args) {
 		

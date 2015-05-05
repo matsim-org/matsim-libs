@@ -24,12 +24,11 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
+
+import javax.inject.Provider;
 
 public class RndPtRouterLauncher2 {
 
@@ -59,7 +58,7 @@ public class RndPtRouterLauncher2 {
 		final TransitRouterConfig trConfig = new TransitRouterConfig( config ) ;
 		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.beelineWalkConnectionDistance);
 		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(routerSchedule);
-		TransitRouterFactory rndTrRouterFactory = new RndPtRouterFactory().createFactory (preparedSchedule, trConfig, routerNetwork, true, true);
+		Provider<TransitRouter> rndTrRouterFactory = new RndPtRouterFactory().createFactory (preparedSchedule, trConfig, routerNetwork, true, true);
 		controler.setTransitRouterFactory(rndTrRouterFactory);
 		
 		//add analyzer for specific bus line and stop Zone conversion

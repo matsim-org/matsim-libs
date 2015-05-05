@@ -49,7 +49,9 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
+
+import javax.inject.Provider;
 
 /**
  * This class exists only to allow the transit schedule to be updated in each iteration
@@ -63,9 +65,9 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 		Logger.getLogger(PTripRouterFactoryImpl.class);
 
 	private final Controler controler;
-    private final TransitRouterFactory transitRouterFactory;
+    private final Provider<TransitRouter> transitRouterFactory;
 
-    public PTripRouterFactoryImpl(final Controler controler, TransitRouterFactory transitRouterFactory) {
+    public PTripRouterFactoryImpl(final Controler controler, Provider<TransitRouter> transitRouterFactory) {
 		this.controler = controler;
 		this.transitRouterFactory = transitRouterFactory;
 	}

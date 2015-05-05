@@ -30,12 +30,14 @@ import org.matsim.core.config.Config;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
+import javax.inject.Provider;
+
 /**
  * 
  * @author aneumann
  *
  */
-class PTransitRouterFactory implements TransitRouterFactory{
+class PTransitRouterFactory implements Provider<TransitRouter> {
 	
 	private final static Logger log = Logger.getLogger(PTransitRouterFactory.class);
 	private TransitRouterConfig transitRouterConfig;
@@ -46,7 +48,7 @@ class PTransitRouterFactory implements TransitRouterFactory{
 	
 	private boolean needToUpdateRouter = true;
 	private TransitRouterNetwork routerNetwork = null;
-	private TransitRouterFactory routerFactory = null;
+	private Provider<TransitRouter> routerFactory = null;
 	private TransitSchedule schedule;
 	private RaptorDisutility raptorDisutility;
 	private TransitRouterQuadTree transitRouterQuadTree;
@@ -110,11 +112,11 @@ class PTransitRouterFactory implements TransitRouterFactory{
 		return new Raptor(this.transitRouterQuadTree, this.raptorDisutility, this.transitRouterConfig);
 	}
 
-	private TransitRouterFactory createSpeedyRouter() {
+	private Provider<TransitRouter> createSpeedyRouter() {
 		try {
 			Class<?> cls = Class.forName("com.senozon.matsim.pt.speedyrouter.SpeedyTransitRouterFactory");
 			Constructor<?> ct = cls.getConstructor(new Class[] {TransitSchedule.class, TransitRouterConfig.class, String.class});
-			return (TransitRouterFactory) ct.newInstance(this.schedule, this.transitRouterConfig, this.ptEnabler);
+			return (Provider<TransitRouter>) ct.newInstance(this.schedule, this.transitRouterConfig, this.ptEnabler);
 		} catch (ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}

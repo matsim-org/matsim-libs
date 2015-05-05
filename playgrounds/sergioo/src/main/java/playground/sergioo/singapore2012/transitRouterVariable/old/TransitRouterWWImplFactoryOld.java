@@ -19,6 +19,7 @@
 
 package playground.sergioo.singapore2012.transitRouterVariable.old;
 
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -26,14 +27,13 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
 
 /**
  * Factory for the variable transit router
  * 
  * @author sergioo
  */
-public class TransitRouterWWImplFactoryOld implements TransitRouterFactory, AfterMobsimListener {
+public class TransitRouterWWImplFactoryOld implements Provider<TransitRouter>, AfterMobsimListener {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;

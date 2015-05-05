@@ -19,21 +19,17 @@
 
 package playground.mmoyo.randomizerPtRouter;
 
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
+
+import javax.inject.Provider;
 
 public class RndPtRouterFactory {
 
-	public TransitRouterFactory createFactory (final TransitSchedule schedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork, final boolean rndParams, final boolean addInfo){
+	public Provider<TransitRouter> createFactory(final TransitSchedule schedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork, final boolean rndParams, final boolean addInfo){
 		return 
-		new TransitRouterFactory() {
+		new Provider<TransitRouter>() {
 			@Override
 			public TransitRouter get() {
 				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
@@ -47,9 +43,9 @@ public class RndPtRouterFactory {
 	/**
 	 * This version receives already the  PreparedTransitSchedule instead of creating it 
 	 */
-	public static TransitRouterFactory createFactory (final PreparedTransitSchedule preparedSchedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork, final boolean rndParams, final boolean addInfo){
+	public static Provider<TransitRouter> createFactory (final PreparedTransitSchedule preparedSchedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork, final boolean rndParams, final boolean addInfo){
 		return 
-		new TransitRouterFactory() {
+		new Provider<TransitRouter>() {
 			@Override
 			public TransitRouter get() {
 				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);

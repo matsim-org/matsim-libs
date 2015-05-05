@@ -30,17 +30,12 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.mmoyo.utils.DataLoader;
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
+
+import javax.inject.Provider;
 
 class PopulationRndPtRouter{ 
 	
@@ -70,7 +65,7 @@ class PopulationRndPtRouter{
 			final TripRouterFactoryBuilderWithDefaults builder =
 				new TripRouterFactoryBuilderWithDefaults();
 			builder.setTransitRouterFactory(
-				new TransitRouterFactory() {
+				new Provider<TransitRouter>() {
 					@Override
 					public TransitRouter get() {
 						return new TransitRouterImpl(

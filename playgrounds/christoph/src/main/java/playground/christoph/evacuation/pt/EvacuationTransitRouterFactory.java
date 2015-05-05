@@ -20,9 +20,7 @@
 
 package playground.christoph.evacuation.pt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
@@ -30,22 +28,19 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.router.FastTransitMultiNodeDijkstra;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.*;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
-import org.matsim.pt.router.TransitTravelDisutilityWrapper;
 import org.matsim.pt.router.util.FastTransitDijkstraFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
 import playground.christoph.evacuation.config.EvacuationConfig;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * @author cdobler
  */
-public class EvacuationTransitRouterFactory implements TransitRouterFactory {
+public class EvacuationTransitRouterFactory implements Provider<TransitRouter> {
 
 	static final Logger log = Logger.getLogger(EvacuationTransitRouterFactory.class);
 	

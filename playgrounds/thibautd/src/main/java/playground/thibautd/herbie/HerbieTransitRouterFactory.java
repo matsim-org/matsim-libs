@@ -19,16 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.herbie;
 
+import com.google.inject.Provider;
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.scoring.TravelScoringFunction;
-
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.router.TransitTravelDisutility;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
@@ -43,7 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  *
  * @author thibautd
  */
-public class HerbieTransitRouterFactory implements TransitRouterFactory {
+public class HerbieTransitRouterFactory implements Provider<TransitRouter> {
 	private static final boolean USE_HERBIE_COST_IN_ROUTING = false;
 
 	private final TransitSchedule schedule;

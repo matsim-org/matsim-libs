@@ -4,48 +4,28 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 
 import javax.inject.Inject;
-
+import javax.inject.Provider;
 import java.util.Collections;
 
 public class PRTripRouterFactory implements TripRouterFactory {
 
     private static Logger log = Logger.getLogger(PRTripRouterFactory.class);
 
-    public static TripRouterFactory createRichTripRouterFactoryImpl(final Scenario scenario) {
-    	
-        return Injector.createInjector(scenario.getConfig(),
-        		new PRTripRouterModule(),
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                        bind(Scenario.class).toInstance(scenario);
-                    }
-                })
-                .getInstance(TripRouterFactory.class);
-	}
-
-	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-    private final TransitRouterFactory transitRouterFactory;
+    private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+    private final Provider<TransitRouter> transitRouterFactory;
     private final Scenario scenario;
 
     @Inject
-    public PRTripRouterFactory(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TransitRouterFactory transitRouterFactory) {
+    public PRTripRouterFactory(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, com.google.inject.Provider<TransitRouter> transitRouterFactory) {
     	this.scenario = scenario;
     	this.transitRouterFactory = transitRouterFactory;
     	this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
@@ -162,7 +142,4 @@ public class PRTripRouterFactory implements TripRouterFactory {
 		return leastCostPathCalculatorFactory;
 	}
 
-	public TransitRouterFactory getTransitRouterFactory() {
-		return transitRouterFactory;
-	}
 }

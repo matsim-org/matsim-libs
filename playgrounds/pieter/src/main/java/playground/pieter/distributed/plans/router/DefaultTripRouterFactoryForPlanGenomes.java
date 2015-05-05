@@ -1,17 +1,16 @@
 package playground.pieter.distributed.plans.router;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Injector;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 import playground.pieter.distributed.plans.router.old.DefaultRoutingModules;
 
 import javax.inject.Inject;
@@ -21,24 +20,12 @@ public class DefaultTripRouterFactoryForPlanGenomes implements TripRouterFactory
 
     private static Logger log = Logger.getLogger(DefaultTripRouterFactoryForPlanGenomes.class);
 
-    public static TripRouterFactory createRichTripRouterFactoryImpl(final Scenario scenario) {
-        return Injector.createInjector(scenario.getConfig(),
-                new TripRouterFactoryModule(),
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                        bind(Scenario.class).toInstance(scenario);
-                    }
-                })
-                .getInstance(TripRouterFactory.class);
-	}
-
-	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-    private final TransitRouterFactory transitRouterFactory;
+    private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+    private final Provider<TransitRouter> transitRouterFactory;
     private final Scenario scenario;
 
     @Inject
-    public DefaultTripRouterFactoryForPlanGenomes(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TransitRouterFactory transitRouterFactory) {
+    public DefaultTripRouterFactoryForPlanGenomes(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, Provider<TransitRouter> transitRouterFactory) {
     	this.scenario = scenario;
     	this.transitRouterFactory = transitRouterFactory;
     	this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
@@ -150,11 +137,4 @@ public class DefaultTripRouterFactoryForPlanGenomes implements TripRouterFactory
         return tripRouter;
     }
 
-	public LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
-		return leastCostPathCalculatorFactory;
-	}
-
-	public TransitRouterFactory getTransitRouterFactory() {
-		return transitRouterFactory;
-	}
 }

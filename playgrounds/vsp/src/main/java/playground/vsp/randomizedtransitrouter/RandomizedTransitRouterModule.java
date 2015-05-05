@@ -23,11 +23,11 @@
 package playground.vsp.randomizedtransitrouter;
 
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 
 public class RandomizedTransitRouterModule extends AbstractModule {
     @Override
     public void install() {
-        bind(TransitRouterFactory.class).to(RandomizedTransitRouterFactory.class);
+        bind(TransitRouter.class).toProvider(RandomizedTransitRouterFactory.class);
     }
 }

@@ -20,8 +20,7 @@
 
 package playground.christoph.evacuation.controler;
 
-import java.util.Map;
-
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
@@ -33,15 +32,17 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
+
+import java.util.Map;
 
 public class EvacuationTripRouterFactory implements TripRouterFactory {
 
 	private final TripRouterFactory delegateFactory;
 	
 	public EvacuationTripRouterFactory(Scenario scenario, Map<String, TravelTime> multiModalTravelTimes,
-			TravelDisutilityFactory travelDisutilityFactory, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, 
-			TransitRouterFactory transitRouterFactory) {
+			TravelDisutilityFactory travelDisutilityFactory, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
+									   Provider<TransitRouter> transitRouterFactory) {
 		
 		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
 		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 

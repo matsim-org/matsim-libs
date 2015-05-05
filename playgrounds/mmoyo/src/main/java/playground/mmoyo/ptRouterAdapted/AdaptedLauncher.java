@@ -1,8 +1,5 @@
 package playground.mmoyo.ptRouterAdapted;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -20,11 +17,13 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterFactory;
-
 import playground.mmoyo.algorithms.PlanScoreNullifier;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.PlanFragmenter;
+
+import javax.inject.Provider;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**routes scenario with configurable travel parameter values**/
 public class AdaptedLauncher {
@@ -155,7 +154,7 @@ public class AdaptedLauncher {
 
 		final TripRouterFactoryBuilderWithDefaults builder =
 			new TripRouterFactoryBuilderWithDefaults();
-		builder.setTransitRouterFactory(new TransitRouterFactory() {
+		builder.setTransitRouterFactory(new Provider<TransitRouter>() {
 			@Override
 			public TransitRouter get() {
 				return new AdaptedTransitRouter(

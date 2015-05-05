@@ -20,13 +20,8 @@
 
 package playground.christoph.evacuation.pt;
 
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import com.google.inject.Provider;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
@@ -35,7 +30,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * 
  * @author cdobler
  */
-public class TransitRouterImplFactory implements TransitRouterFactory {
+public class TransitRouterImplFactory implements Provider<TransitRouter> {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetwork routerNetwork;
