@@ -57,6 +57,8 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 	private static StageActivityTypes stages = EmptyStageActivityTypes.INSTANCE;
 	private static String MODE = "the_vehicular_mode";
 
+	private final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
+
 	private GroupPlans createTestPlan(final Random random) {
 		// attempt to get a high diversity of joint structures.
 		final int nMembers = random.nextInt( 100 );
@@ -88,7 +90,6 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 	private void fillPlan(
 			final Plan plan,
 			final Random random) {
-		final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
 		final Id<Link> homeLinkId = Id.create( "versailles" , Link.class );
 
 		final Activity firstAct = popFact.createActivityFromLinkId( "h" , homeLinkId );
