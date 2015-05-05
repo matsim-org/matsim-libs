@@ -301,7 +301,11 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 		Map<String, Integer[]> personMap = new TreeMap<String, Integer[]>();
 
 		/* Process all records. */
-		LOG.info("Processing records for person-specific scoring.");
+		LOG.info("Processing records for person-specific scoring...");
+		LOG.info("Weights used:");
+		LOG.info("  \\_ acceleration: " + this.getAccelWeight());
+		LOG.info("  \\_ speed: " + this.getSpeedWeight());
+		
 		Counter counter = new Counter("   lines # ");
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		try{
@@ -470,9 +474,11 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 		Double scale = Double.parseDouble(args[2]);
 		int maxLines = Integer.parseInt(args[3]);
 		Visual visual = Visual.valueOf(args[4]);
+		double aWeight = Double.parseDouble(args[5]);
+		double sWeight = Double.parseDouble(args[6]);
 
 		List<Double> riskThresholds = new ArrayList<Double>();
-		int argsIndex = 5;
+		int argsIndex = 7;
 		while(args.length > argsIndex){
 			riskThresholds.add(Double.parseDouble(args[argsIndex++]));
 		}
@@ -487,8 +493,8 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 
 		SpeedAndAccelDigiScorer sds = new SpeedAndAccelDigiScorer(scale, filename, riskThresholds, visual);
 		sds.setMaximumLines(maxLines);
-		sds.setAccelWeight(0.40);
-		sds.setSpeedWeight(0.60);
+		sds.setAccelWeight(aWeight);
+		sds.setSpeedWeight(sWeight);
 		sds.buildScoringModel(filename);
 		sds.getGrid().writeCellCountsAndRiskClasses(outputFolder);
 		sds.writeSpeedCounts(outputFolder);
