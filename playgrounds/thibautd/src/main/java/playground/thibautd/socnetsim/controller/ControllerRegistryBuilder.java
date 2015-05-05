@@ -37,8 +37,8 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.XY2Links;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
@@ -358,7 +358,7 @@ public class ControllerRegistryBuilder {
 	public Provider<TripRouter> getTripRouterFactory() {
 		if ( tripRouterFactory == null ) {
 			final TransitSchedule schedule = scenario.getTransitSchedule();
-			final TransitRouterFactory transitRouterFactory =
+			final Provider<TransitRouter> transitRouterFactory =
 				schedule != null ?
 					new TransitRouterImplFactory(
 							schedule,

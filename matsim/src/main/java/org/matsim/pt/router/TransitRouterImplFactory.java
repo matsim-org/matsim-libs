@@ -24,13 +24,14 @@ import org.matsim.core.config.Config;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 /**
  * @author mrieser
  */
 @Singleton
-public class TransitRouterImplFactory implements TransitRouterFactory {
+public class TransitRouterImplFactory implements Provider<TransitRouter> {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetwork routerNetwork;
