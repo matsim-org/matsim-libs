@@ -33,7 +33,7 @@
             <include>**/SomeNonExistingTestName</include>
           </includes>
           <forkMode>once</forkMode>
-          <argLine>-Xmx700m -Djava.awt.headless=true</argLine>
+          <argLine>-Xmx2000m -Djava.awt.headless=true</argLine>
           <enableAssertions>false</enableAssertions>
         </configuration>
       </plugin>
