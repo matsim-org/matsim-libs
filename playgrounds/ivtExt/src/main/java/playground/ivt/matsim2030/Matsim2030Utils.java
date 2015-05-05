@@ -106,6 +106,7 @@ public class Matsim2030Utils {
 	public static Scenario loadScenario( final Scenario scenario ) {
 		ScenarioUtils.loadScenario( scenario );
 		enrichScenario( scenario );
+		diluteScenario( scenario );
 
 		logPopulationStats( scenario );
 
