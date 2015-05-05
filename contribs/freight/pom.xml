@@ -39,8 +39,23 @@
         </plugin>
     </plugins>
 </build>
-	
-	
+
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.graphstream</groupId>
+				<artifactId>gs-ui</artifactId>
+				<version>1.3</version>
+			</dependency>
+			<dependency>
+				<groupId>org.graphstream</groupId>
+				<artifactId>gs-core</artifactId>
+				<version>1.3</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
