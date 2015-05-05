@@ -34,18 +34,27 @@ public class MySumScoringFunction implements ScoringFunction {
 	
 	private SumScoringFunction delegate = new SumScoringFunction() ;
 	private SumScoringFunction pDelegate = new SumScoringFunction() ;
-
+	
 	@Override
 	public final void handleActivity(Activity activity) {
+		double pScore = pDelegate.getScore();
+		double score = delegate.getScore() ;
+		
 		delegate.handleActivity(activity);
 		
 		Activity pseudoActivity = new ActivityImpl( activity ) ;
-		
 		pseudoActivity.setStartTime( pseudoActivity.getStartTime() - 1 ) ;
 		pDelegate.handleActivity(pseudoActivity);
 		
-		// print out score difference that happens from one second shorter activity:
-		System.out.println( delegate.getScore() - pDelegate.getScore() ) ;
+		// score change by regular activity
+		double diff = delegate.getScore() - score ;
+		
+		// score change by pseudo activity
+		double pDiff = pDelegate.getScore() - pScore ;
+		
+		// score diff caused by one second
+		
+		double diff1 = pDiff - diff ;
 		
 	}
 
