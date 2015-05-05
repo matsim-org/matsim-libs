@@ -71,7 +71,7 @@ public class VBBRouteCatcher {
 			initiate();
 			
 			}
-			private void initiate() {
+			 static void initiate() {
 				//httpclient is extremely noisy by default
 				java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINEST);
 				java.util.logging.Logger.getLogger("org.apache.http.headers").setLevel(java.util.logging.Level.FINEST);

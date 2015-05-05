@@ -1,148 +1,106 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package playground.jbischoff.carsharing.data;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.URL;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
-/**
- * @author jbischoff
- *
- */
+
 public class Car2GoParser
 {
-
-    public static void main(String[] args)
-    {
-        Car2GoParser dnp = new Car2GoParser();
-        Map<Id<CarsharingVehicleData>,CarsharingVehicleData> currentGrep = dnp.grepAndDumpOnlineDatabase("./");
-        for (CarsharingVehicleData cv : currentGrep.values()){
-            System.out.println(cv.toString());
-        }
+  public static void main(String[] args)
+  {
+    Car2GoParser dnp = new Car2GoParser();
+    Map<Id<CarsharingVehicleData>, CarsharingVehicleData> currentGrep = dnp.grepAndDumpOnlineDatabase("./");
+    for (CarsharingVehicleData cv : currentGrep.values()) {
+      System.out.println(cv.toString());
     }
-    
-
-    public Map<Id<CarsharingVehicleData>,CarsharingVehicleData> grepAndDumpOnlineDatabase(String outputfolder)
-    
-{
+  }
+  
+  public Map<Id<CarsharingVehicleData>, CarsharingVehicleData> grepAndDumpOnlineDatabase(String outputfolder)
+  {
     JSONParser jp = new JSONParser();
-    URL url;
-    Map<Id<CarsharingVehicleData>,CarsharingVehicleData> currentGrep = new HashMap<>();
     
-    
-    try {
-    	Car2GoParser.disableCertificates();
-    	//watch out: disables certificate validation 
-    	
-    	System.setProperty("https.protocols", "TLSv1");
-//    	url = new URL("https", "www.car2go.com", 443, "/api/v2.1/vehicles?loc=berlin&oauth_consumer_key=BerlinMultimodal&format=json");
-        url = new URL("https://www.car2go.com/api/v2.1/vehicles?loc=berlin&oauth_consumer_key=BerlinMultimodal&format=json");
-        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-
-        JSONObject jsonObject = (JSONObject)jp.parse(in);
- 
+    Map<Id<CarsharingVehicleData>, CarsharingVehicleData> currentGrep = new HashMap();
+    try
+    {
+      disableCertificates();
+      
+      System.setProperty("https.protocols", "TLSv1");
+      
+      URL url = new URL("https://www.car2go.com/api/v2.1/vehicles?loc=berlin&oauth_consumer_key=BerlinMultimodal&format=json");
+      BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+      
+      JSONObject jsonObject = (JSONObject)jp.parse(in);
+      
+      JSONArray msg = (JSONArray)jsonObject.get("placemarks");
+      Iterator<JSONObject> iterator = msg.iterator();
+      while (iterator.hasNext())
+      {
+        JSONObject car = (JSONObject)iterator.next();
+        String vin = (String)car.get("vin");
+        String license = (String)car.get("name");
+        Id<CarsharingVehicleData> vid = Id.create(vin, CarsharingVehicleData.class);
         
-        JSONArray msg = (JSONArray) jsonObject.get("placemarks");
-        Iterator<JSONObject> iterator = msg.iterator();
-        while (iterator.hasNext()) {
-            JSONObject car = iterator.next();
-            String vin = (String)car.get("vin");
-            String license = (String)car.get("name");
-            Id<CarsharingVehicleData> vid = Id.create(vin, CarsharingVehicleData.class);
-
-            String fuel = car.get("fuel").toString();
-            
-            JSONArray loc = (JSONArray)car.get("coordinates");
-            String longi = loc.get(0).toString();
-            String lat = loc.get(1).toString();
-            currentGrep.put(vid, new CarsharingVehicleData(vid, license, lat, longi,"0" , fuel, "CG"));
-                        
-        }
-        BufferedWriter bw = IOUtils.getBufferedWriter(outputfolder+"c2g_"+System.currentTimeMillis()+".json.gz");
-        bw.write(jsonObject.toString());
-        bw.flush();
-        bw.close();
+        String fuel = car.get("fuel").toString();
         
+        JSONArray loc = (JSONArray)car.get("coordinates");
+        String longi = loc.get(0).toString();
+        String lat = loc.get(1).toString();
+        currentGrep.put(vid, new CarsharingVehicleData(vid, license, lat, longi, "0", fuel, "CG"));
+      }
+      BufferedWriter bw = IOUtils.getBufferedWriter(outputfolder + "c2g_" + System.currentTimeMillis() + ".json.gz");
+      bw.write(jsonObject.toString());
+      bw.flush();
+      bw.close();
     }
-    catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+    catch (IOException e)
+    {
+      e.printStackTrace();
     }
-    catch (ParseException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+    catch (ParseException e)
+    {
+      e.printStackTrace();
     }
-    
     return currentGrep;
-    
-}
-    static public void disableCertificates() {
-        TrustManager[] trustAllCerts = new TrustManager[]{
-            new X509TrustManager() {
-
-                @Override
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-
-                @Override
-                public void checkClientTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                }
-
-                @Override
-                public void checkServerTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                }
-            }
-        };
-
-        // Install the all-trusting trust manager
-        try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (Exception e) {
+  }
+  
+  public static void disableCertificates()
+  {
+    TrustManager[] trustAllCerts = {
+      new X509TrustManager()
+      {
+        public X509Certificate[] getAcceptedIssuers()
+        {
+          return null;
         }
+        
+        public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+        
+        public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+      } };
+    try
+    {
+      SSLContext sc = SSLContext.getInstance("SSL");
+      sc.init(null, trustAllCerts, new SecureRandom());
+      HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
     }
-
-
-
+    catch (Exception localException) {}
+  }
 }
-
-    
-
