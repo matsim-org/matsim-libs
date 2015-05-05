@@ -33,11 +33,11 @@ import org.jzy3d.maths.Coord3d;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.southafrica.projects.digicore.grid.DigiGrid;
 import playground.southafrica.projects.digicore.grid.DigiGrid.Visual;
+import playground.southafrica.projects.digicore.grid.DigiGrid_XYZ;
 import playground.southafrica.utilities.Header;
 
-public class SpeedAndAccelDigiScorer implements DigiScorer{
+public class SpeedAndAccelDigiScorer implements DigiScorer_XYZ{
 	private final static Logger LOG = Logger.getLogger(SpeedAndAccelDigiScorer.class);
 	private final SpeedDigiScorer delegate;
 	
@@ -399,12 +399,12 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 	}
 
 	@Override
-	public DigiGrid getGrid(){
+	public DigiGrid_XYZ getGrid(){
 		return delegate.getGrid();
 	}
 
 	@Override
-	public void setGrid(DigiGrid grid) {
+	public void setGrid(DigiGrid_XYZ grid) {
 		delegate.setGrid(grid);
 	}
 

@@ -33,14 +33,14 @@ import org.jzy3d.maths.Coord3d;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.southafrica.projects.digicore.grid.DigiGrid;
 import playground.southafrica.projects.digicore.grid.DigiGrid.Visual;
+import playground.southafrica.projects.digicore.grid.DigiGrid_XYZ;
 import playground.southafrica.utilities.Header;
 
-public class SpeedDigiScorer implements DigiScorer{
+public class SpeedDigiScorer implements DigiScorer_XYZ{
 	private final static Logger LOG = Logger.getLogger(SpeedDigiScorer.class);
 	
-	private DigiGrid grid;
+	private DigiGrid_XYZ grid;
 	
 	/* Other variables. */
 	private int maxLines = Integer.MAX_VALUE;
@@ -52,7 +52,7 @@ public class SpeedDigiScorer implements DigiScorer{
 
 	
 	public SpeedDigiScorer(final double scale, String filename, final List<Double> riskThresholds, Visual visual) {
-		this.grid = new DigiGrid(scale);
+		this.grid = new DigiGrid_XYZ(scale);
 		this.grid.setVisual(visual);
 		this.grid.setRiskThresholds(riskThresholds);
 		this.grid.setupGrid(filename);
@@ -305,12 +305,12 @@ public class SpeedDigiScorer implements DigiScorer{
 	}
 
 	@Override
-	public DigiGrid getGrid(){
+	public DigiGrid_XYZ getGrid(){
 		return this.grid;
 	}
 
 	@Override
-	public void setGrid(DigiGrid grid) {
+	public void setGrid(DigiGrid_XYZ grid) {
 		this.grid = grid;
 	}
 

@@ -40,18 +40,25 @@ package playground.southafrica.projects.digicore.scoring;
 
 import org.apache.log4j.Logger;
 
+import playground.southafrica.projects.digicore.grid.DigiGrid_XYZ;
+
 /**
  * Basic interface to calculate the risk profile/score of a person, all based 
- * on the raw accelerometer records provided.
+ * on the raw accelerometer records provided. All three dimensions relate to
+ * the three accelerometer axes.
  *  
  * @author jwjoubert
  */
-public interface DigiScorer {
-	final static Logger LOG = Logger.getLogger(DigiScorer.class);
+public interface DigiScorer_XYZ extends DigiScorer{
+	final static Logger LOG = Logger.getLogger(DigiScorer_XYZ.class);
 	
 	public void buildScoringModel(String filename);
 
+	public RISK_GROUP getRiskGroup(String record);
+
 	public void rateIndividuals(String filename, String outputFolder);
-	
-	enum RISK_GROUP{NONE, LOW, MEDIUM, HIGH}
+
+	public DigiGrid_XYZ getGrid();
+
+	public void setGrid(DigiGrid_XYZ grid);
 }

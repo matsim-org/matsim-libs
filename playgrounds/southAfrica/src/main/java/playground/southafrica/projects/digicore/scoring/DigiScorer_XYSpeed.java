@@ -40,18 +40,26 @@ package playground.southafrica.projects.digicore.scoring;
 
 import org.apache.log4j.Logger;
 
+import playground.southafrica.projects.digicore.grid.DigiGrid_XYSpeed;
+
 /**
  * Basic interface to calculate the risk profile/score of a person, all based 
- * on the raw accelerometer records provided.
+ * on the raw accelerometer records provided. The x and y-dimensions relate to
+ * acceleration, while the z-axis relates to speed. To ensure the z-dimension 
+ * is scaled in a useful manner, a multiplier is introduced.
  *  
  * @author jwjoubert
  */
-public interface DigiScorer {
-	final static Logger LOG = Logger.getLogger(DigiScorer.class);
+public interface DigiScorer_XYSpeed extends DigiScorer{
+	final static Logger LOG = Logger.getLogger(DigiScorer_XYZ.class);
 	
 	public void buildScoringModel(String filename);
 
+	public RISK_GROUP getRiskGroup(String record);
+
 	public void rateIndividuals(String filename, String outputFolder);
-	
-	enum RISK_GROUP{NONE, LOW, MEDIUM, HIGH}
+
+	public DigiGrid_XYSpeed getGrid();
+
+	public void setGrid(DigiGrid_XYSpeed grid);
 }

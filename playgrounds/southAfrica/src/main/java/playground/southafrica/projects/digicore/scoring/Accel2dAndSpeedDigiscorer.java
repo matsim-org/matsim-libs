@@ -1,22 +1,3 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,     *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
-
 package playground.southafrica.projects.digicore.scoring;
 
 import java.io.BufferedReader;
@@ -34,24 +15,25 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.projects.digicore.grid.DigiGrid.Visual;
-import playground.southafrica.projects.digicore.grid.DigiGrid_XYZ;
+import playground.southafrica.projects.digicore.grid.DigiGrid_XYSpeed;
 import playground.southafrica.utilities.Header;
 
-public class AccelOnlyDigiScorer implements DigiScorer_XYZ{
-	private final static Logger LOG = Logger.getLogger(AccelOnlyDigiScorer.class);
 
-	private DigiGrid_XYZ grid;
+public class Accel2dAndSpeedDigiscorer implements DigiScorer_XYSpeed{
+	private final static Logger LOG = Logger.getLogger(Accel2dAndSpeedDigiscorer.class);
+
+	private DigiGrid_XYSpeed grid;
 	private int maxLines = Integer.MAX_VALUE;
 
 
-	public AccelOnlyDigiScorer(final double scale, String filename, final List<Double> riskThresholds, Visual visual) {
-		this.grid = new DigiGrid_XYZ(scale);
+	public Accel2dAndSpeedDigiscorer(final double scale, String filename, final List<Double> riskThresholds, Visual visual) {
+		this.grid = new DigiGrid_XYSpeed(scale);
 		this.grid.setVisual(visual);
 		this.grid.setRiskThresholds(riskThresholds);
 		this.grid.setupGrid(filename);
 	}
-
-	@Override
+	
+	
 	public void buildScoringModel(String filename) {
 		LOG.info("Populating the dodecahedra with point observations...");
 		if(this.maxLines < Integer.MAX_VALUE){
@@ -64,29 +46,13 @@ public class AccelOnlyDigiScorer implements DigiScorer_XYZ{
 			String line = null;
 			while( (line = br.readLine()) != null && counter.getCounter() < maxLines){
 				String[] sa = line.split(",");
-				String id = sa[1];
 				double x = Double.parseDouble(sa[5]);
 				double y = Double.parseDouble(sa[6]);
-				double z = Double.parseDouble(sa[7]);
 
 				Double speed = Double.parseDouble(sa[8]);
-				Integer road = Integer.parseInt(sa[9]);
 
-				/* Put data conditions here. */
-				if(
-						//							id.equalsIgnoreCase("16d38cf2304c6ee23c702f4a65e5f5e0") &	/* Specific individual, A: Good */
-						//							id.equalsIgnoreCase("5b71b050d8e03e618728cce5ca6a3471") &	/* Specific individual, B: Average */
-						//							id.equalsIgnoreCase("d655fcbb9910c5580e030a591d6ac66d") &	/* Specific individual, C: Bad */
-						//							road <= 2 & 												/* Road is a highway */
-						//							speed <= 60.0 &												/* Low speed */
-						//							speed > 90.0 &												/* High speed */
-						true){
-
-					/* In this implementation, ONLY look at acceleration, so add
-					 * all the records to the 'blob'. */
-					Coord3d c = grid.getClosest(x, y, z);
-					grid.incrementCount(c, 1.0);
-				}
+				Coord3d c = grid.getClosest(x, y, speed);
+				grid.incrementCount(c, 1.0);
 				counter.incCounter();
 			}
 		} catch (IOException e) {
@@ -106,10 +72,7 @@ public class AccelOnlyDigiScorer implements DigiScorer_XYZ{
 		this.grid.rankGridCells();
 	}
 
-	/**
-	 * An accelerometer record is only classified based on the
-	 * accelerometer data.
-	 */
+
 	@Override
 	public RISK_GROUP getRiskGroup(String record) {
 		/* Check that the 'blob'  has already been created and populated. */
@@ -124,10 +87,10 @@ public class AccelOnlyDigiScorer implements DigiScorer_XYZ{
 		/* Return accelerometer risk class. */
 		double x = Double.parseDouble(sa[5]);
 		double y = Double.parseDouble(sa[6]);
-		double z = Double.parseDouble(sa[7]);
+		double speed = Double.parseDouble(sa[8]);
 
 		/* Get the closest cell to this point. */
-		Coord3d cell = grid.getClosest(x, y, z);
+		Coord3d cell = grid.getClosest(x, y, speed);
 		int risk = grid.getCellRisk(cell);
 		switch (risk) {
 		case 0:
@@ -143,16 +106,9 @@ public class AccelOnlyDigiScorer implements DigiScorer_XYZ{
 		}
 	}
 
-	/**
-	 * Consider each record, and process them per individual so that the total
-	 * number of occurrences in each risk group can be calculated. The output 
-	 * file with name <code>riskClassCountsPerPerson.csv</code> will be created 
-	 * in the output folder.
-	 * 
-	 * @param outputFolder
-	 */
+
 	@Override
-	public void rateIndividuals(String filename, String outputFolder){
+	public void rateIndividuals(String filename, String outputFolder) {
 		Map<String, Integer[]> personMap = new TreeMap<String, Integer[]>();
 
 		/* Process all records. */
@@ -237,31 +193,35 @@ public class AccelOnlyDigiScorer implements DigiScorer_XYZ{
 		LOG.info("Done writing the per-person risk classes counts.");
 	}
 
+
 	@Override
-	public DigiGrid_XYZ getGrid(){
+	public DigiGrid_XYSpeed getGrid() {
 		return this.grid;
 	}
 
+
 	@Override
-	public void setGrid(DigiGrid_XYZ grid) {
+	public void setGrid(DigiGrid_XYSpeed grid) {
 		this.grid = grid;
 	}
+
 
 	public void setMaximumLines(int maxLines){
 		this.maxLines = maxLines;
 	}
 
-
+	
+	
 	public static void main(String[] args) {
 		Header.printHeader(AccelOnlyDigiScorer.class.toString(), args);
-
+		
 		/* Parse the input arguments. */
 		String filename = args[0];
 		String outputFolder = args[1];
 		Double scale = Double.parseDouble(args[2]);
 		int maxLines = Integer.parseInt(args[3]);
 		Visual visual = Visual.valueOf(args[4]);
-
+		
 		List<Double> riskThresholds = new ArrayList<Double>();
 		int argsIndex = 5;
 		while(args.length > argsIndex){
@@ -276,14 +236,13 @@ public class AccelOnlyDigiScorer implements DigiScorer_XYZ{
 		}
 		folder.mkdirs();
 
-		AccelOnlyDigiScorer aos = new AccelOnlyDigiScorer(scale, filename, riskThresholds, visual);
-		aos.setMaximumLines(maxLines);
-		aos.buildScoringModel(filename);
-		aos.getGrid().writeCellCountsAndRiskClasses(outputFolder);
-		aos.rateIndividuals(filename, outputFolder);
+		Accel2dAndSpeedDigiscorer a2s = new Accel2dAndSpeedDigiscorer(scale, filename, riskThresholds, visual);
+		a2s.setMaximumLines(maxLines);
+		a2s.buildScoringModel(filename);
+		a2s.getGrid().writeCellCountsAndRiskClasses(outputFolder);
+		a2s.rateIndividuals(filename, outputFolder);
 
 		Header.printFooter();
-		aos.getGrid().visualiseGrid();
 	}
 
 }

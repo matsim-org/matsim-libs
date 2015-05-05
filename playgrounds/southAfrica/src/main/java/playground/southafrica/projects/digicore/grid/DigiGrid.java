@@ -19,7 +19,6 @@
 
 package playground.southafrica.projects.digicore.grid;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -31,8 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.jzy3d.analysis.AbstractAnalysis;
@@ -56,26 +53,28 @@ import org.matsim.core.utils.misc.Counter;
  * Class that acts as the container for the three-dimensional grid containing
  * the centroids of the polyhedra that is used for the Digicore accelerometer
  * research. Associated with the grid is the number of observations in each
- * dodecahedron (cell) and also the rating of each cell.
+ * dodecahedron (cell) and also the rating of each cell. The x and y-dimensions
+ * relate to acceleration while the z-axis reflects speed.
  *
+ * @see DigiGrid
  * @author jwjoubert
  */
-public class DigiGrid  extends AbstractAnalysis {
-	final private Logger LOG = Logger.getLogger(DigiGrid.class);
+public abstract class DigiGrid extends AbstractAnalysis {
+	final private Logger LOG = Logger.getLogger(DigiGrid_XYZ.class);
 
-	private OcTree<Coord3d> ot;
+	protected OcTree<Coord3d> ot;
 
-	private Map<Coord3d, Double> map;
-	private Map<Coord3d, Integer> mapRating;
+	protected Map<Coord3d, Double> map;
+	protected Map<Coord3d, Integer> mapRating;
 
-	private List<Double> riskThresholds;
+	protected List<Double> riskThresholds;
 	
 	private String snapshotfolder = "./snapshots/";
 	
-	private final double scale;
-	private double pointsConsidered = 0.0;
+	protected final double scale;
+	protected double pointsConsidered = 0.0;
 	private Visual visual = Visual.NONE;
-	private boolean isPopulated = false;
+	protected boolean isPopulated = false;
 	private boolean isRanked = false;
 	
 	private boolean visualiseOnScreen = true;
@@ -89,84 +88,18 @@ public class DigiGrid  extends AbstractAnalysis {
 	final static Color DIGI_GRAY = new Color(100, 100, 100, 255);
 	
 
-
 	public DigiGrid(final double scale) {
 		this.scale = scale;
 	}
 	
-
-	public void setupGrid(String filename){
-		/* Check that risk zone thresholds have been set. */
-		if(riskThresholds == null){
-			LOG.error("Cannot build the grid without risk thresholds.");
-			throw new RuntimeException("First set thresholds with setRiskThresholds() method.");
-		}
-		
-		LOG.info("Calculating the data extent...");
-		double minX = Double.POSITIVE_INFINITY;
-		double minY = Double.POSITIVE_INFINITY;
-		double minZ = Double.POSITIVE_INFINITY;
-		double maxX = Double.NEGATIVE_INFINITY;
-		double maxY = Double.NEGATIVE_INFINITY;
-		double maxZ = Double.NEGATIVE_INFINITY;
-		
-		Counter counter = new Counter("   lines # ");
-		BufferedReader br = IOUtils.getBufferedReader(filename);
-		try{
-			String line = null;
-			while( (line = br.readLine()) != null){
-				String[] sa = line.split(",");
-				double x = Double.parseDouble(sa[5]);
-				double y = Double.parseDouble(sa[6]);
-				double z = Double.parseDouble(sa[7]);
-				minX = Math.min(minX, x);
-				minY = Math.min(minY, y);
-				minZ = Math.min(minZ, z);
-				maxX = Math.max(maxX, x);
-				maxY = Math.max(maxY, y);
-				maxZ = Math.max(maxZ, z);
-				counter.incCounter();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot read from " + filename);
-		} finally{
-			try {
-				br.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + filename);
-			}
-		}
-		counter.printCounter();
-
-		/* Establish the centroid grid given the point extent. */
-		FCCGrid fccg = new FCCGrid(minX, maxX, minY, maxY, minZ, maxZ, scale);
-		GridPoint[] ga = fccg.getFcGrid();
-		for(GridPoint gp : ga){
-			minX = Math.min(minX, gp.getX());
-			minY = Math.min(minY, gp.getY());
-			minZ = Math.min(minZ, gp.getZ());
-			maxX = Math.max(maxX, gp.getX());
-			maxY = Math.max(maxY, gp.getY());
-			maxZ = Math.max(maxZ, gp.getZ());
-		}
-		LOG.info("Done calculating data extent.");
-
-		/* Establish and populate the OcTree given the centroid extent. */
-		LOG.info("Building OcTree with dodecahedron centroids... (" + ga.length + " centroids)");
-		Counter centroidCounter = new Counter("   centroid # "); 
-		map = new HashMap<Coord3d, Double>(ga.length);
-		ot = new OcTree<Coord3d>(minX, minY, minZ, maxX, maxY, maxZ);
-		for(GridPoint gp : ga){
-			Coord3d c = new Coord3d(gp.getX(), gp.getY(), gp.getZ());
-			ot.put(gp.getX(), gp.getY(), gp.getZ(), c);
-			map.put(c, new Double(0.0));
-			centroidCounter.incCounter();
-		}
-		centroidCounter.printCounter();
-		LOG.info("Done populating centroid grid: " + ga.length + " points.");
-	}
+	public abstract void setupGrid(String filename);
+	
+	public abstract Coord3d convertToCoord3d(double x, double y, double z);
+	
+	public abstract Coord3d getClosest(double x, double y, double z);
+	
+	public abstract void writeCellCountsAndRiskClasses(String outputFolder);
+	
 	
 	/* Cells are ranked based on the number of records associated with them */  
 	private Comparator<Coord3d> getGridComparator(){
@@ -177,6 +110,7 @@ public class DigiGrid  extends AbstractAnalysis {
 			}
 		};
 	}
+	
 	
 	public double getCount(Coord3d c){
 		return this.map.get(c);
@@ -194,13 +128,11 @@ public class DigiGrid  extends AbstractAnalysis {
 		return this.scale;
 	}
 	
-	public Coord3d getClosest(double x, double y, double z){
-		return this.ot.get(x, y, z);
-	}
 	
 	public int getCellRisk(Coord3d c){
 		return this.mapRating.get(c);
 	}
+	
 	
 	/** 
 	 * Sort the polyhedra based on their counts only.
@@ -280,6 +212,7 @@ public class DigiGrid  extends AbstractAnalysis {
 		}
 	}
 	
+	
 	public void visualiseGrid(Visual visual){
 		if(visual != this.visual){
 			LOG.warn("Requested visualisation is different than set visualisation.");
@@ -289,6 +222,7 @@ public class DigiGrid  extends AbstractAnalysis {
 		visualiseGrid();
 	}
 
+	
 	public void setVisual(Visual visual){
 		this.visual = visual;
 	}
@@ -367,7 +301,8 @@ public class DigiGrid  extends AbstractAnalysis {
 		chart.getView().setMaximized(true);
 		chart.getView().setViewPoint(newViewPoint, true);
 		chart.getView().setViewPositionMode(ViewPositionMode.FREE);
-		chart.getView().setBoundManual(new BoundingBox3d(-800f, 800f, -800f, 800f, 600f, 1500f));
+//		chart.getView().setBoundManual(new BoundingBox3d(-800f, 800f, -800f, 800f, 600f, 1500f));
+		chart.getView().setBoundManual(new BoundingBox3d(-800f, 800f, -800f, 800f, 000f, 180f));
 		chart.getView().updateBounds();
 		
 		
@@ -383,7 +318,7 @@ public class DigiGrid  extends AbstractAnalysis {
 				
 				/* Clean up a bit. There seems to be a few outliers... this is
 				 * for now where I take them out. */
-				if(c.x > -1000 & c.z > 500){
+//				if(c.x > -1000 & c.z > 500){
 					
 					
 					/* Set up polyhedra shapes. */
@@ -443,7 +378,7 @@ public class DigiGrid  extends AbstractAnalysis {
 						shape.setWireframeColor(DIGI_GRAY);
 						chart.getScene().add(shape);
 					}
-				}
+//				}
 				
 			}
 
@@ -581,51 +516,6 @@ public class DigiGrid  extends AbstractAnalysis {
 		}
 	}
 
-	/**
-	 * Writes the accelerometer 'blob' results: the number of observations in
-	 * each cell (only those with a value greater than zero), and the risk class
-	 * of the cell. The output file with name <code>cellValuesAndRiskClasses.csv</code>
-	 * will be created in the output folder.
-	 * 
-	 * @param outputFolder
-	 */
-	public void writeCellCountsAndRiskClasses(String outputFolder){
-		if(map.size() == 0 || mapRating == null){
-			throw new RuntimeException("Insufficient data to write. Either no grids, or no ranking.");
-		}
-		String filename = outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "cellValuesAndRiskClasses.csv";
-		LOG.info("Writing the cell values and risk classes to " + filename); 
-		
-		/* Report the risk thresholds for which this output holds. */
-		LOG.info("  \\_ Accelerometer risk thresholds:");
-		for(int i = 0; i < this.riskThresholds.size(); i++){
-			LOG.info(String.format("      \\_ Risk %d: %.4f", i, this.riskThresholds.get(i)));
-		}
-		
-		/* Write the cell values and their risk classes. */
-		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-		try{
-			/* Header. */
-			bw.write("x,y,z,count,class");
-			bw.newLine();
-			
-			for(Coord3d c : this.map.keySet()){
-				bw.write(String.format("%.4f, %.4f,%.4f,%.1f,%d\n", c.x, c.y, c.z, this.map.get(c), this.mapRating.get(c)));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot write to " + filename);
-		} finally{
-			try {
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + filename);
-			}
-		}
-		LOG.info("Done writing cell values and risk classes.");
-	}
-	
 	public boolean isRanked(){
 		return this.isRanked;
 	}
