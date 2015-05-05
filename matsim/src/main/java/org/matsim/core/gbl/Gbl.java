@@ -199,6 +199,9 @@ public abstract class Gbl {
 	+ "this.bindMobsim().toProvider(MyMobsimProvider.class) ;\n"
 	+ "}\n"
 	+ "});\n"
-	+ "See, e.g., the RunMobsimWithMultipleModeVehiclesExample class under tutorial.*.  Talk to MZ or KN if you need help.";
+	+ "See, e.g., the RunMobsimWithMultipleModeVehiclesExample class under tutorial.*.  Talk to MZ or KN if you need help. kai, may'15";
+
+	public final static String SET_UP_IS_NOW_FINAL = "controler.setUp() is now final. You should be able to do whatever you need to do with a "
+	+ "ControlerStartupListener. Please talk to MZ or KN if you have difficulties. kai, may'15";
 	
 }

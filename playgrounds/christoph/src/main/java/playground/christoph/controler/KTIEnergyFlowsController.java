@@ -68,7 +68,7 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		this.ktiConfigGroup = new KtiConfigGroup();
 		this.plansCalcRouteKtiInfo = new PlansCalcRouteKtiInfo(this.ktiConfigGroup);
 		this.loadMyControlerListeners();
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
 		
 	}
 	
@@ -119,26 +119,26 @@ public class KTIEnergyFlowsController extends EnergyFlowsController {
 		}
 	}
 	
-	@Override
-	protected void setUp() {
-
-        KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				this.getScenario(),
-				this.ktiConfigGroup,
-				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
-                getScenario().getActivityFacilities());
-		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
-
-		final KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
-			}
-		});
-
-		super.setUp();
-	}
+//	@Override
+//	protected void setUp() {
+//
+//        KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
+//				this.getScenario(),
+//				this.ktiConfigGroup,
+//				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
+//                getScenario().getActivityFacilities());
+//		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
+//
+//		final KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
+//		this.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//			}
+//		});
+//
+//		super.setUp();
+//	}
 	
 	private void loadMyControlerListeners() {
 

@@ -23,7 +23,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
 import playground.anhorni.surprice.analysis.AgentAnalysisShutdownListener;
 import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
 import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
@@ -50,18 +52,20 @@ public class DayControler extends Controler {
 			  			this, this.getConfig().planCalcScore(), getScenario().getNetwork(), this.memories, this.day, this.preferences)
 				);
         this.loadMyControlerListeners();
+        
+        throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	} 
 				
-	protected void setUp() {
-		final SurpriceTravelDisutilityFactoryImpl travelDisutilityFactory = new SurpriceTravelDisutilityFactoryImpl(this.day, this.memories, this.preferences, this);
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindTravelDisutilityFactory().toInstance(travelDisutilityFactory);
-			}
-		});
-		super.setUp();
-	}
+//	protected void setUp() {
+//		final SurpriceTravelDisutilityFactoryImpl travelDisutilityFactory = new SurpriceTravelDisutilityFactoryImpl(this.day, this.memories, this.preferences, this);
+//		this.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindTravelDisutilityFactory().toInstance(travelDisutilityFactory);
+//			}
+//		});
+//		super.setUp();
+//	}
 	
 	private void setTermination(double stoppingRate) {
 		this.terminationCriterion = new TerminationCriterionScoreBased(stoppingRate, this);

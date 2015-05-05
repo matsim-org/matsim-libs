@@ -21,6 +21,7 @@
 package herbie.running.controler;
 
 import com.google.inject.Singleton;
+
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
@@ -28,11 +29,13 @@ import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieScoringFunctionFactory;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.TravelTime;
@@ -75,6 +78,7 @@ public class HerbieControler extends Controler {
 			}
         });
         this.loadMyControlerListeners();
+        throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL) ;
 	}
 
 	@Override
@@ -83,32 +87,32 @@ public class HerbieControler extends Controler {
 		this.setScenarioLoaded(true);
 	}
 
-	@Override
-	protected void setUp() {
-        HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
-				super.getConfig(),
-				this.herbieConfigGroup,
-				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
-                getScenario().getActivityFacilities(),
-                getScenario().getNetwork());
-		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
-				
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(getConfig().planCalcScore());
-		
-		final HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
-		TravelTime timeCalculator = super.getLinkTravelTimes();
-		PlanCalcScoreConfigGroup cnScoringGroup = null;
-		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
-
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
-			}
-		});
-
-		super.setUp();
-	}
+//	@Override
+//	protected void setUp() {
+//        HerbieScoringFunctionFactory herbieScoringFunctionFactory = new HerbieScoringFunctionFactory(
+//				super.getConfig(),
+//				this.herbieConfigGroup,
+//				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
+//                getScenario().getActivityFacilities(),
+//                getScenario().getNetwork());
+//		this.setScoringFunctionFactory(herbieScoringFunctionFactory);
+//				
+//		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(getConfig().planCalcScore());
+//		
+//		final HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
+//		TravelTime timeCalculator = super.getLinkTravelTimes();
+//		PlanCalcScoreConfigGroup cnScoringGroup = null;
+//		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
+//
+//		this.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//			}
+//		});
+//
+//		super.setUp();
+//	}
 	
 	
 	private double reroutingShare = 0.05;

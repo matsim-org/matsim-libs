@@ -26,6 +26,7 @@ import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.PLOC.analysis.ShoppingCalculator;
@@ -35,9 +36,9 @@ public class SingleRunControler extends Controler {
 	private ObjectAttributes personAttributes;
 	private int day = -1;
 	private boolean tempVar;
-	
 	public SingleRunControler(String config) {
 		super(config);	
+		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL) ;
 	}
 		
 	public SingleRunControler(final Config config) {
@@ -65,19 +66,19 @@ public class SingleRunControler extends Controler {
     }
     
          
-    @Override
-    protected void setUp() {
-      super.setUp();
-      super.setOverwriteFiles(true);
-      
-      if (this.day > -1) super.addControlerListener(new ShoppingCalculator(this.personAttributes, this.tempVar, this.day));
-      
-      ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(
-    		  (DestinationChoiceConfigGroup) this.getConfig().getModule("locationchoice"));
-	  ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
-            
-		this.addControlerListener(new DistanceStats(this.getConfig(), "best", "s", actTypeConverter, "car"));
-		
-		throw new RuntimeException("integrate LC with listener!");
-	}  
+//    @Override
+//    protected void setUp() {
+//      super.setUp();
+//      super.setOverwriteFiles(true);
+//      
+//      if (this.day > -1) super.addControlerListener(new ShoppingCalculator(this.personAttributes, this.tempVar, this.day));
+//      
+//      ActivitiesHandler defineFlexibleActivities = new ActivitiesHandler(
+//    		  (DestinationChoiceConfigGroup) this.getConfig().getModule("locationchoice"));
+//	  ActTypeConverter actTypeConverter = defineFlexibleActivities.getConverter();
+//            
+//		this.addControlerListener(new DistanceStats(this.getConfig(), "best", "s", actTypeConverter, "car"));
+//		
+//		throw new RuntimeException("integrate LC with listener!");
+//	}  
 }

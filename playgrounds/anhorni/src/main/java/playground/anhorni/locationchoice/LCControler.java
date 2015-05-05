@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
 import java.util.TreeMap;
 
@@ -37,13 +38,16 @@ public class LCControler extends Controler {
 		
 		this.facilityPenalties = new TreeMap<Id, FacilityPenalty>(); 
 		this.addControlerListener(new FacilitiesLoadCalculator(this.facilityPenalties));		
+		
+		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL) ;
+		// in case below, could set scoring function factory between controler constructor and controler run. kai, may'15
 	}
 
-    @Override
-    protected void setUp() {
-      super.setUp();
-        this.setScoringFunctionFactory(new LocationChoiceScoringFunctionFactory(this.getConfig().planCalcScore(), this.facilityPenalties, getScenario().getActivityFacilities(), getScenario().getNetwork()));
-    }
+//    @Override
+//    protected void setUp() {
+//      super.setUp();
+//        this.setScoringFunctionFactory(new LocationChoiceScoringFunctionFactory(this.getConfig().planCalcScore(), this.facilityPenalties, getScenario().getActivityFacilities(), getScenario().getNetwork()));
+//    }
  
     public static void main (final String[] args) { 
     	LCControler controler = new LCControler(args);

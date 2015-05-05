@@ -21,6 +21,7 @@
 package playground.wrashid.parkingSearch.withindayFW.controllers;
 
 import com.google.inject.Provider;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -28,6 +29,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -41,6 +43,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.Desires;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
+
 import playground.wrashid.parkingSearch.withinday.WithinDayController;
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.LegModeChecker;
@@ -75,6 +78,8 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 
 		// register this as a Controller Listener
 		super.addControlerListener(this);
+		
+		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
 	protected void startUpFinishing() {
@@ -144,71 +149,71 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 */
 	}
 	
-	protected void setUp(){
-//		setUseTripRouting(false);		
-		
-		super.setUp();
-		
-		startUpBegin();
-		//TODO: clean this out! => nothing from test/zürich scenario should be here.
-		HashMap<String, HashSet<Id>> parkingTypes = initParkingTypes(this);
-		
-		// connect facilities to network
-        new WorldConnectLocations(this.getConfig()).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
-
-		super.initWithinDayEngine(numReplanningThreads);
-		super.createAndInitTravelTimeCollector();
-		super.createAndInitLinkReplanningMap();
-
-		// ensure that all agents' plans have valid mode chains
-		legModeChecker = new LegModeChecker(this.getScenario(), new PlanRouter(
-		this.getTripRouterProvider().get(),
-		this.getScenario().getActivityFacilities()
-		));
-		legModeChecker.setValidNonCarModes(new String[] { TransportMode.walk });
-		legModeChecker.setToCarProbability(0.5);
-		ParallelPersonAlgorithmRunner.run(this.getScenario().getPopulation(), numReplanningThreads, legModeChecker);
-		//legModeChecker.run(this.scenarioData.getPopulation());
-
-		if (parkingInfrastructure==null){
-			parkingInfrastructure = new ParkingInfrastructure(this.getScenario(),parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
-		}
-
-		parkingAgentsTracker = new ParkingAgentsTracker(this.getScenario(), 10000.0, parkingInfrastructure);
-		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
-		this.getEvents().addHandler(this.parkingAgentsTracker);
-		this.addControlerListener(parkingAgentsTracker);
-
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.getConfig().planCalcScore());
-		
-		insertParkingActivities = new InsertParkingActivities(getScenario(), this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
-
-		this.getWithinDayEngine().initializeReplanningModules(numReplanningThreads);
-		final MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						return mobsimFactory.createMobsim(getScenario(), getEvents());
-					}
-				});
-			}
-		});
-
-		setDesiresIfApplicable();
-		
-		// this.initIdentifiers();
-		// this.initReplanners();
-		startUpFinishing();
-		
-		throw new RuntimeException("setting useTripRouting to false (see at beginning of method) " +
-				"no longer possible since this only affects initialization and my thus be " +
-		"inconsistent.  kai, may'13.  aborting ... ") ;
-
-
-	}
+//	protected void setUp(){
+////		setUseTripRouting(false);		
+//		
+//		super.setUp();
+//		
+//		startUpBegin();
+//		//TODO: clean this out! => nothing from test/zürich scenario should be here.
+//		HashMap<String, HashSet<Id>> parkingTypes = initParkingTypes(this);
+//		
+//		// connect facilities to network
+//        new WorldConnectLocations(this.getConfig()).connectFacilitiesWithLinks(getScenario().getActivityFacilities(), (NetworkImpl) getScenario().getNetwork());
+//
+//		super.initWithinDayEngine(numReplanningThreads);
+//		super.createAndInitTravelTimeCollector();
+//		super.createAndInitLinkReplanningMap();
+//
+//		// ensure that all agents' plans have valid mode chains
+//		legModeChecker = new LegModeChecker(this.getScenario(), new PlanRouter(
+//		this.getTripRouterProvider().get(),
+//		this.getScenario().getActivityFacilities()
+//		));
+//		legModeChecker.setValidNonCarModes(new String[] { TransportMode.walk });
+//		legModeChecker.setToCarProbability(0.5);
+//		ParallelPersonAlgorithmRunner.run(this.getScenario().getPopulation(), numReplanningThreads, legModeChecker);
+//		//legModeChecker.run(this.scenarioData.getPopulation());
+//
+//		if (parkingInfrastructure==null){
+//			parkingInfrastructure = new ParkingInfrastructure(this.getScenario(),parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
+//		}
+//
+//		parkingAgentsTracker = new ParkingAgentsTracker(this.getScenario(), 10000.0, parkingInfrastructure);
+//		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
+//		this.getEvents().addHandler(this.parkingAgentsTracker);
+//		this.addControlerListener(parkingAgentsTracker);
+//
+//		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.getConfig().planCalcScore());
+//		
+//		insertParkingActivities = new InsertParkingActivities(getScenario(), this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
+//
+//		this.getWithinDayEngine().initializeReplanningModules(numReplanningThreads);
+//		final MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
+//		this.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindMobsim().toProvider(new Provider<Mobsim>() {
+//					@Override
+//					public Mobsim get() {
+//						return mobsimFactory.createMobsim(getScenario(), getEvents());
+//					}
+//				});
+//			}
+//		});
+//
+//		setDesiresIfApplicable();
+//		
+//		// this.initIdentifiers();
+//		// this.initReplanners();
+//		startUpFinishing();
+//		
+//		throw new RuntimeException("setting useTripRouting to false (see at beginning of method) " +
+//				"no longer possible since this only affects initialization and my thus be " +
+//		"inconsistent.  kai, may'13.  aborting ... ") ;
+//
+//
+//	}
 
 	private void setDesiresIfApplicable() {
 		for (Person p:getScenario().getPopulation().getPersons().values()){

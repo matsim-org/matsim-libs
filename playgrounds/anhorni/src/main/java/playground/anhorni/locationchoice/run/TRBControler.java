@@ -23,6 +23,8 @@ import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
+
 import playground.anhorni.locationchoice.analysis.PrintShopAndLeisureLocations;
 import playground.anhorni.locationchoice.analysis.TravelDistanceDistribution;
 import playground.anhorni.locationchoice.analysis.events.CalcLegDistancesListenerDetailed;
@@ -35,32 +37,34 @@ public class TRBControler extends Controler {
 
 	public TRBControler(String[] args) {
 		super(args);
+		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
 	public TRBControler(Config config) {
 		super(config);
+		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
 	public static void main(String[] args) {
 		new TRBControler(args).run();
 	}
 	
-	 protected void setUp() {
-	      super.setUp();
-	      
-	      TRBScoringFunctionFactory trbScoringFunctionFactory =
-	  			new TRBScoringFunctionFactory(this.getConfig().planCalcScore(), this);
-	  		this.setScoringFunctionFactory(trbScoringFunctionFactory);
-
-	  		this.addControlerListener(new FacilitiesLoadCalculator(((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties()));
-	  		this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
-	  		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes.txt", false));
-	  		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes_wayThere.txt", true));
-	  		this.addControlerListener(new CalcLegDistancesListenerDetailed("CalcLegDistances_wayThere.txt"));
-	  		this.addControlerListener(new CalculatePlanTravelStats(true));
-	  		this.addControlerListener(new PrintShopAndLeisureLocations());
-	  		this.addControlerListener(new TravelDistanceDistribution());
-	  		super.run();
-	      
-	 }
+//	 protected void setUp() {
+//	      super.setUp();
+//	      
+//	      TRBScoringFunctionFactory trbScoringFunctionFactory =
+//	  			new TRBScoringFunctionFactory(this.getConfig().planCalcScore(), this);
+//	  		this.setScoringFunctionFactory(trbScoringFunctionFactory);
+//
+//	  		this.addControlerListener(new FacilitiesLoadCalculator(((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties()));
+//	  		this.addControlerListener(new ScoreElements("scoreElementsAverages.txt"));
+//	  		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes.txt", false));
+//	  		this.addControlerListener(new CalcLegTimesListenerDetailed("calcLegTimes_wayThere.txt", true));
+//	  		this.addControlerListener(new CalcLegDistancesListenerDetailed("CalcLegDistances_wayThere.txt"));
+//	  		this.addControlerListener(new CalculatePlanTravelStats(true));
+//	  		this.addControlerListener(new PrintShopAndLeisureLocations());
+//	  		this.addControlerListener(new TravelDistanceDistribution());
+//	  		super.run();
+//	      
+//	 }
 }

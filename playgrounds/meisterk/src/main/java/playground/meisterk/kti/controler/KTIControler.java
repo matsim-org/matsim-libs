@@ -65,7 +65,7 @@ public class KTIControler extends Controler {
         ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(getScenario().getNetwork(), new PlanomatConfigGroup()));
         ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));
         this.loadMyControlerListeners();
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
 	@Override
@@ -77,26 +77,26 @@ public class KTIControler extends Controler {
 		}
 	}
 
-	@Override
-	protected void setUp() {
-
-        KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
-				getScenario(),
-				this.ktiConfigGroup,
-				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
-                getScenario().getActivityFacilities());
-		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
-
-		final KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
-			}
-		});
-
-		super.setUp();
-	}
+//	@Override
+//	protected void setUp() {
+//
+//        KTIYear3ScoringFunctionFactory kTIYear3ScoringFunctionFactory = new KTIYear3ScoringFunctionFactory(
+//				getScenario(),
+//				this.ktiConfigGroup,
+//				((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
+//                getScenario().getActivityFacilities());
+//		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
+//
+//		final KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
+//		this.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//			}
+//		});
+//
+//		super.setUp();
+//	}
 
 
 	private void loadMyControlerListeners() {

@@ -65,7 +65,7 @@ public final class CarSharingControler extends Controler
     //this.getNetwork().getFactory().setRouteFactory(MyTransportMode.ride, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
       ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(MyTransportMode.carsharing, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));
       this.loadMyControlerListeners();
-	throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
+	throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL ) ;
   }
 
   @Override
@@ -76,32 +76,32 @@ public final class CarSharingControler extends Controler
 			this.setScenarioLoaded(true);
 	}
   }
-  @Override
-  protected void setUp(){
-
-	  {
-		  if (this.ftConfigGroup.isUsePlansCalcRouteFt()) {
-			  log.info("Using ftRouter");
-			  this.plansCalcRouteFtInfo.prepare(getScenario().getNetwork());
-		  }
-
-		  FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
-				  this.getConfig(), 
-				  this.ftConfigGroup, 
-				  ((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
-				  getScenario().getActivityFacilities(), getScenario().getNetwork());
-		  this.setScoringFunctionFactory(ftScoringFunctionFactory);
-		  //
-		  final FtTravelCostCalculatorFactory costCalculatorFactory = new FtTravelCostCalculatorFactory(this.ftConfigGroup);
-        this.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
-            }
-        });
-        super.setUp();
-	  }
-  }
+//  @Override
+//  protected void setUp(){
+//
+//	  {
+//		  if (this.ftConfigGroup.isUsePlansCalcRouteFt()) {
+//			  log.info("Using ftRouter");
+//			  this.plansCalcRouteFtInfo.prepare(getScenario().getNetwork());
+//		  }
+//
+//		  FtScoringFunctionFactory ftScoringFunctionFactory = new FtScoringFunctionFactory(
+//				  this.getConfig(), 
+//				  this.ftConfigGroup, 
+//				  ((FacilityPenalties) this.getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME)).getFacilityPenalties(),
+//				  getScenario().getActivityFacilities(), getScenario().getNetwork());
+//		  this.setScoringFunctionFactory(ftScoringFunctionFactory);
+//		  //
+//		  final FtTravelCostCalculatorFactory costCalculatorFactory = new FtTravelCostCalculatorFactory(this.ftConfigGroup);
+//        this.addOverridingModule(new AbstractModule() {
+//            @Override
+//            public void install() {
+//                bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//            }
+//        });
+//        super.setUp();
+//	  }
+//  }
   
   private void loadMyControlerListeners()
   {

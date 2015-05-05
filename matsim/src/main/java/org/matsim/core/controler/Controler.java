@@ -369,7 +369,7 @@ public class Controler extends AbstractController {
 
 	@Deprecated // overwriting this method is deprecated.  Please talk to MZ or KN if you think that you really need this. nov'14
 	// used at about 33 locations. kai, may'15
-	protected void setUp() {}
+	protected final void setUp() {}
 
     @Override
 	protected final boolean continueIterations(int it) {

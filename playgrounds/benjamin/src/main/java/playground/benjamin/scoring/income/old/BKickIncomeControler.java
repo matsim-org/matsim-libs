@@ -38,17 +38,17 @@ public final class BKickIncomeControler extends BkControler {
 
 	public BKickIncomeControler(String configFileName) {
 		super(configFileName);
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
 	}
 	
 	public BKickIncomeControler(Config conf){
 		super(conf);
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
 	}
 
 	public BKickIncomeControler(String[] args) {
 		super(args);
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
 	}
 
 //	@Override
@@ -56,23 +56,23 @@ public final class BKickIncomeControler extends BkControler {
 //		return new BKickIncomeScoringFunctionFactory(this.config.planCalcScore(), this.hhdb, network);
 //	}
 	
-	@Override
-	protected void setUp(){	
-    this.getScenario().getConfig().global().setNumberOfThreads(1);
-		this.hhdb = new PersonHouseholdMapping(this.getScenario().getHouseholds());
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindTravelDisutilityFactory().toInstance(new Income1TravelCostCalculatorFactory());
-			}
-		});
-		//		if (this.travelTimeCalculator == null) {
-//			this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-//		}
-//		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
-		super.setUp();
-        this.setScoringFunctionFactory( new BKickIncomeScoringFunctionFactory(this.getConfig().planCalcScore(), this.hhdb, getScenario().getNetwork()) ) ;
-	}
+//	@Override
+//	protected void setUp(){	
+//    this.getScenario().getConfig().global().setNumberOfThreads(1);
+//		this.hhdb = new PersonHouseholdMapping(this.getScenario().getHouseholds());
+//		this.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindTravelDisutilityFactory().toInstance(new Income1TravelCostCalculatorFactory());
+//			}
+//		});
+//		//		if (this.travelTimeCalculator == null) {
+////			this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+////		}
+////		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
+//		super.setUp();
+//        this.setScoringFunctionFactory( new BKickIncomeScoringFunctionFactory(this.getConfig().planCalcScore(), this.hhdb, getScenario().getNetwork()) ) ;
+//	}
 	
 //	@Override
 //	public PlanAlgorithm createRoutingAlgorithm() {

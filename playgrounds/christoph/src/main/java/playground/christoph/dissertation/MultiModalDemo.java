@@ -54,6 +54,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -662,36 +663,38 @@ public class MultiModalDemo {
 					bindTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
 				}
 			});
+			
+			throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 		}
 		
-		@Override
-		protected void setUp() {
-			super.setUp();
-			
-			TravelTime carTravelTime = this.getLinkTravelTimes();
-			TravelTime bikeTravelTime = new BikeTravelTimeFactory(this.getConfig().plansCalcRoute()).get();
-			TravelTime walkTravelTime = new WalkTravelTimeFactory(this.getConfig().plansCalcRoute()).get();
-			
-			int timeSlice = this.getConfig().travelTimeCalculator().getTraveltimeBinSize();
-			int maxTime = 30 * 3600;
-			WaitToLinkCalculator waitToLinkCalculator = new WaitToLinkCalculator(timeSlice, maxTime);
-			this.getEvents().addHandler(waitToLinkCalculator);
-			this.addControlerListener(waitToLinkCalculator);
-			
-			Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-			
-			travelTimes.put(TransportMode.car, carTravelTime);
-			travelTimes.put(TransportMode.bike, bikeTravelTime);
-			travelTimes.put(TransportMode.walk, walkTravelTime);
-			
-			for (GenericPlanStrategy<Plan, Person> planStrategy : this.getStrategyManager().getStrategiesOfDefaultSubpopulation()) {
-				if (planStrategy instanceof ChooseBestLegModePlanStrategy) {
-					((ChooseBestLegModePlanStrategy) planStrategy).setWaitToLinkCalculator(waitToLinkCalculator);
-					((ChooseBestLegModePlanStrategy) planStrategy).setTravelTimes(travelTimes);
-					((ChooseBestLegModePlanStrategy) planStrategy).setTravelDisutilityFactory(this.getTravelDisutilityFactory());
-				}
-			}
-		}
+//		@Override
+//		protected void setUp() {
+//			super.setUp();
+//			
+//			TravelTime carTravelTime = this.getLinkTravelTimes();
+//			TravelTime bikeTravelTime = new BikeTravelTimeFactory(this.getConfig().plansCalcRoute()).get();
+//			TravelTime walkTravelTime = new WalkTravelTimeFactory(this.getConfig().plansCalcRoute()).get();
+//			
+//			int timeSlice = this.getConfig().travelTimeCalculator().getTraveltimeBinSize();
+//			int maxTime = 30 * 3600;
+//			WaitToLinkCalculator waitToLinkCalculator = new WaitToLinkCalculator(timeSlice, maxTime);
+//			this.getEvents().addHandler(waitToLinkCalculator);
+//			this.addControlerListener(waitToLinkCalculator);
+//			
+//			Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+//			
+//			travelTimes.put(TransportMode.car, carTravelTime);
+//			travelTimes.put(TransportMode.bike, bikeTravelTime);
+//			travelTimes.put(TransportMode.walk, walkTravelTime);
+//			
+//			for (GenericPlanStrategy<Plan, Person> planStrategy : this.getStrategyManager().getStrategiesOfDefaultSubpopulation()) {
+//				if (planStrategy instanceof ChooseBestLegModePlanStrategy) {
+//					((ChooseBestLegModePlanStrategy) planStrategy).setWaitToLinkCalculator(waitToLinkCalculator);
+//					((ChooseBestLegModePlanStrategy) planStrategy).setTravelTimes(travelTimes);
+//					((ChooseBestLegModePlanStrategy) planStrategy).setTravelDisutilityFactory(this.getTravelDisutilityFactory());
+//				}
+//			}
+//		}
 	}
 	
 	private static class TravelTimeAnalyzer implements PersonDepartureEventHandler, PersonArrivalEventHandler, IterationEndsListener {

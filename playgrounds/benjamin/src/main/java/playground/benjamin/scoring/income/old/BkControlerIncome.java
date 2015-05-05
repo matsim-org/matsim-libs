@@ -24,11 +24,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
+
 import playground.benjamin.BkControler;
 import playground.benjamin.BkPaths;
 
@@ -45,33 +47,36 @@ public class BkControlerIncome extends BkControler {
 
 	public BkControlerIncome(String arg) {
 		super(arg);
+		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 	
 	public BkControlerIncome(String[] args) {
 		super(args);
+		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
 	public BkControlerIncome(Config config) {
 		super(config);
+		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
-	@Override
-	@Deprecated // it is no longer necessary to use inheritance here.  kai, oct'11
-	            // for a better use case of personalizable travel costs and personalizable scoring, please refer to {@link BkRouterTest} and {@link BkScoringTest}. benjamin, oct'11
-	protected void setUp() {
-
-		this.addInstallTravelCostCalculatorFactoryControlerListener();
-
-		this.getScenario().getConfig().global().setNumberOfThreads(1);
-		this.personHouseholdMapping = new PersonHouseholdMapping(((ScenarioImpl) this.getScenario()).getHouseholds());
-		
-		/*		Setting the needed scoring function.
-		Remark: parameters must be set in several classes and independently for scoring and router!*/
-        ScoringFunctionFactory scoringFactory = new IncomeScoringFunctionFactory(this.getScenario().getConfig(), personHouseholdMapping, getScenario().getNetwork());
-		
-		this.setScoringFunctionFactory(scoringFactory);
-		super.setUp();
-	}
+//	@Override
+//	@Deprecated // it is no longer necessary to use inheritance here.  kai, oct'11
+//	            // for a better use case of personalizable travel costs and personalizable scoring, please refer to {@link BkRouterTest} and {@link BkScoringTest}. benjamin, oct'11
+//	protected void setUp() {
+//
+//		this.addInstallTravelCostCalculatorFactoryControlerListener();
+//
+//		this.getScenario().getConfig().global().setNumberOfThreads(1);
+//		this.personHouseholdMapping = new PersonHouseholdMapping(((ScenarioImpl) this.getScenario()).getHouseholds());
+//		
+//		/*		Setting the needed scoring function.
+//		Remark: parameters must be set in several classes and independently for scoring and router!*/
+//        ScoringFunctionFactory scoringFactory = new IncomeScoringFunctionFactory(this.getScenario().getConfig(), personHouseholdMapping, getScenario().getNetwork());
+//		
+//		this.setScoringFunctionFactory(scoringFactory);
+//		super.setUp();
+//	}
 
 	private void installTravelCostCalculatorFactory() {
 		//returns null, if there is no road pricing

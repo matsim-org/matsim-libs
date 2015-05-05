@@ -21,6 +21,7 @@
 package playground.christoph.energyflows.controller;
 
 import com.google.inject.Singleton;
+
 import org.apache.log4j.Logger;
 import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.api.core.v01.Scenario;
@@ -29,10 +30,12 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
+
 import playground.christoph.energyflows.replanning.TransitStrategyManager;
 
 import javax.inject.Provider;
@@ -90,13 +93,13 @@ public class EnergyFlowsController extends Controler {
 	 * We use a Scoring Function that get the Facility Opening Times from
 	 * the Facilities instead of the Config File.
 	 */
-	@Override
-	protected void setUp() {
-		if (this.getScoringFunctionFactory() == null) {
-			this.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(this.getConfig().planCalcScore(), this.getScenario()));
-		}
-		super.setUp();
-	}
+//	@Override
+//	protected void setUp() {
+//		if (this.getScoringFunctionFactory() == null) {
+//			this.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(this.getConfig().planCalcScore(), this.getScenario()));
+//		}
+//		super.setUp();
+//	}
 	
 	public EnergyFlowsController(String[] args) {
 		super(args[0]);
@@ -120,6 +123,8 @@ public class EnergyFlowsController extends Controler {
         });
         
         this.loadMyControlerListeners(); 
+        
+        throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
 	public static void main(final String[] args) {

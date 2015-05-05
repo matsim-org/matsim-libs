@@ -22,6 +22,7 @@ package playground.christoph.evacuation.controler;
 
 import com.google.inject.Provider;
 import com.vividsolutions.jts.geom.Geometry;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
@@ -38,6 +39,7 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -89,6 +91,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerF
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 import org.opengis.feature.simple.SimpleFeature;
+
 import playground.christoph.evacuation.analysis.*;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
@@ -249,6 +252,8 @@ public class EvacuationControler extends WithinDayController implements
 		 */
 		Map<String, TravelTime> linkReplanningTravelTimes = this.createLinkReplanningMapTravelTimes();
 		super.createAndInitLinkReplanningMap(linkReplanningTravelTimes);
+		
+		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
 	@Override
@@ -288,8 +293,7 @@ public class EvacuationControler extends WithinDayController implements
 	 * is not possible anymore since the TripRouterFactory is not initialized
 	 * when the StartupListener is called. cdobler, dec'12
 	 */
-	@Override
-	public void setUp() {
+	public void mysetUp() {
 		
 		// initialze plan router
 		super.setUp();

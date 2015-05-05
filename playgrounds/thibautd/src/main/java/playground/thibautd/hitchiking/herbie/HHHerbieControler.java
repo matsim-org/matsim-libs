@@ -20,22 +20,26 @@
 package playground.thibautd.hitchiking.herbie;
 
 import com.google.inject.Singleton;
+
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.replanning.TransitStrategyManager;
 import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 import herbie.running.scoring.TravelScoringFunction;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
+
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.hitchiking.run.HitchHikingControler;
@@ -77,6 +81,8 @@ public class HHHerbieControler extends HitchHikingControler {
         });
         
         this.loadMyControlerListeners();
+        
+        throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
 	@Override
@@ -85,59 +91,59 @@ public class HHHerbieControler extends HitchHikingControler {
 		this.setScenarioLoaded(true);
 	}
 
-	@Override
-	protected void setUp() {
-		FacilityPenalties facPenalties = (FacilityPenalties) getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME);
-
-		if (facPenalties == null) {
-			// I'm pretty sure it's not used anywhere...
-			facPenalties = new FacilityPenalties();
-			getScenario().addScenarioElement( FacilityPenalties.ELEMENT_NAME, facPenalties );
-		}
-
-        HerbiePlanBasedScoringFunctionFactory herbieScoringFunctionFactory =
-			new HerbiePlanBasedScoringFunctionFactory(
-				super.getConfig(),
-				this.herbieConfigGroup,
-				facPenalties.getFacilityPenalties(),
-                    getScenario().getActivityFacilities(),
-                    getScenario().getNetwork());
-
-		this.setScoringFunctionFactory( herbieScoringFunctionFactory );
-				
-		final CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
-		
-		final HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
-		TravelTime timeCalculator = super.getLinkTravelTimes();
-		PlanCalcScoreConfigGroup cnScoringGroup = null;
-		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
-
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
-			}
-		});
-
-		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
-		// if some parts of the code use this method, everything should be consistent.
-		this.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(TransitRouter.class).toProvider(new HerbieTransitRouterFactory(
-                    getScenario().getTransitSchedule(),
-                    new TransitRouterConfig(
-                        HHHerbieControler.this.getConfig().planCalcScore(),
-                        HHHerbieControler.this.getConfig().plansCalcRoute(),
-                        HHHerbieControler.this.getConfig().transitRouter(),
-                        HHHerbieControler.this.getConfig().vspExperimental()),
-                    herbieConfigGroup,
-                    new TravelScoringFunction( params, herbieConfigGroup ) ));
-            }
-        });
-
-		super.setUp();
-	}
+//	@Override
+//	protected void setUp() {
+//		FacilityPenalties facPenalties = (FacilityPenalties) getScenario().getScenarioElement(FacilityPenalties.ELEMENT_NAME);
+//
+//		if (facPenalties == null) {
+//			// I'm pretty sure it's not used anywhere...
+//			facPenalties = new FacilityPenalties();
+//			getScenario().addScenarioElement( FacilityPenalties.ELEMENT_NAME, facPenalties );
+//		}
+//
+//        HerbiePlanBasedScoringFunctionFactory herbieScoringFunctionFactory =
+//			new HerbiePlanBasedScoringFunctionFactory(
+//				super.getConfig(),
+//				this.herbieConfigGroup,
+//				facPenalties.getFacilityPenalties(),
+//                    getScenario().getActivityFacilities(),
+//                    getScenario().getNetwork());
+//
+//		this.setScoringFunctionFactory( herbieScoringFunctionFactory );
+//				
+//		final CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
+//		
+//		final HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
+//		TravelTime timeCalculator = super.getLinkTravelTimes();
+//		PlanCalcScoreConfigGroup cnScoringGroup = null;
+//		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
+//
+//		this.addOverridingModule(new AbstractModule() {
+//			@Override
+//			public void install() {
+//				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+//			}
+//		});
+//
+//		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
+//		// if some parts of the code use this method, everything should be consistent.
+//		this.addOverridingModule(new AbstractModule() {
+//            @Override
+//            public void install() {
+//                bind(TransitRouter.class).toProvider(new HerbieTransitRouterFactory(
+//                    getScenario().getTransitSchedule(),
+//                    new TransitRouterConfig(
+//                        HHHerbieControler.this.getConfig().planCalcScore(),
+//                        HHHerbieControler.this.getConfig().plansCalcRoute(),
+//                        HHHerbieControler.this.getConfig().transitRouter(),
+//                        HHHerbieControler.this.getConfig().vspExperimental()),
+//                    herbieConfigGroup,
+//                    new TravelScoringFunction( params, herbieConfigGroup ) ));
+//            }
+//        });
+//
+//		super.setUp();
+//	}
 	
 	
 	private final double reroutingShare = 0.05;
