@@ -7,6 +7,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -72,7 +73,7 @@ public class UpgradedRunToronto {
 		//Set up the custom travel-time calculator
 		TransitRouterConfig trConfig = new TransitRouterConfig(config);
 		TransitDataCache transitDataCache = new TransitDataCache(scenario.getTransitSchedule());
-		Provider<TransitRouter> trFactory;
+		final Provider<TransitRouter> trFactory;
 		
 		//Branch: if mode-specific boarding costs are specified, use a different calculator.
 		if (config.getModule("boardingcosts") != null){
@@ -86,8 +87,13 @@ public class UpgradedRunToronto {
 			log.info("Configuring Toronto Transit Router");
 			trFactory = new UpgradedTransitRouterFactory(scenario.getNetwork(), trConfig, scenario.getTransitSchedule(), transitDataCache);
 		}
-		controller.setTransitRouterFactory(trFactory);
-		
+		controller.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(trFactory);
+			}
+		});
+
 		//Optional: Load transit schedule data from earlier run
 		if (config.getModule("precongest") != null){
 			EventsManager em = EventsUtils.createEventsManager();

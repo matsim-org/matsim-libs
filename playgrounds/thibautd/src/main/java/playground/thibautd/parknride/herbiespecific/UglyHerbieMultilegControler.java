@@ -35,6 +35,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
@@ -117,7 +118,7 @@ public class UglyHerbieMultilegControler extends Controler {
 						((ScenarioImpl) getScenario()).getActivityFacilities(),
                             getScenario().getNetwork()));
 				
-		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
+		final CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
 		final HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
 
@@ -130,16 +131,20 @@ public class UglyHerbieMultilegControler extends Controler {
 
 		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
 		// if some parts of the code use this method, everything should be consistent.
-		setTransitRouterFactory(
-				new HerbieTransitRouterFactory( 
-					getScenario().getTransitSchedule(),
-					new TransitRouterConfig(
-						getConfig().planCalcScore(),
-						getConfig().plansCalcRoute(),
-						getConfig().transitRouter(),
-						getConfig().vspExperimental()),
-					herbieConfigGroup,
-					new TravelScoringFunction( params, herbieConfigGroup ) ) );
+		this.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(TransitRouter.class).toProvider(new HerbieTransitRouterFactory(
+                    getScenario().getTransitSchedule(),
+                    new TransitRouterConfig(
+                        UglyHerbieMultilegControler.this.getConfig().planCalcScore(),
+                        UglyHerbieMultilegControler.this.getConfig().plansCalcRoute(),
+                        UglyHerbieMultilegControler.this.getConfig().transitRouter(),
+                        UglyHerbieMultilegControler.this.getConfig().vspExperimental()),
+                    herbieConfigGroup,
+                    new TravelScoringFunction( params, herbieConfigGroup ) ));
+            }
+        });
 
 		super.setUp();
 	}

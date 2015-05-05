@@ -35,6 +35,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.pt.router.TransitRouter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -180,10 +181,14 @@ public class PSimControler {
             }
             matsimControler.getEvents().addHandler(waitTimeCalculator);
             matsimControler.getEvents().addHandler(stopStopTimeCalculator);
-            matsimControler.setTransitRouterFactory(
-                    new TransitRouterEventsWSFactory(matsimControler.getScenario(),
+            matsimControler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(matsimControler.getScenario(),
                             waitTimeCalculator.getWaitTimes(),
                             stopStopTimeCalculator.getStopStopTimes()));
+                }
+            });
         } else {
             //randomized routing for car and transit
             final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =

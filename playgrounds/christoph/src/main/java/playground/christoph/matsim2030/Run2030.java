@@ -23,8 +23,10 @@ package playground.christoph.matsim2030;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 
@@ -36,16 +38,21 @@ public class Run2030 {
 	public static void main(String[] args) {
 
 		Config config = ConfigUtils.loadConfig("/data/matsim/cdobler/2030/config.xml");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
+		final TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
 		new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("/data/matsim/cdobler/2030/transitRouterNetwork_thinned.xml.gz");
 		
-		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
+		final TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
 				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		
 		Controler controler = new Controler(scenario);
-		controler.setTransitRouterFactory(new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork));
+			}
+		});
 		controler.run();
 	}
 }

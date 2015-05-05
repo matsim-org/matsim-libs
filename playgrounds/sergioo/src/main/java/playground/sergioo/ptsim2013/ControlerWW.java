@@ -34,6 +34,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import org.matsim.pt.router.TransitRouter;
 import playground.sergioo.ptsim2013.qnetsimengine.PTQSimFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWWImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
@@ -83,10 +84,15 @@ public class ControlerWW {
             });
 		controler.setOverwriteFiles(true);
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));
-        WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
+        final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
-		controler.setTransitRouterFactory(new TransitRouterWWImplFactory(controler, waitTimeCalculator.getWaitTimes()));
-		controler.run();
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(TransitRouter.class).toProvider(new TransitRouterWWImplFactory(controler, waitTimeCalculator.getWaitTimes()));
+            }
+        });
+        controler.run();
 	}
 	
 }

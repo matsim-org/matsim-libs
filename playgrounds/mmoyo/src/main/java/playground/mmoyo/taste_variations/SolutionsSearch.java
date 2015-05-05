@@ -29,6 +29,7 @@ import org.matsim.contrib.cadyts.pt.CadytsPtContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
@@ -100,10 +101,15 @@ public class SolutionsSearch {
 		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);
 		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(schedule);
 		RndPtRouterFactory rndPtRouterFactory = new RndPtRouterFactory();
-		Provider<TransitRouter> randomizedTransitRouterFactory = rndPtRouterFactory.createFactory (preparedSchedule, trConfig, routerNetwork, false, false);
-		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
-		
-		
+		final Provider<TransitRouter> randomizedTransitRouterFactory = rndPtRouterFactory.createFactory (preparedSchedule, trConfig, routerNetwork, false, false);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(randomizedTransitRouterFactory);
+			}
+		});
+
+
 		{//////  Cadyts as plan selector//////////////// 
 		StrategySettings stratSets2 = new StrategySettings(Id.create(++lastStrategyIdx, StrategySettings.class));
 		stratSets2.setStrategyName("myCadyts");

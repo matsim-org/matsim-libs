@@ -2,8 +2,10 @@ package playground.pbouman.transitfares;
 
 import java.util.Map;
 
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 
 import playground.pbouman.agentproperties.AgentProperties;
@@ -24,20 +26,24 @@ public class TransitFares
 	 * to implement sensitivities.
 	 */
 	
-	public static void activateTransitPricing(Controler controler, boolean useRouter, boolean useAgentSensitivities)
+	public static void activateTransitPricing(final Controler controler, boolean useRouter, boolean useAgentSensitivities)
 	{
 		if (useRouter)
 		{
-			controler.setTransitRouterFactory(
-					new TransitFareRouterFactoryImpl(
-								controler.getScenario()
-							,	new TransitRouterConfig
-								(		controler.getConfig().planCalcScore()
-									,	controler.getConfig().plansCalcRoute()
-									,	controler.getConfig().transitRouter()
-									,	controler.getConfig().vspExperimental()
-							)
-			));
+			controler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bind(TransitRouter.class).toProvider(new TransitFareRouterFactoryImpl(
+                            controler.getScenario()
+                            , new TransitRouterConfig
+                            (controler.getConfig().planCalcScore()
+                                    , controler.getConfig().plansCalcRoute()
+                                    , controler.getConfig().transitRouter()
+                                    , controler.getConfig().vspExperimental()
+                            )
+                    ));
+                }
+            });
 		}
 
 		if (useAgentSensitivities)
@@ -54,22 +60,26 @@ public class TransitFares
 	 * @param controler
 	 * @param agentProperties
 	 */
-	public static void activateTransitPricing(Controler controler, Map<String,AgentProperties> agentProperties)
+	public static void activateTransitPricing(final Controler controler, final Map<String,AgentProperties> agentProperties)
 	{
 
-			controler.setTransitRouterFactory(
-					new TransitFareRouterFactoryImpl(
-								controler.getScenario()
-							,	new TransitRouterConfig
-								(		controler.getConfig().planCalcScore()
-									,	controler.getConfig().plansCalcRoute()
-									,	controler.getConfig().transitRouter()
-									,	controler.getConfig().vspExperimental()
-							)
-							,	agentProperties
-			));
+		controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(TransitRouter.class).toProvider(new TransitFareRouterFactoryImpl(
+                        controler.getScenario()
+                        , new TransitRouterConfig
+                        (controler.getConfig().planCalcScore()
+                                , controler.getConfig().plansCalcRoute()
+                                , controler.getConfig().transitRouter()
+                                , controler.getConfig().vspExperimental()
+                        )
+                        , agentProperties
+                ));
+            }
+        });
 
-		
+
 		controler.addControlerListener(new FareHandler(controler.getScenario()));
 	}
 }

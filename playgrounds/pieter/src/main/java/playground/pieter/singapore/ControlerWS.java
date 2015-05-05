@@ -21,8 +21,10 @@
 package playground.pieter.singapore;
 
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.*;
@@ -66,11 +68,16 @@ public class ControlerWS {
 						.getScenario().getConfig().plansCalcRoute(), controler
 						.getScenario().getConfig().transitRouter(), controler
 						.getScenario().getConfig().vspExperimental());
-		TransitRouterWSImplFactory factory = new TransitRouterWSImplFactory(
+		final TransitRouterWSImplFactory factory = new TransitRouterWSImplFactory(
 				controler.getScenario(),
 				waitTimeCalculator.getWaitTimes(),
 				stopStopTimeCalculator.getStopStopTimes());
-		controler.setTransitRouterFactory(factory);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(factory);
+			}
+		});
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}

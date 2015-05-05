@@ -27,6 +27,7 @@ import org.matsim.contrib.cadyts.pt.CadytsPtContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
@@ -116,9 +117,14 @@ public class RndPtRouterLauncher {
 			}} ) ;
 		
 		//create the factory for rndizedRouter
-		Provider<TransitRouter> randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (trSchedule, trConfig, routerNetwork);
-		controler.setTransitRouterFactory(randomizedTransitRouterFactory);		
-		
+		final Provider<TransitRouter> randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (trSchedule, trConfig, routerNetwork);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(randomizedTransitRouterFactory);
+			}
+		});
+
 		//add analyzer for specific bus line and stop Zone conversion
 		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
 		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(true); 

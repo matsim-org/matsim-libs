@@ -22,6 +22,7 @@ package playground.mmoyo.randomizerPtRouter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.*;
@@ -58,9 +59,14 @@ public class RndPtRouterLauncher2 {
 		final TransitRouterConfig trConfig = new TransitRouterConfig( config ) ;
 		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.beelineWalkConnectionDistance);
 		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(routerSchedule);
-		Provider<TransitRouter> rndTrRouterFactory = new RndPtRouterFactory().createFactory (preparedSchedule, trConfig, routerNetwork, true, true);
-		controler.setTransitRouterFactory(rndTrRouterFactory);
-		
+		final Provider<TransitRouter> rndTrRouterFactory = new RndPtRouterFactory().createFactory (preparedSchedule, trConfig, routerNetwork, true, true);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(rndTrRouterFactory);
+			}
+		});
+
 		//add analyzer for specific bus line and stop Zone conversion
 		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
 		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(isStopZoneConversion); 

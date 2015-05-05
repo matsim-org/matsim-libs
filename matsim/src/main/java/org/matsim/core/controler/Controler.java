@@ -541,17 +541,7 @@ public class Controler extends AbstractController {
 		this.terminationCriterion = terminationCriterion;
 	}
 
-	public final void setTransitRouterFactory(
-			final javax.inject.Provider<TransitRouter> transitRouterFactory) {
-        this.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-				bind(TransitRouter.class).toProvider(transitRouterFactory);
-			}
-        });
-	}
-
-    /**
+	/**
      * Allows you to set a factory for {@link org.matsim.core.router.TripRouter} instances.
      * Do this if your use-case requires custom routing logic, for instance if you
      * implement your own complex travel mode.

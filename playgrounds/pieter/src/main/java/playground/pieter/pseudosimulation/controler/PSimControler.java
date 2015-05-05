@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -164,9 +165,14 @@ public class PSimControler {
 	}
 
 
-	public void setTransitRouterFactory(Provider<TransitRouter> transitRouterFactory) {
-		this.matsimControler.setTransitRouterFactory(transitRouterFactory);
-		
+	public void setTransitRouterFactory(final Provider<TransitRouter> transitRouterFactory) {
+		this.matsimControler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(transitRouterFactory);
+			}
+		});
+
 	}
 
 

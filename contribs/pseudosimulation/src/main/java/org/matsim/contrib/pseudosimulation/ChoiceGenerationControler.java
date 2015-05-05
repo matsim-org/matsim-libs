@@ -19,6 +19,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.pt.router.TransitRouter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,11 +57,15 @@ public ChoiceGenerationControler(String[] args) {
             controler.getScenario().getTransitSchedule(),
             controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
             (int) (controler.getConfig().qsim().getEndTime() - controler.getConfig().qsim().getStartTime()));
-    controler.setTransitRouterFactory(
-            new TransitRouterEventsWSFactory(controler.getScenario(),
+    controler.addOverridingModule(new AbstractModule() {
+        @Override
+        public void install() {
+            bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(),
                     waitTimeCalculator.getWaitTimes(),
                     stopStopTimeCalculator.getStopStopTimes()));
-//    controler.setScoringFunctionFactory(
+        }
+    });
+    //    controler.setScoringFunctionFactory(
 //            new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(),
 //                    controler.getScenario()));
     travelTimeCalculator = TravelTimeCalculator.create(scenario.getNetwork(), config.travelTimeCalculator());

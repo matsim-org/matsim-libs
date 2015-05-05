@@ -39,6 +39,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.vehicles.Vehicle;
 import playground.pieter.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import playground.pieter.distributed.listeners.events.transit.TransitPerformance;
@@ -293,7 +294,12 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
 
         if (IntelligentRouters) {
-            matsimControler.setTransitRouterFactory(new TransitRouterEventsWSFactory(scenario, waitTimes, stopStopTimes));
+            matsimControler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(scenario, waitTimes, stopStopTimes));
+                }
+            });
         } else {
             matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
         }

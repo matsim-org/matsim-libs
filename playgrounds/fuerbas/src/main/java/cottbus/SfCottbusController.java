@@ -21,10 +21,12 @@
 package cottbus;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImplFactory;
 
@@ -47,12 +49,17 @@ public class SfCottbusController {
 					final Scenario scenario = event.getControler().getScenario();
 					if (event.getControler().getTransitRouterFactory() == null) {
 						
-						TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
+						final TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 								scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
 								scenario.getConfig().vspExperimental());
-						
-						event.getControler().setTransitRouterFactory(new TransitRouterImplFactory(
-								scenario.getTransitSchedule(), transitRouterConfig ));
+
+						event.getControler().addOverridingModule(new AbstractModule() {
+							@Override
+							public void install() {
+								bind(TransitRouter.class).toProvider(new TransitRouterImplFactory(
+										scenario.getTransitSchedule(), transitRouterConfig));
+							}
+						});
 					}
 
 				}

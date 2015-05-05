@@ -30,6 +30,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.TransitRouter;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterEventsWLFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
@@ -84,9 +85,14 @@ public class ControlerWW {
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
         WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
-		TransitRouterEventsWLFactory factory = new TransitRouterEventsWLFactory(controler, waitTimeCalculator.getWaitTimes());
-		controler.setTransitRouterFactory(factory);
-		controler.run();
+		final TransitRouterEventsWLFactory factory = new TransitRouterEventsWLFactory(controler, waitTimeCalculator.getWaitTimes());
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(TransitRouter.class).toProvider(factory);
+            }
+        });
+        controler.run();
 	}
 	
 }

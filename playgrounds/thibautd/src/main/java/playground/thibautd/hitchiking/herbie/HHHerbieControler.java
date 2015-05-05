@@ -34,6 +34,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import playground.thibautd.herbie.HerbiePlanBasedScoringFunctionFactory;
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
@@ -104,7 +105,7 @@ public class HHHerbieControler extends HitchHikingControler {
 
 		this.setScoringFunctionFactory( herbieScoringFunctionFactory );
 				
-		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
+		final CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
 		final HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
 		TravelTime timeCalculator = super.getLinkTravelTimes();
@@ -120,16 +121,20 @@ public class HHHerbieControler extends HitchHikingControler {
 
 		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
 		// if some parts of the code use this method, everything should be consistent.
-		setTransitRouterFactory(
-				new HerbieTransitRouterFactory( 
-					getScenario().getTransitSchedule(),
-					new TransitRouterConfig(
-						getConfig().planCalcScore(),
-						getConfig().plansCalcRoute(),
-						getConfig().transitRouter(),
-						getConfig().vspExperimental()),
-					herbieConfigGroup,
-					new TravelScoringFunction( params, herbieConfigGroup ) ) );
+		this.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                bind(TransitRouter.class).toProvider(new HerbieTransitRouterFactory(
+                    getScenario().getTransitSchedule(),
+                    new TransitRouterConfig(
+                        HHHerbieControler.this.getConfig().planCalcScore(),
+                        HHHerbieControler.this.getConfig().plansCalcRoute(),
+                        HHHerbieControler.this.getConfig().transitRouter(),
+                        HHHerbieControler.this.getConfig().vspExperimental()),
+                    herbieConfigGroup,
+                    new TravelScoringFunction( params, herbieConfigGroup ) ));
+            }
+        });
 
 		super.setUp();
 	}
