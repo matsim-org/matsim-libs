@@ -28,6 +28,7 @@ import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -93,8 +94,13 @@ public class RunExposureInternalizationMunich {
 		
 		rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);
 		EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(Double.parseDouble(emissionCostFactor),	Boolean.parseBoolean(considerCO2Costs), rgt, links2xCells, links2yCells);
-		EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-		controler.setTravelDisutilityFactory(emfac);
+		final EmissionResponsibilityTravelDisutilityCalculatorFactory emfac = new EmissionResponsibilityTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(emfac);
+			}
+		});
 		controler.addControlerListener(new InternalizeEmissionResponsibilityControlerListener(emissionModule, emissionCostModule, rgt, links2xCells, links2yCells));
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis",new OTFFileWriterFactory());

@@ -37,7 +37,9 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
+
+import javax.inject.Provider;
 
 /**
  * @author cdobler
@@ -47,11 +49,11 @@ public class TransitTripRouterFactory implements TripRouterFactory {
 	private static final Logger log = Logger.getLogger(TransitTripRouterFactory.class);
 		
 	private final TripRouterFactory delegateFactory;
-	private final TransitRouterFactory transitRouterFactory;
+	private final Provider<TransitRouter> transitRouterFactory;
 	private final Scenario scenario;
 		
 	public TransitTripRouterFactory(Scenario scenario, TripRouterFactory delegateFactory,
-			TransitRouterFactory transitRouterFactory) {
+			Provider<TransitRouter> transitRouterFactory) {
 		this.scenario = scenario;
 		this.delegateFactory = delegateFactory;
 		this.transitRouterFactory = transitRouterFactory;
@@ -81,7 +83,7 @@ public class TransitTripRouterFactory implements TripRouterFactory {
 						);
 			}
 			
-        	TransitRouterWrapper routingModule = new TransitRouterWrapper(transitRouterFactory.createTransitRouter(), scenario.getTransitSchedule(),
+        	TransitRouterWrapper routingModule = new TransitRouterWrapper(transitRouterFactory.get(), scenario.getTransitSchedule(),
         			scenario.getNetwork(), transitWalkRoutingModule);
         	
             for (String mode : scenario.getConfig().transit().getTransitModes()) {

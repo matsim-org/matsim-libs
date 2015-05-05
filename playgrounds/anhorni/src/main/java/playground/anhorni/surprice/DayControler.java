@@ -21,6 +21,7 @@ package playground.anhorni.surprice;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.anhorni.surprice.analysis.AgentAnalysisShutdownListener;
@@ -52,9 +53,14 @@ public class DayControler extends Controler {
 	} 
 				
 	protected void setUp() {
-		SurpriceTravelDisutilityFactoryImpl travelDisutilityFactory = new SurpriceTravelDisutilityFactoryImpl(this.day, this.memories, this.preferences, this);
-		this.setTravelDisutilityFactory(travelDisutilityFactory);
-		super.setUp();	
+		final SurpriceTravelDisutilityFactoryImpl travelDisutilityFactory = new SurpriceTravelDisutilityFactoryImpl(this.day, this.memories, this.preferences, this);
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(travelDisutilityFactory);
+			}
+		});
+		super.setUp();
 	}
 	
 	private void setTermination(double stoppingRate) {

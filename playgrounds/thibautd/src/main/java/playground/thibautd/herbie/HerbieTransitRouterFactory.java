@@ -65,7 +65,7 @@ public class HerbieTransitRouterFactory implements TransitRouterFactory {
 	}
 
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		//TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config);
 		TransitTravelDisutility ttCalculator =
 			USE_HERBIE_COST_IN_ROUTING ?

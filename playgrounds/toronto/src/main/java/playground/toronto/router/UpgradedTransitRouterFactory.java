@@ -35,7 +35,7 @@ public class UpgradedTransitRouterFactory implements TransitRouterFactory{
 	}
 	
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		IterativeTransitTimeAndDisutility calc =  new IterativeTransitTimeAndDisutility(cache, config);
 			
 		return new TransitRouterImpl(

@@ -62,7 +62,7 @@ public class TorontoTransitRouterImplFactory implements TransitRouterFactory {
 	}
 
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		TorontoTransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TorontoTransitRouterNetworkTravelTimeAndDisutility(
 				config, cache, busPenalty, subwayPenalty, streetcarPenalty);
 		return new TransitRouterImpl(this.config, new PreparedTransitSchedule(schedule), this.routerNetwork, ttCalculator, ttCalculator);

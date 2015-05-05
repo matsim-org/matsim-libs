@@ -22,6 +22,7 @@ package playground.ciarif.flexibletransports.controler;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -90,9 +91,14 @@ public final class FlexibleTransportControler extends Controler
               getScenario().getActivityFacilities(), getScenario().getNetwork());
     this.setScoringFunctionFactory(ftScoringFunctionFactory);
 
-    FtTravelCostCalculatorFactory costCalculatorFactory = new FtTravelCostCalculatorFactory(this.ftConfigGroup);
-    setTravelDisutilityFactory(costCalculatorFactory);
-    super.setUp();
+    final FtTravelCostCalculatorFactory costCalculatorFactory = new FtTravelCostCalculatorFactory(this.ftConfigGroup);
+      this.addOverridingModule(new AbstractModule() {
+          @Override
+          public void install() {
+              bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+          }
+      });
+      super.setUp();
   }
 
 	private void loadMyControlerListeners()

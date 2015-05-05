@@ -23,6 +23,7 @@ import org.matsim.contrib.emissions.example.EmissionControlerListener;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -115,8 +116,13 @@ public class MunichControler {
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
 			// this affects the router by overwriting its generalized cost function (TravelDisutility):
-			EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-			controler.setTravelDisutilityFactory(emissionTducf);
+			final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(emissionTducf);
+				}
+			});
 
 			// this is essentially the syntax to use the randomizing router instead; needs "scheme" (which implements RoadPricingScheme); needs
 			// a way to insert a new scheme in every iteration (because emissions costs change by iteration).
@@ -133,16 +139,26 @@ public class MunichControler {
 		if(internalizeCongestion) 
 		{
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
-			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
-			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				}
+			});
 			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl)controler.getScenario()) ));
 		}
 
 		if(both) {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
-			EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, tollHandler);
-			controler.setTravelDisutilityFactory(emissionCongestionTravelDisutilityCalculatorFactory);
+			final EmissionCongestionTravelDisutilityCalculatorFactory emissionCongestionTravelDisutilityCalculatorFactory = new EmissionCongestionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule, tollHandler);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(emissionCongestionTravelDisutilityCalculatorFactory);
+				}
+			});
 			controler.addControlerListener(new InternalizeEmissionsCongestionControlerListener(emissionModule, emissionCostModule, (ScenarioImpl) controler.getScenario(), tollHandler));
 		}
 

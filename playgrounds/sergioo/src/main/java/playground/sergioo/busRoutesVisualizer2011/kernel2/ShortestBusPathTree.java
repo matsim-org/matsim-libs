@@ -51,7 +51,7 @@ public class ShortestBusPathTree {
 		scenario.getConfig().transitRouter().setMaxBeelineWalkConnectionDistance(1);
 		scenario.getConfig().planCalcScore().setUtilityOfLineSwitch(-100);
 		scenario.getConfig().planCalcScore().setTravelingWalk_utils_hr(-1000);
-		TransitRouter transitRouter = new TransitRouterImplFactory(scenario.getTransitSchedule(), new TransitRouterConfig(scenario.getConfig().planCalcScore(), scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental())).createTransitRouter();
+		TransitRouter transitRouter = new TransitRouterImplFactory(scenario.getTransitSchedule(), new TransitRouterConfig(scenario.getConfig().planCalcScore(), scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental())).get();
 		ExperimentalTransitRouteFactory routesFactory = new ExperimentalTransitRouteFactory();
 		for(int i=0; i<numStops; i++) {
 			TransitStopFacility mainStop = scenario.getTransitSchedule().getFacilities().get(Id.create(args[4+i], ActivityFacility.class));

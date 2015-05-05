@@ -22,6 +22,7 @@ package playground.imob.feathers2forWithinDayReplanning;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -94,8 +95,13 @@ final class RunWithinDayExample implements StartupListener {
 
 		// Use a Scoring Function that only scores the travel times.  Result will be that the router (see below) routes only based on travel times
 		controler.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
-		controler.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
-		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+			}
+		});
+
 		// workaround
 		// yyyy	 this works around what?
 		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());

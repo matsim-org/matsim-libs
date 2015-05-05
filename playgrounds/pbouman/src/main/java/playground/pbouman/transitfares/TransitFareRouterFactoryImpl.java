@@ -59,7 +59,7 @@ public class TransitFareRouterFactoryImpl implements TransitRouterFactory {
 	}
 	
 	@Override
-	public TransitRouter createTransitRouter()
+	public TransitRouter get()
 	{	
 		TransitFareRouterNetworkTimeAndDisutilityCalc costCalc;
 		if (agentProperties != null)

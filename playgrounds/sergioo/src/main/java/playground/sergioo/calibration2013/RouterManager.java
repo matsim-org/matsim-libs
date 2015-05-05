@@ -63,7 +63,7 @@ public class RouterManager {
 		
 		public Router(Scenario scenario, TravelTime travelTime, WaitTime waitTime, StopStopTime stopStopTime) {
 			final TravelDisutility disutility = new TravelTimeAndDistanceBasedTravelDisutilityFactory().createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
-			transitRouter = new TransitRouterWSImplFactory(scenario, waitTime, stopStopTime).createTransitRouter();
+			transitRouter = new TransitRouterWSImplFactory(scenario, waitTime, stopStopTime).get();
 			router = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), disutility, travelTime);
 			this.scenario = scenario;
 		}

@@ -227,9 +227,14 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 if (IntelligentRouters)
                     install(new TravelDisutilityModule());
                 else{
-                    TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
+                    final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
                             new TravelTimeAndDistanceBasedTravelDisutilityFactory();
-                    matsimControler.setTravelDisutilityFactory(disutilityFactory);
+                    matsimControler.addOverridingModule(new AbstractModule() {
+                        @Override
+                        public void install() {
+                            bindTravelDisutilityFactory().toInstance(disutilityFactory);
+                        }
+                    });
                     disutilityFactory.setSigma(0.1);
 
                 }
@@ -257,10 +262,15 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         if (IntelligentRouters) {
             matsimControler.setTransitRouterFactory(new TransitRouterEventsWSFactory(scenario, waitTimes, stopStopTimes));
         } else {
-                    TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
+                    final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
                             new TravelTimeAndDistanceBasedTravelDisutilityFactory();
-                    matsimControler.setTravelDisutilityFactory(disutilityFactory);
-                    disutilityFactory.setSigma(0.1);
+            matsimControler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bindTravelDisutilityFactory().toInstance(disutilityFactory);
+                }
+            });
+            disutilityFactory.setSigma(0.1);
             matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
         }
         if (trackGenome) {

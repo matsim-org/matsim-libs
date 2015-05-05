@@ -41,7 +41,6 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.DefaultRoutingModules;
-import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
@@ -167,7 +166,7 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 			tripRouter.setRoutingModule(
 					TransportMode.pt,
 					 new TransitRouterWrapper(
-						transitRouterFactory.createTransitRouter(),
+						transitRouterFactory.get(),
 						
 						// this line is the reason why this class exists in my playground 
 						scenario.getTransitSchedule(),

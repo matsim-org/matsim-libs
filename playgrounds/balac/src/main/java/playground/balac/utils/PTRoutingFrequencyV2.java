@@ -184,7 +184,7 @@ public class PTRoutingFrequencyV2 {
 		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 
 		TransitRouterWrapper routingModule = new TransitRouterWrapper(
-        		transitRouterFactory.createTransitRouter(),
+        		transitRouterFactory.get(),
                 scenario.getTransitSchedule(),
                 scenario.getNetwork(), // use a walk router in case no PT path is found
                 DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(), 

@@ -31,13 +31,15 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.herbie.HerbieTransitRouterFactory;
 import playground.thibautd.parknride.ParkAndRideUtils;
 import playground.thibautd.parknride.scoring.CenteredTimeProportionalPenaltyFactory;
 import playground.thibautd.parknride.scoring.ParkingPenaltyFactory;
+
+import javax.inject.Provider;
 
 /**
  * Tests if the custom controler behaves as expected
@@ -66,7 +68,7 @@ public class ControlerTest {
 			// XXX DIRTYYYYYYYYY!!!!!
 			// TODO create facilities and run completely
 		}
-		TransitRouterFactory f = controler.getTransitRouterFactory();
+		Provider<TransitRouter> f = controler.getTransitRouterFactory();
 
 		assertNotNull(
 				"transit router factory is null!?",

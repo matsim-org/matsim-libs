@@ -24,6 +24,7 @@ import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
@@ -69,8 +70,13 @@ public class RunEmissionInternalizationMunich {
 
 		EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
 
-		EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-		controler.setTravelDisutilityFactory(emissionTducf);
+		final EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(emissionTducf);
+			}
+		});
 
 		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 

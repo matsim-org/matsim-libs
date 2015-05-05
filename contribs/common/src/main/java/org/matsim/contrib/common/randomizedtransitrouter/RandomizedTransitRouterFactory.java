@@ -43,7 +43,7 @@ public class RandomizedTransitRouterFactory implements TransitRouterFactory {
 	}
 	
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
 		ttCalculator.setDataCollection(RandomizedTransitRouterTravelTimeAndDisutility.DataCollection.randomizedParameters, true) ;
 		ttCalculator.setDataCollection(RandomizedTransitRouterTravelTimeAndDisutility.DataCollection.additionalInformation, false) ;

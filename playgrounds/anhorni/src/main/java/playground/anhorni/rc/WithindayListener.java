@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -57,8 +58,13 @@ public class WithindayListener implements StartupListener {
 		
 		// Use a Scoring Function, that only scores the travel times!
 		controler.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
-		controler.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
-		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+			}
+		});
+
 		// workaround
 		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());
 	}

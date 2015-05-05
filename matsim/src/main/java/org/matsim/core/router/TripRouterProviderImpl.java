@@ -24,7 +24,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 
 import javax.inject.Provider;
 
@@ -43,7 +43,7 @@ public class TripRouterProviderImpl implements Provider<TripRouter> {
             final TravelDisutilityFactory disutilityFactory,
             final TravelTime travelTime,
             final LeastCostPathCalculatorFactory leastCostAlgoFactory,
-            final TransitRouterFactory transitRouterFactory) {
+            final Provider<TransitRouter> transitRouterFactory) {
 		this.delegate = new DefaultTripRouterFactoryImpl(
 				scenario,
 				leastCostAlgoFactory,

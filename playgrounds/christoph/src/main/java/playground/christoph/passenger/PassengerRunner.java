@@ -47,7 +47,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
 
@@ -133,7 +133,7 @@ public class PassengerRunner {
 		
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(scenario);
-		TransitRouterFactory transitRouterFactory = null;
+		Provider<TransitRouter> transitRouterFactory = null;
 		if (scenario.getConfig().scenario().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(scenario);
 		
 		TravelDisutilityFactory travelDisutilityFactory = new TravelTimeAndDistanceBasedTravelDisutilityFactory();

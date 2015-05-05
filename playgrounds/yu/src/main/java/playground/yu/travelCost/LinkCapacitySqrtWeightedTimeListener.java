@@ -26,6 +26,7 @@ package playground.yu.travelCost;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -125,8 +126,12 @@ public class LinkCapacitySqrtWeightedTimeListener implements
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getConfig().controler().getFirstIteration()) {
-			ctl
-					.setTravelDisutilityFactory(new LinkCapacitySqrtWeightedTravelCostCalculatorFactoryImpl());
+			ctl.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(new LinkCapacitySqrtWeightedTravelCostCalculatorFactoryImpl());
+				}
+			});
 		}
 	}
 

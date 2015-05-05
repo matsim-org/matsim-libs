@@ -119,10 +119,15 @@ public class UglyHerbieMultilegControler extends Controler {
 				
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
-		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
-		
-		this.setTravelDisutilityFactory(costCalculatorFactory);
-		
+		final HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
+
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+			}
+		});
+
 		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
 		// if some parts of the code use this method, everything should be consistent.
 		setTransitRouterFactory(

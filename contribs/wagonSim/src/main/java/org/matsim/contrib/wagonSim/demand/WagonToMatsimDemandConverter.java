@@ -103,7 +103,7 @@ public class WagonToMatsimDemandConverter {
 		
 		TransitRouter router = new TransitRouterImplFactory(
 				scenario.getTransitSchedule(),
-				new TransitRouterConfig(scenario.getConfig())).createTransitRouter();
+				new TransitRouterConfig(scenario.getConfig())).get();
 
 		
 		Set<String> fromZonesNotConnected = new HashSet<>();

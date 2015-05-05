@@ -20,6 +20,7 @@
 package playground.benjamin.scoring.income.old;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.households.PersonHouseholdMapping;
@@ -59,8 +60,13 @@ public final class BKickIncomeControler extends BkControler {
 	protected void setUp(){	
     this.getScenario().getConfig().global().setNumberOfThreads(1);
 		this.hhdb = new PersonHouseholdMapping(this.getScenario().getHouseholds());
-		this.setTravelDisutilityFactory(new Income1TravelCostCalculatorFactory());
-//		if (this.travelTimeCalculator == null) {
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(new Income1TravelCostCalculatorFactory());
+			}
+		});
+		//		if (this.travelTimeCalculator == null) {
 //			this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 //		}
 //		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());

@@ -51,7 +51,7 @@ public class TransitRouterWSImplFactory implements TransitRouterFactory {
 		this.stopStopTime = stopStopTime;
 	}
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWS(config, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
 	}
 

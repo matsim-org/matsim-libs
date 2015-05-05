@@ -47,7 +47,7 @@ public class TransitRouterWithThinnedNetworkFactory  implements TransitRouterFac
 	}
 
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.configTransit, this.preparedTransitSchedule);
 		return new TransitRouterImpl(this.configTransit, preparedTransitSchedule , this.routerNetwork, ttCalculator, ttCalculator);
 	}

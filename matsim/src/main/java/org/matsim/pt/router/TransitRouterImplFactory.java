@@ -20,27 +20,39 @@
 
 package org.matsim.pt.router;
 
+import org.matsim.core.config.Config;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * @author mrieser
  */
+@Singleton
 public class TransitRouterImplFactory implements TransitRouterFactory {
 
-	private final TransitSchedule schedule;
 	private final TransitRouterConfig config;
 	private final TransitRouterNetwork routerNetwork;
 	private final PreparedTransitSchedule preparedTransitSchedule;
 
+	@Inject
+	TransitRouterImplFactory(final TransitSchedule schedule, final Config config) {
+		this(schedule, new TransitRouterConfig(
+				config.planCalcScore(),
+				config.plansCalcRoute(),
+				config.transitRouter(),
+				config.vspExperimental()));
+	}
+
 	public TransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
-		this.schedule = schedule;
 		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, this.config.beelineWalkConnectionDistance);
 		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
 	}
 
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config, this.preparedTransitSchedule);
 		return new TransitRouterImpl(this.config, this.preparedTransitSchedule, this.routerNetwork, ttCalculator, ttCalculator);
 	}

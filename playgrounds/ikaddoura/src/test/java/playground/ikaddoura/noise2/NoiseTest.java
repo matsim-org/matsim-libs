@@ -49,6 +49,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -979,9 +980,14 @@ public class NoiseTest {
 
 		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
 		
-		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(noiseContext);
-		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
-				
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(noiseContext);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+			}
+		});
+
 		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	

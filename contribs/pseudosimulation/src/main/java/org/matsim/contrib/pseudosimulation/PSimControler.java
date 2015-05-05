@@ -186,9 +186,14 @@ public class PSimControler {
                             stopStopTimeCalculator.getStopStopTimes()));
         } else {
             //randomized routing for car and transit
-            TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
+            final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
                     new TravelTimeAndDistanceBasedTravelDisutilityFactory();
-            matsimControler.setTravelDisutilityFactory(disutilityFactory);
+            matsimControler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    bindTravelDisutilityFactory().toInstance(disutilityFactory);
+                }
+            });
             disutilityFactory.setSigma(0.1);
             matsimControler.addOverridingModule(new RandomizedTransitRouterModule());
         }

@@ -78,8 +78,13 @@ public class CASimulationRunner implements IterationStartsListener{
 		if (Constants.MARGINAL_SOCIAL_COST_OPTIMIZATION) {
 			//////////////------------THIS IS FOR THE SYSTEM OPTIMUM SEARCH
 			MSATollHandler tollHandler = new MSATollHandler(controller.getScenario());
-			MSATollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new MSATollDisutilityCalculatorFactory(tollHandler);
-			controller.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+			final MSATollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new MSATollDisutilityCalculatorFactory(tollHandler);
+			controller.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				}
+			});
 			controller.addControlerListener(new MSAMarginalCongestionPricingContolerListener(controller.getScenario(), tollHandler, new MSACongestionHandler(controller.getEvents(), controller.getScenario())));
 			//////////////------------
 		}

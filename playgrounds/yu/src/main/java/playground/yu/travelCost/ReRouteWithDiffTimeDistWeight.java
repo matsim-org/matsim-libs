@@ -24,6 +24,7 @@
 package playground.yu.travelCost;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -56,10 +57,15 @@ public class ReRouteWithDiffTimeDistWeight implements IterationStartsListener,
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler ctl = event.getControler();
-		int iter = event.getIteration();/* firstIter+1, +2, +3 */
-		int firstIter = ctl.getConfig().controler().getFirstIteration();
-		ctl.setTravelDisutilityFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
-				1d - (iter - firstIter - 1) / (nbOfCombi - 1d)/* A -> travelTime */));
+		final int iter = event.getIteration();/* firstIter+1, +2, +3 */
+		final int firstIter = ctl.getConfig().controler().getFirstIteration();
+		ctl.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(new ParameterizedTravelCostCalculatorFactoryImpl(
+						1d - (iter - firstIter - 1) / (nbOfCombi - 1d)/* A -> travelTime */));
+			}
+		});
 	}
 
 	/**

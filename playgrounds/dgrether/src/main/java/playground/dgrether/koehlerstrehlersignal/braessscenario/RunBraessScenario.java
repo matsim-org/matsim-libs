@@ -13,6 +13,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -187,11 +188,16 @@ public class RunBraessScenario {
 				.createSignalsControllerListener());
 		
 		if (this.useRandomizedRouter){
-			RandomizingTimeDistanceTravelDisutility.Builder builder = 
+			final RandomizingTimeDistanceTravelDisutility.Builder builder =
 					new RandomizingTimeDistanceTravelDisutility.Builder();
 			builder.setSigma(this.sigma);
-			
-			controler.setTravelDisutilityFactory(builder);
+
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(builder);
+				}
+			});
 		}
 		
 //		controler.setOverwriteFiles(true);

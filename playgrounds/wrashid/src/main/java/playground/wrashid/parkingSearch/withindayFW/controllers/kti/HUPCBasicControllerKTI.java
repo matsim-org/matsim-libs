@@ -22,8 +22,8 @@ package playground.wrashid.parkingSearch.withindayFW.controllers.kti;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
@@ -85,8 +85,13 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
 		super.createAndInitTravelTimeCollector(analyzedModes);
-		
-		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
+
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+			}
+		});
 		this.initWithinDayTripRouterFactory();
 		
 		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.getConfig().planCalcScore());

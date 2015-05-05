@@ -35,7 +35,7 @@ public class RndPtRouterFactory {
 		return 
 		new TransitRouterFactory() {
 			@Override
-			public TransitRouter createTransitRouter() {
+			public TransitRouter get() {
 				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
 //				ttCalculator.setDataCollection(DataCollection.randomizedParameters, rndParams) ;
 //				ttCalculator.setDataCollection(DataCollection.additionalInformation, addInfo) ;
@@ -51,7 +51,7 @@ public class RndPtRouterFactory {
 		return 
 		new TransitRouterFactory() {
 			@Override
-			public TransitRouter createTransitRouter() {
+			public TransitRouter get() {
 				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
 				//ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
 				//ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;

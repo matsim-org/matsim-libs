@@ -24,18 +24,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -78,7 +72,7 @@ class PopulationRndPtRouter{
 			builder.setTransitRouterFactory(
 				new TransitRouterFactory() {
 					@Override
-					public TransitRouter createTransitRouter() {
+					public TransitRouter get() {
 						return new TransitRouterImpl(
 							trConfig,
 							new PreparedTransitSchedule(schedule),

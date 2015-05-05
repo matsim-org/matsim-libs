@@ -47,6 +47,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -655,7 +656,12 @@ public class MultiModalDemo {
 			super(scenario);
 			
 			this.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
-			this.setTravelDisutilityFactory(new OnlyTimeDependentTravelDisutilityFactory());
+			this.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+				}
+			});
 		}
 		
 		@Override

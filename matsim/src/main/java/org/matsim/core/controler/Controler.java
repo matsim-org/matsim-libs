@@ -34,7 +34,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
-import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.corelisteners.*;
@@ -43,7 +42,6 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategyFactory;
@@ -63,6 +61,7 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.pt.PtConstants;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
@@ -457,7 +456,7 @@ public class Controler extends AbstractController {
 	}
 	
 	public final TravelDisutility createTravelDisutilityCalculator() {
-        return this.injector.getInstance(TravelDisutility.class);
+        return this.injector.getInstance(TravelDisutilityFactory.class).createTravelDisutility(this.injector.getInstance(TravelTime.class), getConfig().planCalcScore());
 	}
 
 	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
@@ -505,8 +504,8 @@ public class Controler extends AbstractController {
 		return this.injector.getInstance(TravelDisutilityFactory.class);
 	}
 
-	public final TransitRouterFactory getTransitRouterFactory() {
-        return this.injector.getInstance(TransitRouterFactory.class);
+	public final javax.inject.Provider<TransitRouter> getTransitRouterFactory() {
+        return this.injector.getProvider(TransitRouter.class);
 	}
 
 
@@ -529,16 +528,6 @@ public class Controler extends AbstractController {
 		this.controlerListenerManager.removeControlerListener(l);
 	}
 
-	public final void setTravelDisutilityFactory(
-			final TravelDisutilityFactory travelCostCalculatorFactory) {
-		this.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(TravelDisutilityFactory.class).toInstance(travelCostCalculatorFactory);
-			}
-		});
-	}
-
 	public final void setScoringFunctionFactory(
 			final ScoringFunctionFactory scoringFunctionFactory) {
         this.addOverridingModule(new AbstractModule() {
@@ -558,7 +547,7 @@ public class Controler extends AbstractController {
         this.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-				bind(TransitRouterFactory.class).toInstance(transitRouterFactory);
+				bind(TransitRouter.class).toProvider(transitRouterFactory);
 			}
         });
 	}

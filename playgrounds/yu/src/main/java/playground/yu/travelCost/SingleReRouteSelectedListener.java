@@ -24,6 +24,7 @@
 package playground.yu.travelCost;
 
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -50,9 +51,13 @@ public class SingleReRouteSelectedListener implements IterationStartsListener,
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Controler ctl = event.getControler();
 		if (event.getIteration() > ctl.getConfig().controler().getFirstIteration()) {
-			ctl
-					.setTravelDisutilityFactory(new ParameterizedTravelCostCalculatorFactoryImpl(
+			ctl.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(new ParameterizedTravelCostCalculatorFactoryImpl(
 							A/* travelTime */));
+				}
+			});
 		}
 	}
 

@@ -27,6 +27,7 @@ package playground.vsp.congestion;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -66,8 +67,13 @@ public class RunSimpleExample {
 		Controler controler = new Controler(configFile);
 
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
-		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
-		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+			}
+		});
 
 		// Define the pricing approach and the congestion implementation.
 		//		controler.addControlerListener(new AverageCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));

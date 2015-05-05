@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -210,8 +211,13 @@ public class MarginalCongestionHandlerV3QsimTest {
 		Controler controler = new Controler(configFile);
 		
 		final TollHandler tollHandler = new TollHandler(controler.getScenario());
-		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
-		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+			}
+		});
 		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())) );
 	
 		final String timeBin1 = "08:00-08:15";

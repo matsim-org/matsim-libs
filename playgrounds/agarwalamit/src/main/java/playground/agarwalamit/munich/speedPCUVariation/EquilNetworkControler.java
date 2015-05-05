@@ -39,6 +39,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -100,9 +101,14 @@ public class EquilNetworkControler {
 		emissionModule.createEmissionHandler();
 
 		EmissionCostModule ecm = new EmissionCostModule(1.0);
-		EmissionTravelDisutilityCalculatorFactory emissFact = new EmissionTravelDisutilityCalculatorFactory(emissionModule, ecm);
-		controler.setTravelDisutilityFactory(emissFact);
-		
+		final EmissionTravelDisutilityCalculatorFactory emissFact = new EmissionTravelDisutilityCalculatorFactory(emissionModule, ecm);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(emissFact);
+			}
+		});
+
 		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, ecm));
 		
 		controler.setOverwriteFiles(true);

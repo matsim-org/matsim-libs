@@ -28,7 +28,6 @@ import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toCH1903LV03Plus;
-import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03Plus;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -230,7 +229,7 @@ public class PTRoutingClaude {
 		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 
 		TransitRouterWrapper routingModule = new TransitRouterWrapper(
-        		transitRouterFactory.createTransitRouter(),
+        		transitRouterFactory.get(),
                 scenario.getTransitSchedule(),
                 scenario.getNetwork(), // use a walk router in case no PT path is found
                 DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(), 

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -115,8 +116,13 @@ public class EconomicsControler {
 
 		// congestion pricing
 		TollHandler tollHandler = new TollHandler(controler.getScenario());
-		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
-		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+			}
+		});
 		controler.addControlerListener(new MarginalCongestionPricingContolerListener( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())  ));
 		
 		controler.setOverwriteFiles(true);

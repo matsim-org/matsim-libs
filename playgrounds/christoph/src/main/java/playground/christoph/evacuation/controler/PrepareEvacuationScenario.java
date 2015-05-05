@@ -57,7 +57,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
@@ -65,6 +65,8 @@ import playground.christoph.evacuation.network.AddExitLinksToNetwork;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
+
+import javax.inject.Provider;
 
 /**
  * Prepares a scenario to be used in an evacuation simulation.
@@ -236,7 +238,7 @@ public class PrepareEvacuationScenario {
 		
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(scenario);
-		TransitRouterFactory transitRouterFactory = null;
+		Provider<TransitRouter> transitRouterFactory = null;
 		if (scenario.getConfig().scenario().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(scenario);
 		
 		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);

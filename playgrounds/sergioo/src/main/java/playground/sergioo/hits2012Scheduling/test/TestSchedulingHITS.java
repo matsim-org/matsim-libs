@@ -26,10 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -418,7 +415,7 @@ public class TestSchedulingHITS {
 		new EventsReaderXMLv1(eventsManager).parse("C:/Users/sergioo/workspace2/playgrounds/sergioo/input/events/150.events.xml.gz");*/
 		TravelDisutility disutilityFunction = (new TravelTimeAndDistanceBasedTravelDisutilityFactory()).createTravelDisutility(travelTimeCalculator.getLinkTravelTimes(), scenario.getConfig().planCalcScore());
 		TransitRouterWSImplFactory factory = new TransitRouterWSImplFactory(scenario, waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		TransitRouter transitRouter = factory.createTransitRouter();
+		TransitRouter transitRouter = factory.get();
 		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
 		preProcessDijkstra.run(scenario.getNetwork());
 		MultiDestinationDijkstra dijkstra = new MultiDestinationDijkstra(scenario.getNetwork(), disutilityFunction, travelTimeCalculator.getLinkTravelTimes(), preProcessDijkstra);

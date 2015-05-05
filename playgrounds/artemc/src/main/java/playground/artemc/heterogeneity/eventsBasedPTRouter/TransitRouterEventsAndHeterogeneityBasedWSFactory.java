@@ -61,7 +61,7 @@ public class TransitRouterEventsAndHeterogeneityBasedWSFactory implements Transi
 		this.stopStopTime = stopStopTime;
 	}
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndHeterogeneityBasedDisutilityWS(config, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
 	}
 

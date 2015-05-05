@@ -42,6 +42,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -184,8 +185,13 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 	}
 
 	private void installEmissionDisutilityCalculatorFactory() {
-		EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-		controler.setTravelDisutilityFactory(emissiondcf);
+		final EmissionTravelDisutilityCalculatorFactory emissiondcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(emissiondcf);
+			}
+		});
 	}
 
 	private void installScoringFunctionFactory() {

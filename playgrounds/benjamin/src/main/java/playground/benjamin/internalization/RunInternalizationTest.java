@@ -34,6 +34,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -99,8 +100,13 @@ public class RunInternalizationTest {
 	}
 
 	private void installTravelCostCalculatorFactory() {
-		EmissionTravelDisutilityCalculatorFactory emissionTdcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
-		controler.setTravelDisutilityFactory(emissionTdcf);
+		final EmissionTravelDisutilityCalculatorFactory emissionTdcf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(emissionTdcf);
+			}
+		});
 	}
 
 	private void installScoringFunctionFactory() {

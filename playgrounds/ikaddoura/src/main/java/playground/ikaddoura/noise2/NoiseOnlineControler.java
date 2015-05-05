@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
@@ -150,8 +151,13 @@ public class NoiseOnlineControler {
 		Controler controler = new Controler(configFile);
 
 		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
-		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(noiseContext);
-		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(noiseContext);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+			}
+		});
 		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	

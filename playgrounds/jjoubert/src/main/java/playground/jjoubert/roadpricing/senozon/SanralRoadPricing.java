@@ -25,6 +25,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -83,7 +84,7 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
 			final TravelDisutilityFactory previousTravelDisutilityFactory = controler.getTravelDisutilityFactory();
 			// area-toll requires a regular TravelCost, no toll-specific one.
-			TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
+			final TravelDisutilityFactory travelCostCalculatorFactory = new TravelDisutilityFactory() {
 
 				@Override
 				public TravelDisutility createTravelDisutility(
@@ -93,7 +94,12 @@ public class SanralRoadPricing implements StartupListener, AfterMobsimListener, 
 				}
 
 			};
-			controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
+				}
+			});
 		}
 
         this.cattl = new CalcAverageTolledTripLength(controler.getScenario().getNetwork(), this.scheme);

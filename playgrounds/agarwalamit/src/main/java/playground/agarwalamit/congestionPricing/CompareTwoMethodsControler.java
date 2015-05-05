@@ -20,6 +20,7 @@ package playground.agarwalamit.congestionPricing;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -71,16 +72,26 @@ public class CompareTwoMethodsControler {
 		{
 			//=== internalization of congestion implV3
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
-			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
-			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				}
+			});
 			controler.addControlerListener(new MarginalCongestionPricingContolerListener((ScenarioImpl) controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 		}
 		
 		if(newMethod) {
 			//=== internalization of congestion implV4
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
-			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
-			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				}
+			});
 			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV4(controler.getEvents(), controler.getScenario())));
 		}
 

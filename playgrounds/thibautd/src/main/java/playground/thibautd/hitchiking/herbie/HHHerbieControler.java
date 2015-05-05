@@ -106,12 +106,17 @@ public class HHHerbieControler extends HitchHikingControler {
 				
 		CharyparNagelScoringParameters params = herbieScoringFunctionFactory.getParams();
 		
-		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
+		final HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
 		TravelTime timeCalculator = super.getLinkTravelTimes();
 		PlanCalcScoreConfigGroup cnScoringGroup = null;
 		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
-		
-		this.setTravelDisutilityFactory(costCalculatorFactory);
+
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+			}
+		});
 
 		// set the TransitRouterFactory rather than a RoutingModuleFactory, so that
 		// if some parts of the code use this method, everything should be consistent.

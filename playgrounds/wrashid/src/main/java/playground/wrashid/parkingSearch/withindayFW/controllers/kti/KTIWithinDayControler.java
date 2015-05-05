@@ -21,6 +21,7 @@ package playground.wrashid.parkingSearch.withindayFW.controllers.kti;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -80,8 +81,13 @@ public class KTIWithinDayControler extends WithinDayParkingController {
                 getScenario().getActivityFacilities());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
-		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
-		this.setTravelDisutilityFactory(costCalculatorFactory);
+		final KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+			}
+		});
 
 		super.setUp();
 	}

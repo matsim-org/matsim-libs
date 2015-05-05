@@ -67,7 +67,7 @@ public class WagonSimRouterFactory2Impl implements TransitRouterFactory{
 	}
 
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		WagonSimRouterNetworkTravelDistutilityAndTravelTime2 tt = 
 				new WagonSimRouterNetworkTravelDistutilityAndTravelTime2(
 						config, 

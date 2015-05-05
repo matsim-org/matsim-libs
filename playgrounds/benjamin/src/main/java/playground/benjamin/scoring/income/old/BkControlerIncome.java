@@ -21,6 +21,7 @@ package playground.benjamin.scoring.income.old;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -84,14 +85,24 @@ public class BkControlerIncome extends BkControler {
 			
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
-			TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme, getConfig());
-			setTravelDisutilityFactory(travelCostCalculatorFactory);
+			final TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTollTravelCostCalculatorFactory(personHouseholdMapping, roadPricingScheme, getConfig());
+			this.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
+				}
+			});
 		}
 		else{
 			/*		Setting travel cost calculator for the router.
 			Remark: parameters must be set in several classes and independently for scoring and router!*/
-			TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
-			setTravelDisutilityFactory(travelCostCalculatorFactory);
+			final TravelDisutilityFactory travelCostCalculatorFactory = new IncomeTravelCostCalculatorFactory(personHouseholdMapping);
+			this.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
+				}
+			});
 		}
 	}
 	

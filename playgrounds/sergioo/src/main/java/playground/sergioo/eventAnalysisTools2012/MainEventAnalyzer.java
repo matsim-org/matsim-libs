@@ -361,7 +361,7 @@ public class MainEventAnalyzer {
 		events.addHandler(ttc);
 		new MatsimEventsReader(events).readFile("./data/MS2/output/ITERS/it.100/100.events.xml.gz");
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig());
-		TransitRouter transitRouter = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig).createTransitRouter();
+		TransitRouter transitRouter = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig).get();
 		BufferedReader reader = new BufferedReader(new FileReader(new File("./data/home_work_locations.csv")));
 		PrintWriter writer = new PrintWriter(new File("./data/home_work_tt.csv"));
 		writer.println("IdHousehold,IdPerson,TTCar,TTPT,DistanceCar,DistancePT");

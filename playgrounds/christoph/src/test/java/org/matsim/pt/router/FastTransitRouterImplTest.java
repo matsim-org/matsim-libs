@@ -58,7 +58,7 @@ public class FastTransitRouterImplTest {
 
 	private TransitRouter createFastTransitRouterImpl(TransitRouterConfig config,
 			TransitSchedule transitSchedule) {
-		return new FastTransitRouterImplFactory(transitSchedule, config).createTransitRouter();
+		return new FastTransitRouterImplFactory(transitSchedule, config).get();
 	}
 	
 	@Test

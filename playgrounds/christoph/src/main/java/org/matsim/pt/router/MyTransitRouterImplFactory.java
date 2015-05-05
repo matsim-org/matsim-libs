@@ -44,7 +44,7 @@ public class MyTransitRouterImplFactory implements TransitRouterFactory {
 	}
 		
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		TransitTravelDisutility ttCalculator = new MyTransitRouterNetworkTravelTimeAndDisutilityWrapper(this.config, 
 				this.preparedTransitSchedule);
 		return new MyTransitRouterImpl(this.config, new PreparedTransitSchedule(schedule), this.routerNetwork, 

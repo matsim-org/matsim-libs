@@ -27,14 +27,17 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.old.DefaultRoutingModules;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterFactory;
+
+import javax.inject.Provider;
 
 /**
  * @author thibautd
  */
 public class ScheduleBasedTripRouterFactory implements TripRouterFactory {
 	final Scenario scenario;
-	final TransitRouterFactory transitRouterFactory;
+	final Provider<TransitRouter> transitRouterFactory;
 	final TripRouterFactory defaultFactory;
 
 	public ScheduleBasedTripRouterFactory(
@@ -45,7 +48,7 @@ public class ScheduleBasedTripRouterFactory implements TripRouterFactory {
 	}
 
 	public ScheduleBasedTripRouterFactory(
-			final TransitRouterFactory transitRouterFactory,
+			final Provider<TransitRouter> transitRouterFactory,
 			final Scenario scenario) {
 		this.scenario = scenario;
 		final TripRouterFactoryBuilderWithDefaults builder =
@@ -67,7 +70,7 @@ public class ScheduleBasedTripRouterFactory implements TripRouterFactory {
 
 		final TransitRouterWrapper routingModule =
 			 new TransitRouterWrapper(
-					transitRouterFactory.createTransitRouter(),
+					transitRouterFactory.get(),
 					scenario.getTransitSchedule(),
 					scenario.getNetwork(), // use a walk router in case no PT path is found
 					DefaultRoutingModules.createTeleportationRouter( TransportMode.transit_walk, scenario.getPopulation().getFactory(), 

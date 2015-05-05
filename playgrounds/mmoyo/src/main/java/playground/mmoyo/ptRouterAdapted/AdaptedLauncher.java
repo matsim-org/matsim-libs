@@ -157,7 +157,7 @@ public class AdaptedLauncher {
 			new TripRouterFactoryBuilderWithDefaults();
 		builder.setTransitRouterFactory(new TransitRouterFactory() {
 			@Override
-			public TransitRouter createTransitRouter() {
+			public TransitRouter get() {
 				return new AdaptedTransitRouter(
 					myTransitRouterConfig,
 					scenario.getTransitSchedule() );

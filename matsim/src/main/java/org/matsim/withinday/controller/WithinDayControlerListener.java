@@ -34,7 +34,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
@@ -43,6 +43,7 @@ import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.TransportModeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
+import javax.inject.Provider;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +77,7 @@ public class WithinDayControlerListener implements StartupListener {
 	private Scenario scenario;
 	private TravelDisutilityFactory travelDisutilityFactory;
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-	private TransitRouterFactory transitRouterFactory;
+	private Provider<TransitRouter> transitRouterFactory;
 
 	private WithinDayEngine withinDayEngine;
 	private TripRouterFactory withinDayTripRouterFactory;
@@ -115,11 +116,11 @@ public class WithinDayControlerListener implements StartupListener {
 		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
 	}
 
-	public TransitRouterFactory getTransitRouterFactory() {
+	public Provider<TransitRouter> getTransitRouterFactory() {
 		return transitRouterFactory;
 	}
 
-	public void setTransitRouterFactory(TransitRouterFactory transitRouterFactory) {
+	public void setTransitRouterFactory(Provider<TransitRouter> transitRouterFactory) {
 		if (locked) throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 		this.transitRouterFactory = transitRouterFactory;
 	}

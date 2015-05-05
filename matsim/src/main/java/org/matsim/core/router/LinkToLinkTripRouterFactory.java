@@ -27,9 +27,10 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.LinkToLinkTravelTime;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * @author thibautd
@@ -51,7 +52,7 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
             LeastCostPathCalculatorFactory leastCostAlgoFactory,
             TravelDisutilityFactory travelDisutilityFactory,
             LinkToLinkTravelTime travelTimes,
-            TransitRouterFactory transitRouterFactory) {
+            Provider<TransitRouter> transitRouterFactory) {
 		this.scenario = scenario;
 		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.travelTimes = travelTimes;

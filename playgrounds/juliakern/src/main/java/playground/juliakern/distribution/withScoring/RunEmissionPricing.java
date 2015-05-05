@@ -27,6 +27,7 @@ import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import playground.benjamin.internalization.EmissionCostModule;
@@ -166,8 +167,13 @@ public class RunEmissionPricing {
 		EmissionModule emissionModule = ecl.emissionModule;
 		EmissionCostModule emissionCostModule = new EmissionCostModule(1.0);
 		// add travel disutility
-		TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl, emissionModule, emissionCostModule);
-		controler.setTravelDisutilityFactory(travelCostCalculatorFactory);
+		final TravelDisutilityFactory travelCostCalculatorFactory = new ResDisFactory(ecl, emissionModule, emissionCostModule);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(travelCostCalculatorFactory);
+			}
+		});
 		controler.run();
 	}
 }

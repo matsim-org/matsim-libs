@@ -44,7 +44,7 @@ public class RndPtRouterLauncher {
 		return 
 		new TransitRouterFactory() {
 			@Override
-			public TransitRouter createTransitRouter() {
+			public TransitRouter get() {
 				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = 
 					new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
 				ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;

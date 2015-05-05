@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -76,8 +77,13 @@ public class InternalizeEmissionsRoadPricingControlerListner implements StartupL
 					controler.getTravelDisutilityFactory(), emissionPricingScheme.getScheme(), controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()
 					) ;
 		travelDisutilityFactory.setSigma(3.);
-		controler.setTravelDisutilityFactory(travelDisutilityFactory);
-		
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(travelDisutilityFactory);
+			}
+		});
+
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());

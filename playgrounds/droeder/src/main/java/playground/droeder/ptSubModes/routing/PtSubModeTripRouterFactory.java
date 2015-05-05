@@ -36,7 +36,6 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.DefaultRoutingModules;
-import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
@@ -162,7 +161,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 			tripRouter.setRoutingModule(
 					mode,
 					new TransitRouterWrapper(
-							((PtSubModeRouterSet) transitRouterFactory.createTransitRouter()).getModeRouter(mode),
+							((PtSubModeRouterSet) transitRouterFactory.get()).getModeRouter(mode),
 							transitSchedule,
 							network, // use a walk router in case no path is found
 							DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, populationFactory, 
@@ -172,7 +171,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 		tripRouter.setRoutingModule(
 				TransportMode.pt,
 				new TransitRouterWrapper(
-						((PtSubModeRouterSet) transitRouterFactory.createTransitRouter()).getModeRouter(TransportMode.pt),
+						((PtSubModeRouterSet) transitRouterFactory.get()).getModeRouter(TransportMode.pt),
 						transitSchedule,
 						network, // use a walk router in case no PT path is found
 						DefaultRoutingModules.createTeleportationRouter( TransportMode.transit_walk, populationFactory, 

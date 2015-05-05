@@ -22,6 +22,7 @@ package playground.meisterk.kti.controler;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -86,8 +87,13 @@ public class KTIControler extends Controler {
                 getScenario().getActivityFacilities());
 		this.setScoringFunctionFactory(kTIYear3ScoringFunctionFactory);
 
-		KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
-		this.setTravelDisutilityFactory(costCalculatorFactory);
+		final KtiTravelCostCalculatorFactory costCalculatorFactory = new KtiTravelCostCalculatorFactory(ktiConfigGroup);
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+			}
+		});
 
 		super.setUp();
 	}

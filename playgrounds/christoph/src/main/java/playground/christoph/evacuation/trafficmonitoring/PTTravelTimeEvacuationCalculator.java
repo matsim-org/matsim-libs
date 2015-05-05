@@ -76,7 +76,7 @@ public class PTTravelTimeEvacuationCalculator implements SwissPTTravelTimeCalcul
 
 		EvacuationTransitRouter evacuationRouter = this.evacuationRouters.get();
 		if (evacuationRouter == null) {
-			evacuationRouter = this.evacuationRouterFactory.createTransitRouter();
+			evacuationRouter = this.evacuationRouterFactory.get();
 			this.evacuationRouters.set(evacuationRouter);
 		}
 		

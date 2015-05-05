@@ -145,8 +145,13 @@ public class EvacPatnaControler {
 		
 		if(congestionPricing) {
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
-			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
-			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
+			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				}
+			});
 			controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(),tollHandler, new CongestionHandlerImplV6(controler.getEvents(), (ScenarioImpl)controler.getScenario()) ));
 		}
 		

@@ -76,7 +76,7 @@ class PTransitRouterFactory implements TransitRouterFactory{
 	}
 
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		if(needToUpdateRouter) {
 			// okay update all routers
 			this.routerFactory = createSpeedyRouter();
@@ -102,7 +102,7 @@ class PTransitRouterFactory implements TransitRouterFactory{
 				return new TransitRouterImpl(this.transitRouterConfig, preparedTransitSchedule, routerNetwork, ttCalculator, ttCalculator);
 			}
 		} else {
-			return this.routerFactory.createTransitRouter();
+			return this.routerFactory.get();
 		}
 	}
 	

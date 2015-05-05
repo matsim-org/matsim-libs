@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
@@ -83,26 +84,41 @@ public class PricingControler {
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		
 		TollHandler tollHandler = new TollHandler(sc);
-		TollDisutilityCalculatorFactory fact = new TollDisutilityCalculatorFactory(tollHandler);
+		final TollDisutilityCalculatorFactory fact = new TollDisutilityCalculatorFactory(tollHandler);
 		
 		switch (congestionPricing) {
 		case "implV3":
 		{
-			controler.setTravelDisutilityFactory(fact);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(fact);
+				}
+			});
 			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 3.");
 		}
 		break;
 		case "implV4":
 			{
-				controler.setTravelDisutilityFactory(fact);
+				controler.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						bindTravelDisutilityFactory().toInstance(fact);
+					}
+				});
 				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV4(controler.getEvents(), sc)));
 				Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 4.");
 			}
 		break;
 		case "implV6":
 		{
-			controler.setTravelDisutilityFactory(fact);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(fact);
+				}
+			});
 			controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV6(controler.getEvents(), sc)));
 			Logger.getLogger(PricingControler.class).info("Using congestion pricing implementation version 6.");
 		}

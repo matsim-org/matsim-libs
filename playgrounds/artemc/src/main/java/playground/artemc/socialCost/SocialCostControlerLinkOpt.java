@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -82,8 +83,13 @@ public class SocialCostControlerLinkOpt {
 				controler.getEvents().addHandler(scc);
 
 				// initialize the social costs disutility calculator
-				SocialCostTravelDisutilityFactory factory = new SocialCostTravelDisutilityFactory(scc);
-				controler.setTravelDisutilityFactory(factory);
+				final SocialCostTravelDisutilityFactory factory = new SocialCostTravelDisutilityFactory(scc);
+				controler.addOverridingModule(new AbstractModule() {
+					@Override
+					public void install() {
+						bindTravelDisutilityFactory().toInstance(factory);
+					}
+				});
 
 				// create a plot containing the mean travel times
 				Set<String> transportModes = new HashSet<String>();

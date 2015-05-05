@@ -52,7 +52,7 @@ public class TransitRouterWWImplFactory implements TransitRouterFactory {
 		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, controler.getScenario().getTransitSchedule(), this.config.beelineWalkConnectionDistance);
 	}
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWW(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().qsim(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule())), routerNetwork);
 	}
 

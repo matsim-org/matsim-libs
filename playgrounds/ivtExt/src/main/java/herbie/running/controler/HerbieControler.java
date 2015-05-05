@@ -95,13 +95,18 @@ public class HerbieControler extends Controler {
 				
 		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(getConfig().planCalcScore());
 		
-		HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
+		final HerbieTravelCostCalculatorFactory costCalculatorFactory = new HerbieTravelCostCalculatorFactory(params, this.herbieConfigGroup);
 		TravelTime timeCalculator = super.getLinkTravelTimes();
 		PlanCalcScoreConfigGroup cnScoringGroup = null;
 		costCalculatorFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
-		
-		this.setTravelDisutilityFactory(costCalculatorFactory);
-		
+
+		this.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(costCalculatorFactory);
+			}
+		});
+
 		super.setUp();
 	}
 	

@@ -35,7 +35,6 @@ import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.router.TransitTravelDisutilityWrapper;
 import org.matsim.pt.router.util.FastTransitDijkstraFactory;
@@ -84,11 +83,11 @@ public class EvacuationTransitRouterFactory implements TransitRouterFactory {
 		 * createTransitRouter() is called concurrently from parallel running threads. Therefore,
 		 * we ensure that the RoutingNetwork is already created and re-used later.
 		 */
-		this.createTransitRouter();
+		this.get();
 	}
 
 	@Override
-	public EvacuationTransitRouter createTransitRouter() {
+	public EvacuationTransitRouter get() {
 		TransitTravelDisutilityWrapper wrapper = new TransitTravelDisutilityWrapper(this.ttCalculator);
 		FastTransitMultiNodeDijkstra dijkstra = (FastTransitMultiNodeDijkstra) dijkstraFactory.createPathCalculator(this.routerNetwork, 
 				wrapper, this.ttCalculator);

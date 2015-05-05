@@ -24,16 +24,18 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterModule;
+
+import javax.inject.Provider;
 
 public class TripRouterFactoryBuilderWithDefaults {
 
-	private TransitRouterFactory transitRouterFactory;
+	private Provider<TransitRouter> transitRouterFactory;
 	
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
-	public void setTransitRouterFactory(TransitRouterFactory transitRouterFactory) {
+	public void setTransitRouterFactory(Provider<TransitRouter> transitRouterFactory) {
 		this.transitRouterFactory = transitRouterFactory;
 	}
 
@@ -55,7 +57,7 @@ public class TripRouterFactoryBuilderWithDefaults {
 		return new DefaultTripRouterFactoryImpl(scenario, leastCostPathCalculatorFactory, transitRouterFactory);
 	}
 
-	public static TransitRouterFactory createDefaultTransitRouter(final Scenario scenario) {
+	public static Provider<TransitRouter> createDefaultTransitRouter(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
                 new TransitRouterModule(),
                 new AbstractModule() {
@@ -64,7 +66,7 @@ public class TripRouterFactoryBuilderWithDefaults {
                         bind(Scenario.class).toInstance(scenario);
                     }
                 })
-        .getInstance(TransitRouterFactory.class);
+        .getProvider(TransitRouter.class);
 	}
 
 	public static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(final Scenario scenario) {

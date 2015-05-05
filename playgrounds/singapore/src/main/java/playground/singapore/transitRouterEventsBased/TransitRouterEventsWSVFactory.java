@@ -54,7 +54,7 @@ public class TransitRouterEventsWSVFactory implements TransitRouterFactory {
 		this.vehicleOccupancy = vehicleOccupancy;
 	}
 	@Override
-	public TransitRouter createTransitRouter() {
+	public TransitRouter get() {
 		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWSV(config, routerNetwork, waitTime, stopStopTime, vehicleOccupancy, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
 	}
 

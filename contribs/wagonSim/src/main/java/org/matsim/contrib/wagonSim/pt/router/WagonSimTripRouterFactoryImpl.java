@@ -93,7 +93,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 //		TripRouter tripRouter = this.delegate.instantiateAndConfigureTripRouter();
 		TripRouter tripRouter = new TripRouter();
 		tripRouter.setRoutingModule(TransportMode.pt, 
-				new WagonSimRouterWrapper(routerFactory.createTransitRouter(), transitSchedule, network, walkRouter, minShuntingTimes));
+				new WagonSimRouterWrapper(routerFactory.get(), transitSchedule, network, walkRouter, minShuntingTimes));
 		return tripRouter;
 	}
 	

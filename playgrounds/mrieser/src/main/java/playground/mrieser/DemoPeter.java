@@ -67,7 +67,7 @@ public class DemoPeter {
 		}
 
 		@Override
-		public TransitRouter createTransitRouter() {
+		public TransitRouter get() {
 			MyTransitRouterNetworkTravelTimeCost ttcalc = new MyTransitRouterNetworkTravelTimeCost(this.config);
 			return new TransitRouterImpl(this.config, new PreparedTransitSchedule(schedule), this.routerNetwork, ttcalc, ttcalc);
 		}

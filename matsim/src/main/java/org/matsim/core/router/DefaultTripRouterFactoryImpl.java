@@ -11,9 +11,10 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouter;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.Collections;
 
 public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
@@ -33,11 +34,11 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 	}
 
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-    private final TransitRouterFactory transitRouterFactory;
+    private final Provider<TransitRouter> transitRouterFactory;
     private final Scenario scenario;
 
     @Inject
-    public DefaultTripRouterFactoryImpl(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, TransitRouterFactory transitRouterFactory) {
+    public DefaultTripRouterFactoryImpl(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory, Provider<TransitRouter> transitRouterFactory) {
     	this.scenario = scenario;
     	this.transitRouterFactory = transitRouterFactory;
     	this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
@@ -133,7 +134,7 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 
         if ( scenario.getConfig().scenario().isUseTransit() ) {
             TransitRouterWrapper routingModule = new TransitRouterWrapper(
-                    transitRouterFactory.createTransitRouter(),
+                    transitRouterFactory.get(),
                     scenario.getTransitSchedule(),
                     scenario.getNetwork(), // use a walk router in case no PT path is found
                     DefaultRoutingModules.createTeleportationRouter(TransportMode.transit_walk, scenario.getPopulation().getFactory(),
@@ -153,7 +154,7 @@ public class DefaultTripRouterFactoryImpl implements TripRouterFactory {
 		return leastCostPathCalculatorFactory;
 	}
 
-	public TransitRouterFactory getTransitRouterFactory() {
+	public Provider<TransitRouter> getTransitRouterFactory() {
 		return transitRouterFactory;
 	}
 }

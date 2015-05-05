@@ -135,7 +135,7 @@ public class Injector {
         ));
     }
 
-    <T> Provider<T> getProvider(Class<T> type) {
+    public <T> Provider<T> getProvider(Class<T> type) {
         return injector.getProvider(type);
     }
 }
