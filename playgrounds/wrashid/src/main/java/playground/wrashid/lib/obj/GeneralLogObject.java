@@ -71,8 +71,9 @@ public class GeneralLogObject {
 			String outputFileName= controler.getControlerIO()
 			.getIterationFilename(iteration, this.outputFile);
 			
-			try {
+			try (
 				FileOutputStream fos = new FileOutputStream(outputFileName);
+					){
 				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
 
 				for (String logGroupName : logGroups.keySet()) {
