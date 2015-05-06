@@ -116,6 +116,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 
 	void writePersons(){
 		for (Person p : persons) {
+			int carCount = 0;
 			Id<Person> id = p.getId();
 			PlanImpl pli = (PlanImpl) p.getSelectedPlan();
 			String departure = String.valueOf(pli.getFirstActivity().getEndTime());
@@ -135,7 +136,9 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 				list.add(new Tuple<String, String>("from", act.getLinkId().toString()));
 				list.add(new Tuple<String, String>("to", nextAct.getLinkId().toString()));
 				if (leg.getMode().equals("car")){
-					list.add(new Tuple<String, String>("lines", "car_" + id.toString()/* + "_" + nextAct.getType()*/));
+					carCount++;
+					list.add(new Tuple<String, String>("lines", "car_" + id.toString() + "_" + nextAct.getType() + "_" + carCount));
+					list.add(new Tuple<String, String>("arrivalPos", "10"));
 					super.writeStartTag("ride", list, true);
 				}else if (leg.getMode().contains("walk")){
 					list.add(new Tuple<String, String>("duration", String.valueOf((leg.getTravelTime()))));
@@ -156,7 +159,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 						lines = lines.substring(0, lines.length() - 1);
 
 					list.add(new Tuple<String, String>("lines", lines));
-					list.add(new Tuple<String, String>("arrivalPos", "-10"));
+					list.add(new Tuple<String, String>("arrivalPos", "10"));
 					super.writeStartTag("ride", list, true); //muss noch angepasst werden
 				}
 				list.clear();
@@ -168,7 +171,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 					else
 						list.add(new Tuple<String, String>("duration", "0"));
 					list.add(new Tuple<String, String>("actType", nextAct.getType()));
-					list.add(new Tuple<String, String>("startPos", "-10"));
+					list.add(new Tuple<String, String>("startPos", "10"));
 					super.writeStartTag("stop", list, true);
 					list.clear();
 				}
@@ -192,28 +195,21 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 				list.add(new Tuple<String, String>("type", vehInfo.getType().getId().toString()));
 				list.add(new Tuple<String, String>("departLane", "best"));
 //				list.add(new Tuple<String, String>("departPos", "free"));
-
-
 				super.writeStartTag("vehicle", list);
 				list.clear();
 
 				list.add(new Tuple<String, String>("edges", vehInfo.getRoute()));
-				list.add(new Tuple<String, String>("departPos", "-10"));
+				list.add(new Tuple<String, String>("departPos", "10"));
 				super.writeStartTag("route", list, true);
 				list.clear();
-				int it = 0;
-				for (String stop : vehInfo.getBusStopFacilities()){
-//					if (it != 0){
-						list.add(new Tuple<String, String>("lane", stop.concat("_0")));
-						list.add(new Tuple<String, String>("duration", "10"));
-						list.add(new Tuple<String, String>("startPos", "-20"));
-//						list.add(new Tuple<String, String>("endPos", "-10"));
-						list.add(new Tuple<String, String>("parking", "true"));
-						super.writeStartTag("stop", list, true);
-						list.clear();
-//					}
-					it++;
-				}
+				
+				list.add(new Tuple<String, String>("lane", vehInfo.getBusStopFacilities().get(0).concat("_0")));
+				list.add(new Tuple<String, String>("duration", "10"));
+				list.add(new Tuple<String, String>("startPos", "20"));
+//				list.add(new Tuple<String, String>("endPos", "-10"));
+//				list.add(new Tuple<String, String>("parking", "true"));
+				super.writeStartTag("stop", list, true);
+				list.clear();
 
 				super.writeEndTag("vehicle");
 			}else if (vehicles2BSorted.get(vehicleId).getType().getId().toString().contains("Bus")){
@@ -243,8 +239,8 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 		Id<VehicleType> vehTypeIdCar = Id.create("car", VehicleType.class);
 		VehicleType vehTypeCar = new VehicleTypeImpl(vehTypeIdCar);
 
-		int count = 0;
 		for (Person p : persons) {
+			int carCount = 0;
 			Id<Person> id = p.getId();
 			PlanImpl pli = (PlanImpl) p.getSelectedPlan();
 
@@ -252,16 +248,11 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			Activity lastAct = pli.getLastActivity();
 			Leg leg = pli.getNextLeg(act);
 			Activity nextAct = pli.getNextActivity(leg);
-
-			List<String> carStops = new ArrayList<>();
-			String allDayCarRoutesOfPerson = "";
-			Id<Vehicle> idV = Id.create("car_" + id.toString(), Vehicle.class);
-			Boolean containsCar = false;
 			
 			while (act != lastAct){
 				if (leg.getMode().equals("car")){
-					containsCar = true;
-//					Id<Vehicle> idV = Id.create("car_" + id.toString()/* + "_" + nextAct.getType()*/, Vehicle.class);
+					carCount++;
+					Id<Vehicle> idV = Id.create("car_" + id.toString() + "_" + nextAct.getType() + "_" + carCount, Vehicle.class);
 
 					String route = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().toString();
 					if (act.getLinkId().equals(nextAct.getLinkId())){
@@ -270,19 +261,11 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 						route = act.getLinkId().toString() + " " + route.substring(1, route.length()-1).replace(",", "") +
 								" " + nextAct.getLinkId().toString();
 					}
-					if (allDayCarRoutesOfPerson.equals("")){
-						allDayCarRoutesOfPerson = route;
-//						System.out.println(allDayCarRoutesOfPerson);
-					}else{
-						if (route.contains(" ")) //else route contains only out of one link
-							allDayCarRoutesOfPerson = allDayCarRoutesOfPerson + route.substring(route.indexOf(" "), route.length());
-						else 
-							count++;
-					}
-					carStops.add(act.getLinkId().toString());
-//					VehicleInformation vehInfo = new VehicleInformation(idV, vehTypeCar, act.getEndTime(), allDayCarRoutesOfPerson, carStops);
+					List<String> stops = new ArrayList();
+					stops.add(act.getLinkId().toString());
+					VehicleInformation vehInfo = new VehicleInformation(idV, vehTypeCar, act.getEndTime(), route, stops);
 
-//					vehicles2BSorted.put(idV, vehInfo);
+					vehicles2BSorted.put(idV, vehInfo);
 				}
 
 				act = nextAct;
@@ -291,12 +274,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 					nextAct = pli.getNextActivity(leg);
 				}
 			}
-			if (containsCar){
-				VehicleInformation vehInfo = new VehicleInformation(idV, vehTypeCar, act.getEndTime(), allDayCarRoutesOfPerson, carStops);
-				vehicles2BSorted.put(idV, vehInfo);
-			}
 		}
-		System.out.println(count);
 
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
 
