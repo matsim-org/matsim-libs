@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.analysis.travelsummary.travelcomponents.*;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
@@ -49,14 +50,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 import playground.pieter.singapore.utils.postgresql.*;
-import playground.singapore.travelsummary.travelcomponents.Activity;
-import playground.singapore.travelsummary.travelcomponents.Journey;
-import playground.singapore.travelsummary.travelcomponents.Transfer;
-import playground.singapore.travelsummary.travelcomponents.TravelComponent;
-import playground.singapore.travelsummary.travelcomponents.TravellerChain;
-import playground.singapore.travelsummary.travelcomponents.Trip;
-import playground.singapore.travelsummary.travelcomponents.Wait;
-import playground.singapore.travelsummary.travelcomponents.Walk;
+
 
 /**
  * 

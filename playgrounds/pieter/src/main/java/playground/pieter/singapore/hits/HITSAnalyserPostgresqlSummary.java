@@ -12,6 +12,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.analysis.travelsummary.travelcomponents.*;
+import org.matsim.contrib.analysis.travelsummary.travelcomponents.Journey;
+import org.matsim.contrib.analysis.travelsummary.travelcomponents.TravellerChain;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -49,7 +52,6 @@ import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetwo
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
-import playground.singapore.travelsummary.travelcomponents.*;
 
 import javax.management.timer.Timer;
 import java.io.*;
