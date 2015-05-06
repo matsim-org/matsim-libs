@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.evacuation.model.config.GripsConfigModule;
+import org.matsim.contrib.evacuation.model.config.EvacuationConfigModule;
 import org.matsim.contrib.evacuation.model.events.InfoEvent;
 import org.matsim.contrib.evacuation.scenariogenerator.ScenarioGenerator;
 import org.matsim.core.config.Config;
@@ -86,7 +86,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		
 		this.c.addModule( new SimulationConfigGroup() );
 		this.c.global().setCoordinateSystem("EPSG:3395");
-		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
+		this.c.controler().setOutputDirectory(getEvacuationConfig(this.c).getOutputDir()+"/output");
 		this.sc = ScenarioUtils.createScenario(this.c);
 		this.safeLinkId = Id.create("el1", Link.class);
 
@@ -111,7 +111,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		
 
 		this.c.controler().setLastIteration(10);
-		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
+		this.c.controler().setOutputDirectory(getEvacuationConfig(this.c).getOutputDir()+"/output");
 
 		
 		
@@ -156,7 +156,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 //		this.c.strategy().addParam("ModuleProbability_3", "0.1");
 		
 
-		this.matsimConfigFile = getGripsConfig(this.c).getOutputDir() + "/config.xml";
+		this.matsimConfigFile = getEvacuationConfig(this.c).getOutputDir() + "/config.xml";
 
 		
 		new ConfigWriter(this.c).write(this.matsimConfigFile);
@@ -280,7 +280,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		line.addRoute(tr);
 		schedule.addTransitLine(line);
 		
-		String out = getGripsConfig().getOutputDir();
+		String out = getEvacuationConfig().getOutputDir();
 		new TransitScheduleWriterV1(schedule).write(out+"/transitSchedule.xml");
 		new VehicleWriterV1(vehicles).writeFile(out+"/transitVehicles.xml");
 		
@@ -303,7 +303,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 	@Override
 	protected void generateAndSavePopulation(Scenario sc) {
 		// for now a simple ESRI shape file format is used to emulated the a more sophisticated not yet defined population meta format
-		GripsConfigModule gcm = getGripsConfig(sc.getConfig());
+		EvacuationConfigModule gcm = getEvacuationConfig(sc.getConfig());
 		String gripsPopulationFile = gcm.getPopulationFileName();
 //		PopulationFromESRIShapeFielGeneratorPT gen = 
 		new PopulationFromESRIShapeFielGeneratorPT(sc, gripsPopulationFile, this.safeLinkId,this.stops).run();

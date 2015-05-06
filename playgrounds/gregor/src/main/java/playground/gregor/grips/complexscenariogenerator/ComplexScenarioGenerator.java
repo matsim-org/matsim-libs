@@ -21,7 +21,7 @@
 package playground.gregor.grips.complexscenariogenerator;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.evacuation.model.config.GripsConfigModule;
+import org.matsim.contrib.evacuation.model.config.EvacuationConfigModule;
 import org.matsim.contrib.evacuation.scenariogenerator.ScenarioGenerator;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
@@ -74,7 +74,7 @@ public class ComplexScenarioGenerator extends ScenarioGenerator {
 	@Override
 	protected void generateAndSavePopulation(Scenario sc) {
 		// for now a simple ESRI shape file format is used to emulated the a more sophisticated not yet defined population meta format
-		GripsConfigModule gcm = getGripsConfig(sc.getConfig());
+		EvacuationConfigModule gcm = getEvacuationConfig(sc.getConfig());
 		String gripsPopulationFile = gcm.getPopulationFileName();
 		new ComplexPopulationFromESRIShapeFileGenerator(sc, gripsPopulationFile).run();
 

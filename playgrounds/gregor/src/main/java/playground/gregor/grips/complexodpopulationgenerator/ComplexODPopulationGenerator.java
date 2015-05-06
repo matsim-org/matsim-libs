@@ -59,9 +59,9 @@ import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.evacuation.io.GripsConfigReader;
+import org.matsim.contrib.evacuation.io.EvacuationConfigReader;
 import org.matsim.contrib.evacuation.jxmapviewerhelper.TileFactoryBuilder;
-import org.matsim.contrib.evacuation.model.config.GripsConfigModule;
+import org.matsim.contrib.evacuation.model.config.EvacuationConfigModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -450,16 +450,16 @@ public class ComplexODPopulationGenerator implements ActionListener{
 				
 				
 				
-				GripsConfigModule gcm = null;
+				EvacuationConfigModule gcm = null;
 				Config c = null;
 				try
 				{
 					c = ConfigUtils.createConfig();
-					gcm = new GripsConfigModule("grips");
+					gcm = new EvacuationConfigModule("grips");
 					c.addModule(gcm);
 					c.global().setCoordinateSystem("EPSG:3395");
 					
-					GripsConfigReader reader = new GripsConfigReader(gcm);
+					EvacuationConfigReader reader = new EvacuationConfigReader(gcm);
 					reader.parse(this.configFile);
 				}
 				catch(Exception ee)
