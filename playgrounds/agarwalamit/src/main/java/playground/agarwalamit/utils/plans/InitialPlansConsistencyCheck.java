@@ -49,6 +49,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * <p> 2) Out of them how many are from urban group (only for munich data) ?
  * <p> 3) Also writes the activity sequence of such inconsistent plans and their frequency.
  * <p> 4) How may activities have zero durations.
+ * <p> 5) How many activities have end time higher than simulation end time.
  * @author amit
  */
 public class InitialPlansConsistencyCheck {
@@ -59,35 +60,41 @@ public class InitialPlansConsistencyCheck {
 	private Map<UserGroup, Integer> userGroup2NumberOfPersons = new HashMap<UserGroup, Integer>();
 	private PersonFilter pf;
 	private BufferedWriter writer;
+	
+	private String configFile ;
+	private String outputDir;
 
-	public InitialPlansConsistencyCheck(String initialPlans) {
+	public InitialPlansConsistencyCheck(String initialPlans, String outputFile, String configFile) {
+		this.configFile = configFile;
+		this.outputDir = outputFile;
 		this.sc = LoadMyScenarios.loadScenarioFromPlans(initialPlans);
 	}
 
 	public static void main(String[] args) {
 		String initialPlansFile = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input"
 				+ "/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
-		String initialConfig = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input/config_munich_1pct_baseCase.xml";
+		String initialConfig = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/input/config_munich_1pct_baseCase_modified.xml";
 		String outputFile = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run7/";
 
-		new InitialPlansConsistencyCheck(initialPlansFile).run(outputFile,initialConfig);
+		new InitialPlansConsistencyCheck(initialPlansFile, outputFile, initialConfig).run();
 	}
 
-	public void run(String outputFile, String configFile){
-		initializePlansStatsWriter(outputFile);
+	public void run(){
+		initializePlansStatsWriter();
 		checkFor1stAndLastActivity();
-		checkForZeroActivitDuration(outputFile);
-		checkForActivityDurationLessThanZeroUtilityDuration(configFile, outputFile);
+		checkForZeroActivitDuration();
+		checkForActivityDurationLessThanZeroUtilityDuration( );
+		checkForActivityStartTimeAndSimulationTime();
 	}
 
-	private void initializePlansStatsWriter (String outputFile){
+	private void initializePlansStatsWriter (){
 
 		pf = new PersonFilter();
 
 		getUserGrp2NumberOfPersons();
 		getPersonId2ActivitiesAndLegs();
-		
-		writer = IOUtils.getBufferedWriter(outputFile+"analysis/plansConsistency_differentFirstAndLastActivities.txt");
+
+		writer = IOUtils.getBufferedWriter(this.outputDir+"analysis/plansConsistency_differentFirstAndLastActivities.txt");
 
 		try {
 			writer.write("UserGroup \t numberOfPersons \n");
@@ -137,14 +144,43 @@ public class InitialPlansConsistencyCheck {
 	}
 
 	/**
+	 * Check if activity start time is higher than simulation end time. Such person will be "stuckAndAbort". 
+	 */
+	private void checkForActivityStartTimeAndSimulationTime(){
+
+		BufferedWriter writer = IOUtils.getBufferedWriter(this.outputDir+"analysis/checkForActStartTime.txt");
+		try {
+			writer.write("personId \t activityType \t activityEndTime\n");
+		
+		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
+		for(Person p : sc.getPopulation().getPersons().values()){
+			for(PlanElement pe : p.getSelectedPlan().getPlanElements()){
+				if (pe instanceof Activity ) {
+					double actEndTime = ((Activity)pe).getEndTime();
+					if(actEndTime > simEndTime){
+						log.error("Activity end time is "+actEndTime+" whereas simulation end time is "+simEndTime);
+							writer.write(p.getId()+"\t"+((Activity)pe).getType()+"\t"+actEndTime+"\n");
+					}
+				}
+			}
+		}
+		writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written in file. Reason: "
+					+ e);
+		}
+
+	}
+
+	/**
 	 * If t_actual becomes less than t_0 (duration at which util_perf =0) than util_perf is negative. Reporting such instances.
 	 */
-	private void checkForActivityDurationLessThanZeroUtilityDuration(String configFile, String outputFile){
-		
+	private void checkForActivityDurationLessThanZeroUtilityDuration(){
+
 		log.info("Consistency check for zero activity duration.");
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile+"analysis/negativeUtil_perfActivities.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(this.outputDir+"analysis/negativeUtil_perfActivities.txt");
 		int zeroUtilDurCount =0;
-		SortedMap<String, Double> actType2ZeroUtilDuration = getZeroUtilDuration(configFile);
+		SortedMap<String, Double> actType2ZeroUtilDuration = getZeroUtilDuration();
 		try {
 			writer.write("Person \t activity \t startTime \t endTime \t zeroUtilDuration \n");
 			for(Person p : sc.getPopulation().getPersons().values()){
@@ -173,32 +209,29 @@ public class InitialPlansConsistencyCheck {
 		}
 		if (zeroUtilDurCount>0) log.warn("There are "+zeroUtilDurCount+" instances where person have activity duration equal to or less than zero utility duration. Check for written file for detailed discription.");
 	}
-	
-	private SortedMap<String, Double> getZeroUtilDuration(String configFile){
+
+	private SortedMap<String, Double> getZeroUtilDuration(){
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader reader = new MatsimConfigReader(config);
 		reader.readFile(configFile);
-		
+
 		PlanCalcScoreConfigGroup params = config.planCalcScore();
-		
+
 		SortedMap<String, Double> actType2ZeroUtilDuration = new TreeMap<>();
 		for(String actType : params.getActivityTypes()){
-			double priority = params.getActivityParams(actType).getPriority();
-			double typicalDuration_s = params.getActivityParams(actType).getTypicalDuration();
-//			double zeroUtilDur_sec = CharyparNagelScoringUtils.computeZeroUtilityDuration_s(priority, typicalDuration_s);
 			ActivityUtilityParameters.Builder builder = new ActivityUtilityParameters.Builder( params.getActivityParams( actType ) ) ;
 			ActivityUtilityParameters ppp = builder.create() ;
 			double zeroUtilDur_sec = ppp.getZeroUtilityDuration_h() * 3600. ;
-			
+
 			actType2ZeroUtilDuration.put(actType, zeroUtilDur_sec);
 		}
 		return actType2ZeroUtilDuration;
 	}
-	
-	private void checkForZeroActivitDuration(String outputFile){
+
+	private void checkForZeroActivitDuration(){
 		log.info("Consistency check for zero activity duration.");
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile+"analysis/zeroActivityDurationPersons.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(this.outputDir+"analysis/zeroActivityDurationPersons.txt");
 		int zeroDurCount =0;
 		try {
 			writer.write("Person \t activity \t startTime \t endTime \n");
