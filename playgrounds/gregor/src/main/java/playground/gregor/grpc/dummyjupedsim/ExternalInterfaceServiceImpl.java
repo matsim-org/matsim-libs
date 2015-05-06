@@ -34,6 +34,8 @@ import org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpace;
 import org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpaceConfirmed;
 import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent;
 import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed;
+import org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents;
+import org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed;
 
 public class ExternalInterfaceServiceImpl implements ExternInterfaceService{
 
@@ -89,6 +91,13 @@ public class ExternalInterfaceServiceImpl implements ExternInterfaceService{
 		ExternAfterSimConfirmed resp = ExternAfterSimConfirmed.newBuilder().build();
 		responseObserver.onValue(resp);
 		responseObserver.onCompleted();		
+	}
+
+	@Override
+	public void reqMaximumNumberOfAgents(MaximumNumberOfAgents request,
+			StreamObserver<MaximumNumberOfAgentsConfirmed> responseObserver) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

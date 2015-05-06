@@ -24,6 +24,8 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CyclicBarrier;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.hybrid.MATSimInterface;
 import org.matsim.hybrid.MATSimInterface.Extern2MATSim;
@@ -53,7 +55,7 @@ public final class DummyJuPedSim implements ExternalSim{
 	private JuPedSimServer server;
 
 	public DummyJuPedSim() {
-//		Logger.getLogger("io.netty").setLevel(Level.OFF);
+		Logger.getLogger("io.netty").setLevel(Level.OFF);
 
 	}
 
@@ -105,7 +107,7 @@ public final class DummyJuPedSim implements ExternalSim{
 	}
 
 	public static void main(String [] args) {
-		new DummyJuPedSim();		
+		new Thread(new DummyJuPedSim()).start();
 	}
 
 	public void putAgent(MATSim2ExternPutAgent request) {

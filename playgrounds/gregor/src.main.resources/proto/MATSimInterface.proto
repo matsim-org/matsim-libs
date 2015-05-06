@@ -85,7 +85,13 @@ message AgentsStuckConfirmed{
 
 }
 
+message MaximumNumberOfAgents {
+	optional int32 number = 1;
+}
 
+message MaximumNumberOfAgentsConfirmed {
+
+}
 service MATSimInterfaceService {
 	rpc reqExtern2MATSim(Extern2MATSim) returns (Extern2MATSimConfirmed);
 	rpc reqAgentStuck(AgentsStuck) returns (AgentsStuckConfirmed);
@@ -99,6 +105,7 @@ service ExternInterfaceService {
 	rpc reqExternDoSimStep(ExternDoSimStep) returns (ExternDoSimStepReceived);
 	rpc reqExternOnPrepareSim(ExternOnPrepareSim) returns (ExternOnPrepareSimConfirmed);
 	rpc reqExternAfterSim(ExternAfterSim) returns (ExternAfterSimConfirmed);
+	rpc reqMaximumNumberOfAgents(MaximumNumberOfAgents) returns (MaximumNumberOfAgentsConfirmed);
 
 }
 

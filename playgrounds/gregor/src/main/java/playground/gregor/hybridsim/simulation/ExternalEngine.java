@@ -61,6 +61,7 @@ import org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpaceConfirmed;
 import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent;
 import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent.Agent.Builder;
 import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed;
+import org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents;
 import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceService;
 
 import playground.gregor.hybridsim.grpc.GRPCExternalClient;
@@ -232,16 +233,21 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
 	@Override
 	public void onPrepareSim() {
+		
 		try {
 			this.clientBarrier.await(); //to make sure matsim --> extern connection is working 
 		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
 		}
-		ExternOnPrepareSim prep = ExternOnPrepareSim.newBuilder().build();
 		if (this.client == null){
 			throw new RuntimeException("client is null");
 		}
+		
+		MaximumNumberOfAgents n = MaximumNumberOfAgents.newBuilder().setNumber(this.sim.getScenario().getPopulation().getPersons().size()).build();
+		this.client.getBlockingStub().reqMaximumNumberOfAgents(n);
+		ExternOnPrepareSim prep = ExternOnPrepareSim.newBuilder().build();
 		ExternOnPrepareSimConfirmed resp = this.client.getBlockingStub().reqExternOnPrepareSim(prep);
+		
 	}
 
 	@Override

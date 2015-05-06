@@ -45,6 +45,12 @@ public class ExternInterfaceServiceGrpc {
           io.grpc.MethodType.UNARY, "reqExternAfterSim",
           io.grpc.protobuf.ProtoUtils.marshaller(org.matsim.hybrid.MATSimInterface.ExternAfterSim.PARSER),
           io.grpc.protobuf.ProtoUtils.marshaller(org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed.PARSER));
+  private static final io.grpc.stub.Method<org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents,
+      org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed> METHOD_REQ_MAXIMUM_NUMBER_OF_AGENTS =
+      io.grpc.stub.Method.create(
+          io.grpc.MethodType.UNARY, "reqMaximumNumberOfAgents",
+          io.grpc.protobuf.ProtoUtils.marshaller(org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents.PARSER),
+          io.grpc.protobuf.ProtoUtils.marshaller(org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed.PARSER));
 
   public static ExternInterfaceServiceStub newStub(io.grpc.Channel channel) {
     return new ExternInterfaceServiceStub(channel, CONFIG);
@@ -76,6 +82,8 @@ public class ExternInterfaceServiceGrpc {
         org.matsim.hybrid.MATSimInterface.ExternOnPrepareSimConfirmed> reqExternOnPrepareSim;
     public final io.grpc.MethodDescriptor<org.matsim.hybrid.MATSimInterface.ExternAfterSim,
         org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed> reqExternAfterSim;
+    public final io.grpc.MethodDescriptor<org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents,
+        org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed> reqMaximumNumberOfAgents;
 
     private ExternInterfaceServiceServiceDescriptor() {
       reqMATSim2ExternHasSpace = createMethodDescriptor(
@@ -88,6 +96,8 @@ public class ExternInterfaceServiceGrpc {
           "org.matsim.hybrid.ExternInterfaceService", METHOD_REQ_EXTERN_ON_PREPARE_SIM);
       reqExternAfterSim = createMethodDescriptor(
           "org.matsim.hybrid.ExternInterfaceService", METHOD_REQ_EXTERN_AFTER_SIM);
+      reqMaximumNumberOfAgents = createMethodDescriptor(
+          "org.matsim.hybrid.ExternInterfaceService", METHOD_REQ_MAXIMUM_NUMBER_OF_AGENTS);
     }
 
     @SuppressWarnings("unchecked")
@@ -108,6 +118,9 @@ public class ExternInterfaceServiceGrpc {
       reqExternAfterSim = (io.grpc.MethodDescriptor<org.matsim.hybrid.MATSimInterface.ExternAfterSim,
           org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed>) methodMap.get(
           CONFIG.reqExternAfterSim.getName());
+      reqMaximumNumberOfAgents = (io.grpc.MethodDescriptor<org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents,
+          org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed>) methodMap.get(
+          CONFIG.reqMaximumNumberOfAgents.getName());
     }
 
     @java.lang.Override
@@ -123,7 +136,8 @@ public class ExternInterfaceServiceGrpc {
           reqMATSim2ExternPutAgent,
           reqExternDoSimStep,
           reqExternOnPrepareSim,
-          reqExternAfterSim);
+          reqExternAfterSim,
+          reqMaximumNumberOfAgents);
     }
   }
 
@@ -143,6 +157,9 @@ public class ExternInterfaceServiceGrpc {
 
     public void reqExternAfterSim(org.matsim.hybrid.MATSimInterface.ExternAfterSim request,
         io.grpc.stub.StreamObserver<org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed> responseObserver);
+
+    public void reqMaximumNumberOfAgents(org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents request,
+        io.grpc.stub.StreamObserver<org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed> responseObserver);
   }
 
   public static interface ExternInterfaceServiceBlockingClient {
@@ -156,6 +173,8 @@ public class ExternInterfaceServiceGrpc {
     public org.matsim.hybrid.MATSimInterface.ExternOnPrepareSimConfirmed reqExternOnPrepareSim(org.matsim.hybrid.MATSimInterface.ExternOnPrepareSim request);
 
     public org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed reqExternAfterSim(org.matsim.hybrid.MATSimInterface.ExternAfterSim request);
+
+    public org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed reqMaximumNumberOfAgents(org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents request);
   }
 
   public static interface ExternInterfaceServiceFutureClient {
@@ -174,6 +193,9 @@ public class ExternInterfaceServiceGrpc {
 
     public com.google.common.util.concurrent.ListenableFuture<org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed> reqExternAfterSim(
         org.matsim.hybrid.MATSimInterface.ExternAfterSim request);
+
+    public com.google.common.util.concurrent.ListenableFuture<org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed> reqMaximumNumberOfAgents(
+        org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents request);
   }
 
   public static class ExternInterfaceServiceStub extends
@@ -224,6 +246,13 @@ public class ExternInterfaceServiceGrpc {
       asyncUnaryCall(
           channel.newCall(config.reqExternAfterSim), request, responseObserver);
     }
+
+    @java.lang.Override
+    public void reqMaximumNumberOfAgents(org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents request,
+        io.grpc.stub.StreamObserver<org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed> responseObserver) {
+      asyncUnaryCall(
+          channel.newCall(config.reqMaximumNumberOfAgents), request, responseObserver);
+    }
   }
 
   public static class ExternInterfaceServiceBlockingStub extends
@@ -268,6 +297,12 @@ public class ExternInterfaceServiceGrpc {
     public org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed reqExternAfterSim(org.matsim.hybrid.MATSimInterface.ExternAfterSim request) {
       return blockingUnaryCall(
           channel.newCall(config.reqExternAfterSim), request);
+    }
+
+    @java.lang.Override
+    public org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed reqMaximumNumberOfAgents(org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents request) {
+      return blockingUnaryCall(
+          channel.newCall(config.reqMaximumNumberOfAgents), request);
     }
   }
 
@@ -318,6 +353,13 @@ public class ExternInterfaceServiceGrpc {
         org.matsim.hybrid.MATSimInterface.ExternAfterSim request) {
       return unaryFutureCall(
           channel.newCall(config.reqExternAfterSim), request);
+    }
+
+    @java.lang.Override
+    public com.google.common.util.concurrent.ListenableFuture<org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed> reqMaximumNumberOfAgents(
+        org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents request) {
+      return unaryFutureCall(
+          channel.newCall(config.reqMaximumNumberOfAgents), request);
     }
   }
 
@@ -387,6 +429,19 @@ public class ExternInterfaceServiceGrpc {
                   org.matsim.hybrid.MATSimInterface.ExternAfterSim request,
                   io.grpc.stub.StreamObserver<org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed> responseObserver) {
                 serviceImpl.reqExternAfterSim(request, responseObserver);
+              }
+            })))
+      .addMethod(createMethodDefinition(
+          METHOD_REQ_MAXIMUM_NUMBER_OF_AGENTS,
+          asyncUnaryRequestCall(
+            new io.grpc.stub.ServerCalls.UnaryRequestMethod<
+                org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents,
+                org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed>() {
+              @java.lang.Override
+              public void invoke(
+                  org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents request,
+                  io.grpc.stub.StreamObserver<org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed> responseObserver) {
+                serviceImpl.reqMaximumNumberOfAgents(request, responseObserver);
               }
             }))).build();
   }

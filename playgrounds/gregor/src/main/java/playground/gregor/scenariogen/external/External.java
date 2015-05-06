@@ -48,8 +48,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class External {
-	private static String inputDir = "/Users/laemmel/devel/external/input";
-	private static String outputDir = "/Users/laemmel/devel/external/output";
+	private static String inputDirWrite = "/Users/laemmel/devel/external/matsim/input";
+	
+	private static String inputDir = "./input";
+	private static String outputDir = "./output";
 
 	private static final int nrAgents = 8000;
 
@@ -111,15 +113,14 @@ public class External {
 
 		c.qsim().setEndTime(2 * 3600);
 
-		new ConfigWriter(c).write(inputDir + "/config.xml");
+		new ConfigWriter(c).write(inputDirWrite + "/config.xml");
 
-		new NetworkWriter(sc.getNetwork()).write(c.network().getInputFile());
+		new NetworkWriter(sc.getNetwork()).write(inputDirWrite + "/network.xml.gz");
 
 		createPopulation(sc);
 
 		Population pop = sc.getPopulation();
-		new PopulationWriter(pop, sc.getNetwork()).write(c.plans()
-				.getInputFile());
+		new PopulationWriter(pop, sc.getNetwork()).write(inputDirWrite + "/population.xml.gz");
 
 	}
 

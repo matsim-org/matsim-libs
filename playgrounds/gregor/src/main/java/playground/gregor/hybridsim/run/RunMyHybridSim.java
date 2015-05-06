@@ -41,7 +41,7 @@ import com.google.inject.Provider;
 public class RunMyHybridSim {
 
 	public static void main(String [] args) {
-		String config = "/Users/laemmel/devel/external/input/config.xml";
+		String config = "./input/config.xml";
 		Config c = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(c, config);
 		c.controler().setWriteEventsInterval(1);
