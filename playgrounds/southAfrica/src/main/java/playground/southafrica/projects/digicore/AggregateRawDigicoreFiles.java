@@ -146,20 +146,20 @@ public class AggregateRawDigicoreFiles {
 		/* Get all the input files to process. */
 		List<File> files = FileUtils.sampleFiles(new File(args[0]), Integer.MAX_VALUE, FileUtils.getFileFilter("csv.gz"));
 		
-		/* Sort the files from smallest record number to highest. */
-		Comparator<File> myIntegerFilenameComparator = new Comparator<File>() {
-			@Override
-			public int compare(File o1, File o2) {
-				int i1 = Integer.parseInt(o1.getName().substring(0, o1.getName().indexOf(".")));
-				int i2 = Integer.parseInt(o2.getName().substring(0, o2.getName().indexOf(".")));
-				return Integer.valueOf(i1).compareTo(Integer.valueOf(i2));
-			}
-		};
-		Collections.sort(files, myIntegerFilenameComparator);
-		
 		Map<File, GregorianCalendar> processedMap;
 
 		if(files != null){
+			/* Sort the files from smallest record number to highest. */
+			Comparator<File> myIntegerFilenameComparator = new Comparator<File>() {
+				@Override
+				public int compare(File o1, File o2) {
+					int i1 = Integer.parseInt(o1.getName().substring(0, o1.getName().indexOf(".")));
+					int i2 = Integer.parseInt(o2.getName().substring(0, o2.getName().indexOf(".")));
+					return Integer.valueOf(i1).compareTo(Integer.valueOf(i2));
+				}
+			};
+			Collections.sort(files, myIntegerFilenameComparator);
+			
 			processedMap = new HashMap<File, GregorianCalendar>(files.size());
 			/* Copy the original allData.csv.gz file, for safe keeping. */
 			String allRecords = args[1] + (args[1].endsWith("/") ? "" : "/") + "allData.csv.gz";
