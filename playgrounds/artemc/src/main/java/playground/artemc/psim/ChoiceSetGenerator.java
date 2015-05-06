@@ -47,9 +47,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 		this.controler = choiceGenerationControler.getControler();
 		this.population = controler.getScenario().getPopulation();
 
-		//Add self for after run plan9 join and output writing
 		controler.addControlerListener(this);
-
 	}
 
 	public static void main(String[] args) {
@@ -65,9 +63,9 @@ public class ChoiceSetGenerator implements ShutdownListener {
 
 			choiceSetGenerator.choiceGenerationControler.run();
 		} else if (args.length == 2) {
-			String outputFolder = args[0];
+			String dataFolder = args[0];
 			Integer lastIteration = Integer.valueOf(args[1]);
-			File directory = new File(outputFolder);
+			File directory = new File(dataFolder);
 			File[] fList = directory.listFiles();
 
 			for (File file : fList) {
@@ -135,85 +133,85 @@ public class ChoiceSetGenerator implements ShutdownListener {
 
 			String[] relevantModes = {"car","pt"};
 			/* Departure time modification for each mode*/
-//			for (String mode :relevantModes) {
-//				Plan basePlan = planMap.get(mode);
-//				population.getPersons().get(personId).setSelectedPlan(basePlan);
-//
-//				for (int i = 1; i < (departureTimeChoices * departureTimeChoices  - 1); i++) {
-//					population.getPersons().get(personId).createCopyOfSelectedPlanAndMakeSelected();
-//				}
-//
-//				int planModCounter = 0;
-//				/* Departure time modification */
-//				for (Plan planToModify : population.getPersons().get(personId).getPlans()) {
-//
-//					if (((Leg) planToModify.getPlanElements().get(1)).getMode().equals(mode)) {
-//
-//						//Home departure time + 1h
-//						if (planModCounter == 0) {
-//							Activity act = (Activity) planToModify.getPlanElements().get(0);
-//							act.setEndTime(act.getEndTime() + 3600.0);
-//						}
-//
-//						//Home departure time - 1h
-//						if (planModCounter == 1) {
-//							Activity act = (Activity) planToModify.getPlanElements().get(0);
-//							act.setEndTime(act.getEndTime() - 3600.0);
-//						}
-//
-//						//Work departure time + 1h
-//						if (planModCounter == 2) {
-//							Activity act = (Activity) planToModify.getPlanElements().get(2);
-//							act.setEndTime(act.getEndTime() + 3600.0);
-//						}
-//
-//						//Work departure time - 1h
-//						if (planModCounter == 3) {
-//							Activity act = (Activity) planToModify.getPlanElements().get(2);
-//							act.setEndTime(act.getEndTime() - 3600.0);
-//						}
-//
-//						//Home departure time + 1h, Work departure time +1h
-//						if (planModCounter == 4) {
-//							Activity act = (Activity) planToModify.getPlanElements().get(0);
-//							act.setEndTime(act.getEndTime() + 3600.0);
-//
-//							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
-//							act2.setEndTime(act2.getEndTime() + 3600.0);
-//						}
-//
-//						//Home departure time - 1h, Work departure time -1h
-//						if (planModCounter == 5) {
-//							Activity act = (Activity) planToModify.getPlanElements().get(0);
-//							act.setEndTime(act.getEndTime() - 3600.0);
-//
-//							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
-//							act2.setEndTime(act2.getEndTime() - 3600.0);
-//						}
-//
-//						//Home departure time +1h, Work departure time -1h
-//						if (planModCounter == 6) {
-//							Activity act = (Activity) planToModify.getPlanElements().get(0);
-//							act.setEndTime(act.getEndTime() + 3600.0);
-//
-//							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
-//							act2.setEndTime(act2.getEndTime() - 3600.0);
-//						}
-//
-//						//Home departure time - 1h, Work departure time +1h
-//						if (planModCounter == 7) {
-//							Activity act = (Activity) planToModify.getPlanElements().get(0);
-//							act.setEndTime(act.getEndTime() - 3600.0);
-//
-//							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
-//							act2.setEndTime(act2.getEndTime() + 3600.0);
-//						}
-//
-//						planModCounter++;
-//					}
-//				}
-//
-//			}
+			for (String mode :relevantModes) {
+				Plan basePlan = planMap.get(mode);
+				population.getPersons().get(personId).setSelectedPlan(basePlan);
+
+				for (int i = 0; i < (departureTimeChoices * departureTimeChoices  - 1); i++) {
+					population.getPersons().get(personId).createCopyOfSelectedPlanAndMakeSelected();
+				}
+
+				int planModCounter = 0;
+				/* Departure time modification */
+				for (Plan planToModify : population.getPersons().get(personId).getPlans()) {
+
+					if (((Leg) planToModify.getPlanElements().get(1)).getMode().equals(mode) && !planToModify.isSelected()) {
+
+						//Home departure time + 1h
+						if (planModCounter == 0) {
+							Activity act = (Activity) planToModify.getPlanElements().get(0);
+							act.setEndTime(act.getEndTime() + 3600.0);
+						}
+
+						//Home departure time - 1h
+						if (planModCounter == 1) {
+							Activity act = (Activity) planToModify.getPlanElements().get(0);
+							act.setEndTime(act.getEndTime() - 3600.0);
+						}
+
+						//Work departure time + 1h
+						if (planModCounter == 2) {
+							Activity act = (Activity) planToModify.getPlanElements().get(2);
+							act.setEndTime(act.getEndTime() + 3600.0);
+						}
+
+						//Work departure time - 1h
+						if (planModCounter == 3) {
+							Activity act = (Activity) planToModify.getPlanElements().get(2);
+							act.setEndTime(act.getEndTime() - 3600.0);
+						}
+
+						//Home departure time + 1h, Work departure time +1h
+						if (planModCounter == 4) {
+							Activity act = (Activity) planToModify.getPlanElements().get(0);
+							act.setEndTime(act.getEndTime() + 3600.0);
+
+							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
+							act2.setEndTime(act2.getEndTime() + 3600.0);
+						}
+
+						//Home departure time - 1h, Work departure time -1h
+						if (planModCounter == 5) {
+							Activity act = (Activity) planToModify.getPlanElements().get(0);
+							act.setEndTime(act.getEndTime() - 3600.0);
+
+							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
+							act2.setEndTime(act2.getEndTime() - 3600.0);
+						}
+
+						//Home departure time +1h, Work departure time -1h
+						if (planModCounter == 6) {
+							Activity act = (Activity) planToModify.getPlanElements().get(0);
+							act.setEndTime(act.getEndTime() + 3600.0);
+
+							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
+							act2.setEndTime(act2.getEndTime() - 3600.0);
+						}
+
+						//Home departure time - 1h, Work departure time +1h
+						if (planModCounter == 7) {
+							Activity act = (Activity) planToModify.getPlanElements().get(0);
+							act.setEndTime(act.getEndTime() - 3600.0);
+
+							Activity act2 = (Activity) planToModify.getPlanElements().get(2);
+							act2.setEndTime(act2.getEndTime() + 3600.0);
+						}
+
+						planModCounter++;
+					}
+				}
+
+			}
 
 			/*Plan split to different persons*/
 			int count = 0;
@@ -294,6 +292,7 @@ public class ChoiceSetGenerator implements ShutdownListener {
 		String tableSuffix = event.getControler().getConfig().controler().getOutputDirectory().split("/")[relativeOutputDirectory - 1];
 		tableSuffix = tableSuffix.replaceAll("\\.0x", "x");
 		tableSuffix = tableSuffix.replaceAll("-", "_");
+		tableSuffix = tableSuffix.replaceAll("\\.5", "5");
 		tableName = tableName + tableSuffix;
 
 		IndividualScoreFromPopulationSQLWriter sqlWriter = new IndividualScoreFromPopulationSQLWriter(event.getControler().getConfig(), newPopulation);

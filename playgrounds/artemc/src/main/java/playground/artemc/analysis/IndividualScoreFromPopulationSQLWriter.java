@@ -43,7 +43,8 @@ public class IndividualScoreFromPopulationSQLWriter {
 		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.config, WelfareMeasure.LOGSUM, false);
 
 		for (Person person : population.getPersons().values()) {
-			if (!dataMap.containsKey(person.getId().toString())) dataMap.put(person.getId().toString(), new ArrayList<String>());
+			if (!dataMap.containsKey(person.getId().toString()))
+				dataMap.put(person.getId().toString(), new ArrayList<String>());
 
 			dataMap.get(person.getId().toString()).add(person.getSelectedPlan().getScore().toString());
 			if (person.getSelectedPlan().getCustomAttributes().containsKey("toll")) {

@@ -29,11 +29,12 @@ import java.util.Random;
 
 public class SimplePopulationGenerator {
 
-	private static Integer populationSize = 12000;
+	private static Integer populationSize = 8000;
 	private static Double noCarPercentage = 0.0;
 	private static Integer corridorLength = 20000;
 	
 	private Random random = new Random(10830239345L);
+
 	private ObjectAttributes incomes = new ObjectAttributes();
 	private HashMap<Id<Person>,Integer> incomeData = new HashMap<Id<Person>,Integer>();
 	

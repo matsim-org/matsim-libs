@@ -30,7 +30,7 @@ public class IndividualSelectedBenefitsSQLWriter {
 		File connectionProperties = new File("/Users/artemc/Workspace/playgrounds/artemc/connections/matsim2postgresLocal.properties");
 		String schema="corridor";
 
-		String dataPath = "/Volumes/DATA 1 (WD 2 TB)/SimMethanaOutput_120215/";
+		String dataPath = "/Volumes/DATA 1 (WD 2 TB)/SimMethanaOutput_280415/";
 		String populationFile;
 
 
@@ -56,8 +56,9 @@ public class IndividualSelectedBenefitsSQLWriter {
 
 				//Write selected plan scores to Database;
 				String individualSelectedBenefitsTableName = schema+".scores";
-				String tableSuffix = file.getAbsolutePath().split("120215/w8-18")[1];
+				String tableSuffix = file.getAbsolutePath().split("280415/w8-18")[1];
 				tableSuffix = tableSuffix.replaceAll("\\.0x", "x");
+				tableSuffix = tableSuffix.replaceAll("\\.5", "5");
 				individualSelectedBenefitsTableName = individualSelectedBenefitsTableName + tableSuffix;
 
 				DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
