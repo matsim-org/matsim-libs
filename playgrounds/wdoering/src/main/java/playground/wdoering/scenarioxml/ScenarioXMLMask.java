@@ -44,13 +44,13 @@ import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.matsim.contrib.grips.control.Controller;
-import org.matsim.contrib.grips.io.DepartureTimeDistribution;
-import org.matsim.contrib.grips.model.AbstractModule;
-import org.matsim.contrib.grips.model.Constants.ModuleType;
-import org.matsim.contrib.grips.model.config.GripsConfigModule;
-import org.matsim.contrib.grips.view.DefaultOpenDialog;
-import org.matsim.contrib.grips.view.DefaultSaveDialog;
+import org.matsim.contrib.evacuation.control.Controller;
+import org.matsim.contrib.evacuation.io.DepartureTimeDistribution;
+import org.matsim.contrib.evacuation.model.AbstractModule;
+import org.matsim.contrib.evacuation.model.Constants.ModuleType;
+import org.matsim.contrib.evacuation.model.config.GripsConfigModule;
+import org.matsim.contrib.evacuation.view.DefaultOpenDialog;
+import org.matsim.contrib.evacuation.view.DefaultSaveDialog;
 
 /**
  * @author wdoering

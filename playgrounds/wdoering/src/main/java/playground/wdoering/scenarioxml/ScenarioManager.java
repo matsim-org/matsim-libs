@@ -36,21 +36,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
 
-import org.matsim.contrib.grips.analysis.EvacuationAnalysis;
-import org.matsim.contrib.grips.control.Controller;
-import org.matsim.contrib.grips.evacuationareaselector.EvacuationAreaSelector;
-import org.matsim.contrib.grips.evacuationptlineseditor.EvacuationPTLinesEditor;
-import org.matsim.contrib.grips.model.AbstractModule;
-import org.matsim.contrib.grips.model.Constants;
-import org.matsim.contrib.grips.model.Constants.ModuleType;
-import org.matsim.contrib.grips.model.ScenarioManagerModuleChain;
-import org.matsim.contrib.grips.model.imagecontainer.BufferedImageContainer;
-import org.matsim.contrib.grips.populationselector.PopulationAreaSelector;
-import org.matsim.contrib.grips.roadclosureseditor.RoadClosuresEditor;
-import org.matsim.contrib.grips.scenariogenerator.MatsimNetworkGenerator;
-import org.matsim.contrib.grips.simulation.SimulationComputation;
-import org.matsim.contrib.grips.view.DefaultWindow;
-import org.matsim.contrib.grips.view.TabButton;
+import org.matsim.contrib.evacuation.analysis.EvacuationAnalysis;
+import org.matsim.contrib.evacuation.control.Controller;
+import org.matsim.contrib.evacuation.evacuationareaselector.EvacuationAreaSelector;
+import org.matsim.contrib.evacuation.evacuationptlineseditor.EvacuationPTLinesEditor;
+import org.matsim.contrib.evacuation.model.AbstractModule;
+import org.matsim.contrib.evacuation.model.Constants;
+import org.matsim.contrib.evacuation.model.ScenarioManagerModuleChain;
+import org.matsim.contrib.evacuation.model.Constants.ModuleType;
+import org.matsim.contrib.evacuation.model.imagecontainer.BufferedImageContainer;
+import org.matsim.contrib.evacuation.populationselector.PopulationAreaSelector;
+import org.matsim.contrib.evacuation.roadclosureseditor.RoadClosuresEditor;
+import org.matsim.contrib.evacuation.scenariogenerator.MatsimNetworkGenerator;
+import org.matsim.contrib.evacuation.simulation.SimulationComputation;
+import org.matsim.contrib.evacuation.view.DefaultWindow;
+import org.matsim.contrib.evacuation.view.TabButton;
 
 public class ScenarioManager extends DefaultWindow
 {

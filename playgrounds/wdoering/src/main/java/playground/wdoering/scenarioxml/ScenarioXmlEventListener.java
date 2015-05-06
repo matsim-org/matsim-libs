@@ -26,13 +26,13 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
-import org.matsim.contrib.grips.control.Controller;
-import org.matsim.contrib.grips.control.eventlistener.AbstractListener;
-import org.matsim.contrib.grips.model.Constants;
-import org.matsim.contrib.grips.model.Constants.SelectionMode;
-import org.matsim.contrib.grips.model.shape.CircleShape;
-import org.matsim.contrib.grips.model.shape.PolygonShape;
-import org.matsim.contrib.grips.model.shape.Shape;
+import org.matsim.contrib.evacuation.control.Controller;
+import org.matsim.contrib.evacuation.control.eventlistener.AbstractListener;
+import org.matsim.contrib.evacuation.model.Constants;
+import org.matsim.contrib.evacuation.model.Constants.SelectionMode;
+import org.matsim.contrib.evacuation.model.shape.CircleShape;
+import org.matsim.contrib.evacuation.model.shape.PolygonShape;
+import org.matsim.contrib.evacuation.model.shape.Shape;
 
 /**
  * the map event listeners

@@ -23,7 +23,7 @@ package playground.wdoering.grips.scenariomanager.control;
 import java.awt.geom.Point2D;
 
 import org.geotools.referencing.CRS;
-import org.matsim.contrib.grips.control.algorithms.PolygonalCircleApproximation;
+import org.matsim.contrib.evacuation.control.algorithms.PolygonalCircleApproximation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;

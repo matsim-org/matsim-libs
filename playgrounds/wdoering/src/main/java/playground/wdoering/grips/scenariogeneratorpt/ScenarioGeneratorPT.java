@@ -20,15 +20,16 @@
 package playground.wdoering.grips.scenariogeneratorpt;
 
 import com.vividsolutions.jts.geom.Geometry;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.grips.model.config.GripsConfigModule;
-import org.matsim.contrib.grips.model.events.InfoEvent;
-import org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator;
+import org.matsim.contrib.evacuation.model.config.GripsConfigModule;
+import org.matsim.contrib.evacuation.model.events.InfoEvent;
+import org.matsim.contrib.evacuation.scenariogenerator.ScenarioGenerator;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -56,6 +57,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.*;
 import org.opengis.feature.simple.SimpleFeature;
+
 import playground.gregor.grips.scenariogeneratorpt.PopulationFromESRIShapeFielGeneratorPT;
 
 import java.util.*;

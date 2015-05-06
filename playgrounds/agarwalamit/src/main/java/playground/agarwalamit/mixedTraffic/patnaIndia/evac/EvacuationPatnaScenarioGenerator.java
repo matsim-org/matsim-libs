@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.grips.scenariogenerator.EvacuationNetworkGenerator;
+import org.matsim.contrib.evacuation.scenariogenerator.EvacuationNetworkGenerator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;

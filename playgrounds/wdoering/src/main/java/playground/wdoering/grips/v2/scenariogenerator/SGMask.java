@@ -40,7 +40,7 @@ import javax.swing.text.Element;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
-import org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator;
+import org.matsim.contrib.evacuation.scenariogenerator.ScenarioGenerator;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.Constants;
@@ -103,7 +103,7 @@ public class SGMask extends JPanel
 						@Override
 						protected String doInBackground()
 						{
-							ScenarioGenerator scengen = new org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator(SGMask.this.controller.getGripsFile());
+							ScenarioGenerator scengen = new org.matsim.contrib.evacuation.scenariogenerator.ScenarioGenerator(SGMask.this.controller.getGripsFile());
 							scengen.run();
 							return "";
 						}

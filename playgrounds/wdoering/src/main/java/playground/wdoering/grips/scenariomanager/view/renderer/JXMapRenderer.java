@@ -30,7 +30,7 @@ import java.util.EventListener;
 
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.jdesktop.swingx.mapviewer.TileFactory;
-import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
+import org.matsim.contrib.evacuation.jxmapviewerhelper.TileFactoryBuilder;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.JXMap;

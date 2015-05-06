@@ -32,7 +32,7 @@ import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.grips.control.algorithms.PolygonalCircleApproximation;
+import org.matsim.contrib.evacuation.control.algorithms.PolygonalCircleApproximation;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;

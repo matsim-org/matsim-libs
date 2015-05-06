@@ -40,7 +40,7 @@ import java.util.List;
 
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
-import org.matsim.contrib.grips.model.config.ToolConfig;
+import org.matsim.contrib.evacuation.model.config.ToolConfig;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;

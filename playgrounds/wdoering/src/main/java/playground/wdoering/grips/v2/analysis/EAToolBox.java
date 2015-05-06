@@ -589,7 +589,7 @@ public class EAToolBox extends AbstractToolBox
 //				
 //				@Override
 //				public void run() {
-//					new org.matsim.contrib.grips.visualization.OTFVisVisualization(controller.getMatsimConfigFile(),30,controller.getWMS(),controller.getWMSLayer()).run();
+//					new org.matsim.contrib.evacuation.visualization.OTFVisVisualization(controller.getMatsimConfigFile(),30,controller.getWMS(),controller.getWMSLayer()).run();
 //				}
 //			});
 //			

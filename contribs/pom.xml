@@ -97,7 +97,7 @@
 		<module>emissions</module>
 		<module>freight</module>
 		<module>gtfs2matsimtransitschedule</module>
-		<module>grips</module>
+		<module>evacuation</module>
 		<module>signals</module>
 		<module>locationchoice</module>
 		<module>matsim4urbansim</module>

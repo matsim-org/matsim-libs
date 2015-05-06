@@ -41,16 +41,16 @@ import java.util.Map;
 import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
-import org.matsim.contrib.grips.control.algorithms.PolygonalCircleApproximation;
-import org.matsim.contrib.grips.model.config.ToolConfig;
+import org.matsim.contrib.evacuation.control.algorithms.PolygonalCircleApproximation;
+import org.matsim.contrib.evacuation.model.config.ToolConfig;
 
 import playground.wdoering.grips.populationselector.PopulationAreaSelector;
+
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.NoninvertibleTransformException;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;

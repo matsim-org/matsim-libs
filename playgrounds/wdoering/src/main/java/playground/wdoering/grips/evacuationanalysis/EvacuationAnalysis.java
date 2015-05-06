@@ -70,7 +70,7 @@ import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
+import org.matsim.contrib.evacuation.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
