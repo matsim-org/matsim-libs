@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -60,7 +61,11 @@ public class DataByMonthSplitter {
 		/* Ensure that the output folder is empty. */
 		File folder = new File(outputFolder);
 		if(folder.isDirectory() && folder.listFiles().length > 0){
-			throw new IOException("May not overwrite output folder: " + outputFolder);
+			/* Wanted to throw an exception, but will, for now only give a 
+			 * warning as this forms part of an automated script on ie-susie. */
+//			throw new IOException("May not overwrite output folder: " + outputFolder);
+			log.warn("The output folder exists and wil be overwritten");
+			FileUtils.delete(folder);
 		}
 		folder.mkdirs();
 	}
