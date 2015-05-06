@@ -36,13 +36,7 @@ public class DataByMonthSplitter {
 		String inputFile = args[0];
 		String outputFolder = args[1];
 		
-		DataByMonthSplitter ds;
-		try {
-			ds = new DataByMonthSplitter(outputFolder);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Could not create object");
-		}
+		DataByMonthSplitter ds = new DataByMonthSplitter(outputFolder);
 		
 		try {
 			ds.splitDataByMonth(inputFile);
@@ -55,7 +49,7 @@ public class DataByMonthSplitter {
 	}
 	
 	
-	public DataByMonthSplitter(final String outputFolder) throws IOException {
+	public DataByMonthSplitter(final String outputFolder){
 		this.outputFolder = outputFolder;
 		
 		/* Ensure that the output folder is empty. */
@@ -64,10 +58,15 @@ public class DataByMonthSplitter {
 			/* Wanted to throw an exception, but will, for now only give a 
 			 * warning as this forms part of an automated script on ie-susie. */
 //			throw new IOException("May not overwrite output folder: " + outputFolder);
-			log.warn("The output folder exists and wil be overwritten");
-			FileUtils.delete(folder);
+			
+			/* Also, for the purpose of incremental analysis I will also not
+			 * delete the folder if it exists. Only it create it if it does
+			 * NOT exist. */
+//			log.warn("The output folder exists and will be overwritten");
+//			FileUtils.delete(folder);
+		} else{
+			folder.mkdirs();
 		}
-		folder.mkdirs();
 	}
 	
 	public void splitDataByMonth(String filename) throws IOException{

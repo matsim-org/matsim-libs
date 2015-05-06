@@ -55,7 +55,15 @@ public class AggregateRawDigicoreFiles {
 	final private static Logger LOG = Logger.getLogger(AggregateRawDigicoreFiles.class);
 
 	/**
-	 * @param args
+	 * @param args The following arguments:
+	 * <ol>
+	 * 		<li> path to the parent folder where following folders reside:<br>
+	 * 		<code>./raw/</code><br>
+	 * 		<code>./processed/</code><br>
+	 * 		<code>./logs/</code><br>
+	 * 		<code>./monthly/</code><br>
+	 * 		</li>
+	 * </ol>
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(AggregateRawDigicoreFiles.class.toString(), args);
@@ -79,11 +87,11 @@ public class AggregateRawDigicoreFiles {
 	
 	
 	public static void moveEventsFile(String[] args) throws IOException{
-		File eventsFile = new File(args[0] + (args[0].endsWith("/") ? "" : "/") + "events.csv.gz");
+		File eventsFile = new File(args[0] + (args[0].endsWith("/") ? "" : "/") + "raw/events.csv.gz");
 		if(eventsFile.exists()){
-			LOG.info("There exists an 'events.xml.gz' file in the input folder " + args[0]);
+			LOG.info("There exists an 'events.xml.gz' file in the input folder " + eventsFile.getAbsolutePath());
 			
-			File newEventsFile = new File(args[1] + (args[1].endsWith("/") ? "" : "/") + "events.csv.gz");
+			File newEventsFile = new File(args[0] + (args[0].endsWith("/") ? "" : "/") + "processed/events.csv.gz");
 			if(newEventsFile.exists()){
 				LOG.warn("In moving the 'events.xml.gz' file, the following file will be replaced: ");
 				LOG.warn("   " + newEventsFile.getAbsolutePath());
@@ -94,7 +102,7 @@ public class AggregateRawDigicoreFiles {
 			/* Remove the original file. */
 			eventsFile.delete();
 		} else{
-			LOG.info("No 'events.csv.gz' file exists in the input folder " + args[0]);
+			LOG.info("No 'events.csv.gz' file exists in the input folder " + eventsFile.getAbsolutePath());
 		}
 	}
 	
@@ -108,7 +116,7 @@ public class AggregateRawDigicoreFiles {
 	public static List<String> parseFileRegister(String[] args) throws IOException{
 		/* Read the register of previously processed files. */
 		List<String> list = new ArrayList<>();
-		String sRegister = args[2] + (args[2].endsWith("/") ? "" : "/") + "registerOfProcessedFiles.csv";
+		String sRegister = args[0] + (args[0].endsWith("/") ? "" : "/") + "logs/registerOfProcessedFiles.csv";
 		File fRegister = new File(sRegister);
 		if(fRegister.exists()){
 			BufferedReader br = IOUtils.getBufferedReader(sRegister);
@@ -127,7 +135,7 @@ public class AggregateRawDigicoreFiles {
 	
 	
 	public static void processRawFiles(String[] args) throws IOException{
-		String sRegister = args[2] + (args[2].endsWith("/") ? "" : "/") + "registerOfProcessedFiles.csv";
+		String sRegister = args[0] + (args[0].endsWith("/") ? "" : "/") + "logs/registerOfProcessedFiles.csv";
 		File fRegister = new File(sRegister);
 		/* If the register does not exist yet, create it by writing the header. */
 		if(!fRegister.exists()){
@@ -144,7 +152,8 @@ public class AggregateRawDigicoreFiles {
 		
 		LOG.info("Processing raw input files...");
 		/* Get all the input files to process. */
-		List<File> files = FileUtils.sampleFiles(new File(args[0]), Integer.MAX_VALUE, FileUtils.getFileFilter("csv.gz"));
+		List<File> files = FileUtils.sampleFiles(new File(args[0] + (args[0].endsWith("/") ? "" : "/") + "raw/"), 
+				Integer.MAX_VALUE, FileUtils.getFileFilter("csv.gz"));
 		
 		Map<File, GregorianCalendar> processedMap;
 
@@ -162,9 +171,9 @@ public class AggregateRawDigicoreFiles {
 			
 			processedMap = new HashMap<File, GregorianCalendar>(files.size());
 			/* Copy the original allData.csv.gz file, for safe keeping. */
-			String allRecords = args[1] + (args[1].endsWith("/") ? "" : "/") + "allData.csv.gz";
+			String allRecords = args[0] + (args[0].endsWith("/") ? "" : "/") + "processed/allData.csv.gz";
 			File allRecordsFile = new File(allRecords);
-			String allRecordsTmp = args[1] + (args[1].endsWith("/") ? "" : "/") + "allDataTmp.csv.gz";
+			String allRecordsTmp = args[0] + (args[0].endsWith("/") ? "" : "/") + "processed/allDataTmp.csv.gz";
 			File allRecordsTmpFile = new File(allRecordsTmp);
 			int statusOverall = 0;
 			
@@ -234,8 +243,12 @@ public class AggregateRawDigicoreFiles {
 			/* Confirm temporary file, or revert back if the overall status is
 			 * not 0 anymore. */
 			if(statusOverall == 0){
-				/* Move the raw data files. */
 				for(File rawFile : files){
+					/* Split the file by month. */
+					DataByMonthSplitter ds = new DataByMonthSplitter(args[0] + (args[0].endsWith("/") ? "" : "/") + "monthly");
+					ds.splitDataByMonth(rawFile.getAbsolutePath());
+					
+					/* Move the raw data files. */
 					GregorianCalendar modified = new GregorianCalendar(TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
 					modified.setTimeInMillis(rawFile.lastModified());
 					String modifiedString = DigicoreUtils.getPrettyDateAndTime(modified);
@@ -250,7 +263,7 @@ public class AggregateRawDigicoreFiles {
 					}
 					
 					/* Move the file. */
-					String newLocation = args[1] + (args[1].endsWith("/") ? "" : "/") + rawFile.getName();
+					String newLocation = args[0] + (args[0].endsWith("/") ? "" : "/") + "processed/" + rawFile.getName();
 					File newLocationFile = new File(newLocation);
 					FileUtils.copyFile(rawFile, newLocationFile);
 					boolean deleted = rawFile.delete();
@@ -289,22 +302,23 @@ public class AggregateRawDigicoreFiles {
 		LOG.info("Reporting file status...");
 		
 		/* Check the input directory. */
-		File folder = new File(args[0]);
+		String folderName = args[0] + (args[0].endsWith("/") ? "" : "/") + "raw/";
+		File folder = new File(folderName);
 		List<File> files = null;
 		if(!folder.isDirectory()){
-			LOG.error("The input directory " + args[0] + " is not a directory!");
+			LOG.error("The input directory " + folderName + " is not a directory!");
 			throw new IllegalArgumentException("Need a valid input directory!");
 		} else{
 			files = FileUtils.sampleFiles(folder, Integer.MAX_VALUE, FileUtils.getFileFilter("csv.gz"));
 			if(files != null){
-				LOG.info("The input directory " + args[0] + " exists and contains " + files.size() + " files with extension '*.csv.gz'");
+				LOG.info("The input directory " + folderName + " exists and contains " + files.size() + " files with extension '*.csv.gz'");
 			} else{
-				LOG.info("The input directory " + args[0] + " exists and contains no files with extension '*.csv.gz'");
+				LOG.info("The input directory " + folderName + " exists and contains no files with extension '*.csv.gz'");
 			}
 		}
 		
 		/* Check the file register. */
-		File register = new File(args[2] + (args[2].endsWith("/") ? "" : "/") + "registerOfProcessedFiles.csv");
+		File register = new File(args[0] + (args[0].endsWith("/") ? "" : "/") + "logs/registerOfProcessedFiles.csv");
 		if(register.exists() && register.isFile()){
 			LOG.info("The file register " + register.getAbsolutePath() + " does exist.");
 			LOG.info("   The following files have been processed in the past:");
@@ -341,7 +355,7 @@ public class AggregateRawDigicoreFiles {
 				LOG.info(String.format("%s%s (modified: %s; processed: %s);", "      ", filename, dateModified, dateProcessed));
 			}
 		} else{
-			LOG.warn("The file register " + args[2] + " does not exist. If needed, a new one will be created.");
+			LOG.warn("The file register " + register.getAbsolutePath() + " does not exist. If needed, a new one will be created.");
 		}
 		
 		LOG.info("Done reporting file status.");

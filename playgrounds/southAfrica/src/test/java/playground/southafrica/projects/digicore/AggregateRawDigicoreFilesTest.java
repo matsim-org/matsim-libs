@@ -52,11 +52,12 @@ public class AggregateRawDigicoreFilesTest {
 
 	@Test
 	public void testMoveEventsFile() {
-		String[] args = getArgs();
+		String folder = utils.getClassInputDirectory();
+		String[] args = {folder};
 		
-		String s1 = args[0] + (args[0].endsWith("/") ? "" : "/") + "events.csv.gz";
+		String s1 = folder + "raw/events.csv.gz";
 		File f1 = new File(s1);
-		String s2 = args[1] + (args[1].endsWith("/") ? "" : "/") + "events.csv.gz";
+		String s2 = folder + "processed/events.csv.gz";
 		File f2 = new File(s2);
 
 		/* Write the first events file. */
@@ -100,13 +101,17 @@ public class AggregateRawDigicoreFilesTest {
 			/* Correctly caught an illegal folder name. */
 		}
 		
-		String[] args = getArgs();
+		String folder = utils.getClassInputDirectory();
+		String[] args = {folder};
+		
 		AggregateRawDigicoreFiles.checkFileStatus(args);
 	}
 	
 	@Test
 	public void testParseFileRegister(){
-		String[] args = getArgs();
+		String folder = utils.getClassInputDirectory();
+		String[] args = {folder};
+		
 		List<String> files = null;
 		try {
 			files = AggregateRawDigicoreFiles.parseFileRegister(args);
@@ -116,9 +121,10 @@ public class AggregateRawDigicoreFilesTest {
 		}
 		Assert.assertEquals("Should have 0 files for non-existing register.", 0, files.size());
 
-		/* Register file with header and one additional line. */
-		String s1 = args[2] + (args[2].endsWith("/") ? "" : "/") + "registerOfProcessedFiles.csv";
-		writeCsvFile(s1,1);
+		/* Register file with 'header' and one additional line. This is just a 
+		 * dummy, because the input file created has no real header. */
+		String s1 = folder + "logs/registerOfProcessedFiles.csv";
+		writeCsvFile(s1,2);
 		try {
 			files = AggregateRawDigicoreFiles.parseFileRegister(args);
 		} catch (IOException e) {
@@ -130,7 +136,8 @@ public class AggregateRawDigicoreFilesTest {
 	
 	@Test
 	public void testProcessRawFiles(){
-		String[] args = getArgs();
+		String folder = utils.getClassInputDirectory();
+		String[] args = {folder};
 		
 		try {
 			List<String> register = AggregateRawDigicoreFiles.parseFileRegister(args);
@@ -141,7 +148,7 @@ public class AggregateRawDigicoreFilesTest {
 		}
 
 		/* Create 1st file. */
-		String s1 = args[0] + (args[0].endsWith("/") ? "" : "/") + "1.csv.gz";
+		String s1 = folder + "raw/1.csv.gz";
 		writeCsvFile(s1, 10);
 		try {
 			AggregateRawDigicoreFiles.processRawFiles(args);
@@ -158,7 +165,7 @@ public class AggregateRawDigicoreFilesTest {
 		}
 
 		/* Create 2nd, duplicate file. */
-		String s2 = args[0] + (args[0].endsWith("/") ? "" : "/") + "1.csv.gz";
+		String s2 = folder + "raw/1.csv.gz";
 		writeCsvFile(s2, 10);
 		try {
 			AggregateRawDigicoreFiles.processRawFiles(args);
@@ -176,7 +183,7 @@ public class AggregateRawDigicoreFilesTest {
 		new File(s2).delete();
 
 		/* Create 3rd, non-duplicate file. */
-		String s3 = args[0] + (args[0].endsWith("/") ? "" : "/") + "2.csv.gz";
+		String s3 = folder + "raw/2.csv.gz";
 		writeCsvFile(s3, 10);
 		try {
 			AggregateRawDigicoreFiles.processRawFiles(args);
@@ -195,17 +202,16 @@ public class AggregateRawDigicoreFilesTest {
 	
 	
 	/**
-	 * Writes out a dummy CSV file to a given location.
+	 * Writes out a dummy CSV file to a given location. The file has no header
+	 * and just repeats one line taken from the actual input of one file.
 	 * 
 	 * @param filename
 	 */
 	private void writeCsvFile(String filename, int numberOfLinesAfterHeader){
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try{
-			bw.write("file,modified,processed");
-			bw.newLine();
 			for(int i=0; i < numberOfLinesAfterHeader; i++){
-				bw.write(String.format("%d,12345,12345", i+1));
+				bw.write("1,37ff9d8e04c164ee793e172a561c7b1e,585045643000,28.2402534484863,-26.1793403625488,22,8,1000,0,29,0,60");
 				bw.newLine();
 			}
 		} catch (IOException e) {
@@ -221,25 +227,7 @@ public class AggregateRawDigicoreFilesTest {
 		}
 	}
 
-	
-	/**
-	 * Returns the same string arguments as created during setUp().
-	 * @return
-	 */
-	private String[] getArgs(){
-		String f1 = utils.getClassInputDirectory() + 
-				(utils.getClassInputDirectory().endsWith("/") ? "" : "/") + 
-				"raw/";
-		String f2 = utils.getClassInputDirectory() + 
-				(utils.getClassInputDirectory().endsWith("/") ? "" : "/") + 
-				"processed/";
-		String f3 = utils.getClassInputDirectory() + 
-				(utils.getClassInputDirectory().endsWith("/") ? "" : "/") + 
-				"log/";
-		String[] sa = {f1,f2,f3};
-		return sa;
-	}
-	
+		
 	/**
 	 * Creates the necessary folders for a) input files; b) where processed 
 	 * files are to be placed; and c) where log files are created and stored.
@@ -248,22 +236,27 @@ public class AggregateRawDigicoreFilesTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		String[] sa = getArgs();
+		String folder = utils.getClassInputDirectory();
 		/* Create all the folders. */
-		File inputFolder = new File(sa[0]);
+		File inputFolder = new File(folder + "raw/");
 		boolean inputCreated = inputFolder.mkdirs();
 		if(!inputCreated){
 			fail("Cannot create input folder!");
 		}
-		File processedFolder = new File(sa[1]);
+		File processedFolder = new File(folder + "processed/");
 		boolean processedCreated = processedFolder.mkdirs();
 		if(!processedCreated){
 			fail("Cannot create processed folder!");
 		}
-		File logFolder = new File(sa[2]);
+		File logFolder = new File(folder + "logs/");
 		boolean logCreated = logFolder.mkdirs();
 		if(!logCreated){
 			fail("Cannot create log folder!");
+		}
+		File monthlyFolder = new File(folder + "monthly/");
+		boolean monthlyCreated = monthlyFolder.mkdirs();
+		if(!monthlyCreated){
+			fail("Cannot create monthly folder!");
 		}
 	}
 
@@ -273,15 +266,17 @@ public class AggregateRawDigicoreFilesTest {
 	 */
 	@After
 	public void cleanUp(){
-		String[] sa = getArgs();
+		String folder = utils.getClassInputDirectory();
 		/* Clean up the folders (possibly) created. I say 'possibly' because 
 		 * the setUp() may itself have failed before all folders were created. */
-		File inputFolder = new File(sa[0]);
-		File processedFolder = new File(sa[1]);
-		File logFolder = new File(sa[2]);
+		File inputFolder = new File(folder + "raw/");
+		File processedFolder = new File(folder + "processed/");
+		File logFolder = new File(folder + "logs/");
+		File monthlyFolder = new File(folder + "monthly/");
 		FileUtils.delete(inputFolder);
 		FileUtils.delete(processedFolder);
 		FileUtils.delete(logFolder);
+		FileUtils.delete(monthlyFolder);
 	}
 
 }
