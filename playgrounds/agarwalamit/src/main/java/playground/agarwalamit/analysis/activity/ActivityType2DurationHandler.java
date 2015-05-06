@@ -49,6 +49,10 @@ public class ActivityType2DurationHandler implements ActivityEndEventHandler, Ac
 		this.midNightTime = midNightTime;
 	}
 
+	public ActivityType2DurationHandler(){
+		this(24*3600);		
+	}
+
 	public static Logger log = Logger.getLogger(ActivityType2DurationHandler.class);
 	private Map<Id<Person>, PersonActivityInfo> personId2ActInfo;
 	double midNightTime;
