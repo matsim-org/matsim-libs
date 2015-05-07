@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * SocnetsimDefaultModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,29 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.thibautd.socnetsim.controller;
 
-package playground.thibautd.socnetsim.replanning.modules;
+import org.matsim.core.controler.AbstractModule;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+/**
+ * @author thibautd
+ */
+public class SocnetsimDefaultModule extends AbstractModule {
 
-import org.matsim.api.core.v01.population.Plan;
-
-import com.google.inject.BindingAnnotation;
-
-public interface PlanLinkIdentifier {
-	@Retention( RetentionPolicy.RUNTIME )
-	@BindingAnnotation
-	@Target( { ElementType.LOCAL_VARIABLE, ElementType.PARAMETER } )
-	public @interface Strong {}
-
-	@Retention( RetentionPolicy.RUNTIME )
-	@BindingAnnotation
-	@Target( { ElementType.LOCAL_VARIABLE, ElementType.PARAMETER } )
-	public @interface Weak {}
-
-
-	public boolean areLinked(Plan p1, Plan p2);
+	@Override
+	public void install() {
+		install( new JointDecisionProcessModule() );
+	}
 }
+

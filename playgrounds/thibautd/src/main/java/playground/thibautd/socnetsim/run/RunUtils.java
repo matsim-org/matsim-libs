@@ -44,6 +44,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.Desires;
 import org.matsim.pt.PtConstants;
+
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.utils.TripModeShares;
 import playground.thibautd.analysis.listeners.LegHistogramListenerWithoutControler;
@@ -57,6 +58,7 @@ import playground.thibautd.socnetsim.cliques.Clique;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
+import playground.thibautd.socnetsim.controller.listeners.GroupReplanningListenner;
 import playground.thibautd.socnetsim.events.CourtesyEventsGenerator;
 import playground.thibautd.socnetsim.population.*;
 import playground.thibautd.socnetsim.qsim.SwitchingJointQSimFactory;

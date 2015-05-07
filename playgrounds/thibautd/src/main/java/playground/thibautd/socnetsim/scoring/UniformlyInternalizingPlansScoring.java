@@ -24,12 +24,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -43,10 +43,12 @@ import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 
+import com.google.inject.Inject;
+
 /**
  * @author thibautd
  */
-public class UniformlyInternalizingPlansScoring implements ScoringListener, IterationStartsListener, IterationEndsListener {
+public class UniformlyInternalizingPlansScoring implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener {
 	private static final Logger log =
 		Logger.getLogger(UniformlyInternalizingPlansScoring.class);
 
@@ -61,6 +63,7 @@ public class UniformlyInternalizingPlansScoring implements ScoringListener, Iter
 
 	private final InternalizationRatioCalculator ratioCalculator;
 
+	@Inject
 	public UniformlyInternalizingPlansScoring(
 			final Scenario sc,
 			final EventsManager events,

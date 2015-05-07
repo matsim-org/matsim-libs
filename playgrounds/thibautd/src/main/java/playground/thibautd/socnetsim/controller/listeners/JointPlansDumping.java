@@ -28,6 +28,8 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
 
+import com.google.inject.Inject;
+
 /**
  * @author thibautd
  */
@@ -40,6 +42,17 @@ public class JointPlansDumping implements BeforeMobsimListener {
 	private final int writePlansInterval;
 	private final int firstIteration ;
 	private final OutputDirectoryHierarchy controlerIO;
+
+	@Inject
+	public JointPlansDumping(
+			final Scenario sc,
+			final OutputDirectoryHierarchy controlerIO ) {
+		this.sc = sc ;
+		this.jointPlans = (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
+		this.firstIteration = sc.getConfig().controler().getFirstIteration();
+		this.writePlansInterval = sc.getConfig().controler().getWritePlansInterval() ;
+		this.controlerIO = controlerIO ;
+	}
 
 	public JointPlansDumping(
 			final Scenario sc,

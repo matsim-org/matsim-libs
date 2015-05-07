@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.controller.listeners;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.DumpDataAtEndImpl;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -31,7 +32,7 @@ import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
 /**
  * @author thibautd
  */
-public class DumpJointDataAtEnd implements ShutdownListener {
+public class DumpJointDataAtEnd implements DumpDataAtEnd, ShutdownListener {
 	private final DumpDataAtEndImpl individualDumper;
 	private final Scenario scenario;
 	private final JointPlans jointPlans;

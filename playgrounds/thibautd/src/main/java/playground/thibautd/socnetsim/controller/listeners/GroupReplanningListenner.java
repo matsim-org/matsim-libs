@@ -17,20 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning;
+package playground.thibautd.socnetsim.controller.listeners;
 
+import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 
 /**
  * @author thibautd
  */
-public class GroupReplanningListenner implements ReplanningListener {
+public class GroupReplanningListenner implements PlansReplanning, ReplanningListener {
 	private final GroupStrategyManager strategyManager;
 	private final ControllerRegistry registry;
 
+	@Inject
 	public GroupReplanningListenner(
 			final ControllerRegistry registry,
 			final GroupStrategyManager strategyManager) {

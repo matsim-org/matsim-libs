@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
@@ -39,7 +40,7 @@ import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 /**
  * @author thibautd
  */
-public class GroupReplanningListennerWithPSimLoop implements ReplanningListener {
+public class GroupReplanningListennerWithPSimLoop implements PlansReplanning, ReplanningListener {
 	private static final Logger log =
 		Logger.getLogger(GroupReplanningListennerWithPSimLoop.class);
 
@@ -84,6 +85,7 @@ public class GroupReplanningListennerWithPSimLoop implements ReplanningListener 
 		// - impossible to configure which listenners are used
 		// - if scoring listenner in controler changes, not automatically
 		// retrofited here.
+		// TODO now possible using DI
 		final EventsManager events = EventsUtils.createEventsManager( registry.getScenario().getConfig() );
 		final UniformlyInternalizingPlansScoring scoring =
 				new UniformlyInternalizingPlansScoring(

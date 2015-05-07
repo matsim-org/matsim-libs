@@ -25,11 +25,42 @@ import playground.thibautd.socnetsim.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+
 /**
  * @author thibautd
  */
 public class PlanLinkIdentifierUtils {
 	private PlanLinkIdentifierUtils() {}
+
+	public static class LinkIdentifierProvider implements Provider<PlanLinkIdentifier> {
+		private final Scenario sc;
+
+		@Inject
+		public LinkIdentifierProvider(final Scenario sc) {
+			this.sc = sc;
+		}
+
+		@Override
+		public PlanLinkIdentifier get() {
+			return createPlanLinkIdentifier( sc );
+		}
+	}
+
+	public static class WeakLinkIdentifierProvider implements Provider<PlanLinkIdentifier> {
+		private final Scenario sc;
+
+		@Inject
+		public WeakLinkIdentifierProvider(final Scenario sc) {
+			this.sc = sc;
+		}
+
+		@Override
+		public PlanLinkIdentifier get() {
+			return createWeakPlanLinkIdentifier( sc );
+		}
+	}
 
 	public static PlanLinkIdentifier createPlanLinkIdentifier(
 			final Scenario scenario ) {

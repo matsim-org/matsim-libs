@@ -57,6 +57,10 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 	// constructors
 	// /////////////////////////////////////////////////////////////////////////
     public CharyparNagelWithJointModesScoringFunctionFactory(
+    		final Scenario sc ) {
+    	this( JointActingTypes.JOINT_STAGE_ACTS , sc );
+    }
+    public CharyparNagelWithJointModesScoringFunctionFactory(
 			final StageActivityTypes typesNotToScore,
 			final Scenario scenario) {
 		log.warn( "initializing the \"CharyparNagel\" scoring function: this has no special parameters for joint modes!" );
