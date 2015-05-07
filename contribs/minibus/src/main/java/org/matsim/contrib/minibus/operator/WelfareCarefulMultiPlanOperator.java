@@ -71,22 +71,22 @@ public final class WelfareCarefulMultiPlanOperator extends AbstractOperator {
 
 	public void score(Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap) {
 				
-		this.scoreLastIteration = this.score;
-		this.score = 0;
+		delegate.scoreLastIteration = delegate.score;
+		delegate.score = 0;
 		
 		// score all plans
-		for (PPlan plan : this.getAllPlans()) {
+		for (PPlan plan : delegate.getAllPlans()) {
 			scorePlan(driverId2ScoreMap, plan);
 			double welfareCorrection = getWelfareCorrection(plan.getLine());
 			plan.setScore(plan.getScore() + welfareCorrection);
 			
-			this.score += plan.getScore();
+			delegate.score += plan.getScore();
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {
-				route.setDescription(plan.toString(this.budget + this.score));
+				route.setDescription(plan.toString(delegate.budget + delegate.score));
 			}
 		}
 		
-		this.processScore();
+		delegate.processScore();
 		
 	}
 

@@ -47,7 +47,8 @@ public class WelfareAnalyzer {
 	}
 	
 	public double getLineId2welfareCorrection(Id<TransitLine> id) {
-		return this.lineId2welfareCorreciton.get(id);
+		return 1000.;
+//		return this.lineId2welfareCorreciton.get(id);
 	}
 
 }
