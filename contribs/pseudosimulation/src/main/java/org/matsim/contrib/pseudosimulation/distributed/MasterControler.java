@@ -13,6 +13,7 @@ import org.matsim.contrib.pseudosimulation.distributed.listeners.controler.Slave
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformanceRecorder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -339,7 +340,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             }
         }
 
-        matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave", new ReplacePlanFromSlaveFactory(newPlans));
+        matsimControler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+                addPlanStrategyBinding("ReplacePlanFromSlave").toProvider(new ReplacePlanFromSlaveFactory(newPlans));
+            }
+        });
         matsimControler.addControlerListener(this);
 
         masterLogger.warn(masterInitialLogString);

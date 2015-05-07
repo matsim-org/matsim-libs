@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.PlanStrategy;
@@ -166,7 +167,7 @@ public class RunNationalFreight {
 		Controler controler = new Controler(sc);
 		controler.setOverwriteFiles(true);
 
-		Provider<PlanStrategy> newPlanStrategyFactory = new javax.inject.Provider<PlanStrategy>() {
+		final Provider<PlanStrategy> newPlanStrategyFactory = new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				PlanStrategyImpl strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
@@ -174,8 +175,13 @@ public class RunNationalFreight {
 				return strategy;
 			}
 		};
-		
-		controler.addPlanStrategyFactory("newPlan", newPlanStrategyFactory );
+
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("newPlan").toProvider(newPlanStrategyFactory);
+			}
+		});
 
 		controler.run();
 		Header.printFooter();

@@ -26,9 +26,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.replanning.modules.ReRoute;
@@ -141,28 +141,40 @@ public class SubPopControler {
 		controler.setDumpDataAtEnd(true);
         controler.getConfig().controler().setCreateGraphs(true);
 
-        controler.addPlanStrategyFactory("ChangeLegMode_slum", new javax.inject.Provider<PlanStrategy>() {
-			String [] availableModes_slum = {"slum_bike","slum_motorbike","slum_pt","slum_walk"};
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-				builder.addStrategyModule(new ChangeLegMode(controler.getConfig().global().getNumberOfThreads(),availableModes_slum,true));
-				builder.addStrategyModule(new ReRoute(controler.getScenario()));
-				return builder.build();
+			public void install() {
+				addPlanStrategyBinding("ChangeLegMode_slum").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					String[] availableModes_slum = {"slum_bike", "slum_motorbike", "slum_pt", "slum_walk"};
+
+					@Override
+					public PlanStrategy get() {
+						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						builder.addStrategyModule(new ChangeLegMode(controler.getConfig().global().getNumberOfThreads(), availableModes_slum, true));
+						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						return builder.build();
+					}
+				});
 			}
 		});
-		
-		controler.addPlanStrategyFactory("ChangeLegMode_nonSlum", new javax.inject.Provider<PlanStrategy>() {
-			String [] availableModes_nonSlum = {"nonSlum_car","nonSlum_bike","nonSlum_motorbike","nonSlum_pt","nonSlum_walk"};
+
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-				builder.addStrategyModule(new ChangeLegMode(controler.getConfig().global().getNumberOfThreads(), availableModes_nonSlum, true));
-				builder.addStrategyModule(new ReRoute(controler.getScenario()));
-				return builder.build();
+			public void install() {
+				addPlanStrategyBinding("ChangeLegMode_nonSlum").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					String[] availableModes_nonSlum = {"nonSlum_car", "nonSlum_bike", "nonSlum_motorbike", "nonSlum_pt", "nonSlum_walk"};
+
+					@Override
+					public PlanStrategy get() {
+						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						builder.addStrategyModule(new ChangeLegMode(controler.getConfig().global().getNumberOfThreads(), availableModes_nonSlum, true));
+						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						return builder.build();
+					}
+				});
 			}
 		});
-		
+
 //		controler.setScoringFunctionFactory(new SubPopulationScoringFactory(controler.getScenario()));
 		controler.run();
 	}

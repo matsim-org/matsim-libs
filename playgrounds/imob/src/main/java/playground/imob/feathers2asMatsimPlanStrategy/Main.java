@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -74,7 +75,7 @@ class Main {
 		ctrl.getEvents().addHandler(feathers2);
 		
 		// add it as a PlanStrategy:
-		ctrl.addPlanStrategyFactory( FEATHERS2, new javax.inject.Provider<PlanStrategy>() {
+		final javax.inject.Provider<PlanStrategy> planStrategyFactory = new javax.inject.Provider<PlanStrategy>() {
 			@Override
 			public PlanStrategy get() {
 				GenericPlanSelector<Plan, Person> planSelector = new RandomPlanSelector<>() ;
@@ -90,9 +91,9 @@ class Main {
 						List<Plan> planToKeep = new ArrayList<>() ;
 						planToKeep.add( plan ) ;
 						person.getPlans().retainAll( planToKeep ) ;
-						
+
 						PopulationFactory pf = scenario.getPopulation().getFactory() ;
-						
+
 						// modify plan by feathers:
 						plan = feathers2.createPlan(  plan.getPerson() , pf ) ;
 					}
@@ -100,8 +101,14 @@ class Main {
 					public void finishReplanning() {
 					}
 				} ;
-				builder.addStrategyModule(module);	
+				builder.addStrategyModule(module);
 				return builder.build() ;
+			}
+		};
+		ctrl.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding(FEATHERS2).toProvider(planStrategyFactory);
 			}
 		});
 

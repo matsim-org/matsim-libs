@@ -127,16 +127,21 @@ public class SolutionsSearch {
 		controler.addControlerListener(cContext) ;
 
 		//set cadyts as strategy for plan selector
-		controler.addPlanStrategyFactory("myCadyts", new javax.inject.Provider<PlanStrategy>() {
-			
-			@Override   
-			public PlanStrategy get() {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scn, cContext);
-				// planSelector.setCadytsWeight(0.0) ;    // <-set it to zero if only cadyts scores are desired
-				return new PlanStrategyImpl(planSelector);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("myCadyts").toProvider(new Provider<PlanStrategy>() {
+
+					@Override
+					public PlanStrategy get() {
+						final CadytsPlanChanger planSelector = new CadytsPlanChanger(scn, cContext);
+						// planSelector.setCadytsWeight(0.0) ;    // <-set it to zero if only cadyts scores are desired
+						return new PlanStrategyImpl(planSelector);
+					}
+				});
 			}
-		} ) ;
-		
+		});
+
 
 		//Cadyts as scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {

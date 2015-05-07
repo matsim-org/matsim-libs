@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -290,17 +291,22 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
 		Controler ctl = new Controler(config);
-		
-		ctl.addPlanStrategyFactory("abc", new javax.inject.Provider<PlanStrategy>() {
+
+		ctl.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector<Plan,Person>() ) ;
-				builder.addStrategyModule( new ChangeLegModeWithParkLocation( config, scenario.getNetwork() ) );
-				builder.addStrategyModule(new ReRoute(scenario) );
-				return builder.build() ;
+			public void install() {
+				addPlanStrategyBinding("abc").toProvider(new Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						final PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder(new RandomPlanSelector<Plan, Person>());
+						builder.addStrategyModule(new ChangeLegModeWithParkLocation(config, scenario.getNetwork()));
+						builder.addStrategyModule(new ReRoute(scenario));
+						return builder.build();
+					}
+				});
 			}
-		} ) ;
-		
+		});
+
 		ctl.addControlerListener(new LegChainModesListener3());
         ctl.getConfig().controler().setCreateGraphs(false);
         ctl.getConfig().controler().setWriteEventsInterval(0);
@@ -324,7 +330,7 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			super(config);
 			final Scenario scenario = this.getScenario() ;
 
-			Provider<PlanStrategy> planStrategyFactory = new javax.inject.Provider<PlanStrategy>(){
+			final Provider<PlanStrategy> planStrategyFactory = new javax.inject.Provider<PlanStrategy>(){
 				@Override public PlanStrategy get() {
 					PlanStrategyImpl.Builder builder = new PlanStrategyImpl.Builder( new RandomPlanSelector<Plan,Person>() ) ;
 					builder.addStrategyModule(new ChangeLegModeWithParkLocation(config, scenario.getNetwork()));
@@ -332,7 +338,12 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 					return builder.build();
 				}
 			} ;
-			this.addPlanStrategyFactory("abc", planStrategyFactory);
+			this.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    addPlanStrategyBinding("abc").toProvider(planStrategyFactory);
+                }
+            });
 
 			StrategySettings stratSets = new StrategySettings( ConfigUtils.createAvailableStrategyId(config) ) ;
 			stratSets.setStrategyName("abc") ;

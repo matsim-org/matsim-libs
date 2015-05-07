@@ -5,6 +5,7 @@ import org.matsim.contrib.pseudosimulation.replanning.factories.DistributedPlanM
 import org.matsim.contrib.pseudosimulation.replanning.factories.DistributedPlanSelectorStrategyFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.modules.*;
@@ -79,17 +80,24 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     }
 
-    public static void registerStrategiesWithControler(Controler controler, PlanCatcher slave, boolean quickReplanning, int selectionInflationFactor) {
-        for (Map.Entry<String, Class<? extends Provider<PlanStrategy>>> e : SupportedSelectors.entrySet()) {
-            controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
-                    new DistributedPlanSelectorStrategyFactory(slave,quickReplanning,selectionInflationFactor,controler,e.getKey()));
+    public static void registerStrategiesWithControler(final Controler controler, final PlanCatcher slave, final boolean quickReplanning, final int selectionInflationFactor) {
+        for (final Map.Entry<String, Class<? extends Provider<PlanStrategy>>> e : SupportedSelectors.entrySet()) {
+            controler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    addPlanStrategyBinding(e.getKey() + SUFFIX).toProvider(new DistributedPlanSelectorStrategyFactory(slave, quickReplanning, selectionInflationFactor, controler, e.getKey()));
+                }
+            });
 
         }
 
-        for (Map.Entry<String, Class<? extends Provider<PlanStrategy>>> e : SupportedMutators.entrySet()) {
-            controler.addPlanStrategyFactory(e.getKey() + SUFFIX,
-                    new DistributedPlanMutatorStrategyFactory(slave, SupportedMutatorGenes.get(e.getKey()),TrackGenome,controler,e.getKey())
-                    );
+        for (final Map.Entry<String, Class<? extends Provider<PlanStrategy>>> e : SupportedMutators.entrySet()) {
+            controler.addOverridingModule(new AbstractModule() {
+                @Override
+                public void install() {
+                    addPlanStrategyBinding(e.getKey() + SUFFIX).toProvider(new DistributedPlanMutatorStrategyFactory(slave, SupportedMutatorGenes.get(e.getKey()), TrackGenome, controler, e.getKey()));
+                }
+            });
         }
 
     }

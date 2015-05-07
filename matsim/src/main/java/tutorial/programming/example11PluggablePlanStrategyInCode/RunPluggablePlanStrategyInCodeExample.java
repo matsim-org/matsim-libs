@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 
 public class RunPluggablePlanStrategyInCodeExample {
@@ -43,7 +44,12 @@ public class RunPluggablePlanStrategyInCodeExample {
 		config.strategy().addStrategySettings(stratSets);
 		
 		final Controler controler = new Controler(config);
-		controler.addPlanStrategyFactory("doSomethingSpecial", MyPlanStrategyFactory.class);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("doSomethingSpecial").toProvider(MyPlanStrategyFactory.class);
+			}
+		});
 		controler.run();
 
 	}

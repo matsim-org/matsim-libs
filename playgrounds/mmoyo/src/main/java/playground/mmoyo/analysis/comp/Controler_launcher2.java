@@ -30,6 +30,7 @@ import org.matsim.contrib.cadyts.pt.CadytsPtContext;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -93,15 +94,20 @@ public class Controler_launcher2 {
 		controler.addControlerListener(cContext) ;
 		
 		//set cadyts as strategy for plan selector
-		controler.addPlanStrategyFactory("myCadyts", new javax.inject.Provider<PlanStrategy>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(), cContext);
-				// planSelector.setCadytsWeight(0.0) ;   // <-set it to zero if only cadyts scores are desired
-				return new PlanStrategyImpl(planSelector);
+			public void install() {
+				addPlanStrategyBinding("myCadyts").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(), cContext);
+						// planSelector.setCadytsWeight(0.0) ;   // <-set it to zero if only cadyts scores are desired
+						return new PlanStrategyImpl(planSelector);
+					}
+				});
 			}
-		} ) ;
-		
+		});
+
 
 		//set scoring functions
 		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()); //M

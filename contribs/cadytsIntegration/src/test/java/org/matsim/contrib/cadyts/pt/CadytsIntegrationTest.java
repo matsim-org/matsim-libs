@@ -88,13 +88,19 @@ public class CadytsIntegrationTest {
 		final Controler controler = new Controler(scenario);
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
-		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				return new PlanStrategyImpl(new CadytsPlanChanger<TransitStopFacility>(scenario, context));
-			}} ) ;
+			public void install() {
+				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						return new PlanStrategyImpl(new CadytsPlanChanger<TransitStopFacility>(scenario, context));
+					}
+				});
+			}
+		});
 
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.addOverridingModule(new AbstractModule() {
@@ -151,18 +157,23 @@ public class CadytsIntegrationTest {
 		final CadytsPtContext cContext = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(cContext) ;
 
-		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(controler.getScenario(), cContext);
-				planSelector.setCadytsWeight(0.) ;
-				// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
-				// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
-				// kai, may'13
-				//				final PlanSelector planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<TransitStopFacility>(beta, cContext) ;
-				return new PlanStrategyImpl(planSelector);
-			} 
-		} ) ;
+			public void install() {
+				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(controler.getScenario(), cContext);
+						planSelector.setCadytsWeight(0.);
+						// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
+						// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
+						// kai, may'13
+						//				final PlanSelector planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<TransitStopFacility>(beta, cContext) ;
+						return new PlanStrategyImpl(planSelector);
+					}
+				});
+			}
+		});
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
@@ -314,13 +325,19 @@ public class CadytsIntegrationTest {
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
 
-		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>( scenario, context);
-				planSelector.setCadytsWeight(beta*30.) ;
-				return new PlanStrategyImpl(planSelector);
-			}} ) ;
+			public void install() {
+				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario, context);
+						planSelector.setCadytsWeight(beta * 30.);
+						return new PlanStrategyImpl(planSelector);
+					}
+				});
+			}
+		});
 
 		controler.run();
 
@@ -461,15 +478,21 @@ public class CadytsIntegrationTest {
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
 //		controler.setOverwriteFiles(true);
-		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(controler.getScenario(), context);
-				planSelector.setCadytsWeight(beta*30.) ;
-				return new PlanStrategyImpl(planSelector);
-			}} ) ;
+			public void install() {
+				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(controler.getScenario(), context);
+						planSelector.setCadytsWeight(beta * 30.);
+						return new PlanStrategyImpl(planSelector);
+					}
+				});
+			}
+		});
 
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.run();

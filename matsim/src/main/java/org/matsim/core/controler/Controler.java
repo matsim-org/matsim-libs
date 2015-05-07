@@ -627,24 +627,6 @@ public class Controler extends AbstractController {
 		this.snapshotWriterRegister.register(snapshotWriterName, snapshotWriterFactory);
 	}
 
-	public final void addPlanStrategyFactory(final String planStrategyFactoryName, final javax.inject.Provider<PlanStrategy> planStrategyFactory) {
-		this.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                addPlanStrategyBinding(planStrategyFactoryName).toProvider(planStrategyFactory);
-            }
-        });
-	}
-
-    public final void addPlanStrategyFactory(final String planStrategyFactoryName, final Class<? extends javax.inject.Provider<PlanStrategy>> planStrategyFactory) {
-        this.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                addPlanStrategyBinding(planStrategyFactoryName).toProvider(planStrategyFactory);
-            }
-        });
-    }
-
 
 	// ******** --------- *******
 	// The following are methods which should not be used at all,

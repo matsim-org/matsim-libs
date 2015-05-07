@@ -110,41 +110,51 @@ public class Simulator {
 		/*
 		 * setup mutation module
 		 */
-		Random random = new XORShiftRandom(controler.getConfig().global().getRandomSeed());
+		final Random random = new XORShiftRandom(controler.getConfig().global().getRandomSeed());
 
 		logger.info("Setting up activity location strategy...");
 		StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class));
 		settings.setStrategyName("activityLocations");
-		int numThreads = controler.getConfig().global().getNumberOfThreads();
-		double mutationError = Double.parseDouble(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "mutationError"));
-		double threshold = Double.parseDouble(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "distThreshold"));
-		controler.addPlanStrategyFactory("activityLocations", new ActivityLocationStrategyFactory(random, numThreads, "home", controler,
-				mutationError, threshold));
+		final int numThreads = controler.getConfig().global().getNumberOfThreads();
+		final double mutationError = Double.parseDouble(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "mutationError"));
+		final double threshold = Double.parseDouble(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "distThreshold"));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("activityLocations").toProvider(new ActivityLocationStrategyFactory(random, numThreads, "home", controler,
+						mutationError, threshold));
+			}
+		});
 
 		settings = new StrategySettings(Id.create(2, StrategySettings.class));
 		settings.setStrategyName("doNothing");
-	
-		controler.addPlanStrategyFactory("doNothing", new javax.inject.Provider<PlanStrategy>() {
 
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				return new PlanStrategy() {
+			public void install() {
+				addPlanStrategyBinding("doNothing").toProvider(new javax.inject.Provider<PlanStrategy>() {
 
 					@Override
-					public void run(HasPlansAndId<Plan, Person> person) {
-					}
+					public PlanStrategy get() {
+						return new PlanStrategy() {
 
-					@Override
-					public void init(ReplanningContext replanningContext) {
-					}
+							@Override
+							public void run(HasPlansAndId<Plan, Person> person) {
+							}
 
-					@Override
-					public void finish() {
+							@Override
+							public void init(ReplanningContext replanningContext) {
+							}
+
+							@Override
+							public void finish() {
+							}
+						};
 					}
-				};
+				});
 			}
 		});
-		/*
+	/*
 		 * setup scoring and cadyts integration
 		 */
 		logger.info("Setting up cadyts...");

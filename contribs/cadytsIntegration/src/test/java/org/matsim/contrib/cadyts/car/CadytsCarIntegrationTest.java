@@ -103,14 +103,20 @@ public class CadytsCarIntegrationTest {
 		config.getModule("cadytsCar").addParam("preparatoryIterations", "1");
 		config.getModule("cadytsCar").addParam("timeBinSize", "3600");
 		controler.addControlerListener(context) ;
-				
-		controler.addPlanStrategyFactory(CADYTS_STRATEGY_NAME, new javax.inject.Provider<PlanStrategy>() {
-			@Override
-			public PlanStrategy get() {
-				return new PlanStrategyImpl(new CadytsPlanChanger(controler.getScenario(), context));
-			}} ) ;
 
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding(CADYTS_STRATEGY_NAME).toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						return new PlanStrategyImpl(new CadytsPlanChanger(controler.getScenario(), context));
+					}
+				});
+			}
+		});
+
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.addOverridingModule(new AbstractModule() {

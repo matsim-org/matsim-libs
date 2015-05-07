@@ -28,7 +28,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.PlanStrategyImpl.Builder;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
@@ -90,26 +89,37 @@ public class SubPopMunichControler {
 
 		final Controler controler = new Controler(config);
 
-		controler.addPlanStrategyFactory("SubtourModeChoice_".concat("COMMUTER_REV_COMMUTER"), new javax.inject.Provider<PlanStrategy>() {
-			String [] availableModes = {"car","pt_COMMUTER_REV_COMMUTER"};
-			String [] chainBasedModes = {"car","bike"};
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-				builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
-				builder.addStrategyModule(new ReRoute(controler.getScenario()));
-				return builder.build();
+			public void install() {
+				addPlanStrategyBinding("SubtourModeChoice_".concat("COMMUTER_REV_COMMUTER")).toProvider(new javax.inject.Provider<PlanStrategy>() {
+					String[] availableModes = {"car", "pt_COMMUTER_REV_COMMUTER"};
+					String[] chainBasedModes = {"car", "bike"};
+
+					@Override
+					public PlanStrategy get() {
+						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						builder.addStrategyModule(new SubtourModeChoice(controler.getConfig().global().getNumberOfThreads(), availableModes, chainBasedModes, false));
+						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						return builder.build();
+					}
+				});
 			}
 		});
 
 		// following is must since, feb15, it is not possible to add two replanning strategies together, even for different sub pop except "ChangeExpBeta"
-		controler.addPlanStrategyFactory("ReRoute_".concat("COMMUTER_REV_COMMUTER"), new javax.inject.Provider<PlanStrategy>() {
-
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				PlanStrategyImpl.Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
-				builder.addStrategyModule(new ReRoute(controler.getScenario()));
-				return builder.build();
+			public void install() {
+				addPlanStrategyBinding("ReRoute_".concat("COMMUTER_REV_COMMUTER")).toProvider(new javax.inject.Provider<PlanStrategy>() {
+
+					@Override
+					public PlanStrategy get() {
+						final Builder builder = new Builder(new RandomPlanSelector<Plan, Person>());
+						builder.addStrategyModule(new ReRoute(controler.getScenario()));
+						return builder.build();
+					}
+				});
 			}
 		});
 

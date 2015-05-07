@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -41,15 +42,20 @@ public class CadytsRunner {
 		stratSets.setStrategyName("ccc") ;
 		stratSets.setWeight(1.0) ;
 		controler.getConfig().strategy().addStrategySettings(stratSets);
-		
-		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
+
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(),cContext);
-				return new PlanStrategyImpl(planSelector);
+			public void install() {
+				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(), cContext);
+						return new PlanStrategyImpl(planSelector);
+					}
+				});
 			}
 		});
-		
+
 		controler.run();
 	}
 }

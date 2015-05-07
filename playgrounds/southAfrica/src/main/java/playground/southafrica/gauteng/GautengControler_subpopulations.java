@@ -233,13 +233,18 @@ public class GautengControler_subpopulations {
 		});
 
 		// ... during replanning (this also needs to be registered as strategy in the config):
-		controler.addPlanStrategyFactory(RE_ROUTE_AND_SET_VEHICLE, new javax.inject.Provider<PlanStrategy>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				PlanStrategyImpl planStrategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() ) ; 
-				planStrategy.addStrategyModule( new ReRoute( sc ) );
-				planStrategy.addStrategyModule( new SetVehicleInAllNetworkRoutes(sc));
-				return planStrategy ;
+			public void install() {
+				addPlanStrategyBinding(RE_ROUTE_AND_SET_VEHICLE).toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						final PlanStrategyImpl planStrategy = new PlanStrategyImpl(new RandomPlanSelector<Plan, Person>());
+						planStrategy.addStrategyModule(new ReRoute(sc));
+						planStrategy.addStrategyModule(new SetVehicleInAllNetworkRoutes(sc));
+						return planStrategy;
+					}
+				});
 			}
 		});
 

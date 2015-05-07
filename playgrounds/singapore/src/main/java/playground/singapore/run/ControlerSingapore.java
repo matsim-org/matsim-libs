@@ -70,12 +70,17 @@ public class ControlerSingapore {
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		// comment: I would argue that when you add waitTime/stopTime to the router, you also need to adapt the scoring function accordingly.
 		// kai, sep'13
-		controler.addPlanStrategyFactory("TransitLocationChoice",new javax.inject.Provider<PlanStrategy>() {
-            @Override
-            public PlanStrategy get() {
-                return new TransitLocationChoiceStrategy(controler.getScenario());
-            }
-        });
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("TransitLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						return new TransitLocationChoiceStrategy(controler.getScenario());
+					}
+				});
+			}
+		});
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

@@ -107,14 +107,20 @@ public class RndPtRouterLauncher {
 		final double beta = 30. ;
 		final CadytsPtContext context = new CadytsPtContext(config, controler.getEvents()) ;
 		controler.addControlerListener(context) ;
-		controler.addPlanStrategyFactory("myCadyts", new javax.inject.Provider<PlanStrategy>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(), context);
-///				planSelector.setCadytsWeight(beta*cadytsWeight) ;   
-				return new PlanStrategyImpl(planSelector);
-			}} ) ;
-		
+			public void install() {
+				addPlanStrategyBinding("myCadyts").toProvider(new Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						final CadytsPlanChanger planSelector = new CadytsPlanChanger(controler.getScenario(), context);
+///				planSelector.setCadytsWeight(beta*cadytsWeight) ;
+						return new PlanStrategyImpl(planSelector);
+					}
+				});
+			}
+		});
+
 		//create the factory for rndizedRouter
 		final Provider<TransitRouter> randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (trSchedule, trConfig, routerNetwork);
 		controler.addOverridingModule(new AbstractModule() {

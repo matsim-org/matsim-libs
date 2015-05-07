@@ -109,7 +109,7 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 	}
 	//Main
 	public static void main(String[] args) {
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
+		final Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
 		new SocialNetworkReader(scenario).parse(args.length>1 ? args[1] : null);
 		final Controler controler = new Controler(scenario);
 		controler.getConfig().plansCalcRoute().getTeleportedModeFreespeedFactors().put("empty", 0.0);
@@ -117,10 +117,25 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		controler.setScoringFunctionFactory(new CharyparNagelWeekScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.addControlerListener(new LegHistogramListener(controler.getEvents()));
 		controler.addControlerListener(new WeeklyControlerAgendaListener(new Boolean(args[2])));
-		controler.addPlanStrategyFactory("ReRouteBase", new ReRoutePlanStrategyFactory(scenario));
-		controler.addPlanStrategyFactory("TimeAllocationBase", new TimeAllocationMutatorPlanStrategyFactory(scenario));
-		controler.addPlanStrategyFactory("TripSubtourModeChoiceBase", new TripSubtourModeChoiceStrategyFactory(scenario));
-		/*WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("ReRouteBase").toProvider(new ReRoutePlanStrategyFactory(scenario));
+			}
+		});
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("TimeAllocationBase").toProvider(new TimeAllocationMutatorPlanStrategyFactory(scenario));
+			}
+		});
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("TripSubtourModeChoiceBase").toProvider(new TripSubtourModeChoiceStrategyFactory(scenario));
+			}
+		});
+	/*WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);

@@ -114,17 +114,22 @@ public class CadytsFreightChainTest {
 		final CadytsFreightChainsContext cContext = new CadytsFreightChainsContext(config, nChainsOfLength );
 		controler.addControlerListener(cContext);
 
-		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
+			public void install() {
+				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
 //				return new PlanStrategyImpl(new ExpBetaPlanSelectorWithCadytsPlanRegistration<Item>(
 //						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 //				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration<Item>(
 //						sc.getConfig().planCalcScore().getBrainExpBeta(), cContext));
-				return new PlanStrategyImpl( new PlanSelectionByCadyts<Item>(
-						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext) ) ;
+						return new PlanStrategyImpl(new PlanSelectionByCadyts<Item>(
+								scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext));
+					}
+				});
 			}
-		} ) ;
+		});
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override

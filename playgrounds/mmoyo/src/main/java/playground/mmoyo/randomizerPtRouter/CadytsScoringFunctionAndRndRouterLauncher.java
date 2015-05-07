@@ -115,15 +115,20 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 		controler.addControlerListener(cContext) ;
 		
 		//set cadyts as strategy for plan selector
-		controler.addPlanStrategyFactory("myCadyts", new javax.inject.Provider<PlanStrategy>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scn, cContext);
+			public void install() {
+				addPlanStrategyBinding("myCadyts").toProvider(new Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						final CadytsPlanChanger planSelector = new CadytsPlanChanger(scn, cContext);
 //				planSelector.setCadytsWeight(0.0) ;
-				return new PlanStrategyImpl(planSelector);
+						return new PlanStrategyImpl(planSelector);
+					}
+				});
 			}
-		} ) ;
-		
+		});
+
 
 		//set scoring functions
 		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()); //M

@@ -17,6 +17,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -219,14 +220,20 @@ public class CompareMain {
 		final CadytsContext context = new CadytsContext(config, counts) ;
 		Controler controler = new Controler(scenario2);
 		controler.addControlerListener(context);
-		controler.addPlanStrategyFactory("ccc", new javax.inject.Provider<PlanStrategy>() {
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2,context);
-				planSelector.setCadytsWeight(10000000);
-				return new PlanStrategyImpl(planSelector);
-			}} ) ;
-        controler.getConfig().controler().setCreateGraphs(false);
+			public void install() {
+				addPlanStrategyBinding("ccc").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, context);
+						planSelector.setCadytsWeight(10000000);
+						return new PlanStrategyImpl(planSelector);
+					}
+				});
+			}
+		});
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 		double sum=0.0;
 		for (Person person : scenario2.getPopulation().getPersons().values()) {

@@ -29,6 +29,7 @@ import org.matsim.contrib.locationchoice.bestresponse.preprocess.ReadOrComputeMa
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -57,10 +58,15 @@ public class RunLocationChoiceFrozenEpsilons {
 
         Controler controler = new Controler(scenario);
         controler.setScoringFunctionFactory(scoringFunctionFactory);
-        controler.addPlanStrategyFactory("MyLocationChoice", new javax.inject.Provider<PlanStrategy>(){
+        controler.addOverridingModule(new AbstractModule() {
             @Override
-            public PlanStrategy get() {
-                return new BestReplyLocationChoicePlanStrategy(scenario) ;
+            public void install() {
+                addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
+                    @Override
+                    public PlanStrategy get() {
+                        return new BestReplyLocationChoicePlanStrategy(scenario);
+                    }
+                });
             }
         });
         controler.run();

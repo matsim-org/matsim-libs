@@ -44,6 +44,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -126,10 +127,15 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME , dcScore);
 
 		// add locachoice strategy factory:
-		controler.addPlanStrategyFactory("MyLocationChoice", new javax.inject.Provider<PlanStrategy>(){
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				return new BestReplyLocationChoicePlanStrategy(scenario) ;
+			public void install() {
+				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						return new BestReplyLocationChoicePlanStrategy(scenario);
+					}
+				});
 			}
 		});
 
@@ -192,10 +198,15 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.getScenario().addScenarioElement(MaxDCScoreWrapper.ELEMENT_NAME , dcScore);
 
 		// set locachoice strategy:
-		controler.addPlanStrategyFactory("MyLocationChoice", new javax.inject.Provider<PlanStrategy>(){
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				return new BestReplyLocationChoicePlanStrategy(scenario) ;
+			public void install() {
+				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						return new BestReplyLocationChoicePlanStrategy(scenario);
+					}
+				});
 			}
 		});
 
@@ -288,10 +299,15 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Controler controler = new Controler(scenario);
 
 		// set locachoice strategy:
-		controler.addPlanStrategyFactory("MyLocationChoice", new javax.inject.Provider<PlanStrategy>(){
+		controler.addOverridingModule(new AbstractModule() {
 			@Override
-			public PlanStrategy get() {
-				return new LocationChoicePlanStrategy(scenario) ;
+			public void install() {
+				addPlanStrategyBinding("MyLocationChoice").toProvider(new javax.inject.Provider<PlanStrategy>() {
+					@Override
+					public PlanStrategy get() {
+						return new LocationChoicePlanStrategy(scenario);
+					}
+				});
 			}
 		});
 		// (this is now only necessary since the config for all three tests sets MyLocationChoice instead of LocationChoice. Probably

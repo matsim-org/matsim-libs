@@ -37,7 +37,6 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.*;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
@@ -51,7 +50,6 @@ import playground.sergioo.passivePlanning2012.core.population.socialNetwork.Soci
 import playground.sergioo.passivePlanning2012.core.replanning.ReRoutePlanStrategyFactory;
 import playground.sergioo.passivePlanning2012.core.replanning.TimeAllocationMutatorPlanStrategyFactory;
 import playground.sergioo.passivePlanning2012.core.replanning.TripSubtourModeChoiceStrategyFactory;
-import playground.sergioo.passivePlanning2012.core.router.PRTripRouterFactory;
 import playground.sergioo.passivePlanning2012.core.router.PRTripRouterModule;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 import playground.sergioo.weeklySimulation.analysis.LegHistogramListener;
@@ -184,7 +182,7 @@ public class WeeklyControlerAgendaListenerTests implements StartupListener, Iter
 	}
 	//Main
 	public static void main(String[] args) {
-		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
+		final Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
 		new SocialNetworkReader(scenario).parse(args.length>1 ? args[1] : null);
 		Controler controler = new Controler(scenario);
 		controler.getConfig().plansCalcRoute().getTeleportedModeFreespeedFactors().put("empty", 0.0);
@@ -192,10 +190,25 @@ public class WeeklyControlerAgendaListenerTests implements StartupListener, Iter
 		controler.setScoringFunctionFactory(new CharyparNagelWeekScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.addControlerListener(new LegHistogramListener(controler.getEvents()));
 		controler.addControlerListener(new WeeklyControlerAgendaListenerTests(new Boolean(args[2])));
-		controler.addPlanStrategyFactory("ReRouteBase", new ReRoutePlanStrategyFactory(scenario));
-		controler.addPlanStrategyFactory("TimeAllocationBase", new TimeAllocationMutatorPlanStrategyFactory(scenario));
-		controler.addPlanStrategyFactory("TripSubtourModeChoiceBase", new TripSubtourModeChoiceStrategyFactory(scenario));
-		/*WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("ReRouteBase").toProvider(new ReRoutePlanStrategyFactory(scenario));
+			}
+		});
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("TimeAllocationBase").toProvider(new TimeAllocationMutatorPlanStrategyFactory(scenario));
+			}
+		});
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanStrategyBinding("TripSubtourModeChoiceBase").toProvider(new TripSubtourModeChoiceStrategyFactory(scenario));
+			}
+		});
+	/*WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
