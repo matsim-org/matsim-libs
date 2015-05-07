@@ -42,6 +42,7 @@ import java.util.*;
  *
  * @author boescpa
  */
+@Deprecated
 public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
 
 	private CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
