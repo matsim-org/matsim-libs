@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,32 +19,40 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.converters.osm;
+package playground.boescpa.converters.osm.scheduleCreator.hafasCreator;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import playground.scnadine.converters.osmPT.Osm2TransitLines;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Run OSM-Converters...
+ * Reads the HAFAS-file BETRIEB_DE and provides the operators in a String-String-Map.
  *
  * @author boescpa
  */
-public class OSM2PTConvMain {
+public class OperatorReader {
 
-	public static void main(String[] args) {
-
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
-
-		Osm2TransitLines osm2pt = new Osm2TransitLines(scenario.getTransitSchedule(), scenario.getNetwork());
-		osm2pt.convert(args[0]);
-
-		new NetworkWriter(scenario.getNetwork()).write(args[1]);
-		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(args[2]);
+	protected static Map<String, String> readOperators(String BETRIEB_DE) {
+		Map<String, String> operators = new HashMap<>();
+		try {
+			BufferedReader readsLines = new BufferedReader(new InputStreamReader(new FileInputStream(BETRIEB_DE), "latin1"));
+			String newLine = readsLines.readLine();
+			while (newLine != null) {
+				String abbrevationOperator = newLine.split("\"")[1].replace(" ","");
+				newLine = readsLines.readLine();
+				if (newLine == null) break;
+				String operatorId = newLine.substring(8, 14).trim();
+				operators.put(operatorId, abbrevationOperator);
+				// read the next operator:
+				newLine = readsLines.readLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return operators;
 	}
 
 }

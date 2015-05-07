@@ -33,6 +33,7 @@ import playground.boescpa.lib.tools.merger.NetworkMerger;
  *
  * @author boescpa
  */
+@Deprecated
 public class MultimodalNetworkCreatorRectangleAroundSwitzerland extends MultimodalNetworkCreator {
 
 	private final CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");

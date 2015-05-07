@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,47 +21,18 @@
 
 package playground.boescpa.converters.osm.scheduleCreator;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
 
 /**
- * Provides the contract to create pt lines (stops and scheduled times, no routes) from an OSM network,
- * which are corrected by a given schedule-file.
- * The stops are linked to a given network.
+ * The route profile module interface requires as input a schedule file that contains all transit stops.
+ * As output, the module has to generate a schedule file, which contains the transit stops and the PT
+ * routes with the stop sequence for each route (route profiles). These route profiles also include
+ * the arrival and departure times for each stop of any route profile.
  *
  * @author boescpa
  */
-public abstract class PTScheduleCreator {
+public interface RouteProfileCreator {
 
-	protected static Logger log = Logger.getLogger(PTScheduleCreator.class);
-
-	private final TransitSchedule schedule;
-	private final Vehicles vehicles;
-
-	public PTScheduleCreator(TransitSchedule schedule, Vehicles vehicles) {
-		this.schedule = schedule;
-		this.vehicles = vehicles;
-	}
-
-	/**
-	 * This method creates a Transit Schedule which is unlinked to any network, but else complete.
-	 *
-	 * @param pathToInputFiles
-	 */
-	public void createSchedule(String pathToInputFiles) {
-		getTransitStopCreator().createTransitStops(this.schedule, pathToInputFiles);
-		getRouteProfileCreator().createRouteProfiles(this.schedule, pathToInputFiles);
-		getDeparturesCreator().createDepartures(this.schedule, this.vehicles, pathToInputFiles);
-	}
-
-	public abstract TransitStopCreator getTransitStopCreator();
-
-	public abstract RouteProfileCreator getRouteProfileCreator();
-
-	public abstract DeparturesCreator getDeparturesCreator();
+	void createRouteProfiles(TransitSchedule schedule, String pathToInputFiles);
 
 }

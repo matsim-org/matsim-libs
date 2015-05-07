@@ -23,12 +23,14 @@ package playground.boescpa.converters.osm;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.run.NetworkCleaner;
-import playground.boescpa.converters.osm.networkCreator.*;
+import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreator;
+import playground.boescpa.converters.osm.networkCreator.MultimodalNetworkCreatorStreets;
+import playground.boescpa.converters.osm.networkCreator.OsmFilter;
 import playground.boescpa.converters.osm.tools.OsmUtils;
 
 /**
- * Provides a cleaned MATSim-Street-Network from an OSM-File.
+ * Provides a cleaned MATSim-Street-Network from an OSM-File
+ * (for the original MATSim core version see org.matsim.core.utils.io.OsmNetworkReader).
  *
  * @author boescpa
  */
@@ -36,9 +38,14 @@ public class Osm2Network {
 
 	// Select the MultimodalNetworkCreator to be used.
 	private static MultimodalNetworkCreator getNetworkCreator(Network emptyNetwork) {
-		//return new MultimodalNetworkCreatorRetainingPTTags(emptyNetwork);
-		//return new MultimodalNetworkCreatorRectangleAroundSwitzerland(emptyNetwork);
-		return new MultimodalNetworkCreatorEllipseAroundSwitzerland(emptyNetwork);
+		// including pt tags:
+		//return new MultimodalNetworkCreatorPT(emptyNetwork);
+
+		// without considering OSM pt tags:
+		MultimodalNetworkCreatorStreets creator = new MultimodalNetworkCreatorStreets(emptyNetwork);
+		creator.addOsmFilter(new OsmFilter.OsmFilterTakeAll(6));
+		// more filters are possible. see MMStreetNetworkCreatorFactory for more ideas...
+		return creator;
 	}
 
 	/**
@@ -60,8 +67,8 @@ public class Osm2Network {
 	private static void convertOSMNetwork(String osmFile, String networkPath) {
 		final Network network = OsmUtils.getEmptyPTScenario().getNetwork();
 		getNetworkCreator(network).createMultimodalNetwork(osmFile);
+		new org.matsim.core.network.algorithms.NetworkCleaner().run(network);
 		new NetworkWriter(network).write(networkPath);
-		new NetworkCleaner().run(networkPath, networkPath);
 	}
 
 }

@@ -32,8 +32,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.boescpa.lib.tools.networkModification.NetworkUtils;
 
 import static org.junit.Assert.assertEquals;
-import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.BUS;
-import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.TRAM;
+import static playground.boescpa.converters.osm.scheduleCreator.hafasCreator.PtRouteFPLAN.BUS;
+import static playground.boescpa.converters.osm.scheduleCreator.hafasCreator.PtRouteFPLAN.TRAM;
 
 /**
  * Provide tests for PTLRFastAStarLandmarks.

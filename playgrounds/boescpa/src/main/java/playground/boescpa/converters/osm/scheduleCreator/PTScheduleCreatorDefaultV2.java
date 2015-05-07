@@ -21,6 +21,7 @@
 
 package playground.boescpa.converters.osm.scheduleCreator;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -29,10 +30,9 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.*;
+import playground.boescpa.converters.osm.scheduleCreator.hafasCreator.PtLineFPLAN;
+import playground.boescpa.converters.osm.scheduleCreator.hafasCreator.PtRouteFPLAN;
 
 import java.io.*;
 import java.util.*;
@@ -43,18 +43,26 @@ import java.util.*;
  * @author boescpa
  */
 @Deprecated
-public class PTScheduleCreatorDefaultV2 extends PTScheduleCreator {
+public class PTScheduleCreatorDefaultV2 {
 
+	protected static Logger log = Logger.getLogger(PTScheduleCreatorDefaultV2.class);
+
+	protected final TransitSchedule schedule;
+	protected final TransitScheduleFactory scheduleBuilder;
+	protected final Vehicles vehicles;
+	protected final VehiclesFactory vehicleBuilder;
 	private CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
 	protected final Map<String, Integer> vehiclesUndefined = new HashMap<>();
 	private final Set<Integer> bitfeldNummern = new HashSet<>();
 	private final Map<String, String> operators = new HashMap<>();
 
 	public PTScheduleCreatorDefaultV2(TransitSchedule schedule, Vehicles vehicles) {
-		super(schedule, vehicles);
+		this.schedule = schedule;
+		this.scheduleBuilder = this.schedule.getFactory();
+		this.vehicles = vehicles;
+		this.vehicleBuilder = this.vehicles.getFactory();
 	}
 
-	@Override
 	public final void createSchedule(String osmFile, String hafasFolder, Network network, String vehicleFile) {
 		log.info("Creating the schedule based on HAFAS...");
 

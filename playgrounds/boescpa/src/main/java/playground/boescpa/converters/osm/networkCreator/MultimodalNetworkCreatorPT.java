@@ -29,9 +29,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
  *
  * @author boescpa
  */
-public class MultimodalNetworkCreatorRetainingPTTagsFullNetwork extends MultimodalNetworkCreator {
+public class MultimodalNetworkCreatorPT extends MultimodalNetworkCreator {
 
-	public MultimodalNetworkCreatorRetainingPTTagsFullNetwork(Network network) {
+	public MultimodalNetworkCreatorPT(Network network) {
 		super(network);
 	}
 

@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.converters.osm.scheduleCreator;
+package playground.boescpa.converters.osm.scheduleCreator.hafasCreator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

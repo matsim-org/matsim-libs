@@ -39,9 +39,9 @@ import java.util.Set;
  */
 public abstract class OsmFilter {
 
-	protected final int hierarchy;
+	protected int hierarchy = Integer.MAX_VALUE;
 
-	public OsmFilter(final int hierarchy) {
+	public void setHierarchy(final int hierarchy) {
 		this.hierarchy = hierarchy;
 	}
 
@@ -55,6 +55,8 @@ public abstract class OsmFilter {
 	 */
 	protected abstract boolean coordCheck(Coord coord);
 
+	protected abstract OsmFilter copy();
+
 	// ******************* A few default implementations... *******************
 
 	/**
@@ -63,12 +65,17 @@ public abstract class OsmFilter {
 	public static class OsmFilterTakeAll extends OsmFilter {
 
 		public OsmFilterTakeAll(int hierarchy) {
-			super(hierarchy);
+			this.setHierarchy(hierarchy);
 		}
 
 		@Override
 		protected boolean coordCheck(Coord coord) {
 			return true;
+		}
+
+		@Override
+		protected OsmFilter copy() {
+			return new OsmFilterTakeAll(this.hierarchy);
 		}
 	}
 
@@ -80,16 +87,25 @@ public abstract class OsmFilter {
 		private final Coord coordNW;
 		private final Coord coordSE;
 
-		public OsmFilterRectangle(final Coord coordNW, final Coord coordSE, final int hierarchy) {
-			super(hierarchy);
+		public OsmFilterRectangle(final Coord coordNW, final Coord coordSE) {
 			this.coordNW = coordNW;
 			this.coordSE = coordSE;
+		}
+
+		public OsmFilterRectangle(final Coord coordNW, final Coord coordSE, final int hierarchy) {
+			this(coordNW, coordSE);
+			this.setHierarchy(hierarchy);
 		}
 
 		@Override
 		protected boolean coordCheck(Coord coord) {
 			return ((this.coordNW.getX() < coord.getX() && coord.getX() < this.coordSE.getX()) &&
 					(this.coordNW.getY() > coord.getY() && coord.getY() > this.coordSE.getY()));
+		}
+
+		@Override
+		protected OsmFilter copy() {
+			return new OsmFilterRectangle(this.coordNW, this.coordSE, this.hierarchy);
 		}
 	}
 
@@ -112,15 +128,25 @@ public abstract class OsmFilter {
 		 * @param radiusA	in coordinate units
 		 * @param radiusB	in coordinate units
 		 * @param anglePhi	in radians
-		 * @param hierarchy
 		 */
-		public OsmFilterEllipse(final Coord center, final double radiusA, final double radiusB, final double anglePhi, final int hierarchy) {
-			super(hierarchy);
+		public OsmFilterEllipse(final Coord center, final double radiusA, final double radiusB, final double anglePhi) {
 			this.center = center;
 			this.radiusASquared = radiusA*radiusA;
 			this.radiusBSquared = radiusB*radiusB;
 			this.cosPhi = Math.cos(anglePhi);
 			this.sinPhi = Math.sin(anglePhi);
+		}
+
+		/**
+		 * @param center
+		 * @param radiusA	in coordinate units
+		 * @param radiusB	in coordinate units
+		 * @param anglePhi	in radians
+		 * @param hierarchy
+		 */
+		public OsmFilterEllipse(final Coord center, final double radiusA, final double radiusB, final double anglePhi, final int hierarchy) {
+			this(center, radiusA, radiusB, anglePhi);
+			this.setHierarchy(hierarchy);
 		}
 
 		@Override
@@ -131,6 +157,11 @@ public abstract class OsmFilter {
 			final double ellipsePosition = a/radiusASquared + b/radiusBSquared;
 			return ellipsePosition <= 1;
 		}
+
+		@Override
+		protected OsmFilter copy() {
+			return new OsmFilterEllipse(this.center, this.radiusASquared, this.radiusBSquared, this.cosPhi, this.hierarchy);
+		}
 	}
 
 	/**
@@ -138,20 +169,31 @@ public abstract class OsmFilter {
 	 * Relies on Dobler's CoordAnalyzer.
 	 */
 	public static class OsmFilterShp extends OsmFilter {
+		private final String pathToShpFile;
 		private final CoordAnalyzer coordAnalyzer;
 
-		public OsmFilterShp(final String pathToShpFile, final int hierarchy) {
-			super(hierarchy);
+		public OsmFilterShp(final String pathToShpFile) {
+			this.pathToShpFile = pathToShpFile;
 			Set<SimpleFeature> features = new HashSet<>();
 			SHPFileUtil util = new SHPFileUtil();
-			features.addAll(ShapeFileReader.getAllFeatures(pathToShpFile));
+			features.addAll(ShapeFileReader.getAllFeatures(this.pathToShpFile));
 			Geometry area = util.mergeGeometries(features);
 			this.coordAnalyzer = new CoordAnalyzer(area);
+		}
+
+		public OsmFilterShp(final String pathToShpFile, final int hierarchy) {
+			this(pathToShpFile);
+			this.setHierarchy(hierarchy);
 		}
 
 		@Override
 		protected boolean coordCheck(Coord coord) {
 			return coordAnalyzer.isCoordAffected(coord);
+		}
+
+		@Override
+		protected OsmFilter copy() {
+			return new OsmFilterShp(this.pathToShpFile, this.hierarchy);
 		}
 	}
 }

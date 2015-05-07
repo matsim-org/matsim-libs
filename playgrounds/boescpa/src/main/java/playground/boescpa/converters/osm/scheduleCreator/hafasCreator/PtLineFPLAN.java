@@ -19,9 +19,8 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.converters.osm.scheduleCreator;
+package playground.boescpa.converters.osm.scheduleCreator.hafasCreator;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -36,7 +35,6 @@ import java.util.*;
  * @author boescpa
  */
 public class PtLineFPLAN {
-	private static Logger log = Logger.getLogger(PtLineFPLAN.class);
 	private static TransitScheduleFactory scheduleBuilder = new TransitScheduleFactoryImpl();
 
 	private final Id<TransitLine> lineId;
@@ -65,7 +63,6 @@ public class PtLineFPLAN {
 		}
 		if (!line.getRoutes().isEmpty()) {
 			return line;
-			//log.info("Added " + schedule.getTransitLines().get(lineId).toString());
 		} else {
 			return null;
 		}

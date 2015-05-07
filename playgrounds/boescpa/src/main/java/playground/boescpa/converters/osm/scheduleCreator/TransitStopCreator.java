@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,47 +21,16 @@
 
 package playground.boescpa.converters.osm.scheduleCreator;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
 
 /**
- * Provides the contract to create pt lines (stops and scheduled times, no routes) from an OSM network,
- * which are corrected by a given schedule-file.
- * The stops are linked to a given network.
+ * The transit stop module interface requires that the output of the module is a MATSim schedule,
+ * in which all transit stops are included with identification number and coordinates.
  *
  * @author boescpa
  */
-public abstract class PTScheduleCreator {
+public interface TransitStopCreator {
 
-	protected static Logger log = Logger.getLogger(PTScheduleCreator.class);
-
-	private final TransitSchedule schedule;
-	private final Vehicles vehicles;
-
-	public PTScheduleCreator(TransitSchedule schedule, Vehicles vehicles) {
-		this.schedule = schedule;
-		this.vehicles = vehicles;
-	}
-
-	/**
-	 * This method creates a Transit Schedule which is unlinked to any network, but else complete.
-	 *
-	 * @param pathToInputFiles
-	 */
-	public void createSchedule(String pathToInputFiles) {
-		getTransitStopCreator().createTransitStops(this.schedule, pathToInputFiles);
-		getRouteProfileCreator().createRouteProfiles(this.schedule, pathToInputFiles);
-		getDeparturesCreator().createDepartures(this.schedule, this.vehicles, pathToInputFiles);
-	}
-
-	public abstract TransitStopCreator getTransitStopCreator();
-
-	public abstract RouteProfileCreator getRouteProfileCreator();
-
-	public abstract DeparturesCreator getDeparturesCreator();
+	void createTransitStops(TransitSchedule schedule, String pathToInputFiles);
 
 }

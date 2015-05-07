@@ -23,59 +23,53 @@ package playground.boescpa.converters.osm.networkCreator;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import playground.boescpa.lib.tools.merger.NetworkMerger;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A version of MultimodalNetworkCreator that creates a simple street network from the OSM file.
  *
  * @author boescpa
  */
-public class MultimodalNetworkCreatorTakeAll extends MultimodalNetworkCreator {
+public class MultimodalNetworkCreatorStreets extends MultimodalNetworkCreator {
 
 	private final CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
 	private final Network streetNetwork;
-	private final Network highwayNetwork;
+	private final List<OsmFilter> osmFilter;
 
-	public MultimodalNetworkCreatorTakeAll(Network network) {
+	public MultimodalNetworkCreatorStreets(Network network) {
 		super(network);
-		streetNetwork = NetworkUtils.createNetwork();
-		highwayNetwork = NetworkUtils.createNetwork();
+		this.streetNetwork = NetworkUtils.createNetwork();
+		this.osmFilter = new ArrayList<>();
+	}
+
+	public void addOsmFilter(final OsmFilter osmFilter) {
+		this.osmFilter.add(osmFilter);
 	}
 
 	@Override
 	public void createMultimodalNetwork(String osmFile) {
 		OsmNetworkReader reader =
 				new OsmNetworkReader(this.network, transformation);
-		// Ellipse around Switzerland
-		reader.setHierarchyLayer(new OsmFilter.OsmFilterTakeAll(6));
-		// Take all highway links...
-		reader.setHierarchyLayer(new OsmFilter.OsmFilterTakeAll(2));
+		for (OsmFilter filter : this.osmFilter) {
+			reader.setHierarchyLayer(filter);
+		}
 		reader.parse(osmFile);
 	}
 
-	public void addStreetNetwork(String osmFile) {
-		// Create Street Network
+	public void addNetwork(String osmFile, final OsmFilter osmFilter, String prefix) {
+		// Create new Network
 		OsmNetworkReader reader =
 				new OsmNetworkReader(streetNetwork, transformation);
-		// Ellipse around Switzerland
-		reader.setHierarchyLayer(new OsmFilter.OsmFilterTakeAll(6));
+		// Take all street links...
+		reader.setHierarchyLayer(osmFilter);
 		reader.parse(osmFile);
 		// Merge networks:
-		NetworkMerger.integrateNetwork(this.network, streetNetwork, "", "st");
-	}
-
-	public void addHighwayNetwork(final String osmFile) {
-		// Create Highway Network
-		OsmNetworkReader reader =
-				new OsmNetworkReader(highwayNetwork, transformation);
-		// Take all highway links...
-		reader.setHierarchyLayer(new OsmFilter.OsmFilterTakeAll(2));
-		reader.parse(osmFile);
-		// Merge networks:
-		NetworkMerger.integrateNetwork(this.network, highwayNetwork, "", "hw");
+		NetworkMerger.integrateNetwork(this.network, streetNetwork, "", prefix);
 	}
 
 }

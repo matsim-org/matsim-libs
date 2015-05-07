@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.Tuple;
@@ -37,8 +36,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.BUS;
-import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.TRAM;
+import static playground.boescpa.converters.osm.scheduleCreator.hafasCreator.PtRouteFPLAN.BUS;
+import static playground.boescpa.converters.osm.scheduleCreator.hafasCreator.PtRouteFPLAN.TRAM;
 
 /**
  * Based on the line, mode, and link type, the traveling on links is assigned different costs.

@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -37,8 +36,8 @@ import org.matsim.pt.transitSchedule.api.*;
 
 import java.util.*;
 
-import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.BUS;
-import static playground.boescpa.converters.osm.scheduleCreator.PtRouteFPLAN.TRAM;
+import static playground.boescpa.converters.osm.scheduleCreator.hafasCreator.PtRouteFPLAN.BUS;
+import static playground.boescpa.converters.osm.scheduleCreator.hafasCreator.PtRouteFPLAN.TRAM;
 
 /**
  * Default implementation of PTLinesCreator.
