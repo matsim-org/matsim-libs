@@ -49,9 +49,9 @@ public final class OperatorInitializer {
 	private int counter;
 	
 	
-	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, Controler controler, TimeProvider timeProvider) {
+	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, Controler controler, TimeProvider timeProvider, WelfareAnalyzer welfareAnalyzer) {
 		this.pConfig = pConfig;
-		this.operatorFactory = new OperatorFactory(this.pConfig, franchise);
+		this.operatorFactory = new OperatorFactory(this.pConfig, franchise, welfareAnalyzer);
         this.routeProvider = PRouteProviderFactory.createRouteProvider(controler.getScenario().getNetwork(), controler.getScenario().getPopulation(), this.pConfig, pStopsOnly, controler.getControlerIO().getOutputPath(), controler.getEvents());
 		
 		if (this.pConfig.getStartWith24Hours()) {

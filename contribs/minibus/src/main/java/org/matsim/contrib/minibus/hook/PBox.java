@@ -69,6 +69,8 @@ final class PBox implements Operators {
 	private final StageContainerCreator stageCollectorHandler;
 	private final OperatorCostCollectorHandler operatorCostCollectorHandler;
 	private final PStrategyManager strategyManager = new PStrategyManager();
+	
+	private final WelfareAnalyzer welfareAnalyzer;
 
 	private final TicketMachine ticketMachine;
 
@@ -79,6 +81,14 @@ final class PBox implements Operators {
 		this.stageCollectorHandler = new StageContainerCreator(this.pConfig.getPIdentifier());
 		this.operatorCostCollectorHandler = new OperatorCostCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getCostPerVehicleAndDay(), this.pConfig.getCostPerKilometer() / 1000.0, this.pConfig.getCostPerHour() / 3600.0);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise(), pConfig.getGridSize());
+		
+		if (pConfig.getWelfareMaximization()) {
+			log.info("Objective Function: Welfare");
+			this.welfareAnalyzer = new WelfareAnalyzer();
+		} else {
+			log.info("Objective Function: Operator Profit");
+			this.welfareAnalyzer = null;
+		}
 	}
 
 	void notifyStartup(StartupEvent event) {
@@ -110,7 +120,7 @@ final class PBox implements Operators {
         this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getScenario().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
 		
 		this.operators = new LinkedList<>();
-		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getControler(), timeProvider);
+		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getControler(), timeProvider, this.welfareAnalyzer);
 		
 		// init additional operators from a given transit schedule file
 		LinkedList<Operator> operatorsFromSchedule = this.operatorInitializer.createOperatorsFromSchedule(event.getControler().getScenario().getTransitSchedule());
@@ -160,6 +170,11 @@ final class PBox implements Operators {
     }
 
 	void notifyScoring(ScoringEvent event) {
+		
+		if (this.pConfig.getWelfareMaximization()) {
+			welfareAnalyzer.computeWelfare(event.getControler().getScenario());	
+		}
+		
 		Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
 		for (Operator operator : this.operators) {
 			operator.score(driverId2ScoreMap);

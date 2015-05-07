@@ -34,10 +34,18 @@ final class OperatorFactory {
 	
 	private final PConfigGroup pConfig;
 	private final PFranchise franchise;
+	private final WelfareAnalyzer welfareAnalyzer;
 	
 	public OperatorFactory(PConfigGroup pConfig, PFranchise franchise){
 		this.pConfig = pConfig;
 		this.franchise = franchise;
+		this.welfareAnalyzer = null;
+	}
+	
+	public OperatorFactory(PConfigGroup pConfig, PFranchise franchise, WelfareAnalyzer welfareAnalyzer){
+		this.pConfig = pConfig;
+		this.franchise = franchise;
+		this.welfareAnalyzer = welfareAnalyzer;
 	}
 	
 	public Operator createNewOperator(Id<Operator> id){
@@ -47,6 +55,14 @@ final class OperatorFactory {
 			return new MultiPlanOperator(id, this.pConfig, this.franchise);
 		} else if(this.pConfig.getOperatorType().equalsIgnoreCase(CarefulMultiPlanOperator.OPERATOR_NAME)){
 			return new CarefulMultiPlanOperator(id, this.pConfig, this.franchise);
+		} else if(this.pConfig.getOperatorType().equalsIgnoreCase(WelfareCarefulMultiPlanOperator.OPERATOR_NAME)){
+			
+			if (this.welfareAnalyzer == null) {
+				throw new RuntimeException("Welfare analyzer is null. Aborting...");
+			}
+			
+			return new WelfareCarefulMultiPlanOperator(id, this.pConfig, this.franchise, this.welfareAnalyzer);
+			
 		} else {
 			log.error("There is no operator type specified. " + this.pConfig.getOperatorType() + " unknown");
 			return null;

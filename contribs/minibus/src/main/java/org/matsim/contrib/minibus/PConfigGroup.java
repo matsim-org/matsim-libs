@@ -101,6 +101,8 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final String PMODULE_DISABLEINITERATION = "ModuleDisableInIteration_";
 	private static final String PMODULE_PARAMETER = "ModuleParameter_";
 	
+	private static final String WELFARE_MAXIMIZATION = "welfareMaximization";
+	
 	// Defaults
 	private String pIdentifier = "p_";
 	private double minX = -Double.MAX_VALUE;
@@ -149,6 +151,8 @@ public final class PConfigGroup extends ConfigGroup{
 	private String ptRouter = "none set";
 	private String operationMode = TransportMode.pt;
 	private String topoTypesForStops = null;
+	
+	private boolean welfareMaximization = false;
 
 	// Strategies
 	private final LinkedHashMap<Id<PStrategySettings>, PStrategySettings> strategies = new LinkedHashMap<>();
@@ -277,6 +281,8 @@ public final class PConfigGroup extends ConfigGroup{
 		} else if (key != null && key.startsWith(PMODULE_PARAMETER)) {
 			PStrategySettings settings = getStrategySettings(Id.create(key.substring(PMODULE_PARAMETER.length()), PStrategySettings.class), true);
 			settings.setParameters(value);
+		} else if (WELFARE_MAXIMIZATION.equals(key)) {
+			this.welfareMaximization = Boolean.parseBoolean(value);
 		} else {
 			log.error("unknown parameter: " + key + "...");
 		}
@@ -334,6 +340,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(PT_ROUTER, this.ptRouter);
 		map.put(OPERATIONMODE, this.operationMode);
 		map.put(TOPOTYPESFORSTOPS, this.topoTypesForStops);
+		map.put(WELFARE_MAXIMIZATION, Boolean.toString(this.welfareMaximization));
 		
 		for (Entry<Id<PStrategySettings>, PStrategySettings> entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), entry.getValue().getModuleName());
@@ -395,6 +402,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(PT_ROUTER, "Uses a experimental connection scan algorithm for routing if set to 'raptor'. Defaults to MATSim standard router.");
 		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
 		map.put(TOPOTYPESFORSTOPS, "comma separated integer-values, as used in NetworkCalcTopoTypes");
+		map.put(WELFARE_MAXIMIZATION, "computes operator revenues based on the change in welfare. EXPERIMENTAL!");
 		
 		for (Entry<Id<PStrategySettings>, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), "name of strategy");
@@ -703,6 +711,10 @@ public final class PConfigGroup extends ConfigGroup{
 				log.warn("Transit lines will be merged. Activate the operator logger to retrieve more detailed information on particular routes.");
 			}
 		}
+	}
+
+	public boolean getWelfareMaximization() {
+		return this.welfareMaximization;
 	}
 
 }

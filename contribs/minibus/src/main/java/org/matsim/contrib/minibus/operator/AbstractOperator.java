@@ -120,6 +120,10 @@ abstract class AbstractOperator implements Operator{
 			}
 		}
 		
+		processScore();
+	}
+	
+	protected void processScore() {
 		// score all vehicles not associated with plans
 		score -= this.numberOfVehiclesInReserve * this.costPerVehicleAndDay;
 		
@@ -152,7 +156,7 @@ abstract class AbstractOperator implements Operator{
 			}
 		}
 	}
-	
+
 	@Override
 	abstract public void replan(PStrategyManager pStrategyManager, int iteration);
 	
@@ -260,16 +264,17 @@ abstract class AbstractOperator implements Operator{
 		}
 	}
 
-	private void scorePlan(Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap, PPlan plan) {
+	protected void scorePlan(Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap, PPlan plan) {
 		double totalLineScore = 0.0;
 		int totalTripsServed = 0;
 		
 		for (Id<Vehicle> vehId : plan.getVehicleIds()) {
 			totalLineScore += driverId2ScoreMap.get(vehId).getTotalRevenue();
-			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();
+			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();	
 		}
 		
 		plan.setScore(totalLineScore);
 		plan.setTripsServed(totalTripsServed);
 	}
+	
 }
