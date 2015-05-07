@@ -67,6 +67,7 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 	public void updateTransitSchedule(TransitSchedule schedule) {
 		this.needToUpdateRouter = true;
 		this.schedule = schedule;
+//		this.schedule = PTransitLineMerger.mergeSimilarRoutes(schedule);
 		
 		if (this.ptRouter.equalsIgnoreCase("raptor")) {
 			// this could also hold updated prices
