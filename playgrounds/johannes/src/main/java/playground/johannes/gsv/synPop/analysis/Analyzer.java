@@ -104,7 +104,8 @@ public class Analyzer {
 	
 	
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-//		task.addTask(new ActivityChainTask());
+		task.addTask(new ActivityChainTask());
+		task.addTask(new HomeActChainTask());
 		task.addTask(new LegGeoDistanceTask("car"));
 		task.addTask(new LegGeoDistanceTask("car", 100000));
 		task.addTask(new LegRouteDistanceTask("car"));

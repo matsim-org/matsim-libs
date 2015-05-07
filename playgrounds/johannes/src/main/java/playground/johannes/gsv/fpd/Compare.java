@@ -26,6 +26,7 @@ import java.util.Set;
 
 import playground.johannes.gsv.sim.cadyts.ODUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
@@ -44,7 +45,7 @@ public class Compare {
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
 		
-		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/15-04-2015/iais.2h.xml");
+		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/28-04-2015/iais.2h.xml");
 		KeyMatrix iais = reader.getMatrix();
 
 		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.modena.xml");
@@ -56,21 +57,27 @@ public class Compare {
 		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/ref/miv.sym.874.xml");
 		KeyMatrix sim = reader.getMatrix();
 		
-//		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/fpd/fraunhofer/study/data/gis/zones.geojson", "NO");
-//		ODUtils.cleanDistances(iais, zones, 50000, WGS84DistanceCalculator.getInstance());
+		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/fpd/fraunhofer/study/data/gis/zones.geojson", "NO");
+		ODUtils.cleanDistances(iais, zones, 50000, WGS84DistanceCalculator.getInstance());
 		
 		
-		double c = ODUtils.calcNormalization(iais, tomtom);
-		playground.johannes.gsv.zones.MatrixOperations.applyFactor(iais, c);
+		double c = ODUtils.calcNormalization(iais, model);
+		playground.johannes.gsv.zones.MatrixOperations.applyFactor(model, 1/c);
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/study/analysis/15-04-2015/compare.txt"));
+		c = ODUtils.calcNormalization(iais, tomtom);
+		playground.johannes.gsv.zones.MatrixOperations.applyFactor(tomtom, 1/c);
+		
+		c = ODUtils.calcNormalization(iais, sim);
+		playground.johannes.gsv.zones.MatrixOperations.applyFactor(sim, 1/c);
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/study/analysis/28-04-2015/compare.2h.txt"));
 		writer.write("from\tto\tvolIais\tvolTomTom");
 		writer.newLine();
 		
 //		TDoubleArrayList iaisVols = new TDoubleArrayList();
 //		TDoubleArrayList tomtomVols = new TDoubleArrayList();
 		
-		BufferedWriter scatterWriter = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/study/analysis/15-04-2015/scatter.txt"));
+		BufferedWriter scatterWriter = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/study/analysis/28-04-2015/scatter.2h.txt"));
 		scatterWriter.write("iais\ttomtom\tmodel\tsim");
 		scatterWriter.newLine();
 		

@@ -17,44 +17,62 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.fpd;
+package playground.johannes.gsv.matrices.analysis;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 
 /**
  * @author johannes
  *
  */
-public class Iais2matrix {
+public class OriginVolume {
 
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/fpd/fraunhofer/study/data/raw/28-04-2015/AggregatedTrajectories_all_noTransit_min2h_splitrules-2_Flows_daily.csv"));
-		String line = reader.readLine();
+		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		reader.setValidating(false);
+		reader.parse("/home/johannes/sge/prj/matsim/run/874/output/matrices-averaged/miv.sym.xml");
 		
-		KeyMatrix m = new KeyMatrix();
+		KeyMatrix m = reader.getMatrix();
+
+		Set<String> keys = m.keys();
+		Map<String, Double> vols = new HashMap<>();
 		
-		while((line = reader.readLine()) != null) {
-			String tokens[] = line.split(",");
-			
-			String id_i = tokens[2];
-			String id_j = tokens[3];
-			double volume = Double.parseDouble(tokens[29]);
-			
-			m.set(id_i, id_j, volume);
+		for(String i : keys) {
+			double sum = 0;
+			for(String j : keys) {
+				Double val = m.get(i, j);
+				if(val != null) {
+					sum += val;
+				}
+			}
+			vols.put(i, sum);
 		}
-		reader.close();
 		
-		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(m, "/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/28-04-2015/iais.2h.xml");
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/matrices/analysis/origin-volumes.txt"));
+		writer.write("id\tvolume");
+		writer.newLine();
+		
+		for(Entry<String, Double> e : vols.entrySet()) {
+			writer.write(e.getKey());
+			writer.write("\t");
+			writer.write(String.valueOf(e.getValue()));
+			writer.newLine();
+		}
+		
+		writer.close();
 	}
 
 }

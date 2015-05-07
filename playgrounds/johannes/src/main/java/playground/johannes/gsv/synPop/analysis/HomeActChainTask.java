@@ -20,16 +20,18 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
-import gnu.trove.TIntIntHashMap;
 import gnu.trove.TObjectDoubleHashMap;
-import gnu.trove.TObjectIntHashMap;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
+import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
@@ -39,52 +41,46 @@ import playground.johannes.sna.util.TXTWriter;
  * @author johannes
  *
  */
-public class ActivityChainTask extends AnalyzerTask {
+public class HomeActChainTask extends AnalyzerTask {
 
-	public static final String KEY = "n.act";
+	public static final String KEY = "n.home.act";
 	
 	@Override
 	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
 		TObjectDoubleHashMap<String> chains = new TObjectDoubleHashMap<String>();
-		
-		TObjectIntHashMap<String> typeCount = new TObjectIntHashMap<String>();
 		
 		TDoubleDoubleHashMap tripCounts = new TDoubleDoubleHashMap();
 		
 		for(ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlan();
 			
-			StringBuilder builder = new StringBuilder();
+			List<String> achain = new ArrayList<>();
 			for(int i = 0; i < plan.getActivities().size(); i++) {
 				String type = (String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
-				
-				typeCount.adjustOrPutValue(type, 1, 1);
-				
-				builder.append(type);
-				builder.append("-");
+				achain.add(type);
+				if(type.equalsIgnoreCase(ActivityType.HOME) && i > 0) {
+					String chain = StringUtils.join(achain, "-");
+					chains.adjustOrPutValue(chain, 1, 1);
+					tripCounts.adjustOrPutValue(achain.size() - 1, 1, 1);
+					
+					achain = new ArrayList<>();
+					achain.add(type);
+				}
 			}
 			
-			String chain = builder.toString();
-			chains.adjustOrPutValue(chain, 1, 1);
-			
-			tripCounts.adjustOrPutValue(plan.getLegs().size(), 1, 1);
 		}
 		
-		for(Object key : typeCount.keys()) {
-			DescriptiveStatistics stats = new DescriptiveStatistics();
-			stats.addValue(typeCount.get((String) key));
-			results.put(String.format("%s.%s", KEY, key), stats);
-		}
-
+		
 		if (outputDirectoryNotNull()) {
 			try {
-				TXTWriter.writeMap(chains, "chain", "n", getOutputDirectory() + "/actchains.txt", true);
+				TXTWriter.writeMap(chains, "chain", "n", getOutputDirectory() + "/homeactchains.txt", true);
 				
-				TXTWriter.writeMap(tripCounts, "nTrips", "n", getOutputDirectory() + "/tripcounts.txt", true);
+				TXTWriter.writeMap(tripCounts, "nTrips", "n", getOutputDirectory() + "/hometripcounts.txt", true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-
+	
+	
 }
