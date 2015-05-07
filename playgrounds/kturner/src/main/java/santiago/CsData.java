@@ -6,12 +6,16 @@ import java.util.TreeMap;
 
 class CsData {
 	
-	private Map<String, ArrayList<Integer>> volumePerTime = new TreeMap<String, ArrayList<Integer>>();
+	private Map<String, ArrayList<Integer>> volumePerTime = new TreeMap<String, ArrayList<Integer>>(); //Map<time, volumes[]>
 	
 //	CsData(String time){
 //		this.volumePerTime.put(time, null);
 //	}
 	
+	Map<String, ArrayList<Integer>> getVolumePerTime() {
+		return volumePerTime;
+	}
+
 	void addTimeAndVolume(String time, Integer vol){
 		volumePerTime.put(time, new ArrayList<Integer>());
 		volumePerTime.get(time).add(vol);
@@ -35,34 +39,4 @@ class CsData {
 		} else
 		return false;
 	}
-	
-	
-//	private String time = null;
-//	private ArrayList<Integer> volumes = new ArrayList<Integer>();
-//	
-//	CsData(String time, Integer vol){
-//		this.time = time;
-//		this.volumes.add(vol);		
-//	}
-//	
-//	void addVolume(Integer vol){
-//		volumes.add(vol);
-//	}
-//	
-//	Integer getTotalVolume(){
-//		Integer sum = 0;
-//		for (int i=0; i<= volumes.size(); i++){
-//			sum += volumes.get(i);
-//		}
-//		return sum;
-//	}
-//	
-//	String getTime() {
-//		return time;
-//	}
-//	void setTime(String time) {
-//		this.time = time;
-//	}
-
-	
 }

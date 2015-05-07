@@ -28,6 +28,8 @@ public class RunCL_KT {
 		CSVToCountingStations converter = new CSVToCountingStations(COUNTFILE, CSIdFILE, CSDATAFILE);
 		converter.createIds();
 		converter.readCountsFromCSV();
+		converter.writeCountsToFile();
+		System.out.println("#### Done.");
 	}
 	
 
