@@ -111,22 +111,22 @@ public class KnSimplifiedController extends AbstractController {
 	@Override
 	protected void loadCoreListeners() {
 
-		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEnd(scenario, getControlerIO());
+		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEndImpl(scenario, getControlerIO());
 		this.addControlerListener(dumpDataAtEnd);
 		
 		final PlansScoring plansScoring = createPlansScoring();
 		this.addControlerListener(plansScoring);
 
 		final StrategyManager strategyManager = createStrategyManager() ;
-		this.addCoreControlerListener(new PlansReplanning( strategyManager, this.population ));
+		this.addCoreControlerListener(new PlansReplanningImpl( strategyManager, this.population ));
 
-		final PlansDumping plansDumping = new PlansDumping( this.scenario, this.config.controler().getFirstIteration(), 
+		final PlansDumping plansDumping = new PlansDumpingImpl( this.scenario, this.config.controler().getFirstIteration(), 
 				this.config.controler().getWritePlansInterval(), stopwatch, getControlerIO() );
 		this.addCoreControlerListener(plansDumping);
 
 		this.addCoreControlerListener(new LegTimesControlerListener(legTimes, getControlerIO()));
 		
-		final EventsHandling eventsHandling = new EventsHandling(events,
+		final EventsHandling eventsHandling = new EventsHandlingImpl(events,
 				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
 				getControlerIO() );
 		this.addCoreControlerListener(eventsHandling); 

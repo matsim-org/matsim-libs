@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DumpJointDataAtEnd.java
+ * ControlerDefaultCoreListenersModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,47 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.controller.listeners;
+package org.matsim.core.controler;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.DumpDataAtEndImpl;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.ShutdownListener;
-
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
+import org.matsim.core.controler.corelisteners.EventsHandling;
+import org.matsim.core.controler.corelisteners.EventsHandlingImpl;
+import org.matsim.core.controler.corelisteners.PlansDumping;
+import org.matsim.core.controler.corelisteners.PlansDumpingImpl;
+import org.matsim.core.controler.corelisteners.PlansReplanning;
+import org.matsim.core.controler.corelisteners.PlansReplanningImpl;
+import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.controler.corelisteners.PlansScoringImpl;
 
 /**
+ * Defines the default core listeners.
+ * In 99% of the use cases, this should be left as is.
+ * Most of the process can be configured using more elemental elements:
+ * StrategyManager, ScoringFunction, EventHandlers.
+ *
  * @author thibautd
  */
-public class DumpJointDataAtEnd implements ShutdownListener {
-	private final DumpDataAtEndImpl individualDumper;
-	private final Scenario scenario;
-	private final JointPlans jointPlans;
-	private final OutputDirectoryHierarchy controlerIO;
-
-	public DumpJointDataAtEnd(
-			final Scenario scenarioData,
-			final JointPlans jointPlans,
-			final OutputDirectoryHierarchy controlerIO) {
-		this.individualDumper = new DumpDataAtEndImpl( scenarioData , controlerIO );
-		this.scenario = scenarioData;
-		this.jointPlans = jointPlans;
-		this.controlerIO = controlerIO;
-	}
+public class ControlerDefaultCoreListenersModule extends AbstractModule {
 
 	@Override
-	public void notifyShutdown(final ShutdownEvent event) {
-		individualDumper.notifyShutdown( event );
-		dumpJointPlans();
-	}
-
-	private void dumpJointPlans() {
-		JointPlansXmlWriter.write(
-				scenario.getPopulation(),
-				jointPlans,
-				controlerIO.getOutputFilename( "output_jointPlans.xml.gz" ) );
+	public void install() {
+		bind( PlansScoring.class ).to( PlansScoringImpl.class );
+		bind( PlansReplanning.class ).to( PlansReplanningImpl.class );
+		bind( PlansDumping.class ).to( PlansDumpingImpl.class );
+		bind( EventsHandling.class ).to( EventsHandlingImpl.class );
+		bind( DumpDataAtEnd.class ).to( DumpDataAtEndImpl.class );
 	}
 }
 

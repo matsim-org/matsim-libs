@@ -20,8 +20,11 @@
 
 package org.matsim.core.controler;
 
-import com.google.inject.Provider;
-import com.google.inject.name.Names;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -36,7 +39,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.controler.corelisteners.*;
+import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
+import org.matsim.core.controler.corelisteners.EventsHandling;
+import org.matsim.core.controler.corelisteners.PlansDumping;
+import org.matsim.core.controler.corelisteners.PlansReplanning;
+import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
@@ -66,10 +73,8 @@ import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import com.google.inject.Provider;
+import com.google.inject.name.Names;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -124,7 +129,7 @@ public class Controler extends AbstractController {
     // DefaultControlerModule includes submodules. If you want less than what the Controler does
     // by default, you can leave ControlerDefaultsModule out, look at what it does,
     // and only include what you want.
-    private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule());
+    private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule(), new ControlerDefaultCoreListenersModule());
 
     // The module which is currently defined by the sum of the setXX methods called on this Controler.
     private AbstractModule overrides = AbstractModule.emptyModule();
@@ -286,10 +291,6 @@ public class Controler extends AbstractController {
 		 * are added to the list.
 		 */
 
-		if (this.dumpDataAtEnd) {
-			this.addCoreControlerListener(new DumpDataAtEnd(scenario , getControlerIO()));
-		}
-
         this.injector = Injector.createInjector(
                 config,
                 new AbstractModule() {
@@ -313,12 +314,15 @@ public class Controler extends AbstractController {
                     }
                 });
         this.injectorCreated = true;
-        this.addCoreControlerListener(new PlansScoring(this.getScenario(), this.getEvents(), this.getControlerIO(), this.getScoringFunctionFactory()));
-        this.addCoreControlerListener(new PlansReplanning(this.injector.getInstance(StrategyManager.class), this.getScenario().getPopulation()));
-		this.addCoreControlerListener(new PlansDumping(this.getScenario(), this.getConfig().controler().getFirstIteration(), this.getConfig().controler().getWritePlansInterval(),
-				this.stopwatch, this.getControlerIO() ));
-		this.addCoreControlerListener(new EventsHandling(this.getEvents(), this.getConfig().controler().getWriteEventsInterval(),
-				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
+
+		if (this.dumpDataAtEnd) {
+			this.addCoreControlerListener( injector.getInstance( DumpDataAtEnd.class ) );
+		}
+
+        this.addCoreControlerListener( injector.getInstance( PlansScoring.class ) );
+        this.addCoreControlerListener( injector.getInstance( PlansReplanning.class ) );
+		this.addCoreControlerListener( injector.getInstance( PlansDumping.class ) );
+		this.addCoreControlerListener( injector.getInstance( EventsHandling.class ) );
 		// must be last being added (=first being executed)
 
         Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();

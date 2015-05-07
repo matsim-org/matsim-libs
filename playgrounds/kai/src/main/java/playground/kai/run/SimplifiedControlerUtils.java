@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.controler.corelisteners.PlansScoringImpl;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -54,11 +54,11 @@ public class SimplifiedControlerUtils {
 	 * Convenience method to have a default implementation of the scoring.  It is deliberately non-configurable.  It makes
 	 * no promises about what it does, nor about stability over time.  May be used as a starting point for own variants.
 	 */
-	static PlansScoring createPlansScoringDefault( Scenario sc, EventsManager ev, OutputDirectoryHierarchy controlerIO ) {
+	static PlansScoringImpl createPlansScoringDefault( Scenario sc, EventsManager ev, OutputDirectoryHierarchy controlerIO ) {
 		Config config = sc.getConfig();
 		Network network = sc.getNetwork() ;
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( config.planCalcScore(), network );
-		final PlansScoring plansScoring = new PlansScoring( sc, ev, controlerIO, scoringFunctionFactory );
+		final PlansScoringImpl plansScoring = new PlansScoringImpl( sc, ev, controlerIO, scoringFunctionFactory );
 		return plansScoring;
 	}
 

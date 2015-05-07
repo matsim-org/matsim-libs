@@ -24,7 +24,7 @@ import org.matsim.analysis.LegTimesControlerListener;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.ControlerUtils;
-import org.matsim.core.controler.corelisteners.EventsHandling;
+import org.matsim.core.controler.corelisteners.EventsHandlingImpl;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -146,7 +146,7 @@ public final class ImmutableJointController extends AbstractController {
 					getControlerIO()));
 		
 		this.addCoreControlerListener(
-				new EventsHandling(
+				new EventsHandlingImpl(
 						registry.getEvents(),
 						// registry.getScenario().getConfig().controler().getWriteEventsInterval(),
 						0, // handled by the PSim config group

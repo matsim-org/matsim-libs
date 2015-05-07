@@ -20,32 +20,12 @@
 
 package org.matsim.core.controler.corelisteners;
 
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.controler.listener.ControlerListener;
 
 /**
- * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
- * replanning of plans in every iteration. Basically it integrates the
- * {@link org.matsim.core.replanning.StrategyManager} with the
- * {@link org.matsim.core.controler.Controler}.
+ * Marker interface, allowing to replace the element providing
+ * this functionality in the Controler by Injection.
  *
- * @author mrieser
+ * @author thibautd
  */
-public final class PlansReplanning implements ReplanningListener {
-	
-	private Population population ;
-	private StrategyManager strategyManager ;
-	
-	public PlansReplanning( StrategyManager strategyManager, Population pop ) {
-		this.population = pop ;
-		this.strategyManager = strategyManager ;
-	}
-
-	@Override
-	public void notifyReplanning(final ReplanningEvent event) {
-		strategyManager.run(population, event.getIteration(), event.getReplanningContext());
-	}
-
-}
+public interface PlansReplanning extends ControlerListener {}

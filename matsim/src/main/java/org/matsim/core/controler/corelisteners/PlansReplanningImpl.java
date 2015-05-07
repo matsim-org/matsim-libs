@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DumpDataAtEnd.java
+ * PlansReplanner.java.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,9 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package org.matsim.core.controler.corelisteners;
 
-import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.replanning.StrategyManager;
 
-public interface DumpDataAtEnd extends ControlerListener {
+import com.google.inject.Inject;
+
+/**
+ * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
+ * replanning of plans in every iteration. Basically it integrates the
+ * {@link org.matsim.core.replanning.StrategyManager} with the
+ * {@link org.matsim.core.controler.Controler}.
+ *
+ * @author mrieser
+ */
+public class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
+	
+	private Population population ;
+	private StrategyManager strategyManager ;
+	
+	@Inject
+	public PlansReplanningImpl( StrategyManager strategyManager, Population pop ) {
+		this.population = pop ;
+		this.strategyManager = strategyManager ;
+	}
+
+	@Override
+	public void notifyReplanning(final ReplanningEvent event) {
+		strategyManager.run(population, event.getIteration(), event.getReplanningContext());
+	}
+
 }
