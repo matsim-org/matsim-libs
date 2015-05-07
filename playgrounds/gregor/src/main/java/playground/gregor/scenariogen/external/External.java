@@ -53,7 +53,7 @@ public class External {
 	private static String inputDir = "./input";
 	private static String outputDir = "./output";
 
-	private static final int nrAgents = 8000;
+	private static final int nrAgents = 100;
 
 	public static void main(String[] args) {
 		Config c = ConfigUtils.createConfig();

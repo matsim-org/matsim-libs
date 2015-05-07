@@ -62,6 +62,7 @@ import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent;
 import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent.Agent.Builder;
 import org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed;
 import org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents;
+import org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed;
 import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceService;
 
 import playground.gregor.hybridsim.grpc.GRPCExternalClient;
@@ -215,6 +216,16 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		responseObserver.onCompleted();
 	}
 
+	
+	@Override
+	public void reqMaximumNumberOfAgents(MaximumNumberOfAgents request,
+			StreamObserver<MaximumNumberOfAgentsConfirmed> responseObserver) {
+		MaximumNumberOfAgentsConfirmed resp = MaximumNumberOfAgentsConfirmed.newBuilder().setNumber(this.sim.getScenario().getPopulation().getPersons().size()).build();
+		responseObserver.onValue(resp);
+		responseObserver.onCompleted();
+		
+	}
+	
 	//rpc MATSim --> extern
 
 	@Override
@@ -243,8 +254,6 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 			throw new RuntimeException("client is null");
 		}
 		
-		MaximumNumberOfAgents n = MaximumNumberOfAgents.newBuilder().setNumber(this.sim.getScenario().getPopulation().getPersons().size()).build();
-		this.client.getBlockingStub().reqMaximumNumberOfAgents(n);
 		ExternOnPrepareSim prep = ExternOnPrepareSim.newBuilder().build();
 		ExternOnPrepareSimConfirmed resp = this.client.getBlockingStub().reqExternOnPrepareSim(prep);
 		
@@ -278,5 +287,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		MATSim2ExternPutAgent addReq = MATSim2ExternPutAgent.newBuilder().setAgent(ab).build();
 		MATSim2ExternPutAgentConfirmed addReqResp = this.client.getBlockingStub().reqMATSim2ExternPutAgent(addReq);
 	}
+
+
 
 }
