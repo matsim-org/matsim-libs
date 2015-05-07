@@ -140,20 +140,25 @@ public class LinkCongestionInfo {
 	}
 
 	public boolean isLinkFree(Id<Person> nowLeavingAgent, double time){
+		boolean isLinkFree = false;
+		if(lastLeavingAgent == null) return true;
+		
 		double freeSpeedLeaveTimeOfLastLeftAgent = this.personId2freeSpeedLeaveTime.get(lastLeavingAgent);
 		double freeSpeedLeaveTimeOfNowAgent = this.personId2freeSpeedLeaveTime.get(nowLeavingAgent);
 		double timeHeadway = freeSpeedLeaveTimeOfNowAgent -  freeSpeedLeaveTimeOfLastLeftAgent;
 		double minTimeHeadway = this.marginalDelayPerLeavingVehicle_sec;
 		
-		if (timeHeadway < minTimeHeadway) return false;
-		else if (timeHeadway == minTimeHeadway){
-			double earliestLeaveTime = Math.floor(lastLeaveTime+ minTimeHeadway) +1;
-			if(time > earliestLeaveTime){
-				return true;
-			} else return false;
-		}
-		else return true;
+		if (timeHeadway < minTimeHeadway) isLinkFree = false;
+		else isLinkFree = true;
+		
+		double earliestLeaveTime = Math.floor(lastLeaveTime+ marginalDelayPerLeavingVehicle_sec) +1;
+		if(time > earliestLeaveTime){
+			isLinkFree = true;
+		} else isLinkFree = false;
+		
+		return isLinkFree;
 	}
+	
 	public List<Id<Link>> getSpillBackCausingLinks() {
 		return spillBackCausingLinks;
 	}

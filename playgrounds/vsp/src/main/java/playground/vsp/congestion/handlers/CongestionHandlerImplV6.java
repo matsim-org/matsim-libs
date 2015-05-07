@@ -47,6 +47,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -77,6 +78,7 @@ PersonStuckEventHandler, ActivityEndEventHandler
 	private Map<Id<Person>, List<Tuple<String, Double>>> personId2ActType2ActEndTime = new HashMap<>();
 	private double totalDelay = 0;
 	private double roundingErrors =0;
+	private double roundingErrorWarnCount =0;
 
 	/**
 	 * @param events
@@ -93,6 +95,17 @@ PersonStuckEventHandler, ActivityEndEventHandler
 			log.warn("Mixed traffic (simulated public transport) is not tested. Vehicles may have different effective cell sizes than 7.5 meters.");
 		}
 		storeLinkInfo();
+	}
+	
+	private void storeLinkInfo(){
+		for(Link link : scenario.getNetwork().getLinks().values()){
+			LinkCongestionInfo linkInfo = new LinkCongestionInfo();
+			linkInfo.setLinkId(link.getId());
+			double flowCapacity_CapPeriod = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
+			double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
+			linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
+			linkId2congestionInfo.put(link.getId(), linkInfo);
+		}
 	}
 
 	@Override
@@ -122,22 +135,10 @@ PersonStuckEventHandler, ActivityEndEventHandler
 			personId2ActType2ActEndTime.put(event.getPersonId(), listNow);
 		}
 	}
-	
-	private void storeLinkInfo(){
-		for(Link link : scenario.getNetwork().getLinks().values()){
-			LinkCongestionInfo linkInfo = new LinkCongestionInfo();
-			linkInfo.setLinkId(link.getId());
-			double flowCapacity_CapPeriod = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
-			double marginalDelay_sec = ((1 / (flowCapacity_CapPeriod / this.scenario.getNetwork().getCapacityPeriod()) ) );
-			linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
-			linkId2congestionInfo.put(link.getId(), linkInfo);
-		}
-	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		String travelMode = event.getLegMode();
-		event.getLegMode();
 		if(congestedModes.contains(travelMode)){
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
@@ -169,39 +170,52 @@ PersonStuckEventHandler, ActivityEndEventHandler
 
 		if(delay > 0.){
 			totalDelay += delay;
-
-			Id<Person> causingAgent;
-			Id<Link> causingLink;
-			String congestionType;
-
-			if(linkInfo.isLinkFree(personId, linkLeaveTime)){
-				causingLink = getNextLinkInRoute(personId, linkId, linkLeaveTime);
-				causingAgent = linkId2congestionInfo.get(causingLink).getLastEnteredAgent(); 
-
-				if (causingAgent==null ) {
-					if(delay==1){
-						roundingErrors+=delay;
-						log.warn("Delays are more than 0 for person "+personId+" but there is no causing agent. This should not happen.");
-						return;
-					}else {
-						throw new RuntimeException("Delay for person "+personId+" is"+delay+" sec. But causing agent could not be located. Aborting...");
-					}
-				} 
-
-				congestionType = CongestionType.SpillbackDelay.toString();
-
-			} else {
-				causingLink = linkId;
-				causingAgent = Id.createPersonId(linkInfo.getLastLeavingAgent().toString());
-				congestionType = CongestionType.FlowDelay.toString();
-			}
-
-			CongestionEvent congestionEvent = new CongestionEvent(linkLeaveTime, congestionType, causingAgent, 
-					personId, delay, causingLink, linkId2congestionInfo.get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
-			this.events.processEvent(congestionEvent);
+			processDelays(event,delay);
 		}
 		linkInfo.setLastLeavingAgent(personId);
 		linkInfo.setLastLeaveTime(linkLeaveTime);
+	}
+	
+	private void processDelays(LinkLeaveEvent event, final double delay){
+
+		Id<Person> personId = Id.createPersonId(event.getVehicleId().toString());
+		Id<Link> linkId	= event.getLinkId();
+		double linkLeaveTime = event.getTime();
+		
+		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(linkId);
+		
+		Id<Person> causingAgent;
+		Id<Link> causingLink;
+		String congestionType;
+		
+		if(linkInfo.isLinkFree(personId, linkLeaveTime)){
+			causingLink = getNextLinkInRoute(personId, linkId, linkLeaveTime);
+			causingAgent = linkId2congestionInfo.get(causingLink).getLastEnteredAgent(); 
+
+			if (causingAgent==null) {
+				if(delay==1){
+					roundingErrors+=delay;
+					if(this.roundingErrorWarnCount==0){
+						log.warn("Delay is 1 sec for person "+personId+" but there is no causing agent. This can happen.");
+						log.warn(Gbl.ONLYONCE);
+						this.roundingErrorWarnCount++;
+					}
+					return;
+				}else {
+					throw new RuntimeException("Delay for person "+personId+" is "+ delay+" sec. But causing agent could not be located. This happened during event "+event.toString()+" Aborting...");
+				}
+			} 
+			congestionType = CongestionType.SpillbackDelay.toString();
+
+		} else {
+			causingLink = linkId;
+			causingAgent = Id.createPersonId(linkInfo.getLastLeavingAgent().toString());
+			congestionType = CongestionType.FlowDelay.toString();
+		}
+		
+		CongestionEvent congestionEvent = new CongestionEvent(linkLeaveTime, congestionType, causingAgent, 
+				personId, delay, causingLink, linkId2congestionInfo.get(causingLink).getPersonId2linkEnterTime().get(causingAgent));
+		this.events.processEvent(congestionEvent);
 	}
 
 	/**
