@@ -136,7 +136,7 @@ public class GeneratingFleetFromDemand {
 		    }
 	    
 
-		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_run34.txt")));
+		BufferedWriter output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_run42.txt")));
 
 		reader = IOUtils.getBufferedReader(args[1]);
 	    
@@ -177,8 +177,8 @@ public class GeneratingFleetFromDemand {
 	    output.flush();
 	    output.close();
 	    
-	    reader = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_run34.txt");
-	    output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_run34_v2.txt")));
+	    reader = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_run42.txt");
+	    output = new BufferedWriter(new FileWriter(new File("C:/Users/balacm/Desktop/Stations_GreaterZurich_from_demand_run42_v1.txt")));
 	    s = reader.readLine();
 	    while(s != null ) {
 	    	

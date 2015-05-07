@@ -12,7 +12,7 @@ public class RentalTimesStatistics {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
-		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/1.250.RT_CS");
+		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Documents/Papers/STRC2015/Unlimited/1.250.RT_CS");
 		int[] rentalTimes = new int[30];
 		int[] distance = new int[50];
 		int[] distanceTraveled = new int[80];
@@ -35,7 +35,7 @@ public class RentalTimesStatistics {
 			String[] arr = s.split("\\s");
 			if (Double.parseDouble(arr[4]) != 0.0) {
 				double time = Double.parseDouble(arr[6]);
-				distance[(int)(time*0.9/130.0)]++;
+				distance[(int)(time  / 130.0)]++;
 				bla.add(Double.parseDouble(arr[0]));
 			//	usedCars.add(arr[8]);
 				double startTime = Double.parseDouble(arr[1]);

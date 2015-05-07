@@ -55,7 +55,7 @@ public class ModalSplitGrocery {
 
 			Population pop = scenario.getPopulation();	
 			for (Person p:pop.getPersons().values()) {
-				if (bla.getAttribute(p.getId().toString(), "subpopulation") == null ) {
+				if (bla.getAttribute(p.getId().toString(), "subpopulation") == null && ((PersonImpl)p).isEmployed()) {
 					if (((PersonImpl)p).getLicense().equals("yes"))
 						countLicenceHolders++;
 					else
