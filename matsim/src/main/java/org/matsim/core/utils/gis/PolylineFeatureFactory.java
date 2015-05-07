@@ -118,7 +118,7 @@ public class PolylineFeatureFactory {
 			SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 			b.setName(this.name);
 			b.setCRS(this.crs);
-			b.add("location", MultiLineString.class);
+			b.add("the_geom", MultiLineString.class);
 			for (Map.Entry<String, Class<?>> attr : this.attributes.entrySet()) {
 				b.add(attr.getKey(), attr.getValue());
 			}

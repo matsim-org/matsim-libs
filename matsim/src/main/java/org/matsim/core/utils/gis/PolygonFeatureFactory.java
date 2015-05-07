@@ -156,7 +156,7 @@ public class PolygonFeatureFactory {
 			SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 			b.setName(this.name);
 			b.setCRS(this.crs);
-			b.add("location", MultiPolygon.class);
+			b.add("the_geom", MultiPolygon.class);
 			for (Map.Entry<String, Class<?>> attr : this.attributes.entrySet()) {
 				b.add(attr.getKey(), attr.getValue());
 			}

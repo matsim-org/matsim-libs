@@ -15,6 +15,9 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.utils.gis.PointFeatureFactory;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.testcases.MatsimTestUtils;
@@ -63,7 +66,7 @@ public class ShapeFileWriterTest {
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setName("EvacuationArea");
 		b.setCRS(DefaultGeographicCRS.WGS84);
-		b.add("location", MultiPolygon.class);
+		b.add("the_geom", MultiPolygon.class);
 		b.add("name", String.class);
 		SimpleFeatureType ft = b.buildFeatureType();
 		
@@ -88,5 +91,91 @@ public class ShapeFileWriterTest {
 		Assert.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
 		
 		
+	}
+	
+	@Test
+	public void testShapeFileWriterWithSelfCreatedContent_withMatsimFactory_Polygon() throws IOException {
+		String outFile = utils.getOutputDirectory() + "test.shp";
+		
+		PolygonFeatureFactory ff = new PolygonFeatureFactory.Builder()
+				.setName("EvacuationArea")
+				.setCrs(DefaultGeographicCRS.WGS84)
+				.addAttribute("name", String.class)
+				.create();
+		
+		Coordinate[] coordinates = new Coordinate[]{new Coordinate(0,0),new Coordinate(0,1),new Coordinate(1,1),new Coordinate(0,0)};
+		SimpleFeature f = ff.createPolygon(coordinates);
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		features.add(f);
+		
+		Geometry g0 = (Geometry) f.getDefaultGeometry();
+		
+		ShapeFileWriter.writeGeometries(features, outFile);
+		
+		SimpleFeatureSource s1 = ShapeFileReader.readDataFile(outFile);
+		SimpleFeatureCollection fts1 = s1.getFeatures();
+		SimpleFeatureIterator it1 = fts1.features();
+		SimpleFeature ft1 = it1.next();
+		Geometry g1 = (Geometry) ft1.getDefaultGeometry();
+		
+		Assert.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
+	}
+
+	@Test
+	public void testShapeFileWriterWithSelfCreatedContent_withMatsimFactory_Polyline() throws IOException {
+		String outFile = utils.getOutputDirectory() + "test.shp";
+		
+		PolylineFeatureFactory ff = new PolylineFeatureFactory.Builder()
+		.setName("EvacuationArea")
+		.setCrs(DefaultGeographicCRS.WGS84)
+		.addAttribute("name", String.class)
+		.create();
+		
+		Coordinate[] coordinates = new Coordinate[]{new Coordinate(0,0),new Coordinate(0,1),new Coordinate(1,1),new Coordinate(0,0)};
+		SimpleFeature f = ff.createPolyline(coordinates);
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		features.add(f);
+		
+		Geometry g0 = (Geometry) f.getDefaultGeometry();
+		
+		ShapeFileWriter.writeGeometries(features, outFile);
+		
+		SimpleFeatureSource s1 = ShapeFileReader.readDataFile(outFile);
+		SimpleFeatureCollection fts1 = s1.getFeatures();
+		SimpleFeatureIterator it1 = fts1.features();
+		SimpleFeature ft1 = it1.next();
+		Geometry g1 = (Geometry) ft1.getDefaultGeometry();
+		
+		Assert.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
+	}
+
+	@Test
+	public void testShapeFileWriterWithSelfCreatedContent_withMatsimFactory_Point() throws IOException {
+		String outFile = utils.getOutputDirectory() + "test.shp";
+		
+		PointFeatureFactory ff = new PointFeatureFactory.Builder()
+		.setName("EvacuationArea")
+		.setCrs(DefaultGeographicCRS.WGS84)
+		.addAttribute("name", String.class)
+		.create();
+		
+		SimpleFeature f = ff.createPoint(new Coordinate(10, 20));
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		features.add(f);
+		
+		Geometry g0 = (Geometry) f.getDefaultGeometry();
+		
+		ShapeFileWriter.writeGeometries(features, outFile);
+		
+		SimpleFeatureSource s1 = ShapeFileReader.readDataFile(outFile);
+		SimpleFeatureCollection fts1 = s1.getFeatures();
+		SimpleFeatureIterator it1 = fts1.features();
+		SimpleFeature ft1 = it1.next();
+		Geometry g1 = (Geometry) ft1.getDefaultGeometry();
+		
+		Assert.assertEquals(g0.getCoordinates().length, g1.getCoordinates().length);
 	}
 }

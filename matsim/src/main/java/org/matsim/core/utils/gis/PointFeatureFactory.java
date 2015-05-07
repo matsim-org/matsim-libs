@@ -122,7 +122,7 @@ public class PointFeatureFactory {
 			SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 			b.setName(this.name);
 			b.setCRS(this.crs);
-			b.add("location", Point.class);
+			b.add("the_geom", Point.class);
 			for (Map.Entry<String, Class<?>> attr : this.attributes.entrySet()) {
 				b.add(attr.getKey(), attr.getValue());
 			}
