@@ -46,7 +46,7 @@ import org.matsim.vehicles.VehicleWriterV1;
 
 import com.google.inject.Inject;
 
-public class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
+public final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private final Scenario scenarioData;
 

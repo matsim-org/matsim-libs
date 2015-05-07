@@ -40,7 +40,7 @@ import com.google.inject.Inject;
  *
  * @author mrieser
  */
-public class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
+public final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 
 	static final private Logger log = Logger.getLogger(PlansDumpingImpl.class);
 	private Scenario sc ;

@@ -44,7 +44,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 
 import com.google.inject.Inject;
 
-public class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener, 
+public final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener, 
 	AfterMobsimListener, IterationEndsListener, ShutdownListener {
 
 	final static private Logger log = Logger.getLogger(EventsHandlingImpl.class);

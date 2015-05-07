@@ -51,7 +51,7 @@ import com.google.inject.Inject;
  *
  * @author mrieser, michaz
  */
-public class PlansScoringImpl implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+public final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
 	private EventsToScore eventsToScore;
 

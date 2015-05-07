@@ -35,7 +35,7 @@ import com.google.inject.Inject;
  *
  * @author mrieser
  */
-public class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
+public final class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
 	
 	private Population population ;
 	private StrategyManager strategyManager ;
