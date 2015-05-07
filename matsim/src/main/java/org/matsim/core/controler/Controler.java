@@ -129,7 +129,11 @@ public class Controler extends AbstractController {
     // DefaultControlerModule includes submodules. If you want less than what the Controler does
     // by default, you can leave ControlerDefaultsModule out, look at what it does,
     // and only include what you want.
-    private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule(), new ControlerDefaultCoreListenersModule());
+    private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule());
+    // this defines the core of the process, and is mandatory: thus it is not in the "ControlerDefaultsModule",
+    // which is more for default facultative stuff (analysis etc.)
+    // One can override selected sub-modules by adding an overriding module.
+    private final AbstractModule coreListenersModule = new ControlerDefaultCoreListenersModule();
 
     // The module which is currently defined by the sum of the setXX methods called on this Controler.
     private AbstractModule overrides = AbstractModule.emptyModule();
@@ -296,9 +300,12 @@ public class Controler extends AbstractController {
                 new AbstractModule() {
                     @Override
                     public void install() {
+                    	final List<AbstractModule> baseModules = new ArrayList<AbstractModule>();
+                    	baseModules.add( coreListenersModule );
+                    	baseModules.addAll( modules );
                         // Use all the modules set with setModules, but overriding them with things set with
                         // other setters on this Controler.
-                        install(AbstractModule.override(modules, overrides));
+                        install(AbstractModule.override(baseModules, overrides));
 
                         // Bootstrap it with the Scenario and some controler context.
 						bind(OutputDirectoryHierarchy.class).toInstance(getControlerIO());
