@@ -18,14 +18,16 @@
  * *********************************************************************** */
 package playground.vsp.planselectors;
 
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelectorFactory;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.PtConstants;
@@ -55,7 +57,7 @@ import java.util.Map;
  */
 public final class DiversityGeneratingPlansRemover extends AbstractPlanSelector {
 	
-	public static final class Builder implements PlanSelectorFactory {
+	public static final class Builder implements Provider<GenericPlanSelector<Plan, Person>> {
 
         private Network network;
         private double actTypeWeight = 1.;

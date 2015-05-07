@@ -25,6 +25,7 @@ package playground.ikaddoura;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover;
 import playground.vsp.planselectors.DiversityGeneratingPlansRemover.Builder;
@@ -74,7 +75,7 @@ public class PathSizeLogitControler {
 
         if (pathSizeLogit){
 			
-			Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
+			final Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
 			builder.setActTypeWeight(0.);
 			builder.setLocationWeight(0.);
 			builder.setSameModePenalty(0.);
@@ -82,7 +83,12 @@ public class PathSizeLogitControler {
 			builder.setActTimeParameter(actTimeParam);
 
 			// this is the new syntax; not yet extensively tested: kai, aug'14
-			controler.addPlanSelectorForRemovalFactory("divGenPlansRemover", builder) ;
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addPlanSelectorForRemovalBinding("divGenPlansRemover").toProvider(builder);
+				}
+			});
 			controler.getConfig().strategy().setPlanSelectorForRemoval("divGenPlansRemover");
 
 		}

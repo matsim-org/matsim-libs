@@ -20,11 +20,8 @@
 
 package org.matsim.core.controler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
+import com.google.inject.Provider;
+import com.google.inject.name.Names;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -33,17 +30,15 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
-import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
@@ -53,7 +48,7 @@ import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.selectors.PlanSelectorFactory;
+import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
@@ -73,8 +68,10 @@ import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
-import com.google.inject.Provider;
-import com.google.inject.name.Names;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -648,17 +645,8 @@ public class Controler extends AbstractController {
         });
     }
 
-    public final void addPlanSelectorForRemovalFactory(final String planSelectorFactoryName, final PlanSelectorFactory planSelectorFactory) {
-        this.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                addPlanSelectorForRemovalBinding(planSelectorFactoryName).toProvider(planSelectorFactory);
-            }
-        });
-    }
 
-
-    // ******** --------- *******
+	// ******** --------- *******
 	// The following are methods which should not be used at all,
 	// or where I am not sure when it is allowed to call them.
 	// ******** --------- *******

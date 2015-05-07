@@ -253,13 +253,18 @@ public class GautengControler_subpopulations {
 		controler.setModules(module);
 
         // PLANS REMOVAL
-		Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
+		final Builder builder = new DiversityGeneratingPlansRemover.Builder() ;
 		builder.setActTypeWeight(5.);
 		builder.setLocationWeight(5.);
 		builder.setSameModePenalty(5.);
 		builder.setSameRoutePenalty(5.);
 		builder.setActTimeParameter(0.);
-		controler.addPlanSelectorForRemovalFactory(DIVERSITY_GENERATING_PLANS_REMOVER, builder);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				addPlanSelectorForRemovalBinding(DIVERSITY_GENERATING_PLANS_REMOVER).toProvider(builder);
+			}
+		});
 		// yyyy needs to be tested.  But in current runs, all plans of an agent are exactly identical at end of 1000it.  kai, mar'13
 		
 		// ADDITIONAL ANALYSIS:
