@@ -22,7 +22,6 @@ import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -75,7 +74,7 @@ PersonStuckEventHandler, ActivityEndEventHandler
 	private final List<String> congestedModes = new ArrayList<String>();
 	private final Map<Id<Link>, LinkCongestionInfo> 	linkId2congestionInfo = new HashMap<>();
 	private final Map<Id<Person>, String> personId2LegMode = new HashMap<>();
-	private Map<Id<Person>, List<Tuple<String, Double>>> personId2ActType2ActEntTime = new HashMap<>();
+	private Map<Id<Person>, List<Tuple<String, Double>>> personId2ActType2ActEndTime = new HashMap<>();
 	private double totalDelay = 0;
 	private double roundingErrors =0;
 
@@ -106,7 +105,7 @@ PersonStuckEventHandler, ActivityEndEventHandler
 	public void reset(int iteration) {
 		this.personId2LegMode.clear();
 		this.linkId2congestionInfo.clear();
-		this.personId2ActType2ActEntTime.clear();
+		this.personId2ActType2ActEndTime.clear();
 
 		storeLinkInfo();
 	}
@@ -114,13 +113,13 @@ PersonStuckEventHandler, ActivityEndEventHandler
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		//require for the multiple next link in route of the same person
-		if(personId2ActType2ActEntTime.containsKey(event.getPersonId())){
-			List<Tuple<String, Double>> listSoFar = personId2ActType2ActEntTime.get(event.getPersonId());
+		if(personId2ActType2ActEndTime.containsKey(event.getPersonId())){
+			List<Tuple<String, Double>> listSoFar = personId2ActType2ActEndTime.get(event.getPersonId());
 			listSoFar.add(new Tuple<String, Double>(event.getActType(), event.getTime()));
 		} else {
 			List<Tuple<String, Double>> listNow = new ArrayList<Tuple<String,Double>>();
 			listNow.add(new Tuple<String, Double>(event.getActType(), event.getTime()));
-			personId2ActType2ActEntTime.put(event.getPersonId(), listNow);
+			personId2ActType2ActEndTime.put(event.getPersonId(), listNow);
 		}
 	}
 	
@@ -146,9 +145,6 @@ PersonStuckEventHandler, ActivityEndEventHandler
 			linkInfo.setLastEnteredAgent(event.getPersonId());
 		}
 		this.personId2LegMode.put(event.getPersonId(), travelMode);
-		if(event.getPersonId().toString().equals("16310_1")){
-			System.out.println(event.getPersonId().toString()+event.toString());
-		}
 	}
 
 	@Override
@@ -231,16 +227,16 @@ PersonStuckEventHandler, ActivityEndEventHandler
 	private Id<Link> getNextLinkInRoute(Id<Person> personId, Id<Link> linkId, double time){
 		List<PlanElement> planElements = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
 
-		List<Tuple<String, Double>> personActInfos = personId2ActType2ActEntTime.get(personId);
+		List<Tuple<String, Double>> personActInfos = personId2ActType2ActEndTime.get(personId);
 		int numberOfActEnded = personActInfos.size();
 
-		String currentAct = personId2ActType2ActEntTime.get(personId).get(numberOfActEnded-1).getFirst();
+		String currentAct = personId2ActType2ActEndTime.get(personId).get(numberOfActEnded-1).getFirst();
 		int noOfOccuranceOfCurrentAct = 0;
 
 		SortedSet<Double> actEndTimes = new TreeSet<Double>();
 
 		for(int i =0;i<numberOfActEnded;i++){ // last stored act is currentAct
-			Tuple<String, Double> actInfo = personId2ActType2ActEntTime.get(personId).get(i);
+			Tuple<String, Double> actInfo = personId2ActType2ActEndTime.get(personId).get(i);
 			if(currentAct.equals(actInfo.getFirst())) {
 				actEndTimes.add(actInfo.getSecond());
 				noOfOccuranceOfCurrentAct++;
