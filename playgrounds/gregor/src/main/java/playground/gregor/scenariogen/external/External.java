@@ -48,11 +48,13 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class External {
-	private static String inputDirWrite = "/Users/laemmel/devel/external/matsim/input";
+	private static String inputDirWrite = "/Users/laemmel/devel/external/input";
 	
-	private static String inputDir = "./input";
-	private static String outputDir = "./output";
-
+//	private static String inputDir = "./input";
+//	private static String outputDir = "./output";
+	
+	private static String inputDir = "/Users/laemmel/devel/external/input";
+	private static String outputDir = "/Users/laemmel/devel/external/output";
 	private static final int nrAgents = 100;
 
 	public static void main(String[] args) {

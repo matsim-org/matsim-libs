@@ -67,6 +67,7 @@ import org.matsim.hybrid.MATSimInterfaceServiceGrpc.MATSimInterfaceService;
 
 import playground.gregor.hybridsim.grpc.GRPCExternalClient;
 import playground.gregor.hybridsim.grpc.GRPCInternalServer;
+import playground.gregor.hybridsim.grpc.RunJupedSim;
 
 public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
@@ -97,7 +98,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
 		}
-//				new Thread(new RunJupedSim()).start();
+				new Thread(new RunJupedSim()).start();
 		//		DummyJuPedSim.main(null);
 //		new Thread(new DummyJuPedSim()).start();
 
@@ -189,7 +190,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		String host = request.getHost();
 		int port = request.getPort();
 		log.info("client connected. openning backward channel to host:" + host + " at port:" + port);
-		this.client = new GRPCExternalClient("localhost",port);
+		this.client = new GRPCExternalClient(host,port);
 		ExternalConnectConfirmed resp = ExternalConnectConfirmed.newBuilder().build();
 		responseObserver.onValue(resp);
 		responseObserver.onCompleted();

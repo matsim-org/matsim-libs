@@ -107,7 +107,7 @@ public class Sim2DExtendedMATSimScenario2CustomizedOSM {
 
 	public static void main(String [] args) {
 		String osmFile = "/Users/laemmel/devel/tmp/map.osm";
-		String inputDir = "/Users/laemmel/devel/gct/input";
+		String inputDir = "/Users/laemmel/devel/hhw_hybrid/input";
 		String configFile = inputDir + "/config.xml";
 		String s2dConfigFile = inputDir + "/s2d_config.xml";
 
