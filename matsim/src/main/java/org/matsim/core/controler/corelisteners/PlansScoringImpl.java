@@ -42,6 +42,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
@@ -51,6 +52,7 @@ import com.google.inject.Inject;
  *
  * @author mrieser, michaz
  */
+@Singleton
 public final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
 	private EventsToScore eventsToScore;

@@ -43,7 +43,9 @@ import org.matsim.core.events.algorithms.EventWriterTXT;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener, 
 	AfterMobsimListener, IterationEndsListener, ShutdownListener {
 

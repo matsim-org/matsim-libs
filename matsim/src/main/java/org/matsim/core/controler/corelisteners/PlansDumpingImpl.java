@@ -30,6 +30,7 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * {@link org.matsim.core.controler.listener.ControlerListener} that dumps the
@@ -40,6 +41,7 @@ import com.google.inject.Inject;
  *
  * @author mrieser
  */
+@Singleton
 public final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 
 	static final private Logger log = Logger.getLogger(PlansDumpingImpl.class);

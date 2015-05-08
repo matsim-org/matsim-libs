@@ -26,6 +26,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.replanning.StrategyManager;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
@@ -35,6 +36,7 @@ import com.google.inject.Inject;
  *
  * @author mrieser
  */
+@Singleton
 public final class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
 	
 	private Population population ;

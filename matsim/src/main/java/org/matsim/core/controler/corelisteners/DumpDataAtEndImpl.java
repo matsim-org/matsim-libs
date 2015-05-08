@@ -45,7 +45,9 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private final Scenario scenarioData;
