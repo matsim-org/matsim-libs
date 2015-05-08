@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd
  */
-public interface GroupPlanStrategyFactory {
-	public GroupPlanStrategy createStrategy( ControllerRegistry registry );
+// For refactoring. should disappear
+public interface GroupPlanStrategyFactory extends Provider<GroupPlanStrategy> {
 }
 

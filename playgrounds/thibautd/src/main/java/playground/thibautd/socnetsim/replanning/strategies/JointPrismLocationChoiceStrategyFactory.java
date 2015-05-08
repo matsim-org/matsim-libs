@@ -19,58 +19,75 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.TripRouter;
+
+import playground.thibautd.router.PlanRoutingAlgorithmFactory;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice.PrismicLocationChoiceModule;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd
  */
 public class JointPrismLocationChoiceStrategyFactory extends AbstractConfigurableSelectionStrategy {
 
-	public JointPrismLocationChoiceStrategyFactory(
-			final GroupPlanStrategyFactoryRegistry factoryRegistry) {
-		super(factoryRegistry);
+	private final Scenario sc;
+	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
+	private final Provider<TripRouter> tripRouterFactory;
+	private final PlanLinkIdentifier planLinkIdentifier;
+
+	@Inject
+	public JointPrismLocationChoiceStrategyFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory ,
+			Provider<TripRouter> tripRouterFactory , PlanLinkIdentifier planLinkIdentifier ) {
+		this.sc = sc;
+		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
+		this.tripRouterFactory = tripRouterFactory;
+		this.planLinkIdentifier = planLinkIdentifier;
 	}
 
+
 	@Override
-	public GroupPlanStrategy createStrategy( final ControllerRegistry registry ) {
-		final GroupPlanStrategy strategy = instantiateStrategy( registry );
+	public GroupPlanStrategy get() {
+		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
 
 		strategy.addStrategyModule(
 				new PrismicLocationChoiceModule(
-					registry.getScenario() ) );
+					sc ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createJointTripAwareTourModeUnifierModule(
-					registry.getScenario().getConfig(),
-					registry.getTripRouterFactory() ) );
+					sc.getConfig(),
+					tripRouterFactory ) );
 
 		// TODO: add an option to enable or disable this part?
 		final VehicleRessources vehicles =
-				(VehicleRessources) registry.getScenario().getScenarioElement(
+				(VehicleRessources) sc.getScenarioElement(
 					VehicleRessources.ELEMENT_NAME );
 		if ( vehicles != null ) {
 			strategy.addStrategyModule(
 					GroupPlanStrategyFactoryUtils.createVehicleAllocationModule(
-						registry.getScenario().getConfig(),
+						sc.getConfig(),
 						vehicles ) );
 		}
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(
-					registry.getScenario().getConfig(),
-					registry.getPlanRoutingAlgorithmFactory(),
-					registry.getTripRouterFactory() ) );
+					sc.getConfig(),
+					planRoutingAlgorithmFactory,
+					tripRouterFactory ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					registry.getScenario().getConfig(),
-					registry.getJointPlans().getFactory(),
-					registry.getPlanLinkIdentifier() ) );
+					sc.getConfig(),
+					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
+					planLinkIdentifier ) );
 
 		return strategy;
 	}

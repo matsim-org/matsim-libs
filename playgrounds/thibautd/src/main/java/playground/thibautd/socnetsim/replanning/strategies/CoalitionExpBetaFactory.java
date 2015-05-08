@@ -23,10 +23,10 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
-import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector;
-import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
+import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector;
+import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
 
 /**
  * @author thibautd

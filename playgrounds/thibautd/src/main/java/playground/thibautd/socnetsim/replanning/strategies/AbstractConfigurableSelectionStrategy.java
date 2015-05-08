@@ -19,30 +19,30 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import java.util.Map;
+
+import org.matsim.core.config.Config;
+
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd
  */
 public abstract class AbstractConfigurableSelectionStrategy implements GroupPlanStrategyFactory {
-	private final GroupPlanStrategyFactoryRegistry factoryRegistry;
+	@Inject
+	private Map<String, Provider<GroupLevelPlanSelector>> factoryRegistry;
 
-	public AbstractConfigurableSelectionStrategy( final GroupPlanStrategyFactoryRegistry factoryRegistry ) {
-		this.factoryRegistry = factoryRegistry;
-	}
-
-	protected final GroupPlanStrategy instantiateStrategy( final ControllerRegistry registry ) {
+	protected GroupPlanStrategy instantiateStrategy( final Config config ) {
 		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
-			registry.getScenario().getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
+			config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
 
-		return new GroupPlanStrategy(
-				factoryRegistry.createSelector(
-					conf.getSelectorForModification(),
-					registry ) );
+		return new GroupPlanStrategy( factoryRegistry.get( conf.getSelectorForModification() ).get() );
 	}
 }
 

@@ -19,44 +19,54 @@
 
 package playground.thibautd.socnetsim.replanning.strategies;
 
+import javax.inject.Provider;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import com.google.inject.Inject;
+
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
-
-import javax.inject.Provider;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 
 public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelectionStrategy {
 	private static final Logger log =
 		Logger.getLogger(GroupTimeAllocationMutatorFactory.class);
 
+	private final Scenario sc;
+	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
+	private final Provider<TripRouter> tripRouterFactory;
+	private final PlanLinkIdentifier planLinkIdentifier;
+
 	private final double maxTemp;
 
-	public  GroupTimeAllocationMutatorFactory(
-			final GroupPlanStrategyFactoryRegistry factoryRegistry,
-			final double maxTemp) {
-		super( factoryRegistry );
-		this.maxTemp = maxTemp;
+	@Inject
+	public GroupTimeAllocationMutatorFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
+			PlanLinkIdentifier planLinkIdentifier ) {
+		this.sc = sc;
+		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
+		this.tripRouterFactory = tripRouterFactory;
+		this.planLinkIdentifier = planLinkIdentifier;
 	}
 
+
 	@Override
-	public GroupPlanStrategy createStrategy(
-			final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = instantiateStrategy( registry );
-		final Config config = registry.getScenario().getConfig();
-		final Provider<TripRouter> tripRouterFactory = registry.getTripRouterFactory();
-		final PlanRoutingAlgorithmFactory planRouterFactory = registry.getPlanRoutingAlgorithmFactory();
+	public GroupPlanStrategy get() {
+		final Config config = sc.getConfig();
+		final GroupPlanStrategy strategy = instantiateStrategy( config );
+		final PlanRoutingAlgorithmFactory planRouterFactory = planRoutingAlgorithmFactory;
 
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
@@ -98,8 +108,8 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
 					config,
-					registry.getJointPlans().getFactory(),
-					registry.getPlanLinkIdentifier() ) );
+					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
+					planLinkIdentifier ) );
 
 		return strategy;
 	}

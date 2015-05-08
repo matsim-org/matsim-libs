@@ -19,40 +19,58 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.TripRouter;
+
+import playground.thibautd.router.PlanRoutingAlgorithmFactory;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd
  */
 public class GroupReRouteFactory extends AbstractConfigurableSelectionStrategy {
-	public GroupReRouteFactory(GroupPlanStrategyFactoryRegistry factoryRegistry) {
-		super(factoryRegistry);
+	private final Scenario sc;
+	private final PlanRoutingAlgorithmFactory routingAlgorithmFactory;
+	private final Provider<TripRouter> tripRouterFactory;
+	private final PlanLinkIdentifier planLinkIdentifier;
+
+
+	@Inject
+	public GroupReRouteFactory( Scenario sc , PlanRoutingAlgorithmFactory routingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
+			PlanLinkIdentifier planLinkIdentifier ) {
+		this.sc = sc;
+		this.routingAlgorithmFactory = routingAlgorithmFactory;
+		this.tripRouterFactory = tripRouterFactory;
+		this.planLinkIdentifier = planLinkIdentifier;
 	}
 
+
 	@Override
-	public GroupPlanStrategy createStrategy(
-			final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = instantiateStrategy( registry );
+	public GroupPlanStrategy get() {
+		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
 	
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(
-					registry.getScenario().getConfig(),
-					registry.getPlanRoutingAlgorithmFactory(),
-					registry.getTripRouterFactory() ) );
+					sc.getConfig(),
+					routingAlgorithmFactory,
+					tripRouterFactory ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
-					registry.getScenario().getConfig(),
-					registry.getTripRouterFactory() ) );
+					sc.getConfig(),
+					tripRouterFactory ) );
 		
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					registry.getScenario().getConfig(),
-					registry.getJointPlans().getFactory(),
-					registry.getPlanLinkIdentifier()));
+					sc.getConfig(),
+					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME ) ).getFactory(),
+					planLinkIdentifier ));
 
 		return strategy;
 	}

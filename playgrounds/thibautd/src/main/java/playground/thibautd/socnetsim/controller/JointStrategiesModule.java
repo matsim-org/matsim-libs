@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GroupPlanStrategyFactoryRegistry.java
+ * JointStrategiesModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,12 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning;
+package playground.thibautd.socnetsim.controller;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.core.controler.AbstractModule;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
+import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
+import playground.thibautd.socnetsim.replanning.GroupLevelPlanSelectorFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.removers.CoalitionMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.LexicographicRemoverFactory;
 import playground.thibautd.socnetsim.replanning.removers.MinimumSumOfMinimumLossSelectorFactory;
@@ -59,56 +62,62 @@ import playground.thibautd.socnetsim.replanning.strategies.RandomJointLocationCh
 import playground.thibautd.socnetsim.replanning.strategies.RandomSumGroupPlanSelectorStrategyFactory;
 import playground.thibautd.socnetsim.replanning.strategies.WeakSelectorFactory;
 
+import com.google.inject.Provider;
+import com.google.inject.multibindings.MapBinder;
+
 /**
  * @author thibautd
  */
-public class GroupPlanStrategyFactoryRegistry {
-	private final Map<String, GroupLevelPlanSelectorFactory> selectorFactories = new HashMap<String, GroupLevelPlanSelectorFactory>();
-	private final Map<String, GroupPlanStrategyFactory> factories = new HashMap<String, GroupPlanStrategyFactory>();
-	private final Map<String, ExtraPlanRemoverFactory> selectors = new HashMap<String, ExtraPlanRemoverFactory>();
+public class JointStrategiesModule extends AbstractModule {
+    private MapBinder<String, GroupPlanStrategy> planStrategyBinder;
+    private MapBinder<String, GroupLevelPlanSelector> selectorBinder;
+    private MapBinder<String, ExtraPlanRemover> removerBinder;
 
-	public GroupPlanStrategyFactoryRegistry() {
+	@Override
+	public void install() {
+		planStrategyBinder = MapBinder.newMapBinder(binder(), String.class, GroupPlanStrategy.class);
+
 		// default factories
 		// ---------------------------------------------------------------------
 		addFactory(
 				"ReRoute",
-				new GroupReRouteFactory( this ) );
+				GroupReRouteFactory.class );
 		addFactory(
 				"TimeAllocationMutator",
-				new GroupTimeAllocationMutatorFactory( this , 1 ) );
+				GroupTimeAllocationMutatorFactory.class );
 		addFactory(
 				"JointTripMutator",
-				new JointTripMutatorFactory( this ) );
+				JointTripMutatorFactory.class );
 		addFactory(
 				"SubtourModeChoice",
-				new GroupSubtourModeChoiceFactory( this ) );
+				GroupSubtourModeChoiceFactory.class );
 		addFactory(
 				"TourVehicleAllocation",
-				new GroupTourVehicleAllocationFactory( this ) );
+				GroupTourVehicleAllocationFactory.class );
 		addFactory(
 				"PlanVehicleAllocation",
-				new GroupPlanVehicleAllocationFactory( this ) );
+				GroupPlanVehicleAllocationFactory.class );
 		addFactory(
 				"OptimizingTourVehicleAllocation",
-				new GroupOptimizingTourVehicleAllocationFactory( this ) );
+				GroupOptimizingTourVehicleAllocationFactory.class );
 		addFactory(
 				"RandomJointPlanRecomposer",
-				new GroupRandomJointPlanRecomposerFactory() );
+				GroupRandomJointPlanRecomposerFactory.class );
 		addFactory(
 				"ActivityInGroupLocationChoice",
-				new ActivityInGroupLocationChoiceFactory( this ) );
+				ActivityInGroupLocationChoiceFactory.class );
 		addFactory(
 				"ActivitySequenceMutator",
-				new GroupActivitySequenceMutator( this ) );
+				GroupActivitySequenceMutator.class );
 		addFactory(
 				"JointLocationMutator",
-				new RandomJointLocationChoiceStrategyFactory( this ) );
+				RandomJointLocationChoiceStrategyFactory.class );
 		addFactory(
 				"JointPrismLocationChoice",
-				new JointPrismLocationChoiceStrategyFactory( this ) );
+				JointPrismLocationChoiceStrategyFactory.class );
 		addFactory(
 				"JointPrismLocationChoiceWithJointTrips",
-				new JointPrismLocationChoiceWithJointTripInsertionStrategyFactory( this ) );
+				JointPrismLocationChoiceWithJointTripInsertionStrategyFactory.class );
 
 		// selectors
 		// ---------------------------------------------------------------------
@@ -186,84 +195,54 @@ public class GroupPlanStrategyFactoryRegistry {
 		addRemoverFactory(
 				"LexicographicPerComposition",
 				new LexicographicRemoverFactory());
-
-	}
-
-	public GroupPlanStrategy createStrategy(
-			final String name,
-			final ControllerRegistry registry) {
-		final GroupPlanStrategyFactory f = factories.get( name );
-
-		if ( f == null ) {
-			throw new IllegalArgumentException( "strategy "+name+
-					" is not known. Known names are "+factories.keySet() );
-		}
-
-		return f.createStrategy( registry );
 	}
 
 	public void addFactory(
 			final String name,
-			final GroupPlanStrategyFactory f) {
-		final GroupPlanStrategyFactory old = factories.put( name , f );
-
-		if ( old != null ) {
-			throw new IllegalArgumentException( "strategy "+name+" already known. Replacing factory is unsafe. Consider using another name for "+f );
-		}
+			final Class<? extends Provider<? extends GroupPlanStrategy>> f) {
+		planStrategyBinder.addBinding( name ).toProvider( f );
 	}
 
 	public void addSelectorFactory(
 			final String name,
-			final GroupLevelPlanSelectorFactory f) {
-		final GroupLevelPlanSelectorFactory old = selectorFactories.put( name , f );
-
-		if ( old != null ) {
-			throw new IllegalArgumentException( "selector "+name+" already known. Replacing factory is unsafe. Consider using another name for "+f );
-		}
+			final Provider<GroupLevelPlanSelector> f) {
+		selectorBinder.addBinding( name ).toProvider( f );
 	}
 
-	public void
-			addSelectorAndStrategyFactory(
-				final String name,
-				final NonInnovativeS f) {
-		addFactory( name , f );
-		addSelectorFactory( name , f );
-	}
-
-	public GroupLevelPlanSelector createSelector(
+	public void addSelectorAndStrategyFactory(
 			final String name,
-			final ControllerRegistry registry) {
-		final GroupLevelPlanSelectorFactory f = selectorFactories.get( name );
-
-		if ( f == null ) {
-			throw new IllegalArgumentException( "remover factory "+name+
-					" is not known. Known names are "+selectors.keySet() );
-		}
-
-		return f.createSelector( registry );
-	}
-
-	public ExtraPlanRemover createRemover(
-			final String name,
-			final ControllerRegistry registry) {
-		final ExtraPlanRemoverFactory f = selectors.get( name );
-
-		if ( f == null ) {
-			throw new IllegalArgumentException( "remover factory "+name+
-					" is not known. Known names are "+selectors.keySet() );
-		}
-
-		return f.createRemover( registry );
+			final NonInnovativeStrategyFactory f) {
+		addFactory( name ,
+				new Provider<GroupPlanStrategy>() {
+					@Override
+					public GroupPlanStrategy get() {
+						// TODO pass something in some way
+						return f.createStrategy( null );
+					}
+				} );
+		addSelectorFactory( name ,
+				new Provider<GroupLevelPlanSelector>() {
+					@Override
+					public GroupLevelPlanSelector get() {
+						// TODO pass something in some way
+						return f.createSelector( null );
+					}
+				} );
 	}
 
 	public void addRemoverFactory(
 			final String name,
 			final ExtraPlanRemoverFactory f) {
-		final ExtraPlanRemoverFactory old = selectors.put( name , f );
-
-		if ( old != null ) {
-			throw new IllegalArgumentException( "removerFactory "+name+" already known. Replacing selector is unsafe. Consider using another name for "+f );
-		}
+		removerBinder
+			.addBinding( name )
+			.toProvider( 
+				new Provider<ExtraPlanRemover>() {
+					@Override
+					public ExtraPlanRemover get() {
+						return f.createRemover( null );
+					}
+				} );
 	}
+
 }
 

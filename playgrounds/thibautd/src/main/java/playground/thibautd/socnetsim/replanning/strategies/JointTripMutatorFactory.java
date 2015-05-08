@@ -19,39 +19,61 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import org.matsim.core.router.TripRouter;
+
+import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.replanning.*;
+import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
+import playground.thibautd.socnetsim.replanning.JointPlanBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAndRemoverAlgorithm;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd
  */
 public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrategy {
 
-	public JointTripMutatorFactory(
-			GroupPlanStrategyFactoryRegistry factoryRegistry) {
-		super(factoryRegistry);
-		// TODO Auto-generated constructor stub
+	private final Scenario sc;
+	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
+	private final Provider<TripRouter> tripRouterFactory;
+	private final PlanLinkIdentifier planLinkIdentifier;
+
+
+	@Inject
+	public JointTripMutatorFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
+			PlanLinkIdentifier planLinkIdentifier ) {
+		this.sc = sc;
+		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
+		this.tripRouterFactory = tripRouterFactory;
+		this.planLinkIdentifier = planLinkIdentifier;
 	}
 
+
+
 	@Override
-	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = instantiateStrategy( registry );
+	public GroupPlanStrategy get() {
+		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
 		
-		final Config config = registry.getScenario().getConfig();
+		final Config config = sc.getConfig();
 
 		strategy.addStrategyModule(
 				new JointPlanMergingModule(
-					registry.getJointPlans().getFactory(),
+					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
 					config.global().getNumberOfThreads(),
 					// merge everything
 					1.0 ) );
@@ -62,8 +84,8 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 						@Override
 						public GenericPlanAlgorithm<JointPlan> createAlgorithm(ReplanningContext replanningContext) {
 							return new JointTripInsertorAndRemoverAlgorithm(
-								registry.getScenario(),
-								registry.getTripRouterFactory().get(),
+								sc,
+								tripRouterFactory.get(),
 								MatsimRandom.getLocalInstance(),
 								true); // "iterative"
 						}
@@ -77,22 +99,22 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(
 					config,
-					registry.getPlanRoutingAlgorithmFactory(),
-					registry.getTripRouterFactory() ) );
+					planRoutingAlgorithmFactory,
+					tripRouterFactory ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createSynchronizerModule(
 					config,
-					registry.getTripRouterFactory()) );
+					tripRouterFactory) );
 
 		final VehicleRessources vehicles = 
-					(VehicleRessources) registry.getScenario().getScenarioElement(
+					(VehicleRessources) sc.getScenarioElement(
 							VehicleRessources.ELEMENT_NAME );
 
 		if ( vehicles != null ) {
 			strategy.addStrategyModule(
 					new AllocateVehicleToPlansInGroupPlanModule(
-						registry.getScenario().getConfig().global().getNumberOfThreads(),
+						sc.getConfig().global().getNumberOfThreads(),
 						vehicles,
 						SharedVehicleUtils.DEFAULT_VEHICULAR_MODES,
 						false,
@@ -102,8 +124,8 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
 					config,
-					registry.getJointPlans().getFactory(),
-					registry.getPlanLinkIdentifier() ) );
+					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
+					planLinkIdentifier ) );
 
 		return strategy;
 	}

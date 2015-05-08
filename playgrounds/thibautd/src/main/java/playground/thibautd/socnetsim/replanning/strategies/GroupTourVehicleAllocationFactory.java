@@ -19,49 +19,65 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.router.TripRouter;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.router.PlanRoutingAlgorithmFactory;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToSubtourModule;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd
  */
 public class GroupTourVehicleAllocationFactory extends AbstractConfigurableSelectionStrategy {
 
-	public GroupTourVehicleAllocationFactory(
-			final GroupPlanStrategyFactoryRegistry factoryRegistry) {
-		super(factoryRegistry);
+	private final Scenario sc;
+	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
+	private final Provider<TripRouter> tripRouterFactory;
+	private final PlanLinkIdentifier planLinkIdentifier;
+
+	@Inject
+	public GroupTourVehicleAllocationFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
+			PlanLinkIdentifier planLinkIdentifier ) {
+		this.sc = sc;
+		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
+		this.tripRouterFactory = tripRouterFactory;
+		this.planLinkIdentifier = planLinkIdentifier;
 	}
 
+
 	@Override
-	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
-		final GroupPlanStrategy strategy = instantiateStrategy( registry );
+	public GroupPlanStrategy get() {
+		final GroupPlanStrategy strategy = instantiateStrategy( sc.getConfig() );
 
 		strategy.addStrategyModule(
 				new IndividualBasedGroupStrategyModule(
 					new AllocateVehicleToSubtourModule(
-						registry.getScenario().getConfig().global().getNumberOfThreads(),
+						sc.getConfig().global().getNumberOfThreads(),
 						TransportMode.car,
-						(VehicleRessources) registry.getScenario().getScenarioElement(
+						(VehicleRessources) sc.getScenarioElement(
 							VehicleRessources.ELEMENT_NAME ) ) ) );
 
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createReRouteModule(
-					registry.getScenario().getConfig(),
-					registry.getPlanRoutingAlgorithmFactory(),
-					registry.getTripRouterFactory() ) );
+					sc.getConfig(),
+					planRoutingAlgorithmFactory,
+					tripRouterFactory ) );
 		
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					registry.getScenario().getConfig(),
-					registry.getJointPlans().getFactory(),
-					registry.getPlanLinkIdentifier()));
+					sc.getConfig(),
+					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
+					planLinkIdentifier));
 
 		return strategy;
 	}

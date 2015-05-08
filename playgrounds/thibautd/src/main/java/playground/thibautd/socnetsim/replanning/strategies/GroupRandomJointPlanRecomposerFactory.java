@@ -19,12 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Inject;
+
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
 
@@ -33,8 +37,17 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
  */
 public class GroupRandomJointPlanRecomposerFactory implements GroupPlanStrategyFactory {
 
+	private final Scenario sc;
+	private final PlanLinkIdentifier planLinkIdentifier;
+
+	@Inject
+	public GroupRandomJointPlanRecomposerFactory( Scenario sc , PlanLinkIdentifier planLinkIdentifier ) {
+		this.sc = sc;
+		this.planLinkIdentifier = planLinkIdentifier;
+	}
+
 	@Override
-	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
+	public GroupPlanStrategy get() {
 		// Note that this breaks incompatibility constraints, but not
 		// joint plans constraints. Thus, it is not such a "recomposition"
 		// as a grouping of joint plans.
@@ -46,9 +59,9 @@ public class GroupRandomJointPlanRecomposerFactory implements GroupPlanStrategyF
 		// recompose
 		strategy.addStrategyModule(
 				GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule(
-					registry.getScenario().getConfig(),
-					registry.getJointPlans().getFactory(),
-					registry.getPlanLinkIdentifier()));
+					sc.getConfig(),
+					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )).getFactory(),
+					planLinkIdentifier));
 
 		return strategy;
 
