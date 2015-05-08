@@ -23,6 +23,8 @@ import java.util.Map;
 
 import org.matsim.core.controler.AbstractModule;
 
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Weak;
 import playground.thibautd.socnetsim.replanning.removers.CoalitionMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.LexicographicRemoverFactory;
 import playground.thibautd.socnetsim.replanning.removers.MinimumSumOfMinimumLossSelectorFactory;
@@ -172,12 +174,15 @@ public class DefaultJointStrategiesModule extends AbstractModule {
 				new Provider<GroupLevelPlanSelector>() {
 					@Inject
 					private IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory = null;
+					@Inject @Weak
+					private PlanLinkIdentifier weakIdentifier;
 
 					@Override
 					public GroupLevelPlanSelector get() {
 						return new WeakSelectorFactory(
-							new RandomGroupPlanSelectorStrategyFactory(
-								incompatiblePlansIdentifierFactory ) ).createSelector();
+								weakIdentifier,
+								new RandomGroupPlanSelectorStrategyFactory(
+										incompatiblePlansIdentifierFactory ) ).createSelector();
 					}
 				});
 
