@@ -58,11 +58,11 @@ public class TestInductiveChargingController extends MatsimTestCase {
 		inductiveCharger.setSamePowerAtAllStreets(3000);
 		
 		ChargingUponArrival chargingUponArrival= controller.getChargingUponArrival();
-		chargingUponArrival.setPowerForNonInitializedActivityTypes(controller.getScenario().getActivityFacilities(), 3500);
+		chargingUponArrival.setPowerForNonInitializedActivityTypes(controller.getRealControler().getScenario().getActivityFacilities(), 3500);
 		chargingUponArrival.getChargablePowerAtActivityTypes().put("h", 7000.0);
 		
 		
-		controller.run();
+		controller.getRealControler().run();
 		controller.printStatisticsToConsole();
 		
 		assertEquals(7, energyConsumptionTracker.getLog().size());

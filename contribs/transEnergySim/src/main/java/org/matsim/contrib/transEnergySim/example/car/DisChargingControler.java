@@ -57,7 +57,7 @@ public class DisChargingControler extends AddHandlerAtStartupControler {
 	private void init(HashMap<Id<Vehicle>, Vehicle> vehicles2) {
 		this.vehicles = vehicles2;
 		EventHandlerGroup handlerGroup = new EventHandlerGroup();
-        setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, getScenario().getNetwork()));
+        setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, getRealControler().getScenario().getNetwork()));
 		handlerGroup.addHandler(getEnergyConsumptionTracker());
 		addHandler(handlerGroup);		
 	}

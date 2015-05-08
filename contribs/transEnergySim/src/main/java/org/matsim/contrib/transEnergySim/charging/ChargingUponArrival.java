@@ -108,7 +108,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 		this.vehicles = vehicles;
 		this.controller = controller;
 		this.setDefaultValues(chargablePowerAtActivityTypes);
-		controller.addControlerListener(this);
+		controller.getRealControler().addControlerListener(this);
 		chargablePowerAtActivityTypes = new DoubleValueHashMap<String>();
 		enableLogging();
 	}
@@ -180,10 +180,10 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 					System.out.println("id has wrong type");
 				}
 				
-				Id<Link> linkId = controller.getScenario().getActivityFacilities().getFacilities().get(facilityId).getLinkId();
+				Id<Link> linkId = controller.getRealControler().getScenario().getActivityFacilities().getFacilities().get(facilityId).getLinkId();
 				
 				if (linkId==null){
-                    linkId = NetworkUtils.getNearestLink((controller.getScenario().getNetwork()), controller.getScenario().getActivityFacilities().getFacilities().get(facilityId).getCoord()).getId();
+                    linkId = NetworkUtils.getNearestLink((controller.getRealControler().getScenario().getNetwork()), controller.getRealControler().getScenario().getActivityFacilities().getFacilities().get(facilityId).getCoord()).getId();
 				}
 				
 				ChargingLogRowFacilityLevel chargingLogRow = new ChargingLogRowFacilityLevel(personId, linkId,facilityId,
