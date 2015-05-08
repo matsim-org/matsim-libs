@@ -76,7 +76,6 @@ import playground.thibautd.socnetsim.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.qsim.SwitchingJointQSimFactory;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.InnovationSwitchingGroupReplanningListenner;
@@ -126,79 +125,6 @@ public class RunUtils {
 							((ScenarioImpl) scenario).getActivityFacilities() );
 		return new PlanRouterWithVehicleRessourcesFactory(
 					jointRouterFactory );
-	}
-
-	public static void loadStrategyRegistryFromGroupStrategyConfigGroup(
-			final GroupPlanStrategyFactoryRegistry factories, 
-			final GroupStrategyRegistry strategyRegistry,
-			final ControllerRegistry controllerRegistry) {
-		final Config config = controllerRegistry.getScenario().getConfig();
-		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup) config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-
-		strategyRegistry.setExtraPlanRemover(
-				factories.createRemover(
-					weights.getSelectorForRemoval(),
-					controllerRegistry ) );
-
-		for ( StrategyParameterSet set : weights.getStrategyParameterSets() ) {
-			strategyRegistry.addStrategy(
-					factories.createStrategy(
-						set.getStrategyName(),
-						controllerRegistry ),
-					set.getSubpopulation(),
-					set.getWeight(),
-					set.isInnovative() ?
-						weights.getDisableInnovationAfterIter() :
-						-1 );
-		}
-	}
-
-	public static void loadStrategyRegistryWithInnovativeStrategiesOnly(
-			final GroupPlanStrategyFactoryRegistry factories, 
-			final GroupStrategyRegistry strategyRegistry,
-			final ControllerRegistry controllerRegistry) {
-		loadStrategyRegistry(
-				true,
-				factories,
-				strategyRegistry,
-				controllerRegistry );
-	}
-
-	public static void loadStrategyRegistryWithNonInnovativeStrategiesOnly(
-			final GroupPlanStrategyFactoryRegistry factories, 
-			final GroupStrategyRegistry strategyRegistry,
-			final ControllerRegistry controllerRegistry) {
-		loadStrategyRegistry(
-				false,
-				factories,
-				strategyRegistry,
-				controllerRegistry );
-	}
-
-	private static void loadStrategyRegistry(
-			final boolean innovativeness,
-			final GroupPlanStrategyFactoryRegistry factories, 
-			final GroupStrategyRegistry strategyRegistry,
-			final ControllerRegistry controllerRegistry) {
-		final Config config = controllerRegistry.getScenario().getConfig();
-		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup) config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-
-		strategyRegistry.setExtraPlanRemover(
-				factories.createRemover(
-					weights.getSelectorForRemoval(),
-					controllerRegistry ) );
-
-		for ( StrategyParameterSet set : weights.getStrategyParameterSets() ) {
-			if ( set.isInnovative() == innovativeness ) {
-				strategyRegistry.addStrategy(
-						factories.createStrategy(
-							set.getStrategyName(),
-							controllerRegistry ),
-						set.getSubpopulation(),
-						set.getWeight(),
-						-1 );
-			}
-		}
 	}
 
 	public static void loadDefaultAnalysis(
