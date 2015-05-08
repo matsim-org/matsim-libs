@@ -19,11 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
 import playground.thibautd.socnetsim.replanning.selectors.ParetoWeight;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
@@ -33,16 +36,25 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
  */
 public class ParetoExpBetaFactory extends NonInnovativeStrategyFactory {
 
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+	private final Scenario sc;
+
+	@Inject
+	public ParetoExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+		this.sc = sc;
+	}
+
+
 	@Override
-	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry registry) {
+	public GroupLevelPlanSelector createSelector() {
 		return 
 				new HighestWeightSelector(
-						registry.getIncompatiblePlansIdentifierFactory(),
+						incompatiblePlansIdentifierFactory,
 						new ParetoWeight(
 							new LogitWeight(
 								MatsimRandom.getLocalInstance(),
-								registry.getScenario().getConfig().planCalcScore().getBrainExpBeta())) );
+								sc.getConfig().planCalcScore().getBrainExpBeta())) );
 	}
 }
 

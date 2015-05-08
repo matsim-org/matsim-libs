@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd
  */
-public interface ExtraPlanRemoverFactory {
-	public ExtraPlanRemover createRemover( ControllerRegistry registry );
+// alias for refactoring, should be inlined
+public interface ExtraPlanRemoverFactory extends Provider<ExtraPlanRemover> {
 }
 

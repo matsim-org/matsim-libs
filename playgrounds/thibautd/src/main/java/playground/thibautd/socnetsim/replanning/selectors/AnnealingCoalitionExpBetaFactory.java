@@ -29,7 +29,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.GroupLevelPlanSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector;
 
@@ -89,8 +88,7 @@ public class AnnealingCoalitionExpBetaFactory implements GroupLevelPlanSelectorF
 	}
 
 	@Override
-	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry registry) {
+	public GroupLevelPlanSelector createSelector() {
 		final LogitWeight weight =
 			new LogitWeight(
 					MatsimRandom.getLocalInstance(),

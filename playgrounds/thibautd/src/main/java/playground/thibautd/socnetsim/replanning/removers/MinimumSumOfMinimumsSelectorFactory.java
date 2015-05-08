@@ -19,25 +19,39 @@
 
 package playground.thibautd.socnetsim.replanning.removers;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Inject;
+
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
 import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 
 public class MinimumSumOfMinimumsSelectorFactory extends AbstractDumbRemoverFactory {
+	
+	private final Scenario sc;
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+
+	@Inject
+	public MinimumSumOfMinimumsSelectorFactory( Scenario sc , IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
+		super( sc );
+		this.sc = sc;
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+	}
+
 	@Override
-	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry controllerRegistry) {
+	public GroupLevelPlanSelector createSelector() {
 		final WeightCalculator baseWeight =
 			new LowestScoreOfJointPlanWeight(
-					controllerRegistry.getJointPlans());
+					(JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME ));
 		return new HighestWeightSelector(
 				true ,
-				controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+				incompatiblePlansIdentifierFactory,
 				new WeightCalculator() {
 					@Override
 					public double getWeight(

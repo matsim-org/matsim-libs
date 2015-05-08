@@ -24,10 +24,12 @@ import java.util.Random;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 
@@ -36,11 +38,18 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
  */
 public class RandomSumGroupPlanSelectorStrategyFactory extends NonInnovativeStrategyFactory {
 
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+
+	@Inject
+	public RandomSumGroupPlanSelectorStrategyFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory ) {
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+	}
+
 	@Override
-	public GroupLevelPlanSelector createSelector(final ControllerRegistry registry) {
+	public GroupLevelPlanSelector createSelector() {
 		final Random random = MatsimRandom.getLocalInstance();
 		return new HighestWeightSelector(
-				registry.getIncompatiblePlansIdentifierFactory(),
+				incompatiblePlansIdentifierFactory,
 				new WeightCalculator() {
 					@Override
 					public double getWeight(

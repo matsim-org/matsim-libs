@@ -50,7 +50,8 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 	private final Provider<TripRouter> tripRouterFactory;
 	private final PlanLinkIdentifier planLinkIdentifier;
 
-	private final double maxTemp;
+	// TODO make configurable again
+	private final double maxTemp = 1;
 
 	@Inject
 	public GroupTimeAllocationMutatorFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,

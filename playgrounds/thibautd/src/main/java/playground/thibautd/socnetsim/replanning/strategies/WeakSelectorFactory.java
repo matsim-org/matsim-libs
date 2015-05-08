@@ -19,8 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.replanning.GroupLevelPlanSelectorFactory;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.WeakSelector;
 
@@ -30,16 +32,19 @@ import playground.thibautd.socnetsim.replanning.selectors.WeakSelector;
 public class WeakSelectorFactory implements GroupLevelPlanSelectorFactory {
 	private final GroupLevelPlanSelectorFactory delegateFactory;
 
+	@Inject @PlanLinkIdentifier.Weak
+	private PlanLinkIdentifier weakPlanLinkIdentifier;
+	
 	public WeakSelectorFactory(
 			final GroupLevelPlanSelectorFactory delegateFactory ) {
 		this.delegateFactory = delegateFactory;
 	}
 
 	@Override
-	public GroupLevelPlanSelector createSelector(final ControllerRegistry registry) {
+	public GroupLevelPlanSelector createSelector() {
 		return new WeakSelector(
-				registry.getWeakPlanLinkIdentifier() ,
-				delegateFactory.createSelector( registry ) );
+				weakPlanLinkIdentifier,
+				delegateFactory.createSelector( ) );
 	}
 }
 

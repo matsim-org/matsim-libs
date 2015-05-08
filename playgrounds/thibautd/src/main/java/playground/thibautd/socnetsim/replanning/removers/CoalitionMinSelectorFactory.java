@@ -19,15 +19,23 @@
 
 package playground.thibautd.socnetsim.replanning.removers;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import org.matsim.api.core.v01.Scenario;
+
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector;
 
 public class CoalitionMinSelectorFactory extends AbstractDumbRemoverFactory {
+	
+	@Inject
+	public CoalitionMinSelectorFactory( Scenario sc ) {
+		super( sc );
+	}
+	
 	@Override
-	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry registry) {
+	public GroupLevelPlanSelector createSelector() {
 		return new CoalitionSelector( new InverseScoreWeight() );
 	}
 }

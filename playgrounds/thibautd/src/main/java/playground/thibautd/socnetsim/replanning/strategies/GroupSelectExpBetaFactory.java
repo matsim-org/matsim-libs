@@ -19,11 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 
 /**
@@ -31,13 +34,21 @@ import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
  */
 public class GroupSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+	private final Scenario sc;
+
+	@Inject
+	public GroupSelectExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+		this.sc = sc;
+	}
+
 	@Override
-	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry registry) {
+	public GroupLevelPlanSelector createSelector() {
 		return new LogitSumSelector(
 			MatsimRandom.getLocalInstance(),
-			registry.getIncompatiblePlansIdentifierFactory(),
-			registry.getScenario().getConfig().planCalcScore().getBrainExpBeta());
+			incompatiblePlansIdentifierFactory,
+			sc.getConfig().planCalcScore().getBrainExpBeta());
 	}
 }
 

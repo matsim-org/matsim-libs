@@ -19,11 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Inject;
+
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
@@ -33,15 +37,24 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
  */
 public class GroupMinSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+	private final Scenario sc;
+
+	@Inject
+	public GroupMinSelectExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+		this.sc = sc;
+	}
+
 	@Override
-	public GroupLevelPlanSelector createSelector(final ControllerRegistry registry) {
+	public GroupLevelPlanSelector createSelector() {
 		return new HighestWeightSelector(
-			 registry.getIncompatiblePlansIdentifierFactory() ,
+			 incompatiblePlansIdentifierFactory ,
 			 new LogitWeight(
 				new LowestScoreOfJointPlanWeight(
-					registry.getJointPlans() ),
+					((JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME  )) ),
 				MatsimRandom.getLocalInstance(),
-				registry.getScenario().getConfig().planCalcScore().getBrainExpBeta()) );
+				sc.getConfig().planCalcScore().getBrainExpBeta()) );
 
 	}
 }

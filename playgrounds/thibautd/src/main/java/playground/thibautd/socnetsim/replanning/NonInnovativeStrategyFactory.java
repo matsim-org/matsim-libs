@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
 
 /**
  * @author thibautd
@@ -27,8 +26,8 @@ import playground.thibautd.socnetsim.controller.ControllerRegistry;
 public abstract class NonInnovativeStrategyFactory implements GroupPlanStrategyFactory, GroupLevelPlanSelectorFactory {
 
 	@Override
-	public GroupPlanStrategy createStrategy(final ControllerRegistry registry) {
-		return new GroupPlanStrategy( createSelector( registry ) );
+	public GroupPlanStrategy get() {
+		return new GroupPlanStrategy( createSelector() );
 	}
 }
 

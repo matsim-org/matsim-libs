@@ -19,15 +19,27 @@
 
 package playground.thibautd.socnetsim.replanning.removers;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import org.matsim.api.core.v01.Scenario;
+
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 
 public class MinimumSumSelectorFactory extends AbstractDumbRemoverFactory {
+	
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+
+	@Inject
+	public MinimumSumSelectorFactory( Scenario sc , IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory ) {
+		super( sc );
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+	}
+
 	@Override
-	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry controllerRegistry) {
+	public GroupLevelPlanSelector createSelector() {
 		return new LowestScoreSumSelectorForRemoval(
-				controllerRegistry.getIncompatiblePlansIdentifierFactory());
+				incompatiblePlansIdentifierFactory);
 	}
 }

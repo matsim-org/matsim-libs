@@ -19,9 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
@@ -34,18 +36,20 @@ import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.Coal
 public class CoalitionExpBetaFactory extends NonInnovativeStrategyFactory  {
 	private final ConflictSolver conflictSolver;
 
+	@Inject
+	private Scenario sc = null;
+
 	public CoalitionExpBetaFactory(
 			final ConflictSolver conflictSolver) {
 		this.conflictSolver = conflictSolver;
 	}
 
 	@Override
-	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry registry) {
+	public GroupLevelPlanSelector createSelector() {
 		return new CoalitionSelector(
 				new LogitWeight(
 					MatsimRandom.getLocalInstance(),
-					registry.getScenario().getConfig().planCalcScore().getBrainExpBeta()),
+					sc.getConfig().planCalcScore().getBrainExpBeta()),
 				conflictSolver);
 	}
 }

@@ -19,12 +19,15 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
 import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
@@ -34,21 +37,30 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
  */
 public class GroupWeightedSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+	private final Scenario sc;
+
+	@Inject
+	public GroupWeightedSelectExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+		this.sc = sc;
+	}
+
 	@Override
-	public GroupLevelPlanSelector createSelector(final ControllerRegistry registry) {
+	public GroupLevelPlanSelector createSelector() {
 		final GroupReplanningConfigGroup configGroup = (GroupReplanningConfigGroup)
-				registry.getScenario().getConfig().getModule(
+				sc.getConfig().getModule(
 						GroupReplanningConfigGroup.GROUP_NAME );
 
 		return 
 				 new HighestWeightSelector(
-					 registry.getIncompatiblePlansIdentifierFactory() ,
+					 incompatiblePlansIdentifierFactory ,
 					 new WeightedWeight(
 						 new LogitWeight(
 							MatsimRandom.getLocalInstance(),
-							registry.getScenario().getConfig().planCalcScore().getBrainExpBeta()),
+							sc.getConfig().planCalcScore().getBrainExpBeta()),
 						 configGroup.getWeightAttributeName(),
-						 registry.getScenario().getPopulation().getPersonAttributes() ) );
+						 sc.getPopulation().getPersonAttributes() ) );
 
 	}
 

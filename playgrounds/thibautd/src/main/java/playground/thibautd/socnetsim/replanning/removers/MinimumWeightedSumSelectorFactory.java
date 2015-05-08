@@ -19,26 +19,39 @@
 
 package playground.thibautd.socnetsim.replanning.removers;
 
+import org.matsim.api.core.v01.Scenario;
+
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 
+import com.google.inject.Inject;
+
 public class MinimumWeightedSumSelectorFactory extends AbstractDumbRemoverFactory {
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+	private final Scenario sc;
+
+	@Inject
+	public MinimumWeightedSumSelectorFactory( Scenario sc, IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory ) {
+		super( sc );
+		this.sc = sc;
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+	}
+
 	@Override
-	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry controllerRegistry) {
+	public GroupLevelPlanSelector createSelector() {
 		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
-				controllerRegistry.getScenario().getConfig().getModule(
+				sc.getConfig().getModule(
 					GroupReplanningConfigGroup.GROUP_NAME );
 		return new HighestWeightSelector(
 				true ,
-				controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+				incompatiblePlansIdentifierFactory,
 				new WeightedWeight(
 					new InverseScoreWeight(),
 					weights.getWeightAttributeName(),
-					controllerRegistry.getScenario().getPopulation().getPersonAttributes()  ));
+					sc.getPopulation().getPersonAttributes()  ));
 	}
 }

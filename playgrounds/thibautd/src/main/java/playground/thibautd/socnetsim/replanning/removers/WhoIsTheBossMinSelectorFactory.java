@@ -19,21 +19,33 @@
 
 package playground.thibautd.socnetsim.replanning.removers;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
 
 public class WhoIsTheBossMinSelectorFactory extends AbstractDumbRemoverFactory {
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+
+	@Inject
+	public WhoIsTheBossMinSelectorFactory(
+			final Scenario sc,
+			final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory) {
+		super( sc );
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+	}
+
 	@Override
-	public GroupLevelPlanSelector createSelector(
-			final ControllerRegistry controllerRegistry) {
+	public GroupLevelPlanSelector createSelector() {
 		return new WhoIsTheBossSelector(
 				true ,
 				MatsimRandom.getLocalInstance(),
-				controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+				incompatiblePlansIdentifierFactory,
 				new InverseScoreWeight() );
 	}
 }

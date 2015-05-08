@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.removers;
 
+import org.matsim.api.core.v01.Scenario;
+
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
@@ -30,15 +31,21 @@ import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector
  */
 abstract class AbstractDumbRemoverFactory implements ExtraPlanRemoverFactory {
 
+	private final Scenario sc;
+	
+	public AbstractDumbRemoverFactory( Scenario sc ) {
+		this.sc = sc;
+	}
+
 	@Override
-	public ExtraPlanRemover createRemover(final ControllerRegistry registry) {
+	public ExtraPlanRemover get() {
 		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
-				registry.getScenario().getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
+				sc.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
 		return new DumbExtraPlanRemover(
-				createSelector( registry ),
+				createSelector( ),
 				conf.getMaxPlansPerAgent() );
 	}
 
-	protected abstract GroupLevelPlanSelector createSelector(final ControllerRegistry registry);
+	protected abstract GroupLevelPlanSelector createSelector();
 }
 

@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 
 /**
  * @author thibautd
  */
 public interface GroupLevelPlanSelectorFactory {
-	public GroupLevelPlanSelector createSelector( final ControllerRegistry registry );
+	public GroupLevelPlanSelector createSelector();
 }
 

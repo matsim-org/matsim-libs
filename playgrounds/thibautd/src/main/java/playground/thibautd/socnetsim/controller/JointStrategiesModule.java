@@ -19,11 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.controller;
 
+import java.util.Map;
+
 import org.matsim.core.controler.AbstractModule;
 
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
-import playground.thibautd.socnetsim.replanning.GroupLevelPlanSelectorFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.removers.CoalitionMinSelectorFactory;
@@ -35,6 +36,7 @@ import playground.thibautd.socnetsim.replanning.removers.MinimumWeightedSumSelec
 import playground.thibautd.socnetsim.replanning.removers.ParetoMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.WhoIsTheBossMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.LeastAverageWeightJointPlanPruningConflictSolver;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.LeastPointedPlanPruningConflictSolver;
 import playground.thibautd.socnetsim.replanning.strategies.ActivityInGroupLocationChoiceFactory;
@@ -62,6 +64,7 @@ import playground.thibautd.socnetsim.replanning.strategies.RandomJointLocationCh
 import playground.thibautd.socnetsim.replanning.strategies.RandomSumGroupPlanSelectorStrategyFactory;
 import playground.thibautd.socnetsim.replanning.strategies.WeakSelectorFactory;
 
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.multibindings.MapBinder;
 
@@ -72,6 +75,7 @@ public class JointStrategiesModule extends AbstractModule {
     private MapBinder<String, GroupPlanStrategy> planStrategyBinder;
     private MapBinder<String, GroupLevelPlanSelector> selectorBinder;
     private MapBinder<String, ExtraPlanRemover> removerBinder;
+    private MapBinder<String, NonInnovativeStrategyFactory> nonInnovativeBinder;
 
 	@Override
 	public void install() {
@@ -123,22 +127,22 @@ public class JointStrategiesModule extends AbstractModule {
 		// ---------------------------------------------------------------------
 		addSelectorAndStrategyFactory(
 				"SelectExpBeta",
-				new GroupSelectExpBetaFactory() );
+				GroupSelectExpBetaFactory.class );
 		addSelectorAndStrategyFactory(
 				"WeightedSelectExpBeta",
-				new GroupWeightedSelectExpBetaFactory() );
+				GroupWeightedSelectExpBetaFactory.class );
 		addSelectorAndStrategyFactory(
 				"WhoIsTheBossSelectExpBeta",
-				new GroupWhoIsTheBossSelectExpBetaFactory() );
+				GroupWhoIsTheBossSelectExpBetaFactory.class );
 		addSelectorAndStrategyFactory(
 				"MinSelectExpBeta",
-				new GroupMinSelectExpBetaFactory() );
+				GroupMinSelectExpBetaFactory.class );
 		addSelectorAndStrategyFactory(
 				"MinLossSelectExpBeta",
-				new GroupMinLossSelectExpBetaFactory() );
+				GroupMinLossSelectExpBetaFactory.class );
 		addSelectorAndStrategyFactory(
 				"ParetoSelectExpBeta",
-				new ParetoExpBetaFactory() );
+				ParetoExpBetaFactory.class );
 		addSelectorAndStrategyFactory(
 				"CoalitionSelectExpBeta_LeastPointedConflictResolution",
 				new CoalitionExpBetaFactory(
@@ -157,49 +161,64 @@ public class JointStrategiesModule extends AbstractModule {
 					new LeastAverageWeightJointPlanPruningConflictSolver() ) );
 		addSelectorAndStrategyFactory(
 				"RandomSelection",
-				new RandomGroupPlanSelectorStrategyFactory() );
+				RandomGroupPlanSelectorStrategyFactory.class );
 		addSelectorAndStrategyFactory(
 				"RandomSumSelection",
-				new RandomSumGroupPlanSelectorStrategyFactory() );
+				RandomSumGroupPlanSelectorStrategyFactory.class );
 
 		// "Weak" versions of selectors (for configurable selection strategies)
 		// ---------------------------------------------------------------------
 		addSelectorFactory(
 				"WeakRandomSelection",
-				new WeakSelectorFactory(
-					new RandomGroupPlanSelectorStrategyFactory() ) );
+				new Provider<GroupLevelPlanSelector>() {
+					@Inject
+					private IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory = null;
+
+					@Override
+					public GroupLevelPlanSelector get() {
+						return new WeakSelectorFactory(
+							new RandomGroupPlanSelectorStrategyFactory(
+								incompatiblePlansIdentifierFactory ) ).createSelector();
+					}
+				});
 
 		// default removers
 		// ---------------------------------------------------------------------
 		addRemoverFactory(
 				"MinimumWeightedSum",
-				new MinimumWeightedSumSelectorFactory());
+				MinimumWeightedSumSelectorFactory.class );
 		addRemoverFactory(
 				"MinimumSum",
-				new MinimumSumSelectorFactory());
+				MinimumSumSelectorFactory.class );
 		addRemoverFactory(
 				"MinimumOfSumOfMinimumsOfJointPlan",
-				new MinimumSumOfMinimumsSelectorFactory());
+				MinimumSumOfMinimumsSelectorFactory.class );
 		addRemoverFactory(
 				"MinimumOfSumOfMinimumIndividualLossOfJointPlan",
-				new MinimumSumOfMinimumLossSelectorFactory());
+				MinimumSumOfMinimumLossSelectorFactory.class );
 		addRemoverFactory(
 				"WhoIsTheBoss",
-				new WhoIsTheBossMinSelectorFactory());
+				WhoIsTheBossMinSelectorFactory.class );
 		addRemoverFactory(
 				"Pareto",
-				new ParetoMinSelectorFactory());
+				ParetoMinSelectorFactory.class );
 		addRemoverFactory(
 				"Coalition",
-				new CoalitionMinSelectorFactory());
+				CoalitionMinSelectorFactory.class );
 		addRemoverFactory(
 				"LexicographicPerComposition",
-				new LexicographicRemoverFactory());
+				LexicographicRemoverFactory.class );
 	}
 
 	public void addFactory(
 			final String name,
 			final Class<? extends Provider<? extends GroupPlanStrategy>> f) {
+		planStrategyBinder.addBinding( name ).toProvider( f );
+	}
+
+	public void addFactory(
+			final String name,
+			final Provider<? extends GroupPlanStrategy> f) {
 		planStrategyBinder.addBinding( name ).toProvider( f );
 	}
 
@@ -211,37 +230,50 @@ public class JointStrategiesModule extends AbstractModule {
 
 	public void addSelectorAndStrategyFactory(
 			final String name,
-			final NonInnovativeStrategyFactory f) {
-		addFactory( name ,
-				new Provider<GroupPlanStrategy>() {
-					@Override
-					public GroupPlanStrategy get() {
-						// TODO pass something in some way
-						return f.createStrategy( null );
-					}
-				} );
+			final Class<? extends NonInnovativeStrategyFactory> f) {
+		// Not really nice, but could not come with something better right now:
+		// still need constructor to be injected,
+		// and the class to provide two providers (which one cannot implement
+		// at the same time)
+		nonInnovativeBinder.addBinding( name ).to( f );
+		addFactory( name , f );
 		addSelectorFactory( name ,
 				new Provider<GroupLevelPlanSelector>() {
+					@Inject Map<String, NonInnovativeStrategyFactory> map;
+
 					@Override
 					public GroupLevelPlanSelector get() {
-						// TODO pass something in some way
-						return f.createSelector( null );
+						return map.get( name ).createSelector();
+					}
+				} );
+	}
+
+	public void addSelectorAndStrategyFactory(
+			final String name,
+			final NonInnovativeStrategyFactory f) {
+		// Not really nice, but could not come with something better right now:
+		// still need constructor to be injected,
+		// and the class to provide two providers (which one cannot implement
+		// at the same time)
+		nonInnovativeBinder.addBinding( name ).toInstance( f );
+		addFactory( name , f );
+		addSelectorFactory( name ,
+				new Provider<GroupLevelPlanSelector>() {
+					@Inject Map<String, NonInnovativeStrategyFactory> map;
+
+					@Override
+					public GroupLevelPlanSelector get() {
+						return map.get( name ).createSelector();
 					}
 				} );
 	}
 
 	public void addRemoverFactory(
 			final String name,
-			final ExtraPlanRemoverFactory f) {
+			final Class<? extends ExtraPlanRemoverFactory> f) {
 		removerBinder
 			.addBinding( name )
-			.toProvider( 
-				new Provider<ExtraPlanRemover>() {
-					@Override
-					public ExtraPlanRemover get() {
-						return f.createRemover( null );
-					}
-				} );
+			.toProvider( f );
 	}
 
 }

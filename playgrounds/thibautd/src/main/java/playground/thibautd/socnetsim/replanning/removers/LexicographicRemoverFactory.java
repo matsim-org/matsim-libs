@@ -19,21 +19,30 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.removers;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import org.matsim.api.core.v01.Scenario;
+
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
+
+import com.google.inject.Inject;
 
 /**
  * @author thibautd
  */
 public class LexicographicRemoverFactory implements ExtraPlanRemoverFactory {
 
+	private final Scenario sc;
+	
+	@Inject
+	public LexicographicRemoverFactory( Scenario sc ) {
+		this.sc = sc;
+	}
+
 	@Override
-	public ExtraPlanRemover createRemover(
-			final ControllerRegistry registry) {
+	public ExtraPlanRemover get() {
 		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
-				registry.getScenario().getConfig().getModule(
+				sc.getConfig().getModule(
 						GroupReplanningConfigGroup.GROUP_NAME );
 
 		return new LexicographicForCompositionExtraPlanRemover(

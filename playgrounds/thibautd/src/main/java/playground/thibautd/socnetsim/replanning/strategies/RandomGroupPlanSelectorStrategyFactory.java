@@ -21,9 +21,11 @@ package playground.thibautd.socnetsim.replanning.strategies;
 
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import com.google.inject.Inject;
+
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
 
 /**
@@ -31,11 +33,18 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
  */
 public class RandomGroupPlanSelectorStrategyFactory extends NonInnovativeStrategyFactory {
 
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+
+	@Inject
+	public RandomGroupPlanSelectorStrategyFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory ) {
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+	}
+
 	@Override
-	public GroupLevelPlanSelector createSelector(ControllerRegistry registry) {
+	public GroupLevelPlanSelector createSelector() {
 		return new RandomGroupLevelSelector(
 			MatsimRandom.getLocalInstance(),
-			registry.getIncompatiblePlansIdentifierFactory() );
+			incompatiblePlansIdentifierFactory );
 	}
 }
 
