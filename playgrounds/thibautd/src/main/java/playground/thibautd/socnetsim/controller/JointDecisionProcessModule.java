@@ -47,8 +47,8 @@ import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
-import playground.thibautd.socnetsim.run.RunUtils.JointPlanCompositionMinimalityChecker;
-import playground.thibautd.socnetsim.run.RunUtils.JointPlanSelectionConsistencyChecker;
+import playground.thibautd.socnetsim.run.JointPlanCompositionMinimalityChecker;
+import playground.thibautd.socnetsim.run.JointPlanSelectionConsistencyChecker;
 import playground.thibautd.socnetsim.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 
