@@ -25,7 +25,6 @@ import org.matsim.core.config.Config;
 
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 
 import com.google.inject.Inject;
@@ -34,7 +33,7 @@ import com.google.inject.Provider;
 /**
  * @author thibautd
  */
-public abstract class AbstractConfigurableSelectionStrategy implements GroupPlanStrategyFactory {
+public abstract class AbstractConfigurableSelectionStrategy implements Provider<GroupPlanStrategy> {
 	@Inject
 	private Map<String, Provider<GroupLevelPlanSelector>> factoryRegistry;
 

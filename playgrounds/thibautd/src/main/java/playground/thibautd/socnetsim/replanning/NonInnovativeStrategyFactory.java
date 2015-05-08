@@ -19,11 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
+import com.google.inject.Provider;
+
 
 /**
  * @author thibautd
  */
-public abstract class NonInnovativeStrategyFactory implements GroupPlanStrategyFactory, GroupLevelPlanSelectorFactory {
+public abstract class NonInnovativeStrategyFactory implements Provider<GroupPlanStrategy>, GroupLevelPlanSelectorFactory {
 
 	@Override
 	public GroupPlanStrategy get() {

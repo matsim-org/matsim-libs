@@ -23,10 +23,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
@@ -35,7 +35,7 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
 /**
  * @author thibautd
  */
-public class GroupRandomJointPlanRecomposerFactory implements GroupPlanStrategyFactory {
+public class GroupRandomJointPlanRecomposerFactory implements Provider<GroupPlanStrategy> {
 
 	private final Scenario sc;
 	private final PlanLinkIdentifier planLinkIdentifier;
