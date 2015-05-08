@@ -21,6 +21,8 @@
 package org.matsim.integration.replanning;
 
 import com.google.inject.Singleton;
+
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -153,7 +155,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
-		Controler controler = new TestControler(config, strategyManager);
+		TestControler controler = new TestControler(config, strategyManager);
 		strategy.addStrategyModule(new ReRoute(controler.getScenario()));
 		controler.run();
 
@@ -164,7 +166,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		config.global().setNumberOfThreads(3); // use a different number of threads because the result must be the same
-		Controler controler2 = new TestControler(config, strategyManager2);
+		TestControler controler2 = new TestControler(config, strategyManager2);
 		strategy2.addStrategyModule(new ReRoute(controler.getScenario()));
 
 		controler2.run();
@@ -202,7 +204,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 		strategyManager.addStrategyForDefaultSubpopulation(strategy, 1.0);
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run1/");
-		Controler controler = new TestControler(config, strategyManager);
+		TestControler controler = new TestControler(config, strategyManager);
 		strategy.addStrategyModule(new ReRoute(controler.getScenario()));
 		controler.run();
 
@@ -213,7 +215,7 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 
 		config.controler().setOutputDirectory(getOutputDirectory() + "/run2/");
 		config.global().setNumberOfThreads(3); // use a different number of threads because the result must be the same
-		Controler controler2 = new TestControler(config, strategyManager2);
+		TestControler controler2 = new TestControler(config, strategyManager2);
 		strategy2.addStrategyModule(new ReRoute(controler.getScenario()));
 		controler2.run();
 
@@ -237,17 +239,19 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
-	private static class TestControler extends Controler {
+	private static class TestControler {
+		Controler controler ;
 
 		private StrategyManager manager;
 
 		public TestControler(final Config config, final StrategyManager manager) {
-			super(config);
-            this.getConfig().controler().setCreateGraphs(false);
-            this.getConfig().controler().setWriteEventsInterval(1);
-			this.setDumpDataAtEnd(false);
+//			super(config);
+			controler = new Controler( config ) ;
+			controler.getConfig().controler().setCreateGraphs(false);
+			controler.getConfig().controler().setWriteEventsInterval(1);
+			controler.setDumpDataAtEnd(false);
 			this.manager = manager ;
-            addOverridingModule(new AbstractModule() {
+			controler.addOverridingModule(new AbstractModule() {
                 @Override
                 public void install() {
 					bind(StrategyManager.class).toProvider(new com.google.inject.Provider<StrategyManager>() {
@@ -263,6 +267,14 @@ public class DeterministicMultithreadedReplanningTest extends MatsimTestCase {
                     }).in(Singleton.class);
 				}
             });
+		}
+
+		public Scenario getScenario() {
+			return this.controler.getScenario() ;
+		}
+
+		public void run() {
+			this.controler.run();
 		}
 
 		private StrategyManager myLoadStrategyManager() {

@@ -207,4 +207,12 @@ public abstract class Gbl {
 	public static final String LOAD_DATA_IS_NOW_FINAL = "controler.loadData() is now final.  If you need this functionality, use ScenarioUtils.loadScenario(...), "
 	+ "then modify the scenario, then pass it into new Controler( scenario ).  Talk to MZ or KN if you need help.  kai, may'15";
 	
+	public static final String CONTROLER_IS_NOW_FINAL = "The Controler class is now final.  Everything that used to be "
+			+ "possible by inheritance should now be doable by other constructs.  See tutorial.programming.* for examples.  Please talk"
+			+ "to MZ or KN if you would like to get help.  kai, may'15" ;
+	
+	public static final String RETROFIT_CONTROLER = Gbl.CONTROLER_IS_NOW_FINAL + " I tried to adapt this to new syntax"
+			+ "but please check functionality. kai, mar'15" ;
+	
+	
 }

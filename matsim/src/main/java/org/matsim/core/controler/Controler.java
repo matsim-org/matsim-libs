@@ -80,7 +80,7 @@ import java.util.Set;
  *
  * @author mrieser
  */
-public class Controler extends AbstractController {
+public final class Controler extends AbstractController {
 	// yyyy Design thoughts:
 	// * Seems to me that we should try to get everything here final.  Flexibility is provided by the ability to set or add factories.  If this is
 	// not sufficient, people should use AbstractController.  kai, jan'13
@@ -97,7 +97,7 @@ public class Controler extends AbstractController {
 	public static final String FILENAME_CONFIG = "output_config.xml.gz";
 	public static final String FILENAME_PERSON_ATTRIBUTES = "output_personAttributes.xml.gz" ; 
 
-	protected static final Logger log = Logger.getLogger(Controler.class);
+	private static final Logger log = Logger.getLogger(Controler.class);
 
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
