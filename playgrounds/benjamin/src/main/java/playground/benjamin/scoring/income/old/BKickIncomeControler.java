@@ -32,73 +32,73 @@ import playground.benjamin.BkControler;
  * @author dgrether
  *
  */
-public final class BKickIncomeControler extends BkControler {
-
-	private PersonHouseholdMapping hhdb;
-
-	public BKickIncomeControler(String configFileName) {
-		super(configFileName);
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
-	}
-	
-	public BKickIncomeControler(Config conf){
-		super(conf);
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
-	}
-
-	public BKickIncomeControler(String[] args) {
-		super(args);
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
-	}
-
-//	@Override
-//	protected ScoringFunctionFactory loadScoringFunctionFactory() {
-//		return new BKickIncomeScoringFunctionFactory(this.config.planCalcScore(), this.hhdb, network);
+public final class BKickIncomeControler {
+//
+//	private PersonHouseholdMapping hhdb;
+//
+//	public BKickIncomeControler(String configFileName) {
+//		super(configFileName);
+//		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
 //	}
-	
-//	@Override
-//	protected void setUp(){	
-//    this.getScenario().getConfig().global().setNumberOfThreads(1);
-//		this.hhdb = new PersonHouseholdMapping(this.getScenario().getHouseholds());
-//		this.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bindTravelDisutilityFactory().toInstance(new Income1TravelCostCalculatorFactory());
-//			}
-//		});
-//		//		if (this.travelTimeCalculator == null) {
-////			this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-////		}
-////		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
-//		super.setUp();
-//        this.setScoringFunctionFactory( new BKickIncomeScoringFunctionFactory(this.getConfig().planCalcScore(), this.hhdb, getScenario().getNetwork()) ) ;
+//	
+//	public BKickIncomeControler(Config conf){
+//		super(conf);
+//		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
 //	}
-	
-//	@Override
-//	public PlanAlgorithm createRoutingAlgorithm() {
-//		return createRoutingAlgorithm(
-//				this.createTravelCostCalculator(),
-//				this.getLinkTravelTimes());
+//
+//	public BKickIncomeControler(String[] args) {
+//		super(args);
+//		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE + Gbl.SET_UP_IS_NOW_FINAL) ;
 //	}
-
-//	private PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
-//		return new IncomePlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory(), this.hhdb);
+//
+////	@Override
+////	protected ScoringFunctionFactory loadScoringFunctionFactory() {
+////		return new BKickIncomeScoringFunctionFactory(this.config.planCalcScore(), this.hhdb, network);
+////	}
+//	
+////	@Override
+////	protected void setUp(){	
+////    this.getScenario().getConfig().global().setNumberOfThreads(1);
+////		this.hhdb = new PersonHouseholdMapping(this.getScenario().getHouseholds());
+////		this.addOverridingModule(new AbstractModule() {
+////			@Override
+////			public void install() {
+////				bindTravelDisutilityFactory().toInstance(new Income1TravelCostCalculatorFactory());
+////			}
+////		});
+////		//		if (this.travelTimeCalculator == null) {
+//////			this.travelTimeCalculator = this.getTravelTimeCalculatorFactory().createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
+//////		}
+//////		this.travelCostCalculator = new BKickIncomeTravelTimeDistanceCostCalculator(this.travelTimeCalculator, this.config.charyparNagelScoring());
+////		super.setUp();
+////        this.setScoringFunctionFactory( new BKickIncomeScoringFunctionFactory(this.getConfig().planCalcScore(), this.hhdb, getScenario().getNetwork()) ) ;
+////	}
+//	
+////	@Override
+////	public PlanAlgorithm createRoutingAlgorithm() {
+////		return createRoutingAlgorithm(
+////				this.createTravelCostCalculator(),
+////				this.getLinkTravelTimes());
+////	}
+//
+////	private PlanAlgorithm createRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
+////		return new IncomePlansCalcRoute(this.config.plansCalcRoute(), this.network, travelCosts, travelTimes, this.getLeastCostPathCalculatorFactory(), ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory(), this.hhdb);
+////	}
+//
+//	
+//	public static void main(String[] args) {
+////		String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
+////		String[] args2 = {config};
+////		args = args2;
+//		if ((args == null) || (args.length == 0)) {
+//			System.out.println("No argument given!");
+//			System.out.println("Usage: Controler config-file [dtd-file]");
+//			System.out.println();
+//		} else {
+//			final Controler controler = new BKickIncomeControler(args);
+//			
+//			controler.run();
+//		}
 //	}
-
-	
-	public static void main(String[] args) {
-//		String config = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/config.xml"; //can also be included in runConfigurations/arguments/programArguments
-//		String[] args2 = {config};
-//		args = args2;
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: Controler config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final Controler controler = new BKickIncomeControler(args);
-			
-			controler.run();
-		}
-	}
-
+//
 }

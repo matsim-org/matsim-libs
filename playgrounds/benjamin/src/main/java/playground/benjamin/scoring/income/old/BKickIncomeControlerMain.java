@@ -23,14 +23,14 @@ import playground.benjamin.BkPaths;
 
 
 public class BKickIncomeControlerMain {
-	
-	public static void main(String[] args){
-//		String config = DgPaths.STUDIESDG + "einkommenSchweiz/config_households_all_zrh30km_10pct.xml";
-//		String config = DgPaths.RUNBASE + "run724/resumeConfig.xml";
+//	
+//	public static void main(String[] args){
+////		String config = DgPaths.STUDIESDG + "einkommenSchweiz/config_households_all_zrh30km_10pct.xml";
+////		String config = DgPaths.RUNBASE + "run724/resumeConfig.xml";
+////		new BKickIncomeControler(config).run();
+//		
+//		String config = BkPaths.RUNSSVN + "run734/resumeConfig.xml";
 //		new BKickIncomeControler(config).run();
-		
-		String config = BkPaths.RUNSSVN + "run734/resumeConfig.xml";
-		new BKickIncomeControler(config).run();
-	}
-
+//	}
+//
 }

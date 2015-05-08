@@ -36,148 +36,148 @@ import playground.balac.taxiservice.router.TaxiserviceRoutingModule;
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
 import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
 
-public class CarsharingWithTaxiControler extends Controler{
-
-	public CarsharingWithTaxiControler(Scenario scenario) {
-		super(scenario);
-	}
-
-
-	public void init(Config config, Network network, Scenario sc) {
-		AllCSModesScoringFunctionFactory allCSModesScoringFunctionFactory = new AllCSModesScoringFunctionFactory(
-				      config, 
-				      network, sc);
-	    this.setScoringFunctionFactory(allCSModesScoringFunctionFactory); 	
-				
-	    this.loadMyControlerListeners();
-		}
-	
-	  private void loadMyControlerListeners() {  
-		  
-//	    super.loadControlerListeners();   
-	    Set<String> modes = new TreeSet<String>();
-	    modes.add("freefloating");
-	    modes.add("twowaycarsharing");
-	    modes.add("car");
-	    modes.add("walk");
-	    modes.add("pt");
-	    modes.add("bike");
-	    modes.add("taxi");
-        TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(this.getConfig().getParam("controler", "outputDirectory")+ "/tripsFile",
-	    		this.getConfig().getParam("controler", "outputDirectory") + "/durationsFile",
-	    		this.getConfig().getParam("controler", "outputDirectory") + "/distancesFile",
-	    		modes, true, getScenario().getNetwork());
-	    this.addControlerListener(tripsAnalyzer);
-	    
-	    this.addControlerListener(new AllCSModesTestListener(this,
-	    		Integer.parseInt(this.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));
-	  }
-	public static void main(final String[] args) {
-		
-    	final Config config = ConfigUtils.loadConfig(args[0]);
-    	OneWayCarsharingRDConfigGroup configGroupow = new OneWayCarsharingRDConfigGroup();
-    	config.addModule(configGroupow);
-    	
-    	FreeFloatingConfigGroup configGroupff = new FreeFloatingConfigGroup();
-    	config.addModule(configGroupff);
-    	
-    	TwoWayCSConfigGroup configGrouptw = new TwoWayCSConfigGroup();
-    	config.addModule(configGrouptw);
-    	
-    	AllCSModesConfigGroup configGroupAll = new AllCSModesConfigGroup();
-    	config.addModule(configGroupAll);
-    	
-    	TaxiserviceConfigGroup configGrouptaxi = new TaxiserviceConfigGroup();
-    	config.addModule(configGrouptaxi);
-    	
-		final Scenario sc = ScenarioUtils.loadScenario(config);
-		
-		
-		final CarsharingWithTaxiControler controler = new CarsharingWithTaxiControler( sc );
-
-		controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bindMobsim().toProvider(new Provider<Mobsim>() {
-                    @Override
-                    public Mobsim get() {
-                        return new AllCSModesQsimFactory(sc, controler).createMobsim(controler.getScenario(), controler.getEvents());
-                    }
-                });
-            }
-        });
-
-		controler.setTripRouterFactory(
-            new TripRouterFactory() {
-                @Override
-                public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
-                    // this factory initializes a TripRouter with default modules,
-                    // taking into account what is asked for in the config
-
-                    // This allows us to just add our module and go.
-                    final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
-
-                    final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
-
-                    // add our module to the instance
-                    router.setRoutingModule(
-                        "twowaycarsharing",
-                        new TwoWayCSRoutingModule());
-
-                    router.setRoutingModule(
-                            "freefloating",
-                            new FreeFloatingRoutingModule());
-
-                    router.setRoutingModule(
-                            "onewaycarsharing",
-                            new OneWayCarsharingRDRoutingModule());
-
-                    router.setRoutingModule(
-                            "taxiservice",
-                            new TaxiserviceRoutingModule(controler));
-
-                    // we still need to provide a way to identify our trips
-                    // as being twowaycarsharing trips.
-                    // This is for instance used at re-routing.
-                    final MainModeIdentifier defaultModeIdentifier =
-                        router.getMainModeIdentifier();
-                    router.setMainModeIdentifier(
-                            new MainModeIdentifier() {
-                                @Override
-                                public String identifyMainMode(
-                                        final List<PlanElement> tripElements) {
-                                    for ( PlanElement pe : tripElements ) {
-                                        if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
-                                            return "twowaycarsharing";
-                                        }
-                                        else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
-                                            return "onewaycarsharing";
-                                        }
-                                        else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
-                                            return "freefloating";
-                                        }
-                                        else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "taxi" ) ) {
-                                            return "taxi";
-                                        }
-                                    }
-                                    // if the trip doesn't contain a onewaycarsharing leg,
-                                    // fall back to the default identification method.
-                                    return defaultModeIdentifier.identifyMainMode( tripElements );
-                                }
-                            });
-
-                    return router;
-                }
-
-
-            });
-
-
-		controler.init(config, sc.getNetwork(), sc);
-
-		controler.run();
-
-
-	}
-
+public class CarsharingWithTaxiControler {
+//
+//	public CarsharingWithTaxiControler(Scenario scenario) {
+//		super(scenario);
+//	}
+//
+//
+//	public void init(Config config, Network network, Scenario sc) {
+//		AllCSModesScoringFunctionFactory allCSModesScoringFunctionFactory = new AllCSModesScoringFunctionFactory(
+//				      config, 
+//				      network, sc);
+//	    this.setScoringFunctionFactory(allCSModesScoringFunctionFactory); 	
+//				
+//	    this.loadMyControlerListeners();
+//		}
+//	
+//	  private void loadMyControlerListeners() {  
+//		  
+////	    super.loadControlerListeners();   
+//	    Set<String> modes = new TreeSet<String>();
+//	    modes.add("freefloating");
+//	    modes.add("twowaycarsharing");
+//	    modes.add("car");
+//	    modes.add("walk");
+//	    modes.add("pt");
+//	    modes.add("bike");
+//	    modes.add("taxi");
+//        TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(this.getConfig().getParam("controler", "outputDirectory")+ "/tripsFile",
+//	    		this.getConfig().getParam("controler", "outputDirectory") + "/durationsFile",
+//	    		this.getConfig().getParam("controler", "outputDirectory") + "/distancesFile",
+//	    		modes, true, getScenario().getNetwork());
+//	    this.addControlerListener(tripsAnalyzer);
+//	    
+//	    this.addControlerListener(new AllCSModesTestListener(this,
+//	    		Integer.parseInt(this.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));
+//	  }
+//	public static void main(final String[] args) {
+//		
+//    	final Config config = ConfigUtils.loadConfig(args[0]);
+//    	OneWayCarsharingRDConfigGroup configGroupow = new OneWayCarsharingRDConfigGroup();
+//    	config.addModule(configGroupow);
+//    	
+//    	FreeFloatingConfigGroup configGroupff = new FreeFloatingConfigGroup();
+//    	config.addModule(configGroupff);
+//    	
+//    	TwoWayCSConfigGroup configGrouptw = new TwoWayCSConfigGroup();
+//    	config.addModule(configGrouptw);
+//    	
+//    	AllCSModesConfigGroup configGroupAll = new AllCSModesConfigGroup();
+//    	config.addModule(configGroupAll);
+//    	
+//    	TaxiserviceConfigGroup configGrouptaxi = new TaxiserviceConfigGroup();
+//    	config.addModule(configGrouptaxi);
+//    	
+//		final Scenario sc = ScenarioUtils.loadScenario(config);
+//		
+//		
+//		final CarsharingWithTaxiControler controler = new CarsharingWithTaxiControler( sc );
+//
+//		controler.addOverridingModule(new AbstractModule() {
+//            @Override
+//            public void install() {
+//                bindMobsim().toProvider(new Provider<Mobsim>() {
+//                    @Override
+//                    public Mobsim get() {
+//                        return new AllCSModesQsimFactory(sc, controler).createMobsim(controler.getScenario(), controler.getEvents());
+//                    }
+//                });
+//            }
+//        });
+//
+//		controler.setTripRouterFactory(
+//            new TripRouterFactory() {
+//                @Override
+//                public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
+//                    // this factory initializes a TripRouter with default modules,
+//                    // taking into account what is asked for in the config
+//
+//                    // This allows us to just add our module and go.
+//                    final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
+//
+//                    final TripRouter router = delegate.instantiateAndConfigureTripRouter(routingContext);
+//
+//                    // add our module to the instance
+//                    router.setRoutingModule(
+//                        "twowaycarsharing",
+//                        new TwoWayCSRoutingModule());
+//
+//                    router.setRoutingModule(
+//                            "freefloating",
+//                            new FreeFloatingRoutingModule());
+//
+//                    router.setRoutingModule(
+//                            "onewaycarsharing",
+//                            new OneWayCarsharingRDRoutingModule());
+//
+//                    router.setRoutingModule(
+//                            "taxiservice",
+//                            new TaxiserviceRoutingModule(controler));
+//
+//                    // we still need to provide a way to identify our trips
+//                    // as being twowaycarsharing trips.
+//                    // This is for instance used at re-routing.
+//                    final MainModeIdentifier defaultModeIdentifier =
+//                        router.getMainModeIdentifier();
+//                    router.setMainModeIdentifier(
+//                            new MainModeIdentifier() {
+//                                @Override
+//                                public String identifyMainMode(
+//                                        final List<PlanElement> tripElements) {
+//                                    for ( PlanElement pe : tripElements ) {
+//                                        if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
+//                                            return "twowaycarsharing";
+//                                        }
+//                                        else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "onewaycarsharing" ) ) {
+//                                            return "onewaycarsharing";
+//                                        }
+//                                        else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
+//                                            return "freefloating";
+//                                        }
+//                                        else if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "taxi" ) ) {
+//                                            return "taxi";
+//                                        }
+//                                    }
+//                                    // if the trip doesn't contain a onewaycarsharing leg,
+//                                    // fall back to the default identification method.
+//                                    return defaultModeIdentifier.identifyMainMode( tripElements );
+//                                }
+//                            });
+//
+//                    return router;
+//                }
+//
+//
+//            });
+//
+//
+//		controler.init(config, sc.getNetwork(), sc);
+//
+//		controler.run();
+//
+//
+//	}
+//
 }

@@ -14,6 +14,10 @@ import playground.balac.aam.scoring.AAMScoringFunctionFactory;
 
 public class AAMControler {
 	Controler cc ;
+	
+	Controler getRealControler() {
+		return cc ;
+	}
 
 	private AAMControler(Scenario scenario) {
 //		super(scenario);
@@ -40,11 +44,11 @@ public class AAMControler {
 		
 		final AAMControler controler = new AAMControler(sc);
 		
-		controler.setTripRouterFactory( new MovingPathwaysTripRouterFactory( sc ) );
+		controler.getRealControler().setTripRouterFactory( new MovingPathwaysTripRouterFactory( sc ) );
 				
 		controler.init(config, sc.getNetwork(), sc);		
 			
-		controler.run();
+		controler.getRealControler().run();
 	}
 
 }
