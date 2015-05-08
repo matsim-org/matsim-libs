@@ -26,49 +26,53 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
-public class RCControler extends Controler {
+public class RCControler  {
+	private static final Logger log = Logger.getLogger(RCControler.class);
 					
 	public RCControler(final String[] args) {
-		super(args);	
+//		super(args);	
+		throw new RuntimeException( Gbl.CONTROLER_IS_NOW_FINAL ) ;
 	}
 
 	public static void main (final String[] args) { 
 		RCControler controler = new RCControler(args);
-		controler.setOverwriteFiles(true);
-		controler.setScoringFunctionFactory(new RCScoringFunctionFactory(
-				controler.getConfig().planCalcScore(), controler.getScenario()));
-			
-		if (Boolean.parseBoolean(controler.getConfig().findParam("rc", "withinday"))) {
-			Set<Id<Link>> links = controler.createTunnelLinks();
-			controler.addControlerListener(new WithindayListener(controler, links));
-		}		
-    	controler.run();
+//		controler.setOverwriteFiles(true);
+//		controler.setScoringFunctionFactory(new RCScoringFunctionFactory(
+//				controler.getConfig().planCalcScore(), controler.getScenario()));
+//			
+//		if (Boolean.parseBoolean(controler.getConfig().findParam("rc", "withinday"))) {
+//			Set<Id<Link>> links = controler.createTunnelLinks();
+//			controler.addControlerListener(new WithindayListener(controler, links));
+//		}		
+//    	controler.run();
     }
 	
 	public Set<Id<Link>> createTunnelLinks() {
 		Set<Id<Link>> links = new HashSet<>();
-		String tunnellinksfile = this.getConfig().findParam("rc", "tunnellinksfile");
+//		String tunnellinksfile = this.getConfig().findParam("rc", "tunnellinksfile");
 		
-		 try {
-	          final BufferedReader in = new BufferedReader(new FileReader(tunnellinksfile));
-	          
-	          int cnt = 0;
-	          String curr_line = in.readLine(); // Skip header
-	          while ((curr_line = in.readLine()) != null) {
-	        	  links.add(Id.create(curr_line, Link.class));
-		          cnt++;
-	          }
-	          in.close();
-	          log.info("added " + cnt + " links");
-	          
-	        } // end try
-	        catch (IOException e) {
-	        	e.printStackTrace();
-	        }			
+//		 try {
+//	          final BufferedReader in = new BufferedReader(new FileReader(tunnellinksfile));
+//	          
+//	          int cnt = 0;
+//	          String curr_line = in.readLine(); // Skip header
+//	          while ((curr_line = in.readLine()) != null) {
+//	        	  links.add(Id.create(curr_line, Link.class));
+//		          cnt++;
+//	          }
+//	          in.close();
+//	          log.info("added " + cnt + " links");
+//	          
+//	        } // end try
+//	        catch (IOException e) {
+//	        	e.printStackTrace();
+//	        }			
 		return links;
 	}
 	

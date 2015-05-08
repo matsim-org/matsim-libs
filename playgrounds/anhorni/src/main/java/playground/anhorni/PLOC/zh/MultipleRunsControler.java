@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.gbl.Gbl;
 
 import playground.anhorni.LEGO.miniscenario.create.AdaptZHScenario;
 import playground.anhorni.PLOC.SingleRunControler;
@@ -110,7 +111,8 @@ public class MultipleRunsControler {
 			String config = configFile;
 			SingleRunControler controler;
     		controler = new SingleRunControler(config);	 
-        	controler.run();
+//        	controler.run();
+    		throw new RuntimeException( Gbl.CONTROLER_IS_NOW_FINAL ) ;
 		}
 	}
 }

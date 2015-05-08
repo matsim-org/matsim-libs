@@ -49,15 +49,15 @@ import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
 import java.util.Set;
 
 
-public class BvgControler extends Controler {
+public class BvgControler {
 
 	private final static Logger log = Logger.getLogger(BvgControler.class);
 
 	private static String singleTripPersonsFile;
 
     public BvgControler(final Scenario scenario) {
-		super(scenario);
-		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
+//		super(scenario);
+		throw new RuntimeException( Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE + Gbl.CONTROLER_IS_NOW_FINAL ) ;
 	}
 
 //	@Override
@@ -80,24 +80,24 @@ public class BvgControler extends Controler {
 
 	private StrategyManager myLoadStrategyManager() {
 		SubSetStrategyManager manager = new SubSetStrategyManager();
-		StrategyManagerConfigLoader.load(this, manager); // load defaults
-
-		// load special groups
-		{
-			Set<Id> ids = ReadSingleTripPersons.readStopNameMap(singleTripPersonsFile);
-			StrategyManager mgr = new StrategyManager();
-
-			PlanStrategy strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.getConfig().planCalcScore()));
-			mgr.addStrategyForDefaultSubpopulation(strategy1, 0.9);
-
-			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy2.addStrategyModule(new TripTimeAllocationMutator(this.getConfig(),7200, true));
-			strategy2.addStrategyModule(new ReRoute(getScenario()));
-			mgr.addStrategyForDefaultSubpopulation(strategy2, 0.1);
-			mgr.addChangeRequestForDefaultSubpopulation(90,strategy2,0.0);
-
-			manager.addSubset(ids, mgr);
-		}
+//		StrategyManagerConfigLoader.load(this, manager); // load defaults
+//
+//		// load special groups
+//		{
+//			Set<Id> ids = ReadSingleTripPersons.readStopNameMap(singleTripPersonsFile);
+//			StrategyManager mgr = new StrategyManager();
+//
+//			PlanStrategy strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.getConfig().planCalcScore()));
+//			mgr.addStrategyForDefaultSubpopulation(strategy1, 0.9);
+//
+//			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
+//			strategy2.addStrategyModule(new TripTimeAllocationMutator(this.getConfig(),7200, true));
+//			strategy2.addStrategyModule(new ReRoute(getScenario()));
+//			mgr.addStrategyForDefaultSubpopulation(strategy2, 0.1);
+//			mgr.addChangeRequestForDefaultSubpopulation(90,strategy2,0.0);
+//
+//			manager.addSubset(ids, mgr);
+//		}
 		return manager;
 	}
 
@@ -129,7 +129,7 @@ public class BvgControler extends Controler {
 
 //		TransitRouterConfig routerConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		final BvgControler c = new BvgControler(sc);
-        c.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), new BvgScoringFunctionConfigGroup(config), c.getScenario().getNetwork()));
+//        c.setScoringFunctionFactory(new BvgScoringFunctionFactory(config.planCalcScore(), new BvgScoringFunctionConfigGroup(config), c.getScenario().getNetwork()));
         AbstractModule myStrategyManagerModule = new AbstractModule() {
 
             @Override
@@ -137,7 +137,7 @@ public class BvgControler extends Controler {
 				bind(StrategyManager.class).toInstance(c.myLoadStrategyManager());
 			}
         };
-        c.addOverridingModule(myStrategyManagerModule);
-        c.run();
+//        c.addOverridingModule(myStrategyManagerModule);
+//        c.run();
 	}
 }

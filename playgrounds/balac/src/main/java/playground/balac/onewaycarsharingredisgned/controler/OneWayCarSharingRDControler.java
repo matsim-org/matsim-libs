@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 import com.google.inject.Provider;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -12,6 +14,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.MainModeIdentifier;
@@ -25,39 +28,39 @@ import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRD
 import playground.balac.onewaycarsharingredisgned.router.OneWayCarsharingRDRoutingModule;
 import playground.balac.onewaycarsharingredisgned.scoring.OneWayCarsharingRDScoringFunctionFactory;
 
-public class OneWayCarSharingRDControler extends Controler{
+public class OneWayCarSharingRDControler {
+	
+	static Controler controler ;
 	
 	
-	public OneWayCarSharingRDControler(Scenario scenario) {
-		super(scenario);
-	}
-
-
-	public void init(Config config, Network network, Scenario sc) {
+	public static void init(Config config, Network network, Scenario sc) {
 		OneWayCarsharingRDScoringFunctionFactory onewayScoringFunctionFactory = new OneWayCarsharingRDScoringFunctionFactory(
 				      config, 
 				      network, sc);
-	    this.setScoringFunctionFactory(onewayScoringFunctionFactory); 	
+		controler.setScoringFunctionFactory(onewayScoringFunctionFactory); 	
 				
-	    this.loadMyControlerListeners();
+	    loadMyControlerListeners();
 		}
 	
 //	@Override
-	  private void loadMyControlerListeners() {  
+	  private static void loadMyControlerListeners() {  
 		  
 //	    super.loadControlerListeners();   
-	    this.addControlerListener(new OWListener(this.getConfig().getModule("OneWayCarsharing").getValue("statsFileName")));
+		  controler.addControlerListener(new OWListener(controler.getConfig().getModule("OneWayCarsharing").getValue("statsFileName")));
 	  }
 	public static void main(final String[] args) {
+		
+		Logger.getLogger( OneWayCarSharingRDControler.class ).fatal( Gbl.RETROFIT_CONTROLER ) ;
+		System.exit(-1) ;
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
     	OneWayCarsharingRDConfigGroup configGroup = new OneWayCarsharingRDConfigGroup();
     	config.addModule(configGroup);
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
+		controler = new Controler( sc ) ;
 		
-		final OneWayCarSharingRDControler controler = new OneWayCarSharingRDControler( sc );
-
+		
 		controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -113,7 +116,7 @@ public class OneWayCarSharingRDControler extends Controler{
 
 
             });
-		controler.init(config, sc.getNetwork(), sc);
+		init(config, sc.getNetwork(), sc);
 
 		controler.run();
 	}

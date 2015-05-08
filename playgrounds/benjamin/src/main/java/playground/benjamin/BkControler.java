@@ -28,21 +28,21 @@ import org.matsim.core.gbl.Gbl;
  * @author dgrether
  *
  */
-public class BkControler extends Controler {
+public class BkControler {
 
 	public BkControler(String configFileName) {
-		super(configFileName);
-		throw new RuntimeException(Gbl.LOAD_DATA_IS_NOW_FINAL) ;
+//		super(configFileName);
+		throw new RuntimeException(Gbl.LOAD_DATA_IS_NOW_FINAL + Gbl.CONTROLER_IS_NOW_FINAL) ;
 	}
 
 	public BkControler(Config conf){
-		super(conf);
-		throw new RuntimeException(Gbl.LOAD_DATA_IS_NOW_FINAL) ;
+//		super(conf);
+		throw new RuntimeException(Gbl.LOAD_DATA_IS_NOW_FINAL + Gbl.CONTROLER_IS_NOW_FINAL ) ;
 	}
 
 	public BkControler(String[] args) {
-		super(args);
-		throw new RuntimeException(Gbl.LOAD_DATA_IS_NOW_FINAL) ;
+//		super(args);
+		throw new RuntimeException(Gbl.LOAD_DATA_IS_NOW_FINAL + Gbl.CONTROLER_IS_NOW_FINAL ) ;
 	}
 
 //	@Override

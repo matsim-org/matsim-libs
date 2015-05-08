@@ -20,25 +20,27 @@
 package playground.anhorni.rc.microwdr;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 
 import playground.anhorni.rc.RCScoringFunctionFactory;
 
-public class RCControler extends Controler {
+public class RCControler {
 					
 	public RCControler(final String[] args) {
-		super(args);	
+//		super(args);	
+		throw new RuntimeException( Gbl.CONTROLER_IS_NOW_FINAL ) ;
 	}
 
 	public static void main (final String[] args) { 
 		RCControler controler = new RCControler(args);
 		//IOUtils.deleteDirectory(new File(controler.getControlerIO().getOutputPath()));
-		controler.setOverwriteFiles(true);
-		controler.setScoringFunctionFactory(new RCScoringFunctionFactory(
-				controler.getConfig().planCalcScore(), controler.getScenario()));
-			
-		if (Boolean.parseBoolean(controler.getConfig().findParam("rc", "withinday"))) {
-			controler.addControlerListener(new WithindayListener(controler));
-		}		
-    	controler.run();
+//		controler.setOverwriteFiles(true);
+//		controler.setScoringFunctionFactory(new RCScoringFunctionFactory(
+//				controler.getConfig().planCalcScore(), controler.getScenario()));
+//			
+//		if (Boolean.parseBoolean(controler.getConfig().findParam("rc", "withinday"))) {
+//			controler.addControlerListener(new WithindayListener(controler));
+//		}		
+//    	controler.run();
     }	
 }

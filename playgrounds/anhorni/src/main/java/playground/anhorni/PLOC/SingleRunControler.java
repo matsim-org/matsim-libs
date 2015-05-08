@@ -19,32 +19,26 @@
 
 package playground.anhorni.PLOC;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.analysis.DistanceStats;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
-import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.anhorni.PLOC.analysis.ShoppingCalculator;
-
-public class SingleRunControler extends Controler {
+public class SingleRunControler {
+	static Controler controler ;
 	
 	private ObjectAttributes personAttributes;
 	private int day = -1;
 	private boolean tempVar;
-	public SingleRunControler(String config) {
-		super(config);	
-		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL) ;
-	}
-		
-	public SingleRunControler(final Config config) {
-		super(config);	
-	}
 	
+	public SingleRunControler(String config) {
+		controler = new Controler( config ) ;
+		throw new RuntimeException( Gbl.RETROFIT_CONTROLER ) ;
+	}
+
 	public void setDay(int day) {
 		this.day = day;
 	}
@@ -58,10 +52,14 @@ public class SingleRunControler extends Controler {
 	}
 		
     public static void main (final String[] args) { 
+	    Logger.getLogger("dummy").fatal( Gbl.RETROFIT_CONTROLER ) ;
+	    System.exit(-1) ;
+	    
+	    
     	// load the config, telling it to "materialize" the location choice section:
     	Config config = ConfigUtils.loadConfig( args[0], new DestinationChoiceConfigGroup() ) ;
     	
-    	SingleRunControler controler = new SingleRunControler(config);
+    controler = new Controler(config);
     	controler.run();
     }
     

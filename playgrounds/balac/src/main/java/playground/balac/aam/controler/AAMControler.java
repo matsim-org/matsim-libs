@@ -5,24 +5,28 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.balac.aam.router.MovingPathwaysTripRouterFactory;
 import playground.balac.aam.scoring.AAMScoringFunctionFactory;
 
 
-public class AAMControler extends Controler{
+public class AAMControler {
+	Controler cc ;
 
-	public AAMControler(Scenario scenario) {
-		super(scenario);
+	private AAMControler(Scenario scenario) {
+//		super(scenario);
 		// TODO Auto-generated constructor stub
+		cc = new Controler( scenario ) ;
+		throw new RuntimeException( Gbl.RETROFIT_CONTROLER ) ;
 	}
 
 	public void init(Config config, Network network, Scenario sc) {
 		AAMScoringFunctionFactory aAMScoringFunctionFactory = new AAMScoringFunctionFactory(
 				      config, 
 				      network, sc);
-	    this.setScoringFunctionFactory(aAMScoringFunctionFactory); 	
+	    cc.setScoringFunctionFactory(aAMScoringFunctionFactory); 	
 				
 		}
 	
@@ -34,7 +38,7 @@ public class AAMControler extends Controler{
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		
-		final AAMControler controler = new AAMControler( sc );
+		final AAMControler controler = new AAMControler(sc);
 		
 		controler.setTripRouterFactory( new MovingPathwaysTripRouterFactory( sc ) );
 				

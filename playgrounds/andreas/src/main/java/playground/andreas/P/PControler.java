@@ -36,17 +36,17 @@ import java.io.File;
  * @author aneumann
  */
 @Deprecated
-public class PControler extends Controler {
+public class PControler {
 
 	private final static Logger log = Logger.getLogger(PControler.class);
 
 	private boolean useOTFVis = false;
 	
 	public PControler(ScenarioImpl scenario) {
-		super(scenario);
+//		super(scenario);
 		// TODO Auto-generated constructor stub
 		
-		throw new RuntimeException(Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE) ;
+		throw new RuntimeException(Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE + Gbl.CONTROLER_IS_NOW_FINAL ) ;
 	}
 
 //	@Override
@@ -150,5 +150,15 @@ public class PControler extends Controler {
 			new VehicleWriterV1(sc.getTransitVehicles()).writeFile(pConfig.getNextOutputBase() + "transitVehicles.xml");
 		}
 		
+	}
+
+	private void run() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	private void setOverwriteFiles(boolean b) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
 	}
 }

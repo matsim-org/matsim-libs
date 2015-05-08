@@ -19,9 +19,9 @@
 
 package playground.anhorni.surprice;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -31,7 +31,8 @@ import playground.anhorni.surprice.analysis.ModeSharesControlerListener;
 import playground.anhorni.surprice.scoring.SurpriceScoringFunctionFactory;
 import playground.anhorni.surprice.warmstart.AdaptNextDay;
 
-public class DayControler extends Controler {
+public class DayControler  {
+	Controler cc ;
 	
 	private AgentMemories memories = new AgentMemories();
 	private String day;	
@@ -40,20 +41,21 @@ public class DayControler extends Controler {
 	private TerminationCriterionScoreBased terminationCriterion = null;
 		
 	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences, Population populationPreviousDay) {
-		super(config);	
-		super.setOverwriteFiles(true);
+//		super(config);
+		cc = new Controler( config ) ;
+		cc.setOverwriteFiles(true);
 		this.memories = memories;	
 		this.day = day;
 		this.preferences = preferences;
 		this.populationPreviousDay = populationPreviousDay;
 
-        this.setScoringFunctionFactory(
+		cc.setScoringFunctionFactory(
 				new SurpriceScoringFunctionFactory(
-			  			this, this.getConfig().planCalcScore(), getScenario().getNetwork(), this.memories, this.day, this.preferences)
+						cc, cc.getConfig().planCalcScore(), cc.getScenario().getNetwork(), this.memories, this.day, this.preferences)
 				);
         this.loadMyControlerListeners();
         
-        throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
+        throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL + Gbl.RETROFIT_CONTROLER  ) ;
 	} 
 				
 //	protected void setUp() {
@@ -68,36 +70,44 @@ public class DayControler extends Controler {
 //	}
 	
 	private void setTermination(double stoppingRate) {
-		this.terminationCriterion = new TerminationCriterionScoreBased(stoppingRate, this);
-		super.setTerminationCriterion(this.terminationCriterion);
+		this.terminationCriterion = new TerminationCriterionScoreBased(stoppingRate, cc);
+		cc.setTerminationCriterion(this.terminationCriterion);
 	}
 	
 	private void loadMyControlerListeners() {
 //		super.loadControlerListeners();
 		//this.addControlerListener(new ScoringFunctionResetter()); TODO: check if really not necessary anymore!
-	  	this.addControlerListener(new Memorizer(this.memories, this.day));
-	  	this.addControlerListener(new ModeSharesControlerListener("times"));
-	  	this.addControlerListener(new ModeSharesControlerListener("distances"));  	
-	  	this.addControlerListener(new AgentAnalysisShutdownListener(this.day, this.getControlerIO().getOutputPath()));
+		cc.addControlerListener(new Memorizer(this.memories, this.day));
+		cc.addControlerListener(new ModeSharesControlerListener("times"));
+		cc.addControlerListener(new ModeSharesControlerListener("distances"));  	
+		cc.addControlerListener(new AgentAnalysisShutdownListener(this.day, cc.getControlerIO().getOutputPath()));
 	  	
-	  	if (Boolean.parseBoolean(this.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
-	  		this.addControlerListener(new RoadPricing(this.preferences));
+	  	if (Boolean.parseBoolean(cc.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
+	  		cc.addControlerListener(new RoadPricing(this.preferences));
 		}
-	  	double stoppingCriterionVal = Double.parseDouble(this.getConfig().findParam(Surprice.SURPRICE_RUN, "stoppingCriterionVal"));
+	  	double stoppingCriterionVal = Double.parseDouble(cc.getConfig().findParam(Surprice.SURPRICE_RUN, "stoppingCriterionVal"));
 	  	if (stoppingCriterionVal > 0.0) {	
 	  		this.setTermination(stoppingCriterionVal);
 	  	}
-	  	if (Boolean.parseBoolean(this.getConfig().findParam(Surprice.SURPRICE_RUN, "warmstart"))) {
-	  		this.addControlerListener(new AdaptNextDay(this.populationPreviousDay));
+	  	if (Boolean.parseBoolean(cc.getConfig().findParam(Surprice.SURPRICE_RUN, "warmstart"))) {
+	  		cc.addControlerListener(new AdaptNextDay(this.populationPreviousDay));
 	  	}
 	}
 	
 	public int getFinalIteration() {
 		if (this.terminationCriterion == null) {
-			return this.getConfig().controler().getLastIteration();
+			return cc.getConfig().controler().getLastIteration();
 		}
 		else {
 			return this.terminationCriterion.getFinalIteration();
 		}
+	}
+
+	public void run() {
+		cc.run() ;
+	}
+
+	public Scenario getScenario() {
+		return cc.getScenario() ;
 	}
 }
