@@ -43,7 +43,9 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.PassengerRoute;
@@ -163,7 +165,7 @@ public class JointTripRouterFactoryTest {
 	@Test
 	public void testPassengerRoute() throws Exception {
 		final PlanAlgorithm planRouter =
-			new JointPlanRouterFactory( null ).createPlanRoutingAlgorithm(
+			new JointPlanRouterFactory( (ActivityFacilities) null ).createPlanRoutingAlgorithm(
 					factory.get() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();
@@ -200,7 +202,7 @@ public class JointTripRouterFactoryTest {
 	@Test
 	public void testDriverRoute() throws Exception {
 		final PlanAlgorithm planRouter =
-			new JointPlanRouterFactory( null ).createPlanRoutingAlgorithm(
+			new JointPlanRouterFactory( (ActivityFacilities) null ).createPlanRoutingAlgorithm(
 					factory.get() );
 		for (Person pers : scenario.getPopulation().getPersons().values()) {
 			final Plan plan = pers.getSelectedPlan();
