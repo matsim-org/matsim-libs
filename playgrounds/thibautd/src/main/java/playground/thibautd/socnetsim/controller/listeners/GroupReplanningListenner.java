@@ -30,10 +30,12 @@ import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * @author thibautd
  */
+@Singleton
 public class GroupReplanningListenner implements PlansReplanning, ReplanningListener {
 	private final GroupStrategyManager strategyManager;
 	private final Scenario sc;

@@ -36,6 +36,7 @@ import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 
 import com.google.inject.Inject;
 
@@ -48,7 +49,7 @@ public final class JointPlanCompositionMinimalityChecker implements IterationEnd
 
 	@Inject
 	public JointPlanCompositionMinimalityChecker(
-			final PlanLinkIdentifier linkIdentifier,
+			final @Strong PlanLinkIdentifier linkIdentifier,
 			final Scenario sc ) {
 		this.linkIdentifier = linkIdentifier;
 		this.population = sc.getPopulation();

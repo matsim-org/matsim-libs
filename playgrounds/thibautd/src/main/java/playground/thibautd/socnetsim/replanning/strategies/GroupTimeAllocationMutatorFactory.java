@@ -40,6 +40,7 @@ import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 
 public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelectionStrategy {
 	private static final Logger log =
@@ -55,7 +56,7 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 
 	@Inject
 	public GroupTimeAllocationMutatorFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			PlanLinkIdentifier planLinkIdentifier ) {
+			@Strong PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;

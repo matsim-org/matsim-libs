@@ -42,9 +42,13 @@ import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 /**
  * @author thibautd
  */
+@Singleton
 public class DynamicGroupIdentifier implements GroupIdentifier {
 	private static final Logger log =
 		Logger.getLogger(DynamicGroupIdentifier.class);
@@ -52,6 +56,7 @@ public class DynamicGroupIdentifier implements GroupIdentifier {
 	private final Scenario scenario;
 	private final Random random;
 
+	@Inject
 	public DynamicGroupIdentifier(final Scenario scenario) {
 		this.scenario = scenario;
 		this.random = MatsimRandom.getLocalInstance();

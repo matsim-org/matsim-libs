@@ -29,6 +29,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.OptimizeVehicleAllocationAtTourLevelModule;
@@ -48,7 +49,7 @@ public class GroupOptimizingTourVehicleAllocationFactory extends AbstractConfigu
 
 	@Inject
 	public GroupOptimizingTourVehicleAllocationFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory ,
-			Provider<TripRouter> tripRouterFactory , PlanLinkIdentifier planLinkIdentifier ) {
+			Provider<TripRouter> tripRouterFactory , @Strong PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;

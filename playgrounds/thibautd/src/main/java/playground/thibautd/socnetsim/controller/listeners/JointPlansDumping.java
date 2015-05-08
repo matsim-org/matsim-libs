@@ -29,10 +29,12 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * @author thibautd
  */
+@Singleton
 public class JointPlansDumping implements BeforeMobsimListener {
 	private static final Logger log =
 		Logger.getLogger(JointPlansDumping.class);

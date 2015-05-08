@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointTripsAndJointVehiclesModule.java
+ * SocialNetworkModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,20 +21,18 @@ package playground.thibautd.socnetsim.controller;
 
 import org.matsim.core.controler.AbstractModule;
 
-import playground.thibautd.router.PlanRoutingAlgorithmFactory;
-import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
-
-import com.google.inject.Scopes;
+import playground.thibautd.socnetsim.replanning.grouping.DynamicGroupIdentifier;
+import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 
 /**
  * @author thibautd
  */
-public class JointTripsModule extends AbstractModule {
-	// TODO: move joint trip specific strategies in there?
+public class SocialNetworkModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind( PlanRoutingAlgorithmFactory.class ).to( JointPlanRouterFactory.class ).in( Scopes.SINGLETON );
+		// TODO Auto-generated method stub
+		bind( GroupIdentifier.class ).to( DynamicGroupIdentifier.class );
 	}
 }
 

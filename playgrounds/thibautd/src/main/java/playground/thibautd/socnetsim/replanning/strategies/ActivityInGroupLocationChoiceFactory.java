@@ -29,6 +29,7 @@ import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.modules.MutateActivityLocationsToLocationsOfOthersModule;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -45,8 +46,11 @@ public class ActivityInGroupLocationChoiceFactory extends AbstractConfigurableSe
 	private final PlanLinkIdentifier planLinkIdentifier;
 
 	@Inject
-	public ActivityInGroupLocationChoiceFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory ,
-			Provider<TripRouter> tripRouterFactory , PlanLinkIdentifier planLinkIdentifier ) {
+	public ActivityInGroupLocationChoiceFactory(
+			Scenario sc ,
+			PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory ,
+			Provider<TripRouter> tripRouterFactory ,
+			@Strong PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;

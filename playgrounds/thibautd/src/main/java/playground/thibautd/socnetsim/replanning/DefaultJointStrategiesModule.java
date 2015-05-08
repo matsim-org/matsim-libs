@@ -76,6 +76,9 @@ public class DefaultJointStrategiesModule extends AbstractModule {
 	@Override
 	public void install() {
 		planStrategyBinder = MapBinder.newMapBinder(binder(), String.class, GroupPlanStrategy.class);
+		selectorBinder =  MapBinder.newMapBinder( binder() , String.class , GroupLevelPlanSelector.class );
+		removerBinder =  MapBinder.newMapBinder( binder() , String.class , ExtraPlanRemover.class );
+		nonInnovativeBinder =  MapBinder.newMapBinder( binder() , String.class , NonInnovativeStrategyFactory.class );
 
 		// default factories
 		// ---------------------------------------------------------------------

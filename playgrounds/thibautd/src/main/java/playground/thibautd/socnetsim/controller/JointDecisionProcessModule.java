@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.controller;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
@@ -39,6 +40,7 @@ import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.GroupReplanningListenner;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
 import playground.thibautd.socnetsim.events.CourtesyEventsGenerator;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.replanning.PlanLinkIdentifierUtils;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
@@ -51,6 +53,9 @@ import playground.thibautd.socnetsim.run.JointPlanCompositionMinimalityChecker;
 import playground.thibautd.socnetsim.run.JointPlanSelectionConsistencyChecker;
 import playground.thibautd.socnetsim.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * Defines the basic elements for the matsim process with joint plans.
@@ -117,6 +122,17 @@ public class JointDecisionProcessModule extends AbstractModule {
 		//			new JointMainModeIdentifier( new MainModeIdentifierImpl() ),
 		//			actTypesForAnalysis));
 
+		// For convenience
+		bind( JointPlans.class ).toProvider(
+				new Provider<JointPlans>() {
+					@Inject
+					private Scenario sc;
+
+					@Override
+					public JointPlans get() {
+						return (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
+					}
+				} );
 	}
 }
 

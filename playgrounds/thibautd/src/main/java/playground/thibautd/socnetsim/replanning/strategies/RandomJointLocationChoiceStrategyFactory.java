@@ -27,6 +27,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 import playground.thibautd.socnetsim.replanning.modules.randomlocationchoice.RandomJointLocationChoiceModule;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
@@ -45,7 +46,7 @@ public class RandomJointLocationChoiceStrategyFactory extends AbstractConfigurab
 
 	@Inject
 	public RandomJointLocationChoiceStrategyFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory ,
-			Provider<TripRouter> tripRouterFactory , PlanLinkIdentifier planLinkIdentifier ) {
+			Provider<TripRouter> tripRouterFactory , @Strong PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;

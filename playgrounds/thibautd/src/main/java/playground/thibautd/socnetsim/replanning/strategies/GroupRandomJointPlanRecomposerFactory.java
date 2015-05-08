@@ -29,6 +29,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
 
@@ -41,7 +42,7 @@ public class GroupRandomJointPlanRecomposerFactory implements Provider<GroupPlan
 	private final PlanLinkIdentifier planLinkIdentifier;
 
 	@Inject
-	public GroupRandomJointPlanRecomposerFactory( Scenario sc , PlanLinkIdentifier planLinkIdentifier ) {
+	public GroupRandomJointPlanRecomposerFactory( Scenario sc , @Strong PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planLinkIdentifier = planLinkIdentifier;
 	}

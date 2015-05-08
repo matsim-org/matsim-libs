@@ -29,15 +29,20 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 /**
  * @author thibautd
  */
+@Singleton
 public class DumpJointDataAtEnd implements DumpDataAtEnd, ShutdownListener {
 	private final DumpDataAtEndImpl individualDumper;
 	private final Scenario scenario;
 	private final JointPlans jointPlans;
 	private final OutputDirectoryHierarchy controlerIO;
 
+	@Inject
 	public DumpJointDataAtEnd(
 			final Scenario scenarioData,
 			final JointPlans jointPlans,

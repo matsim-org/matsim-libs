@@ -27,6 +27,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -43,7 +44,7 @@ public class GroupReRouteFactory extends AbstractConfigurableSelectionStrategy {
 
 	@Inject
 	public GroupReRouteFactory( Scenario sc , PlanRoutingAlgorithmFactory routingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			PlanLinkIdentifier planLinkIdentifier ) {
+			@Strong PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.routingAlgorithmFactory = routingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;

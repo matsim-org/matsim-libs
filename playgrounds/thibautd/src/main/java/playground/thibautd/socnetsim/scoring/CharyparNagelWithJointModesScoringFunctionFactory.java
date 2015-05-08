@@ -40,6 +40,8 @@ import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
+import com.google.inject.Inject;
+
 /**
  * @author thibautd
  */
@@ -56,10 +58,12 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
 	// /////////////////////////////////////////////////////////////////////////
+	@Inject
     public CharyparNagelWithJointModesScoringFunctionFactory(
     		final Scenario sc ) {
     	this( JointActingTypes.JOINT_STAGE_ACTS , sc );
     }
+
     public CharyparNagelWithJointModesScoringFunctionFactory(
 			final StageActivityTypes typesNotToScore,
 			final Scenario scenario) {

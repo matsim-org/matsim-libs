@@ -36,6 +36,7 @@ import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGen
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
@@ -56,7 +57,7 @@ public class JointTripMutatorFactory extends AbstractConfigurableSelectionStrate
 
 	@Inject
 	public JointTripMutatorFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			PlanLinkIdentifier planLinkIdentifier ) {
+			@Strong PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;

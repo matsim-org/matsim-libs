@@ -36,6 +36,7 @@ import playground.thibautd.socnetsim.replanning.JointPlanBasedGroupStrategyModul
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAlgorithm;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 import playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice.PrismicLocationChoiceModule;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
@@ -54,7 +55,7 @@ public class JointPrismLocationChoiceWithJointTripInsertionStrategyFactory exten
 
 	@Inject
 	public JointPrismLocationChoiceWithJointTripInsertionStrategyFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory ,
-			Provider<TripRouter> tripRouterFactory , PlanLinkIdentifier planLinkIdentifier ) {
+			Provider<TripRouter> tripRouterFactory , @Strong PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;
