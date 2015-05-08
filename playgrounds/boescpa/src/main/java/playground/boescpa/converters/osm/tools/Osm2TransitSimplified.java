@@ -21,15 +21,6 @@
 
 package playground.boescpa.converters.osm.tools;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -40,18 +31,10 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
+import playground.boescpa.converters.osm.networkCreator.osmWithPT.*;
 
-import playground.scnadine.converters.osmCore.OsmNodeHandler;
-import playground.scnadine.converters.osmCore.OsmParser;
-import playground.scnadine.converters.osmCore.OsmRelationHandler;
-import playground.scnadine.converters.osmCore.OsmWayHandler;
-import playground.scnadine.converters.osmCore.TagFilter;
+import java.util.*;
 
 /**
  * This is a simplified version of playground.scnadine.converters.osmPT.Osm2TransitLines.
