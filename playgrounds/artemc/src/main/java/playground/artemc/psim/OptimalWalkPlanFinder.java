@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -72,7 +73,11 @@ public class OptimalWalkPlanFinder {
 		}
 
 		((ActivityImpl) plan.getPlanElements().get(0)).setEndTime(workOpeningTime - travelTime);
-		((ActivityImpl) plan.getPlanElements().get(2)).setEndTime(workOpeningTime+workDuration);
+		((ActivityImpl) plan.getPlanElements().get(2)).setEndTime(workOpeningTime + workDuration);
+
+		((LegImpl) plan.getPlanElements().get(1)).setDepartureTime(((ActivityImpl) plan.getPlanElements().get(0)).getEndTime());
+		((LegImpl) plan.getPlanElements().get(3)).setDepartureTime(((ActivityImpl) plan.getPlanElements().get(2)).getEndTime());
+		((ActivityImpl) plan.getPlanElements().get(4)).setStartTime(((LegImpl) plan.getPlanElements().get(3)).getDepartureTime() + ((LegImpl) plan.getPlanElements().get(3)).getTravelTime());
 
 		return plan;
 	}
