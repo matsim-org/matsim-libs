@@ -33,10 +33,12 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import playground.ivt.utils.TripModeShares;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.controller.listeners.GroupReplanningListenner;
 import playground.thibautd.socnetsim.controller.listeners.JointPlansDumping;
+import playground.thibautd.socnetsim.events.CourtesyEventsGenerator;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.replanning.PlanLinkIdentifierUtils;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
@@ -45,6 +47,8 @@ import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
+import playground.thibautd.socnetsim.run.RunUtils.JointPlanCompositionMinimalityChecker;
+import playground.thibautd.socnetsim.run.RunUtils.JointPlanSelectionConsistencyChecker;
 import playground.thibautd.socnetsim.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 
@@ -67,6 +71,12 @@ public class JointDecisionProcessModule extends AbstractModule {
 		bind( DumpDataAtEnd.class ).to( DumpJointDataAtEnd.class );
 
 		addControlerListenerBinding().to( JointPlansDumping.class );
+
+		addEventHandlerBinding().to( CourtesyEventsGenerator.class );
+
+		// consistency
+		addControlerListenerBinding().to( JointPlanCompositionMinimalityChecker.class );
+		addControlerListenerBinding().to( JointPlanSelectionConsistencyChecker.class );
 
 		// default elements
 		bind( GroupIdentifier.class ).toInstance(
@@ -93,6 +103,20 @@ public class JointDecisionProcessModule extends AbstractModule {
 		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toProvider( PlanLinkIdentifierUtils.WeakLinkIdentifierProvider.class );
 		bind( TripRouter.class ).toProvider( JointTripRouterFactory.class );
 		bind( IncompatiblePlansIdentifierFactory.class ).toInstance( new EmptyIncompatiblePlansIdentifierFactory() );
+
+		addControlerListenerBinding().to( TripModeShares.class );
+		//final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
+		//actTypesForAnalysis.addActivityTypes(
+		//		controller.getRegistry().getTripRouterFactory().get().getStageActivityTypes() );
+		//actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
+		//controller.addControlerListener(
+		//		new TripModeShares(
+		//			graphWriteInterval,
+		//			controller.getControlerIO(),
+		//			controller.getRegistry().getScenario(),
+		//			new JointMainModeIdentifier( new MainModeIdentifierImpl() ),
+		//			actTypesForAnalysis));
+
 	}
 }
 

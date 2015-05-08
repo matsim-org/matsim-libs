@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
@@ -35,6 +36,8 @@ import org.matsim.facilities.ActivityFacility;
 import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 
+import com.google.inject.Inject;
+
 /**
  * Creates "courtesy" events: agents say "hello" and "goodbye" to their
  * social contacts located in the same facility as them.
@@ -45,6 +48,14 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 	private final EventsManager events;
 	private final SocialNetwork socialNetwork;
 	private final Map< Id<ActivityFacility> , Set< Id<Person> > > personsAtFacility = new HashMap< >();
+
+	@Inject
+	public CourtesyEventsGenerator(
+			final EventsManager events,
+			final Scenario sc) {
+		this.events = events;
+		this.socialNetwork = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
+	}
 
 	public CourtesyEventsGenerator(
 			final EventsManager events,

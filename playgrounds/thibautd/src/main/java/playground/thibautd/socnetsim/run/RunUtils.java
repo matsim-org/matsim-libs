@@ -19,6 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.run;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -26,20 +34,27 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV2;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.*;
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.Desires;
@@ -53,16 +68,29 @@ import playground.thibautd.pseudoqsim.PseudoSimConfigGroup.PSimType;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
-import playground.thibautd.socnetsim.analysis.*;
+import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
+import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
+import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
+import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
+import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.cliques.Clique;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.controller.listeners.GroupReplanningListenner;
 import playground.thibautd.socnetsim.events.CourtesyEventsGenerator;
-import playground.thibautd.socnetsim.population.*;
+import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.qsim.SwitchingJointQSimFactory;
-import playground.thibautd.socnetsim.replanning.*;
+import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
+import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
+import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
+import playground.thibautd.socnetsim.replanning.InnovationSwitchingGroupReplanningListenner;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
@@ -77,15 +105,19 @@ import playground.thibautd.socnetsim.scoring.FireMoneyEventsForUtilityOfBeingTog
 import playground.thibautd.socnetsim.scoring.GroupSizePreferencesConfigGroup;
 import playground.thibautd.socnetsim.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
-import playground.thibautd.socnetsim.sharedvehicles.*;
+import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
+import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
+import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
+import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
+import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 import playground.thibautd.utils.DistanceFillerAlgorithm;
 import playground.thibautd.utils.GenericFactory;
 import playground.thibautd.utils.TravelTimeRetrofittingEventHandler;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.google.inject.Inject;
 
 /**
  * Groups methods too specific to go in the "frameworky" part of the code,
@@ -96,6 +128,198 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author thibautd
  */
 public class RunUtils {
+	public static final class JointPlanCompositionMinimalityChecker implements IterationEndsListener, IterationStartsListener {
+		// Fail only on start of next iteration, to let all consistency checkers print their error, if any.
+		private boolean gotError = false;
+		private final PlanLinkIdentifier linkIdentifier;
+		private final Population population;
+		private final JointPlans jointPlansStruct;
+
+		@Inject
+		public JointPlanCompositionMinimalityChecker(
+				final PlanLinkIdentifier linkIdentifier,
+				final Scenario sc ) {
+			this.linkIdentifier = linkIdentifier;
+			this.population = sc.getPopulation();
+			this.jointPlansStruct = (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
+		}
+
+		private JointPlanCompositionMinimalityChecker( ImmutableJointController controller ) {
+			this( controller.getRegistry().getPlanLinkIdentifier(),
+					controller.getRegistry().getScenario() );
+		}
+
+		@Override
+		public void notifyIterationEnds(final IterationEndsEvent event) {
+			log.info( "Checking minimality of joint plan composition" );
+			final PlanLinkIdentifier links = linkIdentifier;
+			final Set<JointPlan> jointPlans = new HashSet<JointPlan>();
+
+			for ( Person person : population.getPersons().values() ) {
+				final Plan plan = person.getSelectedPlan();
+				final JointPlan jp = jointPlansStruct.getJointPlan( plan );
+
+				if ( jp != null ) {
+					jointPlans.add( jp );
+				}
+			}
+
+			for ( JointPlan jp : jointPlans ) {
+				for ( Plan p : jp.getIndividualPlans().values() ) {
+					if ( !hasLinkedPlan( links , p , jp.getIndividualPlans().values() ) ) {
+						log.error( "plan "+p+" is in "+jp+" but is not linked with any plan" );
+						gotError = true ;
+					}
+				}
+			}
+		}
+
+		private boolean hasLinkedPlan(
+				final PlanLinkIdentifier links,
+				final Plan p,
+				final Collection<Plan> plans) {
+			for ( Plan p2 : plans ) {
+				if ( p == p2 ) continue;
+				final boolean l = links.areLinked( p , p2 );
+				if ( l != links.areLinked( p2 , p ) ) {
+					log.error( "inconsistent plan link identifier revealed by "+p+" and "+p2 );
+					log.error( p.getPerson().getId()+" is "+(l ? "" : "NOT")+" linked with "+p2.getPerson().getId() );
+					log.error( p2.getPerson().getId()+" is "+(l ? "NOT" : "")+" linked with "+p.getPerson().getId() );
+					gotError = true;
+				}
+				if ( l ) return true;
+			}
+			return false;
+		}
+
+		@Override
+		public void notifyIterationStarts( IterationStartsEvent event ) {
+			if ( gotError ) throw new RuntimeException( "inconsistency detected. Look at error messages for details" );
+		}
+	}
+
+	public static final class JointPlanSelectionConsistencyChecker implements IterationEndsListener, IterationStartsListener {
+		private boolean gotError;
+		private final Population population;
+		private final JointPlans jointPlans;
+
+		@Inject
+		public JointPlanSelectionConsistencyChecker( final Scenario sc ) {
+			this.population = sc.getPopulation();
+			this.jointPlans = (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
+		}
+
+		private JointPlanSelectionConsistencyChecker( ImmutableJointController controller ) {
+			this( controller.getRegistry().getScenario() );
+		}
+
+		@Override
+		public void notifyIterationEnds(final IterationEndsEvent event) {
+			log.info( "Checking consistency of joint plan selection" );
+			final Map<JointPlan, Set<Plan>> plansOfJointPlans = new HashMap<JointPlan, Set<Plan>>();
+
+			for ( Person person : population.getPersons().values() ) {
+				final Plan plan = person.getSelectedPlan();
+				final JointPlan jp = jointPlans.getJointPlan( plan );
+
+				if ( jp != null ) {
+					Set<Plan> plans = plansOfJointPlans.get( jp );
+
+					if ( plans == null ) {
+						plans = new HashSet<Plan>();
+						plansOfJointPlans.put( jp , plans );
+					}
+
+					plans.add( plan );
+				}
+			}
+
+			for ( Map.Entry<JointPlan , Set<Plan>> entry : plansOfJointPlans.entrySet() ) {
+				if ( entry.getKey().getIndividualPlans().size() != entry.getValue().size() ) {
+					log.error( "joint plan "+entry.getKey()+
+							" of size "+entry.getKey().getIndividualPlans().size()+
+							" has only the "+entry.getValue().size()+" following plans selected: "+
+							entry.getValue() );
+					gotError = true;
+				}
+			}
+		}
+
+		@Override
+		public void notifyIterationStarts( IterationStartsEvent event ) {
+			if ( gotError ) throw new RuntimeException( "inconsistency detected. Look at error messages for details" );
+		}
+	}
+
+	public static final class VehicleAllocationConsistencyChecker implements IterationEndsListener, IterationStartsListener {
+		private boolean gotError = false;
+
+		private final Population population;
+		private final JointPlans jointPlans;
+
+		@Inject
+		public VehicleAllocationConsistencyChecker( final Scenario sc ) {
+			this.population = sc.getPopulation();
+			this.jointPlans = (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
+		}
+
+		private VehicleAllocationConsistencyChecker( ImmutableJointController controller ) {
+			this( controller.getRegistry().getScenario() );
+		}
+
+		@Override
+		public void notifyIterationEnds(final IterationEndsEvent event) {
+			log.info( "Checking consistency of vehicle allocation" );
+			final Set<Id> knownVehicles = new HashSet<Id>();
+			final Set<JointPlan> knownJointPlans = new HashSet<JointPlan>();
+
+			boolean hadNull = false;
+			boolean hadNonNull = false;
+			for ( Person person : population.getPersons().values() ) {
+				final Plan plan = person.getSelectedPlan();
+				final JointPlan jp = jointPlans.getJointPlan( plan );
+
+				final Set<Id> vehsOfPlan = 
+					 jp != null && knownJointPlans.add( jp ) ?
+						SharedVehicleUtils.getVehiclesInJointPlan(
+								jp,
+								SharedVehicleUtils.DEFAULT_VEHICULAR_MODES) :
+						(jp == null ?
+							SharedVehicleUtils.getVehiclesInPlan(
+									plan,
+									SharedVehicleUtils.DEFAULT_VEHICULAR_MODES) :
+							Collections.<Id>emptySet());
+
+				for ( Id v : vehsOfPlan ) {
+					if ( v == null ) {
+						if ( hadNonNull ) {
+							log.error( "got null and non-null vehicles" );
+							gotError = true;
+						}
+
+						hadNull = true;
+					}
+					else {
+						if ( hadNull ) {
+							log.error( "got null and non-null vehicles" );
+							gotError = true;
+						}
+						if ( !knownVehicles.add( v ) ) {
+							log.error( "inconsistent allocation of vehicle "+v+" (found in several distinct joint plans)" );
+							gotError = true;
+						}
+						hadNonNull = true;
+					}
+				}
+			}
+		}
+
+		@Override
+		public void notifyIterationStarts( IterationStartsEvent event ) {
+			if ( gotError ) throw new RuntimeException( "inconsistency detected. Look at error messages for details" );
+		}
+	}
+
 	private static final Logger log =
 		Logger.getLogger(RunUtils.class);
 
@@ -241,148 +465,15 @@ public class RunUtils {
 	}
 
 	public static void addConsistencyCheckingListeners(final ImmutableJointController controller) {
-		final AtomicBoolean gotError = new AtomicBoolean( false );
-
-		// only fail after all listenners have been executed
-		// reminder: listenners executed in the inverse order of the insertion order
-		controller.addControlerListener( 
-				new IterationEndsListener() {
-					@Override
-					public void notifyIterationEnds(final IterationEndsEvent event) {
-						if ( gotError.get() ) throw new RuntimeException( "inconsistency detected. Look at error messages for details" );
-					}
-				});
 
 		controller.addControlerListener(
-				new IterationEndsListener() {
-					@Override
-					public void notifyIterationEnds(final IterationEndsEvent event) {
-						log.info( "Checking consistency of vehicle allocation" );
-						final Set<Id> knownVehicles = new HashSet<Id>();
-						final Set<JointPlan> knownJointPlans = new HashSet<JointPlan>();
-
-						boolean hadNull = false;
-						boolean hadNonNull = false;
-						for ( Person person : controller.getRegistry().getScenario().getPopulation().getPersons().values() ) {
-							final Plan plan = person.getSelectedPlan();
-							final JointPlan jp = controller.getRegistry().getJointPlans().getJointPlan( plan );
-
-							final Set<Id> vehsOfPlan = 
-								 jp != null && knownJointPlans.add( jp ) ?
-									SharedVehicleUtils.getVehiclesInJointPlan(
-											jp,
-											SharedVehicleUtils.DEFAULT_VEHICULAR_MODES) :
-									(jp == null ?
-										SharedVehicleUtils.getVehiclesInPlan(
-												plan,
-												SharedVehicleUtils.DEFAULT_VEHICULAR_MODES) :
-										Collections.<Id>emptySet());
-
-							for ( Id v : vehsOfPlan ) {
-								if ( v == null ) {
-									if ( hadNonNull ) {
-										log.error( "got null and non-null vehicles" );
-										gotError.set( true );
-									}
-
-									hadNull = true;
-								}
-								else {
-									if ( hadNull ) {
-										log.error( "got null and non-null vehicles" );
-										gotError.set( true );
-									}
-									if ( !knownVehicles.add( v ) ) {
-										log.error( "inconsistent allocation of vehicle "+v+" (found in several distinct joint plans)" );
-										gotError.set( true );
-									}
-									hadNonNull = true;
-								}
-							}
-						}
-					}
-				});
+				new VehicleAllocationConsistencyChecker( controller ));
 
 		controller.addControlerListener(
-				new IterationEndsListener() {
-					@Override
-					public void notifyIterationEnds(final IterationEndsEvent event) {
-						log.info( "Checking consistency of joint plan selection" );
-						final Map<JointPlan, Set<Plan>> plansOfJointPlans = new HashMap<JointPlan, Set<Plan>>();
-
-						for ( Person person : controller.getRegistry().getScenario().getPopulation().getPersons().values() ) {
-							final Plan plan = person.getSelectedPlan();
-							final JointPlan jp = controller.getRegistry().getJointPlans().getJointPlan( plan );
-
-							if ( jp != null ) {
-								Set<Plan> plans = plansOfJointPlans.get( jp );
-
-								if ( plans == null ) {
-									plans = new HashSet<Plan>();
-									plansOfJointPlans.put( jp , plans );
-								}
-
-								plans.add( plan );
-							}
-						}
-
-						for ( Map.Entry<JointPlan , Set<Plan>> entry : plansOfJointPlans.entrySet() ) {
-							if ( entry.getKey().getIndividualPlans().size() != entry.getValue().size() ) {
-								log.error( "joint plan "+entry.getKey()+
-										" of size "+entry.getKey().getIndividualPlans().size()+
-										" has only the "+entry.getValue().size()+" following plans selected: "+
-										entry.getValue() );
-								gotError.set( true );
-							}
-						}
-					}
-				});
+				new JointPlanSelectionConsistencyChecker( controller ));
 
 		controller.addControlerListener(
-				new IterationEndsListener() {
-					@Override
-					public void notifyIterationEnds(final IterationEndsEvent event) {
-						log.info( "Checking minimality of joint plan composition" );
-						final PlanLinkIdentifier links = controller.getRegistry().getPlanLinkIdentifier();
-						final Set<JointPlan> jointPlans = new HashSet<JointPlan>();
-
-						for ( Person person : controller.getRegistry().getScenario().getPopulation().getPersons().values() ) {
-							final Plan plan = person.getSelectedPlan();
-							final JointPlan jp = controller.getRegistry().getJointPlans().getJointPlan( plan );
-
-							if ( jp != null ) {
-								jointPlans.add( jp );
-							}
-						}
-
-						for ( JointPlan jp : jointPlans ) {
-							for ( Plan p : jp.getIndividualPlans().values() ) {
-								if ( !hasLinkedPlan( links , p , jp.getIndividualPlans().values() ) ) {
-									log.error( "plan "+p+" is in "+jp+" but is not linked with any plan" );
-									gotError.set( true );
-								}
-							}
-						}
-					}
-
-					private boolean hasLinkedPlan(
-							final PlanLinkIdentifier links,
-							final Plan p,
-							final Collection<Plan> plans) {
-						for ( Plan p2 : plans ) {
-							if ( p == p2 ) continue;
-							final boolean l = links.areLinked( p , p2 );
-							if ( l != links.areLinked( p2 , p ) ) {
-								log.error( "inconsistent plan link identifier revealed by "+p+" and "+p2 );
-								log.error( p.getPerson().getId()+" is "+(l ? "" : "NOT")+" linked with "+p2.getPerson().getId() );
-								log.error( p2.getPerson().getId()+" is "+(l ? "NOT" : "")+" linked with "+p.getPerson().getId() );
-								gotError.set( true );
-							}
-							if ( l ) return true;
-						}
-						return false;
-					}
-				});
+				new JointPlanCompositionMinimalityChecker( controller ));
 	}
 
 	public static void addDistanceFillerListener(final ImmutableJointController controller) {

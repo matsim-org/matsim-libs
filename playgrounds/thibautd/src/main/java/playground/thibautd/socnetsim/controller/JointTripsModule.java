@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * JointPlanRouterFactory.java
+ * JointTripsAndJointVehiclesModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.router;
+package playground.thibautd.socnetsim.controller;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.TripRouter;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.controler.AbstractModule;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
+import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 
-import com.google.inject.Inject;
+import com.google.inject.Scopes;
 
 /**
  * @author thibautd
  */
-public class JointPlanRouterFactory implements PlanRoutingAlgorithmFactory {
-	private final ActivityFacilities facilities;
-
-	@Inject
-	public JointPlanRouterFactory(final Scenario sc) {
-		this( sc.getActivityFacilities() );
-	}
-
-	public JointPlanRouterFactory(final ActivityFacilities facilities) {
-		this.facilities = facilities;
-	}
+public class JointTripsModule extends AbstractModule {
 
 	@Override
-	public PlanAlgorithm createPlanRoutingAlgorithm(final TripRouter tripRouter) {
-		return new JointPlanRouter( tripRouter , facilities );
+	public void install() {
+		bind( PlanRoutingAlgorithmFactory.class ).to( JointPlanRouterFactory.class ).in( Scopes.SINGLETON );
 	}
 }
 
