@@ -43,15 +43,20 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.charts.ChartUtil;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 /**
  * @author thibautd
  */
+@Singleton
 public class TripModeShares implements IterationEndsListener, ShutdownListener {
 	private final int graphWriteInterval;
 	private final String pngFileName;
@@ -61,6 +66,14 @@ public class TripModeShares implements IterationEndsListener, ShutdownListener {
 
 	private final BufferedWriter writer;
 	private final History history = new History();
+
+	@Inject
+	public TripModeShares(
+			final OutputDirectoryHierarchy outputDirectoryHierarchy,
+			final Scenario scenario,
+			final TripRouter tripRouter) {
+		this( 10 , outputDirectoryHierarchy , scenario , tripRouter.getMainModeIdentifier() , tripRouter.getStageActivityTypes() );
+	}
 
 	public TripModeShares(
 			final int graphWriteInterval,
