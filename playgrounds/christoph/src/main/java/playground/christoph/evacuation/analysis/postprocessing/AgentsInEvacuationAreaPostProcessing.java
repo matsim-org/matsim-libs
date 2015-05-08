@@ -114,12 +114,14 @@ public class AgentsInEvacuationAreaPostProcessing {
 		 * Since we do not want to overwrite existing results we add an additional prefix
 		 * to the re-created outputs.
 		 */
-		DummyController dummyInputController = new DummyController(scenario);
+//		DummyController dummyInputController = new DummyController(scenario);
+		Controler dummyInputController = null ;
 		
 		// add another string to the runId to not overwrite old files
 		String runId = scenario.getConfig().controler().getRunId();
 		scenario.getConfig().controler().setRunId(runId + ".postprocessed");
-		DummyController dummyOutputController = new DummyController(scenario);
+//		DummyController dummyOutputController = new DummyController(scenario);
+		Controler dummyOutputController = null ;
 		
 		List<ControlerListener> controlerListeners = new ArrayList<ControlerListener>();
 		List<MobsimListener> mobsimListeners = new ArrayList<MobsimListener>();
@@ -276,23 +278,24 @@ public class AgentsInEvacuationAreaPostProcessing {
 	 * 
 	 * @author cdobler
 	 */
-	private static class DummyController extends Controler {
+	private static class DummyController { 
+	//extends Controler {
 		
 		public DummyController(Scenario scenario) {
-			super(scenario);
-			
-			String outputPath = this.getScenario().getConfig().controler().getOutputDirectory();
-			if (outputPath.endsWith("/")) {
-				outputPath = outputPath.substring(0, outputPath.length() - 1);
-			}
-			if (this.getScenario().getConfig().controler().getRunId() != null) {
-//				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), true);
-				this.setupOutputDirectory(outputPath, this.getScenario().getConfig().controler().getRunId(), true) ;
-			} else {
-//				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
-				this.setupOutputDirectory(outputPath, null, true) ;
-			}
-			// yy I don't think that this if confidition is necessary. kai, apr'13
+//			super(scenario);
+//			
+//			String outputPath = this.getScenario().getConfig().controler().getOutputDirectory();
+//			if (outputPath.endsWith("/")) {
+//				outputPath = outputPath.substring(0, outputPath.length() - 1);
+//			}
+//			if (this.getScenario().getConfig().controler().getRunId() != null) {
+////				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), true);
+//				this.setupOutputDirectory(outputPath, this.getScenario().getConfig().controler().getRunId(), true) ;
+//			} else {
+////				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
+//				this.setupOutputDirectory(outputPath, null, true) ;
+//			}
+//			// yy I don't think that this if confidition is necessary. kai, apr'13
 			
 		}
 	}
