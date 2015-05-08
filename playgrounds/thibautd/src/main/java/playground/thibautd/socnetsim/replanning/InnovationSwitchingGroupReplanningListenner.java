@@ -61,14 +61,14 @@ public class InnovationSwitchingGroupReplanningListenner implements ReplanningLi
 				config.isPSimIter( event.getIteration() ) ) {
 			log.info( "performing INNOVATION ONLY iteration (for feeding PSim)" );
 			innovativeStrategyManager.run(
-				event.getIteration(),
-				registry );
+				event.getReplanningContext(),
+				registry.getScenario() );
 		}
 		else {
 			log.info( "performing normal iteration (with non-innovative strategies)" );
 			mainStrategyManager.run(
-					event.getIteration(),
-					registry );
+					event.getReplanningContext(),
+					registry.getScenario() );
 		}
 	}
 }

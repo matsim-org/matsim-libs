@@ -639,7 +639,7 @@ public class RunUtils {
 
 		final GroupStrategyManager mainStrategyManager =
 			new GroupStrategyManager( 
-					mainStrategyRegistry );
+					null, null, mainStrategyRegistry );
 
 		final GroupStrategyRegistry innovativeStrategyRegistry = new GroupStrategyRegistry();
 		RunUtils.loadStrategyRegistryWithInnovativeStrategiesOnly(
@@ -649,7 +649,7 @@ public class RunUtils {
 
 		final GroupStrategyManager innovativeStrategyManager =
 			new GroupStrategyManager( 
-					innovativeStrategyRegistry );
+					null, null, innovativeStrategyRegistry );
 
 		final InnovationSwitchingGroupReplanningListenner listenner =
 					new InnovationSwitchingGroupReplanningListenner(
@@ -715,17 +715,18 @@ public class RunUtils {
 		}
 
 		// create strategy manager
-		final GroupStrategyManager strategyManager =
-			new GroupStrategyManager( 
-					strategyRegistry );
+		final GroupReplanningListenner repl =
+					new GroupReplanningListenner(
+						controllerRegistry.getScenario(),
+						null,
+						controllerRegistry.getGroupIdentifier(),
+						strategyRegistry);
 
 		// create controler
 		final ImmutableJointController controller =
 			new ImmutableJointController(
 					controllerRegistry,
-					new GroupReplanningListenner(
-						controllerRegistry,
-						strategyManager));
+					repl );
 		controller.addControlerListener( annealingSelectorFactory );
 
 		if ( controllerRegistry.getMobsimFactory() instanceof ControlerListener ) {
@@ -733,8 +734,6 @@ public class RunUtils {
 			// the SwitchingJointQSimFactory...
 			controller.addControlerListener( (ControlerListener) controllerRegistry.getMobsimFactory() );
 		}
-
-		strategyManager.setStopWatch( controller.stopwatch );
 
 		if ( !(config.getModule( StrategyAnalysisConfigGroup.GROUP_NAME ) instanceof StrategyAnalysisConfigGroup) ) {
 			config.addModule( new StrategyAnalysisConfigGroup() );
@@ -745,13 +744,13 @@ public class RunUtils {
 
 		if ( analysis.isDumpGroupSizes() ) {
 			final ReplanningStatsDumper replanningStats = new ReplanningStatsDumper( controller.getControlerIO().getOutputFilename( "replanningGroups.dat" ) );
-			strategyManager.addListener( replanningStats );
+			repl.getStrategyManager().addListener( replanningStats );
 			controller.addControlerListener( replanningStats );
 		}
 
 		if ( analysis.isDumpAllocation() ) {
 			final ReplanningAllocationDumper replanningStats = new ReplanningAllocationDumper( controller.getControlerIO().getOutputFilename( "replanningAllocations.dat" ) );
-			strategyManager.addListener( replanningStats );
+			repl.getStrategyManager().addListener( replanningStats );
 			controller.addControlerListener( replanningStats );
 		}
 

@@ -19,35 +19,49 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.controller.listeners;
 
+import org.matsim.analysis.IterationStopWatch;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 
-import com.google.inject.Inject;
-
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
+import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
+import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
+
+import com.google.inject.Inject;
 
 /**
  * @author thibautd
  */
 public class GroupReplanningListenner implements PlansReplanning, ReplanningListener {
 	private final GroupStrategyManager strategyManager;
-	private final ControllerRegistry registry;
+	private final Scenario sc;
 
+	// This class might look useless at first, but separating strategy manager from
+	// the controler listener allows to build more complex listeners, for instance
+	// switching between strategy managers depending on the iteration (PSim)
 	@Inject
 	public GroupReplanningListenner(
-			final ControllerRegistry registry,
-			final GroupStrategyManager strategyManager) {
-		this.registry = registry;
-		this.strategyManager = strategyManager;
+			final Scenario sc,
+			final IterationStopWatch stopWatch,
+			final GroupIdentifier groupIdentifier,
+			final GroupStrategyRegistry registry ) {
+		this.sc = sc;
+		this.strategyManager =
+			new GroupStrategyManager(
+					stopWatch,
+					groupIdentifier,
+					registry );
 	}
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
-		strategyManager.run(
-				event.getIteration(),
-				registry );
+		strategyManager.run( event.getReplanningContext() , sc );
+	}
+
+	public GroupStrategyManager getStrategyManager() {
+		return strategyManager;
 	}
 }
 

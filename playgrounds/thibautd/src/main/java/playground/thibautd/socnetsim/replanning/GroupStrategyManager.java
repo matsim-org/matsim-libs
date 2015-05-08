@@ -28,15 +28,19 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.ivt.utils.MapUtils;
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+
+import com.google.inject.Inject;
 
 /**
  * Implements the group-level replanning logic.
@@ -47,22 +51,21 @@ public class GroupStrategyManager {
 	private static final Logger log =
 		Logger.getLogger(GroupStrategyManager.class);
 
-	// unfortunately, the stopwatch is initilized at the contruction
-	// of abstract controler, and we need to build this thing before
-	// construction the Controller...
-	// So the only way to get the stop watch is via a getter or as a parameter.
-	private IterationStopWatch stopWatch = null;
-	public void setStopWatch(final IterationStopWatch sw) {
-		this.stopWatch = sw;
-	}
+	private IterationStopWatch stopWatch;
 
+	private final GroupIdentifier groupIdentifier;
 	private final GroupStrategyRegistry registry;
 
 	private final Random random;
 	private final List<Listener> listeners = new ArrayList<Listener>( 1 );
 
+	@Inject
 	public GroupStrategyManager(
+			final IterationStopWatch stopWatch,
+			final GroupIdentifier groupIdentifier,
 			final GroupStrategyRegistry registry ) {
+		this.stopWatch = stopWatch;
+		this.groupIdentifier = groupIdentifier;
 		this.registry = registry;
 		this.random = MatsimRandom.getLocalInstance();
 	}
@@ -72,11 +75,11 @@ public class GroupStrategyManager {
 	}
 
 	public final void run(
-			final int iteration,
-			final ControllerRegistry controllerRegistry) {
-		final Population population = controllerRegistry.getScenario().getPopulation();
-		final JointPlans jointPlans = controllerRegistry.getJointPlans();
-		final Collection<ReplanningGroup> groups = controllerRegistry.getGroupIdentifier().identifyGroups( population );
+			final ReplanningContext context,
+			final Scenario scenario) {
+		final Population population = scenario.getPopulation();
+		final JointPlans jointPlans = (JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME );
+		final Collection<ReplanningGroup> groups = groupIdentifier.identifyGroups( population );
 
 		final Map<GroupPlanStrategy, List<ReplanningGroup>> strategyAllocations =
 			new LinkedHashMap<GroupPlanStrategy, List<ReplanningGroup>>();
@@ -86,11 +89,11 @@ public class GroupStrategyManager {
 					jointPlans,
 					g );
 
-			final String subpop = identifySubpopulation( g , controllerRegistry );
-			final GroupPlanStrategy strategy = registry.chooseStrategy( iteration , subpop , random.nextDouble() );
+			final String subpop = identifySubpopulation( g , scenario );
+			final GroupPlanStrategy strategy = registry.chooseStrategy( context.getIteration() , subpop , random.nextDouble() );
 			final List<ReplanningGroup> alloc = MapUtils.getList( strategy , strategyAllocations );
 
-			notifyAlloc( iteration , g , strategy );
+			notifyAlloc( context.getIteration() , g , strategy );
 			alloc.add( g );
 		}
 		if ( stopWatch != null ) stopWatch.endOperation( "remove plans alloc strategy" );
@@ -101,7 +104,7 @@ public class GroupStrategyManager {
 			log.info( "passing "+toHandle.size()+" groups to strategy "+strategy );
 			if ( stopWatch != null ) stopWatch.beginOperation( "strategy "+strategy );
 			strategy.run(
-					controllerRegistry.createReplanningContext( iteration ),
+					context,
 					jointPlans,
 					toHandle );
 			if ( stopWatch != null ) stopWatch.endOperation( "strategy "+strategy );
@@ -111,9 +114,9 @@ public class GroupStrategyManager {
 
 	private static String identifySubpopulation(
 			final ReplanningGroup g,
-			final ControllerRegistry controllerRegistry) {
-		final String attName = controllerRegistry.getScenario().getConfig().plans().getSubpopulationAttributeName();
-		final ObjectAttributes atts = controllerRegistry.getScenario().getPopulation().getPersonAttributes();
+			final Scenario sc) {
+		final String attName = sc.getConfig().plans().getSubpopulationAttributeName();
+		final ObjectAttributes atts = sc.getPopulation().getPersonAttributes();
 
 		String name = null;
 
