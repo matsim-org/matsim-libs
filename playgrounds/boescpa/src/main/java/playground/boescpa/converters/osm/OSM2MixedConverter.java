@@ -35,7 +35,7 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import playground.boescpa.converters.osm.networkCreator.*;
 import playground.boescpa.converters.osm.scheduleCreator.*;
-import playground.boescpa.converters.osm.ptRouter.*;
+import playground.boescpa.converters.osm.ptMapping.*;
 import playground.boescpa.converters.osm.scheduleCreator.hafasCreator.PTScheduleCreatorHAFAS;
 
 /**
@@ -44,33 +44,13 @@ import playground.boescpa.converters.osm.scheduleCreator.hafasCreator.PTSchedule
  * @author boescpa
  */
 public class OSM2MixedConverter {
-
 	private static Logger log = Logger.getLogger(OSM2MixedConverter.class);
 
-	private CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
+	private static CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus");
 
-	private final Network network;
-	private final TransitSchedule schedule;
-	private final Vehicles vehicles;
-	private final String path2InputFiles;
-	private final String path2OSMFile;
-	// TODO-boescpa implement observer for osmFile and scheduleFile so that it hasn't to be read x-times...
-
-	private final MultimodalNetworkCreator multimodalNetworkCreator;
-	private final PTScheduleCreator ptScheduleCreator;
-	private final PTLineRouter ptLineRouter;
-
-	public OSM2MixedConverter(Network network, TransitSchedule schedule, Vehicles vehicles, String path2InputFiles, String path2OSMFile) {
-		this.network = network;
-		this.schedule = schedule;
-		this.vehicles = vehicles;
-		this.path2InputFiles = path2InputFiles;
-		this.path2OSMFile = path2OSMFile;
-
-		this.multimodalNetworkCreator = new MultimodalNetworkCreatorPT(this.network);
-		this.ptScheduleCreator = new PTScheduleCreatorHAFAS(this.schedule, this.vehicles, transformation);
-		this.ptLineRouter = new PTLineRouterDefault(this.schedule);
-	}
+	private static Network network;
+	private static TransitSchedule schedule;
+	private static Vehicles vehicles;
 
 	public static void main(String[] args) {
 
@@ -79,30 +59,31 @@ public class OSM2MixedConverter {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
-		Network network = scenario.getNetwork();
-		TransitSchedule schedule = scenario.getTransitSchedule();
-		Vehicles vehicles = scenario.getTransitVehicles();
+		network = scenario.getNetwork();
+		schedule = scenario.getTransitSchedule();
+		vehicles = scenario.getTransitVehicles();
 		// Get resources:
-		String pathToInputFiles = args[0];
-		String pathToOsmFile = args[1];
+		String path2InputFiles = args[0];
+		String path2OSMFile = args[1];
 		String outputMultimodalNetwork = args[2];
 		String outputSchedule = args[3];
 		String outputVehicles = args[4];
 
 		// **************** Convert ****************
-		OSM2MixedConverter converter = new OSM2MixedConverter(network, schedule, vehicles, pathToInputFiles, pathToOsmFile);
-		converter.convertOSM2MultimodalNetwork();
-		converter.writeOutput(outputMultimodalNetwork, outputSchedule, outputVehicles);
+		convertOSM2MultimodalNetwork(path2InputFiles, path2OSMFile);
+		writeOutput(outputMultimodalNetwork, outputSchedule, outputVehicles);
 	}
 
 	/**
 	 * Converts a given OSM network to a multimodal MATSim network with the help of a HAFAS schedule.
+	 * @param path2InputFiles
+	 * @param path2OSMFile
 	 */
-	public void convertOSM2MultimodalNetwork() {
+	public static void convertOSM2MultimodalNetwork(String path2InputFiles, String path2OSMFile) {
 		log.info("Conversion from OSM to multimodal MATSim network...");
-		multimodalNetworkCreator.createMultimodalNetwork(path2OSMFile);
-		ptScheduleCreator.createSchedule(path2InputFiles);
-		ptLineRouter.routePTLines(network);
+		new MultimodalNetworkCreatorPT(network).createMultimodalNetwork(path2OSMFile);
+		new PTScheduleCreatorHAFAS(schedule, vehicles, transformation).createSchedule(path2InputFiles);
+		new PTMapperBusAndTram(schedule).routePTLines(network);
 		log.info("Conversion from OSM to multimodal MATSim network... done.");
 	}
 
@@ -112,7 +93,7 @@ public class OSM2MixedConverter {
 	 * @param outputMultimodalNetwork	A string specifying the target network file.
 	 * @param outputSchedule			A string specifying the target schedule file.
 	 */
-	public void writeOutput(String outputMultimodalNetwork, String outputSchedule, String outputVehicles) {
+	public static void writeOutput(String outputMultimodalNetwork, String outputSchedule, String outputVehicles) {
 		log.info("Writing multimodal Network to " + outputMultimodalNetwork + "...");
 		new NetworkWriter(network).write(outputMultimodalNetwork);
 		log.info("Writing multimodal Schedule to " + outputSchedule + "...");

@@ -38,8 +38,8 @@ import org.matsim.run.NetworkCleaner;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import playground.boescpa.converters.osm.networkCreator.MMStreetNetworkCreatorFactory;
-import playground.boescpa.converters.osm.ptRouter.PTLineRouterDefaultV2;
-import playground.boescpa.converters.osm.ptRouter.PseudoNetworkCreatorV2;
+import playground.boescpa.converters.osm.ptMapping.PTMapperOnlyBusses;
+import playground.boescpa.converters.osm.ptMapping.PseudoNetworkCreator;
 import playground.boescpa.converters.osm.scheduleCreator.PTScheduleCreatorDefaultV2;
 import playground.boescpa.lib.tools.cutter.ScheduleCutter;
 import playground.boescpa.lib.tools.merger.NetworkMerger;
@@ -55,7 +55,8 @@ import playground.christoph.evacuation.pt.TransitRouterNetworkWriter;
  */
 public class OSM2MixedV2 {
 
-	private final static double maxBeelineWalkConnectingDistance = new TransitRouterConfig(ConfigUtils.createConfig()).beelineWalkConnectionDistance; // = 100
+	private final static double maxBeelineWalkConnectingDistance =
+			new TransitRouterConfig(ConfigUtils.createConfig()).beelineWalkConnectionDistance; // = 100
 
 	private static int cutRadius = 0;
 	private static Coord cutCenter = null;
@@ -129,7 +130,7 @@ public class OSM2MixedV2 {
 		// **************** Route Schedule ****************
 		new NetworkReaderMatsimV1(mixedScenario).parse(networkPath);
 		final Network mixedNetwork = mixedScenario.getNetwork();
-		new PTLineRouterDefaultV2(mixedSchedule).routePTLines(mixedNetwork);
+		new PTMapperOnlyBusses(mixedSchedule).routePTLines(mixedNetwork);
 		final String path_MixedSchedule = outbase + "MixedSchedule.xml.gz";
 		final String path_MixedNetwork = outbase + "MixedNetwork.xml.gz";
 		new TransitScheduleWriter(mixedSchedule).writeFile(path_MixedSchedule);
@@ -163,7 +164,7 @@ public class OSM2MixedV2 {
 
 		// **************** Route Schedule ****************
 		final Network onlyPTNetwork = onlyPTScenario.getNetwork();
-		new PseudoNetworkCreatorV2(onlyPTSchedule, onlyPTNetwork, "pt_").createNetwork();
+		new PseudoNetworkCreator(onlyPTSchedule, onlyPTNetwork, "pt_").createNetwork();
 		final String path_OnlyPTSchedule = outbase + "OnlyPTSchedule.xml.gz";
 		final String path_OnlyPTNetwork = outbase + "OnlyPTNetwork.xml.gz";
 		new TransitScheduleWriter(onlyPTSchedule).writeFile(path_OnlyPTSchedule);
