@@ -21,6 +21,7 @@ public class CSVToCountingStations {
 	private final String ouputCSFile;
 	private final String csIdFile;
 	private final String csDataFile;
+	private String vehCat;
 	
 	private Map<String,Id<Link>> idMap = new HashMap<String,Id<Link>>();	
 	private Map<String, Integer> catColumnInCSVFile = new TreeMap<String, Integer>();
@@ -39,10 +40,11 @@ public class CSVToCountingStations {
 		this.csDataFile = null;
 	}
 	
-	public CSVToCountingStations(String outputFile, String csIdFile, String csDataFile){
+	public CSVToCountingStations(String outputFile, String csIdFile, String csDataFile, String vehCat){
 		this.ouputCSFile = outputFile;
 		this.csIdFile = csIdFile;
 		this.csDataFile = csDataFile;
+		this.vehCat = vehCat;
 	}
 	
 	//Varinte mit CSV Parser, der auch Leerfelder korrekt erfasst.
@@ -71,6 +73,8 @@ public class CSVToCountingStations {
 						} else {
 							System.out.println("key already exists!");
 						}
+					} else {
+						System.out.println("CS with Id has no linkId: " + cs_id);
 					}
 				}
 			}
@@ -101,20 +105,19 @@ public class CSVToCountingStations {
 				splittedLine = csvParser.parseLine(line);
 				String id = splittedLine[catColumnInCSVFile.get("PC")];
 				String time = splittedLine[catColumnInCSVFile.get("HORA")];
-				int vol = Integer.parseInt(splittedLine[catColumnInCSVFile.get("C01")]);
-//				System.out.println(id + " "+ time + " " + vol);
-//				System.out.println(valuesOfCS.get(id).toString());
-				if(!valuesOfCS.get(id).containsTime(time)){ //Create new CSData-Set for this time
-					valuesOfCS.get(id).addTimeAndVolume(time, vol);
-				} else {	//Only add Volume
-					valuesOfCS.get(id).addVolume(time, vol);
-				}	
-//				System.out.println("Summe C01 zur Zeit: CS-ID: " + id + "Zeit: " + time + "Wert: "+  valuesOfCS.get(id).calcVolumePerTime(time));
+				int vol = Integer.parseInt(splittedLine[catColumnInCSVFile.get(vehCat)]);
+				if (valuesOfCS.containsKey(id)){
+					if(!valuesOfCS.get(id).containsTime(time)){ //Create new CSData-Set for this time
+						valuesOfCS.get(id).addTimeAndVolume(time, vol);
+					} else {	//Only add Volume
+						valuesOfCS.get(id).addVolume(time, vol);
+					}	
+				}
 			}
 		} catch(IOException e){
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	void writeCountsToFile() {
@@ -126,7 +129,6 @@ public class CSVToCountingStations {
 			Map<Integer, ArrayList<String>> dataTimesPerHour =  writeDataTimesPerHour(cs_id);
 			Count count = counts.createAndAddCount(Id.create(idMap.get(cs_id), Link.class), cs_id);
 			for (int hour : dataTimesPerHour.keySet()){
-				System.out.println("Before CreateVol: CS-ID: " + cs_id + "Zeit: " + hour + "Wert: "+  calcVolumePerHour(cs_id, dataTimesPerHour, hour));
 				count.createVolume(hour, calcVolumePerHour(cs_id, dataTimesPerHour, hour));
 			}
 		}
@@ -141,24 +143,14 @@ public class CSVToCountingStations {
 		for (Integer i = 1; i <= 24; i++){ //Hours 1-24
 			dataTimesPerHour.put(i, new ArrayList<String>());
 			 for (String t : valuesOfCS.get(id).getVolumePerTime().keySet()){
-				 System.out.println("TimeString: " + t +" Substring: "+ t.substring(0,2) + " mod TimeString" + (Integer.valueOf(t.substring(0,2))+1) + " i: " + i );
-				 
 				 if (Integer.valueOf((t.substring(0,2)))+1 == i){ //correct the different time interpretations (s.above)
 					 dataTimesPerHour.get(i).add(t);
-					 System.out.println("If true; current timelist: " +  dataTimesPerHour.get(i).toString());
-				 } else {
-					 System.out.println("ELSE should do nothing");
-//					 dataTimesPerHour.get(i).add("");
-				 }
+				 } 
 			 }
-			 System.out.println("Times per Hour: Hour: " + i + " times: " + dataTimesPerHour.get(i).toString());
 		}
-		
 		return dataTimesPerHour;
 	}
 	
-	//Note: In data the time descripe the beginning of the time-window. In case of the count it descripes the end of the time-window.
-	//e.g. The volume for the time from 6:00-7:00 are in data: 06:xx, but for the count.createVolume-method it is ("hour" 7).
 	private Integer calcVolumePerHour(String id, Map<Integer, ArrayList<String>> dataPerHour, int hour){
 		Integer sum = 0;
 		for (String time : dataPerHour.get(hour)){
