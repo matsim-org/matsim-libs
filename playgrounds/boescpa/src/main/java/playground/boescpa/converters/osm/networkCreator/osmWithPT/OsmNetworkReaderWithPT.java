@@ -19,7 +19,7 @@
  * *********************************************************************** *
  */
 
-package playground.boescpa.converters.osm.networkCreator;
+package playground.boescpa.converters.osm.networkCreator.osmWithPT;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,12 +40,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.UncheckedIOException;
-
-import playground.scnadine.converters.osmCore.OsmNodeHandler;
-import playground.scnadine.converters.osmCore.OsmParser;
-import playground.scnadine.converters.osmCore.OsmRelationHandler;
-import playground.scnadine.converters.osmCore.OsmWayHandler;
-import playground.scnadine.converters.osmCore.TagFilter;
 
 /**
  * org/matsim/core/utils/io/OsmNetworkReader.java extended with the functionality
