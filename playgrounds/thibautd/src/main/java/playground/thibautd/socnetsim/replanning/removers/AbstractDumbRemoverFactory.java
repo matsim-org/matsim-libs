@@ -21,15 +21,16 @@ package playground.thibautd.socnetsim.replanning.removers;
 
 import org.matsim.api.core.v01.Scenario;
 
+import com.google.inject.Provider;
+
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
-import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 
 /**
  * @author thibautd
  */
-abstract class AbstractDumbRemoverFactory implements ExtraPlanRemoverFactory {
+abstract class AbstractDumbRemoverFactory implements Provider<ExtraPlanRemover> {
 
 	private final Scenario sc;
 	

@@ -24,7 +24,6 @@ import java.util.Map;
 import org.matsim.core.controler.AbstractModule;
 
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
-import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.removers.CoalitionMinSelectorFactory;
@@ -270,7 +269,7 @@ public class JointStrategiesModule extends AbstractModule {
 
 	public void addRemoverFactory(
 			final String name,
-			final Class<? extends ExtraPlanRemoverFactory> f) {
+			final Class<? extends Provider<ExtraPlanRemover>> f) {
 		removerBinder
 			.addBinding( name )
 			.toProvider( f );

@@ -23,14 +23,13 @@ import org.matsim.api.core.v01.Scenario;
 
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
-import playground.thibautd.socnetsim.replanning.ExtraPlanRemoverFactory;
-
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd
  */
-public class LexicographicRemoverFactory implements ExtraPlanRemoverFactory {
+public class LexicographicRemoverFactory implements Provider<ExtraPlanRemover> {
 
 	private final Scenario sc;
 	
