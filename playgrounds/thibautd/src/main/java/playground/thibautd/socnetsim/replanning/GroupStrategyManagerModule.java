@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GroupStrategyLoader.java
+ * GroupStrategyManagerModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,46 +23,59 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Singleton;
 
 /**
  * @author thibautd
  */
-public class GroupStrategyLoader {
-	private final Map<String, Provider<GroupPlanStrategy>> strategies;
-	private final Map<String, Provider<ExtraPlanRemover>> removers;
+public class GroupStrategyManagerModule extends AbstractModule {
+    @Override
+    public void install() {
+        install(new DefaultJointStrategiesModule());
+        bind(GroupStrategyRegistry.class).toProvider(GroupStrategyRegistryFiller.class).in(Singleton.class);
+    }
 
-	private final Scenario sc;
+    private static class GroupStrategyRegistryFiller implements Provider<GroupStrategyRegistry> {
 
-	@Inject
-	public GroupStrategyLoader( Map<String, Provider<GroupPlanStrategy>> strategies , Map<String, Provider<ExtraPlanRemover>> removers , Scenario sc ) {
-		this.strategies = strategies;
-		this.removers = removers;
-		this.sc = sc;
-	}
+		private final Map<String, Provider<GroupPlanStrategy>> strategies;
+		private final Map<String, Provider<ExtraPlanRemover>> removers;
 
-	public void loadStrategyRegistry(
-			final boolean innovativeness,
-			final GroupStrategyRegistry strategyRegistry ) {
-		final Config config = sc.getConfig();
-		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup) config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
+		private final Scenario sc;
 
-		strategyRegistry.setExtraPlanRemover( removers.get( weights.getSelectorForRemoval() ).get() );
+		@Inject
+		public GroupStrategyRegistryFiller( Map<String, Provider<GroupPlanStrategy>> strategies , Map<String, Provider<ExtraPlanRemover>> removers , Scenario sc ) {
+			this.strategies = strategies;
+			this.removers = removers;
+			this.sc = sc;
+		}
 
-		for ( StrategyParameterSet set : weights.getStrategyParameterSets() ) {
-			if ( set.isInnovative() == innovativeness ) {
+        @Override
+        public GroupStrategyRegistry get() {
+			final GroupStrategyRegistry strategyRegistry  = new GroupStrategyRegistry();
+			final Config config = sc.getConfig();
+			final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup) config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
+
+			strategyRegistry.setExtraPlanRemover( removers.get( weights.getSelectorForRemoval() ).get() );
+
+			for ( StrategyParameterSet set : weights.getStrategyParameterSets() ) {
 				strategyRegistry.addStrategy(
 						strategies.get( set.getStrategyName() ).get(),
 						set.getSubpopulation(),
 						set.getWeight(),
-						-1 );
+						set.isInnovative() ?
+							weights.getDisableInnovationAfterIter() :
+							-1 );
 			}
-		}
-	}
-}
 
+            return strategyRegistry;
+        }
+    }
+
+}

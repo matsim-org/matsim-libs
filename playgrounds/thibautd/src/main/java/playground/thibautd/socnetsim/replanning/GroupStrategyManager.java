@@ -40,8 +40,6 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
-import com.google.inject.Inject;
-
 /**
  * Implements the group-level replanning logic.
  * Not very different from the standard StrategyManager.
@@ -59,7 +57,6 @@ public class GroupStrategyManager {
 	private final Random random;
 	private final List<Listener> listeners = new ArrayList<Listener>( 1 );
 
-	@Inject
 	public GroupStrategyManager(
 			final IterationStopWatch stopWatch,
 			final GroupIdentifier groupIdentifier,

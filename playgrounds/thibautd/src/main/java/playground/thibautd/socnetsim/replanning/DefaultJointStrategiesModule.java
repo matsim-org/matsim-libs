@@ -17,15 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.controller;
+package playground.thibautd.socnetsim.replanning;
 
 import java.util.Map;
 
 import org.matsim.core.controler.AbstractModule;
 
-import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.removers.CoalitionMinSelectorFactory;
 import playground.thibautd.socnetsim.replanning.removers.LexicographicRemoverFactory;
 import playground.thibautd.socnetsim.replanning.removers.MinimumSumOfMinimumLossSelectorFactory;
@@ -70,7 +67,7 @@ import com.google.inject.multibindings.MapBinder;
 /**
  * @author thibautd
  */
-public class JointStrategiesModule extends AbstractModule {
+public class DefaultJointStrategiesModule extends AbstractModule {
     private MapBinder<String, GroupPlanStrategy> planStrategyBinder;
     private MapBinder<String, GroupLevelPlanSelector> selectorBinder;
     private MapBinder<String, ExtraPlanRemover> removerBinder;
