@@ -41,7 +41,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author boescpa
  */
-public class TestPTLineRouterDefault {
+public class TestPTMapperBusAndTram {
 
 	Network network = null;
 	TransitSchedule schedule = null;
