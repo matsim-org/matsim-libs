@@ -57,6 +57,9 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
             bind(RoadPricingScheme.class).toProvider(RoadPricingSchemeProvider.class).in(Singleton.class);
         }
 
+        bind(PlansCalcRouteWithTollOrNot.class);
+        addPlanStrategyBinding("ReRouteAreaToll").toProvider(ReRouteAreaToll.class);
+
         // use ControlerDefaults configuration, replacing the TravelDisutility with a toll-dependent one
         install(AbstractModule.override(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()), new AbstractModule() {
             @Override
@@ -114,14 +117,7 @@ public class ControlerDefaultsWithRoadPricingModule extends AbstractModule {
         public TravelDisutilityFactory get() {
             RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
             final TravelDisutilityFactory originalTravelDisutilityFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
-            //			if ( sigma!=0.) {  
-//            	if ( originalTravelDisutilityFactory instanceof TravelTimeAndDistanceBasedTravelDisutilityFactory ) { 
-//            		((TravelTimeAndDistanceBasedTravelDisutilityFactory) originalTravelDisutilityFactory).setSigma( sigma ) ;
-//            	} else {
-//            		throw new RuntimeException("cannot use sigma!=null together with provided travel disutility factory") ;
-//            	}
-//            }
-			TravelDisutilityIncludingToll.Builder travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
+			RoadPricingTravelDisutilityFactory travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
                     originalTravelDisutilityFactory, scheme, scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney()
             );
             travelDisutilityFactory.setSigma(rpConfig.getRoutingRandomness());

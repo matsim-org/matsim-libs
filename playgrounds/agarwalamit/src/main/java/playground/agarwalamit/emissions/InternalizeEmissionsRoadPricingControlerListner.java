@@ -36,7 +36,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.roadpricing.TravelDisutilityIncludingToll;
+import org.matsim.roadpricing.RoadPricingTravelDisutilityFactory;
 
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.benjamin.internalization.EmissionInternalizationHandler;
@@ -54,7 +54,7 @@ public class InternalizeEmissionsRoadPricingControlerListner implements StartupL
 	String emissionEventOutputFile;
 	EventWriterXML emissionEventWriter;
 	EmissionInternalizationHandler emissionInternalizationHandler;
-	TravelDisutilityIncludingToll.Builder travelDisutilityFactory;
+	RoadPricingTravelDisutilityFactory travelDisutilityFactory;
 	Set<Id<Link>> hotspotLinks;
 	EmissionRoadPricing emissionPricingScheme;
 
@@ -73,7 +73,7 @@ public class InternalizeEmissionsRoadPricingControlerListner implements StartupL
 
 		this.emissionPricingScheme = new EmissionRoadPricing(15*60, controler.getScenario(),this.emissionModule, this.emissionCostModule);
 		this.emissionPricingScheme.run();
-		travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
+		travelDisutilityFactory = new RoadPricingTravelDisutilityFactory(
 					controler.getTravelDisutilityFactory(), emissionPricingScheme.getScheme(), controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()
 					) ;
 		travelDisutilityFactory.setSigma(3.);

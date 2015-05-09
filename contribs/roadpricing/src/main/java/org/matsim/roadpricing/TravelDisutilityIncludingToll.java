@@ -21,10 +21,12 @@
 package org.matsim.roadpricing;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -32,13 +34,14 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.vehicles.Vehicle;
 
+import javax.inject.Inject;
+
 /**
  * Calculates the travel disutility for links, including tolls. Currently supports distance, cordon and area tolls.
  *
  * @author mrieser
  */
-public class TravelDisutilityIncludingToll implements TravelDisutility {
-	// needs to be public. kai, sep'14
+class TravelDisutilityIncludingToll implements TravelDisutility {
 
 	private static final Logger log = Logger.getLogger( TravelDisutilityIncludingToll.class ) ;
 
@@ -46,68 +49,18 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	private final TollRouterBehaviour tollCostHandler;
 	private final TravelDisutility normalTravelDisutility;
 	private final double marginalUtilityOfMoney;
-//	private Random random = null ;
-//	private final double normalization ;
 	private final double sigma ;
 
 	private static int utlOfMoneyWrnCnt = 0 ;
 
-	// === start Builder ===
-	public static class Builder implements TravelDisutilityFactory{
-		private final RoadPricingScheme scheme;
-		private final double marginalUtilityOfMoney ;
-		private TravelDisutilityFactory previousTravelDisutilityFactory;
-		private double sigma = 3. ;
-		public Builder( TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, double marginalUtilityOfMoney ) {
-			this.scheme = scheme ;
-			this.marginalUtilityOfMoney = marginalUtilityOfMoney ;
-			this.previousTravelDisutilityFactory = previousTravelDisutilityFactory ;
-		}
-		public Builder( TravelDisutilityFactory previousTravelDisutilityFactory, RoadPricingScheme scheme, Config config ) {
-			this( previousTravelDisutilityFactory, scheme, config.planCalcScore().getMarginalUtilityOfMoney() ) ;
-		}
-		@Override
-		public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-			if ( this.sigma != 0. ) {
-				if ( previousTravelDisutilityFactory instanceof TravelTimeAndDistanceBasedTravelDisutilityFactory ) {
-					((TravelTimeAndDistanceBasedTravelDisutilityFactory) previousTravelDisutilityFactory).setSigma( this.sigma );
-				} else {
-					throw new RuntimeException("cannot use sigma!=null together with provided travel disutility factory");
-				}
-			}
-            if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType())
-                    || RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())
-                    || RoadPricingScheme.TOLL_TYPE_LINK.equals(this.scheme.getType()) ) {
-            // yy this is historically without area toll but it might be better to do it also with area toll
-            // when the randomizing router is used.  I do think, however, that the current specification
-            // of the area toll disutility will not work in that way.  kai, sep'14
-                return new TravelDisutilityIncludingToll(
-                        previousTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup),
-                        this.scheme,
-                        this.marginalUtilityOfMoney,
-                        this.sigma
-                );
-            } else {
-                return previousTravelDisutilityFactory.createTravelDisutility(timeCalculator, cnScoringGroup);
-            }
-		}
-		public void setSigma( double val ) {
-			this.sigma = val ;
-		}
-	}  
-	// === end Builder ===
-
-	@Deprecated // use the builder.  Let me know if/why this is not possible in your case.  kai, sep'14
-	 /* package */ TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config)
-	// could be made private but some calls within package need to be removed
+	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config)
 	{
 		this( normalTravelDisutility, scheme, config.planCalcScore().getMarginalUtilityOfMoney(), 0. ) ;
 		// this is using sigma=0 for backwards compatibility (not sure how often this is needed)
 	}
-	private TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, 
-			double marginalUtilityOfMoney, double sigma )
-	// this should remain private; try using the Builder or ask. kai, sep'14
-	{
+
+	TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme,
+			double marginalUtilityOfMoney, double sigma ) {
 		this.scheme = scheme;
 		this.normalTravelDisutility = normalTravelDisutility;
 		if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType())) {

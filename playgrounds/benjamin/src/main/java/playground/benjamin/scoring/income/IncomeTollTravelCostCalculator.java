@@ -24,10 +24,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.households.Income;
-import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.households.Income.IncomePeriod;
+import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -61,7 +60,7 @@ public class IncomeTollTravelCostCalculator implements TravelDisutility {
 	
 	private PersonHouseholdMapping hhdb;
 	
-	private TravelDisutilityIncludingToll tollTravelCostCalculator;
+	private TravelDisutility tollTravelCostCalculator;
 	
 	
 	public IncomeTollTravelCostCalculator(PersonHouseholdMapping hhdb, RoadPricingScheme scheme, Config config) {
