@@ -46,6 +46,8 @@ public class RunMyHybridSim {
 		ConfigUtils.loadConfig(c, config);
 		c.controler().setWriteEventsInterval(1);
 
+		c.qsim().setEndTime(600);
+		
 		final Scenario sc = ScenarioUtils.loadScenario(c);
 
 		final Controler controller = new Controler(sc);
