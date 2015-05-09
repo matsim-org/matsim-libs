@@ -106,10 +106,10 @@ public class Sim2DExtendedMATSimScenario2CustomizedOSM {
 	}
 
 	public static void main(String [] args) {
-		String osmFile = "/Users/laemmel/devel/tmp/map.osm";
+		String osmFile = "/Users/laemmel/devel/hhw_hybrid/input/map.osm";
 		String inputDir = "/Users/laemmel/devel/hhw_hybrid/input";
 		String configFile = inputDir + "/config.xml";
-		String s2dConfigFile = inputDir + "/s2d_config.xml";
+		String s2dConfigFile = inputDir + "/s2d_config_v0.3.xml";
 
 		Sim2DConfig sim2dc = Sim2DConfigUtils.loadConfig(s2dConfigFile);
 		Sim2DScenario sim2dsc = Sim2DScenarioUtils.loadSim2DScenario(sim2dc);
@@ -301,7 +301,7 @@ public class Sim2DExtendedMATSimScenario2CustomizedOSM {
 			bf.append(Double.toString(n.lat));
 			bf.append("' lon='");
 			bf.append(Double.toString(n.lon));
-			bf.append("' id='");
+			bf.append("' mid='");
 			bf.append(n.matsimId);
 			bf.append("' />\n");
 		}
@@ -312,7 +312,7 @@ public class Sim2DExtendedMATSimScenario2CustomizedOSM {
 			bf.append(Double.toString(n.lat));
 			bf.append("' lon='");
 			bf.append(Double.toString(n.lon));
-			bf.append("' id='");
+			bf.append("' mid='");
 			bf.append(n.matsimId);
 			bf.append("' />\n");
 		}
