@@ -80,7 +80,7 @@ import java.util.Set;
  *
  * @author mrieser
  */
-public final class Controler extends AbstractController {
+public class Controler extends AbstractController {
 	// yyyy Design thoughts:
 	// * Seems to me that we should try to get everything here final.  Flexibility is provided by the ability to set or add factories.  If this is
 	// not sufficient, people should use AbstractController.  kai, jan'13
