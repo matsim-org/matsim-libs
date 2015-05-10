@@ -57,8 +57,8 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 
 		EventHandlerGroup handlerGroup = new EventHandlerGroup();
 
-        setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, getRealControler().getScenario().getNetwork()));
-        setInductiveCharger(new InductiveStreetCharger(vehicles, getRealControler().getScenario().getNetwork(), this));
+        setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, getScenario().getNetwork()));
+        setInductiveCharger(new InductiveStreetCharger(vehicles, getScenario().getNetwork(), this));
 		setChargingUponArrival(new ChargingUponArrival(vehicles, this));
 
 		handlerGroup.addHandler(getEnergyConsumptionTracker());

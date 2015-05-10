@@ -59,8 +59,8 @@ public class RunTransEnerySimExample {
 	
 	
 	public void run(){
-		c.getRealControler().setOverwriteFiles(true);
-		c.getRealControler().run();
+		c.setOverwriteFiles(true);
+		c.run();
 		c.writeStatisticsToFile(ESTATS);
 		
 	}

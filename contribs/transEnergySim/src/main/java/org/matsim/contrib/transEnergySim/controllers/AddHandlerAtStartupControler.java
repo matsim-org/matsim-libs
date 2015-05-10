@@ -31,21 +31,18 @@ import org.matsim.core.events.handler.EventHandler;
  * @author wrashid
  *
  */
-public class AddHandlerAtStartupControler {
-	Controler controler ;
+public class AddHandlerAtStartupControler extends Controler {
 
 	protected LinkedList<EventHandler> handler = new LinkedList<EventHandler>();
 
 	public AddHandlerAtStartupControler(Config config) {
-//		super(config);
-		controler = new Controler( config ) ;
-		controler.addControlerListener(new EventHandlerAdder());
+		super(config);
+		addControlerListener(new EventHandlerAdder());
 	}
 
 	public AddHandlerAtStartupControler(String[] args) {
-//		super(args);
-		controler = new Controler( args ) ;
-		controler.addControlerListener(new EventHandlerAdder());
+		super(args);
+		addControlerListener(new EventHandlerAdder());
 	}
 
 	public void addHandler(EventHandler handler) {
@@ -57,14 +54,10 @@ public class AddHandlerAtStartupControler {
 		@Override
 		public void notifyStartup(StartupEvent event) {
 			for (EventHandler h : handler) {
-				controler.getEvents().addHandler(h);
+				getEvents().addHandler(h);
 			}
 		}
 
-	}
-	
-	public final Controler getRealControler() {
-		return controler ;
 	}
 
 }

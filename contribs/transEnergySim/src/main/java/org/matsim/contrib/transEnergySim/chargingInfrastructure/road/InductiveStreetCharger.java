@@ -70,7 +70,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 	public InductiveStreetCharger(HashMap<Id<Vehicle>, Vehicle> vehicles, Network network, AddHandlerAtStartupControler controller) {
 		this.setVehicles(vehicles);
-		controller.getRealControler().addControlerListener(this);
+		controller.addControlerListener(this);
 		enableLogging();
 	}
 
