@@ -46,8 +46,7 @@ import javax.inject.Provider;
 /**
  * Controler for the Herbie project.
  */
-public class HerbieControler { 
-//extends Controler {
+public class HerbieControler extends Controler {
 
 	protected static final String SCORE_ELEMENTS_FILE_NAME = "scoreElementsAverages.txt";
 	protected static final String CALC_LEG_TIMES_FILE_NAME = "calcLegTimes.txt";
@@ -59,27 +58,27 @@ public class HerbieControler {
 	private static final Logger log = Logger.getLogger(Controler.class);
 	
 	public HerbieControler(String[] args) {
-//		super(args);
-//		super.getConfig().addModule(this.herbieConfigGroup);
-//		super.setOverwriteFiles(true);
-//        addOverridingModule(new AbstractModule() {
-//            @Override
-//            public void install() {
-//				bind(StrategyManager.class).toProvider(new com.google.inject.Provider<StrategyManager>() {
-//                    @Override
-//                    public StrategyManager get() {
-//                        return new Provider<StrategyManager>() {
-//                            @Override
-//                            public StrategyManager get() {
-//                                return myLoadStrategyManager();
-//                            }
-//                        }.get();
-//                    }
-//                }).in(Singleton.class);
-//			}
-//        });
-//        this.loadMyControlerListeners();
-        throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL + Gbl.LOAD_DATA_IS_NOW_FINAL + Gbl.CONTROLER_IS_NOW_FINAL ) ;
+		super(args);
+		super.getConfig().addModule(this.herbieConfigGroup);
+		super.setOverwriteFiles(true);
+        addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+				bind(StrategyManager.class).toProvider(new com.google.inject.Provider<StrategyManager>() {
+                    @Override
+                    public StrategyManager get() {
+                        return new Provider<StrategyManager>() {
+                            @Override
+                            public StrategyManager get() {
+                                return myLoadStrategyManager();
+                            }
+                        }.get();
+                    }
+                }).in(Singleton.class);
+			}
+        });
+        this.loadMyControlerListeners();
+        throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL + Gbl.LOAD_DATA_IS_NOW_FINAL ) ;
 	}
 
 //	@Override
@@ -122,20 +121,20 @@ public class HerbieControler {
 	  * during the replanning phase. They either keep their selected plan or
 	  * replan it.
 	  */
-//	 private StrategyManager myLoadStrategyManager() {
-//	  log.info("loading TransitStrategyManager - using rerouting share of " + reroutingShare);
-//	  StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
-//	  StrategyManagerConfigLoader.load(this, manager);
-//	  return manager;
-//	 }
+	 private StrategyManager myLoadStrategyManager() {
+	  log.info("loading TransitStrategyManager - using rerouting share of " + reroutingShare);
+	  StrategyManager manager = new TransitStrategyManager(this, reroutingShare);
+	  StrategyManagerConfigLoader.load(this, manager);
+	  return manager;
+	 }
 
-//	private void loadMyControlerListeners() {
-////		super.loadControlerListeners();
-//		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
-//		this.addControlerListener(new CalcLegTimesHerbieListener(CALC_LEG_TIMES_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
-//		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME, this.getScenario().getNetwork()));
-////		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
-//	}
+	private void loadMyControlerListeners() {
+//		super.loadControlerListeners();
+		this.addControlerListener(new ScoreElements(SCORE_ELEMENTS_FILE_NAME));
+		this.addControlerListener(new CalcLegTimesHerbieListener(CALC_LEG_TIMES_FILE_NAME, LEG_TRAVEL_TIME_DISTRIBUTION_FILE_NAME));
+		this.addControlerListener(new LegDistanceDistributionWriter(LEG_DISTANCE_DISTRIBUTION_FILE_NAME, this.getScenario().getNetwork()));
+//		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
+	}
 
 	/**
 	 * @param args
@@ -146,9 +145,8 @@ public class HerbieControler {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-//			final Controler controler = new HerbieControler(args);
-			throw new RuntimeException( Gbl.CONTROLER_IS_NOW_FINAL ) ;
-//			controler.run();
+			final Controler controler = new HerbieControler(args);
+			controler.run();
 		}
 		System.exit(0);
 	}
