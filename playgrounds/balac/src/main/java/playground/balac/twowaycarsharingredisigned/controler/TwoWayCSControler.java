@@ -25,22 +25,27 @@ import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSQsimFactory;
 import playground.balac.twowaycarsharingredisigned.router.TwoWayCSRoutingModule;
 import playground.balac.twowaycarsharingredisigned.scoring.TwoWayCSScoringFunctionFactory;
 
-public class TwoWayCSControler {
-	static Controler controler ;
+public class TwoWayCSControler extends Controler{
 	
-	public static void init(Config config, Network network) {
+	
+	public TwoWayCSControler(Scenario scenario) {
+		super(scenario);
+	}
+
+
+	public void init(Config config, Network network) {
 		TwoWayCSScoringFunctionFactory onewayScoringFunctionFactory = new TwoWayCSScoringFunctionFactory(
 				      config, 
 				      network);
-		controler.setScoringFunctionFactory(onewayScoringFunctionFactory); 	
+	    this.setScoringFunctionFactory(onewayScoringFunctionFactory); 	
 				
-		loadMyControlerListeners();
+	    this.loadMyControlerListeners();
 		}
 	
-	  private static void loadMyControlerListeners() {  
+	  private void loadMyControlerListeners() {  
 		  
 //		    super.loadControlerListeners();   
-		  controler.addControlerListener(new TWListener(controler.getConfig().getModule("TwoWayCarsharing").getValue("statsFileName")));
+		    this.addControlerListener(new TWListener(this.getConfig().getModule("TwoWayCarsharing").getValue("statsFileName")));
 		  }
 	public static void main(final String[] args) {
 		
@@ -50,7 +55,7 @@ public class TwoWayCSControler {
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
 		
-		controler = new Controler( sc );
+		final TwoWayCSControler controler = new TwoWayCSControler( sc );
 
 		controler.addOverridingModule(new AbstractModule() {
             @Override
@@ -108,7 +113,7 @@ public class TwoWayCSControler {
 
             });
 
-		init(config, sc.getNetwork());
+		controler.init(config, sc.getNetwork());
 
 		controler.run();
 	}

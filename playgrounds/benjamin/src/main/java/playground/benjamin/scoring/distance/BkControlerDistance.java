@@ -19,10 +19,8 @@
  * *********************************************************************** */
 package playground.benjamin.scoring.distance;
 
-import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.benjamin.BkControler;
@@ -33,19 +31,19 @@ import playground.benjamin.BkControler;
  * @author dgrether
  *
  */
-public final class BkControlerDistance /*extends BkControler */{
+public final class BkControlerDistance extends BkControler {
 
-//	public BkControlerDistance(String configFileName) {
-//		super(configFileName);
-//	}
-//	
-//	public BkControlerDistance(Config conf){
-//		super(conf);
-//	}
-//
-//	public BkControlerDistance(String[] args) {
-//		super(args);
-//	}
+	public BkControlerDistance(String configFileName) {
+		super(configFileName);
+	}
+	
+	public BkControlerDistance(Config conf){
+		super(conf);
+	}
+
+	public BkControlerDistance(String[] args) {
+		super(args);
+	}
 
 //	@Override
 //	protected ScoringFunctionFactory loadScoringFunctionFactory() {
@@ -54,15 +52,12 @@ public final class BkControlerDistance /*extends BkControler */{
 
 	
 	public static void main(final String[] args) {
-		Logger.getLogger("dummy").fatal( Gbl.CONTROLER_IS_NOW_FINAL ) ;
-		System.exit(-1) ;
-		
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final Controler controler = null ;
+			final Controler controler = new BkControlerDistance(args);
 			
 			controler.setScoringFunctionFactory( new BkScoringFunctionFactory( controler.getConfig().planCalcScore() ) ) ;
 			

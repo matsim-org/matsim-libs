@@ -29,20 +29,17 @@ import org.matsim.core.gbl.Gbl;
 import java.util.TreeMap;
 
 
-public class LCControler {
-	
-	Controler controler ;
+public class LCControler extends Controler {
 	
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	
 	public LCControler(final String[] args) {
-//		super(args);
-		controler = new Controler( args ) ;
+		super(args);
 		
 		this.facilityPenalties = new TreeMap<Id, FacilityPenalty>(); 
-		controler.addControlerListener(new FacilitiesLoadCalculator(this.facilityPenalties));		
+		this.addControlerListener(new FacilitiesLoadCalculator(this.facilityPenalties));		
 		
-		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL + Gbl.RETROFIT_CONTROLER) ;
+		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL) ;
 		// in case below, could set scoring function factory between controler constructor and controler run. kai, may'15
 	}
 
@@ -56,9 +53,5 @@ public class LCControler {
     	LCControler controler = new LCControler(args);
     	controler.run();
     }
-
-private void run() {
-	controler.run(); 
-}
 
 }

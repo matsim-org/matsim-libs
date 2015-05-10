@@ -21,7 +21,6 @@
 package playground.andreas.itsumo;
 
 import com.google.inject.Provider;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,7 +35,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -58,13 +56,12 @@ import org.matsim.run.Events2Snapshot;
 import java.io.File;
 
 
-public class MyControler1 {
+public class MyControler1 extends Controler {
 
 	private static final Logger log = Logger.getLogger(MyControler1.class);
 
 	public MyControler1(final Scenario scenario) {
-//		super(scenario);
-		throw new RuntimeException( Gbl.CONTROLER_IS_NOW_FINAL ) ;
+		super(scenario);
 	}
 
 	protected int[] generateDistribution(final LinkImpl[] netLinks, final int popSize, final LinkImpl[] givenLinks, final double[] probs) {
@@ -305,13 +302,13 @@ public class MyControler1 {
 			driversLog.renameTo(eventsFile);
 
 			Events2Snapshot events2Snapshot = new org.matsim.run.Events2Snapshot();
-//            events2Snapshot.run(eventsFile, this.getConfig(), getScenario().getNetwork());
+            events2Snapshot.run(eventsFile, this.getConfig(), getScenario().getNetwork());
 
 			// Run NetVis if possible
-//			if (this.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
-//				String[] visargs = {"./output/vis/Snapshot"};
-//				// NetVis.main(visargs);
-//			}
+			if (this.getConfig().getParam("simulation", "snapshotFormat").equalsIgnoreCase("netvis")){
+				String[] visargs = {"./output/vis/Snapshot"};
+				// NetVis.main(visargs);
+			}
 
 		} else {
 			System.err.println("Couldn't find " + driversLog);
@@ -374,32 +371,32 @@ public class MyControler1 {
 		loadPopulation(scenario);
 
 		final MyControler1 controler = new MyControler1(scenario);
-//		controler.setOverwriteFiles(true);
-//		
-//		final OutputDirectoryHierarchy controlerIO = controler.getControlerIO() ;
-//
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bindMobsim().toProvider(new Provider<Mobsim>() {
-//					@Override
-//					public Mobsim get() {
-//						return new MobsimFactory() {
-//							@Override
-//							public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
-//								final ItsumoSim sim = new ItsumoSim(sc, eventsManager);
-//								sim.setControlerIO(controlerIO);
-//								sim.setIteration(-1); // not directly available; if truly necessary, something else needs to be done (e.g. events handler). kai, feb'13
-//								throw new RuntimeException("inserted this factory instead of overriding runMobSim above.  not tested, this aborting ...");
-////				return sim ;
-//							}
-//						}.createMobsim(controler.getScenario(), controler.getEvents());
-//					}
-//				});
-//			}
-//		});
+		controler.setOverwriteFiles(true);
+		
+		final OutputDirectoryHierarchy controlerIO = controler.getControlerIO() ;
 
-//		controler.run();
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindMobsim().toProvider(new Provider<Mobsim>() {
+					@Override
+					public Mobsim get() {
+						return new MobsimFactory() {
+							@Override
+							public Mobsim createMobsim(final Scenario sc, final EventsManager eventsManager) {
+								final ItsumoSim sim = new ItsumoSim(sc, eventsManager);
+								sim.setControlerIO(controlerIO);
+								sim.setIteration(-1); // not directly available; if truly necessary, something else needs to be done (e.g. events handler). kai, feb'13
+								throw new RuntimeException("inserted this factory instead of overriding runMobSim above.  not tested, this aborting ...");
+//				return sim ;
+							}
+						}.createMobsim(controler.getScenario(), controler.getEvents());
+					}
+				});
+			}
+		});
+
+		controler.run();
 
 		controler.makeVis();
 	}

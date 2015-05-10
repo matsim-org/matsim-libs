@@ -21,31 +21,24 @@ package playground.jjoubert.roadpricing.senozon;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.Gbl;
 
 /**
  * I wanted to make loadCoreListeners final and thus retrofitted this class so that the one test which covers it
  * still works.  A starting point for a better design is, in my view, in GautengControler.  kai, feb'13
  *
  */
-public class SanralControler {
-	
-	Controler controler ;
+public class SanralControler extends Controler {
 
 	public SanralControler(String configFileName) {
-//		super(configFileName);
-//		this.addCoreControlerListener(new SanralRoadPricing());
-//		// adding it as core listener will _always_ call it before the regular listeners
-		
-		throw new RuntimeException( Gbl.CONTROLER_IS_NOW_FINAL ) ;
+		super(configFileName);
+		this.addCoreControlerListener(new SanralRoadPricing());
+		// adding it as core listener will _always_ call it before the regular listeners
 	}
 
 	public SanralControler(Config config) {
-//		super(config);
-//		this.addCoreControlerListener(new SanralRoadPricing());
-//		// adding it as core listener will _always_ call it before the regular listeners
-
-		throw new RuntimeException( Gbl.CONTROLER_IS_NOW_FINAL ) ;
+		super(config);
+		this.addCoreControlerListener(new SanralRoadPricing());
+		// adding it as core listener will _always_ call it before the regular listeners
 	}
 
 

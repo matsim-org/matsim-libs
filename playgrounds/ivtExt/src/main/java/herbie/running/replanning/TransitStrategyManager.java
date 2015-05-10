@@ -23,11 +23,15 @@ package herbie.running.replanning;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 /**
  *	A subset of the switzerland population are transit agents. They can by identified by
@@ -47,14 +51,14 @@ public class TransitStrategyManager extends StrategyManager {
 	private PlanStrategyImpl expBetaSelectorStrategy;
 	private double reroutingShare;
 	
-//	public TransitStrategyManager(UglyHerbieMultilegControler uglyHerbieMultilegControler, double replanningShare) {
-//		reroutingStrategy = new PlanStrategyImpl(new RandomPlanSelector());
-//		reroutingStrategy.addStrategyModule(new ReRoute(uglyHerbieMultilegControler.getScenario()));
-//		
-//		expBetaSelectorStrategy = new PlanStrategyImpl(new ExpBetaPlanSelector(uglyHerbieMultilegControler.getConfig().planCalcScore()));
-//		
-//		this.reroutingShare = replanningShare;
-//	}
+	public TransitStrategyManager(Controler controler, double replanningShare) {
+		reroutingStrategy = new PlanStrategyImpl(new RandomPlanSelector());
+		reroutingStrategy.addStrategyModule(new ReRoute(controler.getScenario()));
+		
+		expBetaSelectorStrategy = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getConfig().planCalcScore()));
+		
+		this.reroutingShare = replanningShare;
+	}
 
 	@Override
 	public void beforePopulationRunHook(Population population, ReplanningContext replanningContext) {

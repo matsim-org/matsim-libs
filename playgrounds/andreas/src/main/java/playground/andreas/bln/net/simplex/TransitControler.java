@@ -56,7 +56,7 @@ import java.util.Set;
 /**
  * @author mrieser
  */
-public final class TransitControler {
+public final class TransitControler extends Controler {
 
 	private final static Logger logger = Logger.getLogger(TransitControler.class);
 
@@ -67,68 +67,67 @@ public final class TransitControler {
 	private boolean useOTFVis = true;
 
 	public TransitControler(final String[] args) {
-//		super(args);
+		super(args);
 		this.transitConfig = new TransitConfigGroup();
 		init();
 		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE 
-				+ Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE + Gbl.CONTROLER_IS_NOW_FINAL ) ;
+				+ Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	}
 
 	public TransitControler(final ScenarioImpl scenario) {
-//		super(scenario);
+		super(scenario);
 		this.transitConfig = new TransitConfigGroup();
 		init();
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE
-				+ Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE + Gbl.CONTROLER_IS_NOW_FINAL ) ;
+		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
 	}
 
 	private final void init() {
-//		if (this.getConfig().getModule(TransitConfigGroup.GROUP_NAME) == null) {
-//			this.getConfig().addModule(this.transitConfig);
-//		} else {
-//			// this would not be necessary if TransitConfigGroup is part of core config
-//			ConfigGroup oldModule = this.getConfig().getModule(TransitConfigGroup.GROUP_NAME);
-//			this.getConfig().removeModule(TransitConfigGroup.GROUP_NAME);
-//			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
-//			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
-//			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
-//		}
-//		this.getConfig().scenario().setUseTransit(true);
-//		this.getConfig().scenario().setUseVehicles(true);
-//		Set<EventsFileFormat> formats = EnumSet.copyOf(this.getConfig().controler().getEventsFileFormats());
-//		formats.add(EventsFileFormat.xml);
-//		this.getConfig().controler().setEventsFileFormats(formats);
-//		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-//		transitActivityParams.setTypicalDuration(120.0);
-//		this.getConfig().planCalcScore().addActivityParams(transitActivityParams);
-//        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
-//        
-//        this.loadMyControlerListeners();
+		if (this.getConfig().getModule(TransitConfigGroup.GROUP_NAME) == null) {
+			this.getConfig().addModule(this.transitConfig);
+		} else {
+			// this would not be necessary if TransitConfigGroup is part of core config
+			ConfigGroup oldModule = this.getConfig().getModule(TransitConfigGroup.GROUP_NAME);
+			this.getConfig().removeModule(TransitConfigGroup.GROUP_NAME);
+			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
+			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
+			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
+		}
+		this.getConfig().scenario().setUseTransit(true);
+		this.getConfig().scenario().setUseVehicles(true);
+		Set<EventsFileFormat> formats = EnumSet.copyOf(this.getConfig().controler().getEventsFileFormats());
+		formats.add(EventsFileFormat.xml);
+		this.getConfig().controler().setEventsFileFormats(formats);
+		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		transitActivityParams.setTypicalDuration(120.0);
+		this.getConfig().planCalcScore().addActivityParams(transitActivityParams);
+        ((PopulationFactoryImpl) getScenario().getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
+        
+        this.loadMyControlerListeners();
 	}
 
 	private void loadMyControlerListeners() {
-////		super.loadControlerListeners();
-//		addTransitControlerListener();
-//		if (getConfig().getModule(COUNTS_MODULE_NAME) != null) {
-//			addPtCountControlerListener();
-//		}
+//		super.loadControlerListeners();
+		addTransitControlerListener();
+		if (getConfig().getModule(COUNTS_MODULE_NAME) != null) {
+			addPtCountControlerListener();
+		}
 	}
 
 	private void addPtCountControlerListener() {
-//		logger.info("Using counts.");
-//
-////		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
-////		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
-////		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
-//		addControlerListener(new PtCountControlerListener(getConfig()) );
-//		// the PtCountControlerListener now has its own OccupancyAnalyzer.  kai, oct'10
-//
-//        this.getConfig().controler().setCreateGraphs(false);
+		logger.info("Using counts.");
+
+//		OccupancyAnalyzer occupancyAnalyzer = new OccupancyAnalyzer(3600, 24 * 3600 - 1);
+//		addControlerListener(new OccupancyAnalyzerListener(occupancyAnalyzer));
+//		addControlerListener(new PtCountControlerListener(config, occupancyAnalyzer));
+		addControlerListener(new PtCountControlerListener(getConfig()) );
+		// the PtCountControlerListener now has its own OccupancyAnalyzer.  kai, oct'10
+
+        this.getConfig().controler().setCreateGraphs(false);
     }
 
 	private void addTransitControlerListener() {
-//		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
-//		addControlerListener(cl);
+		TransitControlerListener cl = new TransitControlerListener(this.transitConfig);
+		addControlerListener(cl);
 	}
 
 //	@Override
@@ -180,9 +179,9 @@ public final class TransitControler {
 
 	public static void main(final String[] args) {
 		TransitControler tc = new TransitControler(args);
-//		tc.setOverwriteFiles(true);
-////		tc.setCreateGraphs(false);
-//		tc.run();
+		tc.setOverwriteFiles(true);
+//		tc.setCreateGraphs(false);
+		tc.run();
 	}
 
 	public static class OccupancyAnalyzerListener implements

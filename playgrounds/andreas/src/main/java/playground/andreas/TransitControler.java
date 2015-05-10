@@ -29,15 +29,15 @@ import playground.andreas.fixedHeadway.FixedHeadwayCycleUmlaufDriverFactory;
 /**
  * @author aneumann
  */
-public class TransitControler {
+public class TransitControler extends Controler {
 	private final static Logger log = Logger.getLogger(TransitControler.class);
 
 	private boolean useOTFVis = true;
 	private boolean useHeadwayControler = false;
 	
 	public TransitControler(Config config) {
-//		super(config);
-		throw new RuntimeException(Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE + Gbl.CONTROLER_IS_NOW_FINAL ) ;
+		super(config);
+		throw new RuntimeException(Gbl.RUN_MOB_SIM_NO_LONGER_POSSIBLE ) ;
 	}
 	
 //	@Override
@@ -109,15 +109,5 @@ public class TransitControler {
 		tc.setOverwriteFiles(true);
 //		tc.setCreateGraphs(false);
 		tc.run();
-	}
-
-	private void run() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
-	}
-
-	private void setOverwriteFiles(boolean b) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
 	}
 }

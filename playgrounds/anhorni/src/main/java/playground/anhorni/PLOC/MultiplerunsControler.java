@@ -65,8 +65,7 @@ public class MultiplerunsControler {
 	    		controler.setPersonAttributes(this.personAttributes);
 	    		controler.setTempVar(configReader.isTemporalVar());
 	    		controler.setDay(i);
-//	        	controler.run();
-	    		throw new RuntimeException("not implemented") ;
+	        	controler.run();
     		}
     	}
     	log.info("Create analysis ...");   	

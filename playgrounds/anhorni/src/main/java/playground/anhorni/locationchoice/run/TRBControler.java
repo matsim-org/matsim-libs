@@ -33,27 +33,20 @@ import playground.anhorni.locationchoice.analysis.plans.CalculatePlanTravelStats
 import playground.anhorni.locationchoice.run.scoring.ScoreElements;
 import playground.anhorni.locationchoice.run.scoring.TRBScoringFunctionFactory;
 
-public class TRBControler {
-	Controler cc ;
+public class TRBControler extends Controler {
 
 	public TRBControler(String[] args) {
-//		super(args);
-		cc = new Controler( args ) ;
-		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL + Gbl.RETROFIT_CONTROLER ) ;
+		super(args);
+		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
 	public TRBControler(Config config) {
-//		super(config);
-		cc = new Controler( config );
-		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL + Gbl.RETROFIT_CONTROLER ) ;
+		super(config);
+		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 
 	public static void main(String[] args) {
 		new TRBControler(args).run();
-	}
-
-	private void run() {
-		cc.run();
 	}
 	
 //	 protected void setUp() {
