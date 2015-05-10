@@ -1,5 +1,6 @@
 package playground.balac.avignon;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
@@ -10,6 +11,7 @@ import org.matsim.core.controler.Controler;
 
 
 public class AvignonControler extends Controler {
+	private static final Logger log = Logger.getLogger( AvignonControler.class ) ;
 	
 	private DestinationChoiceBestResponseContext dcContext;
 	
