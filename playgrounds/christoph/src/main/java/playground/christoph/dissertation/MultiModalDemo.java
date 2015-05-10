@@ -194,8 +194,7 @@ public class MultiModalDemo {
 		
 		adaptNetwork(scenario);
 		
-//		Controler controler = new MultiModalDemoControler(scenario);
-		Controler controler = null ;
+		Controler controler = new MultiModalDemoControler(scenario);
 		controler.setOverwriteFiles(true);
 		
 		// Multi-modal simulation
@@ -408,8 +407,7 @@ public class MultiModalDemo {
 		sc.getPopulation().addPerson(person);
 		
 		// create routes
-//		Controler controler = new MultiModalDemoControler(sc);
-		Controler controler = null ;
+		Controler controler = new MultiModalDemoControler(sc);
 		controler.setOverwriteFiles(true);
 		
 		// Multi-modal simulation
@@ -449,8 +447,7 @@ public class MultiModalDemo {
 		}
 		
 		// create routes
-//		Controler controler = new MultiModalDemoControler(sc);
-		Controler controler = null ;
+		Controler controler = new MultiModalDemoControler(sc);
 		controler.setOverwriteFiles(true);
 		
 		// Multi-modal simulation
@@ -654,21 +651,20 @@ public class MultiModalDemo {
 		log.info("expected non-car share:\t"+ nonCar/200.0);
 	}
 	
-	private static class MultiModalDemoControler{ 
-//	extends Controler {
+	private static class MultiModalDemoControler extends Controler {
 
 		public MultiModalDemoControler(Scenario scenario) {
-//			super(scenario);
-//			
-//			this.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
-//			this.addOverridingModule(new AbstractModule() {
-//				@Override
-//				public void install() {
-//					bindTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
-//				}
-//			});
+			super(scenario);
 			
-			throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL + Gbl.CONTROLER_IS_NOW_FINAL ) ;
+			this.setScoringFunctionFactory(new OnlyTravelTimeDependentScoringFunctionFactory());
+			this.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(new OnlyTimeDependentTravelDisutilityFactory());
+				}
+			});
+			
+			throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 		}
 		
 //		@Override
