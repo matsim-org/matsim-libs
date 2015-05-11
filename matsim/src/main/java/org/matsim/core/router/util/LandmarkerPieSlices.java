@@ -133,24 +133,15 @@ import org.matsim.core.utils.geometry.CoordUtils;
 		}
 		double lastAngle = 0;
 		Iterator<Node[]> it = sortedNodes.values().iterator();
-		// Fill sectors such that each sector contains on average the same number of nodes
-		Node[] tmpNodes = it.next();
-		int k = 0;
-		for (int i = 0; i < this.landmarks.length; i++) {
+		if (it.hasNext()) {
+			// Fill sectors such that each sector contains on average the same number of nodes
+			Node[] tmpNodes = it.next();
+			int k = 0;
+			for (int i = 0; i < this.landmarks.length; i++) {
 
-			sectors.add(new ArrayList<Node>());
-			Node node = null;
-			for (int j = 0; j < nodes.size() / this.landmarks.length; j++) {
-				if (k == tmpNodes.length) {
-					tmpNodes = it.next();
-					k = 0;
-				}
-				node = tmpNodes[k++];
-				sectors.get(angles.size()).add(node);
-			}
-			// Add the remaining nodes to the last sector
-			if (i == this.landmarks.length - 1) {
-				while (it.hasNext() || k < tmpNodes.length) {
+				sectors.add(new ArrayList<Node>());
+				Node node = null;
+				for (int j = 0; j < nodes.size() / this.landmarks.length; j++) {
 					if (k == tmpNodes.length) {
 						tmpNodes = it.next();
 						k = 0;
@@ -158,23 +149,33 @@ import org.matsim.core.utils.geometry.CoordUtils;
 					node = tmpNodes[k++];
 					sectors.get(angles.size()).add(node);
 				}
-			}
-			if (sectors.get(angles.size()).isEmpty()) {
-				log.info("There is no node in sector " + i + "!");
-				sectors.remove(angles.size());
-			} else {
-				// Get the angle of the "rightmost" node
-				double x = node.getCoord().getX() - this.center.getX();
-				double y = node.getCoord().getY() - this.center.getY();
-				double angle = Math.atan2(y, x) + Math.PI;
-				double[] tmp = new double[2];
-				tmp[0] = lastAngle;
-				tmp[1] = angle;
-				angles.add(tmp);
-				lastAngle = angle;
+				// Add the remaining nodes to the last sector
+				if (i == this.landmarks.length - 1) {
+					while (it.hasNext() || k < tmpNodes.length) {
+						if (k == tmpNodes.length) {
+							tmpNodes = it.next();
+							k = 0;
+						}
+						node = tmpNodes[k++];
+						sectors.get(angles.size()).add(node);
+					}
+				}
+				if (sectors.get(angles.size()).isEmpty()) {
+					log.info("There is no node in sector " + i + "!");
+					sectors.remove(angles.size());
+				} else {
+					// Get the angle of the "rightmost" node
+					double x = node.getCoord().getX() - this.center.getX();
+					double y = node.getCoord().getY() - this.center.getY();
+					double angle = Math.atan2(y, x) + Math.PI;
+					double[] tmp = new double[2];
+					tmp[0] = lastAngle;
+					tmp[1] = angle;
+					angles.add(tmp);
+					lastAngle = angle;
+				}
 			}
 		}
-
 		return angles.toArray(new double[0][2]);
 	}
 

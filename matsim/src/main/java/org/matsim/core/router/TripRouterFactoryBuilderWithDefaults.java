@@ -23,7 +23,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.router.costcalculators.TravelDisutilityModule;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.scenario.ScenarioElementsModule;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterModule;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -73,6 +76,9 @@ public class TripRouterFactoryBuilderWithDefaults {
 
 	public static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(final Scenario scenario) {
         return Injector.createInjector(scenario.getConfig(),
+                new ScenarioElementsModule(),
+                new TravelDisutilityModule(),
+                new TravelTimeCalculatorModule(),
                 new LeastCostPathCalculatorModule(),
                 new AbstractModule() {
                     @Override

@@ -131,8 +131,6 @@ public class Controler extends AbstractController {
     // The module which is currently defined by the sum of the setXX methods called on this Controler.
     private AbstractModule overrides = AbstractModule.emptyModule();
 
-    private boolean scenarioLoaded = false;
-
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
 
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
@@ -181,7 +179,6 @@ public class Controler extends AbstractController {
 	private Controler(final String configFileName, final Config config, final Scenario scenario) {
 		if (scenario != null) {
 			// scenario already loaded (recommended):
-			this.scenarioLoaded = true;
 			this.scenario  = scenario;
 			this.config = scenario.getConfig();
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
@@ -200,15 +197,12 @@ public class Controler extends AbstractController {
 
 			// load scenario:
 			this.scenario  = ScenarioUtils.createScenario(this.config);
-			loadData() ;
+			ScenarioUtils.loadScenario(this.scenario );
 		}
 		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
 		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
-
 		this.events = EventsUtils.createEventsManager(this.config);
-
 		this.controlerListenerManager.setControler(this);
-
 		this.config.parallelEventHandling().makeLocked();
 	}
 
@@ -256,19 +250,6 @@ public class Controler extends AbstractController {
 
 		// the QSim reads the config by itself, and configures itself as a
 		// transit-enabled mobsim. kai, nov'11
-	}
-
-	/**
-	 * Loads the Scenario if it was not given in the constructor.
-	 */
-	protected final void loadData() {
-		// yyyy cannot make this final since it is overridden about 16 times. kai, jan'13
-		// confirmed as evil. nov'14
-
-		if (!this.scenarioLoaded) {
-			ScenarioUtils.loadScenario(this.scenario );
-			this.scenarioLoaded = true;
-		}
 	}
 
 	/**
