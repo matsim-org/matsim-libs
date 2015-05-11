@@ -213,7 +213,7 @@ public class TestSchedulingHITS {
 		System.out.println(actChainsNoFlex.size());
 		System.out.println(actChainsNoFlexSimple.size());
 	}
-	public static void main(String[] args) throws NumberFormatException, IOException, ParseException {
+	public static void main0(String[] args) throws NumberFormatException, IOException, ParseException {
 		Map<String, Household> households = HitsReader.readHits(args[0]);
 		IncomeEstimation.init();
 		IncomeEstimation.setIncome(households);
@@ -700,7 +700,7 @@ public class TestSchedulingHITS {
 		return locs;
 	}
 	
-	public static void main1(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(args[0]));
 		reader.readLine();
 		List<double[]> nums = new ArrayList<>();
@@ -708,19 +708,32 @@ public class TestSchedulingHITS {
 		String line =  reader.readLine();
 		while(line!=null) {
 			String[] parts = line.split("\t");
-			double[] num = new double[parts.length-2];
+			double[] num = new double[parts.length-9];
 			for(int i=0; i<num.length; i++)
 				num[i] = Double.parseDouble(parts[i]);
 			nums.add(num);
-			choices.add(parts[parts.length-1].equals("1"));
+			choices.add(parts[parts.length-8].equals("1"));
 			line =  reader.readLine();
 		}
 		reader.close();
-		int numCorrect = 0;
-		for(int i=(int) (nums.size()*0.8); i<nums.size(); i++)
-			if(isShop(nums.get(i))==choices.get(i))
+		int numCorrect = 0, numTotal = 0, numYes = 0, numYesTotal = 0, numYesCorrect = 0;
+		for(int i=0; i<nums.size()*0.2; i++) {
+			numTotal++;
+			if(choices.get(i))
+				numYesTotal++;
+			boolean is = isShop(nums.get(i));
+			if(is==choices.get(i)) {
 				numCorrect++;
-		System.out.println(numCorrect/(nums.size()*0.2));
+				if(choices.get(i))
+					numYesCorrect++;
+			}
+			if(is)
+				numYes++;
+		}
+		System.out.println(numCorrect+"/"+numTotal+"="+numCorrect/(double)numTotal);
+		System.out.println(numYesTotal+"/"+numTotal+"="+numYesTotal/(double)numTotal);
+		System.out.println(numYes+"/"+numTotal+"="+numYes/(double)numTotal);
+		System.out.println(numYesCorrect+"/"+numTotal+"="+numYesCorrect/(double)numTotal);
 	}
 	
 	private static boolean isShop(double[] values) {
@@ -728,10 +741,10 @@ public class TestSchedulingHITS {
 		double INCOME = values[1];
 		double MAIN_INCOME = values[2];
 		double HOUSEHOLD_SIZE = values[3];
-		double ACC_SHOP_HIGH = values[4];
-		double ACC_EAT_LOW = values[5];
-		double ACC_EAT_HIGH = values[6];
-		double ACC_SHOP_LOW = values[7];
+		double ACC_EAT_HIGH = values[4];
+		double ACC_SHOP_HIGH = values[5];
+		double ACC_SHOP_LOW = values[6];
+		double ACC_EAT_LOW = values[7];
 		double HOME_TIME = values[8];
 		double WORK_TIME = values[9];
 		double GENDER = values[10];
@@ -744,54 +757,59 @@ public class TestSchedulingHITS {
 		double YOUNGER = values[17];
 		double one = 1;
 		double AGE_SC = AGE / 100.0;
-		double AGE_LESS_37 = (AGE < 37)?AGE_SC:0;
-		double AGE_MORE_78 = (AGE >= 78)?AGE_SC:0;
-		double I_A = (INCOME == 0)?1:0;
+		double AGE_LESS_29 = (AGE < 29?1:0) * AGE_SC + (AGE >= 29?1:0) *(29/100.0);
+		double AGE_MORE_55 = (AGE >= 55?1:0) * (AGE < 77?1:0) * (AGE_SC - (55/100.0)) + (AGE >= 77?1:0) * (22/100.0);
+		double I_A = (INCOME == 0?1:0);
 		double I_SC = INCOME / 10000.0;
 		double MI_SC = MAIN_INCOME / 10000.0;
-		double MI_LESS_2500 = (MAIN_INCOME < 2500)?MI_SC:0;
-		double MI_MORE_2500 = (MAIN_INCOME >= 2500)?MI_SC:0;
-		double HS_SC = HOUSEHOLD_SIZE / 9;
-		double ACC_A_SC = ACC_SHOP_HIGH / 5000;
-		double ACC_B_SC = ACC_SHOP_LOW / 150;
-		double ACC_C_SC = ACC_EAT_HIGH / 2000;
-		double ACC_D_SC = ACC_EAT_LOW / 200;
-		double HT_SC = HOME_TIME / 150000;
-		double WT_SC = WORK_TIME / 150000;
-		double WT_A = (WORK_TIME == 0)?1:0;
-		double ACC_A = 2.32;
-		double ACC_B = -10.7;
-		double ACC_C = 7.84;
-		double ACC_D = 6.16;
-		double AGE_A = 0.801;
-		double AGE_B = -0.468;
-		double CA = 0.0328;
-		double CHI = 0.339;
-		double GEND = 0.945;
-		double HS = 0.396;
-		double HT = 2.9;
-		double INC = -2.58;
-		double INC_0 = 0.488;
-		double IND = 0.325;
-		double K = -8.22;
-		double MAL = 0.35;
-		double MI_A = -1.6;
-		double MI_B = -0.149;
-		double MN = -0.207;
-		double PA = -0.168;
-		double WT = -3.74;
-		double WT_0 = 1.94;
-		double YO = -0.853;
+		double MI_LESS_2500 = (MAIN_INCOME < 2500?1:0) * MI_SC + (MAIN_INCOME >= 2500?1:0) *(2500/10000.0);
+		double MI_MORE_2500 = (MAIN_INCOME >= 2500?1:0);
+		double HS_SC = HOUSEHOLD_SIZE / 9.0;
+		double ACC_A_SC = ACC_SHOP_HIGH / 5000.0;
+		double ACC_B_SC = ACC_SHOP_LOW / 150.0;
+		double ACC_B_L_86 = (ACC_SHOP_LOW < 86?1:0) * ACC_B_SC;
+		double ACC_B_G_86 = (ACC_SHOP_LOW >= 86?1:0) * (ACC_B_SC - (86/150.0));
+		double ACC_2_B_L_86 = ACC_B_L_86 * ACC_B_L_86;
+		double ACC_2_B_G_86 = ACC_B_G_86 * ACC_B_G_86;
+		double ACC_E_B_SC = ACC_2_B_L_86 - 2*(69/150.0) * ACC_B_L_86 + ((86/150.0)*(2*(69/150.0)-(86/150.0)) * ACC_2_B_G_86 )/((75/150.0)*((75/150.0) - 2*(24/150.0))) - ((86/150.0)*(2*(69/150.0)-(86/150.0))*2*(24/150.0) * ACC_B_G_86 )/((75/150.0)*((75/150.0) - 2*(24/150.0)))  + (86/150.0)*((86/150.0) - 2*(69/150.0));
+		double ACC_C_SC = ACC_EAT_HIGH / 2000.0;
+		double ACC_D_SC = ACC_EAT_LOW / 200.0;
+		double HT_SC = HOME_TIME / 150000.0;
+		double WT_SC = WORK_TIME / 150000.0;
+		double WT_A = (WORK_TIME == 0?1:0);
+		double ACC_A = 7.56;
+		double ACC_B = 1.28;
+		double ACC_C = 1.16;
+		double ACC_D = -8.42;
+		double AGE_A = 20;
+		double AGE_B = 0.445;
+		double CA = -0.166;
+		double CHI = 0.099;
+		double GEND = 0.822;
+		double HS = 0.0426;
+		double HT = 2.17;
+		double INC = -2.18;
+		double INC_0 = 0.0426;
+		double IND = 0.207;
+		double K = -9.79;
+		double MAL = 0.184;
+		double MI_A = -1.11;
+		double MI_B = 0.367;
+		double MN = -0.104;
+		double PA = -0.155;
+		double WT = -4.07;
+		double WT_0 = 1.08;
+		double YO = -0.269;
 		double uYes = K * one
-				+ AGE_A * AGE_LESS_37
-				+ AGE_B * AGE_MORE_78
+				+ AGE_A * AGE_LESS_29
+				+ AGE_B * AGE_MORE_55
 				+ INC_0 * I_A
 				+ INC * I_SC
 				+ MI_A * MI_LESS_2500
 				+ MI_B * MI_MORE_2500
 				+ HS * HS_SC
 				+ ACC_A * ACC_A_SC
-				+ ACC_B * ACC_B_SC
+				+ ACC_B * ACC_E_B_SC
 				+ ACC_C * ACC_C_SC
 				+ ACC_D * ACC_D_SC
 				+ HT * HT_SC
@@ -887,6 +905,239 @@ public class TestSchedulingHITS {
 				+ ACC_D * ACC_D_SC
 				+ ACC_D_SQR * ACC_D_SC_SQR
 				+ ACC_E * ACC_E_SC
+				+ HT * HT_SC
+				+ WT_0 * WT_A
+				+ WT * WT_SC
+				+ GEND * GENDER
+				+ CA * CAR_AVAIL
+				+ CHI * CHINESE
+				+ IND * INDIAN
+				+ MAL * MALAY
+				+ MN * MAIN
+				+ PA * PARTNER
+				+ YO * YOUNGER;
+		double pYes = 1/(Math.exp(-uYes)+1);
+		return Math.random()<pYes;
+	}
+	
+	private static boolean isErrands(double[] values) {
+		double AGE_SC = values[0] / 100.0;
+		double INCOME = values[1];
+		double MAIN_INCOME = values[2];
+		double HOUSEHOLD_SIZE = values[3];
+		double ACC_SHOP_HIGH = values[4];
+		double ACC_EAT_HIGH = values[5];
+		double ACC_CIVIC = values[6];
+		double ACC_SHOP_LOW = values[7];
+		double ACC_HOME_OTHER = values[8];
+		double HOME_TIME = values[9];
+		double WORK_TIME = values[10];
+		double GENDER = values[11];
+		double CAR_AVAIL = values[12];
+		double CHINESE = values[13];
+		double INDIAN = values[14];
+		double MALAY = values[15];
+		double MAIN = values[16];
+		double PARTNER = values[17];
+		double YOUNGER = values[18];
+		double one = 1;
+		double AGE_SQR = AGE_SC * AGE_SC;
+		double I_A = INCOME == 0?1:0;
+		double I_SC = INCOME / 10000.0;
+		double MI_SC = MAIN_INCOME / 10000.0;
+		double HS_SC = HOUSEHOLD_SIZE / 9;
+		double ACC_A_SC = ACC_SHOP_HIGH / 1000;
+		double ACC_B_SC = ACC_SHOP_LOW / 1000;
+		double ACC_C_SC = ACC_EAT_HIGH / 1000;
+		double ACC_D_SC = ACC_HOME_OTHER / 1000;
+		double ACC_E_SC = ACC_CIVIC / 300;
+		double HT_SC = HOME_TIME / 150000;
+		double WT_SC = WORK_TIME / 150000;
+		double WT_A = WORK_TIME == 0?1:0;
+		double ACC_A = -3.74;
+		double ACC_B = -51.7;
+		double ACC_C = 37.2;
+		double ACC_D = -5.27;
+		double ACC_E = 4.6;
+		double AGE = 0.932;
+		double CA = 0.138;
+		double CHI = 1.33;
+		double GEND = 0.307;
+		double HS = -1.04;
+		double HT = -0.194;
+		double INC = -0.413;
+		double INC_0 = 1.16;
+		double IND = 1.54;
+		double K = -6.21;
+		double MAL = 0.931;
+		double MI_A = -0.00164;
+		double MN = 0.489;
+		double PA = 0.255;
+		double WT = -9.32;
+		double WT_0 = 0.882;
+		double YO = 0.542;
+		double uYes = K * one
+				+ AGE * AGE_SQR
+				+ INC_0 * I_A
+				+ INC * I_SC
+				+ MI_A * MI_SC
+				+ HS * HS_SC
+				+ ACC_A * ACC_A_SC
+				+ ACC_B * ACC_B_SC
+				+ ACC_C * ACC_C_SC
+				+ ACC_D * ACC_D_SC
+				+ ACC_E * ACC_E_SC
+				+ HT * HT_SC
+				+ WT_0 * WT_A
+				+ WT * WT_SC
+				+ GEND * GENDER
+				+ CA * CAR_AVAIL
+				+ CHI * CHINESE
+				+ IND * INDIAN
+				+ MAL * MALAY
+				+ MN * MAIN
+				+ PA * PARTNER
+				+ YO * YOUNGER;
+		double pYes = 1/(Math.exp(-uYes)+1);
+		return Math.random()<pYes;
+	}
+	
+	private static boolean isRec(double[] values) {
+		double AGE_SC = values[0] / 100.0;
+		double INCOME = values[1];
+		double MAIN_INCOME = values[2];
+		double HOUSEHOLD_SIZE = values[3];
+		double ACC_PARK_HIGH = values[4];
+		double ACC_PARK_LOW = values[5];
+		double ACC_REC = values[6];
+		double ACC_CIVIC = values[7];
+		double ACC_HOME_OTHER = values[8];
+		double HOME_TIME = values[9];
+		double WORK_TIME = values[10];
+		double GENDER = values[11];
+		double CAR_AVAIL = values[12];
+		double CHINESE = values[13];
+		double INDIAN = values[14];
+		double MALAY = values[15];
+		double MAIN = values[16];
+		double PARTNER = values[17];
+		double YOUNGER = values[18];
+		double one = 1;
+		double I_A = INCOME == 0?1:0;
+		double I_SC = INCOME / 10000.0;
+		double MI_SC = MAIN_INCOME / 10000.0;
+		double HS_SC = HOUSEHOLD_SIZE / 9;
+		double ACC_A_SC = ACC_REC / 100;
+		double ACC_B_SC = ACC_HOME_OTHER / 500;
+		double ACC_C_SC = ACC_PARK_HIGH / 50;
+		double ACC_D_SC = ACC_PARK_LOW / 150;
+		double ACC_E_SC = ACC_CIVIC / 150;
+		double HT_SC = HOME_TIME / 150000;
+		double WT_SC = WORK_TIME / 150000;
+		double ACC_A = 27.6;
+		double ACC_B = 3.04;
+		double ACC_C = -4.21;
+		double ACC_D = -19.1;
+		double ACC_E = 0.626;
+		double AGE = 2.69;
+		double CA = 1.13;
+		double CHI = 0.478;
+		double GEND = 0.661;
+		double HS = 2.44;
+		double HT = -0.922;
+		double INC = -0.191;
+		double INC_0 = 4.52;
+		double IND = 0.474;
+		double K = -18.9;
+		double MAL = -0.656;
+		double MI = 0.288;
+		double MN = 0.202;
+		double PA = 0.0546;
+		double WT = -21.5;
+		double YO = 0.498;
+		double uYes = K * one
+				+ AGE * AGE_SC
+				+ INC_0 * I_A
+				+ INC * I_SC
+				+ MI * MI_SC
+				+ HS * HS_SC
+				+ ACC_A * ACC_A_SC
+				+ ACC_B * ACC_B_SC
+				+ ACC_C * ACC_C_SC
+				+ ACC_D * ACC_D_SC
+				+ ACC_E * ACC_E_SC
+				+ HT * HT_SC
+				+ WT * WT_SC
+				+ GEND * GENDER
+				+ CA * CAR_AVAIL
+				+ CHI * CHINESE
+				+ IND * INDIAN
+				+ MAL * MALAY
+				+ MN * MAIN
+				+ PA * PARTNER
+				+ YO * YOUNGER;
+		double pYes = 1/(Math.exp(-uYes)+1);
+		return Math.random()<pYes;
+	}
+	
+	private static boolean isSocial(double[] values) {
+		double AGE_SC = values[0] / 100.0;
+		double INCOME = values[1];
+		double MAIN_INCOME = values[2];
+		double HOUSEHOLD_SIZE = values[3];
+		double ACC_SHOP_HIGH = values[4];
+		double ACC_CIVIC = values[5];
+		double ACC_HOME_OTHER = values[6];
+		double HOME_TIME = values[7];
+		double WORK_TIME = values[8];
+		double GENDER = values[9];
+		double CAR_AVAIL = values[10];
+		double CHINESE = values[11];
+		double INDIAN = values[12];
+		double MALAY = values[13];
+		double MAIN = values[14];
+		double PARTNER = values[15];
+		double YOUNGER = values[16];
+		double one = 1;
+		double I_A = INCOME == 0?1:0;
+		double I_SC = INCOME / 10000.0;
+		double MI_SC = MAIN_INCOME / 10000.0;
+		double HS_SC = HOUSEHOLD_SIZE / 9;
+		double ACC_A_SC = ACC_SHOP_HIGH / 150;
+		double ACC_B_SC = ACC_HOME_OTHER / 150;
+		double ACC_C_SC = ACC_CIVIC / 50;
+		double HT_SC = HOME_TIME / 150000;
+		double WT_SC = WORK_TIME / 150000;
+		double WT_A = WORK_TIME == 0?1:0;
+		double ACC_A = 1.32;
+		double ACC_B = -5.15;
+		double ACC_C = 7.07;
+		double AGE = 1.17;
+		double CA = -0.109;
+		double CHI = -0.31;
+		double GEND = -0.199;
+		double HS = -1.88;
+		double HT = -1.9;
+		double INC = -1.64;
+		double INC_0 = 2.08;
+		double IND = -0.133;
+		double K = -5.73;
+		double MAL = -0.299;
+		double MI = 0.324;
+		double MN = -0.291;
+		double PA = -0.0773;
+		double WT = -1.5;
+		double WT_0 = 1.56;
+		double YO = -0.243;
+		double uYes = K * one
+				+ AGE * AGE_SC
+				+ INC_0 * I_A
+				+ INC * I_SC
+				+ MI * MI_SC
+				+ HS * HS_SC
+				+ ACC_A * ACC_A_SC
+				+ ACC_B * ACC_B_SC
+				+ ACC_C * ACC_C_SC
 				+ HT * HT_SC
 				+ WT_0 * WT_A
 				+ WT * WT_SC

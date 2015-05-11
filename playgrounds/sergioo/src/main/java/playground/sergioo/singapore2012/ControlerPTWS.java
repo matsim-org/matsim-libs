@@ -27,7 +27,6 @@ package playground.sergioo.singapore2012;
 //import playground.artemc.calibration.CalibrationStatsListener;
 
 import org.matsim.analysis.ScoreStatsControlerListener;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -53,20 +52,19 @@ import playground.sergioo.typesPopulation2013.scenario.ScenarioUtils;
  * @author sergioo
  */
 
-public class ControlerPTWS extends Controler {
+public class ControlerPTWS {
 
-	public ControlerPTWS(Scenario scenario) {
-		super(scenario);
-	}
+	private static Controler controler;
+
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		config.removeModule(StrategyConfigGroup.GROUP_NAME);
 		config.addModule(new StrategyPopsConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
-		final ControlerPTWS controler = new ControlerPTWS(ScenarioUtils.loadScenario(config));
+		controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.setOverwriteFiles(true);
-        controler.addCoreControlerListener(new LegHistogramListener(controler.getEvents(), true, controler.getScenario().getPopulation()));
-        controler.addCoreControlerListener(new ScoreStats(controler.getScenario().getPopulation(), ScoreStatsControlerListener.FILENAME_SCORESTATS, true));
+        controler.addControlerListener(new LegHistogramListener(controler.getEvents(), true, controler.getScenario().getPopulation()));
+        controler.addControlerListener(new ScoreStats(controler.getScenario().getPopulation(), ScoreStatsControlerListener.FILENAME_SCORESTATS, true));
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));
         final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
@@ -83,7 +81,7 @@ public class ControlerPTWS extends Controler {
 
             @Override
             public void install() {
-				bind(StrategyManager.class).toInstance(controler.myLoadStrategyManager());
+				bind(StrategyManager.class).toInstance(myLoadStrategyManager());
 			}
         };
         controler.addOverridingModule(myStrategyManagerModule);
@@ -93,9 +91,9 @@ public class ControlerPTWS extends Controler {
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
-	private StrategyManager myLoadStrategyManager() {
+	private static StrategyManager myLoadStrategyManager() {
 		StrategyManagerPops manager = new StrategyManagerPops();
-		StrategyManagerPopsConfigLoader.load(this, manager);
+		StrategyManagerPopsConfigLoader.load(controler, manager);
 		return manager;
 	}
 }

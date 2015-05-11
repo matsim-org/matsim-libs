@@ -450,16 +450,15 @@ public class BinaryPlaceTypes {
 					for(DetailedType detailedType:detailedTypes) {
 						double maxAcc = 0;
 						for(Trip trip:person.getTrips().values()) {
-							Integer num = typesPlaces.get(trip.getPurpose()).get(detailedType);
-							if(num!=null && num>MIN_OCURR) {
-								double startAcc = accs.get(purpose).get(trip.getStartPostalCode()).get(detailedType);
-								if(startAcc>maxAcc)
-									maxAcc = startAcc;
-								double endAcc = accs.get(purpose).get(trip.getEndPostalCode()).get(detailedType);
-								if(endAcc>maxAcc)
-									maxAcc = endAcc;
-							}
+							double startAcc = accs.get(purpose).get(trip.getStartPostalCode()).get(detailedType);
+							if(startAcc>maxAcc)
+								maxAcc = startAcc;
+							double endAcc = accs.get(purpose).get(trip.getEndPostalCode()).get(detailedType);
+							if(endAcc>maxAcc)
+								maxAcc = endAcc;
 						}
+						if(maxAcc==0)
+							System.out.println();
 						printerB.print(maxAcc+"\t");
 					}
 					printerB.print(homeTime+"\t");
@@ -503,23 +502,23 @@ public class BinaryPlaceTypes {
 		for(String purpose:FLEX_ATIVITIES) {
 			Set<Observation> obs = obsMap.get(purpose);
 			double maxT = 0, maxA = Double.NaN, maxB = Double.NaN;
-			Map<String, Map<DetailedType, Double>> maxAccsPurpose = null;
 			double[] maxMinA = maxMinsA.get(purpose);
 			double[] maxMinB = maxMinsB.get(purpose);
 			for(double a=maxMinA[0]; a==maxMinA[0]; a+=maxMinA[2])
 				for(double b=maxMinB[0]; b==maxMinB[0]; b+=maxMinB[2]) {
 					Map<String, Map<DetailedType, Double>> accsPurpose = new HashMap<>();
-					for(Entry<String, Node> nodeE:nodes.entrySet()) {
+					for(Observation ob:obs) {
+						Node node = nodes.get(ob.zipCode);
 						Map<DetailedType, Double> accMap = new HashMap<Location.DetailedType, Double>();
 						for(DetailedType detailedType:Location.DetailedType.values()) {
 							double sum=0;
 							for(Entry<String, String> entry:locs.get(detailedType).entrySet()) {
 								Location location = Household.LOCATIONS.get(entry.getKey());
-								sum+=Math.pow(location.getTypes().get(location.getType(detailedType).text), b)*Math.exp(-a*ttMap.get(nodeE.getValue().getId().toString()).get(entry.getValue()));
+								sum+=Math.pow(location.getTypes().get(location.getType(detailedType).text), b)*Math.exp(-a*ttMap.get(node.getId().toString()).get(entry.getValue()));
 							}
 							accMap.put(detailedType, sum);
 						}
-						accsPurpose.put(nodeE.getKey(), accMap);
+						accsPurpose.put(ob.zipCode, accMap);
 					}
 					double[] y = new double[obs.size()];
 					double[][] x = new double[obs.size()][1];
@@ -532,11 +531,23 @@ public class BinaryPlaceTypes {
 					System.out.println(a+" "+b+" "+mlr.calculateRSquared()+" "+mlr.estimateRegressionParameters()[1]/mlr.estimateRegressionParametersStandardErrors()[1]+" "+mlr.estimateRegressionParameters()[0]+" "+mlr.estimateRegressionParameters()[1]+" "+obs.size()+" "+purpose);
 					if(mlr.estimateRegressionParameters()[1]/mlr.estimateRegressionParametersStandardErrors()[1]>maxT) {
 						maxT = mlr.estimateRegressionParameters()[1]/mlr.estimateRegressionParametersStandardErrors()[1];
-						maxAccsPurpose = accsPurpose;
 						maxA = a;
 						maxB = b;
 					}
 				}
+			Map<String, Map<DetailedType, Double>> maxAccsPurpose = new HashMap<>();
+			for(Entry<String, Node> nodeE:nodes.entrySet()) {
+				Map<DetailedType, Double> accMap = new HashMap<Location.DetailedType, Double>();
+				for(DetailedType detailedType:Location.DetailedType.values()) {
+					double sum=0;
+					for(Entry<String, String> entry:locs.get(detailedType).entrySet()) {
+						Location location = Household.LOCATIONS.get(entry.getKey());
+						sum+=Math.pow(location.getTypes().get(location.getType(detailedType).text), maxB)*Math.exp(-maxA*ttMap.get(nodeE.getValue().getId().toString()).get(entry.getValue()));
+					}
+					accMap.put(detailedType, sum);
+				}
+				maxAccsPurpose.put(nodeE.getKey(), accMap);
+			}
 			System.out.println(maxA+" "+maxB+" "+maxT+" "+obs.size()+" "+purpose);
 			accs.put(purpose, maxAccsPurpose);
 		}
@@ -568,7 +579,7 @@ public class BinaryPlaceTypes {
 		printer.print("PARTNER\t");
 		printer.print("YOUNGER\t");
 		printer.print("WEIGHT\t");
-		printer.print("CHOICE");
+		printer.print("CHOICE\t");
 		for(Day day:Day.values())
 			printer.print(day.name().toUpperCase()+"\t");
 		printer.println();
@@ -625,7 +636,7 @@ public class BinaryPlaceTypes {
 		printer.print("PARTNER\t");
 		printer.print("YOUNGER\t");
 		printer.print("WEIGHT\t");
-		printer.print("CHOICE");
+		printer.print("CHOICE\t");
 		for(Day day:Day.values())
 			printer.print(day.name().toUpperCase()+"\t");
 		printer.println();

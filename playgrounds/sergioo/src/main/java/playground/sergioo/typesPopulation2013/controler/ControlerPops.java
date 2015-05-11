@@ -39,27 +39,23 @@ import playground.sergioo.typesPopulation2013.scenario.ScenarioUtils;
  * @author sergioo
  */
 
-public class ControlerPops extends Controler {
+public class ControlerPops {
 
-	public ControlerPops(Config config) {
-		super(config);
-	}
-	public ControlerPops(Scenario scenario) {
-		super(scenario);
-	}
+	private static Controler controler;
+	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		config.removeModule(StrategyConfigGroup.GROUP_NAME);
 		config.addModule(new StrategyPopsConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
-		final ControlerPops controler = new ControlerPops(ScenarioUtils.loadScenario(config));
+		controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.setOverwriteFiles(true);
-		controler.addCoreControlerListener(new PlansDumping());
+		controler.addControlerListener(new PlansDumping());
         AbstractModule myStrategyManagerModule = new AbstractModule() {
 
             @Override
             public void install() {
-				bind(StrategyManager.class).toInstance(controler.myLoadStrategyManager());
+				bind(StrategyManager.class).toInstance(myLoadStrategyManager());
 			}
         };
         controler.addOverridingModule(myStrategyManagerModule);
@@ -69,9 +65,9 @@ public class ControlerPops extends Controler {
 	/**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
-	private StrategyManager myLoadStrategyManager() {
+	private static StrategyManager myLoadStrategyManager() {
 		StrategyManagerPops manager = new StrategyManagerPops();
-		StrategyManagerPopsConfigLoader.load(this, manager);
+		StrategyManagerPopsConfigLoader.load(controler, manager);
 		return manager;
 	}
 	
