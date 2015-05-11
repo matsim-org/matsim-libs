@@ -51,7 +51,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		typeBuilder.setName("link");
 		typeBuilder.setCRS(this.crs);
-		typeBuilder.add("location", LineString.class);
+		typeBuilder.add("the_geom", LineString.class);
 		typeBuilder.add("ID", String.class);
 		typeBuilder.add("fromID", String.class);
 		typeBuilder.add("toID", String.class);

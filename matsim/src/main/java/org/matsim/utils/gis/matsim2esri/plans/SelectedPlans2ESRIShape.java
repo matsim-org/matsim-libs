@@ -231,7 +231,7 @@ public class SelectedPlans2ESRIShape {
 		SimpleFeatureTypeBuilder actBuilder = new SimpleFeatureTypeBuilder();
 		actBuilder.setName("activity");
 		actBuilder.setCRS(this.crs);
-		actBuilder.add("location", Point.class);
+		actBuilder.add("the_geom", Point.class);
 		actBuilder.add("PERS_ID", String.class);
 		actBuilder.add("TYPE", String.class);
 		actBuilder.add("LINK_ID", String.class);
@@ -241,7 +241,7 @@ public class SelectedPlans2ESRIShape {
 		SimpleFeatureTypeBuilder legBuilder = new SimpleFeatureTypeBuilder();
 		legBuilder.setName("leg");
 		legBuilder.setCRS(this.crs);
-		legBuilder.add("location", LineString.class);
+		legBuilder.add("the_geom", LineString.class);
 		legBuilder.add("PERS_ID", String.class);
 		legBuilder.add("MODE", String.class);
 		legBuilder.add("DEP_TIME", Double.class);
