@@ -73,12 +73,13 @@ public class JuPedSimGeomtry {
 				handledCrossings.add(crId);
 			}
 
+			int cnt = 0;
 			for (LineSegment open : sec.getOpeningSegments()) {
 				Section nSec = sec.getNeighbor(open);
 				if (nSec == null) {
 					Room ex = new Room();
 					this.rooms.add(ex);
-					ex.id = sec.getId().toString()+"_exit";
+					ex.id = sec.getId().toString()+"_exit"+cnt++;
 					Subroom subEx = new Subroom();
 					ex.subrooms.add(subEx);
 					ex.caption = ex.id;
@@ -149,7 +150,7 @@ public class JuPedSimGeomtry {
 						Goal g = new Goal();
 						this.goals.add(g);
 						g.caption = "goal";
-						g.id = sec.getId().toString();
+						g.id = ex.id;
 						g.p = new Polygon();
 						double x0 = t.v2.px-(TRANSITION_BOX_LENGTH+GOAL_OFFSET)*open.dy;
 						double y0 = t.v2.py+(TRANSITION_BOX_LENGTH+GOAL_OFFSET)*open.dx;
@@ -204,13 +205,13 @@ public class JuPedSimGeomtry {
 		rooms.put("-1", "-1");
 		Map<String,Map<String,String>> rs = new HashMap<>();
 		Map<String,String> tmp = new HashMap<>();
+		Map<String,String> subs = new HashMap<>();
 		tmp.put("-1", "-1");
 		rs.put("-1", tmp);
 		int rIds = 0;
 		for (Room r : this.rooms) {
 			String newId = rIds+++"";
 			rooms.put(r.id, newId);
-			Map<String,String> subs = new HashMap<>();
 			subs.put("-1", "-1");
 			r.id = newId;
 			rs.put(r.id, subs);
@@ -239,6 +240,10 @@ public class JuPedSimGeomtry {
 			tr.subRoom2Id = subs2.get(tr.subRoom2Id);
 		}
 		
+		for (Goal g : this.goals) {
+			g.id = rooms.get(g.id);
+		}
+		
 	}
 
 	static final class Room {
@@ -264,6 +269,10 @@ public class JuPedSimGeomtry {
 	static final class Vertex {
 		double px;
 		double py;
+		@Override
+		public String toString() {
+			return px + " , " + py;
+		}
 	}
 
 	static final class Transition {
@@ -278,6 +287,12 @@ public class JuPedSimGeomtry {
 
 		Vertex v1;
 		Vertex v2;
+		
+		@Override
+		public String toString() {
+			
+			return id + " (" + v1 + ") <--> (" + v2 + ")";
+		}
 	}
 
 	static final class Crossing {

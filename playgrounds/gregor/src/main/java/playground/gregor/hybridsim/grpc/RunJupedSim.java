@@ -35,7 +35,7 @@ public class RunJupedSim implements Runnable, ExternalSim{
 	@Override
 	public void run() {
 		try {
-			this.p1 = new ProcessBuilder("/Users/laemmel/svn/jpscore/Release/jupedsim","/Users/laemmel/svn/jpscore/inputfiles/hybrid/hybrid_hall_ini.xml").start();
+			this.p1 = new ProcessBuilder("/Users/laemmel/svn/jpscore/Release/jupedsim","/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/jps_ini.xml").start();
 			logToLog(this.p1);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

@@ -3,6 +3,12 @@ package playground.gregor.scenariogen.hhw3hybrid;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioUtils;
+
 import playground.gregor.grpc.dummyjupedsim.JuPedSimServer;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
@@ -25,8 +31,9 @@ public class JuPedSimGeomtryConverter {
 			JuPedSimGeomtry geo = new JuPedSimGeomtry();
 			geo.buildFrom2DEnv(env);
 			String jupedsimGeoFile = "/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/jps_geo.xml";
+			String goalFile = "/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/goals.xml";
 			try {
-				new JuPedSimGeomtrySerializer(jupedsimGeoFile, geo).serialize();
+				new JuPedSimGeomtrySerializer(jupedsimGeoFile, geo,goalFile).serialize();
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -46,6 +53,8 @@ public class JuPedSimGeomtryConverter {
 		Sim2DScenario sim2dsc = Sim2DScenarioUtils.loadSim2DScenario(sim2dc);
 		JuPedSimGeomtry geo =  new JuPedSimGeomtryConverter(sim2dsc).buildSaveAndReturnJuPedSimGeomtry();
 		new ConvertToEsriShape(sim2dsc.getSim2DEnvironments().iterator().next().getCRS(), geo, shapeFile).run();;
+		
+		new MATSimScenarioCreator(geo).run();
 		
 		
 	}

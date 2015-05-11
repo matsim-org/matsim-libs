@@ -98,7 +98,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
 		}
-		new Thread(new RunJupedSim()).start();
+//		new Thread(new RunJupedSim()).start();
 		//		DummyJuPedSim.main(null);
 //		new Thread(new DummyJuPedSim()).start();
 

@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import playground.gregor.scenariogen.hhw3hybrid.JuPedSimGeomtry.Crossing;
+import playground.gregor.scenariogen.hhw3hybrid.JuPedSimGeomtry.Goal;
 import playground.gregor.scenariogen.hhw3hybrid.JuPedSimGeomtry.Polygon;
 import playground.gregor.scenariogen.hhw3hybrid.JuPedSimGeomtry.Room;
 import playground.gregor.scenariogen.hhw3hybrid.JuPedSimGeomtry.Subroom;
@@ -19,10 +20,12 @@ public class JuPedSimGeomtrySerializer {
 	private BufferedWriter bw;
 	
 	private int indent = 0;
+	private String goalsFile;
 
-	public JuPedSimGeomtrySerializer(String file, JuPedSimGeomtry geo) {
+	public JuPedSimGeomtrySerializer(String file, JuPedSimGeomtry geo, String goalsFile) {
 		this.file = file;
 		this.geo = geo;
+		this.goalsFile = goalsFile;
 		
 	}
 	
@@ -35,10 +38,47 @@ public class JuPedSimGeomtrySerializer {
 		this.indent--;
 		writeFooter();
 		this.bw.close();
+		dumpGoals();
+	}
+
+	private void dumpGoals() throws IOException {
+		this.bw = new BufferedWriter(new FileWriter(new File(this.goalsFile)));
+		this.indent = 1;
+		String ind = getIndent();
+		this.bw.append(ind+"<routing>\n");
+		this.indent++;
+		ind = getIndent();
+		this.bw.append(ind+"<goals>\n");
+		this.indent++;
+		for (Goal g : this.geo.goals){
+			writeGoal(g);
+		}
+		this.indent--;
+		this.bw.append(ind+"</goals>\n");
+		this.indent--;
+		ind = getIndent();
+		this.bw.append(ind+"</routing>\n");
+		bw.close();
+	}
+
+	private void writeGoal(Goal g) throws IOException {
+		String ind = getIndent();
+		this.bw.append(ind+"<goal id=\""+g.id+"\" final=\"true\" caption =\"" + g.caption + "\">\n");
+		this.indent++;
+		ind = getIndent();
+		this.bw.append(ind+"<polygon>\n");
+		this.indent++;
+		writeVertices(g.p);
+		this.indent--;
+		ind = getIndent();
+		this.bw.append(ind+"</polygon>\n");
+		this.indent--;
+		ind = getIndent();
+		this.bw.append(ind+"</goal>\n");
 	}
 
 	private void writeFooter() throws IOException {
-		this.bw.append("<geomtry>\n");
+		this.bw.append("</geometry>\n");
 		
 	}
 
@@ -101,7 +141,7 @@ public class JuPedSimGeomtrySerializer {
 		writeVertex(c.v1);
 		writeVertex(c.v2);
 		this.indent--;
-		this.bw.append(ind + "<crossing>\n");
+		this.bw.append(ind + "</crossing>\n");
 	}
 
 	private void writeSubrooms(Room r) throws IOException {

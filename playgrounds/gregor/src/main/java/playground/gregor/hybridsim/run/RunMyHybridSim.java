@@ -41,12 +41,12 @@ import com.google.inject.Provider;
 public class RunMyHybridSim {
 
 	public static void main(String [] args) {
-		String config = "/Users/laemmel/devel/external/input/config.xml";
+		String config = "/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/config.xml";
 		Config c = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(c, config);
 		c.controler().setWriteEventsInterval(1);
 
-		c.qsim().setEndTime(600);
+		c.qsim().setEndTime(3600);
 		
 		final Scenario sc = ScenarioUtils.loadScenario(c);
 
