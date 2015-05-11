@@ -57,7 +57,6 @@ import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup.PSimType;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
 import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
 import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
@@ -349,23 +348,24 @@ public class RunUtils {
 
 	public static ImmutableJointController initializePSimController(
 			final ControllerRegistry controllerRegistry) {
-		final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
+		if ( true ) throw new RuntimeException( "to remove, just there as a todo list for refactoring" );
+		//final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
 
 		final GroupStrategyRegistry mainStrategyRegistry = new GroupStrategyRegistry();
-		RunUtils.loadStrategyRegistryWithNonInnovativeStrategiesOnly(
-				factories,
-				mainStrategyRegistry,
-				controllerRegistry );
+		//RunUtils.loadStrategyRegistryWithNonInnovativeStrategiesOnly(
+		//		factories,
+		//		mainStrategyRegistry,
+		//		controllerRegistry );
 
 		final GroupStrategyManager mainStrategyManager =
 			new GroupStrategyManager( 
 					null, null, mainStrategyRegistry );
 
 		final GroupStrategyRegistry innovativeStrategyRegistry = new GroupStrategyRegistry();
-		RunUtils.loadStrategyRegistryWithInnovativeStrategiesOnly(
-				factories,
-				innovativeStrategyRegistry,
-				controllerRegistry );
+		//RunUtils.loadStrategyRegistryWithInnovativeStrategiesOnly(
+		//		factories,
+		//		innovativeStrategyRegistry,
+		//		controllerRegistry );
 
 		final GroupStrategyManager innovativeStrategyManager =
 			new GroupStrategyManager( 
@@ -411,6 +411,7 @@ public class RunUtils {
 
 	public static ImmutableJointController initializeNonPSimController(
 			final ControllerRegistry controllerRegistry) {
+		if ( true ) throw new RuntimeException( "to remove, just there as a todo list for refactoring" );
 		final Config config = controllerRegistry.getScenario().getConfig();
 
 		final GroupReplanningConfigGroup groupReplanningConf = (GroupReplanningConfigGroup)
@@ -426,12 +427,12 @@ public class RunUtils {
 				groupReplanningConf.getDisableInnovationAfterIter() );
 
 		{
-			final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
-			factories.addSelectorFactory( "AnnealingCoalitionExpBeta" , annealingSelectorFactory );
-			RunUtils.loadStrategyRegistryFromGroupStrategyConfigGroup(
-					factories,
-					strategyRegistry,
-					controllerRegistry );
+			//final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
+			//factories.addSelectorFactory( "AnnealingCoalitionExpBeta" , annealingSelectorFactory );
+			//RunUtils.loadStrategyRegistryFromGroupStrategyConfigGroup(
+			//		factories,
+			//		strategyRegistry,
+			//		controllerRegistry );
 		}
 
 		// create strategy manager
