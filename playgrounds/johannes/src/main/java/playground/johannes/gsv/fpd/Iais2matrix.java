@@ -37,7 +37,7 @@ public class Iais2matrix {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/fpd/fraunhofer/study/data/raw/28-04-2015/AggregatedTrajectories_all_noTransit_min2h_splitrules-2_Flows_daily.csv"));
+		BufferedReader reader = new BufferedReader(new FileReader("/home/johannes/gsv/fpd/fraunhofer/study/data/raw/24-04-2015/AggregatedTrajectories_all_noTransit_min3D_Flows_daily.csv"));
 		String line = reader.readLine();
 		
 		KeyMatrix m = new KeyMatrix();
@@ -54,7 +54,7 @@ public class Iais2matrix {
 		reader.close();
 		
 		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(m, "/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/28-04-2015/iais.2h.xml");
+		writer.write(m, "/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/24-04-2015/iais.3d.xml");
 	}
 
 }

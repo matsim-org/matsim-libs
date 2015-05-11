@@ -45,7 +45,7 @@ public class Compare {
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
 		
-		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/28-04-2015/iais.2h.xml");
+		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/24-04-2015/iais.3d.xml");
 		KeyMatrix iais = reader.getMatrix();
 
 		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.modena.xml");
@@ -57,9 +57,9 @@ public class Compare {
 		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/ref/miv.sym.874.xml");
 		KeyMatrix sim = reader.getMatrix();
 		
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/fpd/fraunhofer/study/data/gis/zones.geojson", "NO");
-		ODUtils.cleanDistances(iais, zones, 50000, WGS84DistanceCalculator.getInstance());
-		
+//		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/fpd/fraunhofer/study/data/gis/zones.geojson", "NO");
+//		ODUtils.cleanDistances(iais, zones, 10000, WGS84DistanceCalculator.getInstance());
+//		
 		
 		double c = ODUtils.calcNormalization(iais, model);
 		playground.johannes.gsv.zones.MatrixOperations.applyFactor(model, 1/c);
@@ -70,14 +70,14 @@ public class Compare {
 		c = ODUtils.calcNormalization(iais, sim);
 		playground.johannes.gsv.zones.MatrixOperations.applyFactor(sim, 1/c);
 		
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/study/analysis/28-04-2015/compare.2h.txt"));
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/study/analysis/24-04-2015/compare.3d.txt"));
 		writer.write("from\tto\tvolIais\tvolTomTom");
 		writer.newLine();
 		
 //		TDoubleArrayList iaisVols = new TDoubleArrayList();
 //		TDoubleArrayList tomtomVols = new TDoubleArrayList();
 		
-		BufferedWriter scatterWriter = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/study/analysis/28-04-2015/scatter.2h.txt"));
+		BufferedWriter scatterWriter = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/study/analysis/24-04-2015/scatter.3d.txt"));
 		scatterWriter.write("iais\ttomtom\tmodel\tsim");
 		scatterWriter.newLine();
 		

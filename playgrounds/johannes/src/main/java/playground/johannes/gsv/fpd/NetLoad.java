@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -46,6 +48,10 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
+import org.matsim.counts.CountsReaderMatsimV1;
+import org.matsim.counts.Volume;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -54,11 +60,15 @@ import org.wololo.geojson.FeatureCollection;
 import org.wololo.geojson.LineString;
 import org.wololo.jts2geojson.GeoJSONWriter;
 
+import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.gsv.sim.cadyts.ODCalibrator;
 import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.ColorUtils;
+import playground.johannes.sna.util.ProgressLogger;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -73,32 +83,56 @@ public class NetLoad {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String matrixFile = "/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/15-04-2015/iais.2h.xml";
+		String matrixFile = "/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/24-04-2015/iais.2h.xml";
 		String netFile = "/home/johannes/gsv/osm/network/germany-20140909.5.xml";
 		String zonesFile = "/home/johannes/gsv/gis/modena/zones.gk3.geojson";
-		String outFile = "/home/johannes/gsv/fpd/fraunhofer/study/analysis/15-04-2015/netload.geojson";
-
+		String outFile = "/home/johannes/gsv/fpd/fraunhofer/study/analysis/24-04-2015/netload.geojson";
+		String countsFile = "/home/johannes/gsv/counts/counts.2013.net20140909.5.24h.xml";
+		String outDir = "/home/johannes/gsv/fpd/fraunhofer/study/analysis/24-04-2015/";
+		/*
+		 * load matrix
+		 */
 		KeyMatrixXMLReader mReader = new KeyMatrixXMLReader();
 		mReader.setValidating(false);
 		mReader.parse(matrixFile);
 		KeyMatrix m = mReader.getMatrix();
 
+		MatrixOperations.applyFactor(m, 1.952898582487276);
+		/*
+		 * create scenario
+		 */
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-
+		/*
+		 * lead network
+		 */
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(netFile);
 		Network network = scenario.getNetwork();
-
+		/*
+		 * load counts
+		 */
+		Counts counts = new Counts();
+		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
+		cReader.parse(countsFile);
+		/*
+		 * load zones
+		 */
 		ZoneCollection zones = ZoneCollection.readFromGeoJSON(zonesFile, "NO");
-
+		/*
+		 * setup router
+		 */
 		FreespeedTravelTimeAndDisutility travelCost = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
 		DijkstraFactory dFactory = new DijkstraFactory();
 		LeastCostPathCalculator router = dFactory.createPathCalculator(network, travelCost, travelCost);
 
 		TObjectDoubleHashMap<Link> linkVolumes = new TObjectDoubleHashMap<>();
+		/*
+		 * assign volumes
+		 */
 
 		Set<String> keys = m.keys();
+		ProgressLogger.init(keys.size(), 2, 10);
 		for (String i : keys) {
 			for (String j : keys) {
 				if (i != j) {
@@ -118,8 +152,33 @@ public class NetLoad {
 					}
 				}
 			}
+			ProgressLogger.step();
 		}
+		ProgressLogger.termiante();
+		/*
+		 * compare counts
+		 */
+		BufferedWriter cwriter = new BufferedWriter(new FileWriter(outDir + "counts.txt"));
+		cwriter.write("obs\tsim");
+		cwriter.newLine();
+		for (Count count : counts.getCounts().values()) {
+			Id<Link> id = count.getLocId();
+			Link link = network.getLinks().get(id);
+			double simVol = linkVolumes.get(link);
+			double obsVol = count.getVolume(1).getValue() * 24;
+			if (simVol > 0) {
+				cwriter.write(String.valueOf(obsVol));
+				cwriter.write("\t");
+				cwriter.write(String.valueOf(simVol));
+				cwriter.newLine();
+			}
+		}
+		cwriter.close();
 
+		writeCountsJson(network, linkVolumes, counts, outDir);
+		/*
+		 * write json
+		 */
 		Map<Link, Double> volumes = new HashMap<>(network.getLinks().size());
 		Map<Link, Double> loads = new HashMap<>(network.getLinks().size());
 
@@ -186,6 +245,75 @@ public class NetLoad {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
 			writer.write(fCollection.toString());
 			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void writeCountsJson(Network network, TObjectDoubleHashMap<Link> linkVolumes, Counts obsCounts, String outDir) {
+		MathTransform transform = null;
+		try {
+			transform = CRS.findMathTransform(CRSUtils.getCRS(31467), CRSUtils.getCRS(4326));
+		} catch (FactoryException e) {
+			e.printStackTrace();
+		}
+
+		GeoJSONWriter jsonWriter = new GeoJSONWriter();
+		List<Feature> simFeatures = new ArrayList<>(obsCounts.getCounts().size());
+		List<Feature> obsFeatures = new ArrayList<>(obsCounts.getCounts().size());
+
+		for (Count count : obsCounts.getCounts().values()) {
+			Id<Link> linkId = count.getLocId();
+			if (!linkId.toString().startsWith(ODCalibrator.VIRTUAL_ID_PREFIX)) {
+				Link link = network.getLinks().get(linkId);
+
+				double simVal = linkVolumes.get(link);
+				if (simVal > 0) {
+					double obsVal = 0;
+					for (Volume vol : count.getVolumes().values()) {
+						obsVal += vol.getValue();
+					}
+
+					double relErr = (simVal - obsVal) / obsVal;
+
+					Coord simPos = link.getCoord();
+					Coord obsPos = count.getCoord();
+
+					Point simPoint = MatsimCoordUtils.coordToPoint(simPos);
+					Point obsPoint = MatsimCoordUtils.coordToPoint(obsPos);
+
+					simPoint = CRSUtils.transformPoint(simPoint, transform);
+					obsPoint = CRSUtils.transformPoint(obsPoint, transform);
+
+					Map<String, Object> properties = new HashMap<>();
+
+					properties.put("simulation", simVal);
+					properties.put("observation", obsVal);
+					properties.put("error", relErr);
+					properties.put("color",
+							"#" + String.format("%06x", ColorUtils.getRedGreenColor(Math.min(1, Math.abs(relErr))).getRGB() & 0x00FFFFFF));
+
+					Feature obsFeature = new Feature(jsonWriter.write(obsPoint), properties);
+					Feature simFeature = new Feature(jsonWriter.write(simPoint), properties);
+
+					simFeatures.add(simFeature);
+					obsFeatures.add(obsFeature);
+				}
+			}
+		}
+
+		FeatureCollection simFCollection = jsonWriter.write(simFeatures);
+		FeatureCollection obsFCollection = jsonWriter.write(obsFeatures);
+
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/simCounts.json", outDir)));
+			writer.write(simFCollection.toString());
+			writer.close();
+
+			writer = new BufferedWriter(new FileWriter(String.format("%s/obsCounts.json", outDir)));
+			writer.write(obsFCollection.toString());
+			writer.close();
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

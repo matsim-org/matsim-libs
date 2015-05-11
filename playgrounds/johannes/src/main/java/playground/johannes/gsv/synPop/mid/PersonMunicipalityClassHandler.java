@@ -22,13 +22,12 @@ package playground.johannes.gsv.synPop.mid;
 import java.util.Map;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.AttributeSerializer;
 
 /**
  * @author johannes
  *
  */
-public class PersonMunicipalityClassHandler implements PersonAttributeHandler, AttributeSerializer {
+public class PersonMunicipalityClassHandler implements PersonAttributeHandler {
 
 	@Override
 	public void handle(ProxyPerson person, Map<String, String> attributes) {
@@ -61,16 +60,6 @@ public class PersonMunicipalityClassHandler implements PersonAttributeHandler, A
 		}
 	}
 
-	@Override
-	public String encode(Object value) {
-		return String.valueOf(value);
-	}
-
-	@Override
-	public Object decode(String value) {
-		return Integer.parseInt(value);
-	}
-	
 	private static int[][] categories;
 	
 	private static void initCategories() {
