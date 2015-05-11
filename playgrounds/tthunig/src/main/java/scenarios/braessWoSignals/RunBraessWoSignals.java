@@ -3,6 +3,8 @@ package scenarios.braessWoSignals;
 import java.io.File;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -24,16 +26,20 @@ import playground.dgrether.koehlerstrehlersignal.analysis.AnalyzeBraessSimulatio
  *
  */
 public class RunBraessWoSignals {
+	
+	private static final Logger log = Logger.getLogger(RunBraessWoSignals.class);
 
 	public static void main(String[] args) {
-		String date = "2015-05-05";
+		String date = "2015-05-11";
 		
 		int numberOfAgents = 60;
 		boolean sameStartTime = true;
-		boolean plansWithRoutes = false;
+		boolean initPlansWithAllRoutes = true;
+		boolean initPlansWithZRoute = true;
 		
 		int iterations = 100;
-		boolean writeEventsForAllIts = false; // remind the running time if true
+		boolean writeEventsForAllIts = true; // needed for detailed analysis. remind the running time if true
+		boolean writePlansForAllIts = false; // remind the running time if true
 		
 		double middleLinkTT = 200; // in seconds. for deleting use 200
 		/* travel time of the link which is not at the middle route. */
@@ -52,28 +58,40 @@ public class RunBraessWoSignals {
 		double lateArrivalUtils = -18.0; // default -18
 		boolean scoringDummy = true; // default true
 		
-		double propChangeExpBeta = 0.9; // 0.9 before
-		double propReRoute = 0.1; // 0.1 before
-		double propKeepLast = 0.0; // 0.0 before
+		double propChangeExpBeta = 0.9;
+		double propReRoute = 0.1;
+		double propKeepLast = 0.0;
+		double propSelectRandom = 0.0;
+		double propSelectExpBeta = 0.0;
+		double propBestScore = 0.0;
+		
+		double brainExpBeta = 1.0; // default: 1.0. DG used to use 2.0 - better results!?
+		
+		if (initPlansWithAllRoutes && propReRoute != 0.0)
+			log.warn("ReRoute isn't needed if plans are initialized with all routes.");
+		if (!initPlansWithAllRoutes && propReRoute == 0.0)
+			log.warn("ReRoute is needed if plans aren't initialized with all routes. Please increase the reRoute weight!");
 		
 		String inputDir = DgPaths.SHAREDSVN + "studies/tthunig/scenarios/BraessWoSignals/";
 		
 		// create run name
-		String info = "Braess";
-		info += "_" + numberOfAgents + "p";
+		String info = numberOfAgents + "p";
 		if (sameStartTime)
 			info += "_sameTime";
-		if (plansWithRoutes)
-			info += "_initRoutes";
+		if (initPlansWithZRoute && !initPlansWithAllRoutes)
+			info += "_initZRoute";
 		info += "_" + iterations + "it";
-		if (writeEventsForAllIts)
-			info += "_allEvents";
+//		if (writeEventsForAllIts)
+//			info += "_allEvents";
 		if (enforceZ)
 			info += "_enforceZ";
-		info += "_capZ" + capZ + "_capOther" + capOther;		
-		info += "_ttMid" + middleLinkTT + "s" +
-				"_tt3-" + linkTT3 + "s" +
-				"_tt5-" + linkTT5 + "s";
+		if (capZ == capOther)
+			info += "_cap" + capZ;
+		else
+			info += "_capZ" + capZ + "_capOther" + capOther;		
+		info += "_ttMid" + middleLinkTT + "s";
+		if (linkTT3 != 20.0 || linkTT5 != 20.0)
+			info += "_tt3-" + linkTT3 + "s" + "_tt5-" + linkTT5 + "s";
 		if (increaseLinkTTBy != 0.0)
 			info += "_increaseTT+" + increaseLinkTTBy + "s";
 		if (performingUtils != 6.0)
@@ -85,11 +103,19 @@ public class RunBraessWoSignals {
 		if (!scoringDummy)
 			info += "_dontScoreDummyAct";
 		if (propChangeExpBeta != 0.0)
-			info += "_expBeta" + propChangeExpBeta;
+			info += "_chExpBeta" + propChangeExpBeta;
 		if (propReRoute != 0.0)
 			info += "_reRoute" + propReRoute;
 		if (propKeepLast != 0.0)
 			info += "_keepLast" + propKeepLast;
+		if (propSelectRandom != 0.0)
+			info += "_selRandom" + propSelectRandom;
+		if (propSelectExpBeta != 0.0)
+			info += "_selExpBeta" + propSelectExpBeta;
+		if (propBestScore != 0.0)
+			info += "_bestScore" + propBestScore;
+		if (propSelectExpBeta != 0.0 || propChangeExpBeta != 0.0)
+			info += "_beta" + brainExpBeta;		
 		
 		String outputDir = inputDir + "matsim-output/" + date + "_" + info + "/";
 		String configFile = inputDir + "config.xml";
@@ -108,49 +134,59 @@ public class RunBraessWoSignals {
 			// adapt events writing interval
 			config.controler().setWriteEventsInterval(1);
 		}
+		if (writePlansForAllIts)
+			config.controler().setWritePlansInterval(1);
+		
+		config.planCalcScore().setBrainExpBeta(brainExpBeta);
 		
 		// adapt strategies
 		Collection<StrategySettings> strategySettings = config.strategy().getStrategySettings();
 		for (StrategySettings s : strategySettings){
-			if (s.getName().equals("ReRoute")){
+			if (s.getStrategyName().equals("ReRoute")){
 				s.setWeight(propReRoute);
 				s.setDisableAfter(iterations/2);
 			}
-			if (s.getName().equals("ChangeExpBeta")){
+			if (s.getStrategyName().equals("ChangeExpBeta")){
 				s.setWeight(propChangeExpBeta);
 			}
 		}
 		
-//		StrategySettings keepLastSelectedStrategy = new StrategySettings();
-//		keepLastSelectedStrategy.setStrategyName("KeepLastSelected");
-//		keepLastSelectedStrategy.setWeight(propKeepLast);
-//		config.strategy().addStrategySettings(keepLastSelectedStrategy);
+		StrategySettings keepLastSelectedStrategy = new StrategySettings();
+		keepLastSelectedStrategy.setStrategyName("KeepLastSelected");
+		keepLastSelectedStrategy.setWeight(propKeepLast);
+		keepLastSelectedStrategy.setDisableAfter(iterations/2);
+		config.strategy().addStrategySettings(keepLastSelectedStrategy);
 		
-//		StrategySettings changeExpBetaStrategy = new StrategySettings();
-//		changeExpBetaStrategy.setStrategyName("ChangeExpBeta");
-//		changeExpBetaStrategy.setWeight(propChangeExpBeta);
-//		config.strategy().addStrategySettings(changeExpBetaStrategy);
-//		
-//		StrategySettings reRouteStrategy = new StrategySettings();
-//		reRouteStrategy.setStrategyName("ReRoute");
-//		reRouteStrategy.setWeight(propReRoute);
-//		reRouteStrategy.setDisableAfter(iterations/2);
-//		config.strategy().addStrategySettings(reRouteStrategy);
+		StrategySettings selectRandomStrategy = new StrategySettings();
+		selectRandomStrategy.setStrategyName("SelectRandom");
+		selectRandomStrategy.setWeight(propSelectRandom);
+		selectRandomStrategy.setDisableAfter(iterations/2);
+		config.strategy().addStrategySettings(selectRandomStrategy);
+		
+		StrategySettings selExpBetaStrategy = new StrategySettings();
+		selExpBetaStrategy.setStrategyName("SelectExpBeta");
+		selExpBetaStrategy.setWeight(propSelectExpBeta);
+		config.strategy().addStrategySettings(selExpBetaStrategy);
+		
+		StrategySettings bestScoreStrategy = new StrategySettings();
+		bestScoreStrategy.setStrategyName("BestScore");
+		bestScoreStrategy.setWeight(propBestScore);
+		config.strategy().addStrategySettings(bestScoreStrategy);
 		
 		
 		// adapt plans file
+		String plansFile = "plans" + numberOfAgents;
 		if (sameStartTime){
-			if (plansWithRoutes)
-				config.plans().setInputFile(inputDir + "plans" + numberOfAgents + "sameStartTimeWithRoutes.xml");
-			else
-				config.plans().setInputFile(inputDir + "plans" + numberOfAgents + "sameStartTime.xml");
+			plansFile += "sameStartTime";
 		}
-		else{
-			if (plansWithRoutes)
-				config.plans().setInputFile(inputDir + "plans" + numberOfAgents + "WithRoutes.xml");
-			else
-				config.plans().setInputFile(inputDir + "plans" + numberOfAgents + ".xml");
-		}			
+		if (initPlansWithAllRoutes)
+			plansFile += "AllRoutes";
+		else if (initPlansWithZRoute)
+			plansFile += "RouteZ";
+		plansFile += ".xml";
+		config.plans().setInputFile(inputDir + plansFile);
+		Log.info("Use plans file " + plansFile);
+					
 		
 		// adapt utils
 		config.planCalcScore().setTraveling_utils_hr(travelingUtils);
@@ -184,8 +220,8 @@ public class RunBraessWoSignals {
 		
 		if (enforceZ){
 			// force agents to use the middle link
-			l3.setFreespeed(1);
-			l5.setFreespeed(1);
+			l3.setFreespeed(0.1);
+			l5.setFreespeed(0.1);
 		}
 		
 		// increase travel time on each link (by increasing link length)
@@ -204,11 +240,12 @@ public class RunBraessWoSignals {
 		String analyzeDir = outputDir + "analysis/";
 		new File(analyzeDir).mkdir();
 		AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(outputDir, iterations, analyzeDir);
-		// analyze the last iteration detailed
-		analyzer.analyzeLastIt();
 		if (writeEventsForAllIts)
 			// analyze all iterations in terms of route choice and travel time
 			analyzer.analyzeAllIt();
+		// analyze the last iteration more detailed
+		analyzer.analyzeLastIt();
+				
 	}
 
 }
