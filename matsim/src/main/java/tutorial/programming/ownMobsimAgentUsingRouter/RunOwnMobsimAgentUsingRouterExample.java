@@ -37,6 +37,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
+import javax.inject.Inject;
+
 /**
  * Untested code.  Idea is that an observer notes the traffic congestion, and returns the "best" of all outgoing links to the vehicle.
  * 
@@ -50,38 +52,37 @@ public class RunOwnMobsimAgentUsingRouterExample {
 			@Override
 			public void install() {
 				bindMobsim().toProvider(new Provider<Mobsim>() {
+
+					@Inject Scenario scenario;
+					@Inject EventsManager eventsManager;
+
 					@Override
 					public Mobsim get() {
-						return new MobsimFactory() {
+						scenario.getConfig().qsim().setEndTime(25 * 60 * 60);
+						scenario.getConfig().controler().setLastIteration(0);
+						scenario.getPopulation().getPersons().clear();
+						final QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+						qsim.addAgentSource(new AgentSource() {
 							@Override
-							public Mobsim createMobsim(final Scenario scenario, final EventsManager eventsManager) {
-								scenario.getConfig().qsim().setEndTime(25 * 60 * 60);
-								scenario.getConfig().controler().setLastIteration(0);
-								scenario.getPopulation().getPersons().clear();
-								final QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
-								qsim.addAgentSource(new AgentSource() {
-									@Override
-									public void insertAgentsIntoMobsim() {
-										// router.  In order to be thread safe, one needs one router per agent.  Since, on the other hand, routers are heavy-weight objects,
-										// this will not scale.  For large numbers of replanning agents, one needs to think of a better software architecture here. kai, nov'14
-										final TripRouter router = controler.getTripRouterProvider().get();
+							public void insertAgentsIntoMobsim() {
+								// router.  In order to be thread safe, one needs one router per agent.  Since, on the other hand, routers are heavy-weight objects,
+								// this will not scale.  For large numbers of replanning agents, one needs to think of a better software architecture here. kai, nov'14
+								final TripRouter router = controler.getTripRouterProvider().get();
 
-										// guidance.  Will need one instance per agent in order to be thread safe
-										final MyGuidance guidance = new MyGuidance(router, scenario);
+								// guidance.  Will need one instance per agent in order to be thread safe
+								final MyGuidance guidance = new MyGuidance(router, scenario);
 
-										// insert traveler agent:
-										final MobsimAgent ag = new MyMobsimAgent(guidance, qsim.getSimTimer(), scenario);
-										qsim.insertAgentIntoMobsim(ag);
+								// insert traveler agent:
+								final MobsimAgent ag = new MyMobsimAgent(guidance, qsim.getSimTimer(), scenario);
+								qsim.insertAgentIntoMobsim(ag);
 
-										// insert vehicle:
-										final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
-										final Id<Link> linkId4VehicleInsertion = Id.createLinkId(1);
-										qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
-									}
-								});
-								return qsim;
+								// insert vehicle:
+								final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
+								final Id<Link> linkId4VehicleInsertion = Id.createLinkId(1);
+								qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
 							}
-						}.createMobsim(controler.getScenario(), controler.getEvents());
+						});
+						return qsim;
 					}
 				});
 			}
