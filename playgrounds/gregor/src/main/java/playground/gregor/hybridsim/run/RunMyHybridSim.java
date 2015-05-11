@@ -20,14 +20,22 @@
 
 package playground.gregor.hybridsim.run;
 
+import java.util.Iterator;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.hybridsim.factories.HybridMobsimProvider;
@@ -42,13 +50,27 @@ public class RunMyHybridSim {
 
 	public static void main(String [] args) {
 		String config = "/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/config.xml";
+		if (args.length == 1) {
+			config = args[0];
+		}
 		Config c = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(c, config);
 		c.controler().setWriteEventsInterval(1);
 
-		c.qsim().setEndTime(3600);
+		c.qsim().setEndTime(7200);
 		
 		final Scenario sc = ScenarioUtils.loadScenario(c);
+		
+//		PopulationImpl pop = (PopulationImpl) sc.getPopulation();
+//		Map<Id<Person>, ? extends Person> pers = pop.getPersons();
+//		Iterator<?> it = pers.entrySet().iterator();
+//		while (it.hasNext()) {
+//			it.next();
+//			if (MatsimRandom.getRandom().nextDouble() > 0.1) {
+//				it.remove();
+//			}
+//		}
+//		
 
 		final Controler controller = new Controler(sc);
 		controller.setOverwriteFiles(true);

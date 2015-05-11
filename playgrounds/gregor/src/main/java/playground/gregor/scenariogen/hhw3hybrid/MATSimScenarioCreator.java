@@ -198,7 +198,7 @@ public class MATSimScenarioCreator {
 		double length = 10;
 		double fs = 1.34;
 		double lanes = 1;
-		double cap = 1;
+		double cap = 3600;
 		
 		int id = 0;
 		for (Node n : this.nn.values()) {
@@ -267,6 +267,9 @@ public class MATSimScenarioCreator {
 			if ((from = this.nn.get(l.getFromNode())) != null) {
 				l.setFromNode(from);
 			}
+			if (l.getCapacity() < 10) {
+				l.setCapacity(l.getCapacity()*3600);
+			}
 			impl.addLink(l);
 		}
 		
@@ -298,8 +301,8 @@ public class MATSimScenarioCreator {
 					this.ext2q.add(l.getId());
 				}
 				
-				NodeImpl nn = fac.createNode(Id.createNodeId(t.id), n.getCoord());
-				int id = Integer.parseInt(t.id);
+				NodeImpl nn = fac.createNode(Id.createNodeId(t.room2Id), n.getCoord());
+				int id = Integer.parseInt(t.room2Id);
 				if (id >= frId) {
 					frId = id+1;
 				}

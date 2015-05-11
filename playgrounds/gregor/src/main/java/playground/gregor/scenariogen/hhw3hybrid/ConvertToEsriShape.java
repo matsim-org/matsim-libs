@@ -48,7 +48,7 @@ public class ConvertToEsriShape {
 					for (Vertex vert : p.vertices) {
 						coordinates[idx++] = new Coordinate(vert.px,vert.py);
 					}
-					SimpleFeature f = ff.createPolyline(coordinates, new Object[]{"room",sub.id}, ftId+++"");
+					SimpleFeature f = ff.createPolyline(coordinates, new Object[]{"room",r.id}, ftId+++"");
 					features.add(f);
 				}
 			}

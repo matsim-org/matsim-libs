@@ -58,7 +58,49 @@ public class JuPedSimGeomtrySerializer {
 		this.indent--;
 		ind = getIndent();
 		this.bw.append(ind+"</routing>\n");
+		dumpAgents();
+		
 		bw.close();
+	}
+
+	private void dumpAgents() throws IOException {
+		String ind = getIndent();
+		this.bw.append(ind+"<agents operational_model_id=\"2\">\n");
+		this.indent++;
+		ind = getIndent();
+		this.bw.append(ind+"<agents_distribution>\n");
+		this.indent++;
+		dumpAgentsDistribution();
+		this.indent--;
+		this.bw.append(ind+"</agents_distribution>\n");
+		this.bw.append(ind+"<agents_sources>\n");
+		this.indent++;
+		dumpAgentsSources();
+		this.indent--;
+		this.bw.append(ind+"</agents_sources>\n");
+		this.indent--;
+		ind = getIndent();
+		this.bw.append(ind+"</agents>\n");
+	}
+
+	private void dumpAgentsSources() throws IOException {
+		String ind = getIndent();
+		for (Goal g : this.geo.goals) {
+			String id = g.id;
+			this.bw.append(ind+"<source id=\"" + id + "\" frequency=\"1\" agents_max=\"5\" "
+					+ "group_id=\""+id+"\" caption=\"source "+ id +"\" />\n");
+		}
+		
+	}
+
+	private void dumpAgentsDistribution() throws IOException {
+		String ind = getIndent();
+		for (Goal g : this.geo.goals) {
+			String id = g.id;
+			this.bw.append(ind+"<group group_id=\"" + id + "\" room_id=\"" + id 
+					+ "\" subroom_id=\"0\" number=\"0\" router_id=\"1\" agent_parameter=\"1\" />\n");
+		}
+		
 	}
 
 	private void writeGoal(Goal g) throws IOException {

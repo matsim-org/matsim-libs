@@ -98,9 +98,9 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
 		}
-//		new Thread(new RunJupedSim()).start();
+		//		new Thread(new RunJupedSim()).start();
 		//		DummyJuPedSim.main(null);
-//		new Thread(new DummyJuPedSim()).start();
+		//		new Thread(new DummyJuPedSim()).start();
 
 
 	}
@@ -138,14 +138,14 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		Id<Link> nextLId = veh.getDriver().chooseNextLinkId();
 		QLinkInternalIAdapter ql = this.adapters.get(nextLId);
 		double now = this.sim.getSimTimer().getTimeOfDay();
-		if (ql == null) {
-			this.em.processEvent(new LinkLeaveEvent(now, persId, veh
-					.getDriver().getCurrentLinkId(), veh.getId()));
-			veh.getDriver().notifyMoveOverNode(nextLId);
-			nextLId = veh.getDriver().chooseNextLinkId();
-			this.em.processEvent(new LinkEnterEvent(now, persId, nextLId, veh.getId()));
-			ql = this.adapters.get(nextLId);
-		}
+		//		if (ql == null) {
+		//			this.em.processEvent(new LinkLeaveEvent(now, persId, veh
+		//					.getDriver().getCurrentLinkId(), veh.getId()));
+		//			veh.getDriver().notifyMoveOverNode(nextLId);
+		//			nextLId = veh.getDriver().chooseNextLinkId();
+		//			this.em.processEvent(new LinkEnterEvent(now, persId, nextLId, veh.getId()));
+		//			ql = this.adapters.get(nextLId);
+		//		}
 		org.matsim.hybrid.MATSimInterface.Extern2MATSimConfirmed.Builder b = Extern2MATSimConfirmed.newBuilder();
 
 		if (ql.isAcceptingFromUpstream()) {
@@ -159,7 +159,10 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		} else {
 			b.setAccepted(false);
 		}
-		responseObserver.onValue(b.build());
+		
+		Extern2MATSimConfirmed resp = b.build();
+//		log.info(resp);
+		responseObserver.onValue(resp);
 		responseObserver.onCompleted();
 	}
 
@@ -217,16 +220,16 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		responseObserver.onCompleted();
 	}
 
-	
+
 	@Override
 	public void reqMaximumNumberOfAgents(MaximumNumberOfAgents request,
 			StreamObserver<MaximumNumberOfAgentsConfirmed> responseObserver) {
 		MaximumNumberOfAgentsConfirmed resp = MaximumNumberOfAgentsConfirmed.newBuilder().setNumber(this.sim.getScenario().getPopulation().getPersons().size()).build();
 		responseObserver.onValue(resp);
 		responseObserver.onCompleted();
-		
+
 	}
-	
+
 	//rpc MATSim --> extern
 
 	@Override
@@ -234,6 +237,9 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		double to = time + 1;
 		ExternDoSimStep doSimStepExternal = ExternDoSimStep.newBuilder()
 				.setFromTime(time).setToTime(to).build();
+		if (((int)time) % 60 == 0){
+			log.info(doSimStepExternal);
+		}
 		ExternDoSimStepReceived resp = this.client.getBlockingStub().reqExternDoSimStep(doSimStepExternal);
 		try {
 			this.simStepBarrier.await();
@@ -245,7 +251,7 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 
 	@Override
 	public void onPrepareSim() {
-		
+
 		try {
 			this.clientBarrier.await(); //to make sure matsim --> extern connection is working 
 		} catch (InterruptedException | BrokenBarrierException e) {
@@ -254,10 +260,10 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 		if (this.client == null){
 			throw new RuntimeException("client is null");
 		}
-		
+
 		ExternOnPrepareSim prep = ExternOnPrepareSim.newBuilder().build();
 		ExternOnPrepareSimConfirmed resp = this.client.getBlockingStub().reqExternOnPrepareSim(prep);
-		
+
 	}
 
 	@Override
@@ -283,6 +289,16 @@ public class ExternalEngine implements MobsimEngine, MATSimInterfaceService {
 	public void addFromUpstream(Id<Node> enterId, Id<Node> leaveId, QVehicle veh) {
 		Id<Person> driverId = veh.getDriver().getId();
 		this.vehicles.put(driverId, veh);
+
+		double now = this.sim.getSimTimer().getTimeOfDay();
+		Id<Link> currentLID = veh.getDriver().getCurrentLinkId();
+		this.em.processEvent(new LinkLeaveEvent(now, driverId, currentLID, veh.getId()));
+		Id<Link> nextLId = veh.getDriver().chooseNextLinkId();
+		veh.getDriver().notifyMoveOverNode(nextLId);
+		this.em.processEvent(new LinkEnterEvent(now, driverId, nextLId, veh.getId()));
+
+
+
 		Builder ab = MATSimInterface.MATSim2ExternPutAgent.Agent.newBuilder();
 		ab.setEnterNode(enterId.toString()).setId(driverId.toString()).setLeaveNode(leaveId.toString());
 		MATSim2ExternPutAgent addReq = MATSim2ExternPutAgent.newBuilder().setAgent(ab).build();

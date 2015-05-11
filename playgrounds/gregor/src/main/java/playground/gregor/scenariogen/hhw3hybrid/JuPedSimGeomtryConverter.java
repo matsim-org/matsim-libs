@@ -30,21 +30,13 @@ public class JuPedSimGeomtryConverter {
 		for (Sim2DEnvironment env : e) {
 			JuPedSimGeomtry geo = new JuPedSimGeomtry();
 			geo.buildFrom2DEnv(env);
-			String jupedsimGeoFile = "/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/jps_geo.xml";
-			String goalFile = "/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/goals.xml";
-			try {
-				new JuPedSimGeomtrySerializer(jupedsimGeoFile, geo,goalFile).serialize();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			return geo;
 		}
 		return null;
 	
 	}
 	
-	public static void main(String [] args) {
+	public static void main(String [] args) throws IOException {
 		String inputDir = "/Users/laemmel/devel/hhw_hybrid/input";
 		String s2dConfigFile = inputDir + "/s2d_config_v0.3.xml";
 		String shapeFile = "/Users/laemmel/arbeit/papers/2015/trgindia2015/envplot/jupedsim.shp";
@@ -56,6 +48,13 @@ public class JuPedSimGeomtryConverter {
 		
 		new MATSimScenarioCreator(geo).run();
 		
+		new JupedSimGeometryOffsetter(geo).run();
+		
+		String jupedsimGeoFile = "/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/jps_geo.xml";
+		String goalFile = "/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/goals.xml";
+		new JuPedSimGeomtrySerializer(jupedsimGeoFile, geo,goalFile).serialize();
+		
+//		new ConvertToEsriShape(sim2dsc.getSim2DEnvironments().iterator().next().getCRS(), geo, shapeFile).run();;
 		
 	}
 
