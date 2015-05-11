@@ -30,8 +30,6 @@ import org.matsim.analysis.IterationStopWatch;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -46,9 +44,7 @@ import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
@@ -110,7 +106,7 @@ public class Controler extends AbstractController {
 	private Injector injector;
 	private boolean injectorCreated = false;
 
-	public static interface TerminationCriterion {
+	public interface TerminationCriterion {
 		boolean continueIterations( int iteration ) ;
 	}
 
@@ -297,7 +293,7 @@ public class Controler extends AbstractController {
                 new AbstractModule() {
                     @Override
                     public void install() {
-                    	final List<AbstractModule> baseModules = new ArrayList<AbstractModule>();
+                    	final List<AbstractModule> baseModules = new ArrayList<>();
                     	baseModules.add( coreListenersModule );
                     	baseModules.addAll( modules );
                         // Use all the modules set with setModules, but overriding them with things set with
@@ -338,15 +334,7 @@ public class Controler extends AbstractController {
             this.addControlerListener(controlerListener);
         }
 
-		loadControlerListeners();
 	}
-
-    /**
-     * Empty hook for subclasses to load more ControlerListeners.
-     * Please do not use. Subclassing Controler is discouraged.
-     */
-    @Deprecated
-	private void loadControlerListeners() {}
 
 	@Override
 	protected final void prepareForSim() {
@@ -355,8 +343,6 @@ public class Controler extends AbstractController {
 			((ScenarioImpl)scenario ).setLocked();
 			// see comment in ScenarioImpl. kai, sep'14
 		}
-
-		setUp();
 
 		// make sure all routes are calculated.
         ParallelPersonAlgorithmRunner.run(getScenario().getPopulation(), this.config.global().getNumberOfThreads(),
@@ -371,11 +357,7 @@ public class Controler extends AbstractController {
 		});
 	}
 
-	@Deprecated // overwriting this method is deprecated.  Please talk to MZ or KN if you think that you really need this. nov'14
-	// used at about 33 locations. kai, may'15
-	protected final void setUp() {}
-
-    @Override
+	@Override
 	protected final boolean continueIterations(int it) {
 		return terminationCriterion.continueIterations(it);
 	}
@@ -643,14 +625,6 @@ public class Controler extends AbstractController {
 	@Deprecated // see javadoc above
 	public final StrategyManager getStrategyManager() {
 		return this.injector.getInstance(StrategyManager.class);
-	}
-
-	protected final boolean isScenarioLoaded() {
-		return scenarioLoaded;
-	}
-
-	protected final void setScenarioLoaded(boolean scenarioLoaded) {
-		this.scenarioLoaded = scenarioLoaded;
 	}
 
 }

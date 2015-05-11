@@ -71,7 +71,6 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.households.Household;
 import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -99,7 +98,6 @@ import playground.christoph.evacuation.mobsim.*;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
-import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
 import playground.christoph.evacuation.router.LeastCostPathCalculatorSelectorFactory;
 import playground.christoph.evacuation.router.RandomCompassRouterFactory;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
@@ -296,7 +294,6 @@ public class EvacuationControler extends WithinDayController implements
 	public void mysetUp() {
 		
 		// initialze plan router
-		super.setUp();
 
 		MobsimDataProvider mobsimDataProvider = new MobsimDataProvider();
 		
