@@ -114,15 +114,6 @@ public class RunUtils {
 
 	private RunUtils() {}
 
-	public static PlanRoutingAlgorithmFactory createPlanRouterFactory(
-			final Scenario scenario ) {
-		final PlanRoutingAlgorithmFactory jointRouterFactory =
-					new JointPlanRouterFactory(
-							((ScenarioImpl) scenario).getActivityFacilities() );
-		return new PlanRouterWithVehicleRessourcesFactory(
-					jointRouterFactory );
-	}
-
 	public static void addDistanceFillerListener(final ImmutableJointController controller) {
 		final DistanceFillerAlgorithm algo = new DistanceFillerAlgorithm();
 
@@ -164,50 +155,6 @@ public class RunUtils {
 		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
 					scenario.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
 
-		if ( scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ) {
-			if ( !scenario.getConfig().qsim().getVehicleBehavior().equals( "wait" ) ) {
-				throw new RuntimeException( "agents should wait for vehicles when vehicle ressources are used! Setting is "+
-						scenario.getConfig().qsim().getVehicleBehavior() );
-			}
-
-			log.warn( "Adding the vehicle preparation algorithm with the *default* plan link identifier" );
-			log.warn( "this should be modified, or it will cause inconsistencies" );
-
-			final GenericStrategyModule<ReplanningGroup> additionalPrepareModule =
-				new AbstractMultithreadedGenericStrategyModule<ReplanningGroup>(
-						scenario.getConfig().global() ) {
-					@Override
-					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(ReplanningContext replanningContext) {
-						return 
-							new PrepareVehicleAllocationForSimAlgorithm(
-									MatsimRandom.getLocalInstance(),
-									(JointPlans) scenario.getScenarioElement( JointPlans.ELEMENT_NAME ),
-									(VehicleRessources) scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ),
-									// do not bother with plan links: it can cause problems,
-									// as it can let no individual plans...
-									null );
-					}
-
-					@Override
-					protected String getName() {
-						return "PrepareVehiclesForSim";
-					}
-
-				};
-
-			builder.withAdditionalPrepareForSimModule(
-					additionalPrepareModule );
-		}
-
-		builder.withPlanRoutingAlgorithmFactory(
-				RunUtils.createPlanRouterFactory( scenario ) );
-
-		builder.withIncompatiblePlansIdentifierFactory(
-				weights.getConsiderVehicleIncompatibilities() &&
-				scenario.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
-					new VehicleBasedIncompatiblePlansIdentifierFactory(
-							SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
-					new EmptyIncompatiblePlansIdentifierFactory() );
 
 
 		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
@@ -239,19 +186,6 @@ public class RunUtils {
 		builder.withMobsimFactory(
 				new SwitchingJointQSimFactory(
 						builder.getTravelTime() ) );
-
-		if ( scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ) != null ) {
-			final SocialNetwork sn = (SocialNetwork)
-				scenario.getScenarioElement(
-						SocialNetwork.ELEMENT_NAME );
-			builder.getEvents().addHandler(
-					new CourtesyEventsGenerator(
-						builder.getEvents(),
-						sn ) );
-		}
-		else {
-			log.warn( "NO COURTESY EVENTS WILL BE GENERATED!" );
-		}
 
 		return builder;
 	}
