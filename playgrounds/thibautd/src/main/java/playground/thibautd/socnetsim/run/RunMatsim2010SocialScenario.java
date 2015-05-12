@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.pt.PtConstants;
@@ -35,16 +36,15 @@ import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils.DilutionType;
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
-import playground.thibautd.socnetsim.controller.ImmutableJointController;
+import playground.thibautd.socnetsim.controller.JointDecisionProcessModule;
+import playground.thibautd.socnetsim.controller.JointTripsModule;
+import playground.thibautd.socnetsim.controller.SocialNetworkModule;
+import playground.thibautd.socnetsim.controller.SocnetsimDefaultAnalysisModule;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
-import playground.thibautd.socnetsim.population.SocialNetworkWriter;
-import playground.thibautd.socnetsim.replanning.grouping.DynamicGroupIdentifier;
+import playground.thibautd.socnetsim.replanning.GroupStrategyManagerModule;
 import playground.thibautd.socnetsim.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
@@ -60,62 +60,32 @@ public class RunMatsim2010SocialScenario {
 		final String configFile = args[ 0 ];
 
 		final Config config = loadConfig(configFile);
-		final Scenario scenario = loadScenario(config);
-
-		final ImmutableJointController controller = createController( scenario );
-
-		RunUtils.loadBeingTogetherListenner( controller );
-
-		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup)
-				config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-		
-		RunUtils.loadDefaultAnalysis(
-				weights.getGraphWriteInterval(),
-				null , // cliques...
-				controller );
-
-		if ( weights.getCheckConsistency() ) {
-			// those listenners check the coordination behavior:
-			// do not ad if not used
-			RunUtils.addConsistencyCheckingListeners( controller );
-		}
-		RunUtils.addDistanceFillerListener( controller );
-
-		try { 
-			// run it
-			controller.run();
-		}
-		finally {
-			new SocialNetworkWriter( (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ) ).write( controller.getControlerIO().getOutputFilename( "output_socialnetwork.xml.gz" ) );
-		}
-	}
-
-	private static ImmutableJointController createController(
-			final Scenario scenario) {
-		final Config config = scenario.getConfig();
 		if ( ((ScoringFunctionConfigGroup) config.getModule( ScoringFunctionConfigGroup.GROUP_NAME )).isUseKtiScoring() ) {
 			log.warn( "the parameter \"useKtiScoring\" from module "+ScoringFunctionConfigGroup.GROUP_NAME+" will be set to false" );
 			log.warn( "a KTI-like scoring is already set from the script." );
 			((ScoringFunctionConfigGroup) config.getModule( ScoringFunctionConfigGroup.GROUP_NAME )).setUseKtiScoring( false );
 		}
-		final ControllerRegistry controllerRegistry =
-			RunUtils.loadDefaultRegistryBuilder(
-				new ControllerRegistryBuilder( scenario )
-					.withGroupIdentifier( 
-							new DynamicGroupIdentifier(
-								scenario ) )
-					.withScoringFunctionFactory(
-							new KtiScoringFunctionFactoryWithJointModes(
-								new MATSim2010ScoringFunctionFactory(
-									scenario,
-									new StageActivityTypesImpl(
-										PtConstants.TRANSIT_ACTIVITY_TYPE,
-										JointActingTypes.INTERACTION) ),
-								scenario )),
-				scenario ).build();
 
-		final ImmutableJointController controller = RunUtils.initializeController( controllerRegistry );
-		return controller;
+		final Scenario scenario = loadScenario(config);
+
+		final Controler controller = new Controler( scenario );
+		controller.addOverridingModule( new JointDecisionProcessModule() );
+		controller.addOverridingModule( new SocnetsimDefaultAnalysisModule() );
+		controller.addOverridingModule( new JointActivitiesScoringModule() );
+		controller.addOverridingModule( new GroupStrategyManagerModule() );
+		controller.addOverridingModule( new JointTripsModule() );
+		controller.addOverridingModule( new SocialNetworkModule() );
+
+		controller.setScoringFunctionFactory(
+				new KtiScoringFunctionFactoryWithJointModes(
+					new MATSim2010ScoringFunctionFactory(
+						scenario,
+						new StageActivityTypesImpl(
+							PtConstants.TRANSIT_ACTIVITY_TYPE,
+							JointActingTypes.INTERACTION) ),
+					scenario ) );
+
+		controller.run();
 	}
 
 	private static Scenario loadScenario(final Config config) {
