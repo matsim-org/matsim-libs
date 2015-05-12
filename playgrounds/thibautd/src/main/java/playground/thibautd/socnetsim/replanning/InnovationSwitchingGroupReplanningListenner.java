@@ -19,42 +19,69 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
 import org.apache.log4j.Logger;
+import org.matsim.analysis.IterationStopWatch;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
+import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
+
+import com.google.inject.BindingAnnotation;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * @author thibautd
  */
-public class InnovationSwitchingGroupReplanningListenner implements ReplanningListener {
+@Singleton
+public class InnovationSwitchingGroupReplanningListenner implements ReplanningListener, PlansReplanning {
 	private static final Logger log =
 		Logger.getLogger(InnovationSwitchingGroupReplanningListenner.class);
 
 	private final GroupStrategyManager mainStrategyManager;
 	private final GroupStrategyManager innovativeStrategyManager;
-	private final ControllerRegistry registry;
+	private final Scenario scenario;
 
+	@Retention( RetentionPolicy.RUNTIME )
+	@BindingAnnotation
+	@Target( { ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER } )
+	public @interface Innovative {}
+
+	@Retention( RetentionPolicy.RUNTIME )
+	@BindingAnnotation
+	@Target( { ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER } )
+	public @interface NonInnovative {}
+
+
+	@Inject
 	public InnovationSwitchingGroupReplanningListenner(
-			final ControllerRegistry registry,
-			final GroupStrategyManager mainStrategyManager,
-			final GroupStrategyManager innovativeStrategyManager) {
-		this.registry = registry;
-		this.mainStrategyManager = mainStrategyManager;
-		this.innovativeStrategyManager = innovativeStrategyManager;
+			final Scenario scenario,
+			final IterationStopWatch stopWatch,
+			final GroupIdentifier groups,
+			final @Innovative GroupStrategyRegistry innovManager,
+			final @NonInnovative GroupStrategyRegistry nonInnovManager) {
+		this.mainStrategyManager = new GroupStrategyManager( stopWatch , groups , innovManager );
+		this.innovativeStrategyManager = new GroupStrategyManager( stopWatch , groups , nonInnovManager );
+		this.scenario = scenario;
 	}
 
 
 	@Override
 	public void notifyReplanning(final ReplanningEvent event) {
 		final PseudoSimConfigGroup config = (PseudoSimConfigGroup)
-			registry.getScenario().getConfig().getModule(
+			scenario.getConfig().getModule(
 					PseudoSimConfigGroup.GROUP_NAME );
 		final GroupReplanningConfigGroup repl = (GroupReplanningConfigGroup) 
-			registry.getScenario().getConfig().getModule(
+			scenario.getConfig().getModule(
 					GroupReplanningConfigGroup.GROUP_NAME );
 
 		if ( event.getIteration() < repl.getDisableInnovationAfterIter() &&
@@ -62,13 +89,13 @@ public class InnovationSwitchingGroupReplanningListenner implements ReplanningLi
 			log.info( "performing INNOVATION ONLY iteration (for feeding PSim)" );
 			innovativeStrategyManager.run(
 				event.getReplanningContext(),
-				registry.getScenario() );
+				scenario );
 		}
 		else {
 			log.info( "performing normal iteration (with non-innovative strategies)" );
 			mainStrategyManager.run(
 					event.getReplanningContext(),
-					registry.getScenario() );
+					scenario );
 		}
 	}
 }

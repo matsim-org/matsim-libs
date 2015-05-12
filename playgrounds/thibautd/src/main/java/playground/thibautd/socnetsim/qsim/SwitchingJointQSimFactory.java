@@ -24,30 +24,43 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.QSim;
 
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
+
 /**
  * @author thibautd
  */
-public class SwitchingJointQSimFactory implements MobsimFactory, IterationStartsListener {
+@Singleton
+public class SwitchingJointQSimFactory implements Provider<QSim>, MobsimFactory, IterationStartsListener {
 	private static final Logger log =
 		Logger.getLogger(SwitchingJointQSimFactory.class);
 
 	private int iteration = Integer.MIN_VALUE;
 	private final DeactivableTravelTimeProvider travelTime;
 
+	private final Scenario scenario;
+	private final EventsManager events;
+
+	@Inject
 	public SwitchingJointQSimFactory(
+			final Scenario scenario,
+			final EventsManager events,
 			final DeactivableTravelTimeProvider travelTime) {
 		this.travelTime = travelTime;
+		this.scenario = scenario;
+		this.events = events;
 	}
 
 	@Override
-	public Mobsim createMobsim(
+	public QSim createMobsim(
 			final Scenario sc,
 			final EventsManager eventsManager) {
 		final PseudoSimConfigGroup config = (PseudoSimConfigGroup)
@@ -75,6 +88,11 @@ public class SwitchingJointQSimFactory implements MobsimFactory, IterationStarts
 
 		log.info( "Using physical simulation for iteration "+iteration );
 		return new JointQSimFactory().createMobsim( sc , eventsManager );
+	}
+
+	@Override
+	public QSim get() {
+		return createMobsim( scenario , events );
 	}
 
 	@Override

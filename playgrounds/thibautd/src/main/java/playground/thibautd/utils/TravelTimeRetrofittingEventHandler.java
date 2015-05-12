@@ -23,17 +23,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.router.TripStructureUtils;
 
 import playground.ivt.utils.MapUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * "Retrofits" travel time from events in the plans.
@@ -42,11 +46,18 @@ import playground.ivt.utils.MapUtils;
  * are used in pSim, leading to undefined results...
  * @author thibautd
  */
+@Singleton
 public class TravelTimeRetrofittingEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 	private final Population population;
 
 	// all the stateful part goes there: makes resetting easy
 	private LegHandler legHandler;
+
+	@Inject
+	public TravelTimeRetrofittingEventHandler(
+			final Scenario sc) {
+		this( sc.getPopulation() );
+	}
 
 	public TravelTimeRetrofittingEventHandler(
 			final Population population) {
