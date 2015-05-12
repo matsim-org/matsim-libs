@@ -27,19 +27,49 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+
+import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
+
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 
 /**
  * @author thibautd
  */
+@Singleton
 public class FixedGroupsIdentifier implements GroupIdentifier {
 	private static final Logger log =
 		Logger.getLogger(FixedGroupsIdentifier.class);
 
 	private final Collection<? extends Collection<Id<Person>>> groupsInfo;
+
+	public static class FixedGroupsProvider implements Provider<FixedGroupsIdentifier> {
+		private final Scenario scenario;
+
+		public FixedGroupsProvider( final Scenario sc ) {
+			this.scenario = sc;
+		}
+
+		@Override
+		public FixedGroupsIdentifier get() {
+			final Config config = scenario.getConfig();
+			final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
+						config.getModule( CliquesConfigGroup.GROUP_NAME );
+
+			return config.scenario().isUseHouseholds() ?
+					new FixedGroupsIdentifier(
+							((ScenarioImpl) scenario).getHouseholds() ) :
+					FixedGroupsIdentifierFileParser.readCliquesFile(
+							cliquesConf.getInputFile() );
+		}
+	}
 
 	public FixedGroupsIdentifier(final Collection<? extends Collection<Id<Person>>> groups) {
 		this.groupsInfo = groups;
