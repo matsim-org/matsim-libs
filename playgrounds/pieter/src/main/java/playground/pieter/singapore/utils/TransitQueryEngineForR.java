@@ -21,6 +21,7 @@
 
 package playground.pieter.singapore.utils;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -30,6 +31,7 @@ import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -48,22 +50,28 @@ public class TransitQueryEngineForR {
     private AtomicInteger numThreads;
     private int threads = 4;
     private ArrayList<StopToStopInfo> outList;
+    private double densityDistance;
+    private double densityArea;
 
-    public TransitQueryEngineForR(int threads) {
+    public TransitQueryEngineForR(int threads, double densityDistance) {
         this.threads = threads;
         Config config = ConfigUtils.createConfig();
         config.scenario().setUseTransit(true);
         scenario = ScenarioUtils.createScenario(config);
+        this.densityDistance = densityDistance;
+        densityArea = Math.PI * Math.pow(densityDistance / 1000, 2);
     }
 
-    public TransitQueryEngineForR() {
+    public TransitQueryEngineForR(double densityDistance) {
         Config config = ConfigUtils.createConfig();
         config.scenario().setUseTransit(true);
         scenario = ScenarioUtils.createScenario(config);
+        this.densityDistance = densityDistance;
+        densityArea = Math.PI * Math.pow(densityDistance / 1000, 2);
     }
 
     public static void main(String[] args) {
-        TransitQueryEngineForR transitQueryEngineForR = new TransitQueryEngineForR(4);
+        TransitQueryEngineForR transitQueryEngineForR = new TransitQueryEngineForR(4, 1000);
         transitQueryEngineForR.loadNetwork(args[0]);
         transitQueryEngineForR.loadTransitSchedule(args[1]);
         System.out.println(String.valueOf(transitQueryEngineForR.getInterStopDistance("46219", "46109", "170_weekday_2-p", "170")));
@@ -84,6 +92,7 @@ public class TransitQueryEngineForR {
                 "170", "170", "170", "170", "170", "170", "170", "170", "170", "170", "170"};
         double[] interStopDistances = convertDouble(transitQueryEngineForR.getInterStopDistances(from, to, routes, lines));
         double[] interStopDistances2 = convertDouble(transitQueryEngineForR.getInterStopDistancesMultiThreaded(from, to, routes, lines));
+        transitQueryEngineForR.calculateStopStopInfo(from, to, routes, lines);
 
         System.out.println("Done");
 
@@ -174,7 +183,8 @@ public class TransitQueryEngineForR {
                 out[i] = s.isSuccess();
                 i++;
             }
-        return out;
+
+            return out;
         }
         return new boolean[0];
     }
@@ -187,7 +197,7 @@ public class TransitQueryEngineForR {
                 out[i] = s.getMinCap();
                 i++;
             }
-        return out;
+            return out;
         }
         return new double[0];
     }
@@ -200,7 +210,7 @@ public class TransitQueryEngineForR {
                 out[i] = s.getDistance();
                 i++;
             }
-        return out;
+            return out;
         }
         return new double[0];
     }
@@ -213,7 +223,7 @@ public class TransitQueryEngineForR {
                 out[i] = s.getNoCarsDistance();
                 i++;
             }
-        return out;
+            return out;
         }
         return new double[0];
     }
@@ -226,7 +236,7 @@ public class TransitQueryEngineForR {
                 out[i] = s.getLengthWeightedAverageLaneCount();
                 i++;
             }
-        return out;
+            return out;
         }
         return new double[0];
     }
@@ -239,7 +249,7 @@ public class TransitQueryEngineForR {
                 out[i] = s.getLengthWeightedAverageCapacity();
                 i++;
             }
-        return out;
+            return out;
         }
         return new double[0];
     }
@@ -252,7 +262,105 @@ public class TransitQueryEngineForR {
                 out[i] = s.getSqueezeCap();
                 i++;
             }
-        return out;
+            return out;
+        }
+        return new double[0];
+    }
+
+    public double[] getFromX() {
+        if (outList != null) {
+            int i = 0;
+            double[] out = new double[outList.size()];
+            for (StopToStopInfo s : outList) {
+                try {
+                    out[i] = s.getFromCoord().getX();
+                } catch (NullPointerException e) {
+                    out[i] = Double.POSITIVE_INFINITY;
+                }
+                i++;
+            }
+            return out;
+        }
+        return new double[0];
+    }
+
+    public double[] getToX() {
+        if (outList != null) {
+            int i = 0;
+            double[] out = new double[outList.size()];
+            for (StopToStopInfo s : outList) {
+                try {
+                    out[i] = s.getToCoord().getX();
+                } catch (NullPointerException e) {
+                    out[i] = Double.POSITIVE_INFINITY;
+                }
+                i++;
+            }
+            return out;
+        }
+        return new double[0];
+    }
+
+    public double[] getToY() {
+        if (outList != null) {
+            int i = 0;
+            double[] out = new double[outList.size()];
+            for (StopToStopInfo s : outList) {
+                try {
+                    out[i] = s.getToCoord().getY();
+                } catch (NullPointerException e) {
+                    out[i] = Double.POSITIVE_INFINITY;
+                }
+                i++;
+            }
+            return out;
+        }
+        return new double[0];
+    }
+
+    public double[] getFromY() {
+        if (outList != null) {
+            int i = 0;
+            double[] out = new double[outList.size()];
+            for (StopToStopInfo s : outList) {
+                try {
+                    out[i] = s.getFromCoord().getY();
+                } catch (NullPointerException e) {
+                    out[i] = Double.POSITIVE_INFINITY;
+                }
+                i++;
+            }
+            return out;
+        }
+        return new double[0];
+    }
+
+    public double[] getInterSectionDensity() {
+        if (outList != null) {
+            int i = 0;
+            double[] out = new double[outList.size()];
+            for (StopToStopInfo s : outList) {
+                try {
+                    out[i] = s.getInterSectionDensity();
+                } catch (NullPointerException e) {
+                    out[i] = Double.POSITIVE_INFINITY;
+                }
+                i++;
+            }
+            return out;
+        }
+        return new double[0];
+    }
+
+    public double[] getFreeSpeedTravelTime() {
+        if (outList != null) {
+            int i = 0;
+            double[] out = new double[outList.size()];
+            for (StopToStopInfo s : outList) {
+                out[i] = s.getFreeSpeedTravelTime();
+                i++;
+            }
+            return out;
         }
         return new double[0];
     }
@@ -265,7 +373,20 @@ public class TransitQueryEngineForR {
                 out[i] = s.getIntersectionCount();
                 i++;
             }
-        return out;
+            return out;
+        }
+        return new int[0];
+    }
+
+    public int[] getNodeCount() {
+        if (outList != null) {
+            int i = 0;
+            int[] out = new int[outList.size()];
+            for (StopToStopInfo s : outList) {
+                out[i] = s.getNodeCount();
+                i++;
+            }
+            return out;
         }
         return new int[0];
     }
@@ -327,6 +448,19 @@ public class TransitQueryEngineForR {
         }
     }
 
+    public double calculateIntersectionDensity(Node toNode) {
+        double density = 0;
+
+        NetworkImpl net = (NetworkImpl) scenario.getNetwork();
+        double intersectionCount = (net.getNearestNodes(toNode.getCoord(), densityDistance)).size();
+        density = intersectionCount / getDensityArea();
+
+        return density;
+    }
+
+    private double getDensityArea() {
+        return densityArea;
+    }
 
     private class ParallelQuery implements Runnable {
         String[] fromStops;
@@ -369,6 +503,8 @@ public class TransitQueryEngineForR {
             for (int i = 0; i < fromStops.length; i++) {
                 out[i] = new StopToStopInfo();
                 out[i].setAll(fromStops[i], toStops[i], routes[i], lines[i]);
+                if(i%1000 == 0)
+                    System.out.printf(i+"..");
             }
             System.err.println(numThreads.decrementAndGet());
         }
@@ -377,13 +513,38 @@ public class TransitQueryEngineForR {
     class StopToStopInfo {
         boolean success = false;
         private NetworkRoute subRoute;
-        private double minCap = 0;
+        private double minCap = Double.POSITIVE_INFINITY;
         private double distance = 0;
         private double noCarsDistance = 0;
         private double lengthWeightedAverageLaneCount = 0; //only calculated for sections where there is car traffic
         private double lengthWeightedAverageCapacity = 0; //only calculated for sections where there is car traffic
         private int intersectionCount = 0; //only calculated for sections where there is car traffic
         private double squeezeCap = 0;//
+        private double interSectionDensity = 0;
+        private int nodeCount = 0;
+        private Coord fromCoord;
+        private Coord toCoord;
+        private double freeSpeedTravelTime = 0;
+
+        public double getInterSectionDensity() {
+            return interSectionDensity;
+        }
+
+        public int getNodeCount() {
+            return nodeCount;
+        }
+
+        public Coord getFromCoord() {
+            return fromCoord;
+        }
+
+        public Coord getToCoord() {
+            return toCoord;
+        }
+
+        public double getFreeSpeedTravelTime() {
+            return freeSpeedTravelTime;
+        }
 
         public NetworkRoute getSubRoute() {
             return subRoute;
@@ -440,10 +601,14 @@ public class TransitQueryEngineForR {
             Link fromLink = null;
             Link toLink = null;
             for (TransitRouteStop tss : stops) {
-                if (tss.getStopFacility().getId().equals(fromStopId))
+                if (tss.getStopFacility().getId().equals(fromStopId)) {
                     fromLink = scenario.getNetwork().getLinks().get(tss.getStopFacility().getLinkId());
-                if (tss.getStopFacility().getId().equals(toStopId))
+                    fromCoord = tss.getStopFacility().getCoord();
+                }
+                if (tss.getStopFacility().getId().equals(toStopId)) {
                     toLink = scenario.getNetwork().getLinks().get(tss.getStopFacility().getLinkId());
+                    toCoord = tss.getStopFacility().getCoord();
+                }
             }
             if (fromLink == null || toLink == null)
                 return false;
@@ -462,6 +627,8 @@ public class TransitQueryEngineForR {
                             lengthWeightedAverageLaneCount += link.getLength() * link.getNumberOfLanes();
                             lengthWeightedAverageCapacity += link.getLength() * link.getCapacity();
                             Node toNode = link.getToNode();
+                            nodeCount++;
+                            interSectionDensity += calculateIntersectionDensity(toNode);
                             if (!(
                                     (toNode.getInLinks().size() == 2 && toNode.getOutLinks().size() == 2) ||
                                             (toNode.getInLinks().size() == 1 && toNode.getOutLinks().size() == 1)
@@ -480,6 +647,7 @@ public class TransitQueryEngineForR {
                             }
                         }
                         distance += link.getLength();
+                        freeSpeedTravelTime += link.getLength() > 0 ? link.getLength() / link.getFreespeed() : 0;
                     }
                     //add the last link
                     if (!toLink.getAllowedModes().contains(TransportMode.car)) {
@@ -489,6 +657,8 @@ public class TransitQueryEngineForR {
                         lengthWeightedAverageLaneCount += toLink.getLength() * toLink.getNumberOfLanes();
                         lengthWeightedAverageCapacity += toLink.getLength() * toLink.getCapacity();
                         Node toNode = toLink.getToNode();
+                        nodeCount++;
+                        interSectionDensity += calculateIntersectionDensity(toNode);
                         if (!(
                                 (toNode.getInLinks().size() == 2 && toNode.getOutLinks().size() == 2) ||
                                         (toNode.getInLinks().size() == 1 && toNode.getOutLinks().size() == 1)
@@ -507,8 +677,10 @@ public class TransitQueryEngineForR {
                         }
                     }
                     distance += toLink.getLength();
+                    freeSpeedTravelTime += toLink.getLength() > 0 ? toLink.getLength() / toLink.getFreespeed() : 0;
                     lengthWeightedAverageLaneCount /= distance;
                     lengthWeightedAverageCapacity /= distance;
+                    interSectionDensity /= nodeCount;
                     success = true;
                     return success;
                 } catch (IllegalArgumentException e) {
@@ -516,5 +688,6 @@ public class TransitQueryEngineForR {
                 }
             }
         }
+
     }
 }

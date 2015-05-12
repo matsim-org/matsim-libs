@@ -21,6 +21,7 @@ package org.matsim.contrib.pseudosimulation.util;
 
 import org.matsim.contrib.pseudosimulation.mobsim.PSim;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -34,6 +35,52 @@ import java.util.List;
  *         avoid dependence.
  */
 public class CollectionUtils {
+    /**
+     * Works on arrys instead of collections
+     * @param array
+     * @param n
+     * @param <T>
+     * @return a list of arrays
+     */
+    public static <T> List<T[]> split(T[] array, int n) {
+        Class theClass = array[0].getClass();
+        if (array.length >= n) {
+            @SuppressWarnings("unchecked")
+            List<T[]> out = new ArrayList<>();
+            int minSegmentSize = (int) Math.floor(array.length / (double) n);
+
+            int start = 0;
+            int stop = minSegmentSize;
+
+            for (int i = 0; i < n - 1; i++) {
+                int segmentSize = stop - start;
+                T[] segment = (T[]) Array.newInstance(theClass,segmentSize);
+                int j=0;
+                for (int k = start; k < stop; k++) {
+                    segment[j] = array[k];
+                    j++;
+                }
+                out.add( segment);
+                start = stop;
+                stop += segmentSize;
+            }
+
+            int segmentSize = array.length - start;
+            stop = start + segmentSize;
+            T[] segment = (T[]) Array.newInstance(theClass,segmentSize);
+            int j=0;
+            for (int k = start; k < stop; k++) {
+                segment[j] = array[k];
+                j++;
+            }
+            out.add( segment);
+
+            return out;
+        } else {
+            throw new IllegalArgumentException("n must not be smaller set size!");
+        }
+    }
+
 
     public static <T> List<T>[] split(Collection<T> set, int n) {
         if (set.size() >= n) {
@@ -130,6 +177,9 @@ public class CollectionUtils {
         out = split(a, new double[]{15.0, 5.0, 1.0});
         out = split(a, new double[]{15.0, 5.0, 5.1});
 
+        Integer[] testArraySplit = new Integer[]{0,1,2,3,4,5,6,7,8,9};
+        List<Integer[]> out2 = split(testArraySplit,3);
+        out2 = split(testArraySplit,2);
 
     }
 }
