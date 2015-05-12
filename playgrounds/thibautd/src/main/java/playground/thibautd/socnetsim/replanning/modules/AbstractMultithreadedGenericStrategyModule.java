@@ -38,7 +38,7 @@ import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
  */
 public abstract class AbstractMultithreadedGenericStrategyModule<T> implements GenericStrategyModule<T> {
 	static final private Logger log = Logger.getLogger(AbstractMultithreadedGenericStrategyModule.class);
-	private final int numOfThreads;
+	private int numOfThreads;
 	private final String name;
 
 	public AbstractMultithreadedGenericStrategyModule(GlobalConfigGroup globalConfigGroup) {
