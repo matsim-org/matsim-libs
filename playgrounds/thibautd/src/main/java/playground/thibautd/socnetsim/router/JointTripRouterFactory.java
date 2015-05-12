@@ -66,17 +66,6 @@ public class JointTripRouterFactory implements Provider<TripRouter> {
 			scenario.getPopulation().getFactory() );
 	}
 
-	public JointTripRouterFactory(final Controler controler) {
-		this(
-				controler.getScenario(),
-				controler.getTravelDisutilityFactory(),
-				controler.getLinkTravelTimes(),
-				controler.getLeastCostPathCalculatorFactory(),
-				controler.getScenario().getConfig().scenario().isUseTransit() ?
-					controler.getTransitRouterFactory() :
-					null);
-	}
-
 	@Override
 	public TripRouter get() {
 		TripRouter instance = defaultFactory.get();

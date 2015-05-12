@@ -60,17 +60,6 @@ public class GroupPlanStrategyFactoryUtils {
 	// /////////////////////////////////////////////////////////////////////////
 	// standard modules
 	// /////////////////////////////////////////////////////////////////////////
-	public static GenericStrategyModule<GroupPlans> createTripsToLegsModule(
-			final Config config,
-			final Provider<TripRouter> tripRouterFactory) {
-		return new IndividualBasedGroupStrategyModule(
-				new AbstractMultithreadedModule( config.global() ) {
-					@Override
-					public PlanAlgorithm getPlanAlgoInstance() {
-						return new TripsToLegsAlgorithm( tripRouterFactory.get() );
-					}
-				});
-	}
 
 	public static GenericStrategyModule<GroupPlans> createSynchronizerModule(
 			final Config config,

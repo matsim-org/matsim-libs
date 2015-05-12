@@ -86,6 +86,8 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 				return new MaxDistanceProportionalLocationChooser();
 			case maximumDistanceMinimization:
 				return new MaxDistanceMinimizingLocationChooser();
+			case maximumDistanceLogit:
+				return new MaxDistanceLogitLocationChooser( config.getMaximumDistanceLogitBeta() );
 			default:
 				throw new IllegalArgumentException( ""+config.getSamplingMethod() );
 		}
@@ -192,7 +194,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 		return list;
 	}
 
-	private Collection<ActivityFacility> approximatePrism(
+	private static Collection<ActivityFacility> approximatePrism(
 			final double maxTraveledDistance,
 			final QuadTree<ActivityFacility> quadTree,
 			final ActivityFacility start,

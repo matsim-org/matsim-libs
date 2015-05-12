@@ -229,15 +229,6 @@ final class SelectorUtils {
 		return false;
 	}
 
-	public static boolean intersectsRecords(
-			final Collection<PersonRecord> records,
-			final PlanAllocation alloc) {
-		for ( PlanRecord p : alloc.getPlans() ) {
-			if ( records.contains( p.person ) ) return true;
-		}
-		return false;
-	}
-
 	public static boolean containsAllIds(
 			final List<PersonRecord> persons,
 			final Set<Id<Person>> ids) {
@@ -260,19 +251,6 @@ final class SelectorUtils {
 		return merged;
 	}
 
-	public static boolean containsFeasiblePlans(final List<PlanRecord> records) {
-		for ( PlanRecord r : records ) {
-			if ( r.isStillFeasible ) return true;
-		}
-		return false;
-	}
-
-	public static boolean containsUnfeasiblePlans(final List<PlanRecord> records) {
-		for ( PlanRecord r : records ) {
-			if ( !r.isStillFeasible ) return true;
-		}
-		return false;
-	}
 
 	public static GroupPlans toGroupPlans(final PlanAllocation allocation) {
 		Set<JointPlan> jointPlans = new HashSet<JointPlan>();
@@ -290,21 +268,6 @@ final class SelectorUtils {
 		return new GroupPlans( jointPlans , individualPlans );
 	}
 
-	public static void addToGroupPlans(
-			final GroupPlans groupPlans,
-			final PlanAllocation allocation) {
-		final Set<JointPlan> knownJointPlans = new HashSet<JointPlan>();
-		for ( PlanRecord p : allocation.getPlans() ) {
-			if ( p.jointPlan != null ) {
-				if ( knownJointPlans.add( p.jointPlan ) ) {
-					groupPlans.addJointPlan( p.jointPlan );
-				}
-			}
-			else {
-				groupPlans.addIndividualPlan( p.plan );
-			}
-		}
-	}
 
 	public static PlanAllocation copy(final PlanAllocation allocation) {
 		final PlanAllocation copy = new PlanAllocation();
