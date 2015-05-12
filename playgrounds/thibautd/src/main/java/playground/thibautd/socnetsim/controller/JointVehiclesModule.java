@@ -40,6 +40,7 @@ import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForS
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
+import playground.thibautd.socnetsim.utils.ScenarioElementProvider;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -56,17 +57,8 @@ public class JointVehiclesModule extends AbstractModule {
 					scenario.getConfig().qsim().getVehicleBehavior() );
 		}
 		// For convenience
-		bind( VehicleRessources.class ).toProvider(
-				new Provider<VehicleRessources>() {
-					@Inject
-					private Scenario sc;
+		bind( VehicleRessources.class ).toProvider( new ScenarioElementProvider<VehicleRessources>( VehicleRessources.ELEMENT_NAME ) );
 
-					@Override
-					public VehicleRessources get() {
-						return (VehicleRessources) sc.getScenarioElement( VehicleRessources.ELEMENT_NAME );
-					}
-
-			} );
 		addControlerListenerBinding().toInstance(
 			new AbstractPrepareForSimListener() {
 				@Inject JointPlans jointPlans;
