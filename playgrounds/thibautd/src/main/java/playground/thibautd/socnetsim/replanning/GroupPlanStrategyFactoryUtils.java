@@ -28,7 +28,6 @@ import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.population.algorithms.TripsToLegsAlgorithm;
 import playground.thibautd.replanning.TourModeUnifierModule;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
