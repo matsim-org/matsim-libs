@@ -137,6 +137,11 @@ public class JointTripsModule extends AbstractModule {
 								}
 							};
 						}
+
+						@Override
+						protected String getName() {
+							return "PrepareJointRoutesForSim";
+						}
 					}.handlePlans( context , groups );
 				}
 			} );
