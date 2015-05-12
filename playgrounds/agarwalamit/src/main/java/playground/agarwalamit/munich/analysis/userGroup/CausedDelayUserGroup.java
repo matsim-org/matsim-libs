@@ -26,6 +26,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -82,9 +83,18 @@ public class CausedDelayUserGroup {
 
 	private void run(String runCase, String eventsFile){
 		init(runCase);
-		CausedDelayAnalyzer analyzer = new CausedDelayAnalyzer(eventsFile);
+		
+		Scenario sc = LoadMyScenarios.loadScenarioFromOutputDir(outputDir+runCase+"/output_config.xml");
+		
+		CausedDelayAnalyzer analyzer = new CausedDelayAnalyzer(eventsFile,sc,1);
 		analyzer.run();
-		personId2CausingDelay = analyzer.getPersonId2DelayCaused();
+		Map<Double, Map<Id<Person>, Double>> timeBin2ersonId2CausingDelay = analyzer.getTimeBin2CausingPersonId2Delay();
+		
+		for(double d:timeBin2ersonId2CausingDelay.keySet()){
+			for (Id<Person> personId : timeBin2ersonId2CausingDelay.get(d).keySet()){
+				this.personId2CausingDelay.put(personId, this.personId2CausingDelay.get(personId) + timeBin2ersonId2CausingDelay.get(d).get(personId) );
+			}
+		}
 
 		for(Id<Person> p : personId2CausingDelay.keySet()){
 			UserGroup ug = getUserGrpFromPersonId(p);

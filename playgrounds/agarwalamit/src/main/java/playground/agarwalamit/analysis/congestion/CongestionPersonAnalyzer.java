@@ -21,6 +21,7 @@ package playground.agarwalamit.analysis.congestion;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +37,9 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
+ * This analyzer calculates delay from link enter and link leave events and therefore provides only experienced delay.
+ * <p> In order to get the caused delay for each person, see {@link CausedDelayAnalyzer}
+ * 
  * @author amit
  */
 public class CongestionPersonAnalyzer extends AbstractAnalyisModule {
@@ -43,7 +47,7 @@ public class CongestionPersonAnalyzer extends AbstractAnalyisModule {
 	private final String eventsFile;
 	private CongestionPerPersonHandler congestionPerPersonHandler;
 	private final int noOfTimeBins;
-	private Map<Double, Map<Id<Person>, Double>> congestionPerPersonTimeInterval;
+	private SortedMap<Double, Map<Id<Person>, Double>> congestionPerPersonTimeInterval;
 	private EventsManager eventsManager;
 	private Scenario scenario;
 
@@ -84,7 +88,7 @@ public class CongestionPersonAnalyzer extends AbstractAnalyisModule {
 		return this.congestionPerPersonHandler.getTotalDelayInHours();
 	}
 	
-	public Map<Double, Map<Id<Person>, Double>> getCongestionPerPersonTimeInterval() {
+	public SortedMap<Double, Map<Id<Person>, Double>> getCongestionPerPersonTimeInterval() {
 		return this.congestionPerPersonTimeInterval;
 	}
 	

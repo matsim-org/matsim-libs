@@ -20,6 +20,8 @@ package playground.agarwalamit.analysis.congestion;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -43,7 +45,7 @@ public class CongestionPerPersonHandler implements LinkEnterEventHandler, LinkLe
 PersonDepartureEventHandler, PersonArrivalEventHandler {
 	public final Logger logger = Logger.getLogger(CongestionPerPersonHandler.class);
 
-	private Map<Double, Map<Id<Person>, Double>> personId2DelaysPerTimeBin = new HashMap<Double, Map<Id<Person>, Double>>();
+	private SortedMap<Double, Map<Id<Person>, Double>> personId2DelaysPerTimeBin = new TreeMap<Double, Map<Id<Person>, Double>>();
 	private Map<Id<Link>, Map<Id<Person>, Double>> linkId2PersonIdLinkEnterTime = new HashMap<Id<Link>, Map<Id<Person>,Double>>();
 	private Map<Id<Link>, Double> linkId2FreeSpeedLinkTravelTime = new HashMap<Id<Link>, Double>();
 	private Map<Double, Map<Id<Link>, Double>> time2linkIdLeaveCount = new HashMap<Double, Map<Id<Link>,Double>>();
@@ -155,7 +157,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		this.linkId2PersonIdLinkEnterTime.get(event.getLinkId()).remove(event.getPersonId());
 	}
 
-	public Map<Double, Map<Id<Person>, Double>> getDelayPerPersonAndTimeInterval(){
+	public SortedMap<Double, Map<Id<Person>, Double>> getDelayPerPersonAndTimeInterval(){
 		return this.personId2DelaysPerTimeBin;
 	}
 

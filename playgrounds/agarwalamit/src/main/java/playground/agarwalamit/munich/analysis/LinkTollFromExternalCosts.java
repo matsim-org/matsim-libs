@@ -75,7 +75,7 @@ public class LinkTollFromExternalCosts {
 
 	/**
 	 * @param sc 
-	 * @return link to experienced congestion costs which is basically equal to the toll.
+	 * @return link to caused congestion costs which is basically equal to the toll.
 	 */
 	public Map<Id<Link>, Double> getLink2CongestionToll(Scenario sc){
 		Map<Id<Link>, Double>  linkTolls = new HashMap<Id<Link>, Double>();
@@ -88,16 +88,16 @@ public class LinkTollFromExternalCosts {
 		int lastIt = config.controler().getLastIteration();
 		String eventsFile = config.controler().getOutputDirectory()+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 
-		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile);
+		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile,sc,noOfTimeBin);
 		delayAnalyzer.run();
-		Map<Id<Link>, Double> linkDelays = delayAnalyzer.getLinkId2DelayCaused();
+		Map<Double, Map<Id<Link>, Double>> linkDelays = delayAnalyzer.getTimeBin2LinkId2Delay();
 		
-		for (Link l : sc.getNetwork().getLinks().values()){
-			Id<Link> linkid = l.getId();
-			if(linkDelays.containsKey(linkid)) linkTolls.put(linkid, linkDelays.get(linkid)*vtts_car);
-			else linkTolls.put(linkid, 0.);
+		for (double d :  linkDelays.keySet()){
+			for (Id<Link> linkid : linkDelays.get(d).keySet()){
+				if(linkDelays.containsKey(linkid)) linkTolls.put(linkid, linkDelays.get(d).get(linkid)*vtts_car);
+				else linkTolls.put(linkid, 0.);
+			}
 		}
-		
 		return linkTolls;
 	}
 
