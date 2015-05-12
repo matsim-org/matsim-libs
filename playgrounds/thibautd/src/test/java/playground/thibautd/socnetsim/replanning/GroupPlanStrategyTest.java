@@ -34,15 +34,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
-import playground.thibautd.socnetsim.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -218,11 +212,7 @@ public class GroupPlanStrategyTest {
 	}
 	
 	private static ReplanningContext createContext() {
-		final Config config = ConfigUtils.createConfig();
-		config.addModule( new PlanLinkConfigGroup() );
-		return new ControllerRegistryBuilder(
-				ScenarioUtils.createScenario( config )
-				).build().createReplanningContext( 0 );
+		return null;
 	}
 
 	private static class JointStructureInvertingModule implements GenericStrategyModule<GroupPlans> {

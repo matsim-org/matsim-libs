@@ -33,7 +33,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 
@@ -48,10 +47,6 @@ public final class JointPlanSelectionConsistencyChecker implements IterationEnds
 	public JointPlanSelectionConsistencyChecker( final Scenario sc ) {
 		this.population = sc.getPopulation();
 		this.jointPlans = (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
-	}
-
-	JointPlanSelectionConsistencyChecker( ImmutableJointController controller ) {
-		this( controller.getRegistry().getScenario() );
 	}
 
 	@Override

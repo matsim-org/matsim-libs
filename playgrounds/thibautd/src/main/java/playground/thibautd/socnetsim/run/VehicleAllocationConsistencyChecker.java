@@ -33,7 +33,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
@@ -50,10 +49,6 @@ public final class VehicleAllocationConsistencyChecker implements IterationEndsL
 	public VehicleAllocationConsistencyChecker( final Scenario sc ) {
 		this.population = sc.getPopulation();
 		this.jointPlans = (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
-	}
-
-	VehicleAllocationConsistencyChecker( ImmutableJointController controller ) {
-		this( controller.getRegistry().getScenario() );
 	}
 
 	@Override

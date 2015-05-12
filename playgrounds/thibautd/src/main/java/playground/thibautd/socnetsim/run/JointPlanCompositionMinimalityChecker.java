@@ -32,7 +32,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
@@ -54,11 +53,6 @@ public final class JointPlanCompositionMinimalityChecker implements IterationEnd
 		this.linkIdentifier = linkIdentifier;
 		this.population = sc.getPopulation();
 		this.jointPlansStruct = (JointPlans) sc.getScenarioElement( JointPlans.ELEMENT_NAME );
-	}
-
-	JointPlanCompositionMinimalityChecker( ImmutableJointController controller ) {
-		this( controller.getRegistry().getPlanLinkIdentifier(),
-				controller.getRegistry().getScenario() );
 	}
 
 	@Override

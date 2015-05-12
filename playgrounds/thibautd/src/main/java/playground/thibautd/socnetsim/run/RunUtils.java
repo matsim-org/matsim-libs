@@ -63,9 +63,6 @@ import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
 import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.cliques.Clique;
-import playground.thibautd.socnetsim.controller.ControllerRegistry;
-import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
-import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.controller.listeners.GroupReplanningListenner;
 import playground.thibautd.socnetsim.events.CourtesyEventsGenerator;
 import playground.thibautd.socnetsim.population.JointActingTypes;
@@ -183,18 +180,6 @@ public class RunUtils {
 					actTypesForAnalysis));
 	}
 
-	public static void addConsistencyCheckingListeners(final ImmutableJointController controller) {
-
-		controller.addControlerListener(
-				new VehicleAllocationConsistencyChecker( controller ));
-
-		controller.addControlerListener(
-				new JointPlanSelectionConsistencyChecker( controller ));
-
-		controller.addControlerListener(
-				new JointPlanCompositionMinimalityChecker( controller ));
-	}
-
 	public static void addDistanceFillerListener(final ImmutableJointController controller) {
 		final DistanceFillerAlgorithm algo = new DistanceFillerAlgorithm();
 
@@ -228,12 +213,6 @@ public class RunUtils {
 						}
 					}
 				});
-	}
-
-	public static ControllerRegistryBuilder loadDefaultRegistryBuilder(final Scenario scenario) {
-		final ControllerRegistryBuilder builder = new ControllerRegistryBuilder( scenario );
-		loadDefaultRegistryBuilder( builder, scenario );
-		return builder;
 	}
 
 	public static ControllerRegistryBuilder loadDefaultRegistryBuilder(
