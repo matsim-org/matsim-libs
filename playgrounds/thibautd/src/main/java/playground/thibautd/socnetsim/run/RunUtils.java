@@ -123,63 +123,6 @@ public class RunUtils {
 					jointRouterFactory );
 	}
 
-	public static void loadDefaultAnalysis(
-			final int graphWriteInterval,
-			final FixedGroupsIdentifier cliques,
-			final ImmutableJointController controller) {
-		controller.addControlerListener(
-				new LegHistogramListenerWithoutControler(
-					graphWriteInterval,
-					controller.getRegistry().getEvents(),
-					controller.getControlerIO() ));
-
-		final AbstractPlanAnalyzerPerGroup.GroupIdentifier groupIdentifier =
-			cliques != null ?
-				new CliquesSizeGroupIdentifier(
-						cliques.getGroupInfo() ) :
-				new AbstractPlanAnalyzerPerGroup.GroupIdentifier() {
-					private final Iterable<Id<Clique>> groups = Collections.<Id<Clique>>singleton( Id.create( "all" , Clique.class ) );
-
-					@Override
-					public Iterable<Id<Clique>> getGroups(final Person person) {
-						return groups;
-					}
-				};
-
-		controller.addControlerListener(
-				new FilteredScoreStats(
-					graphWriteInterval,
-					controller.getControlerIO(),
-					controller.getRegistry().getScenario(),
-					groupIdentifier));
-
-		controller.addControlerListener(
-				new JointPlanSizeStats(
-					graphWriteInterval,
-					controller.getControlerIO(),
-					controller.getRegistry().getScenario(),
-					groupIdentifier));
-
-		controller.addControlerListener(
-				new JointTripsStats(
-					graphWriteInterval,
-					controller.getControlerIO(),
-					controller.getRegistry().getScenario(),
-					groupIdentifier));
-
-		final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
-		actTypesForAnalysis.addActivityTypes(
-				controller.getRegistry().getTripRouterFactory().get().getStageActivityTypes() );
-		actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-		controller.addControlerListener(
-				new TripModeShares(
-					graphWriteInterval,
-					controller.getControlerIO(),
-					controller.getRegistry().getScenario(),
-					new JointMainModeIdentifier( new MainModeIdentifierImpl() ),
-					actTypesForAnalysis));
-	}
-
 	public static void addDistanceFillerListener(final ImmutableJointController controller) {
 		final DistanceFillerAlgorithm algo = new DistanceFillerAlgorithm();
 

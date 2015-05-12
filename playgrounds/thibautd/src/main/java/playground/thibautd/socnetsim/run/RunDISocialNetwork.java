@@ -28,6 +28,7 @@ import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.controller.JointDecisionProcessModule;
 import playground.thibautd.socnetsim.controller.JointTripsModule;
 import playground.thibautd.socnetsim.controller.SocialNetworkModule;
+import playground.thibautd.socnetsim.controller.SocnetsimDefaultAnalysisModule;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManagerModule;
@@ -55,6 +56,7 @@ public class RunDISocialNetwork {
 
 		final Controler controler = new Controler( scenario );
 		controler.addOverridingModule( new JointDecisionProcessModule() );
+		controler.addOverridingModule( new SocnetsimDefaultAnalysisModule() );
 		controler.addOverridingModule( new GroupStrategyManagerModule() );
 		controler.addOverridingModule( new JointTripsModule() );
 		controler.addOverridingModule( new SocialNetworkModule() );
