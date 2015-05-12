@@ -41,7 +41,7 @@ public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 	private String internalizationNetworkFile = null;
 	private boolean useLocationChoiceEpsilons = false;
 
-	static enum TogetherScoringForm {
+	public static enum TogetherScoringForm {
 		linear,
 		logarithmic;
 	}

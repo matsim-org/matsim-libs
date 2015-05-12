@@ -43,11 +43,13 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.population.Desires;
 
 import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.population.SocialNetwork;
@@ -141,6 +143,31 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			default:
 				throw new RuntimeException( ""+scoringFunctionConf.getTogetherScoringForm() );
 		}
+	}
+
+	public static double getTypicalDuration(
+			final Scenario scenario,
+			final PersonImpl person,
+			final String type ) {
+		final Desires desires = person.getDesires();
+		if ( desires != null ) {
+			return desires.getActivityDuration( type );
+		}
+
+		final Double typicalDuration =
+					(Double) scenario.getPopulation().getPersonAttributes().getAttribute(
+						person.getId().toString(),
+						"typicalDuration_"+type );
+
+		if ( typicalDuration != null ) return typicalDuration.doubleValue();
+
+		final ActivityParams params = scenario.getConfig().planCalcScore().getActivityParams( type );
+		
+		if ( params == null ) {
+			throw new RuntimeException( "could not find typical duration for Person "+person.getId()+" for type "+type );
+		}
+		
+		return params.getTypicalDuration();
 	}
 
 	public FireMoneyEventsForUtilityOfBeingTogether(
