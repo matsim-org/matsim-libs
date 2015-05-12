@@ -54,7 +54,7 @@ public class VehicularTeleportationEngine implements DepartureHandler, MobsimEng
 	 * Includes all agents that have transportation modes unknown to the
 	 * QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
-	private Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<Tuple<Double, MobsimAgent>>(
+	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue< >(
 			30, new TeleportationArrivalTimeComparator());
 	private InternalInterface internalInterface;
 

@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class RoutingUtils {
 	private RoutingUtils() {}
-	private static PooledPlanFactory planFactory = new PooledPlanFactory();
+	private final static PooledPlanFactory planFactory = new PooledPlanFactory();
 
 	public static List<PlanElement> tripsToLegs(
 			final Plan plan,

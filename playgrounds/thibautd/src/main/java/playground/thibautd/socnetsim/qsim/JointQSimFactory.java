@@ -51,8 +51,8 @@ public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 	private static final Logger log =
 		Logger.getLogger(JointQSimFactory.class);
 	
-	private Scenario sc = null;
-	private EventsManager events = null;
+	private final Scenario sc;
+	private final EventsManager events;
 
 	@Inject
 	public JointQSimFactory( final Scenario sc, final EventsManager events ) {

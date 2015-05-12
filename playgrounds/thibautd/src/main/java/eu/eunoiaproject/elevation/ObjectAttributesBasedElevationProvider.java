@@ -30,7 +30,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public class ObjectAttributesBasedElevationProvider implements ElevationProvider<Id> {
 	private final String attName;
-	private Collection<ObjectAttributes> attributes = new ArrayList<ObjectAttributes>();
+	private final Collection<ObjectAttributes> attributes = new ArrayList<ObjectAttributes>();
 
 	public ObjectAttributesBasedElevationProvider( final ObjectAttributes... attributes ) {
 		this( "elevation" , attributes );

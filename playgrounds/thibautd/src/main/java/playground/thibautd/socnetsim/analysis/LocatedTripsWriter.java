@@ -25,10 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -93,9 +90,6 @@ public class LocatedTripsWriter {
 			final String outRawData) {
 		final Collection<TripInfo> tripInfos = parseTripInfos( filter , population );
 
-		final Set<String> modes = new HashSet<String>();
-		for ( TripInfo info : tripInfos ) modes.add( info.mode );
-
 		try {
 			final BufferedWriter writer = IOUtils.getBufferedWriter( outRawData );
 			writeRawData( writer , tripInfos , outRawData );
@@ -111,9 +105,6 @@ public class LocatedTripsWriter {
 			final String inPopFile,
 			final String outRawData) {
 		final Collection<TripInfo> tripInfos = parseTripInfos( filter , inPopFile );
-
-		final Set<String> modes = new HashSet<String>();
-		for ( TripInfo info : tripInfos ) modes.add( info.mode );
 
 		try {
 			final BufferedWriter writer = IOUtils.getBufferedWriter( outRawData );

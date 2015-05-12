@@ -33,13 +33,13 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * @author thibautd
  */
 public class QuadTreeRebuilder<T> {
-	private double EPSILON = 1E-7;
+	private static final double EPSILON = 1E-7;
 	private double minX = Double.POSITIVE_INFINITY;
 	private double minY = Double.POSITIVE_INFINITY;
 	private double maxX = Double.NEGATIVE_INFINITY;
 	private double maxY = Double.NEGATIVE_INFINITY;
 
-	private List< Tuple<Coord, T> > elements = new ArrayList< Tuple<Coord, T> >();
+	private final List< Tuple<Coord, T> > elements = new ArrayList< Tuple<Coord, T> >();
 	private QuadTree<T> quadTree = null;
 
 	public synchronized QuadTree<T> getQuadTree() {

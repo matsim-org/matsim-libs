@@ -52,7 +52,7 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 	
 	private final BikeSharingManager bikeSharingManager;
 	private InternalInterface internalInterface = null;
-	private EventsManager eventsManager;
+	private final EventsManager eventsManager;
 
 	private final ArrivalQueue arrivalQueue = new ArrivalQueue();
 

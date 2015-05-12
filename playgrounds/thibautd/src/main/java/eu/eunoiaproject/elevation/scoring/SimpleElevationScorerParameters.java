@@ -28,7 +28,7 @@ import org.matsim.core.api.internal.MatsimParameters;
  * @author thibautd
  */
 public class SimpleElevationScorerParameters implements MatsimParameters {
-	private Map<String, Params> params = new LinkedHashMap<String, Params>();
+	private final Map<String, Params> params = new LinkedHashMap<String, Params>();
 
 	public Params getParams( final String mode ) {
 		return params.get( mode );
