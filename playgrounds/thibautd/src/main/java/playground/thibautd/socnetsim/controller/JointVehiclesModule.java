@@ -52,10 +52,10 @@ public class JointVehiclesModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		if ( !scenario.getConfig().qsim().getVehicleBehavior().equals( "wait" ) ) {
-			throw new RuntimeException( "agents should wait for vehicles when vehicle ressources are used! Setting is "+
-					scenario.getConfig().qsim().getVehicleBehavior() );
-		}
+//		if ( !scenario.getConfig().qsim().getVehicleBehavior().equals( "wait" ) ) {
+//			throw new RuntimeException( "agents should wait for vehicles when vehicle ressources are used! Setting is "+
+//					scenario.getConfig().qsim().getVehicleBehavior() );
+//		}
 		// For convenience
 		bind( VehicleRessources.class ).toProvider( new ScenarioElementProvider<VehicleRessources>( VehicleRessources.ELEMENT_NAME ) );
 
