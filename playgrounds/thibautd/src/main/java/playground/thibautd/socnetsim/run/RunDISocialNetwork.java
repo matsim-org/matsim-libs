@@ -57,6 +57,7 @@ public class RunDISocialNetwork {
 		final Controler controler = new Controler( scenario );
 		controler.addOverridingModule( new JointDecisionProcessModule() );
 		controler.addOverridingModule( new SocnetsimDefaultAnalysisModule() );
+		controler.addOverridingModule( new JointActivitiesScoringModule() );
 		controler.addOverridingModule( new GroupStrategyManagerModule() );
 		controler.addOverridingModule( new JointTripsModule() );
 		controler.addOverridingModule( new SocialNetworkModule() );

@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -44,14 +45,20 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 
 import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.run.ScoringFunctionConfigGroup;
 import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.Filter;
+import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.LinearOverlapScorer;
+import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.LogOverlapScorer;
 import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.utils.GenericFactory;
+
+import com.google.inject.Inject;
 
 /**
  * @author thibautd
@@ -73,6 +80,68 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 	private final GenericFactory<PersonOverlapScorer, Id> scorerFactory;
 
 	private final EventsManager events;
+
+	@Inject
+	public FireMoneyEventsForUtilityOfBeingTogether(
+			final EventsManager events,
+			final Scenario sc ) {
+		this( events,
+				(ScoringFunctionConfigGroup) sc.getConfig().getModule( ScoringFunctionConfigGroup.GROUP_NAME ),
+				sc );
+	}
+
+	public FireMoneyEventsForUtilityOfBeingTogether(
+			final EventsManager events,
+			ScoringFunctionConfigGroup module,
+			Scenario sc ) {
+		this( events,
+				module.getActTypeFilterForJointScoring(),
+				module.getModeFilterForJointScoring(),
+				getPersonOverlapScorerFactory( sc ),
+				sc.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+				sc.getActivityFacilities(),
+				(SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME ) );
+				
+	}
+
+	public static GenericFactory<PersonOverlapScorer, Id> getPersonOverlapScorerFactory(
+			final Scenario scenario ) {
+		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
+			scenario.getConfig().getModule( ScoringFunctionConfigGroup.GROUP_NAME );
+		switch ( scoringFunctionConf.getTogetherScoringForm() ) {
+			case linear:
+				return new GenericFactory<PersonOverlapScorer, Id>() {
+						@Override
+						public PersonOverlapScorer create( final Id id ) {
+							return new LinearOverlapScorer(
+									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() );
+						}
+					};
+			case logarithmic:
+				return new GenericFactory<PersonOverlapScorer, Id>() {
+						@Override
+						public PersonOverlapScorer create( final Id id ) {
+							final PersonImpl person = (PersonImpl) scenario.getPopulation().getPersons().get( id );
+							if ( person == null ) {
+								// eg transit agent
+								return new LinearOverlapScorer( 0 );
+							}
+							final double typicalDuration =
+								getTypicalDuration( 
+										scenario,
+										person,
+										scoringFunctionConf.getActivityTypeForContactInDesires() );
+							final double zeroDuration = typicalDuration * Math.exp( -10.0 / typicalDuration );
+							return new LogOverlapScorer(
+									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
+									typicalDuration,
+									zeroDuration);
+						}
+					};
+			default:
+				throw new RuntimeException( ""+scoringFunctionConf.getTogetherScoringForm() );
+		}
+	}
 
 	public FireMoneyEventsForUtilityOfBeingTogether(
 			final EventsManager events,
