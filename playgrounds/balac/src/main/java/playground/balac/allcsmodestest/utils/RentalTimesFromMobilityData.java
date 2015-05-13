@@ -42,7 +42,7 @@ public class RentalTimesFromMobilityData {
 					String[] arr3 = arr1[0].split("/");
 					String[] arr4 = arr2[0].split("/");
 					
-					if (arr3[1].equals(arr4[1]) && Integer.parseInt(arr3[1]) >= 8 && Integer.parseInt(arr3[1]) <= 8 && arr1.length == arr2.length) {
+					if (arr3[1].equals(arr4[1]) && Integer.parseInt(arr3[1]) >= 15 && Integer.parseInt(arr3[1]) <= 15 && arr1.length == arr2.length) {
 						if (true) {
 							
 							String[] arr5 = arr1[1].split(":");
@@ -59,7 +59,7 @@ public class RentalTimesFromMobilityData {
 								double rental = starth*60 +startmin - endh*60 - endmin;
 								if (rental < 0) {
 									fahrzugIDs.add(Double.parseDouble(arr[1]));
-									if ( Double.parseDouble(arr[6]) <= 60.0 ) {
+									if ( Double.parseDouble(arr[6]) <= 160.0 ) {
 										if (timeBla[(int)((Double.parseDouble(arr[6])) / 5.0)] < -rental) {
 											timeBla[(int)((Double.parseDouble(arr[6])) / 5.0)] = -rental;
 											

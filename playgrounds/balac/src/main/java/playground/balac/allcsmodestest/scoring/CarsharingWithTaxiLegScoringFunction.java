@@ -28,6 +28,12 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 	
 	private HashMap<Id, Stats> twMap = new HashMap<Id, Stats>();
 	
+	private int counterOW = 0;
+	
+	private double walkingFF = 0.0;
+	
+	private double walkingOW = 0.0;
+	
 	private double distancetw = 0.0;
 	
 	
@@ -50,6 +56,11 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 		
 		distancetw = 0.0;
 		
+		walkingFF = 0.0;
+		
+		walkingOW = 0.0;
+		
+		counterOW = 0;
 		
 	}
 	
@@ -105,7 +116,7 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 			score += distance * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("distanceFeeFreeFloating"));
 			score += time * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("timeFeeFreeFloating"));
 			score += specialTime * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("specialTimeFee"));
-			
+			score += walkingFF * Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("timeParkingFeeFreeFloating"));
 			
 		}
 		distance = 0.0;
@@ -120,6 +131,7 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 			
 			score += distance * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("distanceFeeOneWayCarsharing"));
 			score += time * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("timeFeeOneWayCarsharing"));
+			score += walkingOW * Double.parseDouble(this.config.getModule("OneWayCarsharing").getParams().get("timeParkingFeeOneWayCarsharing"));
 
 		}
 		distance = 0.0;
@@ -226,7 +238,7 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 		
 		else if (leg.getMode().equals("walk_ff"))
 		{
-			
+			walkingFF += travelTime;
 			tmpScore += getWalkScore(dist, travelTime);
 		}
 		else if (TransportMode.walk.equals(leg.getMode()))
@@ -236,7 +248,10 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 		}
 		else if (leg.getMode().equals("walk_ow_sb"))
 		{
+			if (counterOW % 2 == 0) 				
+				walkingOW += travelTime;
 			
+			counterOW++;
 			tmpScore += getWalkScore(dist, travelTime);
 
 		}

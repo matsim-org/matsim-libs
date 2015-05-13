@@ -12,7 +12,7 @@ public class RentalTimesStatistics {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 
-		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Documents/Papers/STRC2015/Unlimited/1.250.RT_CS");
+		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Documents/Papers/STRC2015/Base/1.250.RT_CS");
 		int[] rentalTimes = new int[30];
 		int[] distance = new int[50];
 		int[] distanceTraveled = new int[80];
@@ -64,7 +64,7 @@ public class RentalTimesStatistics {
 		
 		System.out.println(countZero);
 		System.out.println(di/count);
-		System.out.println(time1/count);
+		System.out.println(time1/count/60.0);
 		for (int i = 0; i < rentalTimes.length; i++) 
 			System.out.println((double)rentalTimes[i]/(double)count * 100.0);
 		System.out.println(count1);	

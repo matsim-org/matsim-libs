@@ -34,6 +34,8 @@ public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {
 	
 	private String timeFeeFreeFloating = null;
 	
+	private String timeParkingFeeFreeFloating = null;
+	
 	private String distanceFeeFreeFloating = null;
 	
 	private boolean useFeeFreeFloating = false;	
@@ -87,6 +89,16 @@ public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "timeFeeFreeFloating" )
 	public void setTimeFeeFreeFloating(final String timeFeeFreeFloating) {
 		this.timeFeeFreeFloating = timeFeeFreeFloating;
+	}
+	
+	@StringGetter( "timeParkingFeeFreeFloating" )
+	public String timeParkingFeeFreeFloating() {
+		return this.timeParkingFeeFreeFloating;
+	}
+
+	@StringSetter( "timeParkingFeeFreeFloating" )
+	public void setTimeParkingFeeFreeFloating(final String timeParkingFeeFreeFloating) {
+		this.timeParkingFeeFreeFloating = timeParkingFeeFreeFloating;
 	}
 	
 	@StringGetter( "distanceFeeFreeFloating" )

@@ -18,6 +18,8 @@ public class OneWayCarsharingRDConfigGroup extends ReflectiveConfigGroup {
 	
 	private String timeFeeOneWayCarsharing = null;
 	
+	private String timeParkingFeeOneWayCarsharing = null;
+
 	private String distanceFeeOneWayCarsharing = null;
 	
 	private boolean useOneWayCarsharing = false;
@@ -84,6 +86,16 @@ public class OneWayCarsharingRDConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "timeFeeOneWayCarsharing" )
 	public void setTimeFeeOneWayCarsharing(final String timeFeeOneWayCarsharing) {
 		this.timeFeeOneWayCarsharing = timeFeeOneWayCarsharing;
+	}
+	
+	@StringGetter( "timeParkingFeeOneWayCarsharing" )
+	public String timeParkingFeeOneWayCarsharing() {
+		return this.timeParkingFeeOneWayCarsharing;
+	}
+
+	@StringSetter( "timeParkingFeeOneWayCarsharing" )
+	public void setTimeParkingFeeOneWayCarsharing(final String timeParkingFeeOneWayCarsharing) {
+		this.timeParkingFeeOneWayCarsharing = timeParkingFeeOneWayCarsharing;
 	}
 	
 	@StringGetter( "distanceFeeOneWayCarsharing" )
