@@ -19,23 +19,23 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.controller;
 
+import com.google.inject.Scopes;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.XY2Links;
-
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.framework.controller.AbstractPrepareForSimListener;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
-
-import com.google.inject.Scopes;
 
 /**
  * @author thibautd
@@ -46,6 +46,7 @@ public class JointTripsModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind( PlanRoutingAlgorithmFactory.class ).to( JointPlanRouterFactory.class ).in( Scopes.SINGLETON );
+		bind(Mobsim.class).toProvider(JointQSimFactory.class);
 
 		// TODO: extract in files (messy and not modular)
 		addControlerListenerBinding().toInstance(

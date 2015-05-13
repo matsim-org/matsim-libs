@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.framework.controller;
 
-import java.util.Collection;
-import java.util.Collections;
-
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
@@ -32,7 +29,6 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
-
 import playground.ivt.utils.TripModeShares;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.framework.controller.listeners.DumpJointDataAtEnd;
@@ -41,6 +37,7 @@ import playground.thibautd.socnetsim.framework.controller.listeners.JointPlansDu
 import playground.thibautd.socnetsim.framework.events.CourtesyEventsGenerator;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.scoring.UniformlyInternalizingPlansScoring;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.replanning.PlanLinkIdentifierUtils;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
@@ -52,8 +49,10 @@ import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.run.JointPlanCompositionMinimalityChecker;
 import playground.thibautd.socnetsim.run.JointPlanSelectionConsistencyChecker;
 import playground.thibautd.socnetsim.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
-import playground.thibautd.socnetsim.framework.scoring.UniformlyInternalizingPlansScoring;
 import playground.thibautd.socnetsim.utils.ScenarioElementProvider;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Defines the basic elements for the matsim process with joint plans.
@@ -101,7 +100,6 @@ public class JointDecisionProcessModule extends AbstractModule {
 						return new PlanRouter( tripRouter );
 					}
 				} );
-		bind( Mobsim.class ).toProvider( JointQSimFactory.class );
 		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Strong.class ).toProvider( PlanLinkIdentifierUtils.LinkIdentifierProvider.class );
 		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toProvider( PlanLinkIdentifierUtils.WeakLinkIdentifierProvider.class );
 		bind( TripRouter.class ).toProvider( JointTripRouterFactory.class );
