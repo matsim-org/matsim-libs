@@ -1,6 +1,6 @@
 package playground.southafrica.projects.digicore.grid;
 
-import playground.southafrica.projects.digicore.grid.DigiGrid.Visual;
+import playground.southafrica.projects.digicore.grid.DigiGrid3D.Visual;
 
 /**
  * Class to read a {@link DigiGrid_XYZ} from file, and visualise it by making 

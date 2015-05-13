@@ -53,5 +53,7 @@ public interface DigiScorer {
 
 	public void rateIndividuals(String filename, String outputFolder);
 	
+	public RISK_GROUP getRiskGroup(String record);
+	
 	enum RISK_GROUP{NONE, LOW, MEDIUM, HIGH}
 }

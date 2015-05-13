@@ -36,10 +36,10 @@ import org.matsim.core.utils.misc.Counter;
  * observations in each dodecahedron (cell) and also the rating of each cell. 
  * All three dimensions are related to acceleration.
  *
- * @see DigiGrid
+ * @see DigiGrid3D
  * @author jwjoubert
  */
-public class DigiGrid_XYZ extends DigiGrid{
+public class DigiGrid_XYZ extends DigiGrid3D{
 	final private Logger LOG = Logger.getLogger(DigiGrid_XYZ.class);
 
 

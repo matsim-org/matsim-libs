@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ConvertOsmToMatsim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,     *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,7 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.projects.digicore.scoring;
+/**
+ * 
+ */
+package playground.southafrica.projects.digicore.scoring.wp3;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -29,18 +33,29 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.jzy3d.maths.Coord3d;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.southafrica.projects.digicore.grid.DigiGrid3D.Visual;
-import playground.southafrica.projects.digicore.grid.DigiGrid_XYZ;
+import playground.southafrica.projects.digicore.grid.DigiGrid2D;
+import playground.southafrica.projects.digicore.scoring.Accel2dAndSpeedDigiscorer;
+import playground.southafrica.projects.digicore.scoring.DigiScorer;
+import playground.southafrica.projects.digicore.scoring.SpeedAndAccelDigiScorer;
 import playground.southafrica.utilities.Header;
 
-public class SpeedAndAccelDigiScorer implements DigiScorer_XYZ{
-	private final static Logger LOG = Logger.getLogger(SpeedAndAccelDigiScorer.class);
-	private final SpeedDigiScorer delegate;
-	
+import com.vividsolutions.jts.geom.Point;
+
+/**
+ * Class to score the accelerometer and speed data of individuals. This class
+ * is based on the original <i>Work package 1</i>'s {@link SpeedAndAccelDigiScorer}
+ * with the difference that for acceleration, only x and y values are used. 
+ * It also differs from </i>Work package 2</i>'s {@link Accel2dAndSpeedDigiscorer}
+ * in that speed is considered a separate criteria, and not the third dimension. 
+ *   
+ * @author jwjoubert
+ */
+public class Wp3Accel2dAndSpeedDigiscorer implements DigiScorer {
+	final private static Logger LOG = Logger.getLogger(Wp3Accel2dAndSpeedDigiscorer.class);
+
 	/* Other variables. */
 	private int maxLines = Integer.MAX_VALUE;
 	private int noSpeedLimitWarningCount = 0;
@@ -51,31 +66,80 @@ public class SpeedAndAccelDigiScorer implements DigiScorer_XYZ{
 	private final double SPEED_TWO = 1.2;
 	private double weight_speed = 0.5;
 	private double weight_accel = 0.5;
+	
+	private DigiGrid2D grid;
 
-
-	public SpeedAndAccelDigiScorer(final double scale, String filename, final List<Double> riskThresholds, Visual visual) {
-		this.delegate = new SpeedDigiScorer(scale, filename, riskThresholds, visual);
+	
+	public Wp3Accel2dAndSpeedDigiscorer(double scale, List<Double> riskThresholds) {
+		this.grid = new DigiGrid2D(scale) {
+			
+			@Override
+			public void writeCellCountsAndRiskClasses(String outputFolder) {
+				if(!this.isPopulated()){
+					throw new RuntimeException("Grid not populated. Nothing to write.");
+				}
+				if(!this.isRanked()){
+					throw new RuntimeException("Grid not ranked. Nothing to write.");
+				}
+				String filename = outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "cellValuesAndRiskClasses.csv";
+				LOG.info("Writing the cell values and risk classes to " + filename); 
+				
+				/* Report the risk thresholds for which this output holds. */
+				LOG.info("  \\_ Accelerometer risk thresholds:");
+				for(int i = 0; i < this.getRiskThresholds().size(); i++){
+					LOG.info(String.format("      \\_ Risk %d: %.4f", i, this.getRiskThresholds().get(i)));
+				}
+				
+				/* Write the cell values and their risk classes. */
+				BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+				try{
+					/* Header. */
+					bw.write("x,y,count,class");
+					bw.newLine();
+					
+					for(Point p : this.map.keySet()){
+						bw.write(String.format("%.4f,%.4f,%.1f,%d\n", p.getX(), p.getY(), this.map.get(p), this.mapRating.get(p)));
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new RuntimeException("Cannot write to " + filename);
+				} finally{
+					try {
+						bw.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw new RuntimeException("Cannot close " + filename);
+					}
+				}
+				LOG.info("Done writing cell values and risk classes.");
+			}
+		};
+		this.grid.setRiskThresholds(riskThresholds); 
 	}
-
+	
+	
 	@Override
 	public void buildScoringModel(String filename) {
-		LOG.info("Populating the dodecahedra with point observations...");
+		LOG.info("Setting up grid...");
+		this.grid.setupGrid(filename);
+
+		LOG.info("Populating the risk space with point observations...");
 		if(this.maxLines < Integer.MAX_VALUE){
 			LOG.warn("A limited number of " + this.maxLines + " is processed (if there are so many)");
 		}
-
+		
 		Counter counter = new Counter("   lines # ");
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		try{
 			String line = null;
-			while( (line = br.readLine()) != null && counter.getCounter() < maxLines){
+			while((line = br.readLine()) != null && counter.getCounter() < this.maxLines){
+				/* Parse the record. */
 				String[] sa = line.split(",");
 				double x = Double.parseDouble(sa[5]);
 				double y = Double.parseDouble(sa[6]);
-				double z = Double.parseDouble(sa[7]);
 				double speed = Double.parseDouble(sa[8]);
 				double speedLimit = Double.parseDouble(sa[11]);
-
+				
 				/* Warn if no speed limit exists. */
 				if(speedLimit == 0 && noSpeedLimitWarningCount < 10){
 					if(noSpeedLimitWarningCount < 10){
@@ -87,15 +151,8 @@ public class SpeedAndAccelDigiScorer implements DigiScorer_XYZ{
 					}
 				}
 
-				/* Major priority rule is speed. But, contrary to SpeedDigiScorer,
-				 * NOT only non-speeding records are added to the blob. The 
-				 * weights are equally shared between the speed risk and the
-				 * accelerometer risk. 
-				 * 
-				 * (5 Nov 2014) It turns out to be that whatever the weight, it
-				 * does not influence the weighting, because the overall weighting
-				 * just goes down. Changed it back to 1.  
-				 */
+				/* All records are added to both the risk spaces: speed and
+				 * acceleration. */
 				/* Put data conditions here. */
 				if(
 						//						id.equalsIgnoreCase("37ff9d8e04c164ee793e172a561c7b1e") &	/* Specific individual, A. */
@@ -106,7 +163,9 @@ public class SpeedAndAccelDigiScorer implements DigiScorer_XYZ{
 						//						speed > 60.0 &												/* High speed */
 						true){
 
-					/* Apply the speed rules according to which records are scored. */
+					/*-------------------------------------------------------*/
+					/* Update the speed risk space.                          */
+					/*-------------------------------------------------------*/
 					double speeding = speed / speedLimit;
 					int speedIndex;
 					if(speeding <= SPEED_ZERO || speedLimit == 0.0){ 
@@ -126,9 +185,12 @@ public class SpeedAndAccelDigiScorer implements DigiScorer_XYZ{
 					double oldCount = speedObservations[speedIndex];
 					speedObservations[speedIndex] = oldCount + 1.0;
 
-					Coord3d c = delegate.getGrid().getClosest(x, y, z);
-					delegate.getGrid().incrementCount(c, 1.0);
+					/*-------------------------------------------------------*/
+					/* Update the acceleration risk space.                   */
+					/*-------------------------------------------------------*/
+					this.grid.incrementValue(x, y, 1.0);
 				}
+				
 				counter.incCounter();
 			}
 		} catch (IOException e) {
@@ -143,167 +205,20 @@ public class SpeedAndAccelDigiScorer implements DigiScorer_XYZ{
 			}
 		}
 		counter.printCounter();
-		LOG.info("All " + counter.getCounter() + " points processed.");
-
-		delegate.getGrid().rankGridCells();
+		LOG.info("Done populating the risk space.");
+		
+		this.grid.rankGridCells();
 	}
 
 	
-	public double getRiskGroupValue(String record){
-		double result = 0.0;
-		
-		String[] sa = record.split(",");
-		
-		//FIXME Remove after debugging
-		String id = sa[1];
-
-		/* Consider speed as first risk component. */
-		double speed = Double.parseDouble(sa[8]);
-		double speedLimit = Double.parseDouble(sa[11]);
-		double speeding = speed / speedLimit;
-
-		/* Because of the data quality, we need to consider zero speed limits.
-		 * When building the risk model, zero speed limits is associated with no 
-		 * risk speed. */
-		RISK_GROUP speedRisk = null;
-		double speedRiskValue = 0.0;
-		if(speeding <= SPEED_ZERO || speedLimit == 0.0){
-			speedRisk = RISK_GROUP.NONE;
-			speedRiskValue = 0.0;
-		} else if(speeding < SPEED_ONE){
-			speedRisk = RISK_GROUP.LOW;	
-			speedRiskValue = 1.0;
-		} else if(speeding < SPEED_TWO){
-			speedRisk = RISK_GROUP.MEDIUM;
-			speedRiskValue = 2.0;
-		} else{
-			speedRisk = RISK_GROUP.HIGH;
-			speedRiskValue = 3.0;
-		}
-
-		RISK_GROUP accelRisk = null;
-		double accelRiskValue = 0.0;
-		/* Return accelerometer risk class. */
-		double x = Double.parseDouble(sa[5]);
-		double y = Double.parseDouble(sa[6]);
-		double z = Double.parseDouble(sa[7]);
-
-		/* Get the closest cell to this point. */
-		Coord3d cell = delegate.getGrid().getClosest(x, y, z);
-		int risk = delegate.getGrid().getCellRisk(cell);
-		switch (risk) {
-		case 0:
-			accelRisk = RISK_GROUP.NONE;
-			accelRiskValue = 0.0;
-			break;
-		case 1:
-			accelRisk = RISK_GROUP.LOW;
-			accelRiskValue = 1.0;
-			break;
-		case 2:
-			accelRisk = RISK_GROUP.MEDIUM;
-			accelRiskValue = 2.0;
-			break;
-		case 3:
-			accelRisk = RISK_GROUP.HIGH;
-			accelRiskValue = 3.0;
-			break;
-		default:
-			throw new RuntimeException("Don't know what risk class " + risk + " is!");
-		}
-
-//		/* Now return the lower (riskier) of the two components. */ 
-//		RISK_GROUP result = null;
-//		switch (speedRisk) {
-//		case NONE:
-//			result = accelRisk;
-//			break;
-//		case LOW:
-//			switch (accelRisk) {
-//			case NONE:
-//			case LOW:
-//				result = speedRisk;
-//				break;
-//			case MEDIUM:			
-//			case HIGH:			
-//			default:
-//				result = accelRisk;
-//			}
-//			break;
-//		case MEDIUM:			
-//			switch (accelRisk) {
-//			case NONE:
-//			case LOW:
-//			case MEDIUM:			
-//				result = speedRisk;
-//				break;
-//			case HIGH:			
-//			default:
-//				result = accelRisk;
-//			}
-//			break;
-//		case HIGH:			
-//			switch (accelRisk) {
-//			case NONE:
-//			case LOW:
-//			case MEDIUM:			
-//			case HIGH:			
-//				result = speedRisk;
-//				break;
-//			default:
-//				result = accelRisk;
-//			}
-//		}
-//		
-		result = weight_speed*speedRiskValue + weight_accel*accelRiskValue;
-		return result;
-	}
-	
-	
-	/**
-	 * An accelerometer record is given two risk groups: one based on speed and
-	 * another based on the accelerometer data. The overall risk group is the
-	 * lower (more risky) of the two components. 
-	 */
 	@Override
-	public RISK_GROUP getRiskGroup(String record) {
-		/* Check that the 'blob'  has already been created and populated. */
-		if(!delegate.getGrid().isRanked()){
-			LOG.error("You cannot get a risk group unless the risk evaluation has been done.");
-			LOG.error("First call the method 'buildScoringModel(...)");
-			throw new RuntimeException();
-		}
-		
-		/* Quantify the risk. */ 
-		double riskValue = getRiskGroupValue(record);
-		
-		if(riskValue <= 0.75){
-			return RISK_GROUP.NONE;
-		} else if(riskValue <= 1.5){
-			return RISK_GROUP.LOW;
-		} else if (riskValue <= 2.25){
-			return RISK_GROUP.MEDIUM;
-		} else{
-			return RISK_GROUP.HIGH;
-		}
-	}
-
-	/**
-	 * Consider each record, and process them per individual so that the total
-	 * number of occurrences in each risk group can be calculated. The output 
-	 * file with name <code>riskClassCountsPerPerson.csv</code> will be created 
-	 * in the output folder.
-	 * 
-	 * @param outputFolder
-	 */
-	@Override
-	public void rateIndividuals(String filename, String outputFolder){
+	public void rateIndividuals(String filename, String outputFolder) {
 		Map<String, Integer[]> personMap = new TreeMap<String, Integer[]>();
 
 		/* Process all records. */
 		LOG.info("Processing records for person-specific scoring...");
 		LOG.info("Weights used:");
-		LOG.info("  \\_ acceleration: " + this.getAccelWeight());
+		LOG.info("  \\_ acceleration: " + this.getAccelerationWeight());
 		LOG.info("  \\_ speed: " + this.getSpeedWeight());
 		
 		Counter counter = new Counter("   lines # ");
@@ -397,88 +312,41 @@ public class SpeedAndAccelDigiScorer implements DigiScorer_XYZ{
 		}
 		LOG.info("Done writing the per-person risk classes counts.");
 	}
-
-	@Override
-	public DigiGrid_XYZ getGrid(){
-		return delegate.getGrid();
-	}
-
-	@Override
-	public void setGrid(DigiGrid_XYZ grid) {
-		delegate.setGrid(grid);
-	}
-
-	public void setMaximumLines(int maxLines){
-		this.maxLines = maxLines;
+	
+	public void setAccelerationWeight(double weight){
+		this.weight_accel = weight;
 	}
 	
-	public double getSpeedWeight(){
-		return this.weight_speed;
+	public double getAccelerationWeight(){
+		return this.weight_accel;
 	}
 	
 	public void setSpeedWeight(double weight){
 		this.weight_speed = weight;
 	}
 	
-	public double getAccelWeight(){
-		return this.weight_accel;
+	public double getSpeedWeight(){
+		return this.weight_speed;
 	}
 	
-	public void setAccelWeight(double weight){
-		this.weight_accel = weight;
+	public void setMaximumLines(int maxLines){
+		this.maxLines = maxLines;
 	}
-	
+
 	/**
-	 * Writes the speed observation results: the number of records in each risk
-	 * class. The output file with name <code>speedClassCounts.csv</code> will
-	 * be created in the output folder.
-	 * 
-	 * @param outputFolder
+	 * @param args
 	 */
-	public void writeSpeedCounts(String outputFolder){
-		String filename = outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "speedClassCounts.csv";
-		LOG.info("Writing the speed class counts to " + filename); 
-
-		/* Write the cell values and their risk classes. */
-		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
-		try{
-			/* Header. */
-			bw.write("speedClass,count");
-			bw.newLine();
-
-			for(int i = 0; i < this.speedObservations.length; i++){
-				bw.write(String.format("%d,%.1f\n", i, this.speedObservations[i]));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot write to " + filename);
-		} finally{
-			try {
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + filename);
-			}
-		}
-		LOG.info("Done writing the speed class counts."); 
-	}
-
-
-
 	public static void main(String[] args) {
-		Header.printHeader(SpeedAndAccelDigiScorer.class.toString(), args);
-
-		/* Parse the input arguments. */
+		Header.printHeader(Wp3Accel2dAndSpeedDigiscorer.class.toString(), args);
 		String filename = args[0];
 		String outputFolder = args[1];
 		Double scale = Double.parseDouble(args[2]);
 		int maxLines = Integer.parseInt(args[3]);
-		Visual visual = Visual.valueOf(args[4]);
-		double aWeight = Double.parseDouble(args[5]);
-		double sWeight = Double.parseDouble(args[6]);
+		double aWeight = Double.parseDouble(args[4]);
+		double sWeight = Double.parseDouble(args[5]);
 
 		List<Double> riskThresholds = new ArrayList<Double>();
-		int argsIndex = 7;
+		int argsIndex = 6;
 		while(args.length > argsIndex){
 			riskThresholds.add(Double.parseDouble(args[argsIndex++]));
 		}
@@ -490,17 +358,105 @@ public class SpeedAndAccelDigiScorer implements DigiScorer_XYZ{
 			throw new RuntimeException("Output directory will not be overwritten!!");
 		}
 		folder.mkdirs();
-
-		SpeedAndAccelDigiScorer sds = new SpeedAndAccelDigiScorer(scale, filename, riskThresholds, visual);
-		sds.setMaximumLines(maxLines);
-		sds.setAccelWeight(aWeight);
-		sds.setSpeedWeight(sWeight);
-		sds.buildScoringModel(filename);
-		sds.getGrid().writeCellCountsAndRiskClasses(outputFolder);
-		sds.writeSpeedCounts(outputFolder);
-		sds.rateIndividuals(filename, outputFolder);
-
+		
+		Wp3Accel2dAndSpeedDigiscorer wp3AS = new Wp3Accel2dAndSpeedDigiscorer(scale, riskThresholds);
+		wp3AS.setAccelerationWeight(aWeight);
+		wp3AS.setSpeedWeight(sWeight);
+		wp3AS.setMaximumLines(maxLines);
+		wp3AS.buildScoringModel(filename);
+		wp3AS.grid.writeCellCountsAndRiskClasses(outputFolder);
+		wp3AS.rateIndividuals(filename, outputFolder);
+		
 		Header.printFooter();
-		sds.getGrid().visualiseGrid();
 	}
+
+
+	/**
+	 * Calculate the {@link RISK_GROUP} based on the weighted risk of both 
+	 * speed and acceleration.
+	 */
+	@Override
+	public RISK_GROUP getRiskGroup(String record) {
+		/* Check that the 'blob'  has already been created and populated. */
+		if(!this.grid.isRanked()){
+			LOG.error("You cannot get a risk group unless the risk evaluation has been done.");
+			LOG.error("First call the method 'buildScoringModel(...)");
+			throw new RuntimeException();
+		}
+		
+		/* Quantify the risk. */ 
+		double riskValue = getRiskGroupValue(record);
+		
+		if(riskValue <= 0.75){
+			return RISK_GROUP.NONE;
+		} else if(riskValue <= 1.5){
+			return RISK_GROUP.LOW;
+		} else if (riskValue <= 2.25){
+			return RISK_GROUP.MEDIUM;
+		} else{
+			return RISK_GROUP.HIGH;
+		}
+	}
+	
+	/**
+	 * Calculate the weighted risk.
+	 * 
+	 * @param record
+	 * @return
+	 */
+	private double getRiskGroupValue(String record){
+		double result = 0.0;
+		
+		String[] sa = record.split(",");
+		
+		//FIXME Remove after debugging
+//		String id = sa[1];
+
+		/* Consider speed as first risk component. */
+		double speed = Double.parseDouble(sa[8]);
+		double speedLimit = Double.parseDouble(sa[11]);
+		double speeding = speed / speedLimit;
+
+		/* Because of the data quality, we need to consider zero speed limits.
+		 * When building the risk model, zero speed limits is associated with no 
+		 * risk speed. */
+		double speedRiskValue = 0.0;
+		if(speeding <= SPEED_ZERO || speedLimit == 0.0){
+			speedRiskValue = 0.0;
+		} else if(speeding < SPEED_ONE){
+			speedRiskValue = 1.0;
+		} else if(speeding < SPEED_TWO){
+			speedRiskValue = 2.0;
+		} else{
+			speedRiskValue = 3.0;
+		}
+
+		double accelRiskValue = 0.0;
+		/* Return accelerometer risk class. */
+		double x = Double.parseDouble(sa[5]);
+		double y = Double.parseDouble(sa[6]);
+
+		/* Get the closest cell to this point. */
+		int risk = this.grid.getCellRisk(x, y);
+		switch (risk) {
+		case 0:
+			accelRiskValue = 0.0;
+			break;
+		case 1:
+			accelRiskValue = 1.0;
+			break;
+		case 2:
+			accelRiskValue = 2.0;
+			break;
+		case 3:
+			accelRiskValue = 3.0;
+			break;
+		default:
+			throw new RuntimeException("Don't know what risk class " + risk + " is!");
+		}
+
+		result = weight_speed*speedRiskValue + weight_accel*accelRiskValue;
+		return result;
+	}
+
 }

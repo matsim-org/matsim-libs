@@ -14,7 +14,7 @@ import org.jzy3d.maths.Coord3d;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.southafrica.projects.digicore.grid.DigiGrid.Visual;
+import playground.southafrica.projects.digicore.grid.DigiGrid3D.Visual;
 import playground.southafrica.projects.digicore.grid.DigiGrid_XYSpeed;
 import playground.southafrica.utilities.Header;
 

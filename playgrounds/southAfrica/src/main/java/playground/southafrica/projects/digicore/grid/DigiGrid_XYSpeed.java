@@ -37,7 +37,7 @@ import org.matsim.core.utils.misc.Counter;
  *
  * @author jwjoubert
  */
-public class DigiGrid_XYSpeed  extends DigiGrid {
+public class DigiGrid_XYSpeed  extends DigiGrid3D {
 	final private Logger LOG = Logger.getLogger(DigiGrid_XYSpeed.class);
 	private double speed_multiplier = 2.5;
 
