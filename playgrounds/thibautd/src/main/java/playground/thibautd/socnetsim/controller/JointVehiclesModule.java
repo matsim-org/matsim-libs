@@ -41,7 +41,7 @@ import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForS
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
-import playground.thibautd.socnetsim.utils.ScenarioElementProvider;
+import playground.thibautd.socnetsim.framework.controller.ScenarioElementProvider;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

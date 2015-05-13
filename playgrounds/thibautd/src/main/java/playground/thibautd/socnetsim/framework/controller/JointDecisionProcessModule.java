@@ -38,7 +38,6 @@ import playground.thibautd.socnetsim.framework.replanning.selectors.EmptyIncompa
 import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.framework.scoring.UniformlyInternalizingPlansScoring;
 import playground.thibautd.socnetsim.replanning.PlanLinkIdentifierUtils;
-import playground.thibautd.socnetsim.utils.ScenarioElementProvider;
 
 import java.util.Collection;
 import java.util.Collections;
