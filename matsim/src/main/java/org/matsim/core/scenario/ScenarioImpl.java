@@ -171,6 +171,7 @@ public class ScenarioImpl implements Scenario {
 
 	@Override
 	public final Config getConfig() {
+		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		return this.config;
 	}
 
@@ -197,6 +198,7 @@ public class ScenarioImpl implements Scenario {
 	
 	@Override
 	public final Households getHouseholds() {
+		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.households == null ) {
 			if ( this.config.scenario().isUseHouseholds() ) {
 				this.createHouseholdsContainer();
@@ -217,6 +219,7 @@ public class ScenarioImpl implements Scenario {
 
 	@Override
 	public final Vehicles getTransitVehicles() {
+		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.transitVehicles == null ) {
 			if ( this.config.scenario().isUseTransit() ) {
 				this.createTransitVehicleContainer();
@@ -237,6 +240,7 @@ public class ScenarioImpl implements Scenario {
 
 	@Override
 	final public Vehicles getVehicles() {
+		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.vehicles == null ) {
 			if ( this.config.scenario().isUseVehicles() ) {
 				this.createVehicleContainer();
@@ -259,6 +263,7 @@ public class ScenarioImpl implements Scenario {
 	
     @Override
 	public final TransitSchedule getTransitSchedule() {
+		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.transitSchedule == null ) {
 			if ( this.config.scenario().isUseTransit() ) {
 				this.createTransitSchedule();
@@ -302,6 +307,7 @@ public class ScenarioImpl implements Scenario {
 
 	@Override
 	public final Object getScenarioElement(final String name) {
+		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		return elements.get( name );
 	}
 	

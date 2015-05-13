@@ -101,7 +101,8 @@ public final class StrategyConfigGroup extends ConfigGroup {
 			map.put( "weight",
 					"weight of a strategy: for each agent, a strategy will be selected with a probability proportional to its weight");
 			map.put( "disableAfterIteration",
-					"iteration after which strategy will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...)");
+					"iteration after which strategy will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...). "
+					+ "Normally, better use fractionOfIterationsToDisableInnovation");
 			map.put( "executionPath",
 					"path to external executable (if applicable)" ) ;
 			map.put( "subpopulation",
