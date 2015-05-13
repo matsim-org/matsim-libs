@@ -49,8 +49,8 @@ import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.population.JointPlansConfigGroup;
 import playground.thibautd.socnetsim.framework.population.JointPlansXmlReader;
 import playground.thibautd.socnetsim.jointtrips.population.PassengerRouteFactory;
-import playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice.PrismicLocationChoiceConfigGroup;
-import playground.thibautd.socnetsim.replanning.modules.randomlocationchoice.RandomJointLocationChoiceConfigGroup;
+import playground.thibautd.socnetsim.jointactivities.replanning.modules.prismiclocationchoice.PrismicLocationChoiceConfigGroup;
+import playground.thibautd.socnetsim.jointactivities.replanning.modules.randomlocationchoice.RandomJointLocationChoiceConfigGroup;
 import playground.thibautd.utils.DesiresConverter;
 
 /**

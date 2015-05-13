@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.modules;
+package playground.thibautd.socnetsim.jointactivities.replanning.modules;
 
 import java.util.ArrayList;
 import java.util.Collections;

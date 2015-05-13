@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PrismicLocationChoiceModule.java
+ * RandomJointLocationChoiceModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,13 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice;
+package playground.thibautd.socnetsim.jointactivities.replanning.modules.randomlocationchoice;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.facilities.ActivityFacilities;
 
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
@@ -32,23 +31,36 @@ import playground.thibautd.socnetsim.framework.replanning.modules.AbstractMultit
 /**
  * @author thibautd
  */
-public class PrismicLocationChoiceModule  extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
-	private final Scenario scenario;
+public class RandomJointLocationChoiceModule extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
+	private final RandomJointLocationChoiceConfigGroup config;
+	private final ActivityFacilities facilities;
+	private final SocialNetwork socialNetwork;
 
-	public PrismicLocationChoiceModule(final Scenario sc) {
-		super( sc.getConfig().global() );
-		this.scenario = sc;
+	public RandomJointLocationChoiceModule(final Scenario scenario) {
+		this( scenario.getConfig().global().getNumberOfThreads(),
+				(RandomJointLocationChoiceConfigGroup)
+					scenario.getConfig().getModule(
+						RandomJointLocationChoiceConfigGroup.GROUP_NAME ),
+				scenario.getActivityFacilities(),
+				(SocialNetwork)
+					scenario.getScenarioElement(
+						SocialNetwork.ELEMENT_NAME ) );
+	}
+
+	public RandomJointLocationChoiceModule(
+			final int nThreads,
+			final RandomJointLocationChoiceConfigGroup config,
+			final ActivityFacilities facilities,
+			final SocialNetwork socialNetwork) {
+		super( nThreads );
+		this.config = config;
+		this.facilities = facilities;
+		this.socialNetwork = socialNetwork;
 	}
 
 	@Override
-	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(final ReplanningContext replanningContext) {
-		return new PrismicLocationChoiceAlgorithm(
-				(PrismicLocationChoiceConfigGroup) scenario.getConfig().getModule( PrismicLocationChoiceConfigGroup.GROUP_NAME ),
-				scenario.getActivityFacilities(),
-				(SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ),
-				new CompositeStageActivityTypes(
-						replanningContext.getTripRouter().getStageActivityTypes(),
-						JointActingTypes.JOINT_STAGE_ACTS ) );
+	public GenericPlanAlgorithm<GroupPlans> createAlgorithm(ReplanningContext replanningContext) {
+		return new RandomJointLocationChoiceAlgorithm( config , facilities , socialNetwork );
 	}
 }
 

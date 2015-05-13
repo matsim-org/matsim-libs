@@ -27,7 +27,7 @@ import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
-import playground.thibautd.socnetsim.replanning.modules.MutateActivityLocationsToLocationsOfOthersModule;
+import playground.thibautd.socnetsim.jointactivities.replanning.modules.MutateActivityLocationsToLocationsOfOthersModule;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 

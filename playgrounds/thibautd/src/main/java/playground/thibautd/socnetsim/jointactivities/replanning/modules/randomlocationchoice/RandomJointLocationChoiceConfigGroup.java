@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.modules.randomlocationchoice;
+package playground.thibautd.socnetsim.jointactivities.replanning.modules.randomlocationchoice;
 
 import java.util.Collection;
 import java.util.Collections;

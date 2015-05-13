@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.run;
+package playground.thibautd.socnetsim.jointactivities.scoring;
 
 import org.matsim.core.controler.AbstractModule;
 

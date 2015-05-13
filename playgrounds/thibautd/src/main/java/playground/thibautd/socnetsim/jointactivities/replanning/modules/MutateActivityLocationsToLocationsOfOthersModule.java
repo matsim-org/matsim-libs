@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.modules;
+package playground.thibautd.socnetsim.jointactivities.replanning.modules;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
@@ -26,7 +26,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
-import playground.thibautd.socnetsim.replanning.modules.MutateActivityLocationsToLocationsOfOthersAlgorithm.ChoiceSet;
+import playground.thibautd.socnetsim.jointactivities.replanning.modules.MutateActivityLocationsToLocationsOfOthersAlgorithm.ChoiceSet;
 
 /**
  * @author thibautd

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice;
+package playground.thibautd.socnetsim.jointactivities.replanning.modules.prismiclocationchoice;
 
 import java.util.ArrayList;
 import java.util.Collection;

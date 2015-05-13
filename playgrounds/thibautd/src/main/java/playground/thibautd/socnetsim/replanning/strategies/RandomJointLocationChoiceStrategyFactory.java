@@ -28,7 +28,7 @@ import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
-import playground.thibautd.socnetsim.replanning.modules.randomlocationchoice.RandomJointLocationChoiceModule;
+import playground.thibautd.socnetsim.jointactivities.replanning.modules.randomlocationchoice.RandomJointLocationChoiceModule;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 import com.google.inject.Inject;

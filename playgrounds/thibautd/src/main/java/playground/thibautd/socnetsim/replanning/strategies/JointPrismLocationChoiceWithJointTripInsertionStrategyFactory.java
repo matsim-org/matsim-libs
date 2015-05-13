@@ -37,7 +37,7 @@ import playground.thibautd.socnetsim.framework.replanning.modules.AbstractMultit
 import playground.thibautd.socnetsim.jointtrips.replanning.modules.JointTripInsertorAlgorithm;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
-import playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice.PrismicLocationChoiceModule;
+import playground.thibautd.socnetsim.jointactivities.replanning.modules.prismiclocationchoice.PrismicLocationChoiceModule;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 import com.google.inject.Inject;
