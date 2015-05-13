@@ -36,8 +36,8 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.facilities.ActivityFacilities;
 
-import playground.thibautd.socnetsim.cliques.herbie.scoring.HerbieJointActivityScoringFunction;
-import playground.thibautd.socnetsim.cliques.herbie.scoring.HerbieJointLegScoringFunction;
+import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointActivityScoringFunction;
+import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
 
 /**
  * @author thibautd

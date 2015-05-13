@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.cliques.herbie.scoring;
+package playground.thibautd.socnetsimusages.cliques.herbie.scoring;
 
 import herbie.running.config.HerbieConfigGroup;
 import herbie.running.pt.DistanceCalculations;

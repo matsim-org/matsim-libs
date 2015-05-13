@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.cliques.herbie.scoring;
+package playground.thibautd.socnetsimusages.cliques.herbie.scoring;
 
 import java.util.Collections;
 import java.util.HashMap;

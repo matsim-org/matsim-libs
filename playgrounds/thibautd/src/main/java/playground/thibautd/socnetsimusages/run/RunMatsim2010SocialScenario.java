@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.run;
+package playground.thibautd.socnetsimusages.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -46,7 +46,9 @@ import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.framework.replanning.GroupStrategyManagerModule;
-import playground.thibautd.socnetsim.scoring.KtiScoringFunctionFactoryWithJointModes;
+import playground.thibautd.socnetsim.run.RunUtils;
+import playground.thibautd.socnetsim.run.ScoringFunctionConfigGroup;
+import playground.thibautd.socnetsimusages.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 /**
@@ -91,7 +93,7 @@ public class RunMatsim2010SocialScenario {
 
 	private static Scenario loadScenario(final Config config) {
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
-		RunUtils.enrichScenario( scenario );
+		RunUtils.enrichScenario(scenario);
 		Matsim2030Utils.enrichScenario( scenario );
 		scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
 
@@ -125,6 +127,7 @@ public class RunMatsim2010SocialScenario {
 	private static Config loadConfig(final String configFile) {
 		final Config config = ConfigUtils.createConfig();
 		JointScenarioUtils.addConfigGroups( config );
+		config.addModule( new KtiInputFilesConfigGroup() );
 		RunUtils.addConfigGroups( config );
 		// some redundancy here... just add scenarioMerging "by hand"
 		//Matsim2030Utils.addDefaultGroups( config );

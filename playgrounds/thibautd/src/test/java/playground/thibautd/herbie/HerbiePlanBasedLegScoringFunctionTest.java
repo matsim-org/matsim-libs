@@ -73,7 +73,7 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.thibautd.socnetsim.cliques.herbie.scoring.HerbieJointLegScoringFunction;
+import playground.thibautd.socnetsimusages.cliques.herbie.scoring.HerbieJointLegScoringFunction;
 
 /**
  * @author thibautd

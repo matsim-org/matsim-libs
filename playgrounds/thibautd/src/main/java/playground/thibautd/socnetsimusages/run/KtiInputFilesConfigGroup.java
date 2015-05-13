@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.thibautd.socnetsim.run;
+package playground.thibautd.socnetsimusages.run;
 
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 
