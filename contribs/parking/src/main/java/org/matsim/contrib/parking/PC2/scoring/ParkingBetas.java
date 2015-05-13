@@ -28,7 +28,7 @@ import org.matsim.contrib.parking.lib.utils.expr.Parser;
 import org.matsim.contrib.parking.lib.utils.expr.SyntaxException;
 import org.matsim.core.population.PersonImpl;
 
-public class ParkingBetas {
+public class ParkingBetas  extends AbstractParkingBetas{
 
 	private String parkingWalkBeta;
 	private Parser parkingCostBetaParser;
@@ -36,7 +36,7 @@ public class ParkingBetas {
 	private DoubleValueHashMap<Id> parkingCostBetaCache;
 	private DoubleValueHashMap<Id> income;
 
-	public ParkingBetas(DoubleValueHashMap<Id> income) {
+	public ParkingBetas(DoubleValueHashMap<Id> income){
 		this.income = income;
 		parkingWalkBetaCache = new HashMap<Id, Parser>();
 		parkingCostBetaCache = new DoubleValueHashMap<Id>();

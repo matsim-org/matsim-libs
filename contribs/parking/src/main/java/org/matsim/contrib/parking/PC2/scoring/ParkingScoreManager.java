@@ -36,7 +36,7 @@ import java.util.Map;
 
 public class ParkingScoreManager {
 
-	private ParkingBetas parkingBetas;
+	private AbstractParkingBetas parkingBetas;
 	private double parkingScoreScalingFactor;
 	private double randomErrorTermScalingFactor;
 	// TODO: also add implementation of random error term + scaling here
@@ -124,11 +124,11 @@ public class ParkingScoreManager {
 		this.randomErrorTermScalingFactor = randomErrorTermScalingFactor;
 	}
 
-	public ParkingBetas getParkingBetas() {
+	public AbstractParkingBetas getParkingBetas() {
 		return parkingBetas;
 	}
 
-	public void setParkingBetas(ParkingBetas parkingBetas) {
+	public void setParkingBetas(AbstractParkingBetas parkingBetas) {
 		this.parkingBetas = parkingBetas;
 	}
 

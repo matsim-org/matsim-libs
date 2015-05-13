@@ -371,7 +371,6 @@ public class ParkingInfrastructureManager {
 		if (parking == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
-
 		int startAvailability = parking.getAvailableParkingCapacity();
 
 		parking.unparkVehicle();

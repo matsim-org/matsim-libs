@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,33 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.parking.PC2.infrastructure;
+package org.matsim.contrib.parking.example;
 
-import java.util.HashSet;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 
-public class PPRestrictedToIndividuals extends PublicParking implements PrivateParking {
-	private HashSet<Id<Person>> personIds;
+/**
+ * @author jbischoff
+ *
+ */
+public class ParkingCostCalculatorExample implements ParkingCostModel {
 
-	public PPRestrictedToIndividuals(Id id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName, HashSet<Id<Person>> personIds) {
-		super(id, capacity, coord, parkingCostModel, groupName);
-		this.personIds=personIds;
-	}
+	private double hourlyParkingCharge;
 
-
-	public void PPRestrictedToIndividuals(HashSet<Id<Person>> personIds){
-		this.personIds = personIds;
+	public ParkingCostCalculatorExample(double hourlyParkingCharge) {
+		this.hourlyParkingCharge = hourlyParkingCharge;
 	}
 	
 	@Override
-	public boolean isAllowedToUseParking(Id personId, Id actFacilityId, String actType) {
-		return personIds.contains(personId);
+	public double calcParkingCost(double arrivalTimeInSeconds,
+		
+			double durationInSeconds, Id<Person> personId, Id parkingFacilityId) {
+					
+			return hourlyParkingCharge*(durationInSeconds/3600);
+		
 	}
-
-	
 
 }
