@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.contrib.pseudosimulation.PSimControler;
+import org.matsim.contrib.pseudosimulation.RunPSim;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
@@ -46,7 +46,7 @@ public class TransitPerformanceRecorder {
     private final Scenario scenario;
     private final Map<Id<Vehicle>, Vehicle> vehicles;
     private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
-    private PSimControler.MobSimSwitcher switcher;
+    private RunPSim.MobSimSwitcher switcher;
     private TransitPerformance transitPerformance;
     private VehicleTrackerCollection vehicletrackers;
     private Map<Id<Departure>, TransitRoute> departureIdToRoute;
@@ -58,7 +58,7 @@ public class TransitPerformanceRecorder {
             return true;
         return switcher.isQSimIteration();
     }
-    public TransitPerformanceRecorder(Scenario scenario, EventsManager eventsManager, PSimControler.MobSimSwitcher switcher) {
+    public TransitPerformanceRecorder(Scenario scenario, EventsManager eventsManager, RunPSim.MobSimSwitcher switcher) {
         this(scenario, eventsManager);
         this.switcher = switcher;
     }

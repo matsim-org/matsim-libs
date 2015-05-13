@@ -23,6 +23,7 @@ package org.matsim.contrib.pseudosimulation;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -71,7 +72,7 @@ import java.util.Map;
  * A controler that alternates between the QSim and PSim for the mobility simulation.
  * Run this class with no arguments to get printed help listing current command line options.
  */
-public class PSimControler {
+public class RunPSim {
     private final Config config;
     private final Scenario scenario;
     private final boolean Diversity;
@@ -88,7 +89,7 @@ public class PSimControler {
     private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private PSimTravelTimeCalculator carTravelTimeCalculator;
     private PlanCatcher plancatcher;
-    private PSimControler(String[] args) throws ParseException {
+    private RunPSim(String[] args) throws ParseException {
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
         options.addOption(OptionBuilder.withLongOpt("config")
@@ -255,7 +256,7 @@ public class PSimControler {
     }
 
     public static void main(String args[]) throws ParseException {
-        new PSimControler(args).run();
+        new RunPSim(args).run();
     }
 
     private static void printHelp(Options options) {
@@ -326,6 +327,8 @@ public class PSimControler {
         config.controler().setWriteEventsInterval(config.controler().getWriteEventsInterval() * IterationsPerCycle);
         config.controler().setWritePlansInterval(config.controler().getWritePlansInterval() * IterationsPerCycle);
         config.controler().setWriteSnapshotsInterval(config.controler().getWriteSnapshotsInterval() * IterationsPerCycle);
+        Logger.getLogger(this.getClass()).warn("Please note: this script violates the matsim convention that the config output should be useable "
+        		+ "as input to another run.   Instead, the write invervals would be multiplied every time this is done.  kai, may'15");
     }
 
 

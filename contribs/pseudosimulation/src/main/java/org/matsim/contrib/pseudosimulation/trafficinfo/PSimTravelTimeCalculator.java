@@ -11,21 +11,21 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.pseudosimulation.PSimControler;
+import org.matsim.contrib.pseudosimulation.RunPSim;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.contrib.pseudosimulation.PSimControler;
+import org.matsim.contrib.pseudosimulation.RunPSim;
 
 /**
  * @author fouriep
  * 
  */
 public class PSimTravelTimeCalculator extends TravelTimeCalculator {
-	private final PSimControler.MobSimSwitcher switcher;
+	private final RunPSim.MobSimSwitcher switcher;
 
 	public PSimTravelTimeCalculator(Network network,
-			TravelTimeCalculatorConfigGroup ttconfigGroup, int numHrs, PSimControler.MobSimSwitcher switcher) {
+			TravelTimeCalculatorConfigGroup ttconfigGroup, int numHrs, RunPSim.MobSimSwitcher switcher) {
 		super(network, ttconfigGroup.getTraveltimeBinSize(), numHrs,
 				ttconfigGroup);
 		this.switcher = switcher;

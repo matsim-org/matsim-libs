@@ -1,6 +1,6 @@
 package org.matsim.contrib.pseudosimulation.replanning;
 
-import org.matsim.contrib.pseudosimulation.PSimControler;
+import org.matsim.contrib.pseudosimulation.RunPSim;
 import org.matsim.contrib.pseudosimulation.replanning.factories.DistributedPlanMutatorStrategyFactory;
 import org.matsim.contrib.pseudosimulation.replanning.factories.DistributedPlanSelectorStrategyFactory;
 import org.matsim.core.config.Config;
@@ -21,7 +21,7 @@ import java.util.Map;
  *         extended strategies with the controler.
  *         <p/>
  *         If a mutating strategy is sent for pseudo-simulation, it needs to be
- *         marked as such, and registered with the {@link PSimControler}.
+ *         marked as such, and registered with the {@link RunPSim}.
  *         Non-mutating strategies, e.g. selector strategies, should be disabled
  *         during PSim iterations, and only run during QSim iterations.
  *         <p/>
