@@ -29,7 +29,7 @@ import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.thibautd.replanning.TourModeUnifierModule;
-import playground.thibautd.router.PlanRoutingAlgorithmFactory;
+import playground.thibautd.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.framework.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.framework.replanning.JointPlanBasedGroupStrategyModule;

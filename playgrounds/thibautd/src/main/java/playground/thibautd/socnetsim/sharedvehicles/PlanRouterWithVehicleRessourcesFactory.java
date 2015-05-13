@@ -22,7 +22,7 @@ package playground.thibautd.socnetsim.sharedvehicles;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.router.PlanRoutingAlgorithmFactory;
+import playground.thibautd.socnetsim.framework.PlanRoutingAlgorithmFactory;
 
 /**
  * @author thibautd

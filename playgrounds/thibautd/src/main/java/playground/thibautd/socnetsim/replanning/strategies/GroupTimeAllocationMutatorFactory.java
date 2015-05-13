@@ -32,7 +32,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 import com.google.inject.Inject;
 
-import playground.thibautd.router.PlanRoutingAlgorithmFactory;
+import playground.thibautd.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
