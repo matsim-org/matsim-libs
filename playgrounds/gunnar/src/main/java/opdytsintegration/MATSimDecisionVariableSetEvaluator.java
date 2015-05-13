@@ -1,5 +1,6 @@
 package opdytsintegration;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -8,6 +9,7 @@ import optdyts.DecisionVariable;
 import optdyts.ObjectiveFunction;
 import optdyts.SimulatorState;
 import optdyts.algorithms.DecisionVariableSetEvaluator;
+import optdyts.surrogatesolutions.TransitionSequence;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -42,6 +44,14 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 
 	private final MATSimStateFactory<X, U> stateFactory;
 
+	// PARAMETERS
+
+	private int startTime_s = 0;
+
+	private int binSize_s = 3600;
+
+	private int binCnt = 24;
+
 	// RUNTIME VARIABLES
 
 	private boolean initialIteration = true;
@@ -62,6 +72,32 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 		this.stateFactory = stateFactory;
 	}
 
+	// -------------------- SETTERS AND GETTERS --------------------
+
+	public int getStartTime_s() {
+		return startTime_s;
+	}
+
+	public void setStartTime_s(final int startTime_s) {
+		this.startTime_s = startTime_s;
+	}
+
+	public int getBinSize_s() {
+		return binSize_s;
+	}
+
+	public void setBinSize_s(final int binSize_s) {
+		this.binSize_s = binSize_s;
+	}
+
+	public int getBinCnt() {
+		return binCnt;
+	}
+
+	public void setBinCnt(final int binCnt) {
+		this.binCnt = binCnt;
+	}
+
 	// --------------- CONTROLLER LISTENER IMPLEMENTATIONS ---------------
 
 	@Override
@@ -69,7 +105,8 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 
 		this.evaluator.implementNextDecisionVariable();
 
-		this.data = new DynamicData<Id<Link>>(0, 3600, 24);
+		this.data = new DynamicData<Id<Link>>(this.startTime_s, this.binSize_s,
+				this.binCnt);
 		this.sortedLinkIds = new TreeSet<Id<Link>>(event.getControler()
 				.getScenario().getNetwork().getLinks().keySet());
 		event.getControler().getEvents()
@@ -94,7 +131,7 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 		if (this.initialIteration) {
 			this.initialIteration = false;
 		} else {
-			
+
 			final Vector newStateVector = new Vector(this.sortedLinkIds.size()
 					* this.data.getBinCnt());
 			int i = 0;
@@ -112,5 +149,11 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 			this.data.clear();
 			this.evaluator.implementNextDecisionVariable();
 		}
+	}
+
+	// TODO experimental code below
+
+	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
+		return this.evaluator.getDecisionVariable2TransitionSequence();
 	}
 }

@@ -39,7 +39,7 @@ import optdyts.SimulatorState;
  * @param <U>
  *            the decision variable type
  */
-class TransitionSequence<X extends SimulatorState<X>, U> {
+public class TransitionSequence<X extends SimulatorState<X>, U> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -72,19 +72,19 @@ class TransitionSequence<X extends SimulatorState<X>, U> {
 
 	// -------------------- GETTERS --------------------
 
-	U getDecisionVariable() {
+	public U getDecisionVariable() {
 		return this.transitions.get(0).getDecisionVariable();
 	}
 
-	int size() {
+	public int size() {
 		return this.transitions.size();
 	}
 
-	List<Transition<X, U>> getTransitions() {
+	public List<Transition<X, U>> getTransitions() {
 		return this.transitions;
 	}
 
-	X getLastState() {
+	public X getLastState() {
 		return this.transitions.get(this.transitions.size() - 1).getToState();
 	}
 

@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package optdyts.surrogatesolutions;
 
 import java.util.ArrayList;
@@ -44,6 +44,8 @@ import floetteroed.utilities.math.Vector;
 class SurrogateSolutionEstimator<X extends SimulatorState<X>, U> {
 
 	// -------------------- CONSTANTS --------------------
+
+	private final double largestSimulatorEigenvalue = 0.95;
 
 	private final double simulationNoiseVariance;
 
@@ -183,7 +185,9 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U> {
 					}
 				}
 				newAlpha /= (innerProds.get(l, l) - 2.0 * innerProds.get(l, 0)
-						+ innerProds.get(0, 0) + this.simulationNoiseVariance);
+						+ innerProds.get(0, 0) + Math.pow(
+						1.0 - this.largestSimulatorEigenvalue, 2.0)
+						* this.simulationNoiseVariance);
 
 				newAlpha = Math.max(newAlpha, 0.0);
 				newAlpha = Math.min(newAlpha, alphas.get(0) + alphas.get(l));

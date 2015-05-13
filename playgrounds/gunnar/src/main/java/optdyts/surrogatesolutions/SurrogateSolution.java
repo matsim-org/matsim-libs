@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package optdyts.surrogatesolutions;
 
 import java.util.ArrayList;
@@ -228,5 +228,11 @@ public class SurrogateSolution<X extends SimulatorState<X>, U> {
 			}
 		}
 		return result;
+	}
+
+	// TODO experimental code below
+
+	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
+		return this.decisionVariable2transitionSequence;
 	}
 }

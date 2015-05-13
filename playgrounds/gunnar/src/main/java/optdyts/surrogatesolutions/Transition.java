@@ -37,7 +37,7 @@ import floetteroed.utilities.math.Vector;
  * @param <U>
  *            the decision variable type
  */
-class Transition<X extends SimulatorState<X>, U> {
+public class Transition<X extends SimulatorState<X>, U> {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -74,19 +74,19 @@ class Transition<X extends SimulatorState<X>, U> {
 
 	// -------------------- GETTERS --------------------
 
-	X getFromState() {
+	public X getFromState() {
 		return this.fromState;
 	}
 
-	U getDecisionVariable() {
+	public U getDecisionVariable() {
 		return this.decisionVariable;
 	}
 
-	X getToState() {
+	public X getToState() {
 		return this.toState;
 	}
 
-	Vector getDelta() {
+	public Vector getDelta() {
 		return this.delta;
 	}
 

@@ -21,18 +21,20 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package optdyts.algorithms;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import optdyts.DecisionVariable;
 import optdyts.ObjectiveFunction;
 import optdyts.SimulatorState;
 import optdyts.surrogatesolutions.SurrogateSolution;
+import optdyts.surrogatesolutions.TransitionSequence;
 
 /**
  * 
@@ -185,8 +187,15 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 			if ((this.decisionVariablesToBeTriedOut.size() == 0)
 					&& (this.surrogateSolution.size() > 1)
 					&& (this.surrogateSolution.getEstimatedExpectedGap2() <= this.maxGap2)) {
-				SurrogateSolution<X, U> best = null;
-				double bestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
+
+				// SurrogateSolution<X, U> best = null;
+				// double bestObjectiveFunctionValue = Double.POSITIVE_INFINITY;
+
+				SurrogateSolution<X, U> best = this.surrogateSolution;
+				double bestObjectiveFunctionValue = this.objectiveFunction
+						.evaluateState(this.surrogateSolution
+								.getEquilibriumState());
+
 				for (SurrogateSolution<X, U> candidate : this.surrogateSolution
 						.newEvaluatedSubsets()) {
 					final double candidateObjectiveFunctionValue = this.objectiveFunction
@@ -205,5 +214,11 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 
 	public U getCurrentDecisionVariable() {
 		return this.currentDecisionVariable;
+	}
+
+	// TODO experimental code below
+
+	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
+		return this.surrogateSolution.getDecisionVariable2TransitionSequence();
 	}
 }
