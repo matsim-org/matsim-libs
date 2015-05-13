@@ -1,4 +1,4 @@
-package playground.southafrica.projects.digicore.scoring;
+package playground.southafrica.projects.digicore.aggregation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -23,10 +23,10 @@ import playground.southafrica.utilities.Header;
  *
  * @author jwjoubert
  */
-public class MaxVector1HzDigiAggregator implements DigiAggregator {
+public class Mean1HzDigiAggregator implements DigiAggregator {
 	private int maxLines = Integer.MAX_VALUE;
 	
-	public MaxVector1HzDigiAggregator() {
+	public Mean1HzDigiAggregator() {
 	}
 
 	@Override
@@ -112,8 +112,10 @@ public class MaxVector1HzDigiAggregator implements DigiAggregator {
 
 		LOG.info("Writing aggregation (mean acceleration and speed) to file.");
 		BufferedWriter bw = IOUtils.getBufferedWriter(output);
+		counter.reset();
+		
 		int recordIndex = 0;
-		int[] counts = {0,0,0,0,0,0};
+		int[] counts = {0,0,0,0,0,0}; 
 		try{
 			for(String date : mapDynamic.keySet()){
 				for(String person : mapDynamic.get(date).keySet()){
@@ -121,29 +123,39 @@ public class MaxVector1HzDigiAggregator implements DigiAggregator {
 
 					/* Just count how many records. */
 					int i = list.size();
+
+					/* Had to add (2015/05/13) a seventh entry as there seems to be 
+					 * duplicate records, i.e. with more than 5 records per second for the
+					 * 5Hz data.*/
+					if(i > 5){
+						LOG.warn("There seems to be duplicate records. More than 5 entries per second for 5Hz data:");
+						LOG.warn("   date,person,x,y,z,speed");
+						for(String s : list){
+							LOG.warn("   " + date + "," + person + "," + s);
+						}
+						/* Replace with 5. */
+						i = 5;
+					}
 					int oldValue = counts[i];
 					counts[i] = oldValue+1;
 
-					/* Aggregate by using the record of the largest vector,
-					 * measured from the origin (0,0,1000) */
-					double maxVector = Double.NEGATIVE_INFINITY;
-					String maxString = null;
-					
+					/* Aggregate by using the mean of the accelerometer and speed records. */
+					double sumX = 0.0;
+					double sumY = 0.0;
+					double sumZ = 0.0;
+					double sumSpeed = 0.0;
 					Iterator<String> it = list.iterator();
 					while(it.hasNext()){
-						String record = it.next();
-						String[] sa = record.split(",");
-						double x = Double.parseDouble(sa[0]);
-						double y = Double.parseDouble(sa[1]);
-						double z = Double.parseDouble(sa[2]);
-						
-						/* Calculate the vector. */
-						double v = Math.sqrt( 	Math.pow(x - 0.0, 2.0) + Math.pow(y - 0.0, 2.0) + Math.pow(z - 1000.0, 2.0));
-						if(v > maxVector){
-							maxVector = v;
-							maxString = record;
-						}
+						String[] sa = it.next().split(",");
+						sumX += Double.parseDouble(sa[0]);
+						sumY += Double.parseDouble(sa[1]);
+						sumZ += Double.parseDouble(sa[2]);
+						sumSpeed += Double.parseDouble(sa[3]);
 					}
+					double meanX = sumX / ((double)list.size());
+					double meanY = sumY / ((double)list.size());
+					double meanZ = sumZ / ((double)list.size());
+					double meanSpeed = sumSpeed / ((double)list.size());
 					
 					/* Break up the static link into its components again. This
 					 * ensures that the final records written are the exact same
@@ -155,23 +167,17 @@ public class MaxVector1HzDigiAggregator implements DigiAggregator {
 					String hist = sa[3];
 					String limit = sa[4];
 					
-					/* Break up the largest vector into its components. */
-					String[] maxSa = maxString.split(",");
-					String maxX = maxSa[0];
-					String maxY = maxSa[1];
-					String maxZ = maxSa[2];
-					String maxSpeed = maxSa[3];
-					
 					/* Convert time back to milliseconds since 1996. */
 					String dateMs = String.valueOf(DigicoreUtils.getLongSince1996FromSeconds(date));
 
 					/* Write the aggregate records to file. */
 					try{
-						bw.write(String.format("%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s", 
+						bw.write(String.format("%d,%s,%s,%s,%s,%.4f,%.4f,%.4f,%.4f,%s,%s,%s", 
 								recordIndex++, personToHash.get(person), dateMs, lon, lat, 
-								maxX, maxY, maxZ, maxSpeed, 
+								meanX, meanY, meanZ, meanSpeed, 
 								road, hist, limit));
 						bw.newLine();
+						counter.incCounter();
 					} catch (IOException e) {
 						e.printStackTrace();
 						throw new RuntimeException("Cannot write to from " + output);
@@ -205,9 +211,9 @@ public class MaxVector1HzDigiAggregator implements DigiAggregator {
 
 	
 	public static void main(String[] args) {
-		Header.printHeader(MaxVector1HzDigiAggregator.class.toString(), args);
+		Header.printHeader(Mean1HzDigiAggregator.class.toString(), args);
 		
-		MaxVector1HzDigiAggregator ma = new MaxVector1HzDigiAggregator();
+		Mean1HzDigiAggregator ma = new Mean1HzDigiAggregator();
 		
 		String input = args[0];
 		String output = args[1];

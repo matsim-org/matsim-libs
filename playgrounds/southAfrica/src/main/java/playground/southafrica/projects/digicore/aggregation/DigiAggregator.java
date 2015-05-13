@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.southafrica.projects.digicore.scoring;
+package playground.southafrica.projects.digicore.aggregation;
 
 import org.apache.log4j.Logger;
 

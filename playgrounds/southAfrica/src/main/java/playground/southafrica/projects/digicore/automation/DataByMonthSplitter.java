@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.southafrica.projects.digicore;
+package playground.southafrica.projects.digicore.automation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.southafrica.projects.digicore.DigicoreUtils;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 

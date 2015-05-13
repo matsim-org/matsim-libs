@@ -1,6 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * ConvertOsmToMatsim.java
+ * project: org.matsim.													   *
+ * Wp3Accel2dAndSpeedDigiScorer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -53,8 +53,8 @@ import com.vividsolutions.jts.geom.Point;
  *   
  * @author jwjoubert
  */
-public class Wp3Accel2dAndSpeedDigiscorer implements DigiScorer {
-	final private static Logger LOG = Logger.getLogger(Wp3Accel2dAndSpeedDigiscorer.class);
+public class Wp3Accel2dAndSpeedDigiScorer implements DigiScorer {
+	final private static Logger LOG = Logger.getLogger(Wp3Accel2dAndSpeedDigiScorer.class);
 
 	/* Other variables. */
 	private int maxLines = Integer.MAX_VALUE;
@@ -70,7 +70,7 @@ public class Wp3Accel2dAndSpeedDigiscorer implements DigiScorer {
 	private DigiGrid2D grid;
 
 	
-	public Wp3Accel2dAndSpeedDigiscorer(double scale, List<Double> riskThresholds) {
+	public Wp3Accel2dAndSpeedDigiScorer(double scale, List<Double> riskThresholds) {
 		this.grid = new DigiGrid2D(scale) {
 			
 			@Override
@@ -337,7 +337,7 @@ public class Wp3Accel2dAndSpeedDigiscorer implements DigiScorer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(Wp3Accel2dAndSpeedDigiscorer.class.toString(), args);
+		Header.printHeader(Wp3Accel2dAndSpeedDigiScorer.class.toString(), args);
 		String filename = args[0];
 		String outputFolder = args[1];
 		Double scale = Double.parseDouble(args[2]);
@@ -359,7 +359,7 @@ public class Wp3Accel2dAndSpeedDigiscorer implements DigiScorer {
 		}
 		folder.mkdirs();
 		
-		Wp3Accel2dAndSpeedDigiscorer wp3AS = new Wp3Accel2dAndSpeedDigiscorer(scale, riskThresholds);
+		Wp3Accel2dAndSpeedDigiScorer wp3AS = new Wp3Accel2dAndSpeedDigiScorer(scale, riskThresholds);
 		wp3AS.setAccelerationWeight(aWeight);
 		wp3AS.setSpeedWeight(sWeight);
 		wp3AS.setMaximumLines(maxLines);

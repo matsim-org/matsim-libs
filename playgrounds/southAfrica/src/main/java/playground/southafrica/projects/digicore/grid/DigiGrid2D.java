@@ -72,10 +72,10 @@ public abstract class DigiGrid2D extends DigiGrid {
 		/* Get the extreme points from the data.
 		 * TODO For now (11 May) this will only hard coded values. In future
 		 * one may want to parse this from the raw data. */
-		double minX = -800d;
-		double maxX = 800d;
-		double minY = -1000d;
-		double maxY = 1000d;
+		double minX = -1000d;
+		double maxX = 1000d;
+		double minY = -1200d;
+		double maxY = 1200d;
 		
 		/* Establish the geometry used to build the grid. */
 		Coordinate c1 = new Coordinate(minX, minY); // Bottom-left

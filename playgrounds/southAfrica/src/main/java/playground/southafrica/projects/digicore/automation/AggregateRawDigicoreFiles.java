@@ -21,14 +21,13 @@
 /**
  * 
  */
-package playground.southafrica.projects.digicore;
+package playground.southafrica.projects.digicore.automation;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -43,6 +42,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.southafrica.projects.digicore.DigicoreUtils;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
