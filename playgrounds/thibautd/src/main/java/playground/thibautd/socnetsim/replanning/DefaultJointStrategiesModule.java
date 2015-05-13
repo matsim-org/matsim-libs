@@ -41,8 +41,8 @@ import playground.thibautd.socnetsim.framework.replanning.selectors.Incompatible
 import playground.thibautd.socnetsim.framework.replanning.selectors.coalitionselector.LeastAverageWeightJointPlanPruningConflictSolver;
 import playground.thibautd.socnetsim.framework.replanning.selectors.coalitionselector.LeastPointedPlanPruningConflictSolver;
 import playground.thibautd.socnetsim.replanning.strategies.ActivityInGroupLocationChoiceFactory;
-import playground.thibautd.socnetsim.replanning.strategies.CoalitionExpBetaFactory;
-import playground.thibautd.socnetsim.replanning.strategies.CoalitionRandomFactory;
+import playground.thibautd.socnetsim.framework.replanning.strategies.CoalitionExpBetaFactory;
+import playground.thibautd.socnetsim.framework.replanning.strategies.CoalitionRandomFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupActivitySequenceMutator;
 import playground.thibautd.socnetsim.replanning.strategies.GroupMinLossSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupMinSelectExpBetaFactory;
@@ -50,12 +50,12 @@ import playground.thibautd.socnetsim.replanning.strategies.GroupOptimizingTourVe
 import playground.thibautd.socnetsim.replanning.strategies.GroupPlanVehicleAllocationFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupRandomJointPlanRecomposerFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupReRouteFactory;
-import playground.thibautd.socnetsim.replanning.strategies.GroupSelectExpBetaFactory;
+import playground.thibautd.socnetsim.framework.replanning.strategies.GroupSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupSubtourModeChoiceFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupTimeAllocationMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupTourVehicleAllocationFactory;
-import playground.thibautd.socnetsim.replanning.strategies.GroupWeightedSelectExpBetaFactory;
-import playground.thibautd.socnetsim.replanning.strategies.GroupWhoIsTheBossSelectExpBetaFactory;
+import playground.thibautd.socnetsim.framework.replanning.strategies.GroupWeightedSelectExpBetaFactory;
+import playground.thibautd.socnetsim.framework.replanning.strategies.GroupWhoIsTheBossSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.JointPrismLocationChoiceStrategyFactory;
 import playground.thibautd.socnetsim.replanning.strategies.JointPrismLocationChoiceWithJointTripInsertionStrategyFactory;
 import playground.thibautd.socnetsim.replanning.strategies.JointTripMutatorFactory;

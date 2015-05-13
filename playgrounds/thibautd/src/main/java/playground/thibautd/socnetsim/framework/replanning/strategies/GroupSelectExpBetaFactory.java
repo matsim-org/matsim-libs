@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AbstractConfigurableSelectionStrategy.java
+ * GroupSelectExpBetaFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,31 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.strategies;
+package playground.thibautd.socnetsim.framework.replanning.strategies;
 
-import java.util.Map;
-
-import org.matsim.core.config.Config;
-
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.gbl.MatsimRandom;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
+
+import playground.thibautd.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
+import playground.thibautd.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.framework.replanning.selectors.LogitSumSelector;
 
 /**
  * @author thibautd
  */
-public abstract class AbstractConfigurableSelectionStrategy implements Provider<GroupPlanStrategy> {
+public class GroupSelectExpBetaFactory extends NonInnovativeStrategyFactory {
+
+	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
+	private final Scenario sc;
+
 	@Inject
-	private Map<String, Provider<GroupLevelPlanSelector>> factoryRegistry;
+	public GroupSelectExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
+		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
+		this.sc = sc;
+	}
 
-	protected GroupPlanStrategy instantiateStrategy( final Config config ) {
-		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
-			config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
-
-		return new GroupPlanStrategy( factoryRegistry.get( conf.getSelectorForModification() ).get() );
+	@Override
+	public GroupLevelPlanSelector createSelector() {
+		return new LogitSumSelector(
+			MatsimRandom.getLocalInstance(),
+			incompatiblePlansIdentifierFactory,
+			sc.getConfig().planCalcScore().getBrainExpBeta());
 	}
 }
 

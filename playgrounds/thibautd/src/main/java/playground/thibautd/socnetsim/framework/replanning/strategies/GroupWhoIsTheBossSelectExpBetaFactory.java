@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GroupSelectExpBetaFactory.java
+ * GroupWhoIsTheBossSelectExpBetaFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.strategies;
+package playground.thibautd.socnetsim.framework.replanning.strategies;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
@@ -27,28 +27,33 @@ import com.google.inject.Inject;
 import playground.thibautd.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.framework.replanning.selectors.LogitSumSelector;
+import playground.thibautd.socnetsim.framework.replanning.selectors.LogitWeight;
+import playground.thibautd.socnetsim.framework.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
 
 /**
  * @author thibautd
  */
-public class GroupSelectExpBetaFactory extends NonInnovativeStrategyFactory {
+public class GroupWhoIsTheBossSelectExpBetaFactory extends NonInnovativeStrategyFactory {
 
 	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
 	private final Scenario sc;
 
 	@Inject
-	public GroupSelectExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
+	public GroupWhoIsTheBossSelectExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
 		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
 		this.sc = sc;
 	}
 
+
 	@Override
 	public GroupLevelPlanSelector createSelector() {
-		return new LogitSumSelector(
-			MatsimRandom.getLocalInstance(),
-			incompatiblePlansIdentifierFactory,
-			sc.getConfig().planCalcScore().getBrainExpBeta());
+		return
+				 new WhoIsTheBossSelector(
+					 MatsimRandom.getLocalInstance(),
+					 incompatiblePlansIdentifierFactory ,
+					 new LogitWeight(
+						MatsimRandom.getLocalInstance(),
+						sc.getConfig().planCalcScore().getBrainExpBeta()) );
 	}
 }
 

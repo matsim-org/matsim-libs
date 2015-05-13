@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * GroupWhoIsTheBossSelectExpBetaFactory.java
+ * AbstractConfigurableSelectionStrategy.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.strategies;
+package playground.thibautd.socnetsim.framework.replanning.strategies;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.MatsimRandom;
+import java.util.Map;
+
+import org.matsim.core.config.Config;
+
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 
 import com.google.inject.Inject;
-
-import playground.thibautd.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
-import playground.thibautd.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.framework.replanning.selectors.LogitWeight;
-import playground.thibautd.socnetsim.framework.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd
  */
-public class GroupWhoIsTheBossSelectExpBetaFactory extends NonInnovativeStrategyFactory {
-
-	private final IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory;
-	private final Scenario sc;
-
+public abstract class AbstractConfigurableSelectionStrategy implements Provider<GroupPlanStrategy> {
 	@Inject
-	public GroupWhoIsTheBossSelectExpBetaFactory( IncompatiblePlansIdentifierFactory incompatiblePlansIdentifierFactory , Scenario sc ) {
-		this.incompatiblePlansIdentifierFactory = incompatiblePlansIdentifierFactory;
-		this.sc = sc;
-	}
+	private Map<String, Provider<GroupLevelPlanSelector>> factoryRegistry;
 
+	protected GroupPlanStrategy instantiateStrategy( final Config config ) {
+		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
+			config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
 
-	@Override
-	public GroupLevelPlanSelector createSelector() {
-		return
-				 new WhoIsTheBossSelector(
-					 MatsimRandom.getLocalInstance(),
-					 incompatiblePlansIdentifierFactory ,
-					 new LogitWeight(
-						MatsimRandom.getLocalInstance(),
-						sc.getConfig().planCalcScore().getBrainExpBeta()) );
+		return new GroupPlanStrategy( factoryRegistry.get( conf.getSelectorForModification() ).get() );
 	}
 }
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CoalitionExpBetaFactory.java
+ * CoalitionRandomFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,39 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning.strategies;
+package playground.thibautd.socnetsim.framework.replanning.strategies;
 
-import org.matsim.api.core.v01.Scenario;
+import java.util.Random;
+
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 
-import com.google.inject.Inject;
-
 import playground.thibautd.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
+import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.framework.replanning.selectors.LogitWeight;
+import playground.thibautd.socnetsim.framework.replanning.selectors.WeightCalculator;
 import playground.thibautd.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
 import playground.thibautd.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
 
 /**
  * @author thibautd
  */
-public class CoalitionExpBetaFactory extends NonInnovativeStrategyFactory  {
+public class CoalitionRandomFactory  extends NonInnovativeStrategyFactory {
 	private final ConflictSolver conflictSolver;
 
-	@Inject
-	private Scenario sc = null;
-
-	public CoalitionExpBetaFactory(
+	public CoalitionRandomFactory(
 			final ConflictSolver conflictSolver) {
 		this.conflictSolver = conflictSolver;
 	}
 
 	@Override
 	public GroupLevelPlanSelector createSelector() {
+		final Random random = MatsimRandom.getLocalInstance();
 		return new CoalitionSelector(
-				new LogitWeight(
-					MatsimRandom.getLocalInstance(),
-					sc.getConfig().planCalcScore().getBrainExpBeta()),
+				new WeightCalculator() {
+					@Override
+					public double getWeight(
+							final Plan indivPlan,
+							final ReplanningGroup group) {
+						return random.nextDouble();
+					}
+				},
 				conflictSolver);
 	}
 }

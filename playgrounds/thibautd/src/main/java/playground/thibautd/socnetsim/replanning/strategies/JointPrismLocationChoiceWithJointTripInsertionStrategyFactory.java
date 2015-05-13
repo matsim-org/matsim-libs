@@ -31,6 +31,7 @@ import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.framework.replanning.strategies.AbstractConfigurableSelectionStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.framework.replanning.JointPlanBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;

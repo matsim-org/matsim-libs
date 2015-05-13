@@ -26,6 +26,7 @@ import org.matsim.core.router.TripRouter;
 import playground.thibautd.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.framework.replanning.strategies.AbstractConfigurableSelectionStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
