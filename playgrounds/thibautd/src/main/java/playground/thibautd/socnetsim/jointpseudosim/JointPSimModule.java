@@ -17,28 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.controller;
-
-import java.util.Map;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
-
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup.StrategyParameterSet;
-import playground.thibautd.socnetsim.qsim.SwitchingJointQSimFactoryModule;
-import playground.thibautd.socnetsim.replanning.DefaultJointStrategiesModule;
-import playground.thibautd.socnetsim.framework.replanning.ExtraPlanRemover;
-import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.framework.replanning.GroupStrategyRegistry;
-import playground.thibautd.socnetsim.replanning.InnovationSwitchingGroupReplanningListenner.Innovative;
-import playground.thibautd.socnetsim.replanning.InnovationSwitchingGroupReplanningListenner.NonInnovative;
-import playground.thibautd.utils.TravelTimeRetrofittingEventHandler;
+package playground.thibautd.socnetsim.jointpseudosim;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
+import playground.thibautd.socnetsim.framework.replanning.ExtraPlanRemover;
+import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.framework.replanning.GroupStrategyRegistry;
+import playground.thibautd.socnetsim.jointpseudosim.qsim.SwitchingJointQSimFactoryModule;
+import playground.thibautd.socnetsim.replanning.DefaultJointStrategiesModule;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup.StrategyParameterSet;
+import playground.thibautd.socnetsim.jointpseudosim.replanning.InnovationSwitchingGroupReplanningListenner.Innovative;
+import playground.thibautd.socnetsim.jointpseudosim.replanning.InnovationSwitchingGroupReplanningListenner.NonInnovative;
+import playground.thibautd.utils.TravelTimeRetrofittingEventHandler;
+
+import java.util.Map;
 
 /**
  * @author thibautd

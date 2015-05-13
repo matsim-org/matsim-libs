@@ -65,7 +65,7 @@ import playground.ivt.utils.AcceptAllFilter;
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.SubpopulationFilter;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
-import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
+import playground.thibautd.socnetsim.jointtrips.JointMainModeIdentifier;
 
 /**
  * @author thibautd

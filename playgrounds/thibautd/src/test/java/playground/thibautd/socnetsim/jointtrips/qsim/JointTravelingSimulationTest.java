@@ -17,13 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.qsim;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
+package playground.thibautd.socnetsim.jointtrips.qsim;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -67,11 +61,15 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
-import playground.thibautd.socnetsim.jointtrips.qsim.JointQSimFactory;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author thibautd
@@ -99,7 +97,6 @@ public class JointTravelingSimulationTest {
 		Logger.getLogger( EventsManagerImpl.class ).setLevel( Level.WARN );
 		Logger.getLogger( Gbl.class ).setLevel( Level.WARN );
 
-		//Logger.getLogger( "playground.thibautd.socnetsim.qsim" ).setLevel( Level.TRACE );
 		log.setLevel( Level.WARN );
 	}
 

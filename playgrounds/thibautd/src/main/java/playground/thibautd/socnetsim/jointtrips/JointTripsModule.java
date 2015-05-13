@@ -40,7 +40,6 @@ import playground.thibautd.socnetsim.jointtrips.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.jointtrips.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.jointtrips.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.jointtrips.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
-import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
 
 /**
  * @author thibautd

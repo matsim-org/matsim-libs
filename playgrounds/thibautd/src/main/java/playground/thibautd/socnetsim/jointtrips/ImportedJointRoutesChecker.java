@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.utils;
+package playground.thibautd.socnetsim.jointtrips;
 
 import java.util.Iterator;
 import java.util.List;

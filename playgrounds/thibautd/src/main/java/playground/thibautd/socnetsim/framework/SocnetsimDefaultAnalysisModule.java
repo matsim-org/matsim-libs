@@ -17,10 +17,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.controller;
+package playground.thibautd.socnetsim.framework;
 
-import java.util.Collections;
-
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -30,22 +30,16 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
-
 import playground.ivt.utils.TripModeShares;
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
-import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
-import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
-import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
-import playground.thibautd.socnetsim.analysis.JointTripsStats;
+import playground.thibautd.socnetsim.analysis.*;
 import playground.thibautd.socnetsim.framework.cliques.Clique;
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifier;
-import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.jointtrips.JointMainModeIdentifier;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.Collections;
 
 /**
  * @author thibautd

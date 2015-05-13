@@ -17,12 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.thibautd.socnetsim.run;
+package playground.thibautd.socnetsim.sharedvehicles;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.google.inject.Inject;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -32,14 +30,16 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
-import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 
-import com.google.inject.Inject;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public final class VehicleAllocationConsistencyChecker implements IterationEndsListener, IterationStartsListener {
+	private final static Logger log = Logger.getLogger( VehicleAllocationConsistencyChecker.class );
+
 	private boolean gotError = false;
 
 	private final Population population;
@@ -53,7 +53,7 @@ public final class VehicleAllocationConsistencyChecker implements IterationEndsL
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		RunUtils.log.info( "Checking consistency of vehicle allocation" );
+		log.info( "Checking consistency of vehicle allocation" );
 		final Set<Id> knownVehicles = new HashSet<Id>();
 		final Set<JointPlan> knownJointPlans = new HashSet<JointPlan>();
 
@@ -77,7 +77,7 @@ public final class VehicleAllocationConsistencyChecker implements IterationEndsL
 			for ( Id v : vehsOfPlan ) {
 				if ( v == null ) {
 					if ( hadNonNull ) {
-						RunUtils.log.error( "got null and non-null vehicles" );
+						log.error( "got null and non-null vehicles" );
 						gotError = true;
 					}
 
@@ -85,11 +85,11 @@ public final class VehicleAllocationConsistencyChecker implements IterationEndsL
 				}
 				else {
 					if ( hadNull ) {
-						RunUtils.log.error( "got null and non-null vehicles" );
+						log.error( "got null and non-null vehicles" );
 						gotError = true;
 					}
 					if ( !knownVehicles.add( v ) ) {
-						RunUtils.log.error( "inconsistent allocation of vehicle "+v+" (found in several distinct joint plans)" );
+						log.error( "inconsistent allocation of vehicle "+v+" (found in several distinct joint plans)" );
 						gotError = true;
 					}
 					hadNonNull = true;

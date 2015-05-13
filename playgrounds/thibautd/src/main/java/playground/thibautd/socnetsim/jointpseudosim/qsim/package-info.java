@@ -23,5 +23,5 @@
  *
  * @author thibautd
  */
-package playground.thibautd.socnetsim.qsim;
+package playground.thibautd.socnetsim.jointpseudosim.qsim;
 

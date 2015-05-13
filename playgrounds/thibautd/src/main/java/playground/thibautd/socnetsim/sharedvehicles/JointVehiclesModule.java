@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.controller;
+package playground.thibautd.socnetsim.sharedvehicles;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
@@ -35,12 +35,6 @@ import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdenti
 import playground.thibautd.socnetsim.framework.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.jointtrips.router.JointPlanRouterFactory;
-import playground.thibautd.socnetsim.run.VehicleAllocationConsistencyChecker;
-import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
-import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
-import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
-import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.framework.controller.ScenarioElementProvider;
 
 import com.google.inject.Inject;

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.qsim;
+package playground.thibautd.socnetsim.jointpseudosim.qsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;

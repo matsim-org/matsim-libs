@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.qsim;
+package playground.thibautd.socnetsim.jointpseudosim.qsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -30,18 +30,13 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.router.util.TravelTime;
-import playground.thibautd.pseudoqsim.NetsimWrappingQVehicleProvider;
-import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import playground.thibautd.pseudoqsim.QVehicleProvider;
-import playground.thibautd.pseudoqsim.pseudoqsimengine.PseudoQsimEngine;
+import playground.thibautd.pseudoqsim.ParkedVehicleProvider;
+import playground.thibautd.pseudoqsim.PopulationAgentSourceForTeleportedVehicles;
+import playground.thibautd.pseudoqsim.VehicularTeleportationEngine;
+import playground.thibautd.pseudoqsim.VehicularTeleportationEngine.VehicleBehavior;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.jointtrips.qsim.JointModesDepartureHandler;
 import playground.thibautd.socnetsim.jointtrips.qsim.PassengerUnboardingAgentFactory;
-import playground.thibautd.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,16 +44,9 @@ import java.util.List;
 /**
  * @author thibautd
  */
-public class JointPseudoSimFactory implements MobsimFactory {
+public class JointTeleportationSimFactory implements MobsimFactory {
 	private static final Logger log =
 		Logger.getLogger(JointPseudoSimFactory.class);
-
-	private final TravelTime travelTime;
-
-	public JointPseudoSimFactory(
-			final TravelTime travelTime) {
-		this.travelTime = travelTime;
-	}
 
 	@Override
 	public QSim createMobsim(
@@ -79,34 +67,29 @@ public class JointPseudoSimFactory implements MobsimFactory {
 		// default initialisation
 		final QSim qSim =
 			new QSim(
-					sc,
-						eventsManager );
-
-        final QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
-		final QVehicleProvider vehicles = new NetsimWrappingQVehicleProvider( netsimEngine );
+					sc, eventsManager  );
+		
+		final ParkedVehicleProvider vehicles = new ParkedVehicleProvider();
+		final VehicularTeleportationEngine vehicularEngine =
+			new VehicularTeleportationEngine(
+					conf.getMainModes(),
+					vehicles,
+					VehicleBehavior.valueOf( conf.getVehicleBehavior() ) );
 
 		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine( activityEngine );
 		qSim.addActivityHandler( activityEngine );
 
-		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
-			sc.getConfig().getModule( PseudoSimConfigGroup.GROUP_NAME );
-		final PseudoQsimEngine pseudoEngine =
-			new PseudoQsimEngine(
-					pSimConf != null ?
-						pSimConf.getNThreads() :
-						1,
-					conf.getMainModes(),
-					travelTime,
-					sc.getNetwork(),
-					vehicles);
+		//final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
+		//	sc.getConfig().getModule( PseudoSimConfigGroup.GROUP_NAME );
+
 		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
-		qSim.addMobsimEngine( pseudoEngine );
+		qSim.addMobsimEngine( vehicularEngine );
 
 		final JointModesDepartureHandler jointDepHandler =
 			new JointModesDepartureHandler(
 					vehicles,
-					pseudoEngine );
+					vehicularEngine );
 		qSim.addDepartureHandler( jointDepHandler );
 		qSim.addMobsimEngine( jointDepHandler );
 
@@ -114,11 +97,12 @@ public class JointPseudoSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine( teleportationEngine );
 
         if (sc.getConfig().scenario().isUseTransit()) {
-            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-            transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-            qSim.addDepartureHandler(transitEngine);
-            qSim.addAgentSource(transitEngine);
-            qSim.addMobsimEngine(transitEngine);
+			log.warn( "pt trips will be teleported!" );
+            //final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+            //transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+            //qSim.addDepartureHandler(transitEngine);
+            //qSim.addAgentSource(transitEngine);
+            //qSim.addMobsimEngine(transitEngine);
         }
 
 		final PassengerUnboardingAgentFactory passAgentFactory =
@@ -128,15 +112,16 @@ public class JointPseudoSimFactory implements MobsimFactory {
 							new DefaultAgentFactory(qSim) ,
 						vehicles );
         final AgentSource agentSource =
-			new PopulationAgentSourceWithVehicles(
+			new PopulationAgentSourceForTeleportedVehicles(
 					sc.getPopulation(),
 					passAgentFactory,
-					qSim);
+					qSim,
+					vehicles);
 		qSim.addMobsimEngine( passAgentFactory );
         qSim.addAgentSource(agentSource);
 
 		// add  at the end: this must just provide the "service network" functionnality
-		qSim.addMobsimEngine( netsimEngine );
+		//qSim.addMobsimEngine( netsimEngine );
 
         return qSim;
 	}

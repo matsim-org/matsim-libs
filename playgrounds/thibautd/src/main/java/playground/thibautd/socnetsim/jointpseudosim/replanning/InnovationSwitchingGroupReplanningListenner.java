@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning;
+package playground.thibautd.socnetsim.jointpseudosim.replanning;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -39,6 +39,7 @@ import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifi
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
 
 /**
  * @author thibautd
@@ -81,7 +82,7 @@ public class InnovationSwitchingGroupReplanningListenner implements ReplanningLi
 		final PseudoSimConfigGroup config = (PseudoSimConfigGroup)
 			scenario.getConfig().getModule(
 					PseudoSimConfigGroup.GROUP_NAME );
-		final GroupReplanningConfigGroup repl = (GroupReplanningConfigGroup) 
+		final GroupReplanningConfigGroup repl = (GroupReplanningConfigGroup)
 			scenario.getConfig().getModule(
 					GroupReplanningConfigGroup.GROUP_NAME );
 

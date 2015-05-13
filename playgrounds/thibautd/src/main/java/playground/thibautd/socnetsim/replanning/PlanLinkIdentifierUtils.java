@@ -29,6 +29,7 @@ import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdenti
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import playground.thibautd.socnetsim.jointactivities.replanning.JoinableActivitiesPlanLinkIdentifier;
 import playground.thibautd.socnetsim.jointtrips.replanning.JointTripsPlanLinkIdentifier;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.VehicularPlanBasedIdentifier;
 

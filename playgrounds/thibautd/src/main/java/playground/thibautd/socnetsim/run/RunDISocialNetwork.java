@@ -29,7 +29,7 @@ import playground.thibautd.socnetsim.framework.controller.JointDecisionProcessMo
 import playground.thibautd.socnetsim.jointactivities.scoring.JointActivitiesScoringModule;
 import playground.thibautd.socnetsim.jointtrips.JointTripsModule;
 import playground.thibautd.socnetsim.framework.controller.SocialNetworkModule;
-import playground.thibautd.socnetsim.controller.SocnetsimDefaultAnalysisModule;
+import playground.thibautd.socnetsim.framework.SocnetsimDefaultAnalysisModule;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.framework.replanning.GroupStrategyManagerModule;

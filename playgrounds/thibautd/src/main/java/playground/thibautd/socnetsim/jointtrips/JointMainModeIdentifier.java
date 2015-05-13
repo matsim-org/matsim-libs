@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.thibautd.socnetsim.utils;
+package playground.thibautd.socnetsim.jointtrips;
 
 import java.util.List;
 

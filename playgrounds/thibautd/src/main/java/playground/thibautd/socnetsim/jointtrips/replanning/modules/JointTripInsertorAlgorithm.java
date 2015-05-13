@@ -52,7 +52,7 @@ import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
+import playground.thibautd.socnetsim.jointtrips.JointMainModeIdentifier;
 import playground.thibautd.socnetsim.utils.JointPlanUtils;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;

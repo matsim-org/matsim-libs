@@ -33,6 +33,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.jointactivities.replanning.JoinableActivitiesPlanLinkIdentifier;
 
 /**
  * @author thibautd
