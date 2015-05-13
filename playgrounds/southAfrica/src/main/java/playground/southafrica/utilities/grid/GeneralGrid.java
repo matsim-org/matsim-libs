@@ -45,9 +45,9 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * Class to generate either a square or hexagonal grid from a given shapefile, 
- * and apply (optional) smoothing when processing points or lines over the
- * grid surface. 
+ * Class to generate either a square or hexagonal grid from a given 
+ * {@link Geometry}, and apply (optional) smoothing when processing points or 
+ * lines over the grid surface. 
  *
  * @author jwjoubert
  */
