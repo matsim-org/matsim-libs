@@ -46,7 +46,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
-import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 

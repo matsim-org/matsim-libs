@@ -46,7 +46,7 @@ public class LossWeight implements WeightCalculator {
 			final ReplanningGroup group) {
 		double best = Double.NEGATIVE_INFINITY;
 
-		for ( Plan p : person.getPlans() ) {
+		for ( final Plan p : person.getPlans() ) {
 			final double score = baseWeight.getWeight( p , group );
 			if ( score > best ) best = score;
 		}

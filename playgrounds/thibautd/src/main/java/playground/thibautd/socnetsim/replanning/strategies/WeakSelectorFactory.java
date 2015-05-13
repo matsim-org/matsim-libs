@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
-import playground.thibautd.socnetsim.replanning.GroupLevelPlanSelectorFactory;
+import playground.thibautd.socnetsim.framework.replanning.GroupLevelPlanSelectorFactory;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.WeakSelector;

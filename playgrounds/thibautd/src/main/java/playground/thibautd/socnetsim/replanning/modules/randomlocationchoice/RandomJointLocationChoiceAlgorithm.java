@@ -42,8 +42,8 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.ivt.utils.MapUtils;
-import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.utils.CollectionUtils;
 import playground.thibautd.utils.QuadTreeRebuilder;

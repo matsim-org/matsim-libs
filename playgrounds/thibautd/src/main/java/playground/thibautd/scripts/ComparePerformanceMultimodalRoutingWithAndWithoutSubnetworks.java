@@ -62,7 +62,7 @@ public class ComparePerformanceMultimodalRoutingWithAndWithoutSubnetworks {
 
 		final Timer timer = new Timer();
 		timer.startTimer();
-		for ( Tuple<Node, Node> od : ods ) {
+		for ( final Tuple<Node, Node> od : ods ) {
 			final Node o = od.getFirst();
 			final Node d = od.getSecond();
 
@@ -74,7 +74,7 @@ public class ComparePerformanceMultimodalRoutingWithAndWithoutSubnetworks {
 		routingAlgo.setModeRestriction( Collections.singleton( "car" ) );
 		timer.resetTimer();
 		timer.startTimer();
-		for ( Tuple<Node, Node> od : ods ) {
+		for ( final Tuple<Node, Node> od : ods ) {
 			final Node o = od.getFirst();
 			final Node d = od.getSecond();
 
@@ -84,7 +84,7 @@ public class ComparePerformanceMultimodalRoutingWithAndWithoutSubnetworks {
 		timer.printMeasuredTime( "restricted " );
 	}
 
-	private static List<Tuple<Node, Node>> sampleOds(Network network) {
+	private static List<Tuple<Node, Node>> sampleOds(final Network network) {
 		final List<Tuple<Node, Node>> list = new ArrayList<Tuple<Node, Node>>();
 
 		final List<Node> nodes = new ArrayList<Node>( network.getNodes().values() );

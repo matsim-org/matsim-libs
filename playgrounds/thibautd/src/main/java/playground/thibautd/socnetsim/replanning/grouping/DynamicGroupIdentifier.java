@@ -38,9 +38,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

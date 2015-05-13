@@ -24,10 +24,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.TripRouter;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
+import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
-import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
+import playground.thibautd.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
@@ -47,8 +47,8 @@ public class GroupTourVehicleAllocationFactory extends AbstractConfigurableSelec
 	private final PlanLinkIdentifier planLinkIdentifier;
 
 	@Inject
-	public GroupTourVehicleAllocationFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier ) {
+	public GroupTourVehicleAllocationFactory( final Scenario sc , final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , final Provider<TripRouter> tripRouterFactory ,
+			@Strong final PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;

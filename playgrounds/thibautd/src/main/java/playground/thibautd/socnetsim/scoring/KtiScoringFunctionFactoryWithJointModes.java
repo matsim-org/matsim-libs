@@ -39,6 +39,8 @@ import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
+import playground.thibautd.socnetsim.framework.scoring.GroupCompositionPenalizer;
+import playground.thibautd.socnetsim.framework.scoring.GroupSizePreferencesConfigGroup;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.run.ScoringFunctionConfigGroup;
 

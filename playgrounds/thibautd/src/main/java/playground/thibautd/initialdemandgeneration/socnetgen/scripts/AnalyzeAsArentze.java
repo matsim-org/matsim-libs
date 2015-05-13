@@ -19,28 +19,29 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.scripts;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
-
 import playground.thibautd.initialdemandgeneration.socnetgen.analysis.ComputeSocialDistanceBetweenRandomIndividuals;
 import playground.thibautd.initialdemandgeneration.socnetgen.analysis.IdentifyAndWriteComponents;
 import playground.thibautd.initialdemandgeneration.socnetgen.analysis.WriteDegreeTable;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgen.scripts.RunTRBModel.ArentzeAgent;
-import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.population.SocialNetworkReader;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
 import playground.thibautd.utils.MoreIOUtils;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * Produce the same kind of stats as T Arentze in his Social Networks paper.

@@ -35,7 +35,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 
-import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
+import playground.thibautd.socnetsim.framework.cliques.config.CliquesConfigGroup;
 
 import com.google.inject.Provider;
 import com.google.inject.Singleton;

@@ -41,8 +41,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlanFactory;
 
 /**
  * @author thibautd

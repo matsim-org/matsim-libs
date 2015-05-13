@@ -46,7 +46,7 @@ public class PseudoSimConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "pSimType" )
-	public void setPsimType(PSimType psimType) {
+	public void setPsimType(final PSimType psimType) {
 		this.psimType = psimType;
 	}
 
@@ -56,7 +56,7 @@ public class PseudoSimConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "nPSimIters" )
-	public void setNPSimIters(int nPSimIters) {
+	public void setNPSimIters(final int nPSimIters) {
 		this.nPSimIters = nPSimIters;
 	}
 
@@ -66,7 +66,7 @@ public class PseudoSimConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "period" )
-	public void setPeriod(int period) {
+	public void setPeriod(final int period) {
 		this.period = period;
 	}
 
@@ -76,7 +76,7 @@ public class PseudoSimConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "nThreads" )
-	public void setNThreads(int nThreads) {
+	public void setNThreads(final int nThreads) {
 		this.nThreads = nThreads;
 	}
 

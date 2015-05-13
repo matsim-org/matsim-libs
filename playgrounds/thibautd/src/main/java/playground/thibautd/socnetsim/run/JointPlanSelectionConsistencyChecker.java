@@ -33,8 +33,8 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
 
 import com.google.inject.Inject;
 

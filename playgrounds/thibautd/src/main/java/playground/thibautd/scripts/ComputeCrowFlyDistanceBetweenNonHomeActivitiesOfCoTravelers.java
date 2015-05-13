@@ -65,7 +65,7 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
 		writer.write( "typePassenger\ttypeDriver\tdist" );
-		for ( Person p : scenario.getPopulation().getPersons().values() ) {
+		for ( final Person p : scenario.getPopulation().getPersons().values() ) {
 			if ( !hasOnlyOnPassengerTrip( p ) ) continue;
 			final Activity passengerAct = getJointAct( p );
 
@@ -85,7 +85,7 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 	private static Activity getOtherNonHome(
 			final Person p,
 			final Activity toExclude) {
-		for ( Activity act : TripStructureUtils.getActivities( p.getSelectedPlan() , JointActingTypes.JOINT_STAGE_ACTS ) ) {
+		for ( final Activity act : TripStructureUtils.getActivities( p.getSelectedPlan() , JointActingTypes.JOINT_STAGE_ACTS ) ) {
 			if ( !act.getType().equals( "h" ) && !act.equals( toExclude ) ) return act;
 		}
 		throw new RuntimeException();
@@ -94,7 +94,7 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 	private static Activity getDriverJointAct(
 			final Person passenger,
 			final Person driver) {
-		for ( Trip trip : TripStructureUtils.getTrips( driver.getSelectedPlan() , JointActingTypes.JOINT_STAGE_ACTS ) ) {
+		for ( final Trip trip : TripStructureUtils.getTrips( driver.getSelectedPlan() , JointActingTypes.JOINT_STAGE_ACTS ) ) {
 			if ( containsPassenger( trip , passenger.getId() ) ) {
 				return trip.getOriginActivity().getType().equals( "h" ) ?
 					trip.getDestinationActivity() :
@@ -105,7 +105,7 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 	}
 
 	private static boolean containsPassenger(final Trip trip, final Id id) {
-		for ( Leg l : trip.getLegsOnly() ) {
+		for ( final Leg l : trip.getLegsOnly() ) {
 			final Route route = l.getRoute();
 			if ( route instanceof DriverRoute && ((DriverRoute) route).getPassengersIds().contains( id ) ) {
 				return true;
@@ -115,7 +115,7 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 	}
 
 	private static Activity getJointAct(final Person passenger) {
-		for ( Trip t : TripStructureUtils.getTrips( passenger.getSelectedPlan() , JointActingTypes.JOINT_STAGE_ACTS ) ) {
+		for ( final Trip t : TripStructureUtils.getTrips( passenger.getSelectedPlan() , JointActingTypes.JOINT_STAGE_ACTS ) ) {
 			if ( isPassengerTrip( t ) ) {
 				// assume no complex trip. should be checked.
 				return t.getOriginActivity().getType().equals( "h" ) ?
@@ -127,14 +127,14 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 	}
 
 	private static boolean isPassengerTrip(final Trip t) {
-		for ( Leg l : t.getLegsOnly() ) {
+		for ( final Leg l : t.getLegsOnly() ) {
 			if ( l.getMode().equals( JointActingTypes.PASSENGER ) ) return true;
 		}
 		return false;
 	}
 
 	private static Id getDriver(final Person passenger) {
-		for ( PlanElement pe : passenger.getSelectedPlan().getPlanElements() ) {
+		for ( final PlanElement pe : passenger.getSelectedPlan().getPlanElements() ) {
 			if ( pe instanceof Leg && ((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
 				return ((PassengerRoute) ((Leg) pe).getRoute()).getDriverId();
 			}
@@ -144,7 +144,7 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 
 	private static boolean hasOnlyOnPassengerTrip(final Person p) {
 		int c = 0;
-		for ( PlanElement pe : p.getSelectedPlan().getPlanElements() ) {
+		for ( final PlanElement pe : p.getSelectedPlan().getPlanElements() ) {
 			if ( pe instanceof Leg && ((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) c++;
 		}
 		return c == 1;

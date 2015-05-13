@@ -46,8 +46,8 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
-import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.population.SocialNetworkReader;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
 
 /**
  * @author thibautd

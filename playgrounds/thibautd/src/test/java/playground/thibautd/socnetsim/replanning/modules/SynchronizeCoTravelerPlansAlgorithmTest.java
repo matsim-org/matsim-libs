@@ -46,8 +46,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 
 /**

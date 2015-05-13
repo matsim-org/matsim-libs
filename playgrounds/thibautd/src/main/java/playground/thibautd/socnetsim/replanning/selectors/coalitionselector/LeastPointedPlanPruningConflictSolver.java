@@ -22,7 +22,7 @@ package playground.thibautd.socnetsim.replanning.selectors.coalitionselector;
 import java.util.Collection;
 import java.util.Map;
 
-import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
 
 /**
@@ -35,11 +35,11 @@ public class LeastPointedPlanPruningConflictSolver implements ConflictSolver {
 			final Map<JointPlan, Collection<PlanRecord>> recordsPerJointPlan) {
 		int minPoint = Integer.MAX_VALUE;
 		Map.Entry<JointPlan , Collection<PlanRecord>> toMark = null;
-		for ( Map.Entry<JointPlan , Collection<PlanRecord>> entry : recordsPerJointPlan.entrySet() ) {
+		for ( final Map.Entry<JointPlan , Collection<PlanRecord>> entry : recordsPerJointPlan.entrySet() ) {
 			final Collection<PlanRecord> records = entry.getValue();
 
 			int nPoint = 0;
-			for ( PlanRecord r : records ) {
+			for ( final PlanRecord r : records ) {
 				if ( r.getAgent().getPointedPlan() == r.getPlan()  ) nPoint++;
 			}
 
@@ -53,7 +53,7 @@ public class LeastPointedPlanPruningConflictSolver implements ConflictSolver {
 			throw new RuntimeException( "could not find least pointed joint plan in "+recordsPerJointPlan );
 		}
 
-		for ( PlanRecord r : toMark.getValue() ) r.setInfeasible();
+		for ( final PlanRecord r : toMark.getValue() ) r.setInfeasible();
 		recordsPerJointPlan.remove( toMark.getKey() );
 	}
 }

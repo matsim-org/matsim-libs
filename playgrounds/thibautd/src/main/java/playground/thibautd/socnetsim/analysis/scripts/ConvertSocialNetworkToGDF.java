@@ -33,8 +33,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.analysis.ConvertSocialNetworkToLocatedMatsimNetwork;
-import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.population.SocialNetworkReader;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
 
 /**
  * @author thibautd

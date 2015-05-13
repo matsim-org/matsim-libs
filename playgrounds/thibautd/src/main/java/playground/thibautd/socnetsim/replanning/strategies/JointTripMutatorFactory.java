@@ -26,12 +26,12 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.router.TripRouter;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
-import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
+import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
-import playground.thibautd.socnetsim.replanning.JointPlanBasedGroupStrategyModule;
+import playground.thibautd.socnetsim.framework.replanning.JointPlanBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
 import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAndRemoverAlgorithm;

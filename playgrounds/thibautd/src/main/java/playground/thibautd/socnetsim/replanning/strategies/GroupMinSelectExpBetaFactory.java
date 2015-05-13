@@ -24,8 +24,8 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import com.google.inject.Inject;
 
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
+import playground.thibautd.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;

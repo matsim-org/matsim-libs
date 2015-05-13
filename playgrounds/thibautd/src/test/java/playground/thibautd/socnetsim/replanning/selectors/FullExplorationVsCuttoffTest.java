@@ -29,7 +29,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.FullyExploredPlansProvider.SelectedInformation;

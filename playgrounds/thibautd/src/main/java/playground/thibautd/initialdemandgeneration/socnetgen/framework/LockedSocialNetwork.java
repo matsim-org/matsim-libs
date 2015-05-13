@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 
 /**
  * @author thibautd
@@ -100,13 +100,13 @@ public class LockedSocialNetwork implements SocialNetwork {
 
 	public void addEgosObjects(final Iterable<? extends Identifiable> egos) {
 		if ( locked ) throw new IllegalStateException();
-		for ( Identifiable ego : egos ) addEgo( ego.getId() );
+		for ( final Identifiable ego : egos ) addEgo( ego.getId() );
 	}
 
 	@Override
 	public void addEgos(final Iterable<? extends Id<Person>> ids) {
 		if ( locked ) throw new IllegalStateException();
-		for ( Id id : ids ) addEgo( id );
+		for ( final Id id : ids ) addEgo( id );
 	}
 
 	@Override
@@ -164,14 +164,14 @@ public class LockedSocialNetwork implements SocialNetwork {
 		secondaryNetwork = new LockedSocialNetwork( getEgos().size() * 2 , 0.5f );
 		secondaryNetwork.addEgos( getEgos() );
 
-		for ( Id ego : getEgos() ) {
+		for ( final Id ego : getEgos() ) {
 			final Set<Id<Person>> alters = getAlters( ego );
 			counter.incCounter();
 
-			for ( Id alter : alters ) {
+			for ( final Id alter : alters ) {
 				final Set<Id<Person>> altersOfAlter = getAlters( alter );
 				
-				for ( Id alterOfAlter : altersOfAlter ) {
+				for ( final Id alterOfAlter : altersOfAlter ) {
 					// is the ego?
 					if ( alterOfAlter.equals( ego ) ) continue;
 					// already a friend?
@@ -187,12 +187,12 @@ public class LockedSocialNetwork implements SocialNetwork {
 	}
 
 	@Override
-	public void addBidirectionalTie(Id id1, Id id2) {
+	public void addBidirectionalTie(final Id id1, final Id id2) {
 		addTie( id1 , id2 );
 	}
 
 	@Override
-	public void addMonodirectionalTie(Id ego, Id alter) {
+	public void addMonodirectionalTie(final Id ego, final Id alter) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -212,7 +212,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 	}
 
 	@Override
-	public void addMetadata(String att, String value) {
+	public void addMetadata(final String att, final String value) {
 		metadata.put( att , value );
 	}
 }

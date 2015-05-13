@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.utils.Couple;
 
@@ -70,8 +70,8 @@ public class JointPlanUtils {
 		final List<JointTrip> jointTrips = new ArrayList<JointTrip>();
 		final PlanElementIterators iterators = new PlanElementIterators( plan );
 
-		for ( DriverTrip driverTrip : driverTrips ) {
-			for (Map.Entry<Id, Id> e : driverTrip.passengerOrigins.entrySet()) {
+		for ( final DriverTrip driverTrip : driverTrips ) {
+			for (final Map.Entry<Id, Id> e : driverTrip.passengerOrigins.entrySet()) {
 				final Id passengerId = e.getKey();
 				final Id originId = e.getValue();
 				final Id destinationId = driverTrip.passengerDestinations.get( passengerId );
@@ -127,10 +127,10 @@ public class JointPlanUtils {
 			final Id originId,
 			final Id destinationId,
 			final List<Leg> driverTrip) {
-		ArrayList<Leg> subTrip = new ArrayList<Leg>();
+		final ArrayList<Leg> subTrip = new ArrayList<Leg>();
 		boolean inSubTrip = false;
 
-		for ( Leg l : driverTrip ) {
+		for ( final Leg l : driverTrip ) {
 			if (l.getRoute().getStartLinkId().equals( originId )) inSubTrip = true;
 			if (inSubTrip) subTrip.add( l );
 			if (l.getRoute().getEndLinkId().equals( destinationId )) break;
@@ -147,13 +147,13 @@ public class JointPlanUtils {
 	final static List<DriverTrip> parseDriverTrips( final JointPlan plan ) {
 		final List<DriverTrip> driverTrips = new ArrayList<DriverTrip>();
 
-		for ( Plan indivPlan : plan.getIndividualPlans().values() ) {
+		for ( final Plan indivPlan : plan.getIndividualPlans().values() ) {
 			final Id driverId = indivPlan.getPerson().getId();
 			final List<Id> currentPassengers = new ArrayList<Id>();
 
 			// store the driver trips we are in, if any
 			DriverTrip currentDriverTrip = null;
-			for ( PlanElement pe : indivPlan.getPlanElements() ) {
+			for ( final PlanElement pe : indivPlan.getPlanElements() ) {
 				if ( pe instanceof Leg &&
 						JointActingTypes.DRIVER.equals( ((Leg) pe).getMode() ) ) {
 					if ( currentDriverTrip == null ) {
@@ -168,7 +168,7 @@ public class JointPlanUtils {
 					final Id destination = dRoute.getEndLinkId();
 					final Collection<Id<Person>> passengerIds = dRoute.getPassengersIds();
 
-					for ( Id passengerId : passengerIds ) {
+					for ( final Id passengerId : passengerIds ) {
 						if ( !currentPassengers.contains( passengerId ) ) {
 							currentDriverTrip.passengerOrigins.put(
 									passengerId,
@@ -229,7 +229,7 @@ public class JointPlanUtils {
 		@Override
 		public boolean equals(final Object o) {
 			if (o != null && o instanceof DriverTrip) {
-				DriverTrip other = (DriverTrip) o;
+				final DriverTrip other = (DriverTrip) o;
 				return other.driverId.equals( driverId ) &&
 					other.driverTrip.equals( driverTrip ) &&
 					other.passengerOrigins.equals( passengerOrigins ) &&
@@ -262,7 +262,7 @@ public class JointPlanUtils {
 				final List<JointTrip> jointTrips) {
 			this.jointTrips = jointTrips;
 
-			for (JointTrip jt : jointTrips) {
+			for (final JointTrip jt : jointTrips) {
 				final List<JointTrip> trips =
 					MapUtils.getList(
 							new Couple(
@@ -297,7 +297,7 @@ public class JointPlanUtils {
 		@Override
 		public boolean equals(final Object o) {
 			if (o != null && o instanceof JointTravelStructure) {
-				JointTravelStructure other = (JointTravelStructure) o;
+				final JointTravelStructure other = (JointTravelStructure) o;
 				return other.getJointTrips().size() == getJointTrips().size() &&
 					other.getJointTrips().containsAll( getJointTrips() );
 			}
@@ -364,7 +364,7 @@ public class JointPlanUtils {
 		@Override
 		public boolean equals(final Object o) {
 			if (o != null && o instanceof JointTrip) {
-				JointTrip other = (JointTrip) o;
+				final JointTrip other = (JointTrip) o;
 				return other.getDriverId().equals( getDriverId() ) &&
 					other.getPassengerId().equals( getPassengerId() ) &&
 					other.getDriverLegs().equals( getDriverLegs() ) &&

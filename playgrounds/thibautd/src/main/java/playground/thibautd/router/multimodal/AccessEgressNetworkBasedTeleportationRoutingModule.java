@@ -124,13 +124,13 @@ public class AccessEgressNetworkBasedTeleportationRoutingModule implements Routi
 
 	private static double calcDistance(final Path path) {
 		double d = 0;
-		for ( Link l : path.links ) d += l.getLength();
+		for ( final Link l : path.links ) d += l.getLength();
 		return d;
 	}
 
 	private static List<Id<Link>> toIds(final List<Link> links) {
 		final List<Id<Link>> ids = new ArrayList<Id<Link>>( links.size() );
-		for ( Link l : links ) ids.add( l.getId() );
+		for ( final Link l : links ) ids.add( l.getId() );
 		return ids;
 	}
 

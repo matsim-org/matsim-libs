@@ -42,7 +42,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
@@ -99,9 +99,9 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 	}
 
 	private void processAllocation(final List<SubtourRecord> vehicularTours) {
-		for ( SubtourRecord r : vehicularTours ) {
-			for ( Trip t : r.subtour.getTrips() ) {
-				for ( Leg leg : t.getLegsOnly() ) {
+		for ( final SubtourRecord r : vehicularTours ) {
+			for ( final Trip t : r.subtour.getTrips() ) {
+				for ( final Leg leg : t.getLegsOnly() ) {
 					if ( !vehicularModes.contains( leg.getMode() ) ) continue;
 
 					if ( allowNullRoutes && leg.getRoute() == null ) {
@@ -155,14 +155,14 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		final List<SubtourRecord> tours = getVehicularToursSortedByStartTime( gps );
 
 		double overlap = 0;
-		for ( SubtourRecord tour : tours ) {
+		for ( final SubtourRecord tour : tours ) {
 			Id veh = null;
-			for ( Trip t : tour.subtour.getTrips() ) {
+			for ( final Trip t : tour.subtour.getTrips() ) {
 				veh = getVehicle( t );
 				if ( veh != null ) break;
 			}
 			
-			for ( VehicleRecord vr : tour.possibleVehicles ) {
+			for ( final VehicleRecord vr : tour.possibleVehicles ) {
 				if ( vr.id.equals( veh ) ) {
 					overlap += Math.max( 0 , vr.availableFrom - tour.startTime );
 					if ( vr.availableFrom < tour.endTime ) {
@@ -183,16 +183,16 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		final List<SubtourRecord> vehicularTours = new ArrayList<SubtourRecord>();
 		final VehicleRecordFactory factory = new VehicleRecordFactory();
 
-		for ( Plan p : plans.getAllIndividualPlans() ) {
+		for ( final Plan p : plans.getAllIndividualPlans() ) {
 			final Collection<Subtour> subtours =
 				TripStructureUtils.getSubtours(
 						p,
 						stageActs,
 						anchorAtFacilities );
-			for ( Subtour s : subtours ) {
+			for ( final Subtour s : subtours ) {
 				if ( s.getParent() != null ) continue; // is not a root tour
 				boolean isFirstTrip = true;
-				for ( Trip t : s.getTrips() ) {
+				for ( final Trip t : s.getTrips() ) {
 					// TODO: check that the sequence of vehicular movements come back to origin
 					if ( isFirstTrip && isVehicular( t ) ) {
 						vehicularTours.add(
@@ -214,7 +214,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 
 		// check validity
 		Id homeLoc = null;
-		for ( SubtourRecord record : vehicularTours ) {
+		for ( final SubtourRecord record : vehicularTours ) {
 			final Subtour s = record.subtour;
 			assert s.getParent() == null;
 			final Id anchor = anchorAtFacilities ?
@@ -312,7 +312,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 		public List<VehicleRecord> getRecords(final Collection<Id<Vehicle>> ids) {
 			final List<VehicleRecord> list = new ArrayList<VehicleRecord>();
 
-			for ( Id<Vehicle> id : ids ) {
+			for ( final Id<Vehicle> id : ids ) {
 				VehicleRecord r = records.get( id );
 
 				if ( r == null ) {
@@ -329,7 +329,7 @@ public class OptimizeVehicleAllocationAtTourLevelAlgorithm implements GenericPla
 
 	private static double calcArrivalTime(final Trip trip) {
 		double now = trip.getOriginActivity().getEndTime();
-		for ( PlanElement pe : trip.getTripElements() ) {
+		for ( final PlanElement pe : trip.getTripElements() ) {
 			if ( pe instanceof Activity ) {
 				final double end = ((Activity) pe).getEndTime();
 				now = end != Time.UNDEFINED_TIME ? end : now + ((Activity) pe).getMaximumDuration();

@@ -41,6 +41,10 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
+import playground.thibautd.socnetsim.framework.population.JointPlansXmlReader;
+import playground.thibautd.socnetsim.framework.population.JointPlansXmlWriter;
 
 /**
  * @author thibautd
@@ -56,7 +60,7 @@ public class JointPlanIOTest {
 		final Population population = scenario.getPopulation();
 
 		final String file = utils.getOutputDirectory()+"/jointPlansDump.xml";
-		JointPlansXmlWriter.write( population , jointPlans , file );
+		JointPlansXmlWriter.write(population, jointPlans, file);
 
 		final Scenario rereadScenario = ScenarioUtils.createScenario( scenario.getConfig() );
 		((ScenarioImpl) rereadScenario).setPopulation( scenario.getPopulation() );

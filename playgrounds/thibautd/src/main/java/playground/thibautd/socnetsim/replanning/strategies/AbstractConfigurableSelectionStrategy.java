@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.matsim.core.config.Config;
 
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 
 import com.google.inject.Inject;

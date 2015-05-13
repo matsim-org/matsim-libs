@@ -66,7 +66,7 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 
 	@Override
 	public ScoringFunction createNewScoringFunction(final Person person) {
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 		scoringFunctionAccumulator.addScoringFunction(
 				// if no pick-up or drop off, behaviour the one of the "base" herbie

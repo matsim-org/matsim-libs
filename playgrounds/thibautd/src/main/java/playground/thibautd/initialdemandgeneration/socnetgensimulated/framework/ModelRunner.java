@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
-import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 
 /**
  * @author thibautd

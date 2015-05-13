@@ -57,33 +57,33 @@ public class ExtractRecordsFromEvents {
 	private static final boolean PRUNE_ZERO_LENGTH_TRIPS = true;
 
 	public static void main(final String[] args) {
-		String networkFile = args[0];
-		String eventFile = args[1];
+		final String networkFile = args[0];
+		final String eventFile = args[1];
 		// ie the output file names will be <prefix>name.dat
 		// this must include the path, and can add a "prefix"
-		String outPrefix = args[2];
+		final String outPrefix = args[2];
 
 		mkdirs( outPrefix );
 
-		Network network = getNetwork( networkFile );
+		final Network network = getNetwork( networkFile );
 
-		TripsRecordsEventsHandler parser = new TripsRecordsEventsHandler();
-		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculator(
+		final TripsRecordsEventsHandler parser = new TripsRecordsEventsHandler();
+		final TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculator(
 				network,
 				new TravelTimeCalculatorConfigGroup());
 		processEvents( parser , travelTimeCalculator , eventFile );
 
-		List<Record> records = extractRecords( parser );
+		final List<Record> records = extractRecords( parser );
 
-		TripsPrism prism = new TripsPrism( records , travelTimeCalculator.getLinkTravelTimes() , network );
+		final TripsPrism prism = new TripsPrism( records , travelTimeCalculator.getLinkTravelTimes() , network );
 
 		RecordsFlatFormatWriter.writeRecords( records , outPrefix+"records.dat" );
-		RecordsFlatFormatWriter writer = new RecordsFlatFormatWriter( outPrefix+"passengerTrips.dat.gz" );
-		Counter counter = new Counter( "--- searching passengers for record # " );
-		for (Record record : records) {
+		final RecordsFlatFormatWriter writer = new RecordsFlatFormatWriter( outPrefix+"passengerTrips.dat.gz" );
+		final Counter counter = new Counter( "--- searching passengers for record # " );
+		for (final Record record : records) {
 			counter.incCounter();
 			if (record.getTripMode().equals( TransportMode.car )) {
-				for (PassengerRecord passenger : prism.getTripsInPrism( record , DETOUR_FRAC , TIME_WINDOW_RADIUS )) {
+				for (final PassengerRecord passenger : prism.getTripsInPrism( record , DETOUR_FRAC , TIME_WINDOW_RADIUS )) {
 					writer.writePassengerTrip( passenger );
 				}
 			}
@@ -94,24 +94,24 @@ public class ExtractRecordsFromEvents {
 	}
 
 	private static void mkdirs(final String outPrefix) {
-		String dirs = outPrefix.substring( 0 , outPrefix.lastIndexOf( "/" )+1 );
-		File f = new File( dirs );
+		final String dirs = outPrefix.substring( 0 , outPrefix.lastIndexOf( "/" )+1 );
+		final File f = new File( dirs );
 		if (!f.exists() && !f.mkdirs()) throw new UncheckedIOException( "could not create dirs for "+dirs );
 
-		Logger root = Logger.getRootLogger();
+		final Logger root = Logger.getRootLogger();
 		root.setLevel( LOG_LEVEL );
 		try {
-			FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outPrefix+"logfile.log");
+			final FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outPrefix+"logfile.log");
 			appender.setName("logfile.log");
 			root.addAppender(appender);
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			throw new UncheckedIOException( e );
 		}
 	}
 
 	private static Network getNetwork(final String networkFile) {
-		Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		(new MatsimNetworkReader( sc )).readFile( networkFile );
 		return sc.getNetwork();
 	}
@@ -120,17 +120,17 @@ public class ExtractRecordsFromEvents {
 			final TripsRecordsEventsHandler parser,
 			final TravelTimeCalculator travelTime,
 			final String eventFile) {
-		EventsManager manager = EventsUtils.createEventsManager();
+		final EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler( parser );
 		manager.addHandler( travelTime );
 		(new MatsimEventsReader( manager )).readFile( eventFile );
 	}
 
 	private static List<Record> extractRecords(final TripsRecordsEventsHandler parser) {
-		List<Record> records = parser.getRecords();
+		final List<Record> records = parser.getRecords();
 
 		if (CONSIDER_ONLY_CAR_TRIPS) {
-			Iterator<Record> it = records.iterator();
+			final Iterator<Record> it = records.iterator();
 
 			while (it.hasNext()) {
 				if (!it.next().getTripMode().equals( TransportMode.car )) {
@@ -139,10 +139,10 @@ public class ExtractRecordsFromEvents {
 			}
 		}
 		if (PRUNE_ZERO_LENGTH_TRIPS) {
-			Iterator<Record> it = records.iterator();
+			final Iterator<Record> it = records.iterator();
 
 			while (it.hasNext()) {
-				Record r = it.next();
+				final Record r = it.next();
 				if (r.getDestinationLink().equals( r.getOriginLink() )) {
 					it.remove();
 				}

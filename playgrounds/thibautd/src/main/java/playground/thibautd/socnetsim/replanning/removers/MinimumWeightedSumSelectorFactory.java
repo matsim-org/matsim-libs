@@ -21,7 +21,7 @@ package playground.thibautd.socnetsim.replanning.removers;
 
 import org.matsim.api.core.v01.Scenario;
 
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;

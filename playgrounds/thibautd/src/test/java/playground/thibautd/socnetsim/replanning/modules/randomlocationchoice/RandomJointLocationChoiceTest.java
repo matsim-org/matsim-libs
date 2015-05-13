@@ -36,7 +36,7 @@ import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.thibautd.socnetsim.population.SocialNetworkImpl;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkImpl;
 
 /**
  * @author thibautd

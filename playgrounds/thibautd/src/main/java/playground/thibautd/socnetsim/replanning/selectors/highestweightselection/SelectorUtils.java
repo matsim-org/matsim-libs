@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**

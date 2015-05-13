@@ -41,7 +41,7 @@ import org.xml.sax.Attributes;
 
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
-import playground.thibautd.socnetsim.events.CourtesyEvent;
+import playground.thibautd.socnetsim.framework.events.CourtesyEvent;
 
 /**
  * @author thibautd

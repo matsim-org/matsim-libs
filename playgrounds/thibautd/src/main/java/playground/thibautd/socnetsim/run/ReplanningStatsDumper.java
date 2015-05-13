@@ -31,8 +31,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
+import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.framework.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
 /**

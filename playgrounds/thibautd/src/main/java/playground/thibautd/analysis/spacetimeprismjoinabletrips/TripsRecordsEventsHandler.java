@@ -65,7 +65,7 @@ public class TripsRecordsEventsHandler implements
 
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
-		RecordBuilder builder = personInfo.get( event.getPersonId() );
+		final RecordBuilder builder = personInfo.get( event.getPersonId() );
 		
 		builder.setArrivalTime( event.getTime() );
 		builder.setDestinationLink( event.getLinkId() );
@@ -130,27 +130,27 @@ public class TripsRecordsEventsHandler implements
 			this.agentId = agentId;
 		}
 
-		public void setTripNr(int tripNr) {
+		public void setTripNr(final int tripNr) {
 			this.tripNr = tripNr;
 		}
 
-		public void setOriginLink(Id<Link> originLink) {
+		public void setOriginLink(final Id<Link> originLink) {
 			this.originLink = originLink;
 		}
 
-		public void setDestinationLink(Id<Link> destinationLink) {
+		public void setDestinationLink(final Id<Link> destinationLink) {
 			this.destinationLink = destinationLink;
 		}
 
-		public void setDepartureTime(double departureTime) {
+		public void setDepartureTime(final double departureTime) {
 			this.departureTime = departureTime;
 		}
 
-		public void setArrivalTime(double arrivalTime) {
+		public void setArrivalTime(final double arrivalTime) {
 			this.arrivalTime = arrivalTime;
 		}
 
-		public void setTripMode(String tripMode) {
+		public void setTripMode(final String tripMode) {
 			this.tripMode = tripMode;
 		}
 

@@ -29,7 +29,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
 
-import playground.thibautd.socnetsim.replanning.GroupLevelPlanSelectorFactory;
+import playground.thibautd.socnetsim.framework.replanning.GroupLevelPlanSelectorFactory;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector;
 
 /**

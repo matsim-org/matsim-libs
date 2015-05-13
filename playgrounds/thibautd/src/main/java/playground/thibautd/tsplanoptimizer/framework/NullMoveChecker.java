@@ -40,10 +40,10 @@ public class NullMoveChecker<T> implements TabuChecker<T> {
 	public boolean isTabu(
 			final Solution<? extends T> solution,
 			final Move move) {
-		Solution<?> newSolution = move.apply( solution );
+		final Solution<?> newSolution = move.apply( solution );
 
-		Iterator<? extends Value> oldIt = solution.getGenotype().iterator();
-		Iterator<? extends Value> newIt = newSolution.getGenotype().iterator();
+		final Iterator<? extends Value> oldIt = solution.getGenotype().iterator();
+		final Iterator<? extends Value> newIt = newSolution.getGenotype().iterator();
 
 		while (oldIt.hasNext()) {
 			if (!oldIt.next().getValue().equals( newIt.next().getValue() )) {

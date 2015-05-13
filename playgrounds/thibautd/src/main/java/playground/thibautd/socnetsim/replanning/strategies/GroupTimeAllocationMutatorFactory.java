@@ -35,10 +35,10 @@ import com.google.inject.Inject;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
 import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
+import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
-import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
+import playground.thibautd.socnetsim.framework.replanning.IndividualBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
 
@@ -55,8 +55,8 @@ public class GroupTimeAllocationMutatorFactory extends AbstractConfigurableSelec
 	private final double maxTemp = 1;
 
 	@Inject
-	public GroupTimeAllocationMutatorFactory( Scenario sc , PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , Provider<TripRouter> tripRouterFactory ,
-			@Strong PlanLinkIdentifier planLinkIdentifier ) {
+	public GroupTimeAllocationMutatorFactory( final Scenario sc , final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory , final Provider<TripRouter> tripRouterFactory ,
+			@Strong final PlanLinkIdentifier planLinkIdentifier ) {
 		this.sc = sc;
 		this.planRoutingAlgorithmFactory = planRoutingAlgorithmFactory;
 		this.tripRouterFactory = tripRouterFactory;

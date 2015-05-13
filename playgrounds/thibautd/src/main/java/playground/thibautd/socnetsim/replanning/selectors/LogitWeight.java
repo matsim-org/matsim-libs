@@ -57,7 +57,7 @@ public class LogitWeight implements WeightCalculator {
 	private double nextErrorTerm() {
 		// "inversion sampling": sample a number between 0 and 1,
 		// and apply the inverse of the CDF to it.
-		double choice = random.nextDouble();
+		final double choice = random.nextDouble();
 
 		double value = Math.log( choice );
 		checkDouble( value );

@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
-import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 

@@ -27,7 +27,7 @@ import java.util.Set;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-import playground.thibautd.socnetsim.scoring.BeingTogetherScoring;
+import playground.thibautd.socnetsim.framework.scoring.BeingTogetherScoring;
 
 public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "scoringFunction";

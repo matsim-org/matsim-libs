@@ -37,7 +37,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.RandomGroupLevelSelector;

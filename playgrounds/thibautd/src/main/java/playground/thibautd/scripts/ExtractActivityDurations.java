@@ -43,8 +43,8 @@ public class ExtractActivityDurations {
 		final String eventFile = args[ 0 ];
 		final String outFile = args[ 1 ];
 
-		Handler handler = new Handler( outFile );
-		EventsManager events = EventsUtils.createEventsManager();
+		final Handler handler = new Handler( outFile );
+		final EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler( handler );
 		new EventsReaderXMLv1( events ).parse( eventFile );
 		handler.close();
@@ -59,7 +59,7 @@ public class ExtractActivityDurations {
 
 			try {
 				writer.write( "agentId\tactType\tduration" );
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new UncheckedIOException( e );
 			}
 		}
@@ -67,17 +67,17 @@ public class ExtractActivityDurations {
 		public void close() {
 			try {
 				writer.close();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new UncheckedIOException( e );
 			}
 		}
 
 		@Override
-		public void reset(int iteration) {}
+		public void reset(final int iteration) {}
 
 		@Override
 		public void handleEvent(final ActivityEndEvent event) {
-			Double start = starts.remove( event.getPersonId() );
+			final Double start = starts.remove( event.getPersonId() );
 			// first act has no start time
 			if (start == null) return;
 
@@ -86,7 +86,7 @@ public class ExtractActivityDurations {
 				writer.write( event.getPersonId()+"\t"+
 						event.getActType()+"\t"+
 						(event.getTime() - start) );
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new UncheckedIOException( e );
 			}
 		}

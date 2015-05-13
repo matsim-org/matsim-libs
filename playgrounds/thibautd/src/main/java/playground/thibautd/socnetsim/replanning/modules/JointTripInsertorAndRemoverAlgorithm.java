@@ -35,11 +35,11 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 
-import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
+import playground.thibautd.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
 
 /**
  * @author thibautd

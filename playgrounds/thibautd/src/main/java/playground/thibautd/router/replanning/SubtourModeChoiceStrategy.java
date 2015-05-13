@@ -62,7 +62,7 @@ public class SubtourModeChoiceStrategy implements PlanStrategy {
 	}
 
 	@Override
-	public void init(ReplanningContext replanningContext) {
+	public void init(final ReplanningContext replanningContext) {
 		strategy.init(replanningContext);
 	}
 

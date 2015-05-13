@@ -36,7 +36,7 @@ import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.log4j.Logger;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
-import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 
 /**
  * @author thibautd

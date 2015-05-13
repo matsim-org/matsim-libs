@@ -38,7 +38,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.thibautd.socnetsim.cliques.Clique;
+import playground.thibautd.socnetsim.framework.cliques.Clique;
 
 /**
  * @author thibautd

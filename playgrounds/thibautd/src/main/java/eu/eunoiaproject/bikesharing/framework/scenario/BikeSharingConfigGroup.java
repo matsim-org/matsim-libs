@@ -58,7 +58,7 @@ public class BikeSharingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "facilitiesAttributesFile" )
-	public void setFacilitiesAttributesFile(String facilitiesAttributesFile) {
+	public void setFacilitiesAttributesFile(final String facilitiesAttributesFile) {
 		this.facilitiesAttributesFile = facilitiesAttributesFile;
 	}
 
@@ -78,7 +78,7 @@ public class BikeSharingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "searchRadius" )
-	public void setSearchRadius(double searchRadius) {
+	public void setSearchRadius(final double searchRadius) {
 		this.searchRadius = searchRadius;
 	}
 
@@ -88,7 +88,7 @@ public class BikeSharingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "ptSearchRadius" )
-	public void setPtSearchRadius(double ptSearchRadius) {
+	public void setPtSearchRadius(final double ptSearchRadius) {
 		this.ptSearchRadius = ptSearchRadius;
 	}
 
@@ -98,7 +98,7 @@ public class BikeSharingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "initialBikesRate" )
-	public void setInitialBikesRate(double initialBikesRate) {
+	public void setInitialBikesRate(final double initialBikesRate) {
 		if ( initialBikesRate < 0 || initialBikesRate > 1 ) throw new IllegalArgumentException( ""+initialBikesRate );
 		this.initialBikesRate = initialBikesRate;
 	}
@@ -109,7 +109,7 @@ public class BikeSharingConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "capacityRate" )
-	public void setCapacityRate(double capacityRate) {
+	public void setCapacityRate(final double capacityRate) {
 		if ( capacityRate < 0 || capacityRate > 1 ) throw new IllegalArgumentException( ""+capacityRate );
 		this.capacityRate = capacityRate;
 	}

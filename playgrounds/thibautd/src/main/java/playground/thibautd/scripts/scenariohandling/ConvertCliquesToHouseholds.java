@@ -34,7 +34,7 @@ import org.matsim.households.HouseholdsWriterV10;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
-import playground.thibautd.socnetsim.cliques.population.CliquesSchemaNames;
+import playground.thibautd.socnetsim.framework.cliques.population.CliquesSchemaNames;
 
 /**
  * @author thibautd

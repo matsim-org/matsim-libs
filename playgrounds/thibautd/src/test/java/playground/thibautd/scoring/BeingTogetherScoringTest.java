@@ -40,9 +40,9 @@ import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
-import playground.thibautd.socnetsim.scoring.BeingTogetherScoring;
-import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.AcceptAllFilter;
-import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.RejectAllFilter;
+import playground.thibautd.socnetsim.framework.scoring.BeingTogetherScoring;
+import playground.thibautd.socnetsim.framework.scoring.BeingTogetherScoring.AcceptAllFilter;
+import playground.thibautd.socnetsim.framework.scoring.BeingTogetherScoring.RejectAllFilter;
 
 /**
  * @author thibautd

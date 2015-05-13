@@ -26,7 +26,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import com.google.inject.Inject;
 
-import playground.thibautd.socnetsim.replanning.NonInnovativeStrategyFactory;
+import playground.thibautd.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;

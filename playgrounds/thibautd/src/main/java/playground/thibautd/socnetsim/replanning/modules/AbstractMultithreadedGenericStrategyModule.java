@@ -30,8 +30,8 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
+import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.framework.replanning.GenericStrategyModule;
 
 /**
  * @author thibautd

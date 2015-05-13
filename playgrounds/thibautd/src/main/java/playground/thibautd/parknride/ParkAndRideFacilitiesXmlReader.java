@@ -78,8 +78,8 @@ public class ParkAndRideFacilitiesXmlReader extends MatsimXmlParser {
 	}
 
 	private static final Coord getCoord( final Attributes atts ) {
-		String x = atts.getValue( X_COORD_ATT );
-		String y = atts.getValue( Y_COORD_ATT );
+		final String x = atts.getValue( X_COORD_ATT );
+		final String y = atts.getValue( Y_COORD_ATT );
 
 		return new CoordImpl(
 				Double.parseDouble( x ),

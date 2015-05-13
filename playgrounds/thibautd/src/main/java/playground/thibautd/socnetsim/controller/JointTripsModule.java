@@ -29,7 +29,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.XY2Links;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
-import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.framework.controller.AbstractPrepareForSimListener;
+import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
@@ -50,7 +51,7 @@ public class JointTripsModule extends AbstractModule {
 		addControlerListenerBinding().toInstance(
 				new AbstractPrepareForSimListener() {
 					@Override
-					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(ReplanningContext replanningContext) {
+					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm(final ReplanningContext replanningContext) {
 						final PlanAlgorithm routingAlgorithm =
 									routingAlgoFactory.createPlanRoutingAlgorithm(
 										replanningContext.getTripRouter() );

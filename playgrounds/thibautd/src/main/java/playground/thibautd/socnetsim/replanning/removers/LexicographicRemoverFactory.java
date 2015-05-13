@@ -21,8 +21,8 @@ package playground.thibautd.socnetsim.replanning.removers;
 
 import org.matsim.api.core.v01.Scenario;
 
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.framework.replanning.ExtraPlanRemover;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 

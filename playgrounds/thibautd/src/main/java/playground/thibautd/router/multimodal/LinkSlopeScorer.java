@@ -56,7 +56,7 @@ public class LinkSlopeScorer {
 	public double calcGainUtil( final NetworkRoute route ) {
 		double score = 0;
 
-		for ( Id<Link> linkId : route.getLinkIds() ) {
+		for ( final Id<Link> linkId : route.getLinkIds() ) {
 			score += calcGainUtil( linkId );
 		}
 

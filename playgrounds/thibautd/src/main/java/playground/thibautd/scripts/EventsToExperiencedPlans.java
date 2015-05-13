@@ -67,7 +67,7 @@ public class EventsToExperiencedPlans {
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 
-		for ( Plan plan : eventsToPlans.getPlans().values() ) {
+		for ( final Plan plan : eventsToPlans.getPlans().values() ) {
 			plan.getPerson().addPlan( plan );
 			transmitCoordinates( inputSc.getPopulation().getPersons().get( plan.getPerson().getId() ) , plan );
 			sc.getPopulation().addPerson( plan.getPerson() );

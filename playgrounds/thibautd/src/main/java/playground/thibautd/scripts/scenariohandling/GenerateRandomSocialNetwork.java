@@ -28,9 +28,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.thibautd.socnetsim.population.SocialNetworkImpl;
-import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.population.SocialNetworkWriter;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkImpl;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkWriter;
 
 /**
  * @author thibautd

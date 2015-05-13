@@ -39,10 +39,10 @@ public class GeolocalizingAPIsUtils {
 			final JSONTokener tokener = new JSONTokener( request.openStream() );
 			return new JSONObject( tokener );
 		}
-		catch (JSONException e) {
+		catch (final JSONException e) {
 			throw new RuntimeException( e );
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			throw new UncheckedIOException( e );
 		}
 	}
@@ -110,11 +110,11 @@ public class GeolocalizingAPIsUtils {
 
 	public static URL pasteAsURL(final String... pieces) {
 		final StringBuilder builder = new StringBuilder();
-		for ( String p : pieces ) builder.append( p );
+		for ( final String p : pieces ) builder.append( p );
 		try {
 			return new URL( builder.toString() );
 		}
-		catch (MalformedURLException e) {
+		catch (final MalformedURLException e) {
 			throw new RuntimeException( e );
 		}
 	}

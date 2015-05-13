@@ -22,7 +22,7 @@ package playground.thibautd.socnetsim.replanning.selectors.coalitionselector;
 import java.util.Collection;
 import java.util.Map;
 
-import playground.thibautd.socnetsim.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.selectors.coalitionselector.CoalitionSelector.ConflictSolver;
 
 /**
@@ -36,12 +36,12 @@ public class LeastAverageWeightJointPlanPruningConflictSolver implements Conflic
 		double minAvg = Double.POSITIVE_INFINITY;
 		Map.Entry<JointPlan , Collection<PlanRecord>> toMark = null;
 
-		for ( Map.Entry<JointPlan , Collection<PlanRecord>> entry : recordsPerJointPlan.entrySet() ) {
+		for ( final Map.Entry<JointPlan , Collection<PlanRecord>> entry : recordsPerJointPlan.entrySet() ) {
 			final Collection<PlanRecord> records = entry.getValue();
 
 			double avg = 0;
 			boolean isPointed = false;
-			for ( PlanRecord r : records ) {
+			for ( final PlanRecord r : records ) {
 				if ( !r.isFeasible() ) throw new RuntimeException( "should not get unfeasible plans!" );
 				isPointed = isPointed || r.getAgent().getPointedPlan() == r.getPlan();
 				avg += r.getWeight();
@@ -58,7 +58,7 @@ public class LeastAverageWeightJointPlanPruningConflictSolver implements Conflic
 			throw new RuntimeException( "could not find pointed joint plan of minimum average weight in "+recordsPerJointPlan );
 		}
 
-		for ( PlanRecord r : toMark.getValue() ) r.setInfeasible();
+		for ( final PlanRecord r : toMark.getValue() ) r.setInfeasible();
 		recordsPerJointPlan.remove( toMark.getKey() );
 	}
 }

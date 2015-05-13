@@ -32,13 +32,13 @@ import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 
 import playground.ivt.utils.TripModeShares;
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.analysis.AbstractPlanAnalyzerPerGroup;
 import playground.thibautd.socnetsim.analysis.CliquesSizeGroupIdentifier;
 import playground.thibautd.socnetsim.analysis.FilteredScoreStats;
 import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
 import playground.thibautd.socnetsim.analysis.JointTripsStats;
-import playground.thibautd.socnetsim.cliques.Clique;
+import playground.thibautd.socnetsim.framework.cliques.Clique;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;

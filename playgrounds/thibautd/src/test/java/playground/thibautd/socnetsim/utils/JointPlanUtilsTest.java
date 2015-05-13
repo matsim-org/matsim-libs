@@ -41,8 +41,8 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlanFactory;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.DriverTrip;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;

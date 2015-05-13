@@ -34,6 +34,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.testcases.MatsimTestUtils;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkImpl;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkWriter;
 
 /**
  * @author thibautd

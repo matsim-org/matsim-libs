@@ -74,7 +74,7 @@ public class ParkAndRideConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	private String arrayToString(final String[] a) {
-		StringBuffer b = new StringBuffer();
+		final StringBuffer b = new StringBuffer();
 
 		if (a.length > 0) {
 			b.append( a[0] );

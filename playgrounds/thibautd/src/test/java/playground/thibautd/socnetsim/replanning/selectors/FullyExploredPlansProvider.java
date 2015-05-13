@@ -44,12 +44,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.socnetsim.cliques.Clique;
-import playground.thibautd.socnetsim.cliques.population.CliquesWriter;
-import playground.thibautd.socnetsim.population.JointPlan;
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.population.JointPlansXmlReader;
-import playground.thibautd.socnetsim.population.JointPlansXmlWriter;
+import playground.thibautd.socnetsim.framework.cliques.Clique;
+import playground.thibautd.socnetsim.framework.cliques.population.CliquesWriter;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
+import playground.thibautd.socnetsim.framework.population.JointPlansXmlReader;
+import playground.thibautd.socnetsim.framework.population.JointPlansXmlWriter;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFileParser;
 import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;

@@ -25,13 +25,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 
 import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
-import playground.thibautd.socnetsim.controller.JointDecisionProcessModule;
+import playground.thibautd.socnetsim.framework.controller.JointDecisionProcessModule;
 import playground.thibautd.socnetsim.controller.JointTripsModule;
-import playground.thibautd.socnetsim.controller.SocialNetworkModule;
+import playground.thibautd.socnetsim.framework.controller.SocialNetworkModule;
 import playground.thibautd.socnetsim.controller.SocnetsimDefaultAnalysisModule;
-import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.population.SocialNetworkReader;
-import playground.thibautd.socnetsim.replanning.GroupStrategyManagerModule;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
+import playground.thibautd.socnetsim.framework.replanning.GroupStrategyManagerModule;
 
 /**
  * @author thibautd

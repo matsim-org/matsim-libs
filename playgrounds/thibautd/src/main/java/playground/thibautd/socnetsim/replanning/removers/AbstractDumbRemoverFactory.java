@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.Scenario;
 
 import com.google.inject.Provider;
 
-import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.replanning.ExtraPlanRemover;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.framework.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 
 /**

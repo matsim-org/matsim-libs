@@ -29,6 +29,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
+import playground.thibautd.socnetsim.framework.population.JointPlans;
+import playground.thibautd.socnetsim.framework.population.PlanWithCachedJointPlan;
 
 /**
  * @author thibautd
@@ -98,7 +101,7 @@ public class JointPlansTest {
 
 		// create a new joint plan with the same individual plan:
 		// this must result in a exception at removal
-		JointPlan wrongInstance = 
+		JointPlan wrongInstance =
 			new JointPlan(
 					jp1 );
 

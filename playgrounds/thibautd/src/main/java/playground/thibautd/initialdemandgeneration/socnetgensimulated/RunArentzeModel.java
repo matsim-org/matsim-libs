@@ -59,8 +59,8 @@ import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.DeterministicPart;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.GumbelErrorTerm;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TiesWeightDistribution;
-import playground.thibautd.socnetsim.population.SocialNetwork;
-import playground.thibautd.socnetsim.population.SocialNetworkWriter;
+import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkWriter;
 import playground.thibautd.utils.MoreIOUtils;
 import playground.thibautd.utils.ObjectPool;
 import playground.thibautd.utils.SoftCache;
