@@ -33,7 +33,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
 
 /**
  * Checks driver routes, in case only passengers were provided in the plan file

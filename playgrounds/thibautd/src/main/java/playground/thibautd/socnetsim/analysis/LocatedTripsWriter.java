@@ -52,7 +52,7 @@ import org.matsim.pt.PtConstants;
 import playground.ivt.utils.Filter;
 
 import playground.thibautd.socnetsim.analysis.scripts.ExtractTripModeSharesLocatedInArea;
-import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 
 /**
  * @author thibautd

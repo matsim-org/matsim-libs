@@ -68,9 +68,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.thibautd.socnetsim.population.DriverRoute;
-import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
+import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
+import playground.thibautd.socnetsim.jointtrips.qsim.JointQSimFactory;
 
 /**
  * @author thibautd

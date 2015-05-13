@@ -32,7 +32,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.socnetsim.router.JointPlanRouter;
+import playground.thibautd.socnetsim.jointtrips.router.JointPlanRouter;
 
 /**
  * @author thibautd

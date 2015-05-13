@@ -34,7 +34,7 @@ import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.framework.replanning.JointPlanBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.framework.replanning.modules.JointPlanMergingModule;
-import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAndRemoverAlgorithm;
+import playground.thibautd.socnetsim.jointtrips.replanning.modules.JointTripInsertorAndRemoverAlgorithm;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;

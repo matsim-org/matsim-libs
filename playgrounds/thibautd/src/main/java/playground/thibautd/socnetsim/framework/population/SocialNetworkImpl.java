@@ -151,7 +151,7 @@ public class SocialNetworkImpl implements SocialNetwork {
 	}
 
 	/* (non-Javadoc)
-	 * @see playground.thibautd.socnetsim.population.SocialNetworkI#isReflective()
+	 * @see playground.thibautd.socnetsim.jointtrips.population.SocialNetworkI#isReflective()
 	 */
 	@Override
 	public boolean isReflective() {

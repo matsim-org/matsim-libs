@@ -46,11 +46,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.socnetsim.population.DriverRoute;
-import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.PassengerRoute;
-import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
-import playground.thibautd.socnetsim.router.JointTripRouterFactory;
+import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
+import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
+import playground.thibautd.socnetsim.jointtrips.router.JointPlanRouterFactory;
+import playground.thibautd.socnetsim.jointtrips.router.JointTripRouterFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -38,7 +38,9 @@ import playground.thibautd.pseudoqsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 import playground.thibautd.pseudoqsim.QVehicleProvider;
 import playground.thibautd.pseudoqsim.pseudoqsimengine.PseudoQsimEngine;
-import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
+import playground.thibautd.socnetsim.jointtrips.qsim.JointModesDepartureHandler;
+import playground.thibautd.socnetsim.jointtrips.qsim.PassengerUnboardingAgentFactory;
 import playground.thibautd.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
 
 import java.util.ArrayList;

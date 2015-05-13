@@ -38,10 +38,10 @@ import playground.thibautd.initialdemandgeneration.transformation.SocialNetworke
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils.DilutionType;
 import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.framework.controller.JointDecisionProcessModule;
-import playground.thibautd.socnetsim.controller.JointTripsModule;
+import playground.thibautd.socnetsim.jointtrips.JointTripsModule;
 import playground.thibautd.socnetsim.framework.controller.SocialNetworkModule;
 import playground.thibautd.socnetsim.controller.SocnetsimDefaultAnalysisModule;
-import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.framework.replanning.GroupStrategyManagerModule;

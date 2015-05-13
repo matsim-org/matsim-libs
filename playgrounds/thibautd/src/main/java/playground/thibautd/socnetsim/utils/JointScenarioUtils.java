@@ -43,12 +43,12 @@ import playground.thibautd.socnetsim.framework.cliques.config.CliquesConfigGroup
 import playground.thibautd.socnetsim.framework.cliques.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.JointTripsMutatorConfigGroup;
-import playground.thibautd.socnetsim.population.DriverRouteFactory;
-import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.jointtrips.population.DriverRouteFactory;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.population.JointPlansConfigGroup;
 import playground.thibautd.socnetsim.framework.population.JointPlansXmlReader;
-import playground.thibautd.socnetsim.population.PassengerRouteFactory;
+import playground.thibautd.socnetsim.jointtrips.population.PassengerRouteFactory;
 import playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice.PrismicLocationChoiceConfigGroup;
 import playground.thibautd.socnetsim.replanning.modules.randomlocationchoice.RandomJointLocationChoiceConfigGroup;
 import playground.thibautd.utils.DesiresConverter;

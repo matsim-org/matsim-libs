@@ -33,7 +33,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
-import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 
 /**

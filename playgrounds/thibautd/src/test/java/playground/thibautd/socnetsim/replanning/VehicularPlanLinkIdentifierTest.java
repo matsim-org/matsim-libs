@@ -34,6 +34,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.sharedvehicles.replanning.VehicularPlanBasedIdentifier;
 
 /**
  * @author thibautd

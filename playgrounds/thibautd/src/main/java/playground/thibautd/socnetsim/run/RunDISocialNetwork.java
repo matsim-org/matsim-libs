@@ -26,7 +26,7 @@ import org.matsim.core.controler.Controler;
 
 import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.framework.controller.JointDecisionProcessModule;
-import playground.thibautd.socnetsim.controller.JointTripsModule;
+import playground.thibautd.socnetsim.jointtrips.JointTripsModule;
 import playground.thibautd.socnetsim.framework.controller.SocialNetworkModule;
 import playground.thibautd.socnetsim.controller.SocnetsimDefaultAnalysisModule;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;

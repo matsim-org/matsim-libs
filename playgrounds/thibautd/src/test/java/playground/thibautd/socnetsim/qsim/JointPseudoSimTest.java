@@ -41,11 +41,12 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.thibautd.mobsim.CompareEventsUtils;
 import playground.thibautd.scripts.scenariohandling.CreateGridNetworkWithDimensions;
-import playground.thibautd.socnetsim.population.DriverRoute;
-import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.PassengerRoute;
-import playground.thibautd.socnetsim.router.JointPlanRouter;
-import playground.thibautd.socnetsim.router.JointTripRouterFactory;
+import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
+import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
+import playground.thibautd.socnetsim.jointtrips.qsim.JointQSimFactory;
+import playground.thibautd.socnetsim.jointtrips.router.JointPlanRouter;
+import playground.thibautd.socnetsim.jointtrips.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 import javax.inject.Provider;

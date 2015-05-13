@@ -34,7 +34,7 @@ import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdenti
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import playground.thibautd.socnetsim.framework.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
+import playground.thibautd.socnetsim.jointtrips.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.run.VehicleAllocationConsistencyChecker;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
 import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
