@@ -40,8 +40,8 @@ import playground.thibautd.socnetsim.analysis.JointPlanSizeStats;
 import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.framework.cliques.Clique;
 import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
-import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.grouping.FixedGroupsIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 
 import com.google.inject.Inject;

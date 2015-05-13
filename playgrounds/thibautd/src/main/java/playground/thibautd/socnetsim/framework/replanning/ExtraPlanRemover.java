@@ -20,7 +20,7 @@
 package playground.thibautd.socnetsim.framework.replanning;
 
 import playground.thibautd.socnetsim.framework.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
 
 /**
  * @author thibautd

@@ -21,8 +21,6 @@ package playground.thibautd.socnetsim.run;
 
 import org.matsim.core.controler.AbstractModule;
 
-import playground.thibautd.socnetsim.framework.scoring.FireMoneyEventsForUtilityOfBeingTogether;
-
 
 /**
  * @author thibautd

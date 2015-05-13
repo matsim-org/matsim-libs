@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 
+import playground.thibautd.socnetsim.replanning.DefaultJointStrategiesModule;
 import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup.StrategyParameterSet;
 

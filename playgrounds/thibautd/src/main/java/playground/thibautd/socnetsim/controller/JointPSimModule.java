@@ -28,7 +28,7 @@ import org.matsim.core.controler.AbstractModule;
 import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup.StrategyParameterSet;
 import playground.thibautd.socnetsim.qsim.SwitchingJointQSimFactoryModule;
-import playground.thibautd.socnetsim.framework.replanning.DefaultJointStrategiesModule;
+import playground.thibautd.socnetsim.replanning.DefaultJointStrategiesModule;
 import playground.thibautd.socnetsim.framework.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.framework.replanning.GroupStrategyRegistry;

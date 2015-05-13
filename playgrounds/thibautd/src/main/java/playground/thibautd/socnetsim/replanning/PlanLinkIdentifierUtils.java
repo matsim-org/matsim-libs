@@ -25,7 +25,7 @@ import playground.thibautd.socnetsim.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.replanning.CompositePlanLinkIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.SocialNetworkPlanLinkIdentifier;
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

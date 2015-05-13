@@ -27,14 +27,19 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.XY2Links;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.framework.controller.AbstractPrepareForSimListener;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
+import playground.thibautd.socnetsim.router.JointTripRouterFactory;
+import playground.thibautd.socnetsim.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
 
 /**
@@ -47,6 +52,17 @@ public class JointTripsModule extends AbstractModule {
 	public void install() {
 		bind( PlanRoutingAlgorithmFactory.class ).to( JointPlanRouterFactory.class ).in( Scopes.SINGLETON );
 		bind(Mobsim.class).toProvider(JointQSimFactory.class);
+
+		bind( ScoringFunctionFactory.class ).to(CharyparNagelWithJointModesScoringFunctionFactory.class);
+		bind(PlanRoutingAlgorithmFactory.class).toInstance(
+				new PlanRoutingAlgorithmFactory() {
+					@Override
+					public PlanAlgorithm createPlanRoutingAlgorithm(
+							final TripRouter tripRouter) {
+						return new PlanRouter(tripRouter);
+					}
+				});
+		bind( TripRouter.class ).toProvider( JointTripRouterFactory.class );
 
 		// TODO: extract in files (messy and not modular)
 		addControlerListenerBinding().toInstance(

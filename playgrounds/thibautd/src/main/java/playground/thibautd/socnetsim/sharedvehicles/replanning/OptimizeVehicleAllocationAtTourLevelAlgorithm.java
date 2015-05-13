@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 
 /**

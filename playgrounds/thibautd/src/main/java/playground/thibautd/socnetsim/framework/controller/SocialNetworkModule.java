@@ -21,8 +21,8 @@ package playground.thibautd.socnetsim.framework.controller;
 
 import org.matsim.core.controler.AbstractModule;
 
-import playground.thibautd.socnetsim.replanning.grouping.DynamicGroupIdentifier;
-import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.grouping.DynamicGroupIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifier;
 
 /**
  * @author thibautd

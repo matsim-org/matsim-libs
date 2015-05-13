@@ -26,12 +26,12 @@ import com.google.inject.Inject;
 
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
-import playground.thibautd.socnetsim.replanning.selectors.LossWeight;
-import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.framework.replanning.selectors.LogitWeight;
+import playground.thibautd.socnetsim.framework.replanning.selectors.LossWeight;
+import playground.thibautd.socnetsim.framework.replanning.selectors.LowestScoreOfJointPlanWeight;
+import playground.thibautd.socnetsim.framework.replanning.selectors.highestweightselection.HighestWeightSelector;
 
 /**
  * @author thibautd

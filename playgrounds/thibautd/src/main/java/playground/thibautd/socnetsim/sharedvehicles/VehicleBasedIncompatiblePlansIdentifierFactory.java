@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.framework.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
-import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierImpl;
+import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierImpl;
 
 /**
  * @author thibautd

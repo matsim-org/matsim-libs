@@ -26,8 +26,8 @@ import org.matsim.core.router.CompositeStageActivityTypes;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
-import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 
 /**
  * @author thibautd

@@ -28,10 +28,10 @@ import com.google.inject.Provider;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
-import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
+import playground.thibautd.socnetsim.framework.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.framework.replanning.selectors.highestweightselection.RandomGroupLevelSelector;
 
 /**
  * @author thibautd

@@ -28,7 +28,7 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 
 import playground.thibautd.socnetsim.framework.population.JointPlan;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
 
 /**
  * Delegates action on individual plans to a {@link PlanStrategyModule}

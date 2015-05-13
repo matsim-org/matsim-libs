@@ -35,9 +35,9 @@ import playground.thibautd.socnetsim.framework.replanning.IndividualBasedGroupSt
 import playground.thibautd.socnetsim.framework.replanning.JointPlanBasedGroupStrategyModule;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.JointPlanFactory;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
-import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.RecomposeJointPlanModule;
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;

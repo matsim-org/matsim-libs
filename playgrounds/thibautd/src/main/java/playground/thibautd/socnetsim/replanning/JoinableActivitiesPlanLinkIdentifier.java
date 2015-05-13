@@ -34,7 +34,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
 import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 
 /**
  * Links plans with "joinable" activities, that is,

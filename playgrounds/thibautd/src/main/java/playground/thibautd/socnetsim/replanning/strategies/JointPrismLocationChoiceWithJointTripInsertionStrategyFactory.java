@@ -33,10 +33,10 @@ import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.framework.replanning.JointPlanBasedGroupStrategyModule;
-import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
+import playground.thibautd.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointTripInsertorAlgorithm;
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier.Strong;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier.Strong;
 import playground.thibautd.socnetsim.replanning.modules.prismiclocationchoice.PrismicLocationChoiceModule;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 

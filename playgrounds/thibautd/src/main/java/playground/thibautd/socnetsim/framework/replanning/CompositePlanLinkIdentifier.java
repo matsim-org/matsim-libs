@@ -25,7 +25,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 
 /**
  * Allows to define complex rules about which plans should be associated in a joint plan.

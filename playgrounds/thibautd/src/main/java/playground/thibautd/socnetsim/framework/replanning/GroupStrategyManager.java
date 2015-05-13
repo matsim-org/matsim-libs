@@ -37,8 +37,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
 
 /**
  * Implements the group-level replanning logic.

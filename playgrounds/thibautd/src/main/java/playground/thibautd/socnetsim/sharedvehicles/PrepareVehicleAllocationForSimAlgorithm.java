@@ -29,10 +29,10 @@ import org.matsim.api.core.v01.population.Plan;
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
-import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.RecomposeJointPlanAlgorithm;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanAlgorithm;
 
 /**

@@ -28,7 +28,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.PassengerRoute;
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 
 /**
  * @author thibautd

@@ -34,9 +34,9 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.framework.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

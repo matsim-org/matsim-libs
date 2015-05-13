@@ -25,10 +25,10 @@ import org.matsim.core.gbl.MatsimRandom;
 import com.google.inject.Inject;
 
 import playground.thibautd.socnetsim.framework.replanning.NonInnovativeStrategyFactory;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
-import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
-import playground.thibautd.socnetsim.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
+import playground.thibautd.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.framework.replanning.selectors.LogitWeight;
+import playground.thibautd.socnetsim.framework.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
 
 /**
  * @author thibautd

@@ -34,7 +34,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.population.JointPlanFactory;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
 
 /**
  * Delegates to a {@link PlanStrategyModule} which handles JointPlans.

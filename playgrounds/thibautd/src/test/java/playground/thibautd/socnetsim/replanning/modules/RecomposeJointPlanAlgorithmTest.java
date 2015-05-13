@@ -41,7 +41,9 @@ import org.matsim.core.population.PlanImpl;
 
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.population.JointPlanFactory;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.RecomposeJointPlanAlgorithm;
 
 /**
  * @author thibautd

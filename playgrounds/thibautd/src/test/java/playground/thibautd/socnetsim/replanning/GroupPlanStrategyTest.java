@@ -42,10 +42,10 @@ import playground.thibautd.socnetsim.framework.population.JointPlanFactory;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.GenericStrategyModule;
 import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.replanning.selectors.HighestScoreSumSelector;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
+import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.framework.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.framework.replanning.selectors.HighestScoreSumSelector;
 
 /**
  * @author thibautd

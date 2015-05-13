@@ -28,8 +28,8 @@ import org.matsim.core.controler.AbstractModule;
 
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkImpl;
-import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
-import playground.thibautd.socnetsim.replanning.grouping.GroupIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.grouping.FixedGroupsIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifier;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

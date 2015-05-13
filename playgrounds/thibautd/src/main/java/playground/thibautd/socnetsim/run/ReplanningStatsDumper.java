@@ -33,7 +33,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.framework.replanning.GroupStrategyManager;
-import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
+import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
 
 /**
  * @author thibautd

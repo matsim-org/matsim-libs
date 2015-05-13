@@ -22,8 +22,7 @@ package playground.thibautd.socnetsim.framework.replanning;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
-import playground.thibautd.socnetsim.framework.replanning.CompositePlanLinkIdentifier;
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 
 /**
  * Two plans are considered linked if the agents are linked by a social tie.

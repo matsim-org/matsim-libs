@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 
 import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
-import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
+import playground.thibautd.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

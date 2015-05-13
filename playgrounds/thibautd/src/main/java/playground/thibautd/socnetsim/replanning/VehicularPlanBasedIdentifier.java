@@ -23,7 +23,7 @@ import java.util.Collections;
 
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 
 /**
