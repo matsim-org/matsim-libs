@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.jointtrips.population;
+package playground.thibautd.socnetsim.framework.population;
 
 import java.util.ArrayList;
 import java.util.List;

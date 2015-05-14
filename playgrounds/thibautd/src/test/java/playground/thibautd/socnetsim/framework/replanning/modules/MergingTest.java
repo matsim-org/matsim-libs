@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.framework.modules;
+package playground.thibautd.socnetsim.framework.replanning.modules;
 
 import static org.junit.Assert.assertEquals;
 

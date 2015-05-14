@@ -22,7 +22,6 @@ package playground.thibautd.initialdemandgeneration.socnetgen.scripts;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -41,7 +40,6 @@ import playground.thibautd.utils.MoreIOUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Set;
 
 /**
  * Produce the same kind of stats as T Arentze in his Social Networks paper.
