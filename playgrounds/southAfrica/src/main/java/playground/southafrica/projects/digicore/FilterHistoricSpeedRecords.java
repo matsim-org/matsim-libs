@@ -60,6 +60,8 @@ public class FilterHistoricSpeedRecords {
 				String[] sa = line.split(",");
 				double historic = Double.parseDouble(sa[10]);
 				if(historic > 0){
+					bw.write(line);
+					bw.newLine();
 					present++;
 				} else{
 					missing++;
