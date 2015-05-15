@@ -23,13 +23,16 @@ package org.matsim.core.config.consistency;
 import java.util.Collection;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 
 /**
@@ -45,9 +48,23 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 
 	@Override
 	public void checkConsistency(Config config) {
-		if ( config.vspExperimental().getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.IGNORE ) ) {
+		Level lvl ;
+		
+		switch ( config.vspExperimental().getVspDefaultsCheckingLevel() ) {
+		case ignore:
 			log.info( "NOT running vsp config consistency check because vsp defaults checking level is set to IGNORE"); 
 			return ;
+		case info:
+			lvl = Level.INFO ;
+			break ;
+		case warn:
+			lvl = Level.WARN ;
+			break;
+		case abort:
+			lvl = Level.WARN ;
+			break;
+		default:
+			throw new RuntimeException("not implemented");
 		}
 		log.info("running checkConsistency ...");
 		
@@ -55,13 +72,13 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		// added apr'15
 		if ( !config.qsim().isUsingFastCapacityUpdate() ) {
-			log.warn( " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
+			log.log( lvl,  " found 'qsim.usingFastCapacityUpdate==false'; vsp should try out `true' and report. ") ;
 		}
 		switch( config.qsim().getTrafficDynamics() ) {
 		case withHoles:
 			break;
 		default:
-			log.warn( " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp should try out `" 
+			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp should try out `" 
 					+ TrafficDynamics.withHoles + "' and report." ) ;
 			break;
 		}
@@ -73,7 +90,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 				break;
 			case uniform:
 //				problem = true ;
-				log.warn( "found `typicalDurationScoreComputation == uniform'; vsp should try out `relative' and report. ") ;
+				log.log( lvl,  "found `typicalDurationScoreComputation == uniform'; vsp should try out `relative' and report. ") ;
 				break;
 			default:
 				throw new RuntimeException("unexpected setting; aborting ... ") ;
@@ -107,7 +124,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if ( config.qsim()!=null && config.qsim().isRemoveStuckVehicles() ) {
 			problem = true ;
 			System.out.flush() ;
-			log.warn("found that the qsim is removing stuck vehicles.  vsp default is setting this to false.");
+			log.log( lvl, "found that the qsim is removing stuck vehicles.  vsp default is setting this to false.");
 		}
 		
 		boolean found = false ;
@@ -120,47 +137,47 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if ( !found ) {
 			problem = true ;
 			System.out.flush() ;
-			log.warn("You have no strategy configured that uses ChangeExpBeta. vsp default is to use ChangeExpBeta at least in one strategy.");
+			log.log( lvl, "You have no strategy configured that uses ChangeExpBeta. vsp default is to use ChangeExpBeta at least in one strategy.");
 		}
 		
 		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
 		if ( !formats.contains(EventsFileFormat.xml) ) {
 			problem = true ;
 			System.out.flush() ;
-			log.warn("did not find xml as one of the events file formats. vsp default is using xml events.");
+			log.log( lvl, "did not find xml as one of the events file formats. vsp default is using xml events.");
 		}
 		
 		// added before nov'12
 		if ( config.timeAllocationMutator().getMutationRange() < 7200 ) {
 			problem = true ;
 			System.out.flush() ;
-			log.warn("timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This means you have to add the following lines to your config file: ") ;
-			log.warn("<module name=\"TimeAllocationMutator\">");
-			log.warn("	<param name=\"mutationRange\" value=\"7200.0\" />");
-			log.warn("</module>");
+			log.log( lvl, "timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This means you have to add the following lines to your config file: ") ;
+			log.log( lvl, "<module name=\"TimeAllocationMutator\">");
+			log.log( lvl, "	<param name=\"mutationRange\" value=\"7200.0\" />");
+			log.log( lvl, "</module>");
 		}
 		// added jan'14
 		if ( config.timeAllocationMutator().isAffectingDuration() ) {
 //			problem = true ;
 			System.out.flush() ;
-			log.warn("timeAllocationMutator is affecting duration; vsp default is to not do that.  This will be more strictly" +
+			log.log( lvl, "timeAllocationMutator is affecting duration; vsp default is to not do that.  This will be more strictly" +
 					" enforced in the future. This means you have to add the following lines to your config file: ") ;
-			log.warn("<module name=\"TimeAllocationMutator\">");
-			log.warn("	<param name=\"affectingDuration\" value=\"false\" />");
-			log.warn("</module>");
+			log.log( lvl, "<module name=\"TimeAllocationMutator\">");
+			log.log( lvl, "	<param name=\"affectingDuration\" value=\"false\" />");
+			log.log( lvl, "</module>");
 		}
 		
 		// added before nov'12
 		if ( !config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
 			problem = true ;
 			System.out.flush() ;
-			log.warn("You are not removing unnecessary plan attributes; vsp default is to do that.") ;
+			log.log( lvl, "You are not removing unnecessary plan attributes; vsp default is to do that.") ;
 		}
 		
 		PlansConfigGroup.ActivityDurationInterpretation actDurInterpr =  config.plans().getActivityDurationInterpretation()  ;
 		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly ) {
 			// added jan'13
-			log.warn(PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly + " is deprecated. Use " + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + " instead.") ;
+			log.log( lvl, PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly + " is deprecated. Use " + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + " instead.") ;
 			problem = true;
 			// added before nov'12
 			if( config.scenario().isUseTransit()) {
@@ -176,11 +193,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if ( actDurInterpr == PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime ) {
 			problem = true ;
 			System.out.flush() ;
-			log.warn("You are using ActivityDurationInterpretation " + config.plans().getActivityDurationInterpretation() + " ; vsp default is to use " +
+			log.log( lvl, "You are using ActivityDurationInterpretation " + config.plans().getActivityDurationInterpretation() + " ; vsp default is to use " +
 					PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + 
 							"This means you have to add the following lines into the vspExperimental section of your config file: ") ;
-			log.warn( "   <param name=\"activityDurationInterpretation\" value=\"" + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + "\" />" ) ;
-			log.warn("Please report if this causes odd results (this will simplify many code maintenance issues, but is unfortunately not well tested).") ;
+			log.log( lvl,  "   <param name=\"activityDurationInterpretation\" value=\"" + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + "\" />" ) ;
+			log.log( lvl, "Please report if this causes odd results (this will simplify many code maintenance issues, but is unfortunately not well tested).") ;
 		}
 		
 		// pseudo-pt über Distanz, nicht ptSpeedFactor
@@ -190,11 +207,11 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
 			problem = true ;
 			System.out.flush() ;
-			log.warn("You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual " +
+			log.log( lvl, "You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual " +
 					"problems during paper writing.) This means you have to add the following lines to your config file: ") ;
-			log.warn("<module name=\"planCalcScore\">");
-			log.warn("	<param name=\"BrainExpBeta\" value=\"1.0\" />");
-			log.warn("</module>");
+			log.log( lvl, "<module name=\"planCalcScore\">");
+			log.log( lvl, "	<param name=\"BrainExpBeta\" value=\"1.0\" />");
+			log.log( lvl, "</module>");
 		}
 		
 		boolean usingLocationChoice = false ;
@@ -222,7 +239,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			}
 		}
 		
-		if ( problem && config.vspExperimental().getVspDefaultsCheckingLevel().equals( VspExperimentalConfigGroup.ABORT ) ) {
+		if ( problem && config.vspExperimental().getVspDefaultsCheckingLevel() == VspDefaultsCheckingLevel.abort ) {
 			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 
 			System.out.flush() ;
 			log.fatal( str ) ; 

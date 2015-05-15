@@ -38,6 +38,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -56,6 +57,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
 import org.matsim.vehicles.*;
+
 import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor_Subpopulation;
 import playground.southafrica.gauteng.scoring.GautengScoringFunctionFactory;
 import playground.southafrica.utilities.Header;
@@ -193,7 +195,7 @@ public class GautengControler_subpopulations {
 		roadPricingConfig.setRoutingRandomness(3.); // <-- This is the diversity generating toll router!
 
 		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
-		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;
+		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort ) ;
 		config.vspExperimental().setWritingOutputEvents(true);
 		
 		// This allows you to add a second config file, overwriting config entries.  Meant for work with jars on the server,

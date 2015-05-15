@@ -57,16 +57,18 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 
 	// ---
 	private static final String VSP_DEFAULTS_CHECKING_LEVEL = "vspDefaultsCheckingLevel" ;
-	public static final String IGNORE = "ignore" ;
-	public static final String WARN = "warn" ;
-	public static final String ABORT = "abort" ;
-	private String vspDefaultsCheckingLevel = WARN ;
+//	public static final String IGNORE = "ignore" ;
+//	public static final String INFO = "info" ;
+//	public static final String WARN = "warn" ;
+//	public static final String ABORT = "abort" ;
+	public static enum VspDefaultsCheckingLevel { ignore, info, warn, abort } ;
+	private VspDefaultsCheckingLevel vspDefaultsCheckingLevel = VspDefaultsCheckingLevel.warn ;
 	@StringGetter(VSP_DEFAULTS_CHECKING_LEVEL)
-	public String getVspDefaultsCheckingLevel() {
+	public VspDefaultsCheckingLevel getVspDefaultsCheckingLevel() {
 		return vspDefaultsCheckingLevel;
 	}
 	@StringSetter(VSP_DEFAULTS_CHECKING_LEVEL)
-	public void setVspDefaultsCheckingLevel(String vspDefaultsCheckingLevel) {
+	public void setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel vspDefaultsCheckingLevel) {
 		this.vspDefaultsCheckingLevel = vspDefaultsCheckingLevel;
 	}
 	// ---
@@ -131,12 +133,10 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 		" Will only work when lastIteration is multiple of events writing interval" ) ;
 
 
-
+		VspDefaultsCheckingLevel[] options = VspDefaultsCheckingLevel.values() ;
 		map.put( VSP_DEFAULTS_CHECKING_LEVEL, 
-				"Options: `"+IGNORE+"', `"+WARN+"', `"+ABORT+"'.  Default: either `"+IGNORE+"' or `"
-				+WARN+"'.\n\t\t" +
-				"When violating VSP defaults, this results in " +
-		"nothing, warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
+				"Options: " + options + ".  When violating VSP defaults, this results in " +
+		"nothing, logfile infos, logfile warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
 
 		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
 		"activityStartTime. default=false") ;
