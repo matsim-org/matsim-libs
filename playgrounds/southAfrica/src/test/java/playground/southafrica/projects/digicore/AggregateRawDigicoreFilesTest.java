@@ -39,6 +39,7 @@ import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.southafrica.projects.digicore.automation.AggregateRawDigicoreFiles;
 import playground.southafrica.utilities.FileUtils;
 
 /**
