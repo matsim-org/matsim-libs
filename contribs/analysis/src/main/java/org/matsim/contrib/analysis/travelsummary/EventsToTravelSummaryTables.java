@@ -76,6 +76,8 @@ public class EventsToTravelSummaryTables implements
     }
 
     public EventsToTravelSummaryTables(Network network, Config config) {
+	    // yy seems a bit overkill to generate a config just to obtain one scalar value. kai, may'15
+	    
         this.network = network;
         this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
     }
