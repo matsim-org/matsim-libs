@@ -52,6 +52,7 @@ public class RunParkingExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		Controler controler = new Controler(scenario); 
+		controler.setOverwriteFiles(true);
 		
 		//setting Parking Costs - charged parking @ work, free parking @ home
 		ParkingCostModel parkingCostModelWork = new ParkingCostCalculatorExample(1);
