@@ -17,45 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
- * 
+ *
  */
-public class ActivityTypePredicate implements Predicate {
-
-	private final String type;
-
-	public ActivityTypePredicate(String type) {
-		this.type = type;
-	}
+public class PredicateANDComposite extends Composite<Predicate> implements Predicate {
 
 	@Override
 	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
-		String prevType = prev.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		String nextType = next.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		if (ActivityType.HOME.equalsIgnoreCase(prevType) && type.equalsIgnoreCase(nextType)) {
-			return true;
-		} else if (ActivityType.HOME.equalsIgnoreCase(nextType) && type.equalsIgnoreCase(prevType)) {
-			return true;
-		} else if (!ActivityType.HOME.equalsIgnoreCase(nextType) && !ActivityType.HOME.equalsIgnoreCase(prevType)) {
-			/*
-			 * count only to activity
-			 */
-			if(type.equalsIgnoreCase(nextType)) {
-				return true;
-			} else {
+		for(Predicate p : components) {
+			if(!p.test(person, leg, prev, next)) {
 				return false;
 			}
-		} else {
-			return false;
 		}
+		
+		return true;
 	}
 
 }

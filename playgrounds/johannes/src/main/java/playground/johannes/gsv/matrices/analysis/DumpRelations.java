@@ -65,7 +65,8 @@ public class DumpRelations {
 
 	public static void main(String[] args) throws IOException {
 		String runId = "874";
-		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
+		String simFile = "/home/johannes/sge/prj/matsim/run/884/output/nuts3/miv.sym.xml";
+//		String simFile = String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
 		String refFile2 = "/home/johannes/gsv/matrices/refmatrices/tomtom.de.xml";
 		String refFile1 = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
 		/*

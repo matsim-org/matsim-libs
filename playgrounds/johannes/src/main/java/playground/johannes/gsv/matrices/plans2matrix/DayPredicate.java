@@ -17,23 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class ToHomePredicate implements Predicate {
+public class DayPredicate implements Predicate {
+
+	private final String day;
+
+	public DayPredicate(String day) {
+		this.day = day;
+	}
 
 	@Override
 	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
-		String nextType = next.getAttribute(CommonKeys.ACTIVITY_TYPE);
-		if (ActivityType.HOME.equalsIgnoreCase(nextType)) {
+		if (day == null || day.equalsIgnoreCase(person.getAttribute(CommonKeys.DAY))) {
 			return true;
 		} else {
 			return false;

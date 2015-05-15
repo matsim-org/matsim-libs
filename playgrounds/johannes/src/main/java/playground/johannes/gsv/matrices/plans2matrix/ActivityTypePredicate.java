@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.plans2matrix;
 
+import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
 
 /**
  * @author johannes
  * 
  */
-public class MonthPredicate implements Predicate {
+public class ActivityTypePredicate implements Predicate {
 
-	private final String month;
+	private final String type;
 
-	public MonthPredicate(String month) {
-		this.month = month;
+	public ActivityTypePredicate(String type) {
+		this.type = type;
 	}
 
 	@Override
 	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
-		if (month == null || month.equalsIgnoreCase(person.getAttribute(MIDKeys.PERSON_MONTH))) {
+		String prevType = prev.getAttribute(CommonKeys.ACTIVITY_TYPE);
+		String nextType = next.getAttribute(CommonKeys.ACTIVITY_TYPE);
+		if (ActivityType.HOME.equalsIgnoreCase(prevType) && type.equalsIgnoreCase(nextType)) {
 			return true;
+		} else if (ActivityType.HOME.equalsIgnoreCase(nextType) && type.equalsIgnoreCase(prevType)) {
+			return true;
+		} else if (!ActivityType.HOME.equalsIgnoreCase(nextType) && !ActivityType.HOME.equalsIgnoreCase(prevType)) {
+			/*
+			 * count only to activity
+			 */
+			if(type.equalsIgnoreCase(nextType)) {
+				return true;
+			} else {
+				return false;
+			}
 		} else {
 			return false;
 		}

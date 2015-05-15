@@ -17,27 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
 
 /**
  * @author johannes
  * 
  */
-public class DayPredicate implements Predicate {
+public class MonthPredicate implements Predicate {
 
-	private final String day;
+	private final String month;
 
-	public DayPredicate(String day) {
-		this.day = day;
+	public MonthPredicate(String month) {
+		this.month = month;
 	}
 
 	@Override
 	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
-		if (day == null || day.equalsIgnoreCase(person.getAttribute(CommonKeys.DAY))) {
+		if (month == null || month.equalsIgnoreCase(person.getAttribute(MIDKeys.PERSON_MONTH))) {
 			return true;
 		} else {
 			return false;

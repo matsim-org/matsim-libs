@@ -64,7 +64,7 @@ public class MatrixCompare2 {
 	 */
 	public static void main(String[] args) throws IOException {
 		String runId = "826";
-		String simFile = "/home/johannes/sge/prj/matsim/run/874/output/nuts3/miv.summer.sym.xml";//String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
+		String simFile = "/home/johannes/sge/prj/matsim/run/883/output/matrices/280/miv.misc.xml";//String.format("/home/johannes/gsv/matrices/simmatrices/miv.%s.xml", runId);
 //		String simFile = "/home/johannes/gsv/matrices/simmatrices/avr/779-780/miv.sym.xml";
 		String refFile = "/home/johannes/gsv/matrices/refmatrices/itp.xml";
 		/*

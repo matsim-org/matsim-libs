@@ -17,29 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.plans2matrix;
 
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
  *
  */
-public class PredicateORComposite extends Composite<Predicate> implements Predicate {
+public interface Predicate {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.matrices.Predicate#test(playground.johannes.gsv.synPop.ProxyObject, playground.johannes.gsv.synPop.ProxyObject, playground.johannes.gsv.synPop.ProxyObject)
-	 */
-	@Override
-	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
-		for(Predicate p : components) {
-			if(p.test(person, leg, prev, next)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
+	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next);
+	
 }

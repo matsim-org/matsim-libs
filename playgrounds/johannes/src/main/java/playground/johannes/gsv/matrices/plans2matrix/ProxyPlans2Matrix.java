@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices;
+package playground.johannes.gsv.matrices.plans2matrix;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -69,15 +69,12 @@ public class ProxyPlans2Matrix {
 
 	private MathTransform transform;
 	
-//	private int validTrips;
-
 	public ProxyPlans2Matrix(Predicate predicate) {
 		setPredicate(predicate);
 
 		try {
 			transform = CRS.findMathTransform(CRSUtils.getCRS(31467), DefaultGeographicCRS.WGS84);
 		} catch (FactoryException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 	}
@@ -94,8 +91,11 @@ public class ProxyPlans2Matrix {
 
 		ProgressLogger.init(persons.size(), 2, 10);
 
-		int legs = 0;
+		int legCandidates = 0;
+		int tripCandidates = 0;
 		int trips = 0;
+		double pkmRoute = 0;
+		double pkmGeo = 0;
 
 		for (ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlans().get(0);
@@ -104,9 +104,9 @@ public class ProxyPlans2Matrix {
 				ProxyObject prev = plan.getActivities().get(i);
 				ProxyObject next = plan.getActivities().get(i + 1);
 
-				legs++;
+				legCandidates++;
 				if (predicate.test(person, leg, prev, next)) {
-					trips++;
+					tripCandidates++;
 					Id<ActivityFacility> origId = Id.create(prev.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					ActivityFacility origFac = facilities.getFacilities().get(origId);
 
@@ -126,7 +126,6 @@ public class ProxyPlans2Matrix {
 						String key1 = origZone.getAttribute(key);
 						String key2 = destZone.getAttribute(key);
 
-						// if (origZone != null && destZone != null) {
 						if (key1 != null && key2 != null) {
 							Double val = m.get(key1, key2);
 							if (val == null) {
@@ -134,7 +133,13 @@ public class ProxyPlans2Matrix {
 							}
 
 							m.set(key1, key2, ++val);
-//							validTrips++;
+							trips++;
+							
+							String routeDistStr = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
+							if(routeDistStr != null) pkmRoute +=  Double.parseDouble(routeDistStr);
+							
+							String geoDistStr = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
+							if(geoDistStr != null) pkmGeo += Double.parseDouble(geoDistStr);
 						} else {
 							noZones++;
 						}
@@ -150,10 +155,12 @@ public class ProxyPlans2Matrix {
 			logger.warn(String.format("%s activity locations could not be located in a zone.", noZones));
 		}
 
-		logger.info(String.format("Processed %s legs.", legs));
-		logger.info(String.format("Processed %s car trips.", trips));
-//		logger.info(String.format("Processed %s car trips.", trips));
-
+		logger.info(String.format("Processed %s legs.", legCandidates));
+		logger.info(String.format("Processed %s car trips.", tripCandidates));
+		logger.info(String.format("Volume: %s car trips.", trips));
+		logger.info(String.format("PKM (route distance): %s", pkmRoute));
+		logger.info(String.format("PKM (geo distance): %s", pkmGeo));
+		
 		return m;
 	}
 
@@ -182,6 +189,9 @@ public class ProxyPlans2Matrix {
 
 		logger.info("Restoring original activity types...");
 		ProxyTaskRunner.run(new RestoreActTypes(), persons, true);
+		
+		logger.info("Replaceing misc types...");
+		new ReplaceMiscType().apply(persons);
 		
 		String outdir = args[4];
 
@@ -237,6 +247,16 @@ public class ProxyPlans2Matrix {
 		p2m.setPredicate(pred);
 		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 		writer.write(m, String.format("%s/miv.wecommuter.xml", outdir));
+		/*
+		 * misc -- for validation
+		 */
+		logger.info("Extracting matrix wecommuter...");
+		pred = new PredicateANDComposite();
+		pred.addComponent(modePred);
+		pred.addComponent(new ActivityTypePredicate("misc"));
+		p2m.setPredicate(pred);
+		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
+		writer.write(m, String.format("%s/miv.misc.xml", outdir));
 		/*
 		 * days
 		 */
