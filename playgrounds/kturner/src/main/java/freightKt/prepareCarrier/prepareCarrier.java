@@ -1,13 +1,18 @@
 package freightKt.prepareCarrier;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.gml.producer.GeometryTransformer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -30,9 +35,12 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
+import org.matsim.core.utils.gis.PolylineFeatureFactory.Builder;
+import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.annotation.Obligation;
 import org.opengis.annotation.Specification;
@@ -46,6 +54,7 @@ import org.opengis.util.GenericName;
 import org.opengis.util.InternationalString;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -71,7 +80,8 @@ class prepareCarrier {
 	private static final String CARRIERS_NAME = "carrierLEH_v2_withFleet" ;
 	private static final String CARRIERS_OUT_NAME = "carrier_1Retailer" ;
 	private static final String TOLL_NAME = "toll_distance_test_kt";
-	private static final String SHAPE_NAME = "Umweltzone";
+	private static final String ZONE_SHAPE_NAME = "Umweltzone/Umweltzone_WGS84";
+	private static final String NETWORK_SHAPE_NAME = "Umweltzone/MatsimNW_conv_Links";
 	//Ende  Namesdefinition Berlin
 
 
@@ -94,18 +104,19 @@ class prepareCarrier {
 	private static final String CARRIERFILE = INPUT_DIR + CARRIERS_NAME + ".xml" ;
 	private static final String CARRIEROUTFILE = INPUT_DIR + CARRIERS_OUT_NAME + ".xml";
 	private static final String TOLLFILE = INPUT_DIR + TOLL_NAME + ".xml";
-	private static final String SHAPEFILE = INPUT_DIR + SHAPE_NAME + ".shp";
+	private static final String ZONESHAPEFILE = INPUT_DIR + ZONE_SHAPE_NAME + ".shp";
+	private static final String NETWORKSHAPEFILE = INPUT_DIR + NETWORK_SHAPE_NAME + ".shp";
 	
 	public static void main(String[] args) {
 		createDir(new File(OUTPUT_DIR));
 				
-		//Network-Stuff
-        Config config = ConfigUtils.createConfig();
-        config.network().setInputFile(NETFILE);
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+//		//Network-Stuff
+//        Config config = ConfigUtils.createConfig();
+//        config.network().setInputFile(NETFILE);
+//        Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		convertNet2Shape2(scenario.getNetwork(), OUTPUT_DIR); //Step 1: Netzwerk zusammenbringen -> Richtige Konvertierung gefunden ;-)
-		extractTollFile(scenario.getNetwork(), SHAPEFILE ,OUTPUT_DIR);
+//		convertNet2Shape(scenario.getNetwork(), OUTPUT_DIR); //Step 1: Netzwerk zusammenbringen -> Richtige Konvertierung gefunden ;-)
+		extractTollLinks(NETWORKSHAPEFILE, ZONESHAPEFILE ,OUTPUT_DIR); //Step 1: Netzwerk zusammenbringen -> Richtige Konvertierung gefunden ;-)
 		
 	
 		//Carrier-Stuff
@@ -123,10 +134,53 @@ class prepareCarrier {
 		System.out.println("### ENDE ###");
 	}
 
-	private static void extractTollFile(Network network, String shapefile2,
-			String outputDir) {
-		// TODO Auto-generated method stub
+	//NW-Step2: Extract all Features of NW-Shape which are within the ZoneShape, write there IDs into a .txt-File 
+	// which is designed in a way, that it can get copied easily to a tollFill and create a .shp-File with this Features
+	private static void extractTollLinks(String networkShapefile, String zoneShapefile, String outputDir) {
 		
+		Collection<SimpleFeature>  zoneFeatures = new ShapeFileReader().readFileAndInitialize(zoneShapefile);
+//		Map<String, Geometry> zoneGeometries = new HashMap<String, Geometry>();
+
+		Collection<SimpleFeature>  networkFeatures = new ShapeFileReader().readFileAndInitialize(networkShapefile);
+//		Map<String, SimpleFeature> networkFeaturesMap = new HashMap<String, SimpleFeature>();
+
+//		for(SimpleFeature feature : zoneFeatures){
+//			zoneGeometries.put((String) feature.getAttribute("NAME"),(Geometry) feature.getDefaultGeometry());
+//		}
+
+//		for(SimpleFeature feature : networkFeatures){
+//			networkFeaturesMap.put((String) feature.getAttribute("ID"), feature);
+//		}
+		
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		FileWriter writer;
+		try {
+			writer = new FileWriter(new File(outputDir + "tollLinks.txt")); //- falls die Datei bereits existiert wird diese überschrieben
+//			writer = new FileWriter(outputDir + "tollLinks.txt", true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
+
+			for (SimpleFeature zoneFeature : zoneFeatures){
+				for(SimpleFeature networkFeature : networkFeatures){ 
+					Geometry zoneGeometry = (Geometry) zoneFeature.getDefaultGeometry();
+					Geometry networkGeometry = (Geometry) networkFeature.getDefaultGeometry();
+					if(zoneGeometry.contains(networkGeometry)) {
+						features.add(networkFeature);
+						// Text wird in den Stream geschrieben
+						writer.write("<link id=" + networkFeature.getAttribute("ID") +" />");
+						writer.write(System.getProperty("line.separator"));
+					}
+				}
+			}
+			writer.flush();
+
+			// Schließt den Stream
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Datei geschrieben.");
+		
+		ShapeFileWriter.writeGeometries(features, outputDir+"TolledLinks.shp");
+
 	}
 
 	//Step 2: Extrahieren einzelner Retailer (alle, die mit dem RetailerNamen beginnen)
@@ -198,15 +252,14 @@ class prepareCarrier {
 		return net;
 	}
 
-	@SuppressWarnings("unchecked")
-	private static void convertNet2Shape2(Network network, String outputDir){
+	//NW Step1: Convert Matsim-Network to Shap-File.
+	private static void convertNet2Shape(Network network, String outputDir){
 		
 		network = convertCoordinates(network);
 		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:4326"); 
 		
 
-		@SuppressWarnings("rawtypes")
-		Collection features = new ArrayList();
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
         PolylineFeatureFactory linkFactory = new PolylineFeatureFactory.Builder().
                 setCrs(crs).
                 setName("link").
@@ -242,7 +295,7 @@ class prepareCarrier {
             SimpleFeature ft = nodeFactory.createPoint(node.getCoord(), new Object[] {node.getId().toString()}, null);
             features.add(ft);
         }
-        ShapeFileWriter.writeGeometries(features, outputDir+"MatsimNW_conv_Links.shp");
+        ShapeFileWriter.writeGeometries(features, outputDir+"MatsimNW_conv_Nodes.shp");
 	}
 	
 	private static void createDir(File file) {
