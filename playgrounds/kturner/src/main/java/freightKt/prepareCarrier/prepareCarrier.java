@@ -68,7 +68,7 @@ class prepareCarrier {
 	 * 	jeweils eigene Carrier mit eigener Flotten zsammensetzung sind.)
 	 * TODO: 3.) Links der Umweltzone einlesen (Maut-file) und die Nachfrage entsprechend auf UCC-Carrier mit ihren Depots und den Elektrofahrzeugen aufteilen.
 	 */
-	
+
 	//Beginn Namesdefinition KT Für Berlin-Szenario 
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/" ;
 	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/Umweltzone/" ;
@@ -85,18 +85,18 @@ class prepareCarrier {
 	//Ende  Namesdefinition Berlin
 
 
-//	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
-//	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-//	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Demand/Grid/UCC2/" ;
-//	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
-//
-//	//Dateinamen ohne XML-Endung
-//	private static final String NETFILE_NAME = "grid-network" ;
-//	private static final String VEHTYPES_NAME = "grid-vehTypes_kt" ;
-//	private static final String CARRIERS_NAME = "grid-carrier" ;
-//	private static final String CARRIERS_OUT_NAME = "grid-algorithm" ;
-//	private static final String TOLL_NAME = "grid-tollCordon";
-//	//Ende Namesdefinition Grid
+	//	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
+	//	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
+	//	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Demand/Grid/UCC2/" ;
+	//	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
+	//
+	//	//Dateinamen ohne XML-Endung
+	//	private static final String NETFILE_NAME = "grid-network" ;
+	//	private static final String VEHTYPES_NAME = "grid-vehTypes_kt" ;
+	//	private static final String CARRIERS_NAME = "grid-carrier" ;
+	//	private static final String CARRIERS_OUT_NAME = "grid-algorithm" ;
+	//	private static final String TOLL_NAME = "grid-tollCordon";
+	//	//Ende Namesdefinition Grid
 
 
 	private static final String NETFILE = INPUT_DIR + NETFILE_NAME + ".xml" ;
@@ -106,57 +106,108 @@ class prepareCarrier {
 	private static final String TOLLFILE = INPUT_DIR + TOLL_NAME + ".xml";
 	private static final String ZONESHAPEFILE = INPUT_DIR + ZONE_SHAPE_NAME + ".shp";
 	private static final String NETWORKSHAPEFILE = INPUT_DIR + NETWORK_SHAPE_NAME + ".shp";
-	
+
 	public static void main(String[] args) {
 		createDir(new File(OUTPUT_DIR));
-				
-//		//Network-Stuff
-//        Config config = ConfigUtils.createConfig();
-//        config.network().setInputFile(NETFILE);
-//        Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-//		convertNet2Shape(scenario.getNetwork(), OUTPUT_DIR); //Step 1: Netzwerk zusammenbringen -> Richtige Konvertierung gefunden ;-)
-		extractTollLinks(NETWORKSHAPEFILE, ZONESHAPEFILE ,OUTPUT_DIR); //Step 1: Netzwerk zusammenbringen -> Richtige Konvertierung gefunden ;-)
-		
-	
-		//Carrier-Stuff
-//		Carriers carriers = new Carriers() ;
-//		new CarrierPlanXmlReaderV2(carriers).read(CARRIERFILE) ;
-//		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
-//		new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPEFILE) ;
-//		
-//		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
-		
-//		calcInfosPerCarrier(carriers);	//Step 1: Analyse der vorhandenen Carrier
-//		extractCarrier(carriers, "aldi"); //Step 2: Extrahieren einzelner Carrier (alle, die mit dem RetailerNamen beginnen)		
 
-		
+		//		//Network-Stuff
+		//        Config config = ConfigUtils.createConfig();
+		//        config.network().setInputFile(NETFILE);
+		//        Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		//		convertNet2Shape(scenario.getNetwork(), OUTPUT_DIR); //Step 1: Netzwerk zusammenbringen -> Richtige Konvertierung gefunden ;-)
+		extractTollLinks(NETWORKSHAPEFILE, ZONESHAPEFILE ,OUTPUT_DIR); //Step 1: Netzwerk zusammenbringen -> Richtige Konvertierung gefunden ;-)
+
+
+		//Carrier-Stuff
+		//		Carriers carriers = new Carriers() ;
+		//		new CarrierPlanXmlReaderV2(carriers).read(CARRIERFILE) ;
+		//		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
+		//		new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPEFILE) ;
+		//		
+		//		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
+
+		//		calcInfosPerCarrier(carriers);	//Step 1: Analyse der vorhandenen Carrier
+		//		extractCarrier(carriers, "aldi"); //Step 2: Extrahieren einzelner Carrier (alle, die mit dem RetailerNamen beginnen)		
+
+
 		System.out.println("### ENDE ###");
+	}
+
+
+
+
+	//NW Step1: Convert Matsim-Network to Shap-File.
+	private static void convertNet2Shape(Network network, String outputDir){
+
+		network = convertCoordinates(network);
+		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:4326"); 
+
+
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		PolylineFeatureFactory linkFactory = new PolylineFeatureFactory.Builder().
+				setCrs(crs).
+				setName("link").
+				addAttribute("ID", String.class).
+				addAttribute("fromID", String.class).
+				addAttribute("toID", String.class).
+				addAttribute("length", Double.class).
+				addAttribute("type", String.class).
+				addAttribute("capacity", Double.class).
+				addAttribute("freespeed", Double.class).
+				create();
+
+		for (Link link : network.getLinks().values()) {
+			Coordinate fromNodeCoordinate = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+			Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
+			Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
+			SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
+					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
+			features.add(ft);
+		}   
+		ShapeFileWriter.writeGeometries(features, outputDir+"MatsimNW_conv_Links.shp");
+
+
+		features.clear();
+
+		PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
+				setCrs(crs).
+				setName("nodes").
+				addAttribute("ID", String.class).
+				create();
+
+		for (Node node : network.getNodes().values()) {
+			SimpleFeature ft = nodeFactory.createPoint(node.getCoord(), new Object[] {node.getId().toString()}, null);
+			features.add(ft);
+		}
+		ShapeFileWriter.writeGeometries(features, outputDir+"MatsimNW_conv_Nodes.shp");
+	}
+
+	//Convert coordinates of NW from Gauß-Krueger (Potsdam) [EPSG: 31468] to coordinate-format of low-emission-zone WGS84 [EPSG:4326]
+	private static Network convertCoordinates(Network net){
+
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:31468", "EPSG:4326");
+
+		for(Node node : net.getNodes().values()){
+			Coord newCoord = ct.transform(node.getCoord());
+			((NodeImpl)node).setCoord(newCoord);
+		}
+
+		return net;
 	}
 
 	//NW-Step2: Extract all Features of NW-Shape which are within the ZoneShape, write there IDs into a .txt-File 
 	// which is designed in a way, that it can get copied easily to a tollFill and create a .shp-File with this Features
 	private static void extractTollLinks(String networkShapefile, String zoneShapefile, String outputDir) {
-		
+
 		Collection<SimpleFeature>  zoneFeatures = new ShapeFileReader().readFileAndInitialize(zoneShapefile);
-//		Map<String, Geometry> zoneGeometries = new HashMap<String, Geometry>();
-
 		Collection<SimpleFeature>  networkFeatures = new ShapeFileReader().readFileAndInitialize(networkShapefile);
-//		Map<String, SimpleFeature> networkFeaturesMap = new HashMap<String, SimpleFeature>();
 
-//		for(SimpleFeature feature : zoneFeatures){
-//			zoneGeometries.put((String) feature.getAttribute("NAME"),(Geometry) feature.getDefaultGeometry());
-//		}
-
-//		for(SimpleFeature feature : networkFeatures){
-//			networkFeaturesMap.put((String) feature.getAttribute("ID"), feature);
-//		}
-		
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		FileWriter writer;
 		try {
 			writer = new FileWriter(new File(outputDir + "tollLinks.txt")); //- falls die Datei bereits existiert wird diese überschrieben
-//			writer = new FileWriter(outputDir + "tollLinks.txt", true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
+			//			writer = new FileWriter(outputDir + "tollLinks.txt", true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
 
 			for (SimpleFeature zoneFeature : zoneFeatures){
 				for(SimpleFeature networkFeature : networkFeatures){ 
@@ -171,55 +222,36 @@ class prepareCarrier {
 				}
 			}
 			writer.flush();
-
-			// Schließt den Stream
 			writer.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		System.out.println("Datei geschrieben.");
-		
 		ShapeFileWriter.writeGeometries(features, outputDir+"TolledLinks.shp");
-
 	}
 
-	//Step 2: Extrahieren einzelner Retailer (alle, die mit dem RetailerNamen beginnen)
-	private static void extractCarrier(Carriers carriers, String retailerName) {
-		String carrierId;
-		for (Carrier carrier : carriers.getCarriers().values()){
-			carrierId = carrier.getId().toString();
-			if (carrierId.startsWith(retailerName)){			//Carriername beginnt mit Retailername
-				Carriers tempCarriers = new Carriers();
-				tempCarriers.addCarrier(carrier);
-				new CarrierPlanXmlWriterV2(tempCarriers).write(OUTPUT_DIR + carrierId +".xml") ;
-			}
-			
-		}
-		
-	}
-
-	//Step 1: Analyse der vorhandenen Carrier
+	//Carrier Step 1: Analyse der vorhandenen Carrier
 	private static void calcInfosPerCarrier(Carriers carriers) {
-		
+
 		File carrierInfoFile = new File(OUTPUT_DIR + "CarrierInformation.txt" );
-		
+
 		String carrierId;
 		int nOfServices;
 		int demand;
 		int nOfDepots;
 		ArrayList<String> depotLinks = new ArrayList<String>();
 		ArrayList<String> vehTypes = new ArrayList<String>();
-		
+
 		for(Carrier carrier : carriers.getCarriers().values()){
 			carrierId = carrier.getId().toString();
-			
+
 			demand = 0; 
 			nOfServices = 0;
 			for (CarrierService service : carrier.getServices()){
 				demand += service.getCapacityDemand();
 				nOfServices++;
 			}
-			
+
 			nOfDepots = 0;
 			depotLinks.clear();
 			vehTypes.clear();
@@ -233,71 +265,26 @@ class prepareCarrier {
 					vehTypes.add(vehicle.getVehicleType().getId().toString());
 				}
 			}
-			
+
 			WriteCarrierInfos carrierInfoWriter = new WriteCarrierInfos(carrierInfoFile, carrierId, nOfServices, demand, nOfDepots, vehTypes) ;
+		}	
+	}
+
+	//Carrier Step 2: Extrahieren einzelner Retailer (alle, die mit dem RetailerNamen beginnen)
+	private static void extractCarrier(Carriers carriers, String retailerName) {
+		String carrierId;
+		for (Carrier carrier : carriers.getCarriers().values()){
+			carrierId = carrier.getId().toString();
+			if (carrierId.startsWith(retailerName)){			//Carriername beginnt mit Retailername
+				Carriers tempCarriers = new Carriers();
+				tempCarriers.addCarrier(carrier);
+				new CarrierPlanXmlWriterV2(tempCarriers).write(OUTPUT_DIR + carrierId +".xml") ;
+			}
+
 		}
-		
-	}
-	
-	//Convert coordinates of NW from Gauß-Krueger (Potsdam) [EPSG: 31468] to coordinate-format of low-emission-zone WGS84 [EPSG:4326]
-	private static Network convertCoordinates(Network net){
-		
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:31468", "EPSG:4326");
-		
-		for(Node node : net.getNodes().values()){
-			Coord newCoord = ct.transform(node.getCoord());
-			((NodeImpl)node).setCoord(newCoord);
-		}
-		
-		return net;
+
 	}
 
-	//NW Step1: Convert Matsim-Network to Shap-File.
-	private static void convertNet2Shape(Network network, String outputDir){
-		
-		network = convertCoordinates(network);
-		CoordinateReferenceSystem crs = MGC.getCRS("EPSG:4326"); 
-		
-
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-        PolylineFeatureFactory linkFactory = new PolylineFeatureFactory.Builder().
-                setCrs(crs).
-                setName("link").
-                addAttribute("ID", String.class).
-                addAttribute("fromID", String.class).
-                addAttribute("toID", String.class).
-                addAttribute("length", Double.class).
-                addAttribute("type", String.class).
-                addAttribute("capacity", Double.class).
-                addAttribute("freespeed", Double.class).
-                create();
-
-        for (Link link : network.getLinks().values()) {
-            Coordinate fromNodeCoordinate = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
-            Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
-            Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
-            SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
-                    new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
-            features.add(ft);
-        }   
-        ShapeFileWriter.writeGeometries(features, outputDir+"MatsimNW_conv_Links.shp");
-       
-        
-        features.clear();
-       
-        PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
-                setCrs(crs).
-                setName("nodes").
-                addAttribute("ID", String.class).
-                create();
-
-        for (Node node : network.getNodes().values()) {
-            SimpleFeature ft = nodeFactory.createPoint(node.getCoord(), new Object[] {node.getId().toString()}, null);
-            features.add(ft);
-        }
-        ShapeFileWriter.writeGeometries(features, outputDir+"MatsimNW_conv_Nodes.shp");
-	}
-	
 	private static void createDir(File file) {
 		System.out.println("Verzeichnis " + file + "erstellt: "+ file.mkdirs());	
 	}
