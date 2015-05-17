@@ -18,6 +18,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -45,7 +46,7 @@ public class Gui extends JFrame {
 	
 	private JButton btnStartMatsim;
 	private JProgressBar progressBar;
-	private JTextArea textArea;
+	private JTextArea textStdOut;
 	private JScrollPane scrollPane;
 	
 	private ExeRunner exeRunner = null;
@@ -56,6 +57,7 @@ public class Gui extends JFrame {
 	private JMenuItem mntmCreateSamplePopulation;
 
 	private PopulationSampler popSampler = null;
+	private JTextArea textErrOut;
 	
 	public Gui() {
 		setTitle("MATSim");
@@ -194,25 +196,21 @@ public class Gui extends JFrame {
 			}
 		});
 		
-		textArea = new JTextArea();
-		textArea.setWrapStyleWord(true);
-		textArea.setTabSize(4);
-		textArea.setEditable(false);
-		scrollPane = new JScrollPane(textArea);
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 //		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
 		GroupLayout groupLayout = new GroupLayout(getContentPane());
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.TRAILING)
-				.addGroup(groupLayout.createSequentialGroup()
+				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
-						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE)
-						.addComponent(lblWorkDirectory, Alignment.LEADING)
-						.addComponent(lblJavaLocation, Alignment.LEADING)
-						.addComponent(lblConfigurationFile, Alignment.LEADING)
-						.addComponent(lblOutputDirectory, Alignment.LEADING)
-						.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 729, Short.MAX_VALUE)
+						.addComponent(lblWorkDirectory)
+						.addComponent(lblJavaLocation)
+						.addComponent(lblConfigurationFile)
+						.addComponent(lblOutputDirectory)
+						.addGroup(groupLayout.createSequentialGroup()
 							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblYouAreRunning)
 								.addComponent(lblYouAreUsing)
@@ -224,16 +222,16 @@ public class Gui extends JFrame {
 									.addComponent(txtRam, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(lblMb))
-								.addComponent(txtMatsimversion, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
-								.addComponent(txtJvmversion, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
-								.addComponent(txtJvmlocation, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
+								.addComponent(txtMatsimversion, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
+								.addComponent(txtJvmversion, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
+								.addComponent(txtJvmlocation, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
 								.addGroup(groupLayout.createSequentialGroup()
-									.addComponent(txtConfigfilename, GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
+									.addComponent(txtConfigfilename, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(btnChoose))
-								.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 496, Short.MAX_VALUE)
+								.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
 								.addGroup(groupLayout.createSequentialGroup()
-									.addComponent(txtOutput, GroupLayout.DEFAULT_SIZE, 323, Short.MAX_VALUE)
+									.addComponent(txtOutput, GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
 									.addPreferredGap(ComponentPlacement.RELATED)
 									.addComponent(btnOpen)
 									.addPreferredGap(ComponentPlacement.RELATED)
@@ -278,9 +276,22 @@ public class Gui extends JFrame {
 						.addComponent(btnStartMatsim)
 						.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+					.addComponent(tabbedPane, GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
 					.addContainerGap())
 		);
+		
+		textStdOut = new JTextArea();
+		textStdOut.setWrapStyleWord(true);
+		textStdOut.setTabSize(4);
+		textStdOut.setEditable(false);
+		scrollPane = new JScrollPane(textStdOut);
+		tabbedPane.addTab("Output", null, scrollPane, null);
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		tabbedPane.addTab("Warnings & Errors", null, scrollPane_1, null);
+		
+		textErrOut = new JTextArea();
+		scrollPane_1.setViewportView(textErrOut);
 
 		getContentPane().setLayout(groupLayout);
 		
@@ -349,8 +360,8 @@ public class Gui extends JFrame {
 						"org.matsim.run.Controler",
 						txtConfigfilename.getText()
 				};
-				Gui.this.textArea.setText("");
-				Gui.this.exeRunner = ExeRunner.run(cmdArgs, Gui.this.textArea, new File(txtConfigfilename.getText()).getParent());
+				Gui.this.textStdOut.setText("");
+				Gui.this.exeRunner = ExeRunner.run(cmdArgs, Gui.this.textStdOut, Gui.this.textErrOut, new File(txtConfigfilename.getText()).getParent());
 				Gui.this.btnStartMatsim.setText("Stop MATSim");
 				Gui.this.btnStartMatsim.setEnabled(true);
 				int exitcode = exeRunner.waitForFinish();
@@ -366,9 +377,9 @@ public class Gui extends JFrame {
 				});
 
 				if (exitcode != 0) {
-					Gui.this.textArea.append("\n");
-					Gui.this.textArea.append("The simulation did not run properly. Error/Exit code: " + exitcode);
-					Gui.this.textArea.setCaretPosition(Gui.this.textArea.getDocument().getLength());
+					Gui.this.textStdOut.append("\n");
+					Gui.this.textStdOut.append("The simulation did not run properly. Error/Exit code: " + exitcode);
+					Gui.this.textStdOut.setCaretPosition(Gui.this.textStdOut.getDocument().getLength());
 					throw new RuntimeException("There was a problem running MATSim. exit code: " + exitcode);
 				}
 			}
@@ -387,9 +398,9 @@ public class Gui extends JFrame {
 					btnStartMatsim.setText("Start MATSim");
 					btnStartMatsim.setEnabled(true);
 					
-					Gui.this.textArea.append("\n");
-					Gui.this.textArea.append("The simulation was stopped forcefully.");
-					Gui.this.textArea.setCaretPosition(Gui.this.textArea.getDocument().getLength());
+					Gui.this.textStdOut.append("\n");
+					Gui.this.textStdOut.append("The simulation was stopped forcefully.");
+					Gui.this.textStdOut.setCaretPosition(Gui.this.textStdOut.getDocument().getLength());
 				}
 			});
 		}

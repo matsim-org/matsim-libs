@@ -43,8 +43,8 @@ import org.matsim.core.utils.io.IOUtils;
 	
 	private final ExternalExecutor executor;
 
-	public static ExeRunner run(final String[] cmdArgs, final JTextArea textArea, final String workingDirectory) {
-		final ExternalExecutor myExecutor = new ExternalExecutor(cmdArgs, textArea, workingDirectory);
+	public static ExeRunner run(final String[] cmdArgs, final JTextArea stdOut, final JTextArea errOut, final String workingDirectory) {
+		final ExternalExecutor myExecutor = new ExternalExecutor(cmdArgs, stdOut, errOut, workingDirectory);
 		ExeRunner runner = new ExeRunner(myExecutor);
 		myExecutor.start();
 		return runner;
@@ -72,15 +72,17 @@ import org.matsim.core.utils.io.IOUtils;
 
 	private static class ExternalExecutor extends Thread {
 		final String[] cmdArgs;
-		final JTextArea textArea;
+		final JTextArea stdOut;
+		final JTextArea errOut;
 		final String workingDirectory;
 		private Process p = null;
 
 		public int erg = -1;
 
-		public ExternalExecutor (final String[] cmdArgs, final JTextArea textArea, final String workingDirectory) {
+		public ExternalExecutor (final String[] cmdArgs, final JTextArea stdOut, final JTextArea errOut, final String workingDirectory) {
 			this.cmdArgs = cmdArgs;
-			this.textArea = textArea;
+			this.stdOut = stdOut;
+			this.errOut = errOut;
 			this.workingDirectory = workingDirectory;
 		}
 		
@@ -102,10 +104,10 @@ import org.matsim.core.utils.io.IOUtils;
 				BufferedReader in = new BufferedReader(new InputStreamReader(this.p.getInputStream()));
 				BufferedReader err = new BufferedReader(new InputStreamReader(this.p.getErrorStream()));
 				
-				StreamHandler outputHandler = new StreamHandler(in, this.textArea);
+				StreamHandler outputHandler = new StreamHandler(in, this.stdOut);
 				outputHandler.start();
 
-				StreamHandler errorHandler = new StreamHandler(err, this.textArea);
+				StreamHandler errorHandler = new StreamHandler(err, this.stdOut, this.errOut);
 				errorHandler.start();
 
 				log.info("Starting external exe with command: " + Arrays.toString(this.cmdArgs));
@@ -140,9 +142,9 @@ import org.matsim.core.utils.io.IOUtils;
 	
 	static class StreamHandler extends Thread {
 		private final BufferedReader in;
-		private final JTextArea textArea;
+		private final JTextArea[] textArea;
 
-		public StreamHandler(final BufferedReader in, final JTextArea textArea) {
+		public StreamHandler(final BufferedReader in, final JTextArea... textArea) {
 			this.in = in;
 			this.textArea = textArea;
 		}
@@ -152,13 +154,15 @@ import org.matsim.core.utils.io.IOUtils;
 			try {
 				String line = null;
 				while ((line = this.in.readLine()) != null) {
-					this.textArea.append(line);
-					this.textArea.append(IOUtils.NATIVE_NEWLINE);
-					int length = this.textArea.getDocument().getLength();
-					this.textArea.setCaretPosition(length);
-					
-					if (length > 512*1024) {
-						this.textArea.setText(this.textArea.getText().substring(256*1024));
+					for (JTextArea out : this.textArea) {
+						out.append(line);
+						out.append(IOUtils.NATIVE_NEWLINE);
+						int length = out.getDocument().getLength();
+						out.setCaretPosition(length);
+						
+						if (length > 512*1024) {
+							out.setText(out.getText().substring(256*1024));
+						}
 					}
 				}
 			} catch (IOException e) {
