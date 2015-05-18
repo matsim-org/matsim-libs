@@ -435,7 +435,9 @@ abstract class AccessibilityControlerListenerImpl {
 						if(!useRawSum){ 	// get log sum
 							accessibilities.put( mode, inverseOfLogitScaleParameter * Math.log( gcs[mode.ordinal()].getSum() ) ) ;
 						} else {
-							accessibilities.put( mode, inverseOfLogitScaleParameter * gcs[mode.ordinal()].getSum() ) ;
+							// this was used by IVT within SustainCity.  Not sure if we should main this; they could, after all, just exp the log results. kai, may'15
+							accessibilities.put( mode, gcs[mode.ordinal()].getSum() ) ;
+//							accessibilities.put( mode, inverseOfLogitScaleParameter * gcs[mode.ordinal()].getSum() ) ;
 							// yyyy why _multiply_ with "inverseOfLogitScaleParameter"??  If anything, would need to take the power:
 							// a * ln(b) = ln( b^a ).  kai, jan'14
 						}
@@ -454,8 +456,19 @@ abstract class AccessibilityControlerListenerImpl {
 				
 				if(this.zoneDataExchangeListenerList != null){
 					for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
-						this.zoneDataExchangeListenerList.get(i).getZoneAccessibilities(origin, accessibilities );
+						this.zoneDataExchangeListenerList.get(i).setZoneAccessibilities(origin, accessibilities );
 				}
+				
+				// yy The above storage logic is a bit odd (probably historically grown and then never cleaned up):
+				// * For urbansim, the data is directly written to file and then forgotten.
+				// * In addition, the cell-based data is memorized for writing it in a different format (spatial grid, for R, not used any more).
+				// * Since the zone-based data is not memorized, there is a specific mechanism to set the value in registered listeners.
+				// * The zone-based listener also works for cell-based data.
+				// * I don't think that it is used anywhere except in one test.  Easiest would be to get rid of this but it may not be completely
+				//  easy to fix the test (maybe memorize all accessibility values in all cases).
+				// It might be a lot easier to just memorize all the data right away.
+				// kai, may'15
+				
 
 			}
 

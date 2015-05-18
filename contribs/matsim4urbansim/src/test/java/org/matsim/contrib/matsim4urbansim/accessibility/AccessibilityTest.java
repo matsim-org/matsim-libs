@@ -216,7 +216,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	}
 
 	@Override
-	public void getAndProcessSpatialGrids( Map<Modes4Accessibility,SpatialGrid> spatialGrids ) {
+	public void setAndProcessSpatialGrids( Map<Modes4Accessibility,SpatialGrid> spatialGrids ) {
 
 		if(accessibilities==null)
 			//initialize accessibilities-array with place for 9 measuring points and 4 modes
@@ -248,7 +248,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	}
 
 	@Override
-	public void getZoneAccessibilities(ActivityFacility measurePoint, Map<Modes4Accessibility,Double> accessibilities1 ) {
+	public void setZoneAccessibilities(ActivityFacility measurePoint, Map<Modes4Accessibility,Double> accessibilities1 ) {
 
 		//store the accessibilities of the zone in the list for home or work accessibilities
 		if(measurePoint.getCoord().equals(new CoordImpl(100,0))){

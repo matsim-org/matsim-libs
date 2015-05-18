@@ -38,7 +38,7 @@ public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeI
 	 * from the grid for given parcel coordinates and written out in UrbanSim format.
 	 */
 	@Override
-	public void getAndProcessSpatialGrids( Map<Modes4Accessibility,SpatialGrid> spatialGrids ) {
+	public void setAndProcessSpatialGrids( Map<Modes4Accessibility,SpatialGrid> spatialGrids ) {
 			
 		// from here accessibility feedback for each parcel
 		UrbanSimParcelCSVWriter.initUrbanSimZoneWriter(config);

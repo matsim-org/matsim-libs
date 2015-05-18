@@ -7,6 +7,6 @@ import org.matsim.facilities.ActivityFacility;
 
 public interface ZoneDataExchangeInterface {
 	
-	public void getZoneAccessibilities(ActivityFacility measurePoint, Map<Modes4Accessibility,Double> accessibilities ) ;
+	public void setZoneAccessibilities(ActivityFacility measurePoint, Map<Modes4Accessibility,Double> accessibilities ) ;
 	
 }

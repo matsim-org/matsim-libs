@@ -177,6 +177,8 @@ implements ShutdownListener, StartupListener {
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		// yyyy do we really need this?  do we really have to open the files if we don't start writing until notifyShutdown?  kai, may'15
+		
 		// I moved this from the constructor since it did actually NOT work in situations where the output directory hierarchy was not there
 		// from the beginning ... since the matsim Controler instantiates this not before the "run" statement ... which is the only way in which
 		// setOverwriteDirectories can be honoured.  kai, feb'14
@@ -290,7 +292,7 @@ implements ShutdownListener, StartupListener {
 		if(this.spatialGridDataExchangeListenerList != null){
 			log.info("Triggering " + this.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
 			for(int i = 0; i < this.spatialGridDataExchangeListenerList.size(); i++)
-				this.spatialGridDataExchangeListenerList.get(i).getAndProcessSpatialGrids( getAccessibilityGrids() );
+				this.spatialGridDataExchangeListenerList.get(i).setAndProcessSpatialGrids( getAccessibilityGrids() );
 		}
 
 	}

@@ -133,7 +133,6 @@ public final class SpatialGrid{
 	 * @param point
 	 * @return the initial value at the given point
 	 */
-	@Deprecated // use method with Coord
 	public double getValue(Point point) {
 		if(isInBounds(point))
 			return getValue(point.getX(), point.getY());
@@ -176,7 +175,6 @@ public final class SpatialGrid{
 	 * @param point
 	 * @return true if the point lies in the bounds of the study area, false otherwise
 	 */
-	@Deprecated // use method with Coord 
 	public boolean setValue(double value, Point point) {
 		if(isInBounds(point)) {
 			setValue(value, point.getX(), point.getY());
@@ -227,7 +225,6 @@ public final class SpatialGrid{
 		}
 	}
 	
-	@Deprecated // use method with Coord 
 	public boolean isInBounds(Point point) {
 		return isInBounds( point.getX(), point.getY() ) ;
 	}
