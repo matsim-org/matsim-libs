@@ -62,11 +62,13 @@ public class DefaultPlanStrategiesModule extends AbstractModule {
         addPlanStrategyBinding(DefaultStrategy.ReRoute.toString()).toProvider(ReRoutePlanStrategyFactory.class);
         addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator.toString()).toProvider(TimeAllocationMutatorPlanStrategyFactory.class);
         addPlanStrategyBinding(DefaultStrategy.TimeAllocationMutator_ReRoute.toString()).toProvider(TimeAllocationMutatorReRoutePlanStrategyFactory.class);
-        addPlanStrategyBinding(DefaultStrategy.ChangeLegMode.toString()).toProvider(ChangeLegModeStrategyFactory.class);
+
         addPlanStrategyBinding(DefaultStrategy.ChangeSingleLegMode.toString()).toProvider(ChangeSingleLegModeStrategyFactory.class);
-        addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripModeStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.ChangeLegMode.toString()).toProvider(ChangeLegModeStrategyFactory.class);
         addPlanStrategyBinding(DefaultStrategy.SubtourModeChoice.toString()).toProvider(SubtourModeChoiceStrategyFactory.class);
+
         addPlanStrategyBinding(DefaultStrategy.ChangeTripMode.toString()).toProvider(ChangeTripModeStrategyFactory.class);
+        addPlanStrategyBinding(DefaultStrategy.ChangeSingleTripMode.toString()).toProvider(ChangeSingleTripModeStrategyFactory.class);
         addPlanStrategyBinding(DefaultStrategy.TripSubtourModeChoice.toString()).toProvider(TripSubtourModeChoiceStrategyFactory.class);
     }
 
