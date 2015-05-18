@@ -21,6 +21,7 @@ package playground.thibautd.socnetsim.framework.population;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Counter;
@@ -112,8 +113,8 @@ public class SocialNetworkWriter extends MatsimXmlWriter {
 		final Set<Id> dumpedEgos = new HashSet<Id>();
 		final boolean reflective = network.isReflective();
 		for ( Id ego : network.getEgos() ) {
-			final Iterable<Id> alters = network.getAlters( ego );
-			for ( Id alter : alters ) {
+			final Iterable<Id<Person>> alters = network.getAlters( ego );
+			for ( Id<Person> alter : alters ) {
 				if ( reflective && dumpedEgos.contains( alter ) ) continue;
 
 				counter.incCounter();

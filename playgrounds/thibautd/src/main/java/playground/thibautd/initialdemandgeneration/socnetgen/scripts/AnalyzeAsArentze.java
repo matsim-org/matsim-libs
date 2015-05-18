@@ -22,6 +22,7 @@ package playground.thibautd.initialdemandgeneration.socnetgen.scripts;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -101,8 +102,8 @@ public class AnalyzeAsArentze {
 			for ( Id egoId : socialNetwork.getEgos() ) {
 				final ArentzeAgent ego = population.getAgentsMap().get( egoId );
 
-				final Iterable<Id> alters = socialNetwork.getAlters( egoId );
-				for ( Id alterId : alters ) {
+				final Iterable<Id<Person>> alters = socialNetwork.getAlters(egoId);
+				for ( Id<Person> alterId : alters ) {
 					counter.incCounter();
 					final ArentzeAgent alter = population.getAgentsMap().get( alterId );
 

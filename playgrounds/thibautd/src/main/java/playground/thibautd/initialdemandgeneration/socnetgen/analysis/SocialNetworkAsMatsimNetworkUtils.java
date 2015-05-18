@@ -66,8 +66,8 @@ public class SocialNetworkAsMatsimNetworkUtils {
 		}
 	
 		for ( Id ego : sn.getEgos() ) {
-			final Iterable<Id> alters = sn.getAlters( ego );
-			for ( Id alter : alters ) {
+			final Iterable<Id<Person>> alters = sn.getAlters( ego );
+			for ( Id<Person> alter : alters ) {
 				net.addLink(
 						net.getFactory().createLink(
 							Id.create( ego+"---"+alter, Link.class ),
