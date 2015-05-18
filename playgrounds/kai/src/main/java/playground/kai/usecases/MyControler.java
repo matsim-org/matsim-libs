@@ -39,7 +39,7 @@ class MyControler {
 		
 		// prepare the config:
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
-		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true) ;
+		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
 		
 		ModeParams settingsForCar = config.planCalcScore().getModes().get( TransportMode.car ) ;
 

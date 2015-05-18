@@ -82,6 +82,9 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		comments.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides " 
 				+ PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime + " will internally use a different " +
 		"(simpler) version of the TimeAllocationMutator.") ;
+		
+		comments.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
+		"activityStartTime. default=false") ;
 
 		return comments;
 	}
@@ -147,5 +150,19 @@ public final class PlansConfigGroup extends ReflectiveConfigGroup {
 		}
 		this.activityDurationInterpretation = actDurInterpret;
 	}
+
+	// ---
+	
+	private static final String REMOVING_UNNECESSARY_PLAN_ATTRIBUTES = "removingUnnecessaryPlanAttributes";
+	private boolean removingUnneccessaryPlanAttributes = false;
+	@StringGetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
+	public boolean isRemovingUnneccessaryPlanAttributes() {
+		return this.removingUnneccessaryPlanAttributes;
+	}
+	@StringSetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
+	public void setRemovingUnneccessaryPlanAttributes(final boolean removingUnneccessaryPlanAttributes) {
+		this.removingUnneccessaryPlanAttributes = removingUnneccessaryPlanAttributes;
+	}
+
 
 }

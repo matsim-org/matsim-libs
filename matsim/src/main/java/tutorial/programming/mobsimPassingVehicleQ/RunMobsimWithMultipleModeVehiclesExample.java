@@ -42,7 +42,7 @@ class RunMobsimWithMultipleModeVehiclesExample {
 		@SuppressWarnings("unchecked")
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
         config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.toString());
-		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true) ;
+		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
 
 		// prepare the scenario
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;

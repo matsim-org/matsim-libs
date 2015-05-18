@@ -142,7 +142,7 @@ public class EvacuationPatnaScenarioGenerator {
 
 		//vsp default
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
-		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
+		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.setParam("TimeAllocationMutator", "mutationAffectsDuration", "false");
 		config.setParam("TimeAllocationMutator", "mutationRange", "7200.0");
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);

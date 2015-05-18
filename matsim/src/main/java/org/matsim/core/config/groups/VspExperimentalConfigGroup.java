@@ -35,9 +35,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "vspExperimental";
 
-	// ---
-	private static final String REMOVING_UNNECESSARY_PLAN_ATTRIBUTES = "removingUnnecessaryPlanAttributes" ;
-	private boolean removingUnneccessaryPlanAttributes = false ;
+	
 
 	// ---
 
@@ -138,9 +136,6 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 				"Options: " + options + ".  When violating VSP defaults, this results in " +
 		"nothing, logfile infos, logfile warnings, or aborts.  Members of VSP should use `abort' or talk to kai.") ;
 
-		map.put(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES, "(not tested) will remove plan attributes that are presumably not used, such as " +
-		"activityStartTime. default=false") ;
-
 		map.put(INPUT_MZ05_FILE, "(do not use) Set this filename of MZ05 daily analysis");
 
 		return map;
@@ -153,15 +148,6 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	public void setInputMZ05File(final String inputMZ05File) {
 		this.inputMZ05File = inputMZ05File;
 	}
-	@StringGetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
-	public boolean isRemovingUnneccessaryPlanAttributes() {
-		return this.removingUnneccessaryPlanAttributes;
-	}
-	@StringSetter(REMOVING_UNNECESSARY_PLAN_ATTRIBUTES)
-	public void setRemovingUnneccessaryPlanAttributes(final boolean removingUnneccessaryPlanAttributes) {
-		this.removingUnneccessaryPlanAttributes = removingUnneccessaryPlanAttributes;
-	}
-
 	@StringGetter(WRITING_OUTPUT_EVENTS)
 	public boolean isWritingOutputEvents() {
 		return this.writingOutputEvents ;
@@ -174,4 +160,5 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	protected void checkConsistency() {
 	}
+	
 }

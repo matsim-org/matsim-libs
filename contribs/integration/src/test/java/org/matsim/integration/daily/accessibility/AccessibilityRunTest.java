@@ -85,7 +85,7 @@ public class AccessibilityRunTest {
 		// some (otherwise irrelevant) settings to make the vsp check happy:
 		config.timeAllocationMutator().setMutationRange(7200.);
 		config.timeAllocationMutator().setAffectingDuration(false);
-		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
+		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.plans().setActivityDurationInterpretation( PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
 
 		{

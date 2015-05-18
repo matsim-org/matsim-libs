@@ -168,7 +168,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		}
 		
 		// added before nov'12
-		if ( !config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
+		if ( !config.plans().isRemovingUnneccessaryPlanAttributes() ) {
 			problem = true ;
 			System.out.flush() ;
 			log.log( lvl, "You are not removing unnecessary plan attributes; vsp default is to do that.") ;

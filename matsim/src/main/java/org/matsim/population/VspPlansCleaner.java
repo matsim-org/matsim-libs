@@ -79,13 +79,13 @@ class VspPlansCleaner implements BeforeMobsimListener {
 						throw new IllegalStateException("should not happen") ;
 					}
 					
-					if ( config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
+					if ( config.plans().isRemovingUnneccessaryPlanAttributes() ) {
 						act.setStartTime(Time.UNDEFINED_TIME) ;
 					}
 					
 				} else if ( pe instanceof Leg ) {
 					Leg leg = (Leg) pe ;
-					if ( config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
+					if ( config.plans().isRemovingUnneccessaryPlanAttributes() ) {
 						leg.setDepartureTime(Time.UNDEFINED_TIME) ; // given by activity end time; everything else confuses
 						((LegImpl)leg).setArrivalTime(Time.UNDEFINED_TIME) ;
 						leg.setTravelTime( Time.UNDEFINED_TIME ); // added apr'2015

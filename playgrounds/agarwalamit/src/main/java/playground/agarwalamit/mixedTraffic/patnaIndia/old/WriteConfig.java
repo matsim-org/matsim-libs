@@ -89,7 +89,7 @@ public class WriteConfig {
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 
 		//vsp default
-		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
+		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", "abort");
 		//vsp default
 

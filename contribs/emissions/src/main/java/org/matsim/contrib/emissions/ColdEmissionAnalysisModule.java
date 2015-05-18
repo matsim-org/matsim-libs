@@ -119,12 +119,14 @@ public class ColdEmissionAnalysisModule {
 			throw new RuntimeException("Vehicle type description for person " + personId + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
 					+ VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+			// yyyy todo: check above error message.  Is this really still in VspExperimentalConfigGroup??? kai, may'15
 		}
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for person " + personId + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
 					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+			// yyyy todo: check above error message.  Is this really still in VspExperimentalConfigGroup??? kai, may'15
 		}
         coldEmissions = getColdPollutantDoubleMap(personId, parkingDuration, vehicleInformationTuple, distance_km);
 

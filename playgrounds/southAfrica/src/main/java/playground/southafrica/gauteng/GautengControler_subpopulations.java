@@ -194,7 +194,7 @@ public class GautengControler_subpopulations {
 				);
 		roadPricingConfig.setRoutingRandomness(3.); // <-- This is the diversity generating toll router!
 
-		config.vspExperimental().setRemovingUnneccessaryPlanAttributes(true);
+		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort ) ;
 		config.vspExperimental().setWritingOutputEvents(true);
 		
