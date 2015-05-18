@@ -317,7 +317,9 @@ public class ScenarioLoaderImpl {
 		log.error("SignalsData is no longer loaded by this method. \n "
 				+ "If you do not use the default signals initialization code that is provided in the contrib, "
 				+ "make sure you add the following line after you have loaded the scenario: \n "
-		        + "  scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData()); \n ");
+		        + "  scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData()); \n "
+				+ "Additionally, you have to add the signals module to the simulation: \n "
+		        + "  controler.addOverridingModule(new SignalsModule()); \n");
 	}
 
 }
