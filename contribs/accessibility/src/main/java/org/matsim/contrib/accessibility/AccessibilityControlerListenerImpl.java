@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -29,6 +30,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -86,6 +88,8 @@ abstract class AccessibilityControlerListenerImpl {
 	Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>() ;
 
 	PtMatrix ptMatrix;
+	
+	RoadPricingScheme scheme ;
 
 	ArrayList<SpatialGridDataExchangeInterface> spatialGridDataExchangeListenerList = null;
 	ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListenerList = null;
@@ -126,8 +130,6 @@ abstract class AccessibilityControlerListenerImpl {
 	
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0 ;
-
-	RoadPricingScheme scheme;
 
 	protected boolean urbansimMode = true;
 
@@ -310,13 +312,14 @@ abstract class AccessibilityControlerListenerImpl {
 	}
 
 	
-	final void accessibilityComputation(TravelTime ttc,
-			LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
-			LeastCostPathTreeExtended lcptExtCongestedCarTravelTime,
-			LeastCostPathTree lcptTravelDistance, 
-			NetworkImpl network,
-			ActivityFacilities  mp,
-			int runMode) {
+	final void accessibilityComputation(TravelTime ttf, TravelTime ttc, Scenario scenario, int runMode, TravelDisutility tdFree, TravelDisutility tdCongested) {
+		
+		LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime = new LeastCostPathTreeExtended( ttf, tdFree, (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
+
+		// get travel distance (in meter):
+		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new LinkLengthTravelDisutility());
+
+		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, this.scheme ) ;
 
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
@@ -329,10 +332,10 @@ abstract class AccessibilityControlerListenerImpl {
 		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
 		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<Id<Node>, ArrayList<ActivityFacility>>();
 		// ========================================================================
-		for ( ActivityFacility aFac : mp.getFacilities().values() ) {
+		for ( ActivityFacility aFac : measuringPoints.getFacilities().values() ) {
 
 			// determine nearest network node (from- or toNode) based on the link 
-			Node fromNode = NetworkUtils.getCloserNodeOnLink(aFac.getCoord(), network.getNearestLinkExactly(aFac.getCoord()));
+			Node fromNode = NetworkUtils.getCloserNodeOnLink(aFac.getCoord(), ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(aFac.getCoord()));
 
 			// this is used as a key for hash map lookups
 			Id<Node> nodeId = fromNode.getId();
@@ -345,9 +348,9 @@ abstract class AccessibilityControlerListenerImpl {
 			aggregatedOrigins.get(nodeId).add(aFac);
 		}
 		// ========================================================================
-
+		
 		log.info("");
-		log.info("Number of measurement points (origins): " + mp.getFacilities().values().size());
+		log.info("Number of measurement points (origins): " + measuringPoints.getFacilities().values().size());
 		log.info("Number of aggregated measurement points (origins): " + aggregatedOrigins.size());
 		log.info("Now going through all origins:");
 
@@ -358,24 +361,24 @@ abstract class AccessibilityControlerListenerImpl {
 
 			bar.update();
 
-			Node fromNode = network.getNodes().get( nodeId );
+			Node fromNode = scenario.getNetwork().getNodes().get( nodeId );
 
 			// run Dijkstra on network
 			// this is done once for all origins in the "origins" list, see below
 			if(this.isComputingMode.get(Modes4Accessibility.freeSpeed) ) {
-				lcptExtFreeSpeedCarTravelTime.calculateExtended(network, fromNode, depatureTime);
+				lcptExtFreeSpeedCarTravelTime.calculateExtended(scenario.getNetwork(), fromNode, depatureTime);
 			}
 			if(this.isComputingMode.get(Modes4Accessibility.car) ) {
-				lcptExtCongestedCarTravelTime.calculateExtended(network, fromNode, depatureTime);
+				lcptExtCongestedCarTravelTime.calculateExtended(scenario.getNetwork(), fromNode, depatureTime);
 			}
-			lcptTravelDistance.calculate(network, fromNode, depatureTime);
+			lcptTravelDistance.calculate(scenario.getNetwork(), fromNode, depatureTime);
 
 			// get list with origins that are assigned to "fromNode"
 			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
 				assert( origin.getCoord() != null );
 
 				// get the nearest link:
-				Link nearestLink = network.getNearestLinkExactly(origin.getCoord());
+				Link nearestLink = ((NetworkImpl)scenario.getNetwork()).getNearestLinkExactly(origin.getCoord());
 
 				// captures the distance (as walk time) between the origin via the link to the node:
 				Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);

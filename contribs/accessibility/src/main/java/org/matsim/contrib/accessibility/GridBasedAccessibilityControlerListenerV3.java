@@ -247,31 +247,12 @@ implements ShutdownListener, StartupListener {
 
 		int benchmarkID = this.benchmark.addMeasure("cell-based accessibility computation");
 
-		// get the free-speed car travel times (in seconds)
-		TravelTime ttf = new FreeSpeedTravelTime() ;
+		// get the car travel times (in seconds)
+		final FreeSpeedTravelTime ttf = new FreeSpeedTravelTime();
 		TravelDisutility tdFree = controler.getTravelDisutilityFactory().createTravelDisutility(ttf, controler.getConfig().planCalcScore() ) ;
-		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttf, tdFree, (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
+		TravelTime ttc = controler.getLinkTravelTimes(); // congested
 
-		// get the congested car travel time (in seconds)
-		TravelTime ttc = null ;
-		if ( controler != null ) {
-			ttc = controler.getLinkTravelTimes(); // congested
-		} else {
-			EventsManager events = EventsUtils.createEventsManager() ;
-			
-			TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, this.config.travelTimeCalculator() ) ;
-			events.addHandler( ttcalc );
-			
-			MatsimEventsReader reader = new MatsimEventsReader(events);
-			reader.readFile("events.xml.gz");
-			
-			ttc = ttcalc.getLinkTravelTimes() ;
-		}
 		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc, controler.getConfig().planCalcScore() ) ;
-		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
-
-		// get travel distance (in meter)
-		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new LinkLengthTravelDisutility());
 
 		this.scheme = (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 
@@ -279,13 +260,7 @@ implements ShutdownListener, StartupListener {
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 		log.info(measuringPoints.getFacilities().values().size() + " measurement points are now processing ...");
 
-		accessibilityComputation(ttc, 
-				lcptExtFreeSpeedCarTrvelTime,
-				lcptExtCongestedCarTravelTime, 
-				lcptTravelDistance, 
-				(NetworkImpl) network,
-				measuringPoints,
-				PARCEL_BASED);
+		accessibilityComputation(ttf, ttc, controler.getScenario(), PARCEL_BASED, tdFree, tdCongested);
 		System.out.println();
 
 		if (this.benchmark != null && benchmarkID > 0) {

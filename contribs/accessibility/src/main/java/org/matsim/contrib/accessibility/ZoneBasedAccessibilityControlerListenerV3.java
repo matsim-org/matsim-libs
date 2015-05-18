@@ -155,13 +155,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 			log.info(measuringPoints.getFacilities().values().size() + " measurement points are now processing ...");
 			
-			accessibilityComputation(ttc, 
-					lcptExtFreeSpeedCarTrvelTime,
-					lcptExtCongestedCarTravelTime, 
-					lcptTravelDistance, 
-					network, 
-					measuringPoints,
-					ZONE_BASED);
+			accessibilityComputation(ttf,  ttc, controler.getScenario(), ZONE_BASED, tdFree, tdCongested);
 			
 			System.out.println();
 			// finalizing/closing csv file containing accessibility measures
