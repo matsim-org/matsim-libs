@@ -82,7 +82,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
 		assert(measuringPoints != null);
-		this.measuringPoints = measuringPoints;
+		this.setMeasuringPoints(measuringPoints);
 		assert(matsim4opusTempDirectory != null);
 		this.ptMatrix = ptMatrix; // this could be zero of no input files for pseudo pt are given ...
 		assert(scenario != null);
@@ -153,7 +153,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
 			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
-			log.info(measuringPoints.getFacilities().values().size() + " measurement points are now processing ...");
+			log.info(getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 			
 			accessibilityComputation(ttf,  ttc, controler.getScenario(), ZONE_BASED, tdFree, tdCongested);
 			
@@ -165,7 +165,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 			if (this.benchmark != null && benchmarkID > 0) {
 				this.benchmark.stoppMeasurement(benchmarkID);
 				log.info("Accessibility computation with " 
-						+ measuringPoints.getFacilities().size()
+						+ getMeasuringPoints().getFacilities().size()
 						+ " zones (origins) and "
 						+ this.aggregatedOpportunities.length
 						+ " destinations (opportunities) took "

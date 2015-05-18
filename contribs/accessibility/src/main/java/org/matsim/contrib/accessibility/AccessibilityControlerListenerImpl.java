@@ -76,7 +76,7 @@ abstract class AccessibilityControlerListenerImpl {
 	int PARCEL_BASED = 1;
 
 	// measuring points (origins) for accessibility calculation
-	ActivityFacilitiesImpl measuringPoints;
+	private ActivityFacilitiesImpl measuringPoints;
 	// containing parcel coordinates for accessibility feedback
 	ActivityFacilitiesImpl parcels; 
 	// destinations, opportunities like jobs etc ...
@@ -654,5 +654,15 @@ abstract class AccessibilityControlerListenerImpl {
 		this.ptMatrix = ptMatrix;
 	}
 	// end new
+
+
+	ActivityFacilitiesImpl getMeasuringPoints() {
+		return measuringPoints;
+	}
+
+
+	void setMeasuringPoints(ActivityFacilitiesImpl measuringPoints) {
+		this.measuringPoints = measuringPoints;
+	}
 
 }

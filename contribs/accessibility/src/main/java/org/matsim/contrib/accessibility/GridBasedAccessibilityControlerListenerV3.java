@@ -225,7 +225,7 @@ implements ShutdownListener, StartupListener {
 		log.info("Entering notifyShutdown ..." );
 
 		// make sure that measuring points are set.
-		if(this.measuringPoints == null){
+		if(this.getMeasuringPoints() == null){
 			// yy this test is really a bit late AFTER all the iterations. kai, mar'14
 			
 			log.error("No measuring points found! For this reason no accessibilities can be calculated!");
@@ -258,7 +258,7 @@ implements ShutdownListener, StartupListener {
 
 		log.info("Computing and writing cell based accessibility measures ...");
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
-		log.info(measuringPoints.getFacilities().values().size() + " measurement points are now processing ...");
+		log.info(getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 
 		accessibilityComputation(ttf, ttc, controler.getScenario(), PARCEL_BASED, tdFree, tdCongested);
 		System.out.println();
@@ -266,7 +266,7 @@ implements ShutdownListener, StartupListener {
 		if (this.benchmark != null && benchmarkID > 0) {
 			this.benchmark.stoppMeasurement(benchmarkID);
 			log.info("Accessibility computation with "
-					+ measuringPoints.getFacilities().size()
+					+ getMeasuringPoints().getFacilities().size()
 					+ " starting points (origins) and "
 					+ this.aggregatedOpportunities.length
 					+ " destinations (opportunities) took "
@@ -310,13 +310,6 @@ implements ShutdownListener, StartupListener {
 	 * 
 	 * THis is only done when urbansimMode in AccessibilityControlerListenerImpl is set to true
 	 * 
-	 * @param measurePoint
-	 * @param fromNode
-	 * @param freeSpeedAccessibility
-	 * @param carAccessibility
-	 * @param bikeAccessibility
-	 * @param walkAccessibility
-	 * @param accCsvWriter
 	 */
 	@Override
 	final void writeCSVData4Urbansim( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
@@ -329,9 +322,6 @@ implements ShutdownListener, StartupListener {
 	
 	/**
 	 * This writes the accessibility grid data into the MATSim output directory
-	 * 
-	 * @param adaptedOutputDirectory
-	 * @throws IOException
 	 */
 	private final void writePlottingData(String adaptedOutputDirectory) {
 
@@ -452,7 +442,7 @@ implements ShutdownListener, StartupListener {
 			throw new RuntimeException("ShapeFile for accessibility computation not found: " + shapeFileName);
 
 		Geometry boundary = GridUtils.getBoundary(shapeFileName);
-		measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize);
+		setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( this.isComputingMode.get(mode) ) {
 				this.getAccessibilityGrids().put( mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize ) ) ;
@@ -504,7 +494,7 @@ implements ShutdownListener, StartupListener {
 	 * @param cellSize double value giving the the side length of the cell in meter
 	 */
 	private void generateGridsAndMeasuringPoints(double minX, double minY, double maxX, double maxY, double cellSize) {
-		measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize);
+		setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( this.isComputingMode.get(mode) ) {
 				this.getAccessibilityGrids().put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN) ) ;
