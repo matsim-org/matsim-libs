@@ -1,7 +1,6 @@
 package org.matsim.contrib.accessibility;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,29 +12,22 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.utils.Benchmark;
-import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 import com.vividsolutions.jts.geom.Geometry;
 
