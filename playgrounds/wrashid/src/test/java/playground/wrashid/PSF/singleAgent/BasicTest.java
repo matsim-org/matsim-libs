@@ -62,6 +62,13 @@ public class BasicTest extends MatsimTestCase {
 
 		// the first charging opportunity at work is used (it has low tariff)
 		assertEquals(22989, chargeLogOfAgentOne.getStartChargingTime(),  1);
+		// yy for some unknown reason, this assertion
+		// * works on the build server
+		// * works one only this test or only this test class or only this test package is run locally on my machine
+		// * fails when I run all wrashid tests locally on my machine.  It is far off then: 2700 instead of 22989. 
+		// kai, may'15
+		
+		
 		assertEquals(23104, chargeLogOfAgentOne.getEndChargingTime(),  1);
 
 		chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(1);
@@ -69,6 +76,7 @@ public class BasicTest extends MatsimTestCase {
 		// when the vehicle arrives at home, there is high tariff, therefore the
 		// vehicle doesn't start charging
 		// immediately, but waits until low tariff starts)
+
 		assertEquals(72000, chargeLogOfAgentOne.getStartChargingTime(),  1);
 		assertEquals(72085, chargeLogOfAgentOne.getEndChargingTime(),  1);
 
