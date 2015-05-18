@@ -19,13 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.framework.replanning.grouping;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Random;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
@@ -38,9 +31,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.thibautd.socnetsim.framework.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author thibautd
@@ -51,7 +50,7 @@ public class FixedGroupsTest {
 
 	@Test
 	public void testIterationOrderIsDeterministic() throws Exception {
-		final String configFile = new File( utils.getPackageInputDirectory() ).getParentFile().getParentFile()+"/config.xml";
+		final String configFile = new File( utils.getPackageInputDirectory() ).getParentFile().getParentFile().getParentFile()+"/config.xml";
 		final Config config = JointScenarioUtils.loadConfig( configFile );
 
 		Collection<ReplanningGroup> previous = null;
