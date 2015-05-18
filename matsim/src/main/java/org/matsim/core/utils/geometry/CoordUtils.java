@@ -24,6 +24,10 @@ import org.matsim.api.core.v01.Coord;
 
 public abstract class CoordUtils {
 	
+	public static Coord createCoord( final double xx, final double yy ) {
+		return new CoordImpl( xx, yy ) ;
+	}
+	
 	public static Coord plus ( Coord coord1, Coord coord2 ) {
 		double xx = coord1.getX() + coord2.getX();
 		double yy = coord1.getY() + coord2.getY();
