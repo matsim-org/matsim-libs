@@ -101,7 +101,8 @@ public class AnalyzeAsArentze {
 			for ( Id egoId : socialNetwork.getEgos() ) {
 				final ArentzeAgent ego = population.getAgentsMap().get( egoId );
 
-				for ( Id alterId : socialNetwork.getAlters( egoId ) ) {
+				final Iterable<Id> alters = socialNetwork.getAlters( egoId );
+				for ( Id alterId : alters ) {
 					counter.incCounter();
 					final ArentzeAgent alter = population.getAgentsMap().get( alterId );
 

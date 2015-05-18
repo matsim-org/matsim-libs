@@ -22,8 +22,20 @@ package playground.thibautd.socnetsim.jointactivities.scoring;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
@@ -40,7 +52,10 @@ import playground.thibautd.socnetsim.framework.scoring.BeingTogetherScoring;
 import playground.thibautd.socnetsim.run.ScoringFunctionConfigGroup;
 import playground.thibautd.utils.GenericFactory;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author thibautd
@@ -205,7 +220,8 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 	private <T extends Event & HasPersonId> void transmitEventToRelevantPersons( final T event ) {
 		final Id ego = event.getPersonId();
 		if ( !socialNetwork.getEgos().contains( ego ) ) return;
-		for ( Id<Person> id : cat( ego , socialNetwork.getAlters( ego ) ) ) {
+		final Iterable<Id<Person>> ids = cat( ego , socialNetwork.getAlters( ego ) );
+		for ( Id<Person> id : ids ) {
 			final Id finalId = id;
 			final BeingTogetherScoring scoring =
 				MapUtils.getArbitraryObject(

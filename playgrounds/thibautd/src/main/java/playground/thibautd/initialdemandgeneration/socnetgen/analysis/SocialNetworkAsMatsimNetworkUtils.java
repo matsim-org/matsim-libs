@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.analysis;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -31,9 +29,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
+
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -67,7 +66,8 @@ public class SocialNetworkAsMatsimNetworkUtils {
 		}
 	
 		for ( Id ego : sn.getEgos() ) {
-			for ( Id alter : sn.getAlters( ego ) ) {
+			final Iterable<Id> alters = sn.getAlters( ego );
+			for ( Id alter : alters ) {
 				net.addLink(
 						net.getFactory().createLink(
 							Id.create( ego+"---"+alter, Link.class ),
