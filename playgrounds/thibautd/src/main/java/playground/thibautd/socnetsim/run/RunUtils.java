@@ -115,7 +115,7 @@ public class RunUtils {
 //			final String elementName = "another social network, to use for internalization";
 //			new SocialNetworkReader( elementName , scenario ).parse( scoringFunctionConf.getInternalizationNetworkFile() );
 //			builder.withScoringListener(
-//					new UniformlyInternalizingPlansScoring(
+//					new InternalizingPlansScoring(
 //						elementName,
 //						scenario,
 //						builder.getEvents(),

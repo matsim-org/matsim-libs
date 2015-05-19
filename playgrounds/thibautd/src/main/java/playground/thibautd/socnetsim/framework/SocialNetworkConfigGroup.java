@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim;
+package playground.thibautd.socnetsim.framework;
 
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim;
+package playground.thibautd.socnetsim.usage;
 
 import java.util.Collection;
 import java.util.Collections;

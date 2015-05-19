@@ -36,7 +36,7 @@ import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils.DilutionType;
-import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
+import playground.thibautd.socnetsim.framework.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.framework.controller.JointDecisionProcessModule;
 import playground.thibautd.socnetsim.jointactivities.scoring.JointActivitiesScoringModule;
 import playground.thibautd.socnetsim.jointtrips.JointTripsModule;

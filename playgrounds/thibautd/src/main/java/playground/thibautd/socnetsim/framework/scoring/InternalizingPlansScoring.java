@@ -20,12 +20,12 @@
 package playground.thibautd.socnetsim.framework.scoring;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -46,70 +46,29 @@ import java.util.Map;
 /**
  * @author thibautd
  */
-public class UniformlyInternalizingPlansScoring implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener {
+public class InternalizingPlansScoring implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener {
 	private static final Logger log =
-		Logger.getLogger(UniformlyInternalizingPlansScoring.class);
+		Logger.getLogger(InternalizingPlansScoring.class);
 
 
 	private EventsToScore eventsToScore;
-
-	private final String socialNetworkName;
 
 	private final Scenario sc;
 	private final EventsManager events;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 
-	private final InternalizationRatioCalculator ratioCalculator;
+	private final InternalizationSettings ratioCalculator;
 
 	@Inject
-	public UniformlyInternalizingPlansScoring(
+	public InternalizingPlansScoring(
+			final InternalizationSettings ratio,
 			final Scenario sc,
 			final EventsManager events,
 			final ScoringFunctionFactory scoringFunctionFactory) {
-		this( new ConfigBasedInternalizationRatio(
-				sc.getConfig() ),
-				sc,
-				events,
-				scoringFunctionFactory );
-	}
-
-	public UniformlyInternalizingPlansScoring(
-			final InternalizationRatioCalculator ratio,
-			final Scenario sc,
-			final EventsManager events,
-			final ScoringFunctionFactory scoringFunctionFactory) {
-		this.socialNetworkName = SocialNetwork.ELEMENT_NAME;
 		this.ratioCalculator = ratio;
 		this.sc = sc ;
 		this.events = events ;
 		this.scoringFunctionFactory = scoringFunctionFactory ;
-	}
-
-	public UniformlyInternalizingPlansScoring(
-			final String socialNetworkName,
-			final Scenario sc,
-			final EventsManager events,
-			final ScoringFunctionFactory scoringFunctionFactory) {
-		this.socialNetworkName = socialNetworkName;
-		this.ratioCalculator = 
-			new ConfigBasedInternalizationRatio(
-					sc.getConfig() );
-		this.sc = sc;
-		this.events = events;
-		this.scoringFunctionFactory = scoringFunctionFactory;
-	}
-
-	public UniformlyInternalizingPlansScoring(
-			final String socialNetworkName,
-			final InternalizationRatioCalculator ratio,
-			final Scenario sc,
-			final EventsManager events,
-			final ScoringFunctionFactory scoringFunctionFactory) {
-		this.socialNetworkName = socialNetworkName;
-		this.ratioCalculator = ratio;
-		this.sc = sc;
-		this.events = events;
-		this.scoringFunctionFactory = scoringFunctionFactory;
 	}
 
 	@Override
@@ -126,8 +85,6 @@ public class UniformlyInternalizingPlansScoring implements PlansScoring, Scoring
 
 	private void internalizeAltersScores() {
 		if ( log.isTraceEnabled() ) log.trace( "internalizing alter's scores" );
-		final SocialNetwork socialNet = (SocialNetwork)
-			sc.getScenarioElement( socialNetworkName );
 
 		// first need to let the scores unmodified, to "internalize" "raw" scores
 		final Map<Id, Double> internalizedScores = new HashMap<Id, Double>();
@@ -135,7 +92,7 @@ public class UniformlyInternalizingPlansScoring implements PlansScoring, Scoring
 		for ( Person ego : sc.getPopulation().getPersons().values() ) {
 			final Collection<? extends Person> alters =
 				MapUtils.get(
-						socialNet.getAlters( ego.getId() ),
+						ratioCalculator.getInternalizationNetwork().getAlters( ego.getId() ),
 						sc.getPopulation().getPersons() );
 
 			double internalizedScore = getScore( ego );
@@ -196,20 +153,26 @@ public class UniformlyInternalizingPlansScoring implements PlansScoring, Scoring
 		this.events.removeHandler(this.eventsToScore);
 	}
 
-	public static interface InternalizationRatioCalculator {
-		public double getInternalizationRatio( Id ego , Id alter );
+	public interface InternalizationSettings {
+		SocialNetwork getInternalizationNetwork();
+		double getInternalizationRatio( Id ego , Id alter );
 	}
 
-	public static class ConfigBasedInternalizationRatio implements  InternalizationRatioCalculator {
+	@Singleton
+	public static class ConfigBasedInternalizationSettings implements InternalizationSettings {
 		private final double ratio;
+		private final SocialNetwork network;
 
-		public ConfigBasedInternalizationRatio(final Config config) {
-			this.ratio = calc( config );
+		@Inject
+		public ConfigBasedInternalizationSettings(final Scenario sc) {
+			final GroupReplanningConfigGroup group = (GroupReplanningConfigGroup)
+					sc.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
+
+			this.network = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
+			this.ratio = calc( group );
 		}
 
-		private static double calc( final Config config ) {
-			final GroupReplanningConfigGroup group = (GroupReplanningConfigGroup)
-				config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
+		private static double calc( final GroupReplanningConfigGroup group ) {
 
 			if ( group == null ) {
 				log.warn( "no "+GroupReplanningConfigGroup.GROUP_NAME+" module found in config" );
@@ -242,6 +205,11 @@ public class UniformlyInternalizingPlansScoring implements PlansScoring, Scoring
 
 			log.info( "setting internalization ratio to "+ratio );
 			return ratio;
+		}
+
+		@Override
+		public SocialNetwork getInternalizationNetwork() {
+			return network;
 		}
 
 		@Override

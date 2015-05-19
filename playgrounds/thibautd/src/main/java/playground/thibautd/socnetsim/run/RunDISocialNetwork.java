@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
+import playground.thibautd.socnetsim.framework.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.framework.controller.JointDecisionProcessModule;
 import playground.thibautd.socnetsim.framework.controller.SocialNetworkModule;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;

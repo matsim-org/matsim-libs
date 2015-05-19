@@ -21,7 +21,7 @@ package playground.thibautd.socnetsim.usage.replanning;
 
 import org.matsim.api.core.v01.Scenario;
 
-import playground.thibautd.socnetsim.PlanLinkConfigGroup;
+import playground.thibautd.socnetsim.usage.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.replanning.CompositePlanLinkIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.SocialNetworkPlanLinkIdentifier;

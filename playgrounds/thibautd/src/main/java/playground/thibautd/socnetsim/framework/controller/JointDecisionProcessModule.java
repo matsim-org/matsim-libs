@@ -37,8 +37,9 @@ import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGro
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.framework.scoring.UniformlyInternalizingPlansScoring;
-import playground.thibautd.socnetsim.usage.replanning.PlanLinkIdentifierUtils;
+import playground.thibautd.socnetsim.framework.scoring.InternalizingPlansScoring;
+import playground.thibautd.socnetsim.framework.scoring.InternalizingPlansScoring.ConfigBasedInternalizationSettings;
+import playground.thibautd.socnetsim.framework.scoring.InternalizingPlansScoring.InternalizationSettings;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -58,8 +59,10 @@ public class JointDecisionProcessModule extends AbstractModule {
 	public void install() {
 		// process as such
 		bind(PlansReplanning.class).to( GroupReplanningListenner.class );
-		bind(PlansScoring.class).to( UniformlyInternalizingPlansScoring.class );
+		bind(PlansScoring.class).to( InternalizingPlansScoring.class );
 		bind(DumpDataAtEnd.class).to( DumpJointDataAtEnd.class );
+
+		bind( InternalizationSettings.class ).to( ConfigBasedInternalizationSettings.class );
 
 		addControlerListenerBinding().to(JointPlansDumping.class);
 
@@ -81,8 +84,8 @@ public class JointDecisionProcessModule extends AbstractModule {
 				});
 
 
-		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Strong.class ).toInstance( new CompositePlanLinkIdentifier() );
-		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toInstance( new CompositePlanLinkIdentifier() );
+		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Strong.class ).toInstance(new CompositePlanLinkIdentifier());
+		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toInstance(new CompositePlanLinkIdentifier());
 		bind( IncompatiblePlansIdentifierFactory.class ).toInstance( new EmptyIncompatiblePlansIdentifierFactory() );
 
 		addControlerListenerBinding().to( TripModeShares.class );
