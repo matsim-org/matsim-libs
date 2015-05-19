@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.usage.replanning;
 
-import java.util.Collection;
-
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+
+import java.util.Collection;
 
 /**
  * @author thibautd
@@ -48,7 +48,7 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 		}
 
 		@StringSetter( "strategyName" )
-		public void setStrategyName(String strategyName) {
+		public void setStrategyName(final String strategyName) {
 			this.strategyName = strategyName;
 		}
 
@@ -58,7 +58,7 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 		}
 
 		@StringSetter( "weight" )
-		public void setWeight(double weight) {
+		public void setWeight(final double weight) {
 			this.weight = weight;
 		}
 
@@ -68,7 +68,7 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 		}
 
 		@StringSetter( "isInnovative" )
-		public void setIsInnovative(boolean isInnovative) {
+		public void setIsInnovative(final boolean isInnovative) {
 			this.isInnovative = isInnovative;
 		}
 
@@ -78,7 +78,7 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 		}
 
 		@StringSetter( "subpopulation" )
-		public void setSubpopulation(String subpopulation) {
+		public void setSubpopulation(final String subpopulation) {
 			this.subpopulation = subpopulation;
 		}
 	}
@@ -93,13 +93,12 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 	private String weightAttribute = null;
 	private String selectorForRemoval = "MinimumSum";
 	private String selectorForModification = "WeakRandomSelection";
-	private double internalizationRatio = 0;
 
 	private int maxPlansPerComposition = 5;
 	private int maxPlansPerAgent = 50;
 
 	public GroupReplanningConfigGroup() {
-		super( GROUP_NAME );
+		super(GROUP_NAME);
 	}
 
 	@Override
@@ -147,7 +146,7 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "disableInnovationAfterIteration" )
-	public void setDisableInnovationAfterIteration(int disableInnovationAfterIter) {
+	public void setDisableInnovationAfterIteration(final int disableInnovationAfterIter) {
 		this.disableInnovationAfterIter = disableInnovationAfterIter;
 	}
 
@@ -189,7 +188,7 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "locationChoiceActivity" )
-	public void setLocationChoiceActivityType(String locationChoiceActivityType) {
+	public void setLocationChoiceActivityType(final String locationChoiceActivityType) {
 		this.locationChoiceActivityType = locationChoiceActivityType;
 	}
 
@@ -209,7 +208,7 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "weightAttributeName" )
-	public void setWeightAttributeName(String weightAttribute) {
+	public void setWeightAttributeName(final String weightAttribute) {
 		this.weightAttribute = weightAttribute;
 	}
 
@@ -219,18 +218,8 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "selectorForModification" )
-	public void setSelectorForModification(String selectorForModification) {
+	public void setSelectorForModification(final String selectorForModification) {
 		this.selectorForModification = selectorForModification;
-	}
-
-	@StringGetter( "internalizationRatio" )
-	public double getInternalizationRatio() {
-		return this.internalizationRatio;
-	}
-
-	@StringSetter( "internalizationRatio" )
-	public void setInternalizationRatio(double internalizationRatio) {
-		this.internalizationRatio = internalizationRatio;
 	}
 
 	@StringGetter( "maxPlansPerAgent" )
@@ -239,7 +228,7 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "maxPlansPerAgent" )
-	public void setMaxPlansPerAgent(int maxPlansPerAgent) {
+	public void setMaxPlansPerAgent(final int maxPlansPerAgent) {
 		if ( maxPlansPerAgent < 1 ) throw new IllegalArgumentException( maxPlansPerAgent+" too small" );
 		this.maxPlansPerAgent = maxPlansPerAgent;
 	}
@@ -250,11 +239,9 @@ public class GroupReplanningConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "maxPlansPerComposition" )
-	public void setMaxPlansPerComposition(int maxPlansPerComposition) {
+	public void setMaxPlansPerComposition(final int maxPlansPerComposition) {
 		if ( maxPlansPerComposition < 1 ) throw new IllegalArgumentException( maxPlansPerComposition+" too small" );
 		this.maxPlansPerComposition = maxPlansPerComposition;
 	}
-
-
 }
 

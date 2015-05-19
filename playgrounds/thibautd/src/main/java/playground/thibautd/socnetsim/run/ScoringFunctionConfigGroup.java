@@ -19,15 +19,14 @@
 
 package playground.thibautd.socnetsim.run;
 
+import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
+import playground.thibautd.socnetsim.framework.scoring.BeingTogetherScoring;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
-import org.matsim.core.utils.collections.CollectionUtils;
-
-import playground.thibautd.socnetsim.framework.scoring.BeingTogetherScoring;
 
 public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "scoringFunction";
@@ -38,7 +37,6 @@ public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 	private double constantDriver = 0;
 	private double constantPassenger = 0;
 	private String activityTypeForContactInDesires = "leisure";
-	private String internalizationNetworkFile = null;
 	private boolean useLocationChoiceEpsilons = false;
 
 	public static enum TogetherScoringForm {
@@ -79,7 +77,7 @@ public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( "marginalUtilityOfBeingTogether_h" )
 	public void setMarginalUtilityOfBeingTogether_h(
-			double marginalUtilityOfBeingTogether_h) {
+			final double marginalUtilityOfBeingTogether_h) {
 		this.marginalUtilityOfBeingTogether_h = marginalUtilityOfBeingTogether_h;
 	}
 
@@ -104,7 +102,7 @@ public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( "marginalUtilityOfBeingDriver_h" )
 	public void setMarginalUtilityOfBeingDriver_h(
-			double marginalUtilityOfBeingDriver_h) {
+			final double marginalUtilityOfBeingDriver_h) {
 		this.marginalUtilityOfBeingDriver_h = marginalUtilityOfBeingDriver_h;
 	}
 
@@ -119,7 +117,7 @@ public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( "marginalUtilityOfBeingPassenger_h" )
 	public void setMarginalUtilityOfBeingPassenger_h(
-			double marginalUtilityOfBeingPassenger_h) {
+			final double marginalUtilityOfBeingPassenger_h) {
 		this.marginalUtilityOfBeingPassenger_h = marginalUtilityOfBeingPassenger_h;
 	}
 
@@ -190,7 +188,7 @@ public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "constantDriver" )
-	public void setConstantDriver(double constantDriver) {
+	public void setConstantDriver(final double constantDriver) {
 		this.constantDriver = constantDriver;
 	}
 
@@ -200,7 +198,7 @@ public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringSetter( "constantPassenger" )
-	public void setConstantPassenger(double constantPassenger) {
+	public void setConstantPassenger(final double constantPassenger) {
 		this.constantPassenger = constantPassenger;
 	}
 
@@ -211,19 +209,8 @@ public class ScoringFunctionConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( "activityTypeForContactInDesires" )
 	public void setActivityTypeForContactInDesires(
-			String activityTypeForContactInDesires) {
+			final String activityTypeForContactInDesires) {
 		this.activityTypeForContactInDesires = activityTypeForContactInDesires;
-	}
-	
-	@StringGetter( "internalizationNetworkFile" )
-	public String getInternalizationNetworkFile() {
-		return this.internalizationNetworkFile;
-	}
-
-	@StringSetter( "internalizationNetworkFile" )
-	public void setInternalizationNetworkFile(
-			final String internalizationNetworkFile) {
-		this.internalizationNetworkFile = internalizationNetworkFile;
 	}
 
 	@Override

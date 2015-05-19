@@ -19,39 +19,39 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.utils;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReaderMatsimV2;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.usage.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.framework.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.JointTripsMutatorConfigGroup;
-import playground.thibautd.socnetsim.jointtrips.population.DriverRouteFactory;
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.population.JointPlansConfigGroup;
 import playground.thibautd.socnetsim.framework.population.JointPlansXmlReader;
-import playground.thibautd.socnetsim.jointtrips.population.PassengerRouteFactory;
+import playground.thibautd.socnetsim.framework.scoring.InternalizationConfigGroup;
 import playground.thibautd.socnetsim.jointactivities.replanning.modules.prismiclocationchoice.PrismicLocationChoiceConfigGroup;
 import playground.thibautd.socnetsim.jointactivities.replanning.modules.randomlocationchoice.RandomJointLocationChoiceConfigGroup;
+import playground.thibautd.socnetsim.jointtrips.population.DriverRouteFactory;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
+import playground.thibautd.socnetsim.jointtrips.population.PassengerRouteFactory;
+import playground.thibautd.socnetsim.usage.PlanLinkConfigGroup;
+import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.utils.DesiresConverter;
+
+import java.util.Map;
 
 /**
  *
@@ -76,7 +76,7 @@ public class JointScenarioUtils {
 
 	public static Scenario createScenario(final Config config) {
 		final Scenario sc = ScenarioUtils.createScenario( config );
-		ModeRouteFactory rFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
+		final ModeRouteFactory rFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
 		rFactory.setRouteFactory(
 				JointActingTypes.DRIVER,
 				new DriverRouteFactory());
@@ -144,10 +144,6 @@ public class JointScenarioUtils {
 		}
 	}
 
-	/**
-	 * @param configFile the path to the config file
-	 * @return a loaded config, including proper setting of joint trips specific groups
-	 */
 	public static Config createConfig() {
 		final Config config = ConfigUtils.createConfig();
 
@@ -169,6 +165,7 @@ public class JointScenarioUtils {
 		config.addModule( new RandomJointLocationChoiceConfigGroup() );
 		config.addModule( new PlanLinkConfigGroup() );
 		config.addModule( new PrismicLocationChoiceConfigGroup() );
+		config.addModule( new InternalizationConfigGroup() );
 	}
 
 	public static Config loadConfig(final String configFile) {

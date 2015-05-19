@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -33,11 +34,12 @@ import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
-import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -165,22 +167,30 @@ public class InternalizingPlansScoring implements PlansScoring, ScoringListener,
 
 		@Inject
 		public ConfigBasedInternalizationSettings(final Scenario sc) {
-			final GroupReplanningConfigGroup group = (GroupReplanningConfigGroup)
-					sc.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
+			final InternalizationConfigGroup group = (InternalizationConfigGroup)
+					sc.getConfig().getModule( InternalizationConfigGroup.GROUP_NAME );
 
-			this.network = (SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME );
+			this.network = group.getInternalizationSocialNetworkFile() == null ?
+					(SocialNetwork) sc.getScenarioElement( SocialNetwork.ELEMENT_NAME ) :
+					readSocialNetwork( group );
 			this.ratio = calc( group );
 		}
 
-		private static double calc( final GroupReplanningConfigGroup group ) {
+		private SocialNetwork readSocialNetwork(final InternalizationConfigGroup group) {
+			final Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig() );
+			// could be added to global scenario somehow
+			new SocialNetworkReader( "sn" , sc ).parse(group.getInternalizationSocialNetworkFile());
+			return (SocialNetwork) sc.getScenarioElement( "sn" );
+		}
+
+		private static double calc( final InternalizationConfigGroup group ) {
 
 			if ( group == null ) {
-				log.warn( "no "+GroupReplanningConfigGroup.GROUP_NAME+" module found in config" );
+				log.warn( "no "+InternalizationConfigGroup.GROUP_NAME+" module found in config" );
 				log.warn( "using null internalization ratio as a consequence" );
 				return 0;
 			}
 
-			assert group != null;
 			final double ratio = group.getInternalizationRatio();
 
 			final double epsilon = 1E-9;
