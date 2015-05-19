@@ -19,29 +19,39 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.framework.replanning.grouping;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.utils.misc.Counter;
-
-import playground.thibautd.utils.AbstractParsePullXmlReader;
-
 /**
  * @author thibautd
  */
-public class FixedGroupsIdentifierFileParser extends AbstractParsePullXmlReader<FixedGroupsIdentifier> {
+public class FixedGroupsIdentifierFileParser {
 	public static FixedGroupsIdentifier readCliquesFile(final String fileName) {
 		return new FixedGroupsIdentifierFileParser().readFile( fileName );
 	}
 
-	@Override
+	private static XMLStreamReader getStreamReader(final String fileName) {
+		final XMLInputFactory xmlif = XMLInputFactory.newInstance();
+		try {
+			final InputStream stream = IOUtils.getInputStream(fileName);
+			return xmlif.createXMLStreamReader( stream );
+		}
+		catch (Exception e) {
+			throw new ParsingException( e );
+		}
+	}
+
 	protected  FixedGroupsIdentifier parse(
 			final XMLStreamReader streamReader) throws XMLStreamException {
 		final Counter counter = new Counter( "parsing group # " );
@@ -68,7 +78,7 @@ public class FixedGroupsIdentifierFileParser extends AbstractParsePullXmlReader<
 		return new FixedGroupsIdentifier( groups );
 	}
 
-	private static <T> Id<T> parseId(final XMLStreamReader streamReader, Class<T> idType ) {
+	private static <T> Id<T> parseId(final XMLStreamReader streamReader, final Class<T> idType ) {
 		if ( streamReader.getAttributeCount() != 1 ) {
 			throw new ParsingException( "unexpected attribute count "+streamReader.getAttributeCount() );
 		}
@@ -78,6 +88,40 @@ public class FixedGroupsIdentifierFileParser extends AbstractParsePullXmlReader<
 		}
 
 		return Id.create( streamReader.getAttributeValue( 0 ).intern() , idType);
+	}
+
+	protected FixedGroupsIdentifier readFile(final String fileName) {
+		final XMLStreamReader streamReader = getStreamReader( fileName );
+		try {
+			return parse( streamReader );
+		}
+		catch (XMLStreamException e) {
+			throw new ParsingException( e );
+		}
+		finally {
+			try {
+				streamReader.close();
+			} catch (XMLStreamException e) {
+				throw new ParsingException( e );
+			}
+		}
+	}
+
+	public static final class ParsingException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+
+		public ParsingException(final String m) {
+			super( m );
+		}
+
+		public ParsingException(final Throwable e) {
+			super( e );
+		}
+
+
+		public ParsingException(final String m, final Throwable e) {
+			super( m , e );
+		}
 	}
 }
 
