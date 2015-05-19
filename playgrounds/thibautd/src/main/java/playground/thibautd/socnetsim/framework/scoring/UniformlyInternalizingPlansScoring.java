@@ -37,7 +37,7 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 
 import java.util.Collection;
 import java.util.HashMap;

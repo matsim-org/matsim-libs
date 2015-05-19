@@ -37,8 +37,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.households.*;
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup.StrategyParameterSet;
+import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup.StrategyParameterSet;
 import playground.thibautd.utils.UniqueIdFactory;
 
 import java.util.*;

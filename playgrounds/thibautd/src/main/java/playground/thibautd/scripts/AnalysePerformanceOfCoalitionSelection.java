@@ -38,7 +38,7 @@ import org.matsim.core.utils.misc.Counter;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
-import playground.thibautd.utils.CollectionUtils;
+import playground.thibautd.socnetsim.utils.CollectionUtils;
 
 /**
  * @author thibautd

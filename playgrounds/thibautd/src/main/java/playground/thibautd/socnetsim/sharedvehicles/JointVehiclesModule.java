@@ -25,7 +25,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
 
 import playground.thibautd.socnetsim.framework.PlanRoutingAlgorithmFactory;
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.framework.controller.AbstractPrepareForSimListener;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;

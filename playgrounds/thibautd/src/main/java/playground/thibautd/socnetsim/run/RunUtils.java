@@ -33,7 +33,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import playground.thibautd.socnetsim.framework.scoring.GroupSizePreferencesConfigGroup;
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;

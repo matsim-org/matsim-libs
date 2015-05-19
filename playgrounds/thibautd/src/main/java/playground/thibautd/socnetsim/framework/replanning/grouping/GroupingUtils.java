@@ -27,7 +27,7 @@ import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkUtils;
-import playground.thibautd.utils.CollectionUtils;
+import playground.thibautd.socnetsim.utils.CollectionUtils;
 
 import java.util.*;
 

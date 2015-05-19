@@ -39,7 +39,7 @@ import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifi
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 
 /**
  * @author thibautd

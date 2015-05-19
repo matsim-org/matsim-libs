@@ -23,28 +23,27 @@ import org.matsim.api.core.v01.Scenario;
 
 import com.google.inject.Provider;
 
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.framework.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.framework.replanning.selectors.GroupLevelPlanSelector;
 
 /**
  * @author thibautd
  */
-abstract class AbstractDumbRemoverFactory implements Provider<ExtraPlanRemover> {
+public abstract class AbstractDumbRemoverFactory implements Provider<ExtraPlanRemover> {
 
-	private final Scenario sc;
-	
-	public AbstractDumbRemoverFactory( Scenario sc ) {
-		this.sc = sc;
+	private final int maxPlansPerAgent;
+
+	public AbstractDumbRemoverFactory(
+			final int maxPlansPerAgent) {
+		this.maxPlansPerAgent = maxPlansPerAgent;
 	}
 
 	@Override
 	public ExtraPlanRemover get() {
-		final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup)
-				sc.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
 		return new DumbExtraPlanRemover(
 				createSelector( ),
-				conf.getMaxPlansPerAgent() );
+				maxPlansPerAgent );
 	}
 
 	protected abstract GroupLevelPlanSelector createSelector();

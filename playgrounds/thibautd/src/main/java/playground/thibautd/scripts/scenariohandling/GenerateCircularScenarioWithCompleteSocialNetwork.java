@@ -57,7 +57,7 @@ import playground.ivt.utils.ArgParser.Args;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkImpl;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkWriter;
-import playground.thibautd.utils.CollectionUtils;
+import playground.thibautd.socnetsim.utils.CollectionUtils;
 import playground.thibautd.utils.DesiresConverter;
 
 /**

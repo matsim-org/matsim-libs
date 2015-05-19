@@ -23,16 +23,16 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-
 import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.framework.controller.JointDecisionProcessModule;
-import playground.thibautd.socnetsim.jointactivities.scoring.JointActivitiesScoringModule;
-import playground.thibautd.socnetsim.jointtrips.JointTripsModule;
 import playground.thibautd.socnetsim.framework.controller.SocialNetworkModule;
-import playground.thibautd.socnetsim.framework.SocnetsimDefaultAnalysisModule;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
-import playground.thibautd.socnetsim.framework.replanning.GroupStrategyManagerModule;
+import playground.thibautd.socnetsim.jointactivities.scoring.JointActivitiesScoringModule;
+import playground.thibautd.socnetsim.jointtrips.JointTripsModule;
+import playground.thibautd.socnetsim.usage.ConfigConfiguredPlanLinkIdentifierModule;
+import playground.thibautd.socnetsim.usage.analysis.SocnetsimDefaultAnalysisModule;
+import playground.thibautd.socnetsim.usage.replanning.DefaultGroupStrategyRegistryModule;
 
 /**
  * @author thibautd
@@ -57,9 +57,10 @@ public class RunDISocialNetwork {
 
 		final Controler controler = new Controler( scenario );
 		controler.addOverridingModule( new JointDecisionProcessModule() );
+		controler.addOverridingModule( new ConfigConfiguredPlanLinkIdentifierModule() );
 		controler.addOverridingModule( new SocnetsimDefaultAnalysisModule() );
 		controler.addOverridingModule( new JointActivitiesScoringModule() );
-		controler.addOverridingModule( new GroupStrategyManagerModule() );
+		controler.addOverridingModule( new DefaultGroupStrategyRegistryModule() );
 		controler.addOverridingModule( new JointTripsModule() );
 		controler.addOverridingModule( new SocialNetworkModule() );
 		controler.run();

@@ -19,27 +19,18 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.framework.replanning.removers;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
-
 import playground.ivt.utils.MapUtils;
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
+
+import java.util.*;
 
 /**
  * Considers the "maximum plans per agent" is actually a "maximum plans per

@@ -32,7 +32,7 @@ import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.Vehicle;
 
-import playground.thibautd.utils.CollectionUtils;
+import playground.thibautd.socnetsim.utils.CollectionUtils;
 
 /**
  * @author thibautd

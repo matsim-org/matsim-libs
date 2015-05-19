@@ -41,11 +41,11 @@ import playground.thibautd.socnetsim.framework.controller.JointDecisionProcessMo
 import playground.thibautd.socnetsim.jointactivities.scoring.JointActivitiesScoringModule;
 import playground.thibautd.socnetsim.jointtrips.JointTripsModule;
 import playground.thibautd.socnetsim.framework.controller.SocialNetworkModule;
-import playground.thibautd.socnetsim.framework.SocnetsimDefaultAnalysisModule;
+import playground.thibautd.socnetsim.usage.analysis.SocnetsimDefaultAnalysisModule;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
-import playground.thibautd.socnetsim.framework.replanning.GroupStrategyManagerModule;
+import playground.thibautd.socnetsim.usage.replanning.DefaultGroupStrategyRegistryModule;
 import playground.thibautd.socnetsim.run.RunUtils;
 import playground.thibautd.socnetsim.run.ScoringFunctionConfigGroup;
 import playground.thibautd.socnetsimusages.scoring.KtiScoringFunctionFactoryWithJointModes;
@@ -75,7 +75,7 @@ public class RunMatsim2010SocialScenario {
 		controller.addOverridingModule( new JointDecisionProcessModule() );
 		controller.addOverridingModule( new SocnetsimDefaultAnalysisModule() );
 		controller.addOverridingModule( new JointActivitiesScoringModule() );
-		controller.addOverridingModule( new GroupStrategyManagerModule() );
+		controller.addOverridingModule( new DefaultGroupStrategyRegistryModule() );
 		controller.addOverridingModule( new JointTripsModule() );
 		controller.addOverridingModule( new SocialNetworkModule() );
 

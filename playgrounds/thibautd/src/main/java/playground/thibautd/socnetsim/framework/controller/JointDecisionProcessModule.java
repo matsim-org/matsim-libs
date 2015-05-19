@@ -31,13 +31,14 @@ import playground.thibautd.socnetsim.framework.controller.listeners.JointPlansDu
 import playground.thibautd.socnetsim.framework.events.CourtesyEventsGenerator;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import playground.thibautd.socnetsim.framework.replanning.CompositePlanLinkIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.framework.scoring.UniformlyInternalizingPlansScoring;
-import playground.thibautd.socnetsim.replanning.PlanLinkIdentifierUtils;
+import playground.thibautd.socnetsim.usage.replanning.PlanLinkIdentifierUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -80,8 +81,8 @@ public class JointDecisionProcessModule extends AbstractModule {
 				});
 
 
-		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Strong.class ).toProvider( PlanLinkIdentifierUtils.LinkIdentifierProvider.class );
-		bind( PlanLinkIdentifier.class ).annotatedWith(PlanLinkIdentifier.Weak.class).toProvider( PlanLinkIdentifierUtils.WeakLinkIdentifierProvider.class );
+		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Strong.class ).toInstance( new CompositePlanLinkIdentifier() );
+		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toInstance( new CompositePlanLinkIdentifier() );
 		bind( IncompatiblePlansIdentifierFactory.class ).toInstance( new EmptyIncompatiblePlansIdentifierFactory() );
 
 		addControlerListenerBinding().to( TripModeShares.class );

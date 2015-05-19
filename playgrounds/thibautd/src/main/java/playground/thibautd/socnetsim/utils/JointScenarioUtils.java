@@ -36,7 +36,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.CliquesConfigGroup;
