@@ -64,10 +64,7 @@ import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -365,6 +362,9 @@ public class Controler extends AbstractController {
 
 	private void enrichSimulation(final Mobsim simulation) {
 		if (simulation instanceof ObservableMobsim) {
+			for (MobsimListener l : this.injector.getMobsimListeners()) {
+				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
+			}
 			for (MobsimListener l : this.getMobsimListeners()) {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(l);
 			}

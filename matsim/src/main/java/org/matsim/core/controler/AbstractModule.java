@@ -34,6 +34,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -61,6 +62,7 @@ public abstract class AbstractModule {
     private Binder binder;
     private Multibinder<EventHandler> eventHandlerMultibinder;
     private Multibinder<ControlerListener> controlerListenerMultibinder;
+    private Multibinder<MobsimListener> mobsimListenerMultibinder;
     private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorForRemovalMultibinder;
     private MapBinder<String, PlanStrategy> planStrategyMultibinder;
 
@@ -80,7 +82,7 @@ public abstract class AbstractModule {
         // Guice error messages should give the code location of the error in the user's module,
         // not in this class.
         this.binder = binder.skipSources(AbstractModule.class);
-
+        this.mobsimListenerMultibinder = Multibinder.newSetBinder(this.binder, MobsimListener.class);
         this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
         this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
         this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
@@ -118,6 +120,10 @@ public abstract class AbstractModule {
 
     protected final com.google.inject.binder.LinkedBindingBuilder<Mobsim> bindMobsim() {
         return bind(Mobsim.class);
+    }
+
+    protected final com.google.inject.binder.LinkedBindingBuilder<MobsimListener> addMobsimListenerBinding() {
+        return mobsimListenerMultibinder.addBinding();
     }
 
     protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindTravelDisutilityFactory() {

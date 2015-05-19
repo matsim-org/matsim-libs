@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 
@@ -131,6 +132,13 @@ public class Injector {
     public Map<String, GenericPlanSelector<Plan, Person>> getPlanSelectorsForRemoval() {
         return injector.getInstance(Key.get(
                 new TypeLiteral<Map<String, GenericPlanSelector<Plan, Person>>>() {
+                }
+        ));
+    }
+
+    public Set<MobsimListener> getMobsimListeners() {
+        return injector.getInstance(Key.get(
+                new TypeLiteral<Set<MobsimListener>>() {
                 }
         ));
     }
