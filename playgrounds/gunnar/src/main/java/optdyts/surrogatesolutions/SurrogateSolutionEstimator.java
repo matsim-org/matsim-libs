@@ -27,6 +27,7 @@ package optdyts.surrogatesolutions;
 import java.util.ArrayList;
 import java.util.List;
 
+import optdyts.DecisionVariable;
 import optdyts.SimulatorState;
 import floetteroed.utilities.math.Matrix;
 import floetteroed.utilities.math.Vector;
@@ -41,10 +42,11 @@ import floetteroed.utilities.math.Vector;
  * @param <U>
  *            the decision variable type
  */
-class SurrogateSolutionEstimator<X extends SimulatorState<X>, U> {
+class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends DecisionVariable> {
 
 	// -------------------- CONSTANTS --------------------
 
+	// TODO Replace this by something more intelligent.
 	private final double largestSimulatorEigenvalue = 0.95;
 
 	private final double simulationNoiseVariance;
@@ -136,6 +138,8 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U> {
 
 		/*
 		 * (1) Extract first differences of the state sequence.
+		 * 
+		 * TODO Try to get rid of deltaList, just use Transition.getDelta().
 		 */
 
 		final List<Vector> deltaList = new ArrayList<Vector>(transitions.size());

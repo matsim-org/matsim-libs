@@ -1,8 +1,9 @@
 package opdytsintegration.roadinvestment;
 
 import java.util.List;
+import java.util.Random;
 
-import optdyts.SimulatorState;
+import opdytsintegration.MATSimUnevaluatedState;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -14,8 +15,9 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  * 
  */
-public class RoadInvestmentState implements SimulatorState<RoadInvestmentState> {
-	// extends MATSimUnevaluatedState<TestZurichState> {
+public class RoadInvestmentState // implements
+									// SimulatorState<RoadInvestmentState> {
+		extends MATSimUnevaluatedState<RoadInvestmentState> {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -29,22 +31,20 @@ public class RoadInvestmentState implements SimulatorState<RoadInvestmentState> 
 
 	// -------------------- CONSTRUCTION --------------------
 
-	RoadInvestmentState(final Vector vectorRepresentation, final Double betaPay,
-			final Double betaAlloc, final Double avgScore) {
-		this.vectorRepresentation = vectorRepresentation.copy();
-		this.betaPay = betaPay;
-		this.betaAlloc = betaAlloc;
-		this.avgScore = avgScore;
-	}
+	// RoadInvestmentState(final Vector vectorRepresentation, final Double
+	// betaPay,
+	// final Double betaAlloc, final Double avgScore) {
+	// this.vectorRepresentation = vectorRepresentation.copy();
+	// this.betaPay = betaPay;
+	// this.betaAlloc = betaAlloc;
+	// this.avgScore = avgScore;
+	// }
 
 	RoadInvestmentState(final Population population,
 			final Vector vectorRepresentation, final Double betaPay,
-			final Double betaAlloc // , final Random rnd
-	) {
+			final Double betaAlloc, final Random rnd) {
 
-		// >>>>> TODO taken out person references >>>>>
-		// super(population, rnd);
-		// <<<<< TODO taken out person references <<<<<
+		super(population, rnd);
 
 		this.vectorRepresentation = vectorRepresentation.copy();
 		this.betaPay = betaPay;
@@ -88,9 +88,10 @@ public class RoadInvestmentState implements SimulatorState<RoadInvestmentState> 
 	@Override
 	public RoadInvestmentState deepCopy() {
 		final RoadInvestmentState result = new RoadInvestmentState(
-				this.vectorRepresentation, this.betaPay, this.betaAlloc,
-				this.avgScore // , this.rnd
-		);
+				this.population, this.vectorRepresentation, this.betaPay,
+				this.betaAlloc,
+				// this.avgScore,
+				this.rnd);
 		return result;
 	}
 
@@ -119,10 +120,11 @@ public class RoadInvestmentState implements SimulatorState<RoadInvestmentState> 
 	// }
 
 	@Override
-	public void takeOverConvexCombination(final List<RoadInvestmentState> states,
-			final List<Double> weights) {
+	public void takeOverConvexCombination(
+			final List<RoadInvestmentState> states, final List<Double> weights) {
 
 		// >>>>> TODO taken out person references >>>>>
+		// TODO !!! This means that there is no convex population combination !!!
 		// super.takeOverConvexCombination(states, weights);
 		// <<<<< TODO taken out person references <<<<<
 
@@ -142,12 +144,12 @@ public class RoadInvestmentState implements SimulatorState<RoadInvestmentState> 
 		}
 	}
 
-	// @Override
-	// public void implementInSimulation() {
-	// // >>>>> TODO taken out person references >>>>>
-	// // super.implementInSimulation();
-	// // <<<<< TODO taken out person references <<<<<
-	// throw new UnsupportedOperationException();
-	// }
+	@Override
+	public void implementInSimulation() {
+		// >>>>> TODO taken out person references >>>>>
+		super.implementInSimulation();
+		// <<<<< TODO taken out person references <<<<<
+		// throw new UnsupportedOperationException();
+	}
 
 }

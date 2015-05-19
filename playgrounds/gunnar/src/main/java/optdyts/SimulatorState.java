@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package optdyts;
 
 import java.util.List;
@@ -39,9 +39,9 @@ import floetteroed.utilities.math.Vector;
 public interface SimulatorState<X extends SimulatorState<X>> {
 
 	/**
-	 * Returns a copy of this simulator. This copy must be "deep" for (i) all
-	 * referenced objects that may be evaluated by an ObjectiveFunction and the
-	 * state's vector representation as returned by
+	 * Returns a copy of this simulator state. This copy must be "deep" for (i)
+	 * all referenced objects that may be evaluated by an ObjectiveFunction and
+	 * the state's vector representation as returned by
 	 * getReferenceToVectorRepresentation().
 	 * 
 	 * @return a deep copy of this simulator state
@@ -69,4 +69,8 @@ public interface SimulatorState<X extends SimulatorState<X>> {
 	 */
 	public Vector getReferenceToVectorRepresentation();
 
+	/**
+	 * Sets the simulator to this SimulatorState.
+	 */
+	public void implementInSimulation();
 }

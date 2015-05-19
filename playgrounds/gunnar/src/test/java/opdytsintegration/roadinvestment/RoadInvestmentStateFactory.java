@@ -1,5 +1,7 @@
 package opdytsintegration.roadinvestment;
 
+import java.util.Random;
+
 import opdytsintegration.MATSimStateFactory;
 
 import org.matsim.api.core.v01.population.Population;
@@ -14,10 +16,10 @@ import floetteroed.utilities.math.Vector;
 public class RoadInvestmentStateFactory implements
 		MATSimStateFactory<RoadInvestmentState, RoadInvestmentDecisionVariable> {
 
-	// private final Random rnd;
+	private final Random rnd;
 
-	public RoadInvestmentStateFactory() { // final Random rnd) {
-		// this.rnd = rnd;
+	public RoadInvestmentStateFactory(final Random rnd) {
+		this.rnd = rnd;
 	}
 
 	@Override
@@ -26,9 +28,8 @@ public class RoadInvestmentStateFactory implements
 			final RoadInvestmentDecisionVariable decisionVariable) {
 		return new RoadInvestmentState(population, stateVector,
 				decisionVariable != null ? decisionVariable.betaPay() : null,
-				decisionVariable != null ? decisionVariable.betaAlloc() : null
-		// , this.rnd
-		);
+				decisionVariable != null ? decisionVariable.betaAlloc() : null,
+				this.rnd);
 	}
 
 }

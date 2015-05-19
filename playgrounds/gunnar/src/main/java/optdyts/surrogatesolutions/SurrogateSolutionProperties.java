@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package optdyts.surrogatesolutions;
 
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import optdyts.DecisionVariable;
 import optdyts.SimulatorState;
 import floetteroed.utilities.math.Vector;
 
@@ -42,7 +43,7 @@ import floetteroed.utilities.math.Vector;
  * @param <U>
  *            the decision variable type
  */
-class SurrogateSolutionProperties<X extends SimulatorState<X>, U> {
+class SurrogateSolutionProperties<X extends SimulatorState<X>, U extends DecisionVariable> {
 
 	// -------------------- (CONSTANT) MEMBERS --------------------
 

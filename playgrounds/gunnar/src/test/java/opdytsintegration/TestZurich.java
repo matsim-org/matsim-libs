@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import opdytsintegration.roadinvestment.RoadInvestmentDecisionVariable;
@@ -49,7 +50,9 @@ class TestZurich {
 		link2freespeed = Collections.unmodifiableMap(link2freespeed);
 		link2capacity = Collections.unmodifiableMap(link2capacity);
 
-		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
+		final Random rnd = new Random();
+		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory(
+				rnd);
 		final ObjectiveFunction<RoadInvestmentState> objectiveFunction = new RoadInvestmentObjectiveFunction();
 		final Set<RoadInvestmentDecisionVariable> decisionVariables = new LinkedHashSet<RoadInvestmentDecisionVariable>();
 

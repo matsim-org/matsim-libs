@@ -31,17 +31,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import optdyts.DecisionVariable;
 import optdyts.SimulatorState;
 
 /**
- * A surrogate solution represents, a convex combination of stationary simulator
+ * A surrogate solution represents a convex combination of stationary simulator
  * states that are compatible with a set of Transition instances. In a way, an
  * approximate equilibrium state predictor.
  * 
  * @author Gunnar Flötteröd
  * 
  */
-public class SurrogateSolution<X extends SimulatorState<X>, U> {
+public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -83,6 +84,11 @@ public class SurrogateSolution<X extends SimulatorState<X>, U> {
 
 	public Map<U, Double> getDecisionVariable2alphaSum() {
 		return this.properties.getDecisionVariable2alphaSum();
+	}
+
+	// TODO experimental, should be removed.
+	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
+		return this.decisionVariable2transitionSequence;
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -131,27 +137,26 @@ public class SurrogateSolution<X extends SimulatorState<X>, U> {
 			transitionList.addAll(implementationPath.getTransitions());
 		}
 
-		final List<Double> initialAlphas = new ArrayList<Double>();
-		for (Transition<X, U> transition : transitionList) {
-			if (decisionVariable2alphaSum == null) {
-				initialAlphas.add(1.0 / transitionList.size());
-			} else {
-				final U decisionVariable = transition.getDecisionVariable();
-				initialAlphas.add(decisionVariable2alphaSum
-						.get(decisionVariable)
-						/ this.decisionVariable2transitionSequence.get(
-								decisionVariable).size());
-			}
-		}
-
 		/*
 		 * (2) Estimate the surrogate solution.
 		 */
 
 		final SurrogateSolutionEstimator<X, U> ssEstimator = new SurrogateSolutionEstimator<X, U>(
 				this.simulationNoiseVariance);
-		this.properties = ssEstimator.computeProperties(transitionList,
-				initialAlphas);
+		if (decisionVariable2alphaSum == null) {
+			this.properties = ssEstimator.computeProperties(transitionList);
+		} else {
+			final List<Double> initialAlphas = new ArrayList<Double>();
+			for (Transition<X, U> transition : transitionList) {
+				final U decisionVariable = transition.getDecisionVariable();
+				initialAlphas.add(decisionVariable2alphaSum
+						.get(decisionVariable)
+						/ this.decisionVariable2transitionSequence.get(
+								decisionVariable).size());
+			}
+			this.properties = ssEstimator.computeProperties(transitionList,
+					initialAlphas);
+		}
 	}
 
 	public void evaluate() {
@@ -189,23 +194,25 @@ public class SurrogateSolution<X extends SimulatorState<X>, U> {
 			newSurrogateSolution
 					.removeDecisionVariable(takeOutDecisionVariable);
 
-			// 1.2. Initialize new alphas.
+			// 1.2. Evaluate the new sub-surrogate solution.
 
-			final Map<U, Double> newAlphas = new LinkedHashMap<U, Double>();
-			for (U decisionVariable : this.decisionVariable2transitionSequence
-					.keySet()) {
-				if (!decisionVariable.equals(takeOutDecisionVariable)) {
-					newAlphas.put(
-							decisionVariable,
-							this.getDecisionVariable2alphaSum().get(
-									decisionVariable)
-									/ (1.0 - takeOutAlpha));
+			if (takeOutAlpha > 0.99) {
+				newSurrogateSolution.evaluate();
+			} else {
+				final Map<U, Double> newAlphas = new LinkedHashMap<U, Double>();
+				for (U decisionVariable : this.decisionVariable2transitionSequence
+						.keySet()) {
+					if (!decisionVariable.equals(takeOutDecisionVariable)) {
+						newAlphas.put(
+								decisionVariable,
+								this.getDecisionVariable2alphaSum().get(
+										decisionVariable)
+										/ (1.0 - takeOutAlpha));
+					}
 				}
+				newSurrogateSolution.evaluate(newAlphas);
 			}
 
-			// 1.3. Evaluate the new sub-surrogate solution.
-
-			newSurrogateSolution.evaluate(newAlphas);
 			result.add(newSurrogateSolution);
 		}
 
@@ -228,11 +235,5 @@ public class SurrogateSolution<X extends SimulatorState<X>, U> {
 			}
 		}
 		return result;
-	}
-
-	// TODO experimental code below
-
-	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
-		return this.decisionVariable2transitionSequence;
 	}
 }

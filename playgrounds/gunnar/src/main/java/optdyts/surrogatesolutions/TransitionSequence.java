@@ -21,16 +21,17 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package optdyts.surrogatesolutions;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import optdyts.DecisionVariable;
 import optdyts.SimulatorState;
 
 /**
- * Represents a (possibly non consecutive) sequence of transitions.
+ * Represents a (possibly non consecutive) sequence of simulator transitions.
  * 
  * @author Gunnar Flötteröd
  * 
@@ -39,7 +40,7 @@ import optdyts.SimulatorState;
  * @param <U>
  *            the decision variable type
  */
-public class TransitionSequence<X extends SimulatorState<X>, U> {
+public class TransitionSequence<X extends SimulatorState<X>, U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -47,13 +48,13 @@ public class TransitionSequence<X extends SimulatorState<X>, U> {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	TransitionSequence(final Transition<X, U> transition) {
-		if (transition == null) {
+	TransitionSequence(final Transition<X, U> firstTransition) {
+		if (firstTransition == null) {
 			throw new RuntimeException("Cannot initialize "
 					+ this.getClass().getSimpleName()
 					+ " with a null transition.");
 		}
-		this.transitions.add(transition);
+		this.transitions.add(firstTransition);
 	}
 
 	void addTransition(final Transition<X, U> transition) {

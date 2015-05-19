@@ -58,7 +58,9 @@ class TestEquilnet {
 		link2freespeed = Collections.unmodifiableMap(link2freespeed);
 		link2capacity = Collections.unmodifiableMap(link2capacity);
 
-		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
+		final Random rnd = new Random();
+		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory(
+				rnd);
 		final ObjectiveFunction<RoadInvestmentState> objectiveFunction = new RoadInvestmentObjectiveFunction();
 		final Set<RoadInvestmentDecisionVariable> decisionVariables = new LinkedHashSet<RoadInvestmentDecisionVariable>();
 
@@ -121,7 +123,9 @@ class TestEquilnet {
 		link2freespeed = Collections.unmodifiableMap(link2freespeed);
 		link2capacity = Collections.unmodifiableMap(link2capacity);
 
-		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
+		final Random rnd = new Random();
+		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory(
+				rnd);
 		final ObjectiveFunction<RoadInvestmentState> objectiveFunction = new RoadInvestmentObjectiveFunction();
 		final Set<RoadInvestmentDecisionVariable> decisionVariables = new LinkedHashSet<RoadInvestmentDecisionVariable>();
 
