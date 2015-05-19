@@ -61,7 +61,7 @@ final class ComplexCircleScheduleProvider implements PRouteProvider {
 	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, double vehicleMaximumVelocity, double planningSpeedFactor, final String transportMode) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
-		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
+		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0); // Here, it may make sense to use the variable cost parameters given in the config. Ihab/Daniel may'14
 		this.routingAlgo = new Dijkstra(this.net, tC, tC);
 		@SuppressWarnings("serial")
 		Set<String> modes =  new HashSet<String>(){{
