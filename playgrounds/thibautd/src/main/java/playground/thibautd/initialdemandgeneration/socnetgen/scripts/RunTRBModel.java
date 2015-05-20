@@ -49,7 +49,7 @@ import playground.thibautd.initialdemandgeneration.socnetgen.framework.Threshold
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.UtilityFunction;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkWriter;
 import playground.thibautd.utils.MoreIOUtils;
-import playground.thibautd.utils.ObjectPool;
+import playground.thibautd.socnetsim.utils.ObjectPool;
 
 /**
  * @author thibautd

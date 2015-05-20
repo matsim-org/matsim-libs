@@ -62,7 +62,7 @@ import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkWriter;
 import playground.thibautd.utils.MoreIOUtils;
-import playground.thibautd.utils.ObjectPool;
+import playground.thibautd.socnetsim.utils.ObjectPool;
 import playground.thibautd.utils.SoftCache;
 
 /**

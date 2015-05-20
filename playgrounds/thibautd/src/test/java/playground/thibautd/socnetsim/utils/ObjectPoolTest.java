@@ -17,13 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
-
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+package playground.thibautd.socnetsim.utils;
 
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author thibautd

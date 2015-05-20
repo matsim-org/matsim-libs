@@ -33,7 +33,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
-import playground.thibautd.utils.ObjectPool;
+import playground.thibautd.socnetsim.utils.ObjectPool;
 
 import java.util.HashMap;
 import java.util.Map;

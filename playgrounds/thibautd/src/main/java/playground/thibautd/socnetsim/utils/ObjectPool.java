@@ -17,18 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
+package playground.thibautd.socnetsim.utils;
+
+import org.apache.log4j.Logger;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.apache.log4j.Logger;
-
 /**
  * A simple object to avoid multiplying identical instances of immutable objects.
- * It uses a WeakHashMap internally, so that no unecessary instances are remembered.
+ * It uses a WeakHashMap internally, so that no unnecessary instances are remembered.
+ * It helps achieving nice memory consumption reduction when using with coordinates,
+ * for instance.
  * <br>
  * Do not use with mutable objects!
  *
@@ -53,9 +55,19 @@ public class ObjectPool<T extends Object> {
 	public ObjectPool( final boolean weaklyReference ) {
 		this.pool = weaklyReference ?
 			new WeakHashMap<T, WeakReference<T>>() :
+			// this is sufficient: the Key is a hard reference of the object,
+			// so the value is not garbage collected.
 			new HashMap<T, WeakReference<T>>();
 	}
 
+	/**
+	 * Get the pooled instance that is equal to the object passed as a parameter,
+	 * or pool the object.
+	 *
+	 * @param object the object for which an instance is searched
+	 * @return the pooled instance equal to the object, if any, or the object itself,
+	 * after being pooled.
+	 */
 	public T getPooledInstance( final T object ) {
 		queries++;
 		WeakReference<T> pooled = pool.get( object );
