@@ -117,15 +117,5 @@ public class JointDecisionProcessModule extends AbstractModule {
 		bind( JointPlans.class ).toProvider( new ScenarioElementProvider<JointPlans>( JointPlans.ELEMENT_NAME ) );
 		bind( SocialNetwork.class ).toProvider( new ScenarioElementProvider<SocialNetwork>( SocialNetwork.ELEMENT_NAME ) );
 	}
-
-	public static AbstractModule createOverridenModule( final AbstractModule... features ) {
-		return override( Arrays.asList( new JointDecisionProcessModule() ),
-				new AbstractModule() {
-					@Override
-					public void install() {
-						for ( AbstractModule feature : features ) install( feature );
-					}
-				} );
-	}
 }
 
