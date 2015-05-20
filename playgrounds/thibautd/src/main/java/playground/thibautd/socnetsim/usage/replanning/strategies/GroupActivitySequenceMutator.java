@@ -22,7 +22,7 @@ package playground.thibautd.socnetsim.usage.replanning.strategies;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.TripRouter;
 
-import playground.thibautd.replanning.ActivitySequenceMutatorModule;
+import playground.thibautd.socnetsim.framework.replanning.modules.ActivitySequenceMutatorModule;
 import playground.thibautd.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.JointPlans;

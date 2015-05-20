@@ -17,16 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.replanning;
-
-import java.util.List;
-import java.util.Random;
+package playground.thibautd.socnetsim.framework.replanning.modules;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * This algorithm must be followed by a re-route!

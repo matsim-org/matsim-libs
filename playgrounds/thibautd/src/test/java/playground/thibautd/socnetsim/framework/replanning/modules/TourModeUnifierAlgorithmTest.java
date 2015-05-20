@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.replanning;
+package playground.thibautd.socnetsim.framework.replanning.modules;
 
 import java.util.List;
 import java.util.Random;
@@ -39,6 +39,7 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import playground.thibautd.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm;
 
 /**
  * @author thibautd
@@ -116,7 +117,7 @@ public class TourModeUnifierAlgorithmTest {
 		final int nActs = TripStructureUtils.getActivities( plan , types ).size();
 
 		final PlanAlgorithm testee =
-			new TourModeUnifierAlgorithm( 
+			new TourModeUnifierAlgorithm(
 					types,
 					new MainModeIdentifierImpl() );
 		testee.run( plan );

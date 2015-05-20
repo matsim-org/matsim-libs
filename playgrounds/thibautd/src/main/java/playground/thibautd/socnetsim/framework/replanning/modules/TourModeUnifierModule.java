@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ActivitySequenceMutatorModule.java
+ * TourModeUnifierModule.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,47 +17,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.replanning;
+package playground.thibautd.socnetsim.framework.replanning.modules;
 
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import playground.thibautd.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm.SubtourFirstModeIdentifier;
+import playground.thibautd.socnetsim.framework.replanning.modules.TourModeUnifierAlgorithm.SubtourModeIdentifier;
 
 /**
  * @author thibautd
  */
-public class ActivitySequenceMutatorModule extends AbstractMultithreadedModule {
-	private final StageActivityTypes additionalBlackList;
+public class TourModeUnifierModule extends AbstractMultithreadedModule {
+	final StageActivityTypes stages;
+	final SubtourModeIdentifier modeIdentifier;
 
-
-	public ActivitySequenceMutatorModule(
-			final int numOfThreads ) {
-		this( numOfThreads , null );
+	public TourModeUnifierModule(
+			final int nThreads,
+			final StageActivityTypes stages,
+			final MainModeIdentifier modeIdentifier) {
+		this( nThreads,
+				stages,
+				new SubtourFirstModeIdentifier(
+					modeIdentifier ) );
 	}
 
-	public ActivitySequenceMutatorModule(
-			final int numOfThreads,
-			final StageActivityTypes additionalBlackList) {
-		super(numOfThreads);
-		this.additionalBlackList = additionalBlackList;
+	public TourModeUnifierModule(
+			final int nThreads,
+			final StageActivityTypes stages,
+			final SubtourModeIdentifier modeIdentifier) {
+		super( nThreads );
+		this.stages = stages;
+		this.modeIdentifier = modeIdentifier;
 	}
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final CompositeStageActivityTypes actualBlackList = new CompositeStageActivityTypes();
-		actualBlackList.addActivityTypes(
-				getReplanningContext().getTripRouter().getStageActivityTypes() );
-
-		if ( additionalBlackList != null ) {
-			actualBlackList.addActivityTypes(
-					additionalBlackList );
-		}
-
-		return new ActivitySequenceMutatorAlgorithm(
-				MatsimRandom.getLocalInstance(),
-				actualBlackList );
+		return new TourModeUnifierAlgorithm( stages , modeIdentifier );
 	}
 }
 

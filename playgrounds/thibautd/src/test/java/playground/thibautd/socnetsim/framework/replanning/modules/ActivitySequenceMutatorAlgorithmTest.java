@@ -17,9 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.replanning;
-
-import java.util.Random;
+package playground.thibautd.socnetsim.framework.replanning.modules;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,6 +33,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.Random;
 
 /**
  * @author thibautd
