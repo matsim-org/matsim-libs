@@ -28,11 +28,23 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Utils class for the common pattern of creating an entry in a map if nothing is associated to the requested key.
+ * This is typically useful for weights or counters (Double or Integer), or one-to-many mappings (Lists or Sets).
+ *
  * @author thibautd
  */
-public class MapUtils {
+public final class MapUtils {
 	private MapUtils() {}
 
+	/**
+	 * Gets the collection associated with the key in this map, or create an empty list if no mapping exists yet.
+	 *
+	 * @param key the key of the mapping
+	 * @param map the map in which to search
+	 * @param <K> type of the key
+	 * @param <V> parameter of the collection type
+	 * @return the collection (evt. newly) associated with the key
+	 */
 	public static <K,V> Collection<V> getCollection(
 			final K key,
 			final Map<K, Collection<V>> map) {
@@ -46,6 +58,15 @@ public class MapUtils {
 		return coll;
 	}
 
+	/**
+	 * Gets the collection associated with the key in this map, or create an empty list if no mapping exists yet.
+	 *
+	 * @param key the key of the mapping
+	 * @param map the map in which to search
+	 * @param <K> type of the key
+	 * @param <V> parameter of the List type
+	 * @return the List (evt. newly) associated with the key
+	 */
 	public static <K,V> List<V> getList(
 			final K key,
 			final Map<K, List<V>> map) {
@@ -59,6 +80,15 @@ public class MapUtils {
 		return coll;
 	}
 
+	/**
+	 * Gets the set associated with the key in this map, or create an empty set if no mapping exists yet.
+	 *
+	 * @param key the key of the mapping
+	 * @param map the map in which to search
+	 * @param <K> type of the key
+	 * @param <V> parameter of the set type
+	 * @return the set (evt. newly) associated with the key
+	 */
 	public static <K,V> Set<V> getSet(
 			final K key,
 			final Map<K, Set<V>> map) {
@@ -72,6 +102,16 @@ public class MapUtils {
 		return coll;
 	}
 
+	/**
+	 * Gets the map associated with the key in this map, or create an empty map if no mapping exists yet.
+	 *
+	 * @param key the key of the mapping
+	 * @param map the map in which to search
+	 * @param <K> type of the in the primary map
+	 * @param <C> type of the key in the secondary map
+	 * @param <V> type of the values in the secondary map
+	 * @return the Map (evt. newly) associated with the key
+	 */
 	public static <K,C,V> Map<C,V> getMap(
 			final K key,
 			final Map<K, Map<C,V>> map) {
@@ -85,6 +125,16 @@ public class MapUtils {
 		return coll;
 	}
 
+	/**
+	 * Gets the object associated with the key in this map, or create one if no mapping exists yet.
+	 *
+	 * @param key the key of the mapping
+	 * @param map the map in which to search
+	 * @param <K> type of the key
+	 * @param <T> parameter of the values type
+	 * @param fact the factory to use to create a default object if none is found
+	 * @return the Object (evt. newly) associated with the key
+	 */
 	public static <K,T> T getArbitraryObject(
 			final K key,
 			final Map<K, T> map,
@@ -99,6 +149,15 @@ public class MapUtils {
 		return coll;
 	}
 
+	/**
+	 * Gets the double associated with the key in this map, or create a new one if no mapping exists yet.
+	 *
+	 * @param key the key of the mapping
+	 * @param map the map in which to search
+	 * @param initialValue the value to which new entries should be initialized
+	 * @param <K> type of the key
+	 * @return the value (evt. newly) associated with the key
+	 */
 	public static <K> Double getDouble(
 			final K key,
 			final Map<K, Double> map,
@@ -113,6 +172,17 @@ public class MapUtils {
 		return d;
 	}
 
+	/**
+	 * Add a given value to the Double associated with the key in this map, or initialize a new one if no mapping exists
+	 * yet.
+	 *
+	 * @param key the key of the mapping
+	 * @param map the map in which to search
+	 * @param initialValue the value to which new entries should be initialized
+	 * @param toAdd the value to add to the existing mapped values
+	 * @param <K> type of the key
+	 * @return the collection (evt. newly) associated with the key
+	 */
 	public static <K> double addToDouble(
 			final K key,
 			final Map<K, Double> map,
@@ -125,6 +195,16 @@ public class MapUtils {
 		return newValue;
 	}
 
+
+	/**
+	 * Gets the Integer associated with the key in this map, or create a new one if no mapping exists yet.
+	 *
+	 * @param key the key of the mapping
+	 * @param map the map in which to search
+	 * @param initialValue the value to which new entries should be initialized
+	 * @param <K> type of the key
+	 * @return the value (evt. newly) associated with the key
+	 */
 	public static <K> Integer getInteger(
 			final K key,
 			final Map<K, Integer> map,
@@ -139,6 +219,17 @@ public class MapUtils {
 		return i;
 	}
 
+	/**
+	 * Add a given value to the Integer associated with the key in this map, or initialize a new one if no mapping exists
+	 * yet.
+	 *
+	 * @param key the key of the mapping
+	 * @param map the map in which to search
+	 * @param initialValue the value to which new entries should be initialized
+	 * @param toAdd the value to add to the existing mapped values
+	 * @param <K> type of the key
+	 * @return the collection (evt. newly) associated with the key
+	 */
 	public static <K> double addToInteger(
 			final K key,
 			final Map<K, Integer> map,
@@ -151,27 +242,16 @@ public class MapUtils {
 		return newValue;
 	}
 
-	public static interface Factory<T> {
-		public T create();
-	}
-
-	public static class DefaultFactory<T> implements Factory<T> {
-		private final Class<? extends T> theClass;
-
-		public DefaultFactory( final Class<? extends T> theClass ) {
-			this.theClass = theClass;
-		}
-
-		@Override
-		public T create() {
-			try {
-				return theClass.getConstructor().newInstance();
-			} catch (Exception e) {
-				throw new RuntimeException( e );
-			}
-		}
-	}
-
+	/**
+	 * Fill in a collection with the values associated with the requested keys
+	 *
+	 * @param keys the keys to search for. If a key appears several times, its value will be added to the collection the
+	 *             corresponding number of times.
+	 * @param map the map in which to search
+	 * @param <K> type of the key
+	 * @param <V> type of the values
+	 * @return a new collection, filled in with the values associated with the keys provided, in iteration order.
+	 */
 	public static <K,V> Collection<V> get(
 			final Iterable<K> keys,
 			final Map<K, V> map ) {
@@ -180,6 +260,36 @@ public class MapUtils {
 		for ( K k : keys ) coll.add( map.get( k ) );
 
 		return coll;
+	}
+
+	public interface Factory<T> {
+		T create();
+	}
+
+	/**
+	 * Helper class, to use as a factory if objects should be instanciated using their parameter-less constructor.
+	 *
+	 * @param <T>
+	 */
+	public static class DefaultFactory<T> implements Factory<T> {
+		private final Class<? extends T> theClass;
+
+		public DefaultFactory( final Class<? extends T> theClass ) {
+			this.theClass = theClass;
+		}
+
+		/**
+		 * @throws RuntimeException if the constructor does not exist or throws an exception
+		 * @return a new instance
+		 */
+		@Override
+		public T create() {
+			try {
+				return theClass.getConstructor().newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException( e );
+			}
+		}
 	}
 }
 
