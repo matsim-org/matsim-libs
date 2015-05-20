@@ -19,15 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.framework.population;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
-
 import playground.thibautd.socnetsim.utils.CollectionUtils;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author thibautd
@@ -45,7 +44,7 @@ public final class SocialNetworkUtils {
 
 			for ( Id<Person> alter : alters ) {
 				final Set<Id<Person>> altersOfAlter = socialNetwork.getAlters( alter );
-				
+
 				for ( Id<Person> alterOfAlter : altersOfAlter ) {
 					// is the ego?
 					if ( alterOfAlter.equals( ego ) ) continue;
@@ -68,7 +67,7 @@ public final class SocialNetworkUtils {
 
 		for ( Id ego : egos ) {
 			final Set<Id<Person>> alters = network.getAlters( ego );
-			subnet.put( ego , CollectionUtils.intersectSorted( egos , alters ) );
+			subnet.put( ego , CollectionUtils.<Id<Person>>intersectSorted( egos , alters ) );
 		}
 
 		return subnet;
