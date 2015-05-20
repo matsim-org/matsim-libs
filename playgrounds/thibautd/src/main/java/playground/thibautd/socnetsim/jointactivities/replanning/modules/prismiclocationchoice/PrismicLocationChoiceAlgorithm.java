@@ -47,7 +47,7 @@ import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.framework.replanning.grouping.GroupingUtils;
 import playground.thibautd.socnetsim.framework.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.utils.CollectionUtils;
-import playground.thibautd.utils.QuadTreeRebuilder;
+import playground.thibautd.socnetsim.utils.QuadTreeRebuilder;
 
 /**
  * @author thibautd

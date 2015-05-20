@@ -22,20 +22,8 @@ package playground.thibautd.socnetsim.jointactivities.scoring;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
@@ -43,14 +31,13 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.Desires;
-import org.matsim.core.utils.collections.MapUtils;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.scoring.BeingTogetherScoring;
 import playground.thibautd.socnetsim.run.ScoringFunctionConfigGroup;
-import playground.thibautd.utils.GenericFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -74,7 +61,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 	private final ActivityFacilities facilities;
 	private final Map<Id, BeingTogetherScoring> scorings = new HashMap<Id, BeingTogetherScoring>();
 
-	private final GenericFactory<BeingTogetherScoring.PersonOverlapScorer, Id> scorerFactory;
+	private final OverlapScorerFactory scorerFactory;
 
 	private final EventsManager events;
 
@@ -101,23 +88,23 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 
 	}
 
-	public static GenericFactory<BeingTogetherScoring.PersonOverlapScorer, Id> getPersonOverlapScorerFactory(
+	public static OverlapScorerFactory getPersonOverlapScorerFactory(
 			final Scenario scenario ) {
 		final ScoringFunctionConfigGroup scoringFunctionConf = (ScoringFunctionConfigGroup)
 			scenario.getConfig().getModule( ScoringFunctionConfigGroup.GROUP_NAME );
 		switch ( scoringFunctionConf.getTogetherScoringForm() ) {
 			case linear:
-				return new GenericFactory<BeingTogetherScoring.PersonOverlapScorer, Id>() {
+				return new OverlapScorerFactory() {
 						@Override
-						public BeingTogetherScoring.PersonOverlapScorer create( final Id id ) {
+						public BeingTogetherScoring.PersonOverlapScorer createScorer(final Id id) {
 							return new BeingTogetherScoring.LinearOverlapScorer(
 									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() );
 						}
 					};
 			case logarithmic:
-				return new GenericFactory<BeingTogetherScoring.PersonOverlapScorer, Id>() {
+				return new OverlapScorerFactory() {
 						@Override
-						public BeingTogetherScoring.PersonOverlapScorer create( final Id id ) {
+						public BeingTogetherScoring.PersonOverlapScorer createScorer(final Id id) {
 							final PersonImpl person = (PersonImpl) scenario.getPopulation().getPersons().get( id );
 							if ( person == null ) {
 								// eg transit agent
@@ -169,7 +156,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			final EventsManager events,
 			final BeingTogetherScoring.Filter actTypeFilter,
 			final BeingTogetherScoring.Filter modeFilter,
-			final GenericFactory<BeingTogetherScoring.PersonOverlapScorer, Id> scorerFactory,
+			final OverlapScorerFactory scorerFactory,
 			final double marginalUtilityOfMoney,
 			final ActivityFacilities facilities,
 			final SocialNetwork socialNetwork) {
@@ -234,7 +221,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 										facilities,
 										actTypeFilter,
 										modeFilter,
-										scorerFactory.create( finalId ),
+										scorerFactory.createScorer(finalId),
 										finalId,
 										socialNetwork.getAlters( finalId ) );
 							}
@@ -258,6 +245,10 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			events.processEvent(
 					new PersonMoneyEvent(Time.MIDNIGHT, id, scoring.getScore() / marginalUtilityOfMoney) );
 		}
+	}
+
+	public interface OverlapScorerFactory {
+		BeingTogetherScoring.PersonOverlapScorer createScorer(Id id);
 	}
 }
 

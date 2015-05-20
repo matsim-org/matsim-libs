@@ -17,15 +17,15 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
-
-import java.util.ArrayList;
-import java.util.List;
+package playground.thibautd.socnetsim.utils;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helps working with quad trees, by re-building a new quad tree

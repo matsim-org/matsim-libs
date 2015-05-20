@@ -31,7 +31,7 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.thibautd.utils.QuadTreeRebuilder;
+import playground.thibautd.socnetsim.utils.QuadTreeRebuilder;
 
 /**
  * The scenario element containing information about bike sharing facilities.

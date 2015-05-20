@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.thibautd.utils;
+package playground.thibautd.socnetsim.utils;
 
 import org.matsim.api.core.v01.Id;
 

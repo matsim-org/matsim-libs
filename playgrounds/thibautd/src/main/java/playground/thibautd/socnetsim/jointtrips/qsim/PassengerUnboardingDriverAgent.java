@@ -41,7 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.thibautd.pseudoqsim.QVehicleProvider;
 import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
-import playground.thibautd.utils.IdentifiableCollectionsUtils;
+import playground.thibautd.socnetsim.utils.IdentifiableCollectionsUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

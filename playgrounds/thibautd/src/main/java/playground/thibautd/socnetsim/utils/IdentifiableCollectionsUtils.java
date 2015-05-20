@@ -17,12 +17,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.utils;
-
-import java.util.Collection;
+package playground.thibautd.socnetsim.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+
+import java.util.Collection;
 
 /**
  * @author thibautd

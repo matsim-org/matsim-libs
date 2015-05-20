@@ -39,7 +39,6 @@ import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
-import playground.thibautd.utils.Couple;
 
 /**
  * @author thibautd
