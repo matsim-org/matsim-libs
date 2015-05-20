@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.jointpseudosim.replanning;
+package playground.thibautd.socnetsimusages.jointpseudosim.replanning;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

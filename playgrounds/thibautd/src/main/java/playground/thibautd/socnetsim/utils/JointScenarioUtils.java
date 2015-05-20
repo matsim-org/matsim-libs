@@ -32,7 +32,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 import playground.thibautd.socnetsim.framework.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.JointTimeModeChooserConfigGroup;
@@ -160,7 +159,7 @@ public class JointScenarioUtils {
 		config.addModule( new JointPlansConfigGroup());
 		config.addModule( new GroupReplanningConfigGroup() );
 		config.addModule( new KtiLikeScoringConfigGroup() );
-		config.addModule( new PseudoSimConfigGroup() );
+		//config.addModule( new PseudoSimConfigGroup() );
 		config.addModule( new SocialNetworkConfigGroup() );
 		config.addModule( new RandomJointLocationChoiceConfigGroup() );
 		config.addModule( new PlanLinkConfigGroup() );

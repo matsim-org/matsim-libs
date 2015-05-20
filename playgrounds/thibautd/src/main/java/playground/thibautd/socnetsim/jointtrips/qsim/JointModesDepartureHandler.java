@@ -38,8 +38,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 
-import playground.thibautd.pseudoqsim.NetsimWrappingQVehicleProvider;
-import playground.thibautd.pseudoqsim.QVehicleProvider;
+import playground.thibautd.socnetsim.qsim.NetsimWrappingQVehicleProvider;
+import playground.thibautd.socnetsim.qsim.QVehicleProvider;
 import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;

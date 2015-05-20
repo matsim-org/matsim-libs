@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import playground.thibautd.pseudoqsim.NetsimWrappingQVehicleProvider;
+import playground.thibautd.socnetsim.qsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
 

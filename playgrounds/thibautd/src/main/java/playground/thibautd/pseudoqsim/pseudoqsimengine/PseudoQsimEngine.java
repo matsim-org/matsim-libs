@@ -52,7 +52,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.thibautd.pseudoqsim.QVehicleProvider;
+import playground.thibautd.socnetsim.qsim.QVehicleProvider;
 
 /**
  * An engine aimed at replacing the QnetsimEngine for a "PSim" like behavior.

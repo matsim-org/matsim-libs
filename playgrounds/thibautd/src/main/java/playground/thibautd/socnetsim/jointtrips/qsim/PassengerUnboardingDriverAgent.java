@@ -38,7 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.thibautd.pseudoqsim.QVehicleProvider;
+import playground.thibautd.socnetsim.qsim.QVehicleProvider;
 import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.utils.IdentifiableCollectionsUtils;

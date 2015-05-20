@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.jointpseudosim;
+package playground.thibautd.socnetsimusages.jointpseudosim;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -28,12 +28,12 @@ import org.matsim.core.controler.AbstractModule;
 import playground.thibautd.socnetsim.framework.replanning.ExtraPlanRemover;
 import playground.thibautd.socnetsim.framework.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.framework.replanning.GroupStrategyRegistry;
-import playground.thibautd.socnetsim.jointpseudosim.qsim.SwitchingJointQSimFactoryModule;
+import playground.thibautd.socnetsimusages.jointpseudosim.qsim.SwitchingJointQSimFactoryModule;
 import playground.thibautd.socnetsim.usage.replanning.DefaultJointStrategiesModule;
 import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup.StrategyParameterSet;
-import playground.thibautd.socnetsim.jointpseudosim.replanning.InnovationSwitchingGroupReplanningListenner.Innovative;
-import playground.thibautd.socnetsim.jointpseudosim.replanning.InnovationSwitchingGroupReplanningListenner.NonInnovative;
+import playground.thibautd.socnetsimusages.jointpseudosim.replanning.InnovationSwitchingGroupReplanningListenner.Innovative;
+import playground.thibautd.socnetsimusages.jointpseudosim.replanning.InnovationSwitchingGroupReplanningListenner.NonInnovative;
 import playground.thibautd.utils.TravelTimeRetrofittingEventHandler;
 
 import java.util.Map;

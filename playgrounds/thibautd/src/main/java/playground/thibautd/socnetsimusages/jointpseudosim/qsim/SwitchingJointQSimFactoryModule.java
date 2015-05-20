@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.jointpseudosim.qsim;
+package playground.thibautd.socnetsimusages.jointpseudosim.qsim;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;

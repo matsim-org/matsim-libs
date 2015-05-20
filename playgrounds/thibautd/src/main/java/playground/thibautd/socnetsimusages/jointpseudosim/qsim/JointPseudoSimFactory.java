@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.jointpseudosim.qsim;
+package playground.thibautd.socnetsimusages.jointpseudosim.qsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -34,9 +34,9 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
-import playground.thibautd.pseudoqsim.NetsimWrappingQVehicleProvider;
+import playground.thibautd.socnetsim.qsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import playground.thibautd.pseudoqsim.QVehicleProvider;
+import playground.thibautd.socnetsim.qsim.QVehicleProvider;
 import playground.thibautd.pseudoqsim.pseudoqsimengine.PseudoQsimEngine;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.jointtrips.qsim.JointModesDepartureHandler;
