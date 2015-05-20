@@ -95,6 +95,7 @@ public class RunMatsim2010SocialScenario {
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 		RunUtils.enrichScenario(scenario);
 		Matsim2030Utils.enrichScenario( scenario );
+		ZurichScenarioUtils.enrichScenario( scenario );
 		scenario.getConfig().controler().setCreateGraphs( false ); // cannot set that from config file...
 
 		final SocialNetworkConfigGroup snConf = (SocialNetworkConfigGroup)

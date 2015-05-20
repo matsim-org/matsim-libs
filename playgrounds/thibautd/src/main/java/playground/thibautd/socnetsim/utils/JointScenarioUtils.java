@@ -21,16 +21,12 @@ package playground.thibautd.socnetsim.utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReaderMatsimV2;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.Desires;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.thibautd.socnetsim.framework.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.framework.cliques.config.JointTimeModeChooserConfigGroup;
@@ -47,19 +43,12 @@ import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.jointtrips.population.PassengerRouteFactory;
 import playground.thibautd.socnetsim.usage.PlanLinkConfigGroup;
 import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
-import playground.thibautd.utils.DesiresConverter;
-
-import java.util.Map;
 
 /**
  *
  * @author thibautd
  */
 public class JointScenarioUtils {
-	private static final Logger log =
-		Logger.getLogger(JointScenarioUtils.class);
-
-	private static final String UNKOWN_TRAVEL_CARD = "unknown";
 	private JointScenarioUtils() {}
 
 	/**
@@ -104,41 +93,6 @@ public class JointScenarioUtils {
 		}
 		else {
 			scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
-		}
-
-		if ( config.plans().getInputPersonAttributeFile() != null ) {
-			log.info( "re-reading attributes, this time using a converter for Desires." );
-			final ObjectAttributesXmlReader reader =
-				new ObjectAttributesXmlReader(
-						scenario.getPopulation().getPersonAttributes());
-			reader.putAttributeConverter( Desires.class , new DesiresConverter() );
-			reader.parse(
-				config.plans().getInputPersonAttributeFile() );
-
-			for ( Person person : scenario.getPopulation().getPersons().values() ) {
-				// put desires (if any) in persons for backward compatibility
-				final Desires desires = (Desires)
-					scenario.getPopulation().getPersonAttributes().getAttribute(
-							person.getId().toString(),
-							"desires" );
-				if ( desires != null ) {
-					((PersonImpl) person).createDesires( desires.getDesc() );
-					for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
-						((PersonImpl) person).getDesires().putActivityDuration(
-							entry.getKey(),
-							entry.getValue() );
-					}
-				}
-
-				// travel card
-				final Boolean hasCard = (Boolean)
-					scenario.getPopulation().getPersonAttributes().getAttribute(
-							person.getId().toString(),
-							"hasTravelcard" );
-				if ( hasCard != null && hasCard ) {
-					((PersonImpl) person).addTravelcard( UNKOWN_TRAVEL_CARD );
-				}
-			}
 		}
 	}
 
