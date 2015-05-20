@@ -38,7 +38,7 @@ import playground.thibautd.socnetsim.usage.replanning.DefaultGroupStrategyRegist
 /**
  * @author thibautd
  */
-public class RunDISocialNetwork {
+public class RunSocialNetwork {
 	public static void main(final String[] args) {
 		final String configFile = args[ 0 ];
 
