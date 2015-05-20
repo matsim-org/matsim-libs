@@ -92,22 +92,6 @@ public class JointVehiclesModule extends AbstractModule {
 					}
 				} );
 
-		bind( IncompatiblePlansIdentifierFactory.class ).toProvider(
-				new Provider<IncompatiblePlansIdentifierFactory>() {
-					@Inject Scenario sc;
-
-					@Override
-					public IncompatiblePlansIdentifierFactory get() {
-						final GroupReplanningConfigGroup conf = (GroupReplanningConfigGroup) sc.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME );
-						return conf.getConsiderVehicleIncompatibilities() &&
-								sc.getScenarioElement( VehicleRessources.ELEMENT_NAME ) != null ?
-									new VehicleBasedIncompatiblePlansIdentifierFactory(
-											SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
-									new EmptyIncompatiblePlansIdentifierFactory();
-					}
-				} );
-
-
 	}
 }
 
