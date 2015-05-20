@@ -24,7 +24,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
-import playground.ivt.utils.TripModeShares;
 import playground.thibautd.socnetsim.framework.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.framework.controller.listeners.GroupReplanningListenner;
 import playground.thibautd.socnetsim.framework.controller.listeners.JointPlansDumping;
@@ -88,7 +87,7 @@ public class JointDecisionProcessModule extends AbstractModule {
 		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toInstance(new CompositePlanLinkIdentifier());
 		bind( IncompatiblePlansIdentifierFactory.class ).toInstance( new EmptyIncompatiblePlansIdentifierFactory() );
 
-		addControlerListenerBinding().to( TripModeShares.class );
+		//addControlerListenerBinding().to( TripModeShares.class );
 		//final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
 		//actTypesForAnalysis.addActivityTypes(
 		//		controller.getRegistry().getTripRouterFactory().get().getStageActivityTypes() );
