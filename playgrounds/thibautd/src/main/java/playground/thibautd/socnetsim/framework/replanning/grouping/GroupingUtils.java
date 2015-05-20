@@ -43,7 +43,7 @@ public class GroupingUtils {
 			final double probBreakingJointPlan,
 			final GroupPlans groupPlans,
 			final SocialNetwork socialNetwork) {
-		final Map<Id, Plan> planPerPerson = new LinkedHashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> planPerPerson = new LinkedHashMap<>();
 		for ( Plan p : groupPlans.getAllIndividualPlans() ) {
 			planPerPerson.put( p.getPerson().getId() , p );
 		}

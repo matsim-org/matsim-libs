@@ -62,7 +62,7 @@ public final class SocialNetworkUtils {
 
 	public static Map<Id<Person>, Set<Id<Person>>> getSubnetwork(
 			final SocialNetwork network,
-			final Set<Id> egos ) {
+			final Set<Id<Person>> egos ) {
 		final Map<Id<Person>, Set<Id<Person>>> subnet = new LinkedHashMap<>();
 
 		for ( Id ego : egos ) {
