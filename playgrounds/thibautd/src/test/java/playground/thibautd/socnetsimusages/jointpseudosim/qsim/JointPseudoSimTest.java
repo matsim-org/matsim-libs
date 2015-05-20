@@ -47,7 +47,7 @@ import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
 import playground.thibautd.socnetsim.jointtrips.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.jointtrips.router.JointPlanRouter;
 import playground.thibautd.socnetsim.jointtrips.router.JointTripRouterFactory;
-import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+import playground.thibautd.socnetsim.usage.JointScenarioUtils;
 
 import javax.inject.Provider;
 import java.util.ArrayList;

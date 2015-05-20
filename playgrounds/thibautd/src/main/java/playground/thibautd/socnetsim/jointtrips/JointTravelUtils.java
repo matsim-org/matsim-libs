@@ -17,34 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.utils;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+package playground.thibautd.socnetsim.jointtrips;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.utils.collections.MapUtils;
+import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
-import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
+import playground.thibautd.socnetsim.utils.Couple;
+
+import java.util.*;
 
 /**
  * @author thibautd
  */
-public class JointPlanUtils {
-	private JointPlanUtils() {}
+public class JointTravelUtils {
+	private JointTravelUtils() {}
 
 	public static JointTravelStructure analyseJointTravel(final JointPlan plan) {
 		// this is a two-passes algorithm:

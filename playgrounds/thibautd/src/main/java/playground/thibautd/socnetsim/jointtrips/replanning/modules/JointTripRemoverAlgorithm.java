@@ -48,9 +48,9 @@ import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.utils.JointPlanUtils;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils.JointTravelStructure;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils.JointTrip;
 
 /**
  * @author thibautd
@@ -84,7 +84,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 	}
 
 	public ActedUponInformation run( final JointPlan plan , final Collection<Id<Person>> agentsToIgnore ) {
-		final JointTravelStructure structure = JointPlanUtils.analyseJointTravel( plan );
+		final JointTravelStructure structure = JointTravelUtils.analyseJointTravel(plan);
 
 		if (structure.getJointTrips().size() == 0) {
 			log.warn( getClass().getSimpleName()+" was called on a plan with no joint trips."

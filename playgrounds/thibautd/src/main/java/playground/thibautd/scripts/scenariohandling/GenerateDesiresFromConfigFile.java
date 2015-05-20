@@ -29,7 +29,7 @@ import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
-import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+import playground.thibautd.socnetsim.usage.JointScenarioUtils;
 import playground.thibautd.utils.DesiresConverter;
 
 /**

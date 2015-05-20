@@ -36,7 +36,7 @@ import playground.thibautd.socnetsim.framework.scoring.GroupSizePreferencesConfi
 import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
-import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+import playground.thibautd.socnetsim.usage.JointScenarioUtils;
 
 /**
  * Groups methods too specific to go in the "frameworky" part of the code,

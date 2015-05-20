@@ -17,13 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.utils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package playground.thibautd.socnetsim.jointtrips;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -38,20 +32,21 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-
-import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.population.JointPlanFactory;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils.DriverTrip;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils.JointTravelStructure;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils.JointTrip;
+import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.DriverTrip;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
+
+import java.util.*;
 
 /**
  * @author thibautd
  */
-public class JointPlanUtilsTest {
+public class JointTravelUtilsTest {
 	private final List<Fixture> fixtures = new ArrayList<Fixture>();
 
 	@After
@@ -808,7 +803,7 @@ public class JointPlanUtilsTest {
 	@Test
 	public void testExtractJointTrips() throws Exception {
 		for ( Fixture f : fixtures ) {
-			JointTravelStructure struct = JointPlanUtils.analyseJointTravel( f.plan );
+			JointTravelStructure struct = JointTravelUtils.analyseJointTravel(f.plan);
 
 			Assert.assertEquals(
 					"wrong structure for fixture "+f.name+
@@ -822,7 +817,7 @@ public class JointPlanUtilsTest {
 	@Test
 	public void testParseDriverTrips() throws Exception {
 		for ( Fixture f : fixtures ) {
-			List<DriverTrip> trips = JointPlanUtils.parseDriverTrips( f.plan );
+			List<DriverTrip> trips = JointTravelUtils.parseDriverTrips(f.plan);
 
 			Assert.assertEquals(
 					"wrong number of driver trips: "+f.driverTrips+" is the target, got "+trips,

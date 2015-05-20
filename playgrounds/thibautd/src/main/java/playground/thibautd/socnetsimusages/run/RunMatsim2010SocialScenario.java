@@ -49,7 +49,7 @@ import playground.thibautd.socnetsim.usage.replanning.DefaultGroupStrategyRegist
 import playground.thibautd.socnetsim.run.RunUtils;
 import playground.thibautd.socnetsim.run.ScoringFunctionConfigGroup;
 import playground.thibautd.socnetsimusages.scoring.KtiScoringFunctionFactoryWithJointModes;
-import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+import playground.thibautd.socnetsim.usage.JointScenarioUtils;
 
 /**
  * @author thibautd

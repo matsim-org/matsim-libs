@@ -41,7 +41,7 @@ import playground.thibautd.socnetsim.framework.population.JointPlanFactory;
 import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
-import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+import playground.thibautd.socnetsim.usage.JointScenarioUtils;
 
 import java.util.HashMap;
 import java.util.Map;

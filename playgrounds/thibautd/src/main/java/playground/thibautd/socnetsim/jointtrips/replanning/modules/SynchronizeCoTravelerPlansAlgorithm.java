@@ -33,9 +33,9 @@ import org.matsim.core.utils.misc.Time;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
-import playground.thibautd.socnetsim.utils.JointPlanUtils;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils.JointTravelStructure;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils.JointTrip;
 
 /**
  * An algorithm which attempts to synchronize the plans of passengers
@@ -62,7 +62,7 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 	@Override
 	public void run(final JointPlan plan) {
 		final JointTravelStructure jointTravelStructure =
-			JointPlanUtils.analyseJointTravel( plan );
+			JointTravelUtils.analyseJointTravel(plan);
 
 		for ( JointTrip jt : jointTravelStructure.getJointTrips() ) {
 			final double pickUpTime = inferPickUpTime( jt , plan );

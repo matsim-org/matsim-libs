@@ -55,7 +55,7 @@ import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.population.JointPlanFactory;
 import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils.JointTrip;
 
 /**
  * @author thibautd

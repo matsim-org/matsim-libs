@@ -53,9 +53,9 @@ import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.jointtrips.JointMainModeIdentifier;
-import playground.thibautd.socnetsim.utils.JointPlanUtils;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils.JointTravelStructure;
+import playground.thibautd.socnetsim.jointtrips.JointTravelUtils.JointTrip;
 
 /**
  * An algorithm which creates joint trips from nothing,
@@ -156,7 +156,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			final JointPlan jointPlan,
 			final ClassifiedTrips trips) {
 		final List<Match> matches = new ArrayList<Match>();
-		final JointTravelStructure structure = JointPlanUtils.analyseJointTravel( jointPlan );
+		final JointTravelStructure structure = JointTravelUtils.analyseJointTravel(jointPlan);
 
 		for ( Map.Entry<Id<Person>, List<Trip>> eDriver : trips.carTrips.entrySet() ) {
 			final Id<Person> driverId = eDriver.getKey();

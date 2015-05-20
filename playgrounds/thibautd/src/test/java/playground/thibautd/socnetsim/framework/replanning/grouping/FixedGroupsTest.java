@@ -32,7 +32,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.thibautd.socnetsim.framework.cliques.config.CliquesConfigGroup;
-import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+import playground.thibautd.socnetsim.usage.JointScenarioUtils;
 
 import java.io.File;
 import java.util.Collection;

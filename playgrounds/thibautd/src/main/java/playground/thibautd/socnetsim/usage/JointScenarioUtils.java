@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.utils;
+package playground.thibautd.socnetsim.usage;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -92,7 +92,7 @@ public class JointScenarioUtils {
 			new JointPlansXmlReader( scenario ).parse( jpConfig.getFileName() );
 		}
 		else {
-			scenario.addScenarioElement( JointPlans.ELEMENT_NAME , new JointPlans() );
+			scenario.addScenarioElement(JointPlans.ELEMENT_NAME, new JointPlans());
 		}
 	}
 
