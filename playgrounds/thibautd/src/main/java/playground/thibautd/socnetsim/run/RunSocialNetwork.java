@@ -36,6 +36,7 @@ import playground.thibautd.socnetsim.usage.analysis.SocnetsimDefaultAnalysisModu
 import playground.thibautd.socnetsim.usage.replanning.DefaultGroupStrategyRegistryModule;
 
 /**
+ * Starts a simulation with a social network, joint trips and joint activities.
  * @author thibautd
  */
 public class RunSocialNetwork {
