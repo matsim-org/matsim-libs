@@ -57,47 +57,47 @@ public class Run {
                 new DecisionVariable() {
                     @Override
                     public void implementInSimulation() {
-                        statex = (0.9 * statex) + (0.1 * 100) ;
-                        statey = (0.9 * statey )+ (0.1 * 100) ;
+                        statex = (0.9 * statex) + (0.1 * 100) + Math.random() - 0.5;
+                        statey = (0.9 * statey )+ (0.1 * 100) + Math.random() - 0.5;
                     }
                 }, new DecisionVariable() {
                     @Override
                     public void implementInSimulation() {
-                        statex = (0.9 * statex) + (0.1 * 20) ;
-                        statey = (0.9 * statey )+ (0.1 * -37);
+                        statex = (0.9 * statex) + (0.1 * 20) + Math.random() - 0.5;
+                        statey = (0.9 * statey )+ (0.1 * -37)+ Math.random() - 0.5;
                     }
                 }, new DecisionVariable() {
                     @Override
                     public void implementInSimulation() {
-                        statex = (0.9 * statex) + (0.1 * 0) ;
-                        statey = (0.9 * statey )+ (0.1 * 0) ;
+                        statex = (0.9 * statex) + (0.1 * 0)+ Math.random() - 0.5 ;
+                        statey = (0.9 * statey )+ (0.1 * 0) + Math.random() - 0.5;
                     }
                 }, new DecisionVariable() {
                     @Override
                     public void implementInSimulation() {
-                        statex = (0.9 * statex) + (0.1 * -37);
-                        statey = (0.9 * statey )+ (0.1 * 20);
+                        statex = (0.9 * statex) + (0.1 * -37)+ Math.random() - 0.5;
+                        statey = (0.9 * statey )+ (0.1 * 20)+ Math.random() - 0.5;
                     }
                 }, new DecisionVariable() {
                     @Override
                     public void implementInSimulation() {
-                        statex = (0.9 * statex) + (0.1 * 21);
-                        statey = (0.9 * statey )+ (0.1 * -38);
+                        statex = (0.9 * statex) + (0.1 * 21)+ Math.random() - 0.5;
+                        statey = (0.9 * statey )+ (0.1 * -38)+ Math.random() - 0.5;
                     }
                 })),
                 objectiveFunction,
                 2 * (1.0 / 12.0),
                 1.);
-        while (true) {
+        while (objectiveFunction.evaluateState(new MySimulatorState(statex, statey)) > 1.0) {
             System.out.println("implement");
             decisionVariableSetEvaluator.implementNextDecisionVariable();
             System.out.println("register");
-            decisionVariableSetEvaluator.registerState(new MySimulatorState(statex + Math.random(), statey + Math.random()));
+            decisionVariableSetEvaluator.registerState(new MySimulatorState(statex , statey));
             System.out.printf("%f,%f", statex, statey);
         }
     }
 
-    static class MySimulatorState implements SimulatorState<MySimulatorState> {
+    class MySimulatorState implements SimulatorState<MySimulatorState> {
 
         double x, y;
 
@@ -125,6 +125,13 @@ public class Run {
         public Vector getReferenceToVectorRepresentation() {
             return new Vector(new double[]{x, y});
         }
+
+        @Override
+        public void implementInSimulation() {
+            statex = x;
+            statey = y;
+        }
+
     }
 
 
