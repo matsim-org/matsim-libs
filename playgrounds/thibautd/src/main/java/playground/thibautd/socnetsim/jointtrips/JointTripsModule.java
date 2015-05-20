@@ -53,14 +53,6 @@ public class JointTripsModule extends AbstractModule {
 		bind(Mobsim.class).toProvider(JointQSimFactory.class);
 
 		bind( ScoringFunctionFactory.class ).to(CharyparNagelWithJointModesScoringFunctionFactory.class);
-		bind(PlanRoutingAlgorithmFactory.class).toInstance(
-				new PlanRoutingAlgorithmFactory() {
-					@Override
-					public PlanAlgorithm createPlanRoutingAlgorithm(
-							final TripRouter tripRouter) {
-						return new PlanRouter(tripRouter);
-					}
-				});
 		bind( TripRouter.class ).toProvider( JointTripRouterFactory.class );
 
 		// TODO: extract in files (messy and not modular)

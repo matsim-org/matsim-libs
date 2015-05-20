@@ -22,6 +22,7 @@ package playground.thibautd.socnetsim.run;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import playground.thibautd.socnetsim.framework.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.framework.controller.JointDecisionProcessModule;
@@ -57,12 +58,20 @@ public class RunDISocialNetwork {
 
 		final Controler controler = new Controler( scenario );
 		controler.addOverridingModule( new JointDecisionProcessModule() );
-		controler.addOverridingModule( new ConfigConfiguredPlanLinkIdentifierModule() );
-		controler.addOverridingModule( new SocnetsimDefaultAnalysisModule() );
-		controler.addOverridingModule( new JointActivitiesScoringModule() );
-		controler.addOverridingModule( new DefaultGroupStrategyRegistryModule() );
-		controler.addOverridingModule( new JointTripsModule() );
-		controler.addOverridingModule( new SocialNetworkModule() );
+		// One needs to add the various features one wants to use in one module to be safe:
+		// this way, if two features conflict, a crash will occur at injection.
+		controler.addOverridingModule(
+				new AbstractModule() {
+					@Override
+					public void install() {
+						install( new ConfigConfiguredPlanLinkIdentifierModule());
+						install( new SocnetsimDefaultAnalysisModule() );
+						install( new JointActivitiesScoringModule() );
+						install( new DefaultGroupStrategyRegistryModule() );
+						install( new JointTripsModule() );
+						install( new SocialNetworkModule() );
+					}
+				} );
 		controler.run();
 	}
 }

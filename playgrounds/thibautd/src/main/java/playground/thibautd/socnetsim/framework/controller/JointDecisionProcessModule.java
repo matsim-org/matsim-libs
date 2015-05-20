@@ -24,6 +24,10 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.population.algorithms.PlanAlgorithm;
+import playground.thibautd.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import playground.thibautd.socnetsim.framework.controller.listeners.DumpJointDataAtEnd;
 import playground.thibautd.socnetsim.framework.controller.listeners.GroupReplanningListenner;
 import playground.thibautd.socnetsim.framework.controller.listeners.JointPlansDumping;
@@ -40,6 +44,7 @@ import playground.thibautd.socnetsim.framework.scoring.InternalizingPlansScoring
 import playground.thibautd.socnetsim.framework.scoring.InternalizingPlansScoring.ConfigBasedInternalizationSettings;
 import playground.thibautd.socnetsim.framework.scoring.InternalizingPlansScoring.InternalizationSettings;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -82,6 +87,14 @@ public class JointDecisionProcessModule extends AbstractModule {
 					}
 				});
 
+		bind(PlanRoutingAlgorithmFactory.class).toInstance(
+				new PlanRoutingAlgorithmFactory() {
+					@Override
+					public PlanAlgorithm createPlanRoutingAlgorithm(
+							final TripRouter tripRouter) {
+						return new PlanRouter(tripRouter);
+					}
+				});
 
 		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Strong.class ).toInstance(new CompositePlanLinkIdentifier());
 		bind( PlanLinkIdentifier.class ).annotatedWith( PlanLinkIdentifier.Weak.class ).toInstance(new CompositePlanLinkIdentifier());
@@ -103,6 +116,16 @@ public class JointDecisionProcessModule extends AbstractModule {
 		// For convenience
 		bind( JointPlans.class ).toProvider( new ScenarioElementProvider<JointPlans>( JointPlans.ELEMENT_NAME ) );
 		bind( SocialNetwork.class ).toProvider( new ScenarioElementProvider<SocialNetwork>( SocialNetwork.ELEMENT_NAME ) );
+	}
+
+	public static AbstractModule createOverridenModule( final AbstractModule... features ) {
+		return override( Arrays.asList( new JointDecisionProcessModule() ),
+				new AbstractModule() {
+					@Override
+					public void install() {
+						for ( AbstractModule feature : features ) install( feature );
+					}
+				} );
 	}
 }
 
