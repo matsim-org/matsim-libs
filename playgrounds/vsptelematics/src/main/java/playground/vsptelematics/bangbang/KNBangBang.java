@@ -172,24 +172,18 @@ public class KNBangBang {
 
 		Set<String> analyzedModes = new HashSet<>() ;
 		analyzedModes.add( TransportMode.car ) ;
-		final TravelTime travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
-		controler.getEvents().addHandler((TravelTimeCollector) travelTime);
-		controler.getMobsimListeners().add((TravelTimeCollector) travelTime);
-		
-//		controler.addOverridingModule( new AbstractModule(){
-//			@Override
-//			public void install() {
-//				this.add
-//			}
-//			
-//		}) ;
+		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
+//		controler.getEvents().addHandler(travelTime);
+//		controler.getMobsimListeners().add(travelTime);
 		
 		controler.addOverridingModule( new AbstractModule(){
 			@Override
 			public void install() {
+				this.addEventHandlerBinding().toInstance( travelTime ) ;
+				this.addMobsimListenerBinding().toInstance( travelTime );
 				this.bind( TravelTime.class ).toInstance( travelTime );
 			}
-		} ) ;
+		}) ;
 		
 		// ---
 		

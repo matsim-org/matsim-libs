@@ -23,6 +23,8 @@
 package org.matsim.core.controler;
 
 import com.google.inject.*;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -67,10 +69,13 @@ public class Injector {
         }
         com.google.inject.Injector realInjector = bootstrapInjector.createChildInjector(guiceModules);
         for (Map.Entry<Key<?>, Binding<?>> entry : realInjector.getBindings().entrySet()) {
+      	  Level level = Level.DEBUG ;
+      	  if ( entry.getKey().toString().contains("type=org.matsim") ) {
+      		  level = Level.WARN ;
+      	  }
 //            logger.debug(String.format("%s\n-> %s", entry.getKey(), entry.getValue()));
-        	logger.debug( entry.getKey() );
-//        	logger.debug( "   -> key=" + entry.getValue().getKey() ) ;
-        	logger.debug( "   -> " + entry.getValue().getProvider() ) ;
+        	logger.log( level, entry.getKey() );
+        	logger.log( level, "   -> " + entry.getValue().getProvider() ) ;
         }
         return fromGuiceInjector(realInjector);
     }
