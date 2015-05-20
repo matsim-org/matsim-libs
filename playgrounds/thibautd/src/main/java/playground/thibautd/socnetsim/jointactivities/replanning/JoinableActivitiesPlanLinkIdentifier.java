@@ -19,18 +19,22 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.jointactivities.replanning;
 
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.router.*;
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
-import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 
-import java.util.PriorityQueue;
-import java.util.Queue;
+import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
+import playground.thibautd.socnetsim.framework.replanning.modules.PlanLinkIdentifier;
 
 /**
  * Links plans with "joinable" activities, that is,
@@ -43,13 +47,11 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 	private static final Logger log =
 		Logger.getLogger(JoinableActivitiesPlanLinkIdentifier.class);
 
-	// should be passed from outside, but not available at construction
-	// but on the other side, not a big deal if stage activities are considered
-	// as activities, as identification is restricted to activities of a given type...
-	private final StageActivityTypes stages = EmptyStageActivityTypes.INSTANCE;
-			//new CompositeStageActivityTypes(
-			//		JointActingTypes.JOINT_STAGE_ACTS,
-			//		new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ) );
+	// XXX should be passed from outside, but not available at construction
+	private final StageActivityTypes stages =
+			new CompositeStageActivityTypes(
+					JointActingTypes.JOINT_STAGE_ACTS,
+					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ) );
 	private final String type;
 
 	public JoinableActivitiesPlanLinkIdentifier(
@@ -135,7 +137,7 @@ public class JoinableActivitiesPlanLinkIdentifier implements PlanLinkIdentifier 
 		private final Id locId;
 		private final Id personId;
 		private final double startTime;
-		private final int index;
+		private int index;
 
 		public LocationEvent(
 				final int index,
