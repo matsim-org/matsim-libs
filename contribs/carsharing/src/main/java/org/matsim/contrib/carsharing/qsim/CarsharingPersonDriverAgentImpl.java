@@ -69,7 +69,7 @@ import org.matsim.vehicles.Vehicle;
  */
 
  
-public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent{
+public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent{
 
 	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 
@@ -127,7 +127,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	private TripRouter tripRouter;
 	
 
-	public AllCSModesPersonDriverAgentImpl(final Person person, final Plan plan, 
+	public CarsharingPersonDriverAgentImpl(final Person person, final Plan plan, 
 			final Netsim simulation, final Scenario scenario,
 			CarSharingVehicles carSharingVehicles, TripRouter tripRouter) {
 		this.person = person;
