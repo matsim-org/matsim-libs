@@ -46,7 +46,7 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.population.Desires;
-import playground.ivt.utils.MapUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 import playground.thibautd.socnetsim.framework.scoring.BeingTogetherScoring;
 import playground.thibautd.socnetsim.run.ScoringFunctionConfigGroup;

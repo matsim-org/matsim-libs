@@ -44,7 +44,7 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
-import playground.ivt.utils.MapUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import playground.thibautd.socnetsim.framework.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;

@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.facilities.ActivityFacility;
 
-import playground.ivt.utils.MapUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import playground.thibautd.socnetsim.framework.population.SocialNetwork;
 
 import com.google.inject.Inject;

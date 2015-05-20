@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.router.TripStructureUtils;
 
-import playground.ivt.utils.MapUtils;
+import org.matsim.core.utils.collections.MapUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

@@ -39,8 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.ivt.utils.ArgParser;
-import playground.ivt.utils.MapUtils;
-import playground.thibautd.geocoding.GeolocalizingParser;
+import org.matsim.core.utils.collections.MapUtils;
 import playground.thibautd.geocoding.MapquestResult.Result;
 import playground.thibautd.utils.CsvUtils;
 

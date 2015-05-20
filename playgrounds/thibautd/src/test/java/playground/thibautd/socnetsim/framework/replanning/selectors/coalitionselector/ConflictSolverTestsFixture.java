@@ -29,7 +29,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
-import playground.ivt.utils.MapUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import playground.thibautd.socnetsim.framework.population.JointPlan;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;

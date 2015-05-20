@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import playground.ivt.utils.MapUtils;
+import org.matsim.core.utils.collections.MapUtils;
 
 /**
  * @author thibautd

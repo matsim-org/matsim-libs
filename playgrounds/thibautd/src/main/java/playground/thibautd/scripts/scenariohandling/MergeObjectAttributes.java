@@ -30,7 +30,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.ivt.utils.MapUtils;
+import org.matsim.core.utils.collections.MapUtils;
 
 /**
  * merges object attributes files to stdout

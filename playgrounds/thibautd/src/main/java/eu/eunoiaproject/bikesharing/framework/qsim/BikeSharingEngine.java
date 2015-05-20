@@ -37,7 +37,7 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import playground.ivt.utils.MapUtils;
+import org.matsim.core.utils.collections.MapUtils;
 
 import java.util.*;
 

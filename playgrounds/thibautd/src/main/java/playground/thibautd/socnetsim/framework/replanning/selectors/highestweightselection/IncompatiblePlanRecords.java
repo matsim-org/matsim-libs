@@ -28,7 +28,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.ivt.utils.MapUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import playground.thibautd.socnetsim.framework.replanning.selectors.IncompatiblePlansIdentifier;
 
 /**

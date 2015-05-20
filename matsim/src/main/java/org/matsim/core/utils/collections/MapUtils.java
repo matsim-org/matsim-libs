@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.utils;
+package org.matsim.core.utils.collections;
 
 import java.util.ArrayList;
 import java.util.Collection;

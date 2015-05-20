@@ -35,7 +35,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.ivt.utils.MapUtils;
+import org.matsim.core.utils.collections.MapUtils;
 import playground.thibautd.socnetsim.framework.population.JointPlans;
 import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifier;
 import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;

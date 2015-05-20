@@ -42,8 +42,8 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTime;
 
-import playground.ivt.utils.MapUtils;
-import playground.ivt.utils.MapUtils.Factory;
+import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.collections.MapUtils.Factory;
 
 /**
  * @author thibautd
