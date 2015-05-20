@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.jointtrips.scoring;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,13 +32,13 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-
 import playground.ivt.scoring.BlackListedActivityScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -110,7 +108,7 @@ public class CharyparNagelWithJointModesScoringFunctionFactory implements Scorin
 
 	@Override
 	public ScoringFunction createNewScoringFunction(final Person person) {
-		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(

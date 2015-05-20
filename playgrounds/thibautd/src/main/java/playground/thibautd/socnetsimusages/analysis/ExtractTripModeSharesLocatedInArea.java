@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.usage.analysis.scripts;
+package playground.thibautd.socnetsimusages.analysis;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -29,8 +29,6 @@ import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
 import playground.ivt.utils.Filter;
 import playground.ivt.utils.SubpopulationFilter;
-
-import playground.thibautd.socnetsim.usage.analysis.LocatedTripsWriter;
 
 /**
  * @author thibautd
