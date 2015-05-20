@@ -113,7 +113,7 @@ public abstract class AbstractController {
     }
 
     protected final void setupOutputDirectory(final String outputDirectory, String runId, final boolean overwriteFiles) {
-        this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be before logging
+        this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be there before logging
         OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
     }
 

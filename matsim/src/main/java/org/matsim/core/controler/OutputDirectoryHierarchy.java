@@ -22,7 +22,6 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
 /**
  * 
  * Represents the directory hierarchy where the MATSim output goes in.

@@ -19,8 +19,11 @@
 package playground.vsptelematics.bangbang;
 
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,7 +35,6 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -54,7 +56,8 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
-import java.util.*;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author nagel
@@ -92,13 +95,14 @@ public class KNBangBang {
 
 		// ---
 		
-		Config config = ConfigUtils.loadConfig("/Users/nagel/kairuns/telematics/baseconfig.xml") ;
+		final Config config = ConfigUtils.loadConfig("/Users/nagel/kairuns/telematics/baseconfig.xml") ;
 		
 		config.network().setInputFile("/Users/nagel/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml.gz");
 		config.network().setTimeVariantNetwork(true);
 		
 //		config.plans().setInputFile("/Users/nagel/kairuns/a100/7dec13-base/output_plans.xml.gz");
 		config.plans().setInputFile("/Users/nagel/kairuns/telematics/reduced-plans.xml.gz");
+		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		
 		config.controler().setFirstIteration(9);
 		config.controler().setLastIteration(9);
@@ -171,6 +175,14 @@ public class KNBangBang {
 		final TravelTime travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
 		controler.getEvents().addHandler((TravelTimeCollector) travelTime);
 		controler.getMobsimListeners().add((TravelTimeCollector) travelTime);
+		
+//		controler.addOverridingModule( new AbstractModule(){
+//			@Override
+//			public void install() {
+//				this.add
+//			}
+//			
+//		}) ;
 		
 		controler.addOverridingModule( new AbstractModule(){
 			@Override
