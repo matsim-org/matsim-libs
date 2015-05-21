@@ -44,7 +44,6 @@ import playground.thibautd.socnetsim.framework.scoring.InternalizingPlansScoring
 import playground.thibautd.socnetsim.framework.scoring.InternalizingPlansScoring.ConfigBasedInternalizationSettings;
 import playground.thibautd.socnetsim.framework.scoring.InternalizingPlansScoring.InternalizationSettings;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
