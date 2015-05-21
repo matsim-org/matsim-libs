@@ -38,9 +38,9 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.ivt.scoring.BlackListedActivityScoringFunction;
-import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
-import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 
 /**
  * This factory creates "CharyparNagel" scoring functions, but with

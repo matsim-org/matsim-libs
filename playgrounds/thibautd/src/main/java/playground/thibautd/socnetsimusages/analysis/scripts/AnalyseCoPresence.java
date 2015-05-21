@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.socnetsim.usage.analysis.scripts;
+package playground.thibautd.socnetsimusages.analysis.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

@@ -24,19 +24,13 @@ import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.listener.ControlerListener;
-import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.MainModeIdentifierImpl;
-import org.matsim.core.router.TripRouter;
-import playground.ivt.utils.TripModeShares;
 import org.matsim.contrib.socnetsim.framework.cliques.Clique;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.FixedGroupsIdentifier;
 import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupIdentifier;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
-import org.matsim.contrib.socnetsim.jointtrips.JointMainModeIdentifier;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.listener.ControlerListener;
 
 import java.util.Collections;
 
@@ -97,25 +91,6 @@ public class SocnetsimDefaultAnalysisModule extends AbstractModule {
 					}
 				});
 
-		this.addControlerListenerBinding().toProvider( 
-				new Provider<ControlerListener>() {
-					@Inject OutputDirectoryHierarchy controlerIO;
-					@Inject Scenario scenario;
-					@Inject TripRouter tripRouter;
-
-					@Override
-					public ControlerListener get() {
-						final CompositeStageActivityTypes actTypesForAnalysis = new CompositeStageActivityTypes();
-						actTypesForAnalysis.addActivityTypes( tripRouter.getStageActivityTypes() );
-						actTypesForAnalysis.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-						return new TripModeShares(
-									((GroupReplanningConfigGroup) scenario.getConfig().getModule( GroupReplanningConfigGroup.GROUP_NAME )).getGraphWriteInterval(),
-									controlerIO,
-									scenario,
-									new JointMainModeIdentifier( new MainModeIdentifierImpl() ),
-									actTypesForAnalysis);
-					}
-				});
 
 	}
 

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.scoring;
+package org.matsim.contrib.socnetsim.jointtrips.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;

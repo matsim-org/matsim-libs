@@ -32,10 +32,9 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import playground.ivt.scoring.BlackListedActivityScoringFunction;
-import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
-import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 
 import java.util.HashMap;
 import java.util.Map;

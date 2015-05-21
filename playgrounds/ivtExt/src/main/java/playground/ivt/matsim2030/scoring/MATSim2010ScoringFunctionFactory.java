@@ -52,9 +52,9 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.ivt.scoring.BlackListedActivityScoringFunction;
-import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
-import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 
 /**
  * @author thibautd
