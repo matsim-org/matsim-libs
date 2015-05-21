@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
+
+<network name="PLOC net">
+   <nodes>
+      <node id="0" x="0" y="-500"/>
+      <node id="01" x="0" y="-250"/>
+      
+      <node id="1" x="1000" y="-500"/>
+      
+      <node id="2" x="-500" y="0"/>
+      <node id="02" x="-250" y="0"/>
+      
+      <node id="3" x="0" y="0"/>      
+      <node id="4" x="1000" y="0"/>
+      <node id="5" x="1500" y="0"/>  
+      
+      <node id="6" x="0" y="500"/>
+      <node id="06" x="0" y="250"/>
+      
+      <node id="7" x="1000" y="500"/>     
+   </nodes>
+   
+   <links capperiod="01:00:00">
+      <link id="0" from="0" to="01" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  />
+      <link id="01" from="01" to="3" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  />
+      
+      <link id="1" from="4" to="1" length="500.00" capacity="10.0" freespeed="10.00" permlanes="1"  />  
+      
+      <link id="2" from="2" to="02" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  /> 
+      <link id="02" from="02" to="3" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  /> 
+      
+      <link id="3" from="3" to="4" length="1000.00" capacity="10.0" freespeed="10.00" permlanes="1"  />
+      <link id="4" from="4" to="5" length="500.00" capacity="10.0" freespeed="10.00" permlanes="1"  /> 
+      
+      <link id="5" from="6" to="06" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  /> 
+      <link id="05" from="06" to="3" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  /> 
+      
+      <link id="6" from="4" to="7" length="500.00" capacity="10.0" freespeed="10.00" permlanes="1"  />   
+
+      <link id="10" from="01" to="0" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  />
+      <link id="101" from="3" to="01" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  />
+      
+      <link id="11" from="1" to="4" length="500.00" capacity="10.0" freespeed="10.00" permlanes="1"  />  
+      
+      <link id="12" from="02" to="2" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  /> 
+      <link id="102" from="3" to="02" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  /> 
+      
+      <link id="13" from="4" to="3" length="1000.00" capacity="10.0" freespeed="10.00" permlanes="1"  />
+      <link id="14" from="5" to="4" length="500.00" capacity="10.0" freespeed="10.00" permlanes="1"  /> 
+      
+      <link id="15" from="06" to="6" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  /> 
+      <link id="105" from="3" to="06" length="250.00" capacity="10.0" freespeed="10.00" permlanes="1"  /> 
+      
+      <link id="16" from="7" to="4" length="500.00" capacity="10.0" freespeed="10.00" permlanes="1"  />      
+   </links>
+</network>
