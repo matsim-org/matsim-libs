@@ -3,6 +3,7 @@
 	<!ENTITY outputName "equil" >
 	<!ENTITY cliques "test/input/org/matsim/contrib/socnetsim/cliques.xml" >
 	<!ENTITY plans "test/input/org/matsim/contrib/socnetsim/plans.xml" >
+	<!ENTITY network "test/input/org/matsim/contrib/socnetsim/network.xml" >
 ]>
 <config>
 
@@ -63,7 +64,7 @@
 
 	<module name="network" >
 		<param name="inputChangeEventsFile" value="null" />
-		<param name="inputNetworkFile" value="test/input/playground/thibautd/socnetsim/network.xml" />
+		<param name="inputNetworkFile" value="&network;" />
 		<param name="laneDefinitionsFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
 	</module>
