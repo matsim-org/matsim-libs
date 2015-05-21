@@ -107,6 +107,7 @@
 		<module>otfvis</module>
 		<module>matrixbasedptrouter</module>
 		<module>parking</module>
+		<module>socnetsim</module>
 		<module>transEnergySim</module>
 		<module>roadpricing</module>
 		<module>multimodal</module>
