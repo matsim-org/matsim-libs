@@ -250,6 +250,11 @@ final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<P
 	}
 
 	/* default */ final int getCurrentPlanElementIndex() {
+		// Should this be made public?  
+		// Pro: Many programmers urgently seem to need this: They do everything possible to get to this index, including copy/paste of the whole class.
+		// Con: I don't think that it is needed in many of those cases with a bit of thinking, and without it it really makes the code more flexible including
+		// the possibility to, say, "consume" the plan while it is executed.
+		// kai, may'15
 		return currentPlanElementIndex;
 	}
 	@Override

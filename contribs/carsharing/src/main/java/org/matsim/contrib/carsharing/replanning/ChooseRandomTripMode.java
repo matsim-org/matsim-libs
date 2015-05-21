@@ -16,7 +16,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 /**
  * @author balacm
  */
-public class ChooseRandomTripMode implements PlanAlgorithm {
+public final class ChooseRandomTripMode implements PlanAlgorithm {
 	
 	private final String[] possibleModes;
 	//private boolean ignoreCarAvailability = true;
@@ -95,11 +95,6 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 					trip.getDestinationActivity());
 	
 	}
-	public void setIgnoreCarAvailability(boolean ignoreCarAvailability2) {
-		// TODO Auto-generated method stub
-		
-		
-		
-	}
+
 
 }

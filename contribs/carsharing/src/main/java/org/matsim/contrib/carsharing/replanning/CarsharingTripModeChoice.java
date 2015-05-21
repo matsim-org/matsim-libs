@@ -15,7 +15,6 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 	/*package*/ final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
 
 	private String[] availableModes = null;
-	private boolean ignoreCarAvailability = true;
 	private final Scenario scenario;
 
 	public CarsharingTripModeChoice(final Scenario scenario) {
@@ -58,7 +57,6 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 	public PlanAlgorithm getPlanAlgoInstance() {
 		final TripRouter tripRouter = getReplanningContext().getTripRouter();
 		ChooseRandomTripMode algo = new ChooseRandomTripMode(this.scenario, this.availableModes, MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
-		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
 		return algo;
 	}
 

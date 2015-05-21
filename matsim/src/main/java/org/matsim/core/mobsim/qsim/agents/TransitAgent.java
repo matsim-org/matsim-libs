@@ -46,7 +46,7 @@ import org.matsim.vehicles.Vehicle;
 public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent, HasPerson {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(TransitAgent.class);
-	
+
 	private BasicPlanAgentImpl basicAgentDelegate ;
 	private PlanBasedDriverAgentImpl driverAgentDelegate ;
 	private TransitAgentImpl transitAgentDelegate ;
@@ -67,138 +67,111 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	public final void endLegAndComputeNextState(double now) {
 		basicAgentDelegate.endLegAndComputeNextState(now);
 	}
-
 	@Override
 	public final void setStateToAbort(double now) {
 		basicAgentDelegate.setStateToAbort(now);
 	}
-
 	@Override
 	public final void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 		basicAgentDelegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
 	}
-
 	@Override
 	public final void endActivityAndComputeNextState(double now) {
 		basicAgentDelegate.endActivityAndComputeNextState(now);
 	}
-
 	@Override
 	public final Id<Vehicle> getPlannedVehicleId() {
 		return basicAgentDelegate.getPlannedVehicleId();
 	}
-
 	@Override
 	public final String getMode() {
 		return basicAgentDelegate.getMode();
 	}
-
 	@Override
 	public String toString() {
 		return basicAgentDelegate.toString();
 	}
-
 	@Override
 	public final Double getExpectedTravelTime() {
 		return basicAgentDelegate.getExpectedTravelTime();
 	}
-
-    @Override
-    public final Double getExpectedTravelDistance() {
-        return basicAgentDelegate.getExpectedTravelDistance();
-    }
-
-    @Override
+	@Override
+	public final Double getExpectedTravelDistance() {
+		return basicAgentDelegate.getExpectedTravelDistance();
+	}	
+	@Override
 	public final PlanElement getCurrentPlanElement() {
 		return basicAgentDelegate.getCurrentPlanElement();
 	}
-
 	@Override
 	public final PlanElement getNextPlanElement() {
 		return basicAgentDelegate.getNextPlanElement();
 	}
-
 	@Override
 	public final Plan getCurrentPlan() {
 		return basicAgentDelegate.getCurrentPlan();
 	}
-
 	@Override
 	public final Id<Person> getId() {
 		return basicAgentDelegate.getId();
 	}
-
 	@Override
 	public final Person getPerson() {
 		return basicAgentDelegate.getPerson();
 	}
-
 	@Override
 	public final MobsimVehicle getVehicle() {
 		return basicAgentDelegate.getVehicle();
 	}
-
 	@Override
 	public final void setVehicle(MobsimVehicle vehicle) {
 		basicAgentDelegate.setVehicle(vehicle);
 	}
-
 	@Override
 	public final Id<Link> getCurrentLinkId() {
 		return basicAgentDelegate.getCurrentLinkId();
 	}
-
 	@Override
 	public final Id<Link> getDestinationLinkId() {
 		return basicAgentDelegate.getDestinationLinkId();
 	}
-
 	@Override
 	public final double getActivityEndTime() {
 		return basicAgentDelegate.getActivityEndTime();
 	}
-
 	@Override
 	public final State getState() {
 		return basicAgentDelegate.getState();
 	}
-
 	@Override
 	public final void notifyMoveOverNode(Id<Link> newLinkId) {
 		driverAgentDelegate.notifyMoveOverNode(newLinkId);
 	}
-
 	@Override
 	public final Id<Link> chooseNextLinkId() {
 		return driverAgentDelegate.chooseNextLinkId();
 	}
-
 	@Override
 	public final boolean isWantingToArriveOnCurrentLink() {
 		return driverAgentDelegate.isWantingToArriveOnCurrentLink();
 	}
-
 	@Override
 	public final boolean getExitAtStop(TransitStopFacility stop) {
 		return transitAgentDelegate.getExitAtStop(stop);
 	}
-
 	@Override
 	public final boolean getEnterTransitRoute(TransitLine line, TransitRoute transitRoute, List<TransitRouteStop> stopsToCome,
 			TransitVehicle transitVehicle) {
 		return transitAgentDelegate.getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle);
 	}
-
 	@Override
 	public final double getWeight() {
 		return transitAgentDelegate.getWeight();
 	}
-
 	@Override
 	public final Id<TransitStopFacility> getDesiredAccessStopId() {
 		return transitAgentDelegate.getDesiredAccessStopId();
 	}
-
 	@Override
 	public final Id<TransitStopFacility> getDesiredDestinationStopId() {
 		return transitAgentDelegate.getDesiredDestinationStopId();
