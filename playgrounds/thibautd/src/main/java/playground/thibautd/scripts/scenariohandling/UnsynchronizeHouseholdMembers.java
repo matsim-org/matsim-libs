@@ -31,7 +31,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
 
-import playground.thibautd.socnetsim.usage.JointScenarioUtils;
+import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 
 /**
  * @author thibautd

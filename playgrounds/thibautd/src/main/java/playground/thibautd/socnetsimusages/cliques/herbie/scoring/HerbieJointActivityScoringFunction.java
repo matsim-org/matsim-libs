@@ -44,7 +44,7 @@ import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.facilities.OpeningTime.DayType;
 
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 
 /**
  * @author thibautd

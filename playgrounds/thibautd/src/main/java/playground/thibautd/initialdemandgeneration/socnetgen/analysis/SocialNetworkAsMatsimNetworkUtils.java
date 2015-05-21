@@ -29,8 +29,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import playground.thibautd.socnetsim.framework.population.SocialNetwork;
-import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
 
 import java.util.Map;
 

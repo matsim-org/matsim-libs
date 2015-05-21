@@ -25,8 +25,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SnaUtils;
-import playground.thibautd.socnetsim.framework.population.SocialNetwork;
-import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
 
 /**
  * @author thibautd

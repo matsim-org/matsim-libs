@@ -29,8 +29,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import playground.thibautd.socnetsim.jointtrips.qsim.JointQSimFactory;
-import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.contrib.socnetsim.jointtrips.qsim.JointQSimFactory;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

@@ -34,7 +34,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
 import playground.thibautd.householdsfromcensus.CliquesWriter;
-import playground.thibautd.socnetsim.framework.cliques.Clique;
+import org.matsim.contrib.socnetsim.framework.cliques.Clique;
 
 /**
  * @author thibautd

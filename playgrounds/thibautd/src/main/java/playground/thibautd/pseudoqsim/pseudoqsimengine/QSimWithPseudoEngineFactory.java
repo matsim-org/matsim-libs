@@ -36,7 +36,7 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
-import playground.thibautd.socnetsim.qsim.NetsimWrappingQVehicleProvider;
+import org.matsim.contrib.socnetsim.qsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 
 /**

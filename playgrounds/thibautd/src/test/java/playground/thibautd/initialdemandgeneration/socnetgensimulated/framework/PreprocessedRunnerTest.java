@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.DeterministicPart;
 import playground.thibautd.initialdemandgeneration.socnetgensimulated.framework.TieUtility.NoErrorTerm;
-import playground.thibautd.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
 
 /**
  * @author thibautd

@@ -37,8 +37,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 import playground.ivt.utils.Filter;
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
-import playground.thibautd.socnetsimusages.analysis.ExtractTripModeSharesLocatedInArea;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 
 import java.io.BufferedWriter;
 import java.io.File;

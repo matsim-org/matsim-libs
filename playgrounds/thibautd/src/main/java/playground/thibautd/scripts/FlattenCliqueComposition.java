@@ -29,7 +29,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
-import playground.thibautd.socnetsim.framework.cliques.population.CliquesSchemaNames;
+import org.matsim.contrib.socnetsim.framework.cliques.population.CliquesSchemaNames;
 
 /**
  * flattens a clique file for easy usage from other tools.

@@ -37,7 +37,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.thibautd.hitchiking.HitchHikingConstants;
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 
 /**
  * @author thibautd

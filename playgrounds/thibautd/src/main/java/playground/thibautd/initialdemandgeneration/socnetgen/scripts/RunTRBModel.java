@@ -47,9 +47,9 @@ import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialNet
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.SocialPopulation;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.ThresholdFunction;
 import playground.thibautd.initialdemandgeneration.socnetgen.framework.UtilityFunction;
-import playground.thibautd.socnetsim.framework.population.SocialNetworkWriter;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 import playground.thibautd.utils.MoreIOUtils;
-import playground.thibautd.socnetsim.utils.ObjectPool;
+import org.matsim.contrib.socnetsim.utils.ObjectPool;
 
 /**
  * @author thibautd

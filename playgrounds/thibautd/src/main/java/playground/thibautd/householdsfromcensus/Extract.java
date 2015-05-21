@@ -25,7 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.thibautd.socnetsim.framework.cliques.Clique;
+import org.matsim.contrib.socnetsim.framework.cliques.Clique;
 
 /**
  * @author thibautd

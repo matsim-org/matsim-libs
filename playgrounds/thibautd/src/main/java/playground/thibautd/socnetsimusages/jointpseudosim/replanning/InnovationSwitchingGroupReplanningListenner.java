@@ -32,14 +32,14 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import playground.thibautd.socnetsim.framework.replanning.GroupStrategyManager;
-import playground.thibautd.socnetsim.framework.replanning.GroupStrategyRegistry;
-import playground.thibautd.socnetsim.framework.replanning.grouping.GroupIdentifier;
+import org.matsim.contrib.socnetsim.framework.replanning.GroupStrategyManager;
+import org.matsim.contrib.socnetsim.framework.replanning.GroupStrategyRegistry;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.GroupIdentifier;
 
 import com.google.inject.BindingAnnotation;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import playground.thibautd.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 
 /**
  * @author thibautd

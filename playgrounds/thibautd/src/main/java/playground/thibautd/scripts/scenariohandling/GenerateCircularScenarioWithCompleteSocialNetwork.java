@@ -54,10 +54,10 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
-import playground.thibautd.socnetsim.framework.population.SocialNetwork;
-import playground.thibautd.socnetsim.framework.population.SocialNetworkImpl;
-import playground.thibautd.socnetsim.framework.population.SocialNetworkWriter;
-import playground.thibautd.socnetsim.utils.CollectionUtils;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import playground.thibautd.utils.DesiresConverter;
 
 /**

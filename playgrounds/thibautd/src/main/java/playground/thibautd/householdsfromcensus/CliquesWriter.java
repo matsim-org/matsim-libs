@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import playground.thibautd.socnetsim.framework.cliques.Clique;
+import org.matsim.contrib.socnetsim.framework.cliques.Clique;
 
 /**
  * Writes clique pertenancy information to an XML file.

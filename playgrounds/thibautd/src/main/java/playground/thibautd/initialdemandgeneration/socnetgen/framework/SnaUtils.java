@@ -42,9 +42,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.socnetsim.framework.population.SocialNetwork;
-import playground.thibautd.socnetsim.framework.population.SocialNetworkImpl;
-import playground.thibautd.socnetsim.utils.CollectionUtils;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 
 /**
  * Provides methods to produce standard statistics for social networks

@@ -38,11 +38,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.thibautd.socnetsim.jointtrips.population.DriverRoute;
-import playground.thibautd.socnetsim.jointtrips.population.DriverRouteFactory;
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
-import playground.thibautd.socnetsim.jointtrips.population.PassengerRoute;
-import playground.thibautd.socnetsim.jointtrips.population.PassengerRouteFactory;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.DriverRouteFactory;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRoute;
+import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRouteFactory;
 
 /**
  * looks at co travelers with only one joint trip in a 3 acts plan, and computes the crow fly distance

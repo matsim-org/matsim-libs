@@ -51,7 +51,7 @@ import playground.thibautd.router.multimodal.AccessEgressMultimodalTripRouterFac
 import playground.thibautd.router.multimodal.AccessEgressNetworkBasedTeleportationRouteFactory;
 import playground.thibautd.router.multimodal.LinkSlopeScorer;
 import playground.thibautd.router.multimodal.SlopeAwareTravelDisutilityFactory;
-import playground.thibautd.socnetsim.utils.CollectionUtils;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 import eu.eunoiaproject.bikesharing.framework.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.framework.router.BikeSharingTripRouterFactory;
 import eu.eunoiaproject.bikesharing.framework.router.TransitMultiModalAccessRoutingModule.RoutingData;

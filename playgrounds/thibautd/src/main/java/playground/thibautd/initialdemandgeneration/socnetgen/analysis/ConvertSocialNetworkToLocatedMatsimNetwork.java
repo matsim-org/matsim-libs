@@ -31,9 +31,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
-import playground.thibautd.socnetsim.framework.population.SocialNetwork;
-import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
-import playground.thibautd.socnetsim.utils.ObjectPool;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
+import org.matsim.contrib.socnetsim.utils.ObjectPool;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -34,9 +34,9 @@ import playground.thibautd.pseudoqsim.ParkedVehicleProvider;
 import playground.thibautd.pseudoqsim.PopulationAgentSourceForTeleportedVehicles;
 import playground.thibautd.pseudoqsim.VehicularTeleportationEngine;
 import playground.thibautd.pseudoqsim.VehicularTeleportationEngine.VehicleBehavior;
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
-import playground.thibautd.socnetsim.jointtrips.qsim.JointModesDepartureHandler;
-import playground.thibautd.socnetsim.jointtrips.qsim.PassengerUnboardingAgentFactory;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.qsim.JointModesDepartureHandler;
+import org.matsim.contrib.socnetsim.jointtrips.qsim.PassengerUnboardingAgentFactory;
 
 import java.util.ArrayList;
 import java.util.List;

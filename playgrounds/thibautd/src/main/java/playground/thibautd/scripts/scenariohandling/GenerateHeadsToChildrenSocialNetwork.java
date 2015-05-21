@@ -37,9 +37,9 @@ import org.matsim.households.HouseholdsReaderV10;
 
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
-import playground.thibautd.socnetsim.framework.population.SocialNetwork;
-import playground.thibautd.socnetsim.framework.population.SocialNetworkImpl;
-import playground.thibautd.socnetsim.framework.population.SocialNetworkWriter;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkImpl;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkWriter;
 
 /**
  * Takes households, and generates a social network, where the children are alters

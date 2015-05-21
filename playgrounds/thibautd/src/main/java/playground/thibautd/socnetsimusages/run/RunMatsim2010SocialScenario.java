@@ -36,20 +36,20 @@ import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils.DilutionType;
-import playground.thibautd.socnetsim.framework.SocialNetworkConfigGroup;
-import playground.thibautd.socnetsim.framework.controller.JointDecisionProcessModule;
-import playground.thibautd.socnetsim.jointactivities.scoring.JointActivitiesScoringModule;
-import playground.thibautd.socnetsim.jointtrips.JointTripsModule;
-import playground.thibautd.socnetsim.framework.controller.SocialNetworkModule;
-import playground.thibautd.socnetsim.usage.analysis.SocnetsimDefaultAnalysisModule;
-import playground.thibautd.socnetsim.jointtrips.population.JointActingTypes;
-import playground.thibautd.socnetsim.framework.population.SocialNetwork;
-import playground.thibautd.socnetsim.framework.population.SocialNetworkReader;
-import playground.thibautd.socnetsim.usage.replanning.DefaultGroupStrategyRegistryModule;
-import playground.thibautd.socnetsim.run.RunUtils;
-import playground.thibautd.socnetsim.run.ScoringFunctionConfigGroup;
+import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
+import org.matsim.contrib.socnetsim.framework.controller.JointDecisionProcessModule;
+import org.matsim.contrib.socnetsim.jointactivities.scoring.JointActivitiesScoringModule;
+import org.matsim.contrib.socnetsim.jointtrips.JointTripsModule;
+import org.matsim.contrib.socnetsim.framework.controller.SocialNetworkModule;
+import org.matsim.contrib.socnetsim.usage.analysis.SocnetsimDefaultAnalysisModule;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetwork;
+import org.matsim.contrib.socnetsim.framework.population.SocialNetworkReader;
+import org.matsim.contrib.socnetsim.usage.replanning.DefaultGroupStrategyRegistryModule;
+import org.matsim.contrib.socnetsim.run.RunUtils;
+import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
 import playground.thibautd.socnetsimusages.scoring.KtiScoringFunctionFactoryWithJointModes;
-import playground.thibautd.socnetsim.usage.JointScenarioUtils;
+import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 
 /**
  * @author thibautd

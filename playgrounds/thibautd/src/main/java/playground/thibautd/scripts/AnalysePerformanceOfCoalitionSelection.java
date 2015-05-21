@@ -35,10 +35,10 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.socnetsim.framework.population.JointPlans;
-import playground.thibautd.socnetsim.framework.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
-import playground.thibautd.socnetsim.utils.CollectionUtils;
+import org.matsim.contrib.socnetsim.framework.population.JointPlans;
+import org.matsim.contrib.socnetsim.framework.replanning.grouping.ReplanningGroup;
+import org.matsim.contrib.socnetsim.framework.replanning.selectors.coalitionselector.CoalitionSelector;
+import org.matsim.contrib.socnetsim.utils.CollectionUtils;
 
 /**
  * @author thibautd

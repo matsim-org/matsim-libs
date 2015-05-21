@@ -43,7 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.householdsfromcensus.CliquesWriter;
-import playground.thibautd.socnetsim.framework.cliques.Clique;
+import org.matsim.contrib.socnetsim.framework.cliques.Clique;
 
 /**
  * @author thibautd

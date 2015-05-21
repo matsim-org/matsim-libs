@@ -28,8 +28,8 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.thibautd.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
-import playground.thibautd.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator.Setting;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator;
+import org.matsim.contrib.socnetsim.framework.replanning.modules.BlackListedTimeAllocationMutator.Setting;
 
 /**
  * @author thibautd
