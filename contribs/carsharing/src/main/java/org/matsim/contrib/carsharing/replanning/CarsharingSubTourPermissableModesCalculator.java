@@ -17,10 +17,11 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 	private final Scenario scenario;
 	private final List<String> availableModes;
 	private final List<String> availableModesWithoutCar;
+	
 	public CarsharingSubTourPermissableModesCalculator(final Scenario scenario, final String[] availableModes) {
 		this.scenario = scenario;
 		this.availableModes = Arrays.asList(availableModes);
-
+		
 		if ( this.availableModes.contains( TransportMode.car ) ) {
 			final List<String> l = new ArrayList<String>( this.availableModes );
 			while ( l.remove( TransportMode.car ) ) {}
@@ -34,6 +35,7 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 	@Override
 	public Collection<String> getPermissibleModes(Plan plan) {
 		final PersonImpl person;
+		List<String> l; 
 		try {
 			person = (PersonImpl) plan.getPerson();
 		}
@@ -44,17 +46,21 @@ public class CarsharingSubTourPermissableModesCalculator implements PermissibleM
 		final boolean carAvail =
 			!"no".equals( person.getLicense() ) &&
 			!"never".equals( person.getCarAvail() );
-		
+		if (carAvail)			 
+			  l = new ArrayList<String>( this.availableModes );
+		  else
+			  l = new ArrayList<String>( this.availableModesWithoutCar );
 		
 		 if (Boolean.parseBoolean(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
 		
 				 && Boolean.parseBoolean((String) scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), "RT_CARD"))) {
-		
-			 availableModes.add("twowaycarsharing");
-			 availableModesWithoutCar.add("twowaycarsharing");
+			 
+			 
+			 l.add("twowaycarsharing");
+			 
 		 }
 		
-		return carAvail ? availableModes : availableModesWithoutCar;
+		return l;
 	}
 
 }
