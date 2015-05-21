@@ -22,6 +22,7 @@ package org.matsim.contrib.socnetsim.framework.replanning.selectors;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,6 +38,7 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.FullyExplored
 /**
  * @author thibautd
  */
+@Ignore( "expensive")
 public class FullExplorationVsCuttoffTest {
 	private static final Logger log =
 		Logger.getLogger(FullExplorationVsCuttoffTest.class);
