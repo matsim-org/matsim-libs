@@ -280,6 +280,9 @@ class TestEquilnet {
 		final MATSimDecisionVariableSetEvaluator<RoadInvestmentState, RoadInvestmentDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadInvestmentState, RoadInvestmentDecisionVariable>(
 				decisionVariables, objectiveFunction, simulatedNoiseVariance,
 				g2max, stateFactory);
+		predictor.setStartTime_s(5 * 60 * 60);
+		predictor.setBinSize_s(15 * 60);
+		predictor.setBinCnt(4 * 4);
 		controler.addControlerListener(predictor);
 		controler.run();
 
