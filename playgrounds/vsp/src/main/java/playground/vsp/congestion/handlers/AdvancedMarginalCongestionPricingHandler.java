@@ -40,8 +40,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.utils.misc.Time;
 
 import playground.vsp.congestion.events.CongestionEvent;
 
@@ -65,9 +65,10 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	private double amountSum = 0.;
 	
 	private List<CongestionEvent> congestionEventsToProcess = new ArrayList<CongestionEvent>();
-	private Map<Id<Person>, Double> personId2activityStartTime = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> personId2currentActivityStartTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, Double> personId2firstActivityEndTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, String> personId2currentActivityType = new HashMap<Id<Person>, String>();
+	private Map<Id<Person>, String> personId2firstActivityType = new HashMap<Id<Person>, String>();
 
 	public AdvancedMarginalCongestionPricingHandler(EventsManager eventsManager, Scenario scenario) {
 		this.events = eventsManager;
@@ -81,36 +82,28 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	@Override
 	public void reset(int iteration) {
 		this.amountSum = 0.;
-		this.personId2activityStartTime.clear();
+		this.personId2currentActivityStartTime.clear();
 		this.congestionEventsToProcess.clear();
 		this.personId2firstActivityEndTime.clear();
 		this.personId2currentActivityType.clear();
+		this.personId2firstActivityType.clear();
 	}
 
 	@Override
 	public void handleEvent(CongestionEvent event) {
-		congestionEventsToProcess.add(event);
-//		System.out.println("***");
-//		System.out.println("Updated congestion events to process (after adding): ");
-//		for (CongestionEvent congestionEvent : this.congestionEventsToProcess) {
-//			System.out.println(congestionEvent.toString());
-//		}
-//		System.out.println("***");
-		
+		congestionEventsToProcess.add(event);		
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		System.out.println(event.getActType());
-		if (this.personId2activityStartTime.containsKey(event.getPersonId())) {
+		if (this.personId2currentActivityStartTime.containsKey(event.getPersonId())) {
 			// not the first activity
-//			System.out.println("not the first activity");
-			processCongestionEvents(event.getPersonId(), this.personId2activityStartTime.get(event.getPersonId()), event.getTime(), event.getLinkId());
+			processCongestionEvents(event.getPersonId(), this.personId2currentActivityStartTime.get(event.getPersonId()), event.getTime(), event.getLinkId());
 			removeProcessedCongestionEvents(event.getPersonId());
 		} else {
 			// the first activity
-//			System.out.println("first activity");
 			this.personId2firstActivityEndTime.put(event.getPersonId(), event.getTime());
+			this.personId2firstActivityType.put(event.getPersonId(), event.getActType());
 		}
 	}
 
@@ -121,23 +114,17 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		        iterator.remove();
 		    }
 		}
-//		System.out.println("***");
-//		System.out.println("Updated congestion events to process (after removing): ");
-//		for (CongestionEvent congestionEvent : this.congestionEventsToProcess) {
-//			System.out.println(congestionEvent.toString());
-//		}
-//		System.out.println("***");
 	}
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		this.personId2activityStartTime.put(event.getPersonId(), event.getTime());
+		this.personId2currentActivityStartTime.put(event.getPersonId(), event.getTime());
 		this.personId2currentActivityType.put(event.getPersonId(), event.getActType());
 	}
 	
 	public void processFinalCongestionEvents() {
-		for (CongestionEvent congestionEvent : this.congestionEventsToProcess) {
-			processCongestionEvents(congestionEvent.getAffectedAgentId(), this.personId2activityStartTime.get(congestionEvent.getAffectedAgentId()), this.personId2firstActivityEndTime.get(congestionEvent.getAffectedAgentId()), null);
+		for (CongestionEvent congestionEvent : this.congestionEventsToProcess) {			
+			processCongestionEvents(congestionEvent.getAffectedAgentId(), this.personId2currentActivityStartTime.get(congestionEvent.getAffectedAgentId()), Time.UNDEFINED_TIME, null);
 		}
 	}
 	
@@ -155,11 +142,27 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			
 			// calculate the agent's activity delay disutility: activityScore(arrivalTime_ohneDelay) - activityScore(arrivalTime_withDelay)
 			MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction();
-			marginaSumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
-			ActivityImpl activity = new ActivityImpl(this.personId2currentActivityType.get(personId), linkId);
-			activity.setStartTime(this.personId2activityStartTime.get(personId));
-			activity.setEndTime(activityEndTime);	
-			double activityDelayDisutility = marginaSumScoringFunction.getActivityDelayDisutility(activity, totalDelayThisPerson);
+			
+			double activityDelayDisutility = 0.;
+			if (activityEndTime == Time.UNDEFINED_TIME) {
+				// the last activity, now the overnight activity can be handled
+				
+				ActivityImpl activityMorning = new ActivityImpl(this.personId2firstActivityType.get(personId), linkId);
+				activityMorning.setEndTime(this.personId2firstActivityEndTime.get(personId));
+				
+				ActivityImpl activityEvening = new ActivityImpl(this.personId2currentActivityType.get(personId), linkId);
+				activityEvening.setStartTime(this.personId2currentActivityStartTime.get(personId));
+				
+				activityDelayDisutility = marginaSumScoringFunction.getOvernightActivityDelayDisutility(params, activityMorning, activityEvening, totalDelayThisPerson);
+				
+			} else {
+				// a normal activity 
+				
+				ActivityImpl activity = new ActivityImpl(this.personId2currentActivityType.get(personId), linkId);
+				activity.setStartTime(this.personId2currentActivityStartTime.get(personId));
+				activity.setEndTime(activityEndTime);	
+				activityDelayDisutility = marginaSumScoringFunction.getNormalActivityDelayDisutility(params, activity, totalDelayThisPerson);
+			}
 			
 			// calculate the agent's trip delay disutility (could be done similar to the activity delay disutility)
 			double tripDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
