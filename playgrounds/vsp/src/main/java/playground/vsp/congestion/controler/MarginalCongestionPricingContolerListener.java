@@ -71,7 +71,7 @@ public class MarginalCongestionPricingContolerListener implements StartupListene
 		EventsManager eventsManager = event.getControler().getEvents();
 		
 		this.pricingHandler = new MarginalCongestionPricingHandler(eventsManager, this.scenario);
-		this.extCostHandler = new CongestionAnalysisEventHandler(this.scenario, true);
+		this.extCostHandler = new CongestionAnalysisEventHandler(this.scenario, false);
 		
 		eventsManager.addHandler(this.congestionHandler);
 		eventsManager.addHandler(this.pricingHandler);
