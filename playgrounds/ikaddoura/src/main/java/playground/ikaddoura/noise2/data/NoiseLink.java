@@ -43,6 +43,14 @@ public class NoiseLink {
 	private int carAgents = 0; // carAgents x scaleFactor = cars
 	private int hgvAgents = 0; // hgvAgents x scaleFactor = hgv
 	private double emission = 0.;
+	
+	private double marginalEmissionCar = 0.;
+	private double marginalEmissionHgv = 0.;
+	private double marginalImmissionCar = 0.;
+	private double marginalImmissionHgv = 0.;
+	private double marginalDamageCostCar = 0.;
+	private double marginalDamageCostHgv = 0.;
+	
 	private double damageCost = 0.; 
 	private double damageCostPerCar = 0.; 
 	private double damageCostPerHgv = 0.; 
@@ -94,6 +102,42 @@ public class NoiseLink {
 	}
 	public void setEmission(double emission) {
 		this.emission = emission;
+	}
+	public double getMarginalEmissionCar() {
+		return marginalEmissionCar;
+	}
+	public void setMarginalEmissionCar(double marginalEmissionCar) {
+		this.marginalEmissionCar = marginalEmissionCar;
+	}
+	public double getMarginalEmissionHgv() {
+		return marginalEmissionHgv;
+	}
+	public void setMarginalEmissionHgv(double marginalEmissionHgv) {
+		this.marginalEmissionHgv = marginalEmissionHgv;
+	}
+	public double getMarginalImmissionCar() {
+		return marginalImmissionCar;
+	}
+	public void setMarginalImmissionCar(double marginalImmissionCar) {
+		this.marginalImmissionCar = marginalImmissionCar;
+	}
+	public double getMarginalImmissionHgv() {
+		return marginalImmissionHgv;
+	}
+	public void setMarginalImmissionHgv(double marginalImmissionHgv) {
+		this.marginalImmissionHgv = marginalImmissionHgv;
+	}
+	public double getMarginalDamageCostCar() {
+		return marginalDamageCostCar;
+	}
+	public void setMarginalDamageCostCar(double marginalDamageCostCar) {
+		this.marginalDamageCostCar = marginalDamageCostCar;
+	}
+	public double getMarginalDamageCostHgv() {
+		return marginalDamageCostHgv;
+	}
+	public void setMarginalDamageCostHgv(double marginalDamageCostHgv) {
+		this.marginalDamageCostHgv = marginalDamageCostHgv;
 	}
 	
 }

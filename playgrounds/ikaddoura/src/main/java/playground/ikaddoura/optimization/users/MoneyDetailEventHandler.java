@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author Ihab
@@ -40,13 +41,13 @@ import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
  */
 public class MoneyDetailEventHandler implements PersonMoneyEventHandler, ActivityEndEventHandler {
 	
-	List<Id> personIDsSecondTrip = new ArrayList<Id>();
+	List<Id<Person>> personIDsSecondTrip = new ArrayList<Id<Person>>();
 	
-	Map<Id, Double> personId2fareFirstTrip = new HashMap<Id, Double>();
-	Map<Id, Double> personId2fareSecondTrip = new HashMap<Id, Double>();
+	Map<Id<Person>, Double> personId2fareFirstTrip = new HashMap<Id<Person>, Double>();
+	Map<Id<Person>, Double> personId2fareSecondTrip = new HashMap<Id<Person>, Double>();
 	
-	Map<Id, Double> personId2firstTripDepartureTime = new HashMap<Id, Double>();
-	Map<Id, Double> personId2secondTripDepartureTime = new HashMap<Id, Double>();
+	Map<Id<Person>, Double> personId2firstTripDepartureTime = new HashMap<Id<Person>, Double>();
+	Map<Id<Person>, Double> personId2secondTripDepartureTime = new HashMap<Id<Person>, Double>();
 	
 	@Override
 	public void reset(int iteration) {
@@ -93,7 +94,7 @@ public class MoneyDetailEventHandler implements PersonMoneyEventHandler, Activit
 		}
 			
 		for (Double time : tripDepTime2fares.keySet()){
-			for (Id personId : this.personId2firstTripDepartureTime.keySet()){
+			for (Id<Person> personId : this.personId2firstTripDepartureTime.keySet()){
 				if (this.personId2firstTripDepartureTime.get(personId) < time && this.personId2firstTripDepartureTime.get(personId) >= (time - periodLength)) {
 					if (tripDepTime2fares.containsKey(time)){
 						tripDepTime2fares.get(time).add(this.personId2fareFirstTrip.get(personId));
@@ -101,7 +102,7 @@ public class MoneyDetailEventHandler implements PersonMoneyEventHandler, Activit
 				}
 			}
 			
-			for (Id personId : this.personId2secondTripDepartureTime.keySet()){
+			for (Id<Person> personId : this.personId2secondTripDepartureTime.keySet()){
 				if (this.personId2secondTripDepartureTime.get(personId) < time && this.personId2secondTripDepartureTime.get(personId) >= (time - periodLength)) {
 					if (tripDepTime2fares.containsKey(time)){
 						tripDepTime2fares.get(time).add(this.personId2fareSecondTrip.get(personId));
@@ -144,11 +145,11 @@ public class MoneyDetailEventHandler implements PersonMoneyEventHandler, Activit
 		}
 	}
 
-	public Map<Id, Double> getPersonId2fareFirstTrip() {
+	public Map<Id<Person>, Double> getPersonId2fareFirstTrip() {
 		return personId2fareFirstTrip;
 	}
 
-	public Map<Id, Double> getPersonId2fareSecondTrip() {
+	public Map<Id<Person>, Double> getPersonId2fareSecondTrip() {
 		return personId2fareSecondTrip;
 	}
 	

@@ -29,6 +29,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -128,11 +129,11 @@ public class OperatorUserAnalysis {
 		return this.moneyDetailHandler.getAvgFarePerTripDepartureTime();
 	}
 
-	public Map<Id, Double> getFirstTripFares() {
+	public Map<Id<Person>, Double> getFirstTripFares() {
 		return this.moneyDetailHandler.getPersonId2fareFirstTrip();
 	}
 	
-	public Map<Id, Double> getSecondTripFares() {
+	public Map<Id<Person>, Double> getSecondTripFares() {
 		return this.moneyDetailHandler.getPersonId2fareSecondTrip();
 	}
 }

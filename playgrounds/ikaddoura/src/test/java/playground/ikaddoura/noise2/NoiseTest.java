@@ -155,9 +155,7 @@ public class NoiseTest {
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.run();
 		
 		// run the noise analysis for the final iteration (offline)

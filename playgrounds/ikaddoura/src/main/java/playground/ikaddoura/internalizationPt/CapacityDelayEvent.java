@@ -26,6 +26,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Event to indicate that an agent who is in a public vehicle delayed another passenger who could not board the public vehicle.
@@ -39,12 +41,12 @@ public final class CapacityDelayEvent extends Event {
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 	public static final String ATTRIBUTE_DELAY = "delay";
 
-	private final Id causingAgentId;
-	private final Id affectedAgentId;
-	private final Id vehicleId;
+	private final Id<Person> causingAgentId;
+	private final Id<Person> affectedAgentId;
+	private final Id<Vehicle> vehicleId;
 	private final double delay;
 
-	public CapacityDelayEvent(double time, Id causingAgentId, Id affectedAgentId, Id vehicleId, double delay) {
+	public CapacityDelayEvent(double time, Id<Person> causingAgentId, Id<Person> affectedAgentId, Id<Vehicle> vehicleId, double delay) {
 		super(time);
 		this.causingAgentId = causingAgentId;
 		this.affectedAgentId = affectedAgentId;
@@ -52,7 +54,7 @@ public final class CapacityDelayEvent extends Event {
 		this.delay = delay;
 	}
 	
-	public Id getVehicleId() {
+	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
 
@@ -75,11 +77,11 @@ public final class CapacityDelayEvent extends Event {
 		return attrs;
 	}
 
-	public Id getCausingAgentId() {
+	public Id<Person> getCausingAgentId() {
 		return causingAgentId;
 	}
 
-	public Id getAffectedAgentId() {
+	public Id<Person> getAffectedAgentId() {
 		return affectedAgentId;
 	}
 

@@ -32,7 +32,9 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author Ihab
@@ -42,8 +44,8 @@ public class ConstantFareHandler implements PersonEntersVehicleEventHandler, Tra
 
 	private final EventsManager events;
 	private final double fare;
-	private final List<Id> ptDriverIDs = new ArrayList<Id>();
-	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
+	private final List<Id<Person>> ptDriverIDs = new ArrayList<>();
+	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<>();
 
 	public ConstantFareHandler(EventsManager events, double fare) {
 		this.events = events;
@@ -52,8 +54,8 @@ public class ConstantFareHandler implements PersonEntersVehicleEventHandler, Tra
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id personId = event.getPersonId();
-		Id vehId = event.getVehicleId();
+		Id<Person> personId = event.getPersonId();
+		Id<Vehicle> vehId = event.getVehicleId();
 		if (!ptDriverIDs.contains(personId) && ptVehicleIDs.contains(vehId)){
 			double fareForTrip = calculateFare(event);
 			if (fareForTrip == 0.){

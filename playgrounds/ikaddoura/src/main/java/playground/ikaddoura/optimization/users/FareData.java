@@ -23,6 +23,7 @@
 package playground.ikaddoura.optimization.users;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * Simply collects the information when which amount had to be paid while boarding and alighting.
@@ -34,7 +35,7 @@ public class FareData {
 	
 	private double time;
 	private double amount;
-	private Id personId;
+	private Id<Person> personId;
 	
 	public double getTime() {
 		return time;
@@ -48,10 +49,10 @@ public class FareData {
 	public void setAmount(double amount) {
 		this.amount = amount;
 	}
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return personId;
 	}
-	public void setPersonId(Id personId) {
+	public void setPersonId(Id<Person> personId) {
 		this.personId = personId;
 	}
 }

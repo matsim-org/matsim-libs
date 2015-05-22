@@ -38,6 +38,8 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author ikaddoura
@@ -48,12 +50,12 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 	private double vehicleKm;
 	private double operatingHours_excludingSlackTimes;
 	
-	private Map<Id, Double> ptDriverId2firstDepartureTime = new HashMap<Id, Double>();
-	private Map<Id, Double> ptDriverId2lastArrivalTime = new HashMap<Id, Double>();
-	private Map<Id, Double> ptDriverId2lastRouteStartTime = new HashMap<Id, Double>();
+	private Map<Id<Person>, Double> ptDriverId2firstDepartureTime = new HashMap<>();
+	private Map<Id<Person>, Double> ptDriverId2lastArrivalTime = new HashMap<>();
+	private Map<Id<Person>, Double> ptDriverId2lastRouteStartTime = new HashMap<>();
 	
-	private final List<Id> ptDriverIDs = new ArrayList<Id>();
-	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
+	private final List<Id<Person>> ptDriverIDs = new ArrayList<>();
+	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<>();
 	
 	public OperatorCostHandler(Network network) {
 		this.network = network;
@@ -91,7 +93,7 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 		}
 	}
 	
-	public List<Id> getVehicleIDs() {
+	public List<Id<Vehicle>> getVehicleIDs() {
 		return this.ptVehicleIDs;
 	}
 	
@@ -145,7 +147,7 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 	
 	public double getVehicleHours_includingSlackTimes() {
 		double vehicleSeconds = 0.;
-		for (Id id : this.ptDriverId2firstDepartureTime.keySet()){
+		for (Id<Person> id : this.ptDriverId2firstDepartureTime.keySet()){
 			vehicleSeconds = vehicleSeconds + ((this.ptDriverId2lastArrivalTime.get(id) - this.ptDriverId2firstDepartureTime.get(id)));
 		}
 		return vehicleSeconds / 3600.0;

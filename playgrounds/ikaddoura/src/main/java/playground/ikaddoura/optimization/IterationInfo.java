@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.ikaddoura.optimization.users.FareData;
 
@@ -68,7 +69,7 @@ public class IterationInfo {
 	
 	private double averageFarePerAgent;
 	
-	private Map <Id, List<Double>> personId2waitingTimes = new HashMap<Id, List<Double>>();
+	private Map <Id<Person>, List<Double>> personId2waitingTimes = new HashMap<Id<Person>, List<Double>>();
 	
 	public List <Double> getWaitingTimes() {
 		return waitingTimes;
@@ -250,11 +251,11 @@ public class IterationInfo {
 		return noValidPlanScore;
 	}
 
-	public void setPersonId2waitingTimes(Map <Id, List<Double>> personId2waitingTimes) {
+	public void setPersonId2waitingTimes(Map <Id<Person>, List<Double>> personId2waitingTimes) {
 		this.personId2waitingTimes = personId2waitingTimes;
 	}
 
-	public Map <Id, List<Double>> getPersonId2waitingTimes() {
+	public Map <Id<Person>, List<Double>> getPersonId2waitingTimes() {
 		return personId2waitingTimes;
 	}
 

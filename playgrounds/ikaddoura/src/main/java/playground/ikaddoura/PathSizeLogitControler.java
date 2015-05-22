@@ -72,9 +72,7 @@ public class PathSizeLogitControler {
 		
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.getConfig().controler().setCreateGraphs(false);
 
         if (pathSizeLogit){

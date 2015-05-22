@@ -26,7 +26,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Event to indicate that an agent entering or leaving a public vehicle delayed passengers waiting for that public vehicle.
@@ -40,12 +41,12 @@ public final class TransferDelayWaitingEvent extends Event {
 	public static final String ATTRIBUTE_AFFECTED_AGENTS = "numberOfAffectedAgents";
 	public static final String ATTRIBUTE_DELAY = "delay";
 	
-	private final Id vehicleId;
-	private final Id personId;
+	private final Id<Vehicle> vehicleId;
+	private final Id<Person> personId;
 	private final double affectedAgentUnits;
 	private final double delay;
 
-	public TransferDelayWaitingEvent(Id personId, Id vehicleId, double time, double delayedPassengers, double externalDelay) {
+	public TransferDelayWaitingEvent(Id<Person> personId, Id<Vehicle> vehicleId, double time, double delayedPassengers, double externalDelay) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.personId = personId;
@@ -53,11 +54,11 @@ public final class TransferDelayWaitingEvent extends Event {
 		this.delay = externalDelay;
 	}
 
-	public Id getCausingAgent() {
+	public Id<Person> getCausingAgent() {
 		return this.personId;
 	}
 	
-	public Id getVehicleId() {
+	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
 

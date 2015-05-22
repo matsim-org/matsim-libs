@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author Ihab
@@ -45,8 +46,8 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 
 	private final static Logger log = Logger.getLogger(CarCongestionHandler.class);
 	private final Network network;
-	private Map<Id, Double> personId2enteringTime = new HashMap<Id, Double>();
-	private Map<Id, Double> personId2t0MinusTAkt = new HashMap<Id, Double>();
+	private Map<Id<Person>, Double> personId2enteringTime = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> personId2t0MinusTAkt = new HashMap<Id<Person>, Double>();
 	
 	public CarCongestionHandler(Network network) {
 		this.network = network;

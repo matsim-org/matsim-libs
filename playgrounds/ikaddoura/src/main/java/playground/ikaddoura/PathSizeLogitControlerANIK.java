@@ -75,9 +75,7 @@ public class PathSizeLogitControlerANIK {
 		
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.getConfig().controler().setCreateGraphs(false);
         final Network network = controler.getScenario().getNetwork();
 		

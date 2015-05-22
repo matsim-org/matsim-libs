@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author Ihab
@@ -49,10 +50,10 @@ public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, Link
 
 	private final static Logger log = Logger.getLogger(CarCongestionHandlerAdvanced.class);
 	private final Network network;
-	private Map<Id, Double> personId2enteringTime = new HashMap<Id, Double>();
-	private Map<Id, Double> personId2t0MinusTAkt = new HashMap<Id, Double>();
-	private Map<Id, Double> personId2t0 = new HashMap<Id, Double>();
-	private Map<Id, Double> personId2tAct = new HashMap<Id, Double>();
+	private Map<Id<Person>, Double> personId2enteringTime = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> personId2t0MinusTAkt = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> personId2t0 = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, Double> personId2tAct = new HashMap<Id<Person>, Double>();
 	private List<Double> t0minusTActDividedByT0 = new ArrayList<Double>();
 
 	

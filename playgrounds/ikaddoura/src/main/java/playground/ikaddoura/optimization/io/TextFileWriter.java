@@ -11,11 +11,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Time;
 
 import playground.ikaddoura.optimization.IterationInfo;
 import playground.ikaddoura.optimization.users.FareData;
-
 
 /**
  * @author Ihab
@@ -211,7 +211,7 @@ public class TextFileWriter {
 		bw.write(zeile1);
 		bw.newLine();
 		
-		for (Id personId : extIt2information.get(extItParam1).getPersonId2waitingTimes().keySet()){
+		for (Id<Person> personId : extIt2information.get(extItParam1).getPersonId2waitingTimes().keySet()){
 		    
 			List<Double> waitingTimes = extIt2information.get(extItParam1).getPersonId2waitingTimes().get(personId);
 
@@ -288,7 +288,7 @@ public class TextFileWriter {
 		
 	}
 
-	public void writeTripFarePerId(String outputPath, Map<Id, Double> firstTripFares, Map<Id, Double> secondTripFares) {
+	public void writeTripFarePerId(String outputPath, Map<Id<Person>, Double> firstTripFares, Map<Id<Person>, Double> secondTripFares) {
 	
 		File file = new File(outputPath + "/personId2tripFares.csv");
 		   
@@ -301,7 +301,7 @@ public class TextFileWriter {
 	    bw.write(zeile1);
 	    bw.newLine();
 	
-	    for (Id id : firstTripFares.keySet()){
+	    for (Id<Person> id : firstTripFares.keySet()){
 	    	
 	    	String zeile = id + ";" + firstTripFares.get(id) + ";" + secondTripFares.get(id);
 	

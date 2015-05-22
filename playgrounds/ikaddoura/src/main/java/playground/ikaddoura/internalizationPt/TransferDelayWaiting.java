@@ -23,6 +23,8 @@
 package playground.ikaddoura.internalizationPt;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Collects the information of the external waiting delay effect for each person.
@@ -35,9 +37,9 @@ import org.matsim.api.core.v01.Id;
  */
 public class TransferDelayWaiting {
 	
-	private Id personId;
+	private Id<Person> personId;
 	private double affectedAgents;
-	private Id affectedVehicle;
+	private Id<Vehicle> affectedVehicle;
 	private double transferDelay;
 	
 	public double getTransferDelay() {
@@ -46,10 +48,10 @@ public class TransferDelayWaiting {
 	public void setDelay(double transferDelay) {
 		this.transferDelay = transferDelay;
 	}
-	public Id getAffectedVehicle() {
+	public Id<Vehicle> getAffectedVehicle() {
 		return affectedVehicle;
 	}
-	public void setAffectedVehicle(Id affectedVehicle) {
+	public void setAffectedVehicle(Id<Vehicle> affectedVehicle) {
 		this.affectedVehicle = affectedVehicle;
 	}
 	public double getAffectedAgents() {
@@ -58,10 +60,10 @@ public class TransferDelayWaiting {
 	public void setAffectedAgents(double d) {
 		this.affectedAgents = d;
 	}
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return personId;
 	}
-	public void setPersonId(Id personId) {
+	public void setPersonId(Id<Person> personId) {
 		this.personId = personId;
 	}
 	

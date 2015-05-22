@@ -31,6 +31,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 
 /**
@@ -41,7 +42,7 @@ public class MoneyEventHandler implements PersonMoneyEventHandler {
 
 	private double revenues;
 	private List<FareData> fareDataList = new ArrayList<FareData>();
-	private Map<Id, List<Double>> person2amounts = new HashMap<Id, List<Double>>();
+	private Map<Id<Person>, List<Double>> person2amounts = new HashMap<>();
 	
 	@Override
 	public void reset(int iteration) {
@@ -86,7 +87,7 @@ public class MoneyEventHandler implements PersonMoneyEventHandler {
 		
 		double averageAmountSum = 0.;
 		int personCounter = 0;
-		for (Id personId : this.person2amounts.keySet()){			
+		for (Id<Person> personId : this.person2amounts.keySet()){			
 			double amountSum = 0.;
 			int counter = 0;
 			for (Double amount : this.person2amounts.get(personId)){

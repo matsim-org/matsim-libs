@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -45,6 +46,7 @@ import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHan
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -71,26 +73,26 @@ import org.matsim.core.scenario.ScenarioImpl;
  *
  */
 public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, AgentWaitingForPtEventHandler {
-	private final static Logger log = Logger.getLogger(TransferDelayWaitingHandler.class);
+//	private final static Logger log = Logger.getLogger(TransferDelayWaitingHandler.class);
 
 	// extra delay for a bus before and after agents are entering or leaving a public vehicle
 	// currently there is an extra delay of 1 sec before and 1 sec after agents are entering or leaving
 	private final double doorOpeningTime = 1.0;
 	private final double doorClosingTime = 1.0;
-	private final Map<Id, List<Id>> vehId2agentsTransferingAtThisStop = new HashMap<Id, List<Id>>();
+	private final Map<Id<Vehicle>, List<Id<Person>>> vehId2agentsTransferingAtThisStop = new HashMap<>();
 	
 	private final ScenarioImpl scenario;
 	private final EventsManager events;
-	private final List<Id> ptDriverIDs = new ArrayList<Id>();
-	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
+	private final List<Id<Person>> ptDriverIDs = new ArrayList<>();
+	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<>();
 		
 	private final List<TransferDelayWaiting> boardingDelayEffects = new ArrayList<TransferDelayWaiting>();
 	private final List<TransferDelayWaiting> alightingDelayEffects = new ArrayList<TransferDelayWaiting>();
 	private final List<TransferDelayWaiting> extraDelayEffects = new ArrayList<TransferDelayWaiting>();
 	
-	private final Map<Id, Double> personId2startWaitingForPt = new HashMap<Id, Double>();
-	private final Map<Id, Double> vehicleId2delay = new HashMap<Id, Double>();
-	private final Map<Id, Boolean> vehicleId2isFirstTransfer = new HashMap<Id, Boolean>();
+	private final Map<Id<Person>, Double> personId2startWaitingForPt = new HashMap<>();
+	private final Map<Id<Vehicle>, Double> vehicleId2delay = new HashMap<>();
+	private final Map<Id<Vehicle>, Boolean> vehicleId2isFirstTransfer = new HashMap<>();
 
 	public TransferDelayWaitingHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -189,9 +191,9 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 			}
 						
 			// remember who was boarding and alighting at this stop.
-			List<Id> agentsTransferingAtThisStop;
+			List<Id<Person>> agentsTransferingAtThisStop;
 			if (this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null){
-				agentsTransferingAtThisStop = new ArrayList<Id>();
+				agentsTransferingAtThisStop = new ArrayList<>();
 			} else {
 				// TODO: AddAll
 				agentsTransferingAtThisStop = this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId());
@@ -270,9 +272,9 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 			}
 						
 			// remember who was boarding and alighting at this stop.
-			List<Id> agentsTransferingAtThisStop;
+			List<Id<Person>> agentsTransferingAtThisStop;
 			if (this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null){
-				agentsTransferingAtThisStop = new ArrayList<Id>();
+				agentsTransferingAtThisStop = new ArrayList<>();
 			} else {
 				// TODO: AddAll
 				agentsTransferingAtThisStop = this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId());
@@ -295,7 +297,7 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 		}
 	}
 	
-	private TransferDelayWaiting startTrackingDelayEffect(Id vehicleId, Id personId, double delay) {
+	private TransferDelayWaiting startTrackingDelayEffect(Id<Vehicle> vehicleId, Id<Person> personId, double delay) {
 		
 		TransferDelayWaiting delayEffect = new TransferDelayWaiting();
 		delayEffect.setPersonId(personId);
@@ -320,11 +322,11 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 		// start tracking the extra delays for "opening" and "closing" the doors
 		if (!(this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null)){
 
-			List<Id> agentsTransferingAtThisStop = this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId());
+			List<Id<Person>> agentsTransferingAtThisStop = this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId());
 			if (!(agentsTransferingAtThisStop.size() == 0)){
 				double delayPerPerson = (this.doorClosingTime + this.doorOpeningTime) / agentsTransferingAtThisStop.size();
 				
-				for (Id personId : agentsTransferingAtThisStop){
+				for (Id<Person> personId : agentsTransferingAtThisStop){
 					// start tracking for each person
 					TransferDelayWaiting delayEffect = startTrackingDelayEffect(event.getVehicleId(), personId, delayPerPerson);
 					this.extraDelayEffects.add(delayEffect);	

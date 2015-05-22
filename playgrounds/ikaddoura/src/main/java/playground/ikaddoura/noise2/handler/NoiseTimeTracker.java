@@ -474,7 +474,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			for(Id<Link> linkId : rp.getLinkId2distanceCorrection().keySet()) {
 				if (this.noiseContext.getNoiseParams().getTunnelLinkIDs().contains(linkId)) {
 					linkId2isolatedImmission.put(linkId, 0.);
-			 			
+								 			
 			 	} else {
 				
 			 		double noiseImmission = 0.;
@@ -514,6 +514,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			double vHdv = vCar;
 			
 			double noiseEmission = 0.;
+			double marginalEmissionCar = 0.;
+			double marginalEmissionHgv = 0.;
 
 			int n_car = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
@@ -525,10 +527,16 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				n_hgv = this.noiseContext.getNoiseLinks().get(linkId).getHgvAgents();
 			}
 			int n = n_car + n_hgv;
+			int nPlusOneCar = (n_car + 1) + n_hgv;
+			int nPlusOneHgv = n_car + (n_hgv + 1);
+			
 			double p = 0.;
-				
+			double pPlusOneCar = 0.;
+			double pPlusOneHgv = 0.;
 			if(!(n == 0)) {
 				p = n_hgv / ((double) n);
+				pPlusOneCar = n_hgv / ((double) nPlusOneCar);
+				pPlusOneHgv = nPlusOneHgv / ((double) n);
 			}
 				
 			if(!(n == 0)) {
@@ -542,14 +550,30 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
 				double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, p);
 				noiseEmission = mittelungspegel + Dv;	
+				
+				double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm(nPlusOneCar, pPlusOneCar);
+				double DvPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, pPlusOneCar);
+				double noiseEmissionPlusOneCar = mittelungspegelPlusOneCar + DvPlusOneCar;
+				
+				double mittelungspegelPlusOneHgv = NoiseEquations.calculateMittelungspegelLm(nPlusOneHgv, pPlusOneHgv);
+				double DvPlusOneHgv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, pPlusOneHgv);
+				double noiseEmissionPlusOneHgv = mittelungspegelPlusOneHgv + DvPlusOneHgv;
+				
+				marginalEmissionCar = noiseEmissionPlusOneCar - noiseEmission;
+				marginalEmissionHgv = noiseEmissionPlusOneHgv - noiseEmission;
+				
 			}
 			
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
-				this.noiseContext.getNoiseLinks().get(linkId).setEmission(noiseEmission);		
+				this.noiseContext.getNoiseLinks().get(linkId).setEmission(noiseEmission);
+				this.noiseContext.getNoiseLinks().get(linkId).setMarginalEmissionCar(marginalEmissionCar);
+				this.noiseContext.getNoiseLinks().get(linkId).setMarginalEmissionHgv(marginalEmissionHgv);
+
 			} else {
-				// also saving zero emissions
 				NoiseLink noiseLink = new NoiseLink(linkId);
 				noiseLink.setEmission(noiseEmission);
+				noiseLink.setMarginalEmissionCar(marginalEmissionCar);
+				noiseLink.setMarginalEmissionHgv(marginalEmissionHgv);
 				this.noiseContext.getNoiseLinks().put(linkId, noiseLink );
 			}
 		}

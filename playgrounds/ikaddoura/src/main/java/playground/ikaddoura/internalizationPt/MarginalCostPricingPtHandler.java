@@ -41,7 +41,7 @@ public class MarginalCostPricingPtHandler implements TransferDelayInVehicleEvent
 	private final double vtts_waiting;
 	
 	// TODO: make configurable
-	private final double operatorCostPerVehHour = 39.93; // = 33 * 1.21 (overhead)
+//	private final double operatorCostPerVehHour = 39.93; // = 33 * 1.21 (overhead)
 
 	public MarginalCostPricingPtHandler(EventsManager eventsManager, ScenarioImpl scenario) {
 		this.events = eventsManager;

@@ -24,9 +24,9 @@
 
 package playground.ikaddoura;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * @author Ihab
@@ -35,9 +35,9 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 public class IKControlerListener implements StartupListener {
 
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 
-	public IKControlerListener(ScenarioImpl scenario){
+	public IKControlerListener(Scenario scenario){
 		this.scenario = scenario;
 	}
 	

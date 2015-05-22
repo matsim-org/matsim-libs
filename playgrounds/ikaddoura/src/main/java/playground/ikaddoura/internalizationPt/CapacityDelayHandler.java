@@ -35,10 +35,12 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.BoardingDeniedEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Calculates and throws external delay effect events that are related to capacity constraints of public vehicles.
@@ -53,14 +55,14 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 	private final ScenarioImpl scenario;
 	private final EventsManager events;
 	
-	private final Map<Id, List<Id>> affectedAgent2causingAgents = new HashMap<Id, List<Id>>();
-	private final Map<Id, Double> affectedAgent2boardingDeniedTime = new HashMap<Id, Double>();
-	private final Map<Id, Id> affectedAgent2deniedVehicle = new HashMap<Id, Id>();
-	private final Map<Id, List<Id>> vehId2passengers = new HashMap<Id, List<Id>>();
-	private final Map<Id, Id> vehId2lastEnteringAgent = new HashMap<Id, Id>();
+	private final Map<Id<Person>, List<Id<Person>>> affectedAgent2causingAgents = new HashMap<>();
+	private final Map<Id<Person>, Double> affectedAgent2boardingDeniedTime = new HashMap<>();
+	private final Map<Id<Person>, Id<Vehicle>> affectedAgent2deniedVehicle = new HashMap<>();
+	private final Map<Id<Vehicle>, List<Id<Person>>> vehId2passengers = new HashMap<>();
+	private final Map<Id<Vehicle>, Id<Person>> vehId2lastEnteringAgent = new HashMap<>();
 	
-	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
-	private final List<Id> ptDriverIDs = new ArrayList<Id>();
+	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<>();
+	private final List<Id<Person>> ptDriverIDs = new ArrayList<>();
 	
 	private final CausingAgentsMethod causingAgentsMethod = CausingAgentsMethod.allPassengersInThePublicVehicle;
 //	private final CausingAgentsMethod causingAgentsMethod = CausingAgentsMethod.lastAgentEnteringThePublicVehicle;
@@ -116,12 +118,12 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 			
 			// update number of passengers in vehicle
 			if (this.vehId2passengers.containsKey(event.getVehicleId())){
-				List<Id> passengers = new ArrayList<Id>();
+				List<Id<Person>> passengers = new ArrayList<>();
 				passengers = this.vehId2passengers.get(event.getVehicleId());
 				passengers.add(event.getPersonId());
 				this.vehId2passengers.put(event.getVehicleId(), passengers);
 			} else {
-				List<Id> passengersInVeh = new ArrayList<Id>();
+				List<Id<Person>> passengersInVeh = new ArrayList<>();
 				passengersInVeh.add(event.getPersonId());
 				this.vehId2passengers.put(event.getVehicleId(), passengersInVeh);
 			}
@@ -139,7 +141,7 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 						
 			// update number of passengers in vehicle
 			if (this.vehId2passengers.containsKey(event.getVehicleId())){
-				List<Id> passengers = new ArrayList<Id>();
+				List<Id<Person>> passengers = new ArrayList<>();
 				passengers = this.vehId2passengers.get(event.getVehicleId());
 				passengers.remove(event.getPersonId());
 				this.vehId2passengers.put(event.getVehicleId(), passengers);
@@ -157,7 +159,7 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 			calculateExternalDelay(event.getTime(), event.getPersonId());
 		}
 		
-		List<Id> causingAgents = new ArrayList<Id>();
+		List<Id<Person>> causingAgents = new ArrayList<>();
 		if (causingAgentsMethod.equals(CausingAgentsMethod.allPassengersInThePublicVehicle)){
 			causingAgents.addAll(getAllAgentsInPublicVehicle(event.getVehicleId()));
 		} else if (causingAgentsMethod.equals(CausingAgentsMethod.lastAgentEnteringThePublicVehicle)){
@@ -175,27 +177,27 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 
 	}
 
-	private List<Id> getLastAgentEnteringPublicVehicle(Id vehicleId) {
-		List<Id> lastAgentEnteringPublicVehicle = new ArrayList<Id>();
+	private List<Id<Person>> getLastAgentEnteringPublicVehicle(Id<Vehicle> vehicleId) {
+		List<Id<Person>> lastAgentEnteringPublicVehicle = new ArrayList<>();
 		lastAgentEnteringPublicVehicle.add(this.vehId2lastEnteringAgent.get(vehicleId));
 		return lastAgentEnteringPublicVehicle;
 	}
 
-	private List<Id> getAllAgentsInPublicVehicle(Id vehicleId) {
-		List<Id> agentsInPublicVehicle = new ArrayList<Id>();
+	private List<Id<Person>> getAllAgentsInPublicVehicle(Id<Vehicle> vehicleId) {
+		List<Id<Person>> agentsInPublicVehicle = new ArrayList<>();
 		agentsInPublicVehicle = this.vehId2passengers.get(vehicleId);
 		return agentsInPublicVehicle;
 	}
 
-	private void calculateExternalDelay(double time, Id affectedAgentId) {
+	private void calculateExternalDelay(double time, Id<Person> affectedAgentId) {
 		
 		double delay = time - this.affectedAgent2boardingDeniedTime.get(affectedAgentId);
 //		System.out.println("Delay: " + delay);
-		List<Id> causingAgents = this.affectedAgent2causingAgents.get(affectedAgentId);
+		List<Id<Person>> causingAgents = this.affectedAgent2causingAgents.get(affectedAgentId);
 //		System.out.println("Causing agents: " + causingAgents);
 		double delayPerCausingAgent = delay / causingAgents.size();
 		
-		for (Id causingAgentId : causingAgents) {
+		for (Id<Person> causingAgentId : causingAgents) {
 			CapacityDelayEvent capacityDelayEvent = new CapacityDelayEvent(time, causingAgentId, affectedAgentId, this.affectedAgent2deniedVehicle.get(affectedAgentId), delayPerCausingAgent);
 //			System.out.println("Capacity delay event: " + capacityDelayEvent.toString());
 			this.events.processEvent(capacityDelayEvent);

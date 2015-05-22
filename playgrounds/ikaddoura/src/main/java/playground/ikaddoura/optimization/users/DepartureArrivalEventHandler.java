@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author Ihab
@@ -41,8 +43,8 @@ public class DepartureArrivalEventHandler implements TransitDriverStartsEventHan
 	private int numberOfPtLegs;
 	private int numberOfCarLegs;
 	private int numberOfWalkLegs; // TransitWalk
-	private final List<Id> ptDriverIDs = new ArrayList<Id>();
-	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
+	private final List<Id<Person>> ptDriverIDs = new ArrayList<>();
+	private final List<Id<Vehicle>> ptVehicleIDs = new ArrayList<>();
 	
 	@Override
 	public void reset(int iteration) {

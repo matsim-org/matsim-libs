@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -36,29 +36,32 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.BoardingDeniedEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author Ihab
  *
  */
 public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, BoardingDeniedEventHandler {
-	private final static Logger log = Logger.getLogger(WaitingTimeHandler.class);
+//	private final static Logger log = Logger.getLogger(WaitingTimeHandler.class);
 
 	private final List <Double> waitingTimes = new ArrayList<Double>();
 	private final List <Double> waitingTimesMissed = new ArrayList<Double>();
 	private final List <Double> waitingTimesNotMissed = new ArrayList<Double>();
-	private Map <Id, List<Double>> personId2waitingTimes = new HashMap<Id, List<Double>>();
+	private Map <Id<Person>, List<Double>> personId2waitingTimes = new HashMap<>();
 
-	private final Map <Id, Double> personId2PersonEntersVehicleTime = new HashMap<Id, Double>();
-	private final Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
-	private final Map <Id, Double> personId2InVehicleTime = new HashMap<Id, Double>();
-	private final Map <Id, Id> busId2currentFacilityId = new HashMap<Id, Id>();
+	private final Map <Id<Person>, Double> personId2PersonEntersVehicleTime = new HashMap<>();
+	private final Map <Id<Person>, Double> personId2AgentDepartureTime = new HashMap<>();
+	private final Map <Id<Person>, Double> personId2InVehicleTime = new HashMap<>();
+	private final Map <Id<Vehicle>, Id<TransitStopFacility>> busId2currentFacilityId = new HashMap<>();
 
 	private int numberOfMissedVehicles;
 	private int boardingDeniedEvents;
@@ -97,8 +100,8 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id personId = event.getPersonId();
-		Id vehId = event.getVehicleId();
+		Id<Person> personId = event.getPersonId();
+		Id<Vehicle> vehId = event.getVehicleId();
 		
 		if (personId.toString().contains("person") && vehId.toString().contains("bus")){
 			personId2PersonEntersVehicleTime.put(personId, event.getTime());
@@ -145,7 +148,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		
 		if (event.getLegMode().toString().equals("pt")){
 			personId2AgentDepartureTime.put(personId, event.getTime());
@@ -157,7 +160,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		
 		if (event.getLegMode().toString().equals("pt")){
 
@@ -184,14 +187,14 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 		return waitingTimes;
 	}
 
-	public Map<Id, Double> getPersonId2InVehicleTime() {
+	public Map<Id<Person>, Double> getPersonId2InVehicleTime() {
 		return personId2InVehicleTime;
 	}
 	
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		Id busId = event.getVehicleId();
-		Id facilityId = event.getFacilityId();
+		Id<Vehicle> busId = event.getVehicleId();
+		Id<TransitStopFacility> facilityId = event.getFacilityId();
 		
 		if (event.getDelay()!=0){
 			if(event.getDelay()>maxArriveDelay){
@@ -213,7 +216,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 		return waitingTimesNotMissed;
 	}
 
-	public Map <Id, List<Double>> getPersonId2waitingTimes() {
+	public Map <Id<Person>, List<Double>> getPersonId2waitingTimes() {
 		return personId2waitingTimes;
 	}
 

@@ -58,10 +58,8 @@ public class IKControler {
 		
 		Controler controler = new Controler(configFile);
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		//		controler.addControlerListener(new IKControlerListener((ScenarioImpl) controler.getScenario()));
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		//		controler.addControlerListener(new IKControlerListener(controler.getScenario()));
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.run();
 	}
