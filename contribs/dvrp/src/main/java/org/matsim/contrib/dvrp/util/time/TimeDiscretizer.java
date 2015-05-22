@@ -69,6 +69,13 @@ public class TimeDiscretizer
 
         return idx;
     }
+    
+    
+    public int discretize(double time)
+    {
+        int idx = getIdx(time);
+        return idx * timeInterval;
+    }
 
 
     public int getTimeInterval()

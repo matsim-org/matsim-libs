@@ -22,6 +22,11 @@ package playground.michalm.taxi.optimizer.mip;
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.Requests;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.router.tree.DijkstraWithDijkstraTreeCache;
+import org.matsim.contrib.dvrp.util.time.TimeDiscretizer;
+import org.matsim.core.router.util.*;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -48,8 +53,12 @@ public class MIPTaxiOptimizer
             throw new IllegalArgumentException("Destinations must be known ahead");
         }
 
-        pathTravelTimeCalc = new PathTreeBasedTravelTimeCalculator(new LeastCostPathTreeStorage(
-                optimConfig.context.getScenario().getNetwork()));
+        TravelTime travelTime = new FreeSpeedTravelTime();
+        TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
+
+        pathTravelTimeCalc = new PathTreeBasedTravelTimeCalculator(
+                new DijkstraWithDijkstraTreeCache(optimConfig.context.getScenario().getNetwork(),
+                        travelDisutility, travelTime, TimeDiscretizer.CYCLIC_24_HOURS));
     }
 
 

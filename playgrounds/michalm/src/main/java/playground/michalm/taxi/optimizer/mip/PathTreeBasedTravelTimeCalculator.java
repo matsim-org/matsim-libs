@@ -19,21 +19,18 @@
 
 package playground.michalm.taxi.optimizer.mip;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.utils.leastcostpathtree.LeastCostPathTree.NodeData;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.router.tree.DijkstraWithDijkstraTreeCache;
 
 
 public class PathTreeBasedTravelTimeCalculator
 {
-    private final LeastCostPathTreeStorage leastCostPathTrees;
+    private final DijkstraWithDijkstraTreeCache dijkstraTrees;
 
 
-    public PathTreeBasedTravelTimeCalculator(LeastCostPathTreeStorage leastCostPathTrees)
+    public PathTreeBasedTravelTimeCalculator(DijkstraWithDijkstraTreeCache dijkstraTrees)
     {
-        this.leastCostPathTrees = leastCostPathTrees;
+        this.dijkstraTrees = dijkstraTrees;
     }
 
 
@@ -43,13 +40,9 @@ public class PathTreeBasedTravelTimeCalculator
             return 0;
         }
 
-        Map<Id<Node>, NodeData> tree = leastCostPathTrees.getTree(fromLink.getToNode());
-        NodeData nodeData = tree.get(toLink.getFromNode().getId());
-
         double tt = 1;//getting over the first node
-        tt += nodeData.getTime();//travelling along the path
+        tt += dijkstraTrees.getTree(fromLink.getToNode(), 0).getTime(toLink.getFromNode());//travelling along the path
         tt += toLink.getLength() / toLink.getFreespeed();//travelling the last link (approx.)
-
         return tt;
     }
 }
