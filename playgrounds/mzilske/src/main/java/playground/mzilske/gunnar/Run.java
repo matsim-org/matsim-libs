@@ -89,10 +89,7 @@ public class Run {
                 2 * (1.0 / 12.0),
                 1.);
         while (objectiveFunction.evaluateState(new MySimulatorState(statex, statey)) > 1.0) {
-            System.out.println("implement");
-            decisionVariableSetEvaluator.implementNextDecisionVariable();
-            System.out.println("register");
-            decisionVariableSetEvaluator.registerState(new MySimulatorState(statex , statey));
+            decisionVariableSetEvaluator.afterIteration(new MySimulatorState(statex , statey));
             System.out.printf("%f,%f", statex, statey);
         }
     }
@@ -130,6 +127,11 @@ public class Run {
         public void implementInSimulation() {
             statex = x;
             statey = y;
+        }
+
+        @Override
+        public void releaseDeepMemory() {
+
         }
 
     }
