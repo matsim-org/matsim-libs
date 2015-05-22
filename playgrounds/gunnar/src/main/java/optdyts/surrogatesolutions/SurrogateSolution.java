@@ -49,9 +49,9 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 
 	// PARAMETERS
 
-	private final double convergenceNoiseVarianceScale;
-
 	private final double transitionNoiseVarianceScale;
+
+	private final double convergenceNoiseVarianceScale;
 
 	// DATA TO BE PROCESSED
 
@@ -63,10 +63,10 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public SurrogateSolution(final double convergenceNoiseVarianceScale,
-			final double transitionNoiseVarianceScale) {
-		this.convergenceNoiseVarianceScale = convergenceNoiseVarianceScale;
+	public SurrogateSolution(final double transitionNoiseVarianceScale,
+			final double convergenceNoiseVarianceScale) {
 		this.transitionNoiseVarianceScale = transitionNoiseVarianceScale;
+		this.convergenceNoiseVarianceScale = convergenceNoiseVarianceScale;
 	}
 
 	// -------------------- GETTERS --------------------
@@ -238,8 +238,8 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 			// 1.1. Add all transition sequences but one to the new solution.
 
 			final SurrogateSolution<X, U> newSurrogateSolution = new SurrogateSolution<X, U>(
-					this.convergenceNoiseVarianceScale,
-					this.transitionNoiseVarianceScale);
+					this.transitionNoiseVarianceScale,
+					this.convergenceNoiseVarianceScale);
 			newSurrogateSolution.decisionVariable2transitionSequence
 					.putAll(this.decisionVariable2transitionSequence);
 			newSurrogateSolution

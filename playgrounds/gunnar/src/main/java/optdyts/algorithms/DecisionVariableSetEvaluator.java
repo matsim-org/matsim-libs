@@ -51,8 +51,6 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 
 	private final ObjectiveFunction<X> objectiveFunction;
 
-	// private final double maxGap2;
-
 	// MEMBERS
 
 	private SurrogateSolution<X, U> surrogateSolution;
@@ -61,8 +59,7 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 
 	private X fromState = null;
 
-	// TODO only for testing
-	private StringBuffer msg = new StringBuffer();
+	private StringBuffer msg = new StringBuffer(); // TODO only for testing
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -71,15 +68,15 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 	 *            the decision variables to be tried out
 	 * @param objectiveFunction
 	 *            represents the objective function that is to be minimized
-	 * @param simulatorNoiseVariance
-	 *            the variance of the noise of the simulator transition function
-	 *            (more specifically, the trace of its covariance matrix), a
-	 *            nonnegative number
-	 * @param maxGap2
-	 *            largest tolerated equilibrium gap, must be strictly larger
-	 *            than simulatorNoiseVariance
+	 * @param transitionNoiseVarianceScale
+	 *            defines an estimate of the simulation transition noise as
+	 *            (transitionNoiseVarianceScale * the square norm of the current
+	 *            simulator state)
+	 * @param convergenceNoiseVarianceScale
+	 *            defines the convergence threshold
+	 *            (convergenceNoiseVarianceScale * the square norm of the
+	 *            current simulator state)
 	 */
-	// TODO ADJUST CALLS
 	public DecisionVariableSetEvaluator(final Set<U> decisionVariables,
 			final ObjectiveFunction<X> objectiveFunction,
 			final double transitionNoiseVarianceScale,
@@ -88,8 +85,18 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 				decisionVariables);
 		this.objectiveFunction = objectiveFunction;
 		this.surrogateSolution = new SurrogateSolution<X, U>(
-				convergenceNoiseVarianceScale, transitionNoiseVarianceScale);
-		// this.maxGap2 = maxGap2;
+				transitionNoiseVarianceScale, convergenceNoiseVarianceScale);
+	}
+
+	// -------------------- GETTERS --------------------
+
+	public U getCurrentDecisionVariable() {
+		return this.currentDecisionVariable;
+	}
+
+	// TODO experimental, remove again
+	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
+		return this.surrogateSolution.getDecisionVariable2TransitionSequence();
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -117,7 +124,7 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 
 		/*
 		 * (1) If fromState is not null, then a full transition has been
-		 * observed that now is processed.
+		 * observed that can now be processed.
 		 */
 
 		if (this.fromState != null) {
@@ -155,8 +162,6 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 			if ((this.decisionVariablesToBeTriedOut.size() == 0)
 					&& (this.surrogateSolution.size() > 1)
 					&& (this.surrogateSolution.isConverged())) {
-				// && (this.surrogateSolution.getEstimatedExpectedGap2() <=
-				// this.maxGap2)) {
 
 				SurrogateSolution<X, U> best = this.surrogateSolution;
 				double bestObjectiveFunctionValue = this.objectiveFunction
@@ -165,8 +170,6 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 
 				for (SurrogateSolution<X, U> candidate : this.surrogateSolution
 						.newEvaluatedSubsets()) {
-					// if (candidate.getEstimatedExpectedGap2() <= this.maxGap2)
-					// {
 					if (candidate.isConverged()) {
 						final double candidateObjectiveFunctionValue = this.objectiveFunction
 								.evaluateState(candidate.getEquilibriumState());
@@ -208,14 +211,5 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 		}
 
 		this.currentDecisionVariable.implementInSimulation();
-	}
-
-	public U getCurrentDecisionVariable() {
-		return this.currentDecisionVariable;
-	}
-
-	// TODO experimental, remove again
-	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
-		return this.surrogateSolution.getDecisionVariable2TransitionSequence();
 	}
 }

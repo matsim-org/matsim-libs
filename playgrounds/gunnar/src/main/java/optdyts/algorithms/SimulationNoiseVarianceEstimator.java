@@ -10,6 +10,8 @@ import floetteroed.utilities.math.Vector;
 /**
  * 
  * @author Gunnar Flötteröd
+ * 
+ * @deprecated
  *
  */
 public class SimulationNoiseVarianceEstimator<X extends SimulatorState<X>, U extends DecisionVariable> {
