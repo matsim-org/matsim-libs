@@ -65,7 +65,8 @@ class SurrogateSolutionProperties<X extends SimulatorState<X>, U extends Decisio
 		final List<X> states = new ArrayList<X>(transitions.size());
 		final List<Double> weights = new ArrayList<Double>(transitions.size());
 		for (int i = 0; i < transitions.size(); i++) {
-			states.add(transitions.get(i).getToState()); // combining to-states
+			// combining toStates because only those contain deep state copies
+			states.add(transitions.get(i).getToState());
 			weights.add(alphas.get(i));
 		}
 		this.state = transitions.get(0).getToState().deepCopy();

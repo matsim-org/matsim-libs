@@ -138,7 +138,6 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 				* this.getAverageLastStateNorm2();
 	}
 
-	// TODO new
 	public boolean isConverged() {
 		return (this.properties.getEstimatedExpectedGap2() <= this
 				.getConvergenceNoiseVariance());
@@ -150,14 +149,14 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 			final X toState) {
 		final Transition<X, U> transition = new Transition<X, U>(fromState,
 				decisionVariable, toState);
-		TransitionSequence<X, U> implementationPath = this.decisionVariable2transitionSequence
+		TransitionSequence<X, U> transitionSequence = this.decisionVariable2transitionSequence
 				.get(transition.getDecisionVariable());
-		if (implementationPath == null) {
-			implementationPath = new TransitionSequence<X, U>(transition);
+		if (transitionSequence == null) {
+			transitionSequence = new TransitionSequence<X, U>(transition);
 			this.decisionVariable2transitionSequence.put(
-					transition.getDecisionVariable(), implementationPath);
+					transition.getDecisionVariable(), transitionSequence);
 		} else {
-			implementationPath.addTransition(transition);
+			transitionSequence.addTransition(transition);
 		}
 		this.properties = null;
 	}
@@ -194,10 +193,8 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 		 * (2) Estimate the surrogate solution.
 		 */
 
-		// TODO: Parameter shall be TRANSITIONNOISEVARIANCE
 		final SurrogateSolutionEstimator<X, U> ssEstimator = new SurrogateSolutionEstimator<X, U>(
 				this.getTransitionNoiseVariance());
-
 		if (decisionVariable2alphaSum == null) {
 			this.properties = ssEstimator.computeProperties(transitionList);
 		} else {
@@ -230,7 +227,7 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 		}
 
 		/*
-		 * (1) Create all "take-one-decision-variable-out"-subsets.
+		 * (1) Go through all "take-one-decision-variable-out"-subsets.
 		 */
 
 		final List<SurrogateSolution<X, U>> result = new ArrayList<SurrogateSolution<X, U>>();
@@ -248,7 +245,7 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 			newSurrogateSolution
 					.removeDecisionVariable(takeOutDecisionVariable);
 
-			// 1.2. Evaluate the new sub-surrogate solution.
+			// 1.2. Evaluate the new surrogate solution subset.
 
 			final double takeOutAlpha = this.getDecisionVariable2alphaSum()
 					.get(takeOutDecisionVariable);

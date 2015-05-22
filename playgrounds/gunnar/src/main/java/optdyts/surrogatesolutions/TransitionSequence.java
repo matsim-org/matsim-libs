@@ -54,7 +54,7 @@ public class TransitionSequence<X extends SimulatorState<X>, U extends DecisionV
 					+ this.getClass().getSimpleName()
 					+ " with a null transition.");
 		}
-		// for the first transition, the fromState is needed
+		// the first transition's fromState is needed, do not remove it
 		this.transitions.add(firstTransition);
 	}
 
