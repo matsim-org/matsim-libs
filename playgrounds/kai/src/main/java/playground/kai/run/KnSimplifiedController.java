@@ -33,6 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -82,7 +83,7 @@ public class KnSimplifiedController extends AbstractController {
 		// so this is really of less importance here.  kai, sep'12)
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 		ControlerUtils.checkConfigConsistencyAndWriteToLog(this.config, "Complete config dump after reading the config file:");
-		this.setupOutputDirectory(config.controler().getOutputDirectory(), config.controler().getRunId(), true);
+		this.setupOutputDirectory(config.controler().getOutputDirectory(), config.controler().getRunId(), OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		this.network = this.scenario.getNetwork();
 		this.population = this.scenario.getPopulation();
 		this.events = EventsUtils.createEventsManager(config); 

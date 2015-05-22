@@ -28,6 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -258,10 +259,10 @@ public class AgentsReturnHomePostProcessing {
 			}
 			if (this.getScenario().getConfig().controler().getRunId() != null) {
 //				this.controlerIO = new OutputDirectoryHierarchy(outputPath, this.scenarioData.getConfig().controler().getRunId(), true);
-				this.setupOutputDirectory(outputPath, this.getScenario().getConfig().controler().getRunId(), true) ;
+				this.setupOutputDirectory(outputPath, this.getScenario().getConfig().controler().getRunId(), OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles) ;
 			} else {
 //				this.controlerIO = new OutputDirectoryHierarchy(outputPath, true);
-				this.setupOutputDirectory(outputPath, null, true) ;
+				this.setupOutputDirectory(outputPath, null, OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles) ;
 			}
 		}
 	}
