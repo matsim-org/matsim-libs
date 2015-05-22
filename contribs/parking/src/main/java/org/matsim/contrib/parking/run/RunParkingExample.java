@@ -37,6 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 /**
@@ -51,9 +52,12 @@ public class RunParkingExample {
 		Config config = ConfigUtils.loadConfig("src/main/ressources/config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		Controler controler = new Controler(scenario); 
-		controler.setOverwriteFiles(true);
-		
+		Controler controler = new Controler(scenario);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		//setting Parking Costs - charged parking @ work, free parking @ home
 		ParkingCostModel parkingCostModelWork = new ParkingCostCalculatorExample(1);
 		ParkingCostModel parkingCostModelHome = new ParkingCostCalculatorExample(0);

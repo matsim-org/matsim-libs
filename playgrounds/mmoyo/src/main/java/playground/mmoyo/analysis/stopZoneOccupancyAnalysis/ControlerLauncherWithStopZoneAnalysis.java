@@ -23,6 +23,7 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class ControlerLauncherWithStopZoneAnalysis {
 
@@ -38,8 +39,11 @@ public class ControlerLauncherWithStopZoneAnalysis {
 		config = ConfigUtils.loadConfig(configFile);
 
 		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		CadytsConfigGroup ccg = new CadytsConfigGroup() ;
 		config.addModule(ccg) ;
 		

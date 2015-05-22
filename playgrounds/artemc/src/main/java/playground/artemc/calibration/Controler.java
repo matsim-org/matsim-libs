@@ -21,12 +21,11 @@
 package playground.artemc.calibration;
 
 import java.util.HashSet;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 
 /**
@@ -59,7 +58,10 @@ public class Controler {
 	}
 	
 	public void setOverwriteFiles(final boolean overwriteFiles) {
-		this.controler.setOverwriteFiles(overwriteFiles);
+		this.controler.getConfig().controler().setOverwriteFileSetting(
+				overwriteFiles ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 	}
 	
 	public Scenario getScenario() {

@@ -40,6 +40,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.events.EventsUtils;
@@ -296,8 +297,11 @@ public class MarginalCongestionHandlerV3QsimTest {
 			}
 				
 		});
-			
-		controler.setOverwriteFiles(true);
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 			
 		{ // controlling and showing the conditions of the test:

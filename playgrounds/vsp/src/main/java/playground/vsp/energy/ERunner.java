@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -82,8 +83,11 @@ public class ERunner {
 		c.addControlerListener(trafficState);
 		
 		c.setDumpDataAtEnd(true);
-		c.setOverwriteFiles(true);
-		
+		c.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		c.run();
 	}
 	

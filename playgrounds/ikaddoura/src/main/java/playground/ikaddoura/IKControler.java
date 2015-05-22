@@ -27,6 +27,7 @@ package playground.ikaddoura;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
@@ -56,8 +57,11 @@ public class IKControler {
 	private void run() {
 		
 		Controler controler = new Controler(configFile);
-		controler.setOverwriteFiles(true);
-//		controler.addControlerListener(new IKControlerListener((ScenarioImpl) controler.getScenario()));
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		//		controler.addControlerListener(new IKControlerListener((ScenarioImpl) controler.getScenario()));
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.run();
 	}

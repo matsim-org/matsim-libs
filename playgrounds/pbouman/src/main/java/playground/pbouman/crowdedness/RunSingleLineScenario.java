@@ -20,10 +20,9 @@
 package playground.pbouman.crowdedness;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
-import playground.pbouman.crowdedness.CrowdedScoringFunctionFactory;
-import playground.pbouman.crowdedness.CrowdednessObserver;
 import playground.pbouman.crowdedness.rules.SimpleRule;
 import playground.pbouman.scenarios.SingleLineScenario;
 
@@ -41,7 +40,10 @@ public class RunSingleLineScenario
 	{
 		Scenario scenario = SingleLineScenario.buildScenario(20);
 		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		controler.setScoringFunctionFactory(new CrowdedScoringFunctionFactory(
 			new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()),

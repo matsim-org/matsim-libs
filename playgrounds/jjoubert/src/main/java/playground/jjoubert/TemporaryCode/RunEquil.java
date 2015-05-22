@@ -21,6 +21,7 @@
 package playground.jjoubert.TemporaryCode;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class RunEquil {
 
@@ -30,7 +31,10 @@ public class RunEquil {
 	public static void main(String[] args) {
 		Controler c = new Controler(args[0]	);
         c.getConfig().controler().setCreateGraphs(false);
-        c.setOverwriteFiles(true);
+		c.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		c.run();
 	}
 

@@ -30,6 +30,7 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
@@ -102,7 +103,10 @@ public class InternalControler {
 		confReader.readFile(configFile);
 			
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.addControlerListener(new MyControlerListener(fare, this.ptLegHandler));
 		

@@ -23,6 +23,7 @@ package playground.singapore.calibration;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import java.util.HashSet;
 
@@ -57,7 +58,10 @@ public class Controler {
 	}
 	
 	public void setOverwriteFiles(final boolean overwriteFiles) {
-		this.controler.setOverwriteFiles(overwriteFiles);
+		this.controler.getConfig().controler().setOverwriteFileSetting(
+				overwriteFiles ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 	}
 	
 	public Scenario getScenario() {

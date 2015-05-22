@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
@@ -103,7 +104,10 @@ class AllrouteTest {
 					log.info(STR_READING + strCombination);
 					Controler controler = new Controler( this.scn ) ;
                     controler.getConfig().controler().setCreateGraphs(false);
-                    controler.setOverwriteFiles(true);
+					controler.getConfig().controler().setOverwriteFileSetting(
+							true ?
+									OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+									OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 					controler.run();
 					
 					//get error graph
@@ -206,7 +210,10 @@ class AllrouteTest {
 					//simulate
 					Controler controler = new Controler( tmpconfigFile ) ;
                     controler.getConfig().controler().setCreateGraphs(false);
-                    controler.setOverwriteFiles(true);
+					controler.getConfig().controler().setOverwriteFileSetting(
+							true ?
+									OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+									OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 					controler.run();
 					
 					/*
@@ -254,7 +261,10 @@ class AllrouteTest {
 				//simulate
 				Controler controler = new Controler( this.outDir +  configFileName ) ;
                 controler.getConfig().controler().setCreateGraphs(false);
-                controler.setOverwriteFiles(true);
+				controler.getConfig().controler().setOverwriteFileSetting(
+						true ?
+								OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+								OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 				controler.run();
 			}		
 		}
@@ -314,7 +324,10 @@ class AllrouteTest {
 				String configFile = configDirPath + s + STR_CONF;
 				Controler controler = new Controler( configFile) ;
                 controler.getConfig().controler().setCreateGraphs(false);
-                controler.setOverwriteFiles(true);
+				controler.getConfig().controler().setOverwriteFileSetting(
+						true ?
+								OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+								OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 				controler.run();
 			}
 			i++;

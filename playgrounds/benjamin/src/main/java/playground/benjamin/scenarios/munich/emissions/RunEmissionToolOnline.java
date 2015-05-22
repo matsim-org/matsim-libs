@@ -27,6 +27,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -62,8 +63,11 @@ public class RunEmissionToolOnline {
 		Controler controler = new Controler(config);
 		
 	// controler settings	
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
 
         // controlerConfigGroup
 		ControlerConfigGroup ccg = controler.getConfig().controler();

@@ -32,6 +32,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.StrategyManager;
 import playground.sergioo.singapore2012.scoringFunction.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.sergioo.typesPopulation2013.analysis.ScoreStats;
@@ -58,8 +59,11 @@ public class ControlerPTW {
 		config.addModule(new StrategyPopsConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
 		controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.setOverwriteFiles(true);
-        controler.addControlerListener(new LegHistogramListener(controler.getEvents(), true, controler.getScenario().getPopulation()));
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.addControlerListener(new LegHistogramListener(controler.getEvents(), true, controler.getScenario().getPopulation()));
         controler.addControlerListener(new ScoreStats(controler.getScenario().getPopulation(), ScoreStatsControlerListener.FILENAME_SCORESTATS, true));
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id<Person>>()));
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));

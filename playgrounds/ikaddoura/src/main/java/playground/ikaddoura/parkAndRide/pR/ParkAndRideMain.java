@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -160,7 +161,10 @@ public class ParkAndRideMain {
 	private void run() {
 		
 		final Controler controler = new Controler(configFile);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		
 		PRFileReader prReader = new PRFileReader(prFacilityFile);

@@ -26,6 +26,7 @@ package playground.ikaddoura;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
@@ -65,9 +66,12 @@ public class IKSocialCostController extends SocialCostController {
 		
 		// Additional analysis
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
-		
-		controler.setOverwriteFiles(true);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.run();
 	}
 }

@@ -22,13 +22,12 @@ package tutorial.trafficsignals;
 import java.io.File;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.controler.DefaultSignalsControllerListenerFactory;
-import org.matsim.contrib.signals.controler.SignalsControllerListenerFactory;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.signals.data.SignalsData;
 
@@ -76,7 +75,10 @@ public class RunSignalSystemsExample {
 		c.addOverridingModule(new SignalsModule());
 		
 		//do it, do it, do it, now
-		c.setOverwriteFiles(true);
+		c.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		c.run();
 	}
 

@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -78,8 +79,11 @@ class PtTutorialControler {
 //		accessibilityListener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 //		accessibilityListener.generateGridsAndMeasuringPointsByNetwork(251);
 //		controler.addControlerListener(accessibilityListener);
-		
-		controler.setOverwriteFiles(true);
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 	

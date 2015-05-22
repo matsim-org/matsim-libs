@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -94,8 +94,11 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 		
 		ActivityDurationEstimator activityDurationEstimator = new ActivityDurationEstimator(controler.getScenario(), Id.create(1, Person.class));
 		eventHandlerAtStartupAdder.addEventHandler(activityDurationEstimator);
-		
-		controler.setOverwriteFiles(true);
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 		return activityDurationEstimator;
 	}

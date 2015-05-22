@@ -29,6 +29,7 @@ import org.matsim.contrib.freight.mobsim.TimeScoringFunctionFactoryForTests;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
@@ -68,7 +69,10 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 			CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler), new DistanceScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
 //			carrierControler.setEnableWithinDayActivityReScheduling(true);
 			controler.addOverridingModule(carrierControler);
-			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.run();
 //			assertTrue(true);
 		}
@@ -82,7 +86,10 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
             CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler), new DistanceScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
 //			carrierControler.setEnableWithinDayActivityReScheduling(true);
 			controler.addOverridingModule(carrierControler);
-			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.run();
 			
 			Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
@@ -102,8 +109,11 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 		CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler), new TimeScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
 
 		controler.addOverridingModule(carrierControler);
-		controler.setOverwriteFiles(true);
-		controler.run();	
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.run();
 
 		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
 		assertEquals(-240.0, carrier1.getSelectedPlan().getScore(),2.0);
@@ -117,8 +127,11 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
         CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler), new TimeScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
 		carrierControler.setPhysicallyEnforceTimeWindowBeginnings(true);
 		controler.addOverridingModule(carrierControler);
-		controler.setOverwriteFiles(true);
-		controler.run();	
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.run();
 
 		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));
 		assertEquals(-4871.0, carrier1.getSelectedPlan().getScore(),2.0);

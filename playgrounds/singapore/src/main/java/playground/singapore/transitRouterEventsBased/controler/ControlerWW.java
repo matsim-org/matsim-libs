@@ -24,6 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.pt.router.TransitRouter;
@@ -43,8 +44,11 @@ public class ControlerWW {
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, args[0]);
 		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.setOverwriteFiles(true);
-        final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig());
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig());
 		controler.getEvents().addHandler(waitTimeCalculator);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

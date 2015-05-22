@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -208,7 +209,10 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 			System.out.println();
 		} else {
 			final Controler controler = new PrepareScenarioControler(args);
-			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.run();
 		}
 		System.exit(0);

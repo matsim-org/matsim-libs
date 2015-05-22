@@ -53,6 +53,7 @@ import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWrite
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -284,8 +285,11 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 			// this is now no longer a hack but something that should be reasonably stable.  NOTE: You have to switch on/off roadpricing now in a 
 			// (newly constructed) matsim4Urbansim config section.  kai & michael z, sep'14
 		}
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(true);
 
         PtMatrix ptMatrix = null ;
 		MatrixBasedPtRouterConfigGroup ippcm = ConfigUtils.addOrGetModule(scenario.getConfig(), MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class) ;

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.LinkImpl;
@@ -155,7 +156,10 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new MinimizeV_CWeightedTimeListener());
 		controler.getConfig().controler().setWriteEventsInterval(1);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 

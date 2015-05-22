@@ -5,6 +5,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class BerlinRunCongested implements Runnable {
@@ -48,7 +49,10 @@ public class BerlinRunCongested implements Runnable {
 //                return qsim;
 //            }
 //        });
-        controller.setOverwriteFiles(true);
+		controller.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controller.run();
 		
 

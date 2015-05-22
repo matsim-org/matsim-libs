@@ -27,6 +27,7 @@ package playground.ikaddoura.berlin;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
@@ -61,7 +62,10 @@ public class IKControler_Berlin {
 	private void run() {
 		
 		Controler controler = new Controler(configFile);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);

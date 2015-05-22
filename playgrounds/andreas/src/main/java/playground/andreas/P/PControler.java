@@ -1,30 +1,14 @@
 package playground.andreas.P;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.ObservableMobsim;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.andreas.P.init.CreateInitialTimeSchedule;
 import playground.andreas.P.init.PConfigGroup;
@@ -138,8 +122,11 @@ public class PControler extends Controler {
 //				if(args.length > 1 && args[1].equalsIgnoreCase("true")){
 //					tc.setUseOTFVis(true);
 //				}
-			tc.setOverwriteFiles(true);
-//				tc.setCreateGraphs(false);
+			tc.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+			//				tc.setCreateGraphs(false);
 			tc.run();
 			
 			File nextOutDir = new File(pConfig.getNextOutputBase());

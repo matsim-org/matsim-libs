@@ -46,6 +46,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -102,7 +103,10 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true) ;
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
         computer.readOrCreateMaxDCScore(controler.getConfig(), lcContext.kValsAreRead());
@@ -180,7 +184,10 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true) ;
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
         computer.readOrCreateMaxDCScore(controler.getConfig(), lcContext.kValsAreRead());
@@ -313,7 +320,10 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// (this is now only necessary since the config for all three tests sets MyLocationChoice instead of LocationChoice. Probably
 		// should pull the best response test away from the other (old) test.  kai, feb'13
 
-		controler.setOverwriteFiles(true) ;
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 
 		// test that everything worked as expected

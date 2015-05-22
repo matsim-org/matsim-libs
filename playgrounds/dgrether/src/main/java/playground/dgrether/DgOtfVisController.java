@@ -1,5 +1,6 @@
 package playground.dgrether;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 
@@ -33,7 +34,10 @@ public class DgOtfVisController {
 	public static void main(String[] args) {
 		Controler c = new Controler(args);
 		c.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		c.setOverwriteFiles(true);
+		c.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		c.run();
 	}
 

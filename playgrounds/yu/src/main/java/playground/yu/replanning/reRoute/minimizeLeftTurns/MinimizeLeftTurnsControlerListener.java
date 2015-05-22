@@ -24,6 +24,7 @@
 package playground.yu.replanning.reRoute.minimizeLeftTurns;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import playground.yu.travelCost.SingleReRouteSelectedControler;
@@ -47,7 +48,10 @@ public class MinimizeLeftTurnsControlerListener implements
 		controler
 				.addControlerListener(new MinimizeLeftTurnsControlerListener());
 		controler.getConfig().controler().setWriteEventsInterval(1);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -56,7 +60,10 @@ public class MinimizeLeftTurnsControlerListener implements
 		controler
 				.addControlerListener(new MinimizeLeftTurnsControlerListener());
 		// controler.setWriteEventsInterval(1);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 

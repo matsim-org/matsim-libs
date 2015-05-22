@@ -27,8 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import org.matsim.core.mobsim.framework.Mobsim;
 import playground.dgrether.DgOTFVisConfigWriter;
@@ -52,8 +51,11 @@ public class DgSatellicWithindayTestStarter {
 		
 		
 		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

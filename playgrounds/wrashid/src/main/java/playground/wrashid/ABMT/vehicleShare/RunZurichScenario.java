@@ -22,13 +22,13 @@ package playground.wrashid.ABMT.vehicleShare;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -90,7 +90,10 @@ public class RunZurichScenario {
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 
 		final Controler controler = new Controler( scenario );
-		controler.setOverwriteFiles( true );
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		connectFacilitiesWithNetwork( controler );
 		

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.noise2.data.GridParameters;
@@ -160,8 +161,11 @@ public class NoiseOnlineControler {
 		});
 		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 		
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
-		controler.setOverwriteFiles(true);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 	

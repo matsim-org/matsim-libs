@@ -1,7 +1,6 @@
 package playground.balac.allcsmodestest.controler;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -18,6 +17,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
@@ -93,9 +93,12 @@ public class CarsharingMATSimLControler {
 			final Scenario scenario = ScenarioUtils.loadScenario( config );
 
 			final Controler controler = new Controler( scenario );
-			controler.setOverwriteFiles( true );
-			
-			 Set<String> modes = new TreeSet<String>();
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
+			Set<String> modes = new TreeSet<String>();
 			    modes.add("freefloating");
 			    modes.add("twowaycarsharing");
 			    modes.add("onewaycarsharing");

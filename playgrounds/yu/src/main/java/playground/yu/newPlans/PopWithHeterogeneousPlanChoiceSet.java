@@ -24,6 +24,7 @@
 package playground.yu.newPlans;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * generate a populationfile, in which each agent has a plan choice set with
@@ -83,8 +84,11 @@ public class PopWithHeterogeneousPlanChoiceSet extends Controler {
 				args[0]/* configfilename */);
 		controler.setStrategyChangerIteration(Integer
 				.parseInt(args[1]/* strategyChangerIteration */));
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(100);
 		controler.run();
 	}

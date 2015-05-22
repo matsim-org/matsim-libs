@@ -35,6 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -210,7 +211,10 @@ public class EvacuationControler extends WithinDayController implements
 		} else {
 			Config config = ConfigUtils.loadConfig(args[0], new MultiModalConfigGroup(), new KtiConfigGroup());
 			final Controler controler = new EvacuationControler(config, args[1]);
-			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.run();
 		}
 		System.exit(0);

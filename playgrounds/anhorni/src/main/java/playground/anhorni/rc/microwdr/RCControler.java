@@ -21,6 +21,7 @@ package playground.anhorni.rc.microwdr;
 
 import org.matsim.core.controler.Controler;
 
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.anhorni.rc.RCScoringFunctionFactory;
 
 public class RCControler extends Controler {
@@ -32,7 +33,10 @@ public class RCControler extends Controler {
 	public static void main (final String[] args) { 
 		RCControler controler = new RCControler(args);
 		//IOUtils.deleteDirectory(new File(controler.getControlerIO().getOutputPath()));
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.setScoringFunctionFactory(new RCScoringFunctionFactory(
 				controler.getConfig().planCalcScore(), controler.getScenario()));
 			

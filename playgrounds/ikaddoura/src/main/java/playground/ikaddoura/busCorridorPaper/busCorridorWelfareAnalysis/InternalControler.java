@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
@@ -89,7 +90,10 @@ public class InternalControler {
 		new VehicleReaderV1(((ScenarioImpl) scenario).getTransitVehicles()).readFile(this.directoryExtIt + "/vehiclesFile.xml");
 
 		Controler controler = new Controler(this.scenario);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.addControlerListener(new PtControlerListener(this.scenario, this.fare, this.ptLegHandler));
 		

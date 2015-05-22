@@ -33,6 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PlanImpl;
@@ -94,8 +95,11 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		pcsConfig.addActivityParams(params) ;
 		
 		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.addControlerListener(new StartupListener() {
 			@Override

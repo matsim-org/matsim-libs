@@ -12,6 +12,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.ParametersPSFMutator;
 import playground.wrashid.PSF.energy.AddEnergyScoreListener;
@@ -185,7 +186,10 @@ public class PSSControler {
 		}
 
 		controler.addControlerListener(new AddEnergyScoreListener());
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		LogEnergyConsumption logEnergyConsumption = new LogEnergyConsumption(controler);
 		LogParkingTimes logParkingTimes = new LogParkingTimes(controler);

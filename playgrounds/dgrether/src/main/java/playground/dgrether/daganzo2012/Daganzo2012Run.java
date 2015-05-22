@@ -22,6 +22,7 @@ package playground.dgrether.daganzo2012;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -73,8 +74,11 @@ public class Daganzo2012Run {
 		sylviaConfig.setUseFixedTimeCycleAsMaximalExtension(true);
         //FIXME: Take care that the normal SignalsControllerListener is NOT added.
         controler.addControlerListener(new DgSylviaControlerListenerFactory(sylviaConfig).createSignalsControllerListener());
-        controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
         addControlerListener(controler);
 		controler.run();
 	}

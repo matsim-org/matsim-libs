@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 
 import playground.ivt.matsim2030.Matsim2030Utils;
@@ -57,7 +58,10 @@ public class RunBaseSimulation {
 		final Scenario scenario = Matsim2030Utils.loadScenario( config );
 
 		final Controler controler = new Controler( scenario );
-		controler.setOverwriteFiles( true );
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		Matsim2030Utils.initializeLocationChoice( controler );
 		controler.setTripRouterFactory(

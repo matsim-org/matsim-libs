@@ -45,6 +45,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -176,9 +177,12 @@ public class AccessibilityIntegrationTest {
 		
 		// yy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
 		// But that test uses the matsim4urbansim setup, which we don't want to use in the present test.
-		
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 		
 		// compare some results -> done in EvaluateTestResults
@@ -248,9 +252,12 @@ public class AccessibilityIntegrationTest {
 		gacl.generateGridsAndMeasuringPointsByNetwork(cellSize);
 
 		controler.addControlerListener(gacl);
-		
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 		
 		// compare some results -> done in EvaluateTestResults 
@@ -332,9 +339,12 @@ public class AccessibilityIntegrationTest {
 		gacl.generateGridsAndMeasuringPointsByShapeFile(acm.getShapeFileCellBasedAccessibility(), cellSize);
 
 		controler.addControlerListener(gacl);
-		
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
         
 		// compare some results -> done in EvaluateTestResults 

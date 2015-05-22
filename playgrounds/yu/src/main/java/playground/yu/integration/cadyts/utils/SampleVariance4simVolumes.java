@@ -25,6 +25,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -80,7 +81,10 @@ public class SampleVariance4simVolumes implements StartupListener,
 	public static void main(String[] args) {
 		Controler ctl = new Controler(args);
 		ctl.addControlerListener(new SampleVariance4simVolumes());
-		ctl.setOverwriteFiles(true);
+		ctl.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		ctl.run();
 	}
 

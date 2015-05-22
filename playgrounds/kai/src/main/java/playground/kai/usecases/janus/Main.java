@@ -27,6 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -57,7 +58,10 @@ public class Main {
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
 		final Controler ctrl = new Controler(scenario) ;
-		ctrl.setOverwriteFiles(true);
+		ctrl.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		ctrl.addOverridingModule(new AbstractModule() {
 			@Override

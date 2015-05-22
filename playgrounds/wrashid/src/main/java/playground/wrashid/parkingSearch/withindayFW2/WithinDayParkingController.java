@@ -20,38 +20,26 @@
 
 package playground.wrashid.parkingSearch.withindayFW2;
 
-import com.google.inject.Provider;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTime;
 import org.matsim.contrib.multimodal.router.util.UnknownTravelTime;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
-import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
 
 import playground.wrashid.parkingSearch.withinday.LegModeChecker;
 import playground.wrashid.parkingSearch.withinday.WithinDayController;
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
-import playground.wrashid.parkingSearch.withindayFW.core.mobsim.ParkingQSimFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -194,9 +182,12 @@ public class WithinDayParkingController extends WithinDayController implements R
 //			args=new String[]{"test/input/playground/wrashid/parkingSearch/withinday/chessboard/config.xml"};
 		}
 		final WithinDayParkingController controller = new WithinDayParkingController(args);
-		controller.setOverwriteFiles(true);
-		
-		
+		controller.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
+
 		controller.run();
 		
 		System.exit(0);

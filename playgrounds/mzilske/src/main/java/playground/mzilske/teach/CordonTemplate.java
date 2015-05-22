@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -61,7 +62,10 @@ public class CordonTemplate {
 		final LinkLeaveEventHandler linkLeaveEventHandler = new MyLinkEventHandler(network);
 
 		final Controler controller = new Controler(fileName);
-		controller.setOverwriteFiles(true);
+		controller.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controller.getEvents().addHandler(linkLeaveEventHandler);
 		controller.run();
 		

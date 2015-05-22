@@ -23,6 +23,7 @@ package playground.duncan.archive;
  */
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
@@ -40,7 +41,10 @@ public class MyControler1 {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(configFile).loadScenario();
 
 		final Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 

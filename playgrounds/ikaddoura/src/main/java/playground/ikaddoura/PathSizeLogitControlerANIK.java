@@ -27,6 +27,7 @@ package playground.ikaddoura;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.selectors.AbstractPlanSelector;
@@ -73,8 +74,11 @@ public class PathSizeLogitControlerANIK {
 	private void run() {
 		
 		Controler controler = new Controler(configFile);
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
         final Network network = controler.getScenario().getNetwork();
 		
 		if (pathSizeLogit){

@@ -24,6 +24,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.util.TravelTime;
 
 
@@ -36,7 +37,10 @@ public class SimLauncher
         // cfg = "src/test/java/playground/michalm/ttcalc_error/error_2/config.xml";
 
         Controler controler = new Controler(new String[] { cfg });
-        controler.setOverwriteFiles(true);
+        controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
         controler.run();
 
         TravelTime travelTime = controler.getLinkTravelTimes();

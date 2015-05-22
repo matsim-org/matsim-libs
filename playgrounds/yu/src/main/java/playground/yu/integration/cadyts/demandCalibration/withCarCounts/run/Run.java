@@ -24,6 +24,7 @@
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.run;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.yu.integration.cadyts.demandCalibration.withCarCounts.utilityCorrection.BseUCControler;
 
 import java.io.IOException;
@@ -47,8 +48,11 @@ public class Run {
 			ctl = new BseUCControler(args);
 		}
 
-		ctl.setOverwriteFiles(true);
-        ctl.getConfig().controler().setCreateGraphs(false);
+		ctl.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		ctl.getConfig().controler().setCreateGraphs(false);
         ctl.run();
 	}
 
@@ -61,8 +65,11 @@ public class Run {
 			ctl = new BseUCControler(args);
 		}
 
-		ctl.setOverwriteFiles(true);
-        ctl.getConfig().controler().setCreateGraphs(false);
+		ctl.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		ctl.getConfig().controler().setCreateGraphs(false);
         ctl.run();
 	}
 
@@ -80,8 +87,11 @@ public class Run {
 			ctl = new BseUCControler(args);
 		}
 
-		ctl.setOverwriteFiles(true);
-        ctl.getConfig().controler().setCreateGraphs(false);
+		ctl.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		ctl.getConfig().controler().setCreateGraphs(false);
         ctl.run();
 	}
 

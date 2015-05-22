@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -85,7 +86,10 @@ public class BurgdorfRunner implements StartupListener {
 			System.out.println();
 		} else {
 			final Controler controler = new Controler(args);
-			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.getConfig().controler().setRunId(runId);
 			controler.addControlerListener(new BurgdorfRunner(controler));
 			controler.run();

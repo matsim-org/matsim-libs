@@ -23,7 +23,6 @@ package org.matsim.contrib.pseudosimulation;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -49,6 +48,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
@@ -252,7 +252,10 @@ public class RunPSim {
                 (Diversity ? "_D" : "") +
                 appendString;
         config.controler().setOutputDirectory(outputDirectory);
-        matsimControler.setOverwriteFiles(true);
+        matsimControler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
     }
 
     public static void main(String args[]) throws ParseException {

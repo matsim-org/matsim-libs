@@ -29,6 +29,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
@@ -79,8 +80,11 @@ public class RunSimpleExample {
 //		controler.addControlerListener(new AverageCongestionPricingControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler ));
 		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
-		controler.setOverwriteFiles(true);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 
 	}

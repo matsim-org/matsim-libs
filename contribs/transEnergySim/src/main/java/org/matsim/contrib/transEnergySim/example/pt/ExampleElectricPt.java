@@ -29,6 +29,7 @@ import org.matsim.contrib.transEnergySim.pt.PtVehicleEnergyState;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ConstantEnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -59,7 +60,10 @@ public class ExampleElectricPt {
         PtVehicleEnergyControlImpl ptVehicleEnergyControl = new PtVehicleEnergyControlImpl(controler.getScenario().getNetwork(),chargingPowerAtStops);
 		
 		new ElectricPtSimModule(controler, ptEnergyMangementModels,ptVehicleEnergyControl);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 	

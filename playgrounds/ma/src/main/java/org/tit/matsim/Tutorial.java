@@ -16,6 +16,7 @@ import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -36,7 +37,10 @@ public class Tutorial {
 		String configFile = "input/config_countsScaleFactor1.xml";
 		Config config = ConfigUtils.loadConfig(configFile);
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -45,7 +49,10 @@ public class Tutorial {
 		String configFile = "input/config_useHandMadePlan.xml";
 		Config config = ConfigUtils.loadConfig(configFile);
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 		 try {
 			 Tools.copyCurrentOutput(name);

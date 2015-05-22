@@ -32,6 +32,7 @@ import org.matsim.contrib.sna.graph.Graph;
 import org.matsim.contrib.sna.graph.Vertex;
 import org.matsim.contrib.sna.math.Distribution;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -56,8 +57,11 @@ public class SNRun {
 	 */
 	public static void main(String[] args) throws IOException {
 		Controler c = new Controler(args);
-		c.setOverwriteFiles(true);
-        c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		c.getConfig().controler().setCreateGraphs(false);
         c.setWriteEventsInterval(0);
 		c.addControlerListener(new SNSetup());
 		c.run();

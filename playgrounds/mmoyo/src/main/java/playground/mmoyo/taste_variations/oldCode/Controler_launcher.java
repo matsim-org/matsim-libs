@@ -31,6 +31,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scoring.ScoringFunction;
@@ -65,8 +66,11 @@ public class Controler_launcher {
 
 		final Config config = ConfigUtils.loadConfig(configFile);
 		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-        final Network net = controler.getScenario().getNetwork();
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		final Network net = controler.getScenario().getNetwork();
 		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 		final boolean doStopZoneConversion = Boolean.parseBoolean(strDoStzopZoneConversion);
 		strDoStzopZoneConversion= null;

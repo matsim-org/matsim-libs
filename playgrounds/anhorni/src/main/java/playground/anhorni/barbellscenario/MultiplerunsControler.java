@@ -20,7 +20,6 @@
 package playground.anhorni.barbellscenario;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -28,6 +27,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.anhorni.utils.Utils;
@@ -57,9 +57,12 @@ public class MultiplerunsControler {
     	for (int i = 100; i <= 1000; i+=100) {     		
     		config[0] = path + "/config.xml";
 	    	controler = new Controler(config);
-	    	controler.setOverwriteFiles(true);
-	    	    		    	
-	    	controler.getConfig().setParam("plans", "inputPlansFile", path + i + "plans.xml");
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
+			controler.getConfig().setParam("plans", "inputPlansFile", path + i + "plans.xml");
 	    	
 	    	controler.getConfig().setParam("qsim", "flowCapacityFactor", formatter.format(flowCapacityFactor));
 	    	controler.getConfig().setParam("controler", "runId", "demand_" + i +"_fcf_" + formatter.format(flowCapacityFactor));

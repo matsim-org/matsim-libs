@@ -25,6 +25,7 @@ package playground.yu.pseudoPt;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.testcases.MatsimTestCase;
@@ -127,7 +128,10 @@ public class PtTest extends MatsimTestCase {
 		Controler controler = new Controler(config);
 		controler.addControlerListener(new TestControlerListener());
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -139,7 +143,10 @@ public class PtTest extends MatsimTestCase {
 		Controler controler = new Controler(config);
 		controler.addControlerListener(new TestControlerListener());
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 }

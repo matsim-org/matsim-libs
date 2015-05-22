@@ -21,6 +21,7 @@ package playground.benjamin.scenarios.munich.testroad;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 
 /**
@@ -52,7 +53,10 @@ public class RunTestRoadCapacityChanges {
 		for(int day : days){
 			String config = inputPath + day + configName;
 			Controler controler = new Controler(config);
-			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			Scenario scenario = controler.getScenario();
 			controler.addControlerListener(new UpdateCapacityControlerListener(scenario, enterLinkId, leaveLinkId, startCapacity, stepSize));
 			controler.run();

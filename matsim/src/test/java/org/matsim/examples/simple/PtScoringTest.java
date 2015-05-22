@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
@@ -54,8 +55,11 @@ public class PtScoringTest {
 		config.planCalcScore().setWriteExperiencedPlans(true);
 
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
@@ -194,8 +198,11 @@ public class PtScoringTest {
 		config.planCalcScore().setConstantPt(1.) ;
 
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
@@ -336,8 +343,11 @@ public class PtScoringTest {
 		config.planCalcScore().setMarginalUtlOfWaitingPt_utils_hr(-18.0) ;
 
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);
@@ -409,8 +419,11 @@ public class PtScoringTest {
 		config.planCalcScore().setWriteExperiencedPlans(true);
 
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
 
         EventsCollector collector = new EventsCollector();
 		controler.getEvents().addHandler(collector);

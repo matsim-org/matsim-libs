@@ -4,6 +4,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.vbmh.vmEV.EVControlerListener;
 import playground.vbmh.vmParking.ParkControlerListener;
 import playground.vbmh.vmParking.ParkScoringFactory;
@@ -55,7 +56,10 @@ public class SFControler1 {
 		parkHistoryFileName = config.getModule("controler").getValue("outputDirectory")+"/parkhistory/parkhistory"; 
 		
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		ParkControlerListener parklistener = new ParkControlerListener();
 		parklistener.setParkHistoryOutputFileName(parkHistoryFileName);
 		parklistener.getParkHandler().getParkControl().startup(parking_filename, pricing_filename, controler);

@@ -25,6 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -108,7 +109,10 @@ public class MyCarrierSimulation {
         CarrierPlanStrategyManagerFactory stratManFactory = mcs.createReplanStrategyFactory(vehicleTypes, controler);
         CarrierScoringFunctionFactory scoringFactory = mcs.createScoringFactory();
 
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		CarrierModule carrierController = new CarrierModule(carriers, stratManFactory, scoringFactory);
 		carrierController.setPhysicallyEnforceTimeWindowBeginnings(false);

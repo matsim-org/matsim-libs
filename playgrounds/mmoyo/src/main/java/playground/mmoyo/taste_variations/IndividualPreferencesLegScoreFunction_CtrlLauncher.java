@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -58,8 +59,11 @@ public class IndividualPreferencesLegScoreFunction_CtrlLauncher {
 		final TransitSchedule schedule = scn.getTransitSchedule();
 		
 		final Controler controler = new Controler(scn);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		controler.getConfig().addModule(ccc) ;
 		

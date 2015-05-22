@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -55,8 +56,11 @@ public class Controller {
 
 	public Controller(String[] args){
 		Controler c = new Controler(args);
-		c.setOverwriteFiles(true);
-        c.getConfig().controler().setCreateGraphs(false);
+		c.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		c.getConfig().controler().setCreateGraphs(false);
         addListener(c);
 		c.run();
 	}

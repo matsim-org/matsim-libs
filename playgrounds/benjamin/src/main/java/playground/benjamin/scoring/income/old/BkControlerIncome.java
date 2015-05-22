@@ -22,12 +22,11 @@ package playground.benjamin.scoring.income.old;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.households.PersonHouseholdMapping;
 import org.matsim.roadpricing.RoadPricingScheme;
 
@@ -135,8 +134,11 @@ public class BkControlerIncome extends BkControler {
 			System.out.println();
 		} else {
 			final BkControlerIncome controler = new BkControlerIncome(args);
-			
-			controler.setOverwriteFiles(true);
+
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.run();
 		}
 	}

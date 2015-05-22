@@ -24,8 +24,7 @@
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.utilityCorrection.crossValidation;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * @author yu
@@ -63,7 +62,10 @@ public class BseUCControler extends Controler {
 		// Controler Constructor
 		BseUCControler ctl = new BseUCControler(args);
 		// ctl.setCreateGraphs(false);
-		ctl.setOverwriteFiles(true);
+		ctl.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		ctl.getConfig().controler().setWriteEventsInterval(100);
 		// ctl.setWriteQGISFile(false);
 		ctl.run();

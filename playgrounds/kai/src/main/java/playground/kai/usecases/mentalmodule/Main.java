@@ -21,6 +21,7 @@
 package playground.kai.usecases.mentalmodule;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategy;
@@ -39,7 +40,10 @@ public class Main {
 				controler.getStrategyManager().addStrategyForDefaultSubpopulation(strategy, 0.1 ) ;
 			}
 		}) ;
-		controler.setOverwriteFiles(true) ;
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 

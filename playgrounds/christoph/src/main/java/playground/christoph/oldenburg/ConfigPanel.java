@@ -22,6 +22,7 @@ package playground.christoph.oldenburg;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -641,8 +642,11 @@ public class ConfigPanel extends JPanel {
 //			controller(false);
 			
 			// overwrite old files
-			controler.setOverwriteFiles(true);
-			
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 			controler.addControlerListener(this);
 		}
 		

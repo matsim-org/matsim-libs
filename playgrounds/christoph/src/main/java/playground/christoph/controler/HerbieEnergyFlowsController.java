@@ -24,16 +24,10 @@ import herbie.running.config.HerbieConfigGroup;
 import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
-import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import playground.christoph.energyflows.controller.EnergyFlowsController;
 
@@ -51,8 +45,11 @@ public class HerbieEnergyFlowsController extends EnergyFlowsController {
 	public HerbieEnergyFlowsController(String[] args) {
 		super(args);
 		super.getConfig().addModule(this.herbieConfigGroup);
-		super.setOverwriteFiles(true);
-		
+		this.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		this.loadMyControlerListeners();
 		
 		throw new RuntimeException(Gbl.SET_UP_IS_NOW_FINAL) ;

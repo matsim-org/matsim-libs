@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -72,8 +73,11 @@ public class RailSimulator {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		final Controler controler = new Controler(args);
-		controler.setOverwriteFiles(true);
-//		generateFacilities(controler);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		//		generateFacilities(controler);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

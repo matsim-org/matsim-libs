@@ -27,6 +27,7 @@ package playground.ikaddoura.internalizationPt;
 import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
@@ -57,7 +58,10 @@ public class InternalizationPtControler {
 	private void run() {
 		
 		Controler controler = new Controler(configFile);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addControlerListener(new InternalizationPtControlerListener( (ScenarioImpl) controler.getScenario()));
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.run();

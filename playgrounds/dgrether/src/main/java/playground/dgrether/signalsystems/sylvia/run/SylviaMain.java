@@ -21,6 +21,7 @@ package playground.dgrether.signalsystems.sylvia.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListenerFactory;
 
@@ -53,7 +54,10 @@ public class SylviaMain {
         //FIXME: Take care that the normal SignalsControllerListener is NOT added.
         controler.addControlerListener(new DgSylviaControlerListenerFactory(sylviaConfig).createSignalsControllerListener());
         //		controler.addControlerListener(analysis);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 

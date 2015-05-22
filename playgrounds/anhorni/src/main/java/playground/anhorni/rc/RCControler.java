@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class RCControler extends Controler {
 	private static final Logger log = Logger.getLogger( RCControler.class ) ;
@@ -40,7 +41,10 @@ public class RCControler extends Controler {
 
 	public static void main (final String[] args) { 
 		RCControler controler = new RCControler(args);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.setScoringFunctionFactory(new RCScoringFunctionFactory(
 				controler.getConfig().planCalcScore(), controler.getScenario()));
 			

@@ -30,6 +30,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -65,7 +66,10 @@ public class TransitControler {
 		
 
 		final Controler tc = new Controler(config) ;
-		tc.setOverwriteFiles(true);
+		tc.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		tc.setDirtyShutdown(true);
 		
 //		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;

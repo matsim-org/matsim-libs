@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -83,7 +84,10 @@ public abstract class BuildingEnergyRunnerMain {
 		Scenario sc = loadScenario(c, agents2exclude);
 		// run
 		Controler controler = new Controler(sc);
-		controler.setOverwriteFiles(overwrite);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				overwrite ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addControlerListener(new MyControlerListener(c, sc.getNetwork()));
 		controler.run();
 	}

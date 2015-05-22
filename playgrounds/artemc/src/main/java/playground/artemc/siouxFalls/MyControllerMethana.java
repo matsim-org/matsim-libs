@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -45,7 +46,10 @@ public class MyControllerMethana {
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), SURVEY_FILES,1, "HITS 2008", "Red_Scheme"));
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 
 	}

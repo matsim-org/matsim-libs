@@ -20,6 +20,7 @@
 package playground.dgrether.signalsystems.cottbus.pt;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  *@author jbischoff
@@ -32,7 +33,10 @@ public class CottbusPTControler {
 	public static void main(String[] args) {
 
 		Controler con = new Controler("\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\cottbus\\cottbus_feb_fix\\Cottbus-pt\\config_1.xml");		//args: configfile
-		con.setOverwriteFiles(true);
+		con.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		con.run();	}
 
 }

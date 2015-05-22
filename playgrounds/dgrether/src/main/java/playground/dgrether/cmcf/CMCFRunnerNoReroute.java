@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -80,7 +81,10 @@ public class CMCFRunnerNoReroute {
 		if (!visualizationOnly) {		
 			
 			Controler controler = new Controler(CMCFScenarioGeneratorNoReroute.configOut);
-			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 			final TTInOutflowEventHandler handler3 = new TTInOutflowEventHandler(Id.create("3", Link.class), Id.create("5", Link.class));
 			final TTInOutflowEventHandler handler4 = new TTInOutflowEventHandler(Id.create("4", Link.class));

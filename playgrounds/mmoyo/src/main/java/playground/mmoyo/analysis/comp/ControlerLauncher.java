@@ -24,6 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 
 /**
@@ -43,8 +44,11 @@ public class ControlerLauncher {
 		config = ConfigUtils.loadConfig(configFile);
 
 		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		//add analyzer for specific bus line and stop Zone conversion
 		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		controler.getConfig().addModule(ccc) ;

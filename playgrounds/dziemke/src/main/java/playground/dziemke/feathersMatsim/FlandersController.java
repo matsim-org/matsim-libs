@@ -23,6 +23,7 @@ package playground.dziemke.feathersMatsim;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class FlandersController {
 	//private final static Logger log = Logger.getLogger(StandardController.class);
@@ -33,7 +34,10 @@ public class FlandersController {
 		// Config config = ConfigUtils.loadConfig(args[0]) ;
 		Config config = ConfigUtils.loadConfig(configFile) ;
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 }

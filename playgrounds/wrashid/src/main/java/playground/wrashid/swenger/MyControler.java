@@ -21,14 +21,18 @@
 package playground.wrashid.swenger;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class MyControler {
 
 	
 	public static void main(String[] args) {
 		Controler controler=new Controler(args);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		NewStrategyModule.controler=controler;
 		
 		controler.run();

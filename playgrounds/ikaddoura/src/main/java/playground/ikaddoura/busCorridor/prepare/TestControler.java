@@ -24,6 +24,7 @@
 package playground.ikaddoura.busCorridor.prepare;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * @author Ihab
@@ -35,8 +36,11 @@ public class TestControler {
 
 			String config = "../../shared-svn/studies/ihab/busCorridor/bus_test/config_busline.xml";
 			Controler controler = new Controler(config);
-			controler.setOverwriteFiles(true);
-			controler.run();
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.run();
 	}
 }
 	

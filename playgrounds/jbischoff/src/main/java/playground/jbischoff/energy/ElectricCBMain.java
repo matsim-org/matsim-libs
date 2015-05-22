@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -81,7 +82,10 @@ public class ElectricCBMain
         final EVehQSimFactory ev = new EVehQSimFactory(ch,ect);
         
         final Controler c = new Controler(scenario);
-        c.setOverwriteFiles(true);
+        c.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
         c.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

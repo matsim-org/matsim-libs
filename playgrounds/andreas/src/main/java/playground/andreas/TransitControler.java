@@ -1,30 +1,11 @@
 package playground.andreas;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OnTheFlyServer;
-
-import playground.andreas.fixedHeadway.FixedHeadwayControler;
-import playground.andreas.fixedHeadway.FixedHeadwayCycleUmlaufDriverFactory;
 
 /**
  * @author aneumann
@@ -106,8 +87,11 @@ public class TransitControler extends Controler {
 		if(args.length > 1 && args[1].equalsIgnoreCase("true")){
 			tc.setUseOTFVis(true);
 		}
-		tc.setOverwriteFiles(true);
-//		tc.setCreateGraphs(false);
+		tc.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		//		tc.setCreateGraphs(false);
 		tc.run();
 	}
 }

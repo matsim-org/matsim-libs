@@ -23,6 +23,7 @@ import org.matsim.contrib.matsim4urbansim.config.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -91,7 +92,10 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
-		ctrl.setOverwriteFiles(true);
+		ctrl.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		//pt not used in this test
 		PtMatrix ptMatrix = null;
@@ -171,7 +175,10 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
-		ctrl.setOverwriteFiles(true);
+		ctrl.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		//create a box with 9 measuring points (one for each node)
 		double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());

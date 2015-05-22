@@ -26,6 +26,7 @@ package playground.yu.timeToll;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -75,7 +76,10 @@ public class TimeTollTest extends MatsimTestCase {
 		Controler ctl = new Controler(config);
 		ctl.addControlerListener(new TestControlerListener());
         ctl.getConfig().controler().setCreateGraphs(false);
-        ctl.setOverwriteFiles(true);
+		ctl.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		ctl.run();
 	}
 
@@ -84,7 +88,10 @@ public class TimeTollTest extends MatsimTestCase {
 		Controler ctl = new Controler(config);
 		ctl.addControlerListener(new TestControlerListener());
         ctl.getConfig().controler().setCreateGraphs(false);
-        ctl.setOverwriteFiles(true);
+		ctl.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		ctl.run();
 	}
 }

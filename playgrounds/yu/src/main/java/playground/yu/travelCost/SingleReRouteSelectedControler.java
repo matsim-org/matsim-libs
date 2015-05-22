@@ -24,10 +24,8 @@
 package playground.yu.travelCost;
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
-import playground.yu.replanning.StrategyManagerWithRouteComparison;
 import playground.yu.replanning.reRoute.tightTurnPenalty.TightTurnPenaltyControlerListener;
 
 /**
@@ -66,7 +64,10 @@ public class SingleReRouteSelectedControler extends Controler {
 			controler.addControlerListener(new SingleReRouteSelectedListener(
 					1d - i / 2d));
 			controler.getConfig().controler().setWriteEventsInterval(0);
-			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.run();
 		}
 	}
@@ -81,7 +82,10 @@ public class SingleReRouteSelectedControler extends Controler {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new SingleReRouteSelectedListener(0d));
 		controler.getConfig().controler().setWriteEventsInterval(1);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -90,7 +94,10 @@ public class SingleReRouteSelectedControler extends Controler {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new TightTurnPenaltyControlerListener());
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -99,7 +106,10 @@ public class SingleReRouteSelectedControler extends Controler {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new LinkCapacityWeightedTimeListener());
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -109,7 +119,10 @@ public class SingleReRouteSelectedControler extends Controler {
 		controler
 				.addControlerListener(new LinkCapacitySquareWeightedTimeListener());
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -119,7 +132,10 @@ public class SingleReRouteSelectedControler extends Controler {
 		controler
 				.addControlerListener(new LinkCapacitySqrtWeightedTimeListener());
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -128,7 +144,10 @@ public class SingleReRouteSelectedControler extends Controler {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new SpeedWeightedTimeListener());
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -137,7 +156,10 @@ public class SingleReRouteSelectedControler extends Controler {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new SpeedSquareWeightedTimeListener());
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -146,7 +168,10 @@ public class SingleReRouteSelectedControler extends Controler {
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new SpeedSqrtWeightedTimeListener());
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 
@@ -157,7 +182,10 @@ public class SingleReRouteSelectedControler extends Controler {
 		controler
 				.addControlerListener(new SpeedCapacitySqrtCombiWeightedTimeListener());
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 

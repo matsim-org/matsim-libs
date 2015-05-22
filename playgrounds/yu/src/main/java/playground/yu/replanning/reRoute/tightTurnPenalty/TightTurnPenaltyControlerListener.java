@@ -24,6 +24,7 @@
 package playground.yu.replanning.reRoute.tightTurnPenalty;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import playground.yu.travelCost.SingleReRouteSelectedControler;
@@ -48,7 +49,10 @@ public class TightTurnPenaltyControlerListener implements
 		Controler controler = new SingleReRouteSelectedControler(args[0]);
 		controler.addControlerListener(new TightTurnPenaltyControlerListener());
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 }

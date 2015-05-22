@@ -32,6 +32,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
 import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -59,7 +60,10 @@ public class RunTransEnerySimExample {
 	
 	
 	public void run(){
-		c.setOverwriteFiles(true);
+		c.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		c.run();
 		c.writeStatisticsToFile(ESTATS);
 		

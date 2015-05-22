@@ -28,6 +28,7 @@ import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
@@ -81,7 +82,10 @@ final public class RunAccessibilityExample {
 		// the whole string.  BEWARE!  This is not good software design and should be changed.  kai, feb'14
 		
 		Controler controler = new Controler(scenario) ;
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		for ( String actType : activityTypes ) {
 			

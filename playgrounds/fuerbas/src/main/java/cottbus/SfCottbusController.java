@@ -23,6 +23,7 @@ package cottbus;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
@@ -39,7 +40,10 @@ public class SfCottbusController {
 
 	public static void main(String[] args) {
 		Controler con = new Controler("E:\\Cottbus\\Cottbus_pt\\Cottbus-pt\\config_1.xml");		//args: configfile
-		con.setOverwriteFiles(true);
+		con.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		// NOTE: this is the code for the deleted TransitControlerListener. It was added
 		// here, although if the config is properly set (ie the "useTransit" flag in the
 		// scenario config group is set to true), it is useless. td, sept. 2012

@@ -29,6 +29,7 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
@@ -395,7 +396,10 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		}
 		final HUPCControllerKTIzh controller = new HUPCControllerKTIzh(args);
 
-		controller.setOverwriteFiles(true);
+		controller.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		controller.run();
 

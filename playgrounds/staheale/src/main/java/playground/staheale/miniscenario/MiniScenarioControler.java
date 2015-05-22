@@ -21,22 +21,11 @@
 package playground.staheale.miniscenario;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
-import org.matsim.contrib.locationchoice.analysis.DistanceStats;
-import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
-import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
-import org.matsim.contrib.locationchoice.utils.ActivitiesHandler;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import playground.staheale.occupancy.FacilitiesOccupancyCalculator;
 import playground.staheale.occupancy.FacilityOccupancy;
-import playground.staheale.scoring.AgentInteractionScoringFunctionFactory;
 
 import java.util.TreeMap;
 
@@ -46,7 +35,10 @@ public class MiniScenarioControler extends Controler {
 
 	public MiniScenarioControler(final String[] args) {
 		super(args);
-		super.setOverwriteFiles(true) ;
+		this.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		throw new RuntimeException( Gbl.SET_UP_IS_NOW_FINAL ) ;
 	}
 

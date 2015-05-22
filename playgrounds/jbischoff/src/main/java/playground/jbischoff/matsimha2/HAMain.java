@@ -22,7 +22,7 @@ package playground.jbischoff.matsimha2;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
-
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 
 /**
@@ -40,7 +40,10 @@ public class HAMain {
 	public void runCottbus(String c){
 		log.info("Running HAMain with config: " + c);
 		Controler controler = new Controler(c);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 	

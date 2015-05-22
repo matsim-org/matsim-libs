@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.RoutingContext;
@@ -65,9 +66,12 @@ final class RunWithinDayExample implements StartupListener {
 		} else {
 			final Controler controler = new Controler(args);
 			controler.addControlerListener(new RunWithinDayExample(controler));
-			
-			controler.setOverwriteFiles(true);
-			
+
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 			controler.run();
 		}
 		System.exit(0);

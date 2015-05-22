@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -27,8 +28,11 @@ public class TestControler extends Controler {
 		final Scenario sc = ScenarioUtils.loadScenario(config);		
 		
 		final TestControler controler = new TestControler( sc );
-	    controler.setOverwriteFiles(true);
-	    controler.init(config, sc.getNetwork(), sc);	
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.init(config, sc.getNetwork(), sc);
     	controler.run();		   	
     	
 	}

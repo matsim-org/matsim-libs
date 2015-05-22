@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestCase;
 
 public class Initializer {
@@ -39,7 +40,10 @@ public class Initializer {
 		this.controler = new Controler(config);
         this.controler.getConfig().controler().setCreateGraphs(false);
         this.controler.getConfig().controler().setWriteEventsInterval(0); // disables events-writing
-		this.controler.setOverwriteFiles(true);
+		this.controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		this.controler.run();
 	}
 

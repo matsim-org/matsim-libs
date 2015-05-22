@@ -5,6 +5,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class RunPassengerPlansFromScratch {
 	
@@ -42,8 +43,11 @@ public class RunPassengerPlansFromScratch {
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		controler.run();
 
 	}

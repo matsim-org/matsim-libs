@@ -5,6 +5,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.dhosse.prt.PrtConfigGroup;
 import playground.dhosse.prt.PrtModule;
 
@@ -27,8 +28,11 @@ public class PrtLauncher {
 		ConfigUtils.loadConfig(config, args[0]);
 		
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		PrtModule module = new PrtModule();
 		module.configureControler(controler);
 		controler.run();

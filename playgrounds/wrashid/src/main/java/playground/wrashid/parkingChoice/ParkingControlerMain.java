@@ -3,6 +3,7 @@ package playground.wrashid.parkingChoice;
 import java.util.LinkedList;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.ParkingImpl;
@@ -31,10 +32,13 @@ public static void main(String[] args) {
 		}
 		
 		ParkingModule parkingModule=new ParkingModule(controler, parkingCollection);
-		
-		controler.setOverwriteFiles(true);
 
-		controler.run();
+	controler.getConfig().controler().setOverwriteFileSetting(
+			true ?
+					OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+					OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
+	controler.run();
 		
 	}
 }

@@ -13,6 +13,7 @@ import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
 import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -50,8 +51,11 @@ public class RunControlerMATSim2030 extends Controler {
 						ScenarioUtils.loadScenario(
 								ConfigUtils.loadConfig(
 										args[ 0 ] ) ) );
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(true);
         controler.init();
 		controler.run();
 	}

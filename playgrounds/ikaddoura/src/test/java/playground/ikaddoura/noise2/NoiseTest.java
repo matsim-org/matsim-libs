@@ -51,6 +51,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -153,7 +154,10 @@ public class NoiseTest {
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Controler controler = new Controler(configFile);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 		
 		// run the noise analysis for the final iteration (offline)
@@ -990,8 +994,11 @@ public class NoiseTest {
 
 		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 		
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
-		controler.setOverwriteFiles(true);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 		
 		// and test i.e. the routing relevant information... TODO

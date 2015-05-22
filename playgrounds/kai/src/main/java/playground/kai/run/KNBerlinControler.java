@@ -8,10 +8,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -58,7 +57,10 @@ class KNBerlinControler {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-		controler.setOverwriteFiles(true) ;
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addControlerListener(new KaiAnalysisListener()) ;
 //		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 //		controler.setMobsimFactory(new OldMobsimFactory()) ;

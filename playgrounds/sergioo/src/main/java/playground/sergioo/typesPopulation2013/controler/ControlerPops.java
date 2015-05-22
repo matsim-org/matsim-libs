@@ -20,12 +20,12 @@
 
 package playground.sergioo.typesPopulation2013.controler;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.StrategyManager;
 import playground.sergioo.typesPopulation2013.config.groups.StrategyPopsConfigGroup;
 import playground.sergioo.typesPopulation2013.controler.corelisteners.PlansDumping;
@@ -49,7 +49,10 @@ public class ControlerPops {
 		config.addModule(new StrategyPopsConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
 		controler = new Controler(ScenarioUtils.loadScenario(config));
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addControlerListener(new PlansDumping());
         AbstractModule myStrategyManagerModule = new AbstractModule() {
 

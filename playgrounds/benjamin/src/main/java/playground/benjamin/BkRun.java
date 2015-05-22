@@ -26,6 +26,7 @@ import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * @author benjamin
@@ -59,8 +60,11 @@ public class BkRun {
 		Controler kontrolle = new Controler(config);
 		
 	// controler settings	
-		kontrolle.setOverwriteFiles(true);
-        kontrolle.getConfig().controler().setCreateGraphs(false);
+		kontrolle.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		kontrolle.getConfig().controler().setCreateGraphs(false);
 
         // controlerConfigGroup
 		ControlerConfigGroup ccg = kontrolle.getConfig().controler();

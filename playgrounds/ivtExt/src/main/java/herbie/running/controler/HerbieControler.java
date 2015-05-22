@@ -27,19 +27,14 @@ import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
 import herbie.running.controler.listeners.LegDistanceDistributionWriter;
 import herbie.running.controler.listeners.ScoreElements;
 import herbie.running.replanning.TransitStrategyManager;
-import herbie.running.scoring.HerbieScoringFunctionFactory;
-import herbie.running.scoring.HerbieTravelCostCalculatorFactory;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 import javax.inject.Provider;
 
@@ -60,8 +55,11 @@ public class HerbieControler extends Controler {
 	public HerbieControler(String[] args) {
 		super(args);
 		super.getConfig().addModule(this.herbieConfigGroup);
-		super.setOverwriteFiles(true);
-        addOverridingModule(new AbstractModule() {
+		this.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
 				bind(StrategyManager.class).toProvider(new com.google.inject.Provider<StrategyManager>() {

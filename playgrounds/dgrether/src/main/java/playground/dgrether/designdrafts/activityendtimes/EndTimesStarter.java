@@ -20,7 +20,7 @@
 package playground.dgrether.designdrafts.activityendtimes;
 
 import org.matsim.core.controler.Controler;
-
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 
 /**
@@ -39,7 +39,10 @@ public class EndTimesStarter {
 		
 //		OTFVisController controller = new OTFVisController(config);
 		Controler controller = new Controler(config);
-		controller.setOverwriteFiles(true);
+		controller.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controller.addControlerListener(new CalculateActivityEndTimesControllerListener());
 		controller.run();
 	}

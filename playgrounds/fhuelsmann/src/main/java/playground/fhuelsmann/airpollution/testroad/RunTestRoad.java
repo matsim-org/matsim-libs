@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * @author benjamin
@@ -73,8 +74,11 @@ public class RunTestRoad {
 			Controler controler = new Controler(config);
 
 			// controler settings	
-			controler.setOverwriteFiles(true);
-            controler.getConfig().controler().setCreateGraphs(false);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+			controler.getConfig().controler().setCreateGraphs(false);
 
             // config settings
 			config.controler().setOutputDirectory(outputPath + day + "/");

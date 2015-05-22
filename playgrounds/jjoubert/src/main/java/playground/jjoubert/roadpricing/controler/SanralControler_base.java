@@ -5,6 +5,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.jjoubert.Utilities.matsim2urbansim.controler.MyBasicConfig;
 
 public class SanralControler_base {
@@ -67,9 +68,12 @@ public class SanralControler_base {
 		Controler c = new Controler(config);
         c.getConfig().controler().setCreateGraphs(true);
         c.getConfig().controler().setWriteEventsInterval(20);
-		c.setOverwriteFiles(false);
-		
-		
+		c.getConfig().controler().setOverwriteFileSetting(
+				false ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
+
 		config.checkConsistency();
 		new ConfigWriter(config).write("./output/Sanral_config.xml");
 		

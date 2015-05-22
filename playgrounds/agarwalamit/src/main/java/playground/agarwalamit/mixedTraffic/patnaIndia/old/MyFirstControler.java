@@ -13,6 +13,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SeepageMobsimfactory;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -88,7 +89,10 @@ public class MyFirstControler {
 		sc.getConfig().qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.withHoles);
 		
 		final Controler controler = new Controler(sc);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.setDumpDataAtEnd(true);
         controler.getConfig().controler().setCreateGraphs(true);
         controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());

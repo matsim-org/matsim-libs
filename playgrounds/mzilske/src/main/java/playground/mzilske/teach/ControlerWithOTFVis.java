@@ -3,6 +3,7 @@ package playground.mzilske.teach;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 public class ControlerWithOTFVis {
@@ -11,7 +12,10 @@ public class ControlerWithOTFVis {
 		Config config = ConfigUtils.loadConfig("examples/tutorial/config/example5-config.xml");
 		Controler controler = new Controler(config);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 

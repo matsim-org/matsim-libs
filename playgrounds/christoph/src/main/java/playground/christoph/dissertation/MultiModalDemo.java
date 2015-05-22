@@ -39,7 +39,6 @@ import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
 import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
 import org.matsim.contrib.multimodal.ControlerDefaultsWithMultiModalModule;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -58,7 +57,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -195,8 +193,11 @@ public class MultiModalDemo {
 		adaptNetwork(scenario);
 		
 		Controler controler = new MultiModalDemoControler(scenario);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		// Multi-modal simulation
         controler.setModules(new ControlerDefaultsWithMultiModalModule());
 
@@ -408,8 +409,11 @@ public class MultiModalDemo {
 		
 		// create routes
 		Controler controler = new MultiModalDemoControler(sc);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		// Multi-modal simulation
         controler.setModules(new ControlerDefaultsWithMultiModalModule());
 
@@ -448,8 +452,11 @@ public class MultiModalDemo {
 		
 		// create routes
 		Controler controler = new MultiModalDemoControler(sc);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		// Multi-modal simulation
         controler.setModules(new ControlerDefaultsWithMultiModalModule());
 

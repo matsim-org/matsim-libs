@@ -41,6 +41,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.PopulationWriter;
@@ -110,8 +111,11 @@ public class EquilNetworkControler {
 		});
 
 		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, ecm));
-		
-		controler.setOverwriteFiles(true);
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.getConfig().controler().setOutputDirectory(outputDir);
 		controler.run();
 	}

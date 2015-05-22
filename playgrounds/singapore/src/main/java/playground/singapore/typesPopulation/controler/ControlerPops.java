@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.StrategyManager;
 import playground.singapore.typesPopulation.config.groups.StrategyPopsConfigGroup;
 import playground.singapore.typesPopulation.controler.corelisteners.PlansDumping;
@@ -53,7 +54,10 @@ public class ControlerPops extends Controler {
 		config.addModule(new StrategyPopsConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
 		final ControlerPops controler = new ControlerPops(ScenarioUtils.loadScenario(config));
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addCoreControlerListener(new PlansDumping());
         AbstractModule myStrategyManagerModule = new AbstractModule() {
 

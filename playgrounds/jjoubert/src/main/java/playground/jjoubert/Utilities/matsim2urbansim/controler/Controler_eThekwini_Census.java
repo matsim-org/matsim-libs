@@ -22,6 +22,7 @@ package playground.jjoubert.Utilities.matsim2urbansim.controler;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class Controler_eThekwini_Census {
 	private static int numberOfIterations;
@@ -63,8 +64,11 @@ public class Controler_eThekwini_Census {
 		Controler c = new Controler(config);
         c.getConfig().controler().setCreateGraphs(true);
         c.getConfig().controler().setWriteEventsInterval(20);
-		c.setOverwriteFiles(overwrite);
-		
+		c.getConfig().controler().setOverwriteFileSetting(
+				overwrite ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		c.run();
 	}
 

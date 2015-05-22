@@ -36,6 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -90,7 +91,10 @@ public class Simulator {
 	
 	public static void main(String[] args) throws IOException {
 		final Controler controler = new Controler(args);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.setDumpDataAtEnd(false);
 		
 		boolean replanCandidates = Boolean.parseBoolean(controler.getConfig().getParam(GSV_CONFIG_MODULE_NAME, "replanCandidates"));

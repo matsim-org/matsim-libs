@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.SnapshotWriterFactoryRegister;
 import org.matsim.core.controler.SnapshotWriterRegistrar;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -77,8 +78,11 @@ public class OTFVisTest extends MatsimTestCase {
 
 		final Controler controler = new Controler(config);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(false);
 		controler.run();
 

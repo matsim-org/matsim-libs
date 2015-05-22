@@ -531,38 +531,8 @@ public class Controler extends AbstractController {
         this.overrides = AbstractModule.override(Arrays.asList(this.overrides), abstractModule);
     }
 
-    /**
-	 * Sets whether the Controler is allowed to overwrite files in the output
-	 * directory or not. <br>
-	 * When starting, the Controler can check that the output directory is empty
-	 * or does not yet exist, so no files will be overwritten (default setting).
-	 * While useful in a productive environment, this security feature may be
-	 * interfering in test cases or while debugging. <br>
-	 * <strong>Use this setting with caution, as it can result in data
-	 * loss!</strong>
-	 *
-	 * @param overwrite
-	 *            whether files and directories should be overwritten (true) or
-	 *            not (false)
-	 * @deprecated the danger represented by this method seems too great compared to
-	 * the small convenience it brings: it will thus be removed soon.
-	 * If you are sure that you want to get rid of previous results, call
-	 * {@link org.matsim.core.utils.io.IOUtils#deleteDirectory(java.io.File)} on your output directory.
-	 * If you want to write stuff to the output directory before lanching the controler,
-	 * you might (i) write this stuff to another directory, or (ii) put your
-	 * IO code in a StartupListenner, to get it executed after the controler
-	 * created the output directory.
-	 */
-	@Deprecated
-	public final void setOverwriteFiles(final boolean overwrite) {
-		this.getConfig().controler().setOverwriteFileSetting(
-				overwrite ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-	}
 
-
-    /**
+	/**
 	 * @param dumpData
 	 *            <code>true</code> if at the end of a run, plans, network,
 	 *            config etc should be dumped to a file.

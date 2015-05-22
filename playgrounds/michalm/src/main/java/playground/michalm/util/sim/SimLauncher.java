@@ -22,6 +22,7 @@ package playground.michalm.util.sim;
 import java.util.Arrays;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 
 public class SimLauncher
@@ -48,7 +49,10 @@ public class SimLauncher
         }
 
         Controler controler = new Controler(new String[] { dir + cfgFile });
-        controler.setOverwriteFiles(true);
+        controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
         controler.run();
     }
 }

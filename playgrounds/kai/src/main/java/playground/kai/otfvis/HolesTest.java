@@ -21,6 +21,7 @@
 package playground.kai.otfvis;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * @author nagel
@@ -33,7 +34,10 @@ public class HolesTest {
 	 */
 	public static void main(String[] args) {
 		Controler controler = new Controler( "examples/config/holes-config.xml" ) ;
-		controler.setOverwriteFiles( true ) ;
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run() ;
 		
 		org.matsim.contrib.otfvis.OTFVis.main( new String[] {"output/holes/ITERS/it.0/0.otfvis.mvi"} ) ;

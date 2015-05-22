@@ -25,6 +25,7 @@ import java.io.IOException;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
  * @author nagel
@@ -42,7 +43,10 @@ public class OevTest {
 		}
 
 		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true) ;
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 
 	}

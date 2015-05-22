@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -118,7 +119,10 @@ public class Matsim4Urbansim {
 
 		((ScenarioImpl) scenarioData).setPopulation(newPop);
 		Controler controler = new Controler(scenarioData) ;
-		controler.setOverwriteFiles(true) ;
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		// The following lines register what should be done _after_ the iterations were run:
 		MyControlerListener myControlerListener = new MyControlerListener( zones ) ;

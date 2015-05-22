@@ -21,6 +21,7 @@ package playground.dgrether.signalsystems.laemmer;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.laemmer.controler.LaemmerControlerListenerFactory;
 
@@ -51,7 +52,10 @@ public class LaemmerMain {
 		Controler controler = new Controler(args2);
         //FIXME: Take care that the normal SignalsControllerListener is NOT added.
         controler.addControlerListener(new LaemmerControlerListenerFactory().createSignalsControllerListener());
-        controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 
 	}

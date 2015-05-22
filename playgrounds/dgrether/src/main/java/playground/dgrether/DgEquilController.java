@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
@@ -69,9 +70,12 @@ public class DgEquilController {
 		else {
 		  ((SimulationConfigGroup) controler.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(1.0);
 		}
-		
-		controler.setOverwriteFiles(true);
-		
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		controler.addControlerListener(new StartupListener(){
 			public void notifyStartup(final StartupEvent event) {
 				event.getControler().getConfig().controler().setLastIteration(iteration);

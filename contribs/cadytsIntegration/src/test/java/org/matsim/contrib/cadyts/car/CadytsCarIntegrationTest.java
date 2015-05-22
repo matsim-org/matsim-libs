@@ -44,6 +44,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
@@ -92,8 +93,11 @@ public class CadytsCarIntegrationTest {
 		config.strategy().addStrategySettings(strategySettings);
 		
 		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		final CadytsContext context = new CadytsContext(config);
 		config.getModule("cadytsCar").addParam("startTime", "04:00:00");
 		config.getModule("cadytsCar").addParam("endTime", "20:00:00");
@@ -170,8 +174,11 @@ public class CadytsCarIntegrationTest {
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.setDumpDataAtEnd(true);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		final CadytsContext cContext = new CadytsContext(config);
 		controler.addControlerListener(cContext);
 

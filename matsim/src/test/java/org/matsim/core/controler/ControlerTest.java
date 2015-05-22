@@ -175,7 +175,10 @@ public class ControlerTest {
 		// Run the simulation again
 		controler = new Controler(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);
-        controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 

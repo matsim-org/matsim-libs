@@ -10,6 +10,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -44,7 +45,10 @@ class MyControler {
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
-		controler.setOverwriteFiles(true) ;
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.addControlerListener(new KaiAnalysisListener()) ;
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 //		controler.setMobsimFactory(new OldMobsimFactory()) ;

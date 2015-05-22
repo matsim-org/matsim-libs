@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.vis.otfvis.OTFClientFile;
 
@@ -22,8 +23,11 @@ public class Equil {
 		String configFile = "/Users/zilske/matsim-without-history/matsim/trunk/examples/equil/config.xml";
 		final Map<Id, Double> lastEntered = new HashMap<Id, Double>();
 		final Controler controller = new Controler(configFile);
-		controller.setOverwriteFiles(true) ;
-		
+		controller.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		final ArrayList<Double> link2 = new ArrayList<Double>();
 		final ArrayList<Double> link15 = new ArrayList<Double>();
 		final ArrayList<Double> link2time = new ArrayList<Double>();

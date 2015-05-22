@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.population.LegImpl;
@@ -52,9 +53,12 @@ public class IntegrationTest  extends TestCase {
 		};
 		
 		controler.addControlerListener(afterMobSimListener);
-		
-		controler.setOverwriteFiles(true);
-		
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		controler.run();
 		assertFalse(someErrorHappened);
 	}

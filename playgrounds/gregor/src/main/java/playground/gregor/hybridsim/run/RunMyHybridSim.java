@@ -20,22 +20,15 @@
 
 package playground.gregor.hybridsim.run;
 
-import java.util.Iterator;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.HybridNetworkFactory;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.hybridsim.factories.HybridMobsimProvider;
@@ -73,8 +66,11 @@ public class RunMyHybridSim {
 //		
 
 		final Controler controller = new Controler(sc);
-		controller.setOverwriteFiles(true);
-		
+		controller.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 
 		final HybridNetworkFactory netFac = new HybridNetworkFactory();
 //		netFac.putNetsimNetworkFactory("2ext", netFac);

@@ -21,8 +21,8 @@ package playground.anhorni.surprice;
 
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -40,9 +40,12 @@ public class DayControler extends Controler {
 	private TerminationCriterionScoreBased terminationCriterion = null;
 		
 	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences, Population populationPreviousDay) {
-		super(config);	
-		super.setOverwriteFiles(true);
-		this.memories = memories;	
+		super(config);
+		this.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		this.memories = memories;
 		this.day = day;
 		this.preferences = preferences;
 		this.populationPreviousDay = populationPreviousDay;

@@ -24,6 +24,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class DCControler extends Controler {
 	
@@ -31,8 +32,11 @@ public class DCControler extends Controler {
 	
 	
 	public DCControler(final String[] args) {
-		super(args);	
-		this.setOverwriteFiles(true);
+		super(args);
+		this.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		this.init();
 	}
 	 

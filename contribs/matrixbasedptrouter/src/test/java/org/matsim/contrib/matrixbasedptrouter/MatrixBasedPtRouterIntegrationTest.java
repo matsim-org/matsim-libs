@@ -31,9 +31,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -42,6 +39,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -106,8 +104,11 @@ public class MatrixBasedPtRouterIntegrationTest {
 		
 		//set up controler
 		Controler controler = new Controler(scenario) ;
-		controler.setOverwriteFiles(true);		
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		//add home and work activity to plansCalcScoreConfigGroup
 		PlanCalcScoreConfigGroup planCalcScore = controler.getScenario().getConfig().planCalcScore();
 		planCalcScore.addParam("activityType_0", "home");

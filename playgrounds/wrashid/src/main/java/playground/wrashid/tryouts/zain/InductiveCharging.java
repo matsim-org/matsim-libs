@@ -16,6 +16,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.Energy
 import org.matsim.contrib.transEnergySim.vehicles.impl.InductivelyChargableBatteryElectricVehicle;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class InductiveCharging {
 
@@ -64,10 +65,12 @@ public class InductiveCharging {
 		//chargingUponArrival.setPowerForNonInitializedActivityTypes(controller.getFacilities(), 3500);
 		chargingUponArrival.getChargablePowerAtActivityTypes().put("h", 3312.0);
 		chargingUponArrival.getChargablePowerAtActivityTypes().put("w", 3312.0);
-		
-		
-		
-		controller.setOverwriteFiles(true);
+
+
+		controller.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controller.run();
 		controller.printStatisticsToConsole();
 		

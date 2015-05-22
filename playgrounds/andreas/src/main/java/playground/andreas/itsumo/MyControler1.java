@@ -371,8 +371,11 @@ public class MyControler1 extends Controler {
 		loadPopulation(scenario);
 
 		final MyControler1 controler = new MyControler1(scenario);
-		controler.setOverwriteFiles(true);
-		
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		final OutputDirectoryHierarchy controlerIO = controler.getControlerIO() ;
 
 		controler.addOverridingModule(new AbstractModule() {

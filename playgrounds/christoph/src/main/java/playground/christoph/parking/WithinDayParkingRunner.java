@@ -32,6 +32,7 @@ import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.christoph.parking.core.facilities.OtherFacilityCreator;
@@ -112,7 +113,10 @@ public class WithinDayParkingRunner {
 			controler.addControlerListener(parkingControlerListener);
             controler.setModules(new ControlerDefaultsWithMultiModalModule());
 
-            controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.run();
 			
 			System.exit(0);			

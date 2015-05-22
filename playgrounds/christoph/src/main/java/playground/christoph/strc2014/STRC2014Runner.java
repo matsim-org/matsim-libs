@@ -33,6 +33,7 @@ import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -115,8 +116,11 @@ public class STRC2014Runner {
 			 */
 			controler.addControlerListener(new ActivitiesAnalyzer());
 			controler.addControlerListener(new TripsAnalyzer());
-			
-			controler.setOverwriteFiles(true);
+
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.run();
 			
 			System.exit(0);			

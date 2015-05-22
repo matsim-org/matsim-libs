@@ -22,6 +22,7 @@ package playground.benjamin.scenarios.munich;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -51,8 +52,11 @@ public class RunMunich {
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		Controler controler = new Controler(scenario);
 
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(true);
 
         if(considerZone30){
 			ShapeFileReader shapeFileReader = new ShapeFileReader();

@@ -22,11 +22,11 @@ package playground.andreas.bln.net.simplex;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -34,8 +34,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
@@ -46,8 +44,6 @@ import org.matsim.pt.counts.PtCountControlerListener;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -179,8 +175,11 @@ public final class TransitControler extends Controler {
 
 	public static void main(final String[] args) {
 		TransitControler tc = new TransitControler(args);
-		tc.setOverwriteFiles(true);
-//		tc.setCreateGraphs(false);
+		tc.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		//		tc.setCreateGraphs(false);
 		tc.run();
 	}
 

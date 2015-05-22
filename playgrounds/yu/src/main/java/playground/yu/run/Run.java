@@ -21,6 +21,7 @@
 package playground.yu.run;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import playground.yu.analysis.QVProfilControlerListener;
 import playground.yu.analysis.RouteTravelTimeSummary;
 import playground.yu.counts.CntSimCap4Chart;
@@ -43,7 +44,10 @@ public class Run {
 			controler.addControlerListener(new QVProfilControlerListener());
 		}
         controler.getConfig().controler().setCreateGraphs(Boolean.parseBoolean(args[1]));
-        controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 

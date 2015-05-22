@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -58,8 +59,11 @@ public class CMCFRunner {
 			final LinkSensorManager lsm = new LinkSensorManager();
 			lsm.addLinkSensor(Id.create("3", Link.class));
 			lsm.addLinkSensor(Id.create("4", Link.class));
-			controler.setOverwriteFiles(true);
-//			controler.addControlerListener(new StartupListener() {
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+			//			controler.addControlerListener(new StartupListener() {
 //				public void notifyStartup(StartupEvent e) {
 //					e.getControler().getEvents().addHandler(lsm);
 //					LinkTravelTimeCounter.init(e.getControler().getEvents(), e.getControler().getNetwork().getLinks().size());

@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -129,7 +130,10 @@ public class OwnScoringFunctionAndReplanning {
 		new ObjectAttributesXmlWriter(workTimes).writeFile("output/worktimes.xml");
 		
 		final Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.setScoringFunctionFactory(new MyScoringFunctionFactory(config, scenario.getNetwork()));
 		controler.addControlerListener(new StartupListener() {
 			@Override

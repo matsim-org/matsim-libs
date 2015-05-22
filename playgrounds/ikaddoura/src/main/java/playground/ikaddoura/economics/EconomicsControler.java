@@ -33,6 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -124,9 +125,12 @@ public class EconomicsControler {
 			}
 		});
 		controler.addControlerListener(new MarginalCongestionPricingContolerListener( controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())  ));
-		
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(true);
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(true);
         controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.run();
 		
@@ -160,9 +164,12 @@ public class EconomicsControler {
 
 		FlatPricingControlerListener flatPricing = new FlatPricingControlerListener(scenario, flatToll);
 		controler.addControlerListener(flatPricing);
-		
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(true);
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(true);
         controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.run();
 		
@@ -190,9 +197,12 @@ public class EconomicsControler {
 
 		WelfareAnalysisControlerListener analysis = new WelfareAnalysisControlerListener(scenario);
 		controler.addControlerListener(analysis);
-		
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(true);
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(true);
         controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.run();
 	}
@@ -222,8 +232,11 @@ public class EconomicsControler {
 
 			DemandFunctionControlerListener demandFunctionControlerListener = new DemandFunctionControlerListener();
 
-			controler.setOverwriteFiles(true);
-            controler.getConfig().controler().setCreateGraphs(false);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+			controler.getConfig().controler().setCreateGraphs(false);
             controler.addControlerListener(demandFunctionControlerListener);
 			controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 			controler.run();
@@ -284,8 +297,11 @@ public class EconomicsControler {
 
 			CostFunctionsControlerListener economicsControlerListener = new CostFunctionsControlerListener((ScenarioImpl) controler.getScenario());
 
-			controler.setOverwriteFiles(true);
-            controler.getConfig().controler().setCreateGraphs(false);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+			controler.getConfig().controler().setCreateGraphs(false);
             controler.addControlerListener(economicsControlerListener);
 			controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 			controler.run();

@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -260,7 +261,10 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 		}
 		final HUPCBasicControllerKTI controller = new HUPCBasicControllerKTI(args);
 
-		controller.setOverwriteFiles(true);
+		controller.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
 		controller.run();
 

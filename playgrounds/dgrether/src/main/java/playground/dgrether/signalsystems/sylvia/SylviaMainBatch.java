@@ -24,6 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.sylvia.controler.DgSylviaConfig;
@@ -84,7 +85,10 @@ public class SylviaMainBatch {
 			baseConfig.controler().setRunId("fixed-time_scale_" + scale);
 			Controler controler = new Controler(baseConfig);
 			controler.addControlerListener(analysis);
-			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.run();
 			
 			//sylvia control
@@ -98,7 +102,10 @@ public class SylviaMainBatch {
             //FIXME: Take care that the normal SignalsControllerListener is NOT added.
             controler.addControlerListener(new DgSylviaControlerListenerFactory(new DgSylviaConfig()).createSignalsControllerListener());
             controler.addControlerListener(analysis);
-			controler.setOverwriteFiles(true);
+			controler.getConfig().controler().setOverwriteFileSetting(
+					true ?
+							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			controler.run();
 		}
 		

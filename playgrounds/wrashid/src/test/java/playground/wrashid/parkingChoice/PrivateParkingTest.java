@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestCase;
@@ -69,9 +70,12 @@ public class PrivateParkingTest extends MatsimTestCase {
 		
 		
 		ParkingModule parkingModule = new ParkingModule(controler,parkingCollection);
-		
-		controler.setOverwriteFiles(true);
-		
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		controler.run();
 		
 		return parkingModule.getAverageWalkingDistance();
@@ -98,9 +102,12 @@ public class PrivateParkingTest extends MatsimTestCase {
 		
 		
 		ParkingModule parkingModule = new ParkingModule(controler,parkingCollection);
-		
-		controler.setOverwriteFiles(true);
-		
+
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		controler.run();
 		
 	//	assertEquals(3489,parkingModule.getAverageWalkingDistance(),5.0);

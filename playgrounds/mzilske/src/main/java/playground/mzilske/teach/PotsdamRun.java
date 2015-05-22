@@ -9,6 +9,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -69,7 +70,10 @@ public class PotsdamRun implements Runnable {
 		config.controler().setOutputDirectory("output-homogeneous-37");
 		
 		final Controler controller = new Controler(scenario);
-		controller.setOverwriteFiles(true);
+		controller.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controller.run();
 		
 //		Link bridge1 = scenario.getNetwork().getLinks().get(Id.create(17919, Link.class));

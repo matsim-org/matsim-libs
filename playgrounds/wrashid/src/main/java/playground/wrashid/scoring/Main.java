@@ -20,6 +20,7 @@
 package playground.wrashid.scoring;
 
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 
@@ -28,7 +29,10 @@ public class Main {
 		Controler controler = new Controler(args);
         CharyparNagelScoringFunctionFactory factory = new CharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario().getNetwork());
 		controler.setScoringFunctionFactory(factory);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 	}
 }

@@ -3,6 +3,7 @@ package playground.wrashid.PHEV.Utility;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumption;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
 
@@ -24,7 +25,10 @@ public class MobSimController extends Controler {
 		Timer t=new Timer();
 		t.startTimer();
 		final MobSimController controler = new MobSimController(args);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		EventsManager events=controler.getEvents();
 		
 		

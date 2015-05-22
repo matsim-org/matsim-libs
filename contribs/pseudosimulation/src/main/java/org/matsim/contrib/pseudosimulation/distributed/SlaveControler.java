@@ -21,6 +21,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -210,7 +211,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         matsimControler = new Controler(scenario);
         plancatcher = new PlanCatcher();
         DistributedPlanStrategyTranslationAndRegistration.registerStrategiesWithControler(this.matsimControler, plancatcher, quickReplannning, numberOfPSimIterationsPerCycle);
-        matsimControler.setOverwriteFiles(true);
+        matsimControler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
         matsimControler.addControlerListener(this);
         linkTravelTimes = new FreeSpeedTravelTime();
         travelTime = new ReplaceableTravelTime();

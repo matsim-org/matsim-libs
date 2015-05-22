@@ -38,6 +38,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -94,8 +95,11 @@ public class VehicleType2ScenarioTest {
 		runTest.createConfig();
 
 		final Controler cont = new Controler(runTest.scenario);
-		cont.setOverwriteFiles(true);
-		
+		cont.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+
 		if(useModifiedMobsimFactory){
 			cont.addOverridingModule(new AbstractModule() {
 				@Override

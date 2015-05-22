@@ -29,6 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EquilWithCarrierWithPassTest extends MatsimTestCase {
@@ -84,7 +85,10 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
         CarrierModule carrierControler = new CarrierModule(planFile,new StrategyManagerFactoryForTests(controler),new DistanceScoringFunctionFactoryForTests(controler.getScenario().getNetwork()));
 		
 		controler.addOverridingModule(carrierControler);
-		controler.setOverwriteFiles(true);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.run();
 
 		Carrier carrier1 = controler.getInjector().getInstance(Carriers.class).getCarriers().get(Id.create("carrier1", Carrier.class));

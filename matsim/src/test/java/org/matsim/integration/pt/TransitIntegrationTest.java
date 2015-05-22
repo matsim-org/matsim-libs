@@ -24,6 +24,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -38,8 +39,11 @@ public class TransitIntegrationTest {
 		config.controler().setLastIteration(0);
 		config.plans().setInputFile("test/scenarios/pt-tutorial/population2.xml");
 		Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-        controler.getConfig().controler().setCreateGraphs(false);
+		controler.getConfig().controler().setOverwriteFileSetting(
+				true ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
 
 		ScenarioImpl s = (ScenarioImpl) controler.getScenario();
