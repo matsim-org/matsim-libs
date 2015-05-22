@@ -192,12 +192,12 @@ public class OutputDirectoryHierarchy {
 						throw new RuntimeException( "unknown setting "+overwriteFiles );
 				}
 			}
-		} else {
-			if (!outputDir.mkdirs()) {
-				throw new RuntimeException(
-						"The output directory path " + outputPath
-						+ " could not be created. Check pathname and permissions! Full path: " + new File(outputPath).getAbsolutePath());
-			}
+		}
+
+		if (!outputDir.exists() && !outputDir.mkdirs()) {
+			throw new RuntimeException(
+					"The output directory path " + outputPath
+					+ " could not be created. Check pathname and permissions! Full path: " + new File(outputPath).getAbsolutePath());
 		}
 	
 		File tmpDir = new File(getTempPath());
