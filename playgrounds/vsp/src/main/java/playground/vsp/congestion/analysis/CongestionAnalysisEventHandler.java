@@ -89,6 +89,9 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 		this.scenario = scenario;
 		this.useMoneyEvents = useMoneyEvents;
 		log.info("UseMoneyEvents : " + useMoneyEvents);
+		if (useMoneyEvents) {
+			log.warn("Money events may be thrown later than the congestion events... May result in a wrong interpretation of the results. Better use directly the congestion events for analysis.");
+		}
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		log.info("VTTS_car: " + vtts_car);
 	}
