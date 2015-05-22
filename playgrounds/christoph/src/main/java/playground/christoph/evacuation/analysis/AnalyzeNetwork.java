@@ -45,7 +45,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -122,9 +121,15 @@ public class AnalyzeNetwork implements PersonDepartureEventHandler, PersonArriva
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}
 		if (scenario.getConfig().controler().getRunId() != null) {
-			dummyInputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, scenario.getConfig().controler().getRunId(), true);
+			dummyInputDirectoryHierarchy = new OutputDirectoryHierarchy(
+					outputPath,
+					scenario.getConfig().controler().getRunId(),
+							true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		} else {
-			dummyInputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, null, true);
+			dummyInputDirectoryHierarchy = new OutputDirectoryHierarchy(
+					outputPath,
+					null,
+							true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		}
 		
 		// add another string to the runId to not overwrite old files
@@ -136,9 +141,15 @@ public class AnalyzeNetwork implements PersonDepartureEventHandler, PersonArriva
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}
 		if (scenario.getConfig().controler().getRunId() != null) {
-			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, scenario.getConfig().controler().getRunId(), true);
+			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(
+					outputPath,
+					scenario.getConfig().controler().getRunId(),
+							true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		} else {
-			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, null, true);
+			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(
+					outputPath,
+					null,
+							true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		}
 		
 		Set<SimpleFeature> features = new HashSet<SimpleFeature>();

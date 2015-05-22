@@ -96,7 +96,7 @@ class BuildingEnergyAnalyzerMain {
 			runs.add(args[i]);
 		}
 		//catch logEntries
-		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputPath, BuildingEnergyAnalyzer.class.getSimpleName(), true, false));
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputPath, BuildingEnergyAnalyzer.class.getSimpleName(), OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles, false));
 		OutputDirectoryLogging.catchLogEntries();
 		// dump input-parameters to log
 		log.info("running class: " + System.getProperty("sun.java.command"));

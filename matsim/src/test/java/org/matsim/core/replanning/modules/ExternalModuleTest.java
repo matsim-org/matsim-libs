@@ -56,7 +56,7 @@ public class ExternalModuleTest {
     public void setUp() {
         scenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
         originalScenario = ScenarioUtils.loadScenario(utils.loadConfig("test/scenarios/equil/config.xml"));
-        outputDirectoryHierarchy = new OutputDirectoryHierarchy(utils.getOutputDirectory(), true);
+        outputDirectoryHierarchy = new OutputDirectoryHierarchy(utils.getOutputDirectory(), OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
     }
 
     @Test

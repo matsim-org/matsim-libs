@@ -85,7 +85,7 @@ public class ListenersInjectionTest {
                     @Override
                     public void install() {
                         // put dummy dependencies to get the listenners happy
-						bind(OutputDirectoryHierarchy.class).toInstance( new OutputDirectoryHierarchy( outputDir , true ) );
+						bind(OutputDirectoryHierarchy.class).toInstance( new OutputDirectoryHierarchy( outputDir , OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists ) );
 						bind(IterationStopWatch.class).toInstance( new IterationStopWatch() );
 						bind(Scenario.class).toInstance( ScenarioUtils.createScenario( config ) );
 						bind(EventsManager.class).toInstance( new EventsManagerImpl() );

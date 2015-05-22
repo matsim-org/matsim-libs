@@ -148,7 +148,11 @@ public class CreateLegHistogramImproved {
 			String runId = (String) runs[i].getFirst();
 			Integer it = (Integer) runs[i].getSecond();
 			String rundir = baseDirectory + "runs-svn/run" + runId + "/";
-			OutputDirectoryHierarchy out = new OutputDirectoryHierarchy(rundir, runId, false, false);
+			OutputDirectoryHierarchy out = new OutputDirectoryHierarchy(
+					rundir,
+					runId,
+							false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists,
+					false);
 			String eventsFilename = out.getIterationFilename(it, "events.xml.gz");
 			String pngOutputLegHisto = out.getIterationFilename(it, "leg_histogram_improved_de");
 			String txtOutputLegHisto = pngOutputLegHisto;

@@ -28,12 +28,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringGetter;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
 public final class ControlerConfigGroup extends ReflectiveConfigGroup {
+	private static final Logger log = Logger.getLogger( ControlerConfigGroup.class );
 
 	public enum RoutingAlgorithmType {Dijkstra, AStarLandmarks, FastDijkstra, FastAStarLandmarks}
 
@@ -51,6 +55,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private static final String SNAPSHOT_FORMAT = "snapshotFormat";
 	private static final String WRITE_EVENTS_INTERVAL = "writeEventsInterval";
 	private static final String WRITE_PLANS_INTERVAL = "writePlansInterval";
+	private static final String OVERWRITE_FILE = "overwriteFiles";
 
 	/*package*/ static final String MOBSIM = "mobsim";
 	public enum MobsimType {qsim, JDEQSim}
@@ -75,6 +80,7 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	private String mobsim = MobsimType.qsim.toString();
 	private int writeSnapshotsInterval = 1;
 	private boolean createGraphs = true;
+	private OverwriteFileSetting overwriteFileSetting = OverwriteFileSetting.failIfDirectoryExists;
 
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
@@ -300,4 +306,18 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 		this.createGraphs = createGraphs;
 	}
 
+	@StringGetter( OVERWRITE_FILE )
+	public OverwriteFileSetting getOverwriteFileSetting() {
+		return overwriteFileSetting;
+	}
+
+	@StringSetter( OVERWRITE_FILE )
+	public void setOverwriteFileSetting(final OverwriteFileSetting overwriteFileSetting) {
+		if ( overwriteFileSetting == OverwriteFileSetting.overwriteExistingFiles ) {
+			log.warn( "setting overwriting behavior to "+overwriteFileSetting );
+			log.warn( "this is not recommended, as it might result in a directory containing output from several model runs" );
+			log.warn( "prefer the options "+OverwriteFileSetting.deleteDirectoryIfExists+" or "+OverwriteFileSetting.failIfDirectoryExists );
+		}
+		this.overwriteFileSetting = overwriteFileSetting;
+	}
 }

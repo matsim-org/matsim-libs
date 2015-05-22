@@ -102,7 +102,7 @@ public final class LinkActivityCalculationFromEventsMain {
 		int tmax = Integer.parseInt(args[5]);
 		String runId = args[6];
 		//catch logEntries
-		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputPath, runId + "." + PREFIX, true, false));
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputPath, runId + "." + PREFIX, OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles, false));
 		OutputDirectoryLogging.catchLogEntries();
 		Gbl.enableThreadCpuTimeMeasurement();
 		// dump input-parameters

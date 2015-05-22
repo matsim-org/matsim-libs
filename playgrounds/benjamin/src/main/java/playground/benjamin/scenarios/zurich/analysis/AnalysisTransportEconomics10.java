@@ -54,8 +54,14 @@ public class AnalysisTransportEconomics10 {
 		
 		String outputPath1 = BkPaths.RUNSSVN + runid1String;
 		String outputPath2 = BkPaths.RUNSSVN + runid2String;
-		OutputDirectoryHierarchy io1 = new OutputDirectoryHierarchy(outputPath1, runid1String, false);
-		OutputDirectoryHierarchy io2 = new OutputDirectoryHierarchy(outputPath2, runid2String, false);
+		OutputDirectoryHierarchy io1 = new OutputDirectoryHierarchy(
+				outputPath1,
+				runid1String,
+						false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		OutputDirectoryHierarchy io2 = new OutputDirectoryHierarchy(
+				outputPath2,
+				runid2String,
+						false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		
 
 		netfile = io1.getOutputFilename("output_network") + ".xml.gz";

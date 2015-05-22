@@ -82,9 +82,14 @@ public class DgCottbusSignalPlanChartGenerator {
 		//skript
 		OutputDirectoryHierarchy io = null;
 		if (runId != null) 
-			io = new OutputDirectoryHierarchy(baseDir, runId.toString(), false);
+			io = new OutputDirectoryHierarchy(
+					baseDir,
+					runId.toString(),
+							false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		else
-			io = new OutputDirectoryHierarchy(baseDir, false);
+			io = new OutputDirectoryHierarchy(
+					baseDir,
+							false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		
 		String eventsFilename = io.getIterationFilename(iteration, "events.xml.gz");
 		

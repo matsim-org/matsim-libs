@@ -193,9 +193,15 @@ public class DetailedAgentsTrackerPostProcessing {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}
 		if (scenario.getConfig().controler().getRunId() != null) {
-			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, scenario.getConfig().controler().getRunId(), true);
+			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(
+					outputPath,
+					scenario.getConfig().controler().getRunId(),
+							true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		} else {
-			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, null, true);
+			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(
+					outputPath,
+					null,
+							true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		}
 		
 		return dummyOutputDirectoryHierarchy;

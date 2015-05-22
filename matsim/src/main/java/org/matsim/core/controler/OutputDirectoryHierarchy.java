@@ -22,6 +22,8 @@ package org.matsim.core.controler;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.utils.io.IOUtils;
+
 /**
  * 
  * Represents the directory hierarchy where the MATSim output goes in.
@@ -30,7 +32,9 @@ import org.apache.log4j.Logger;
  *
  */
 public class OutputDirectoryHierarchy {
-	
+
+	public enum OverwriteFileSetting {failIfDirectoryExists, overwriteExistingFiles, deleteDirectoryIfExists}
+
 	private static final String DIRECTORY_ITERS = "ITERS";
 	
 	private static Logger log = Logger.getLogger(OutputDirectoryHierarchy.class);
@@ -39,13 +43,13 @@ public class OutputDirectoryHierarchy {
 	
 	private final String outputPath;
 	
-	private boolean overwriteFiles = false;
+	private OverwriteFileSetting overwriteFiles = OverwriteFileSetting.failIfDirectoryExists;
 	
-	public OutputDirectoryHierarchy(String outputPath, boolean overwriteFiles) {
+	public OutputDirectoryHierarchy(String outputPath, OverwriteFileSetting overwriteFiles) {
 		this(outputPath, null, overwriteFiles, true);
 	}
 	
-	public OutputDirectoryHierarchy(String outputPath, String runId, boolean overwriteFiles) {
+	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles) {
 		this(outputPath, runId, overwriteFiles, true);
 	}	
 	/**
@@ -55,7 +59,7 @@ public class OutputDirectoryHierarchy {
 	 * @param outputPath the path to the output directory
 	 * @param createDirectories create the directories or abort if they exist
 	 */
-	public OutputDirectoryHierarchy(String outputPath, String runId, boolean overwriteFiles, boolean createDirectories){
+	public OutputDirectoryHierarchy(String outputPath, String runId, OverwriteFileSetting overwriteFiles, boolean createDirectories){
 		this.overwriteFiles = overwriteFiles;
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
@@ -66,7 +70,7 @@ public class OutputDirectoryHierarchy {
 			this.createDirectories();
 		}
 	}
-		
+
 	/**
 	 * Returns the path to a directory where temporary files can be stored.
 	 *
@@ -138,7 +142,7 @@ public class OutputDirectoryHierarchy {
 	public final void createIterationDirectory(final int iteration) {
 		File dir = new File(getIterationPath(iteration));
 		if (!dir.mkdir()) {
-			if (this.overwriteFiles && dir.exists()) {
+			if (this.overwriteFiles == OverwriteFileSetting.overwriteExistingFiles && dir.exists()) {
 				log.info("Iteration directory "
 						+ getIterationPath(iteration)
 						+ " exists already.");
@@ -157,20 +161,35 @@ public class OutputDirectoryHierarchy {
 						+ outputPath + " is a file and cannot be replaced by a directory.");
 			}
 			if (outputDir.list().length > 0) {
-				if (overwriteFiles) {
-					System.out.flush();
-					log.warn("###########################################################");
-					log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
-					log.warn("### " + outputPath);
-					log.warn("###########################################################");
-					System.err.flush();
-					// IOUtils.deleteDirectory( outputDir, false );
-				} else {
-					// the directory is not empty, we do not overwrite any
-					// files!
-					throw new RuntimeException(
-							"The output directory " + outputPath
-							+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
+				switch ( overwriteFiles ) {
+					case failIfDirectoryExists:
+						// the directory is not empty, we do not overwrite any
+						// files!
+						throw new RuntimeException(
+								"The output directory " + outputPath
+								+ " exists already but has files in it! Please delete its content or the directory and start again. We will not delete or overwrite any existing files.");
+					case overwriteExistingFiles:
+						System.out.flush();
+						log.warn("###########################################################");
+						log.warn("### THE CONTROLER WILL OVERWRITE FILES IN:");
+						log.warn("### " + outputPath);
+						log.warn("###########################################################");
+						System.err.flush();
+						break;
+					case deleteDirectoryIfExists:
+						// log a warning, even if at the time the user sees it,
+						// it is too late to change his mind...
+						// I still have problems understanding why people want such a setting.
+						System.out.flush();
+						log.warn("###########################################################");
+						log.warn("### THE CONTROLER WILL DELETE THE EXISTING OUTPUT DIRECTORY:");
+						log.warn("### " + outputPath);
+						log.warn("###########################################################");
+						System.err.flush();
+						IOUtils.deleteDirectory(outputDir, false);
+						break;
+					default:
+						throw new RuntimeException( "unknown setting "+overwriteFiles );
 				}
 			}
 		} else {

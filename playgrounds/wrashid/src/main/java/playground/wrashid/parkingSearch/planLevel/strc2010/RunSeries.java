@@ -47,7 +47,9 @@ public class RunSeries {
 			public void notifyStartup(StartupEvent event) {
 				String outputFolder=getOutputFolderFullPath(GlobalRegistry.runNumber);
 				Controler controler= event.getControler();
-				OutputDirectoryHierarchy controlerIO=new OutputDirectoryHierarchy(outputFolder, false);
+				OutputDirectoryHierarchy controlerIO=new OutputDirectoryHierarchy(
+						outputFolder,
+								false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 				
 				//TODO: write tests for this, which fail when the variable or method names change (and as such can be easily adapted).
 				

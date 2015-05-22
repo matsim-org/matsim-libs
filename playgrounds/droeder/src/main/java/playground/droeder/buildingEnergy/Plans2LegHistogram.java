@@ -57,7 +57,7 @@ public abstract class Plans2LegHistogram {
 		}
 		String plansfile = args[0];
 		String outputpath = new File(args[1]).getAbsolutePath() + System.getProperty("file.separator");
-		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputpath, "legHistograms", true));
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputpath, "legHistograms", OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles));
 		OutputDirectoryLogging.catchLogEntries();
 		log.info("plansfile: " + plansfile);
 		log.info("outputpath: " + outputpath);

@@ -87,10 +87,15 @@ public class BkVisLiveFromLastIteration {
 		configReader.readFile(newConfigFile);
 		OutputDirectoryHierarchy oldConfControlerIO;
 		if (config.controler().getRunId() != null) {
-			oldConfControlerIO = new OutputDirectoryHierarchy(currentDirectory, config.controler().getRunId(), false);
+			oldConfControlerIO = new OutputDirectoryHierarchy(
+					currentDirectory,
+					config.controler().getRunId(),
+							false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		}
 		else {
-			oldConfControlerIO = new OutputDirectoryHierarchy(currentDirectory, true);
+			oldConfControlerIO = new OutputDirectoryHierarchy(
+					currentDirectory,
+							true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		}
 		config.network().setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
 		config.plans()
@@ -121,7 +126,9 @@ public class BkVisLiveFromLastIteration {
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		Scenario sc = loader.loadScenario();
 		EventsManager events = EventsUtils.createEventsManager();
-		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(sc.getConfig().controler().getOutputDirectory(), true);
+		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(
+				sc.getConfig().controler().getOutputDirectory(),
+						true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(sc, events);
 		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, sc, events, otfVisQSim);

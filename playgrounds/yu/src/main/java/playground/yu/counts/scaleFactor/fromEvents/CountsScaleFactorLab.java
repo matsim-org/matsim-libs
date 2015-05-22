@@ -236,9 +236,6 @@ public class CountsScaleFactorLab {
 	private Config config;
 	private Counts counts;
 
-	/**
-	 * @param config
-	 */
 	public CountsScaleFactorLab(String configFilename, String eventsFilename,
 			double[] scaleFactors) {
 		scenario = ScenarioUtils.loadScenario(ConfigUtils
@@ -291,8 +288,11 @@ public class CountsScaleFactorLab {
 			ControlerConfigGroup ctlCG = config.controler();
 
 			int iteration = ctlCG.getFirstIteration();
-			OutputDirectoryHierarchy ctlIO = new OutputDirectoryHierarchy(ctlCG.getOutputDirectory(),
-					ctlCG.getRunId(), false);
+			OutputDirectoryHierarchy ctlIO =
+					new OutputDirectoryHierarchy(
+							ctlCG.getOutputDirectory(),
+							ctlCG.getRunId(),
+							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 
 			// String filename = ctlIO.getIterationFilename(iteration, "sf"
 			// + scaleFactor + "_countscompare" + ".kmz");

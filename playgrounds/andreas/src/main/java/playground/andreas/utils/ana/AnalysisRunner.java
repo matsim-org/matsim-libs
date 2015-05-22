@@ -103,7 +103,11 @@ public class AnalysisRunner {
 //		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin
 //		String targetCoordinateSystem = TransformationFactory.WGS84;		// World Mercator
 		
-		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(outputDir + "/" + runId + "/", runId, true, true);
+		OutputDirectoryHierarchy dir = new OutputDirectoryHierarchy(
+				outputDir + "/" + runId + "/",
+				runId,
+						true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists,
+				true);
 		
 		new TransitScheduleReader(sc).readFile(dir.getIterationFilename(iteration, "transitSchedule.xml.gz"));
 		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles()).readFile(dir.getIterationFilename(iteration, "vehicles.xml.gz"));

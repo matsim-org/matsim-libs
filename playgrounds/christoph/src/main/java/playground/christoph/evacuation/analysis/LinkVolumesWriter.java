@@ -106,7 +106,10 @@ public class LinkVolumesWriter implements IterationEndsListener {
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}
-		dummyInputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, runId, true);
+		dummyInputDirectoryHierarchy = new OutputDirectoryHierarchy(
+				outputPath,
+				runId,
+						true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		
 		// add another string to the runId to not overwrite old files
 		OutputDirectoryHierarchy dummyOutputDirectoryHierarchy;
@@ -114,7 +117,10 @@ public class LinkVolumesWriter implements IterationEndsListener {
 		if (outputPath.endsWith("/")) {
 			outputPath = outputPath.substring(0, outputPath.length() - 1);
 		}
-		dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, runId + ".postprocessed", true);
+		dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(
+				outputPath,
+				runId + ".postprocessed",
+						true ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		int timeSlice = 900;

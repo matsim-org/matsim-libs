@@ -66,7 +66,11 @@ public class RunResultsLoader {
 		if (! (dir.exists() && dir.isDirectory())) {
 			throw new IllegalArgumentException("Run directory " + this.directory + " can not be found");
 		}
-		this.outputDir = new OutputDirectoryHierarchy(this.directory, this.runId, false, false);
+		this.outputDir = new OutputDirectoryHierarchy(
+				this.directory,
+				this.runId,
+						false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists,
+				false);
 		String configFilename = outputDir.getOutputFilename(Controler.FILENAME_CONFIG);
 	}
 

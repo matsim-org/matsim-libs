@@ -68,7 +68,7 @@ final class PlansAnalyzer {
 		}
 		String plansfile = args[0];
 		String outputpath = new File(args[1]).getAbsolutePath() + System.getProperty("file.separator");
-		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputpath, "plansAnalysis", true));
+		OutputDirectoryLogging.initLogging(new OutputDirectoryHierarchy(outputpath, "plansAnalysis", OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles));
 		OutputDirectoryLogging.catchLogEntries();
 		log.info("plansfile: " + plansfile);
 		log.info("outputpath: " + outputpath);

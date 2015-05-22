@@ -133,7 +133,6 @@ public class Controler extends AbstractController {
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
 
 	private boolean dumpDataAtEnd = true; 
-	private boolean overwriteFiles = false;
 
     public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -207,7 +206,10 @@ public class Controler extends AbstractController {
 	 * Starts the iterations.
 	 */
 	public final void run() {
-		setupOutputDirectory(this.config.controler().getOutputDirectory(), this.config.controler().getRunId(), this.overwriteFiles);
+		setupOutputDirectory(
+				this.config.controler().getOutputDirectory(),
+				this.config.controler().getRunId(),
+				this.config.controler().getOverwriteFileSetting() );
 		if (this.config.scenario().isUseTransit()) {
 			setupTransitSimulation();
 		}
@@ -553,7 +555,10 @@ public class Controler extends AbstractController {
 	 */
 	@Deprecated
 	public final void setOverwriteFiles(final boolean overwrite) {
-		this.overwriteFiles = overwrite;
+		this.getConfig().controler().setOverwriteFileSetting(
+				overwrite ?
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 	}
 
 
