@@ -20,7 +20,7 @@
  *  * ***********************************************************************
  */
 
-package playground.mzilske.gunnar;
+package michael;
 
 import floetteroed.utilities.math.Vector;
 import optdyts.DecisionVariable;
