@@ -299,9 +299,7 @@ public class MarginalCongestionHandlerV3QsimTest {
 		});
 
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.run();
 			
 		{ // controlling and showing the conditions of the test:
@@ -1106,81 +1104,6 @@ private void setPopulation6(Scenario scenario) {
 		network.addLink(link3);
 		network.addLink(link4);
 		network.addLink(link5);
-
-		this.events = EventsUtils.createEventsManager();
-		return scenario;
-	}
-	
-	// identical with the network-xml-file for testRouting
-	private Scenario loadScenario3() {
-		
-		//	  <---------------------link4------------------< 
-		// (0)				(1)				(2)				(3)	
-		//    >----link1--->   >---link2--->   >---link3--->     
-		
-		Config config = testUtils.loadConfig(null);
-		QSimConfigGroup qSimConfigGroup = config.qsim();
-		qSimConfigGroup.setFlowCapFactor(1.0);
-		qSimConfigGroup.setStorageCapFactor(1.0);
-		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-		qSimConfigGroup.setRemoveStuckVehicles(true);
-		qSimConfigGroup.setStuckTime(3600.0);
-		Scenario scenario = (ScenarioUtils.createScenario(config));
-	
-		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		network.setEffectiveCellSize(7.5);
-		network.setCapacityPeriod(3600.);
-		
-		Node node0 = network.getFactory().createNode(Id.create("0", Node.class), scenario.createCoord(0., 0.));
-		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(100., 0.));
-		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(200., 0.));
-		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(300., 0.));
-		
-		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
-		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);
-		Link link3 = network.getFactory().createLink(this.linkId3, node2, node3);
-		Link link4 = network.getFactory().createLink(this.linkId4, node3, node1);
-
-		Set<String> modes = new HashSet<String>();
-		modes.add("car");
-		
-		// link without capacity restrictions
-		link1.setAllowedModes(modes);
-		link1.setCapacity(3600);
-		link1.setFreespeed(10); // one time step
-		link1.setNumberOfLanes(1);
-		link1.setLength(500);
-
-		// link without capacity restrictions
-		link2.setAllowedModes(modes);
-		link2.setCapacity(360);
-		link2.setFreespeed(10); // two time steps
-		link2.setNumberOfLanes(1);
-		link2.setLength(500);
-
-		// capacity: one car every 10 sec
-		link3.setAllowedModes(modes);
-		link3.setCapacity(3600);
-		link3.setFreespeed(10); // one time step
-		link3.setNumberOfLanes(1);
-		link3.setLength(500);
-
-		// link without capacity restrictions
-		link4.setAllowedModes(modes);
-		link4.setCapacity(3600);
-		link4.setFreespeed(10); // two time steps
-		link4.setNumberOfLanes(1);
-		link4.setLength(1500);
-
-		network.addNode(node0);
-		network.addNode(node1);
-		network.addNode(node2);
-		network.addNode(node3);
-
-		network.addLink(link1);
-		network.addLink(link2);
-		network.addLink(link3);
-		network.addLink(link4);
 
 		this.events = EventsUtils.createEventsManager();
 		return scenario;

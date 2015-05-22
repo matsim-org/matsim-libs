@@ -77,15 +77,13 @@ public class MarginalCongestionHandlerV3Test {
 		});
 
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.run();
 		
 		// process
-		Map<Id, Double> personId2causedDelay = new HashMap<Id, Double>();
-		Map<Id, Double> personId2affectedDelay = new HashMap<Id, Double>();
-		List<Id> persons = new ArrayList<Id>();
+		Map<Id<Person>, Double> personId2causedDelay = new HashMap<Id<Person>, Double>();
+		Map<Id<Person>, Double> personId2affectedDelay = new HashMap<Id<Person>, Double>();
+		List<Id<Person>> persons = new ArrayList<Id<Person>>();
 		double totalDelay = 0.;
 		
 		for (CongestionEvent event : congestionEvents) {
@@ -118,7 +116,7 @@ public class MarginalCongestionHandlerV3Test {
 		}
 		
 		// print out
-		for (Id personId : persons) {
+		for (Id<Person> personId : persons) {
 			System.out.println("Person: " + personId + " // total caused delay: " + personId2causedDelay.get(personId) + " // total affected delay: " + personId2affectedDelay.get(personId));		
 		}
 		
