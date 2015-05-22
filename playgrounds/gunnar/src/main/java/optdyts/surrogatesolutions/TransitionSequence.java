@@ -54,6 +54,7 @@ public class TransitionSequence<X extends SimulatorState<X>, U extends DecisionV
 					+ this.getClass().getSimpleName()
 					+ " with a null transition.");
 		}
+		// for the first transition, the fromState is needed
 		this.transitions.add(firstTransition);
 	}
 
@@ -68,6 +69,9 @@ public class TransitionSequence<X extends SimulatorState<X>, U extends DecisionV
 					+ " with decision variable " + this.getDecisionVariable()
 					+ ".");
 		}
+		// for all but the first transition, only the last toState is needed
+		this.getLastState().releaseDeepMemory();
+		transition.getFromState().releaseDeepMemory();
 		this.transitions.add(transition);
 	}
 

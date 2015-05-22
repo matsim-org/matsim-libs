@@ -51,10 +51,7 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 
 	private final ObjectiveFunction<X> objectiveFunction;
 
-	private final double maxGap2;
-
-	// TODO new
-	private final boolean requireSubsetsToBeConverged = true;
+	// private final double maxGap2;
 
 	// MEMBERS
 
@@ -62,10 +59,7 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 
 	private U currentDecisionVariable = null;
 
-	// TODO new
-	// private X initialState = null;
-
-	private X currentState = null;
+	private X fromState = null;
 
 	// TODO only for testing
 	private StringBuffer msg = new StringBuffer();
@@ -85,120 +79,51 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 	 *            largest tolerated equilibrium gap, must be strictly larger
 	 *            than simulatorNoiseVariance
 	 */
+	// TODO ADJUST CALLS
 	public DecisionVariableSetEvaluator(final Set<U> decisionVariables,
 			final ObjectiveFunction<X> objectiveFunction,
-			final double simulationNoiseVariance, final double maxGap2) {
+			final double transitionNoiseVarianceScale,
+			final double convergenceNoiseVarianceScale) {
 		this.decisionVariablesToBeTriedOut = new LinkedHashSet<U>(
 				decisionVariables);
 		this.objectiveFunction = objectiveFunction;
 		this.surrogateSolution = new SurrogateSolution<X, U>(
-				simulationNoiseVariance);
-		this.maxGap2 = maxGap2;
+				convergenceNoiseVarianceScale, transitionNoiseVarianceScale);
+		// this.maxGap2 = maxGap2;
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	// >>>>> Keeping track of the right call order. >>>>>
-
-	private enum NextExpectedCall {
-		implementNextDecisionVariable, registerState
-	};
-
-	private NextExpectedCall nextExpectedCall = NextExpectedCall.implementNextDecisionVariable;
-
-	private void checkNextExpectedCall(final NextExpectedCall correct,
-			final NextExpectedCall switchTo) {
-		if (!this.nextExpectedCall.equals(correct)) {
-			throw new RuntimeException("next call should be " + correct
-					+ " but is " + this.nextExpectedCall);
-		} else {
-			this.nextExpectedCall = switchTo;
-		}
-	}
-
-	// <<<<< Keeping track of the right call order. <<<<<
-
 	/**
-	 * To be called once before each simulation iteration.
-	 * 
-	 * @return the currently implemented decision variable; the calling function
-	 *         is not expected to perform any operations with this variable
+	 * Call once before the simulation is started. This only implements a
+	 * randomly selected decision variable in the simulation, merely with the
+	 * objective to enable a first simulation transition.
 	 */
-	public U implementNextDecisionVariable() {
-
-		this.checkNextExpectedCall(
-				NextExpectedCall.implementNextDecisionVariable,
-				NextExpectedCall.registerState);
-
-		if (this.decisionVariablesToBeTriedOut.size() > 0) {
-			// there still are untried decision variables, pick one
-			this.currentDecisionVariable = (this.decisionVariablesToBeTriedOut
-					.iterator()).next();
-			if (this.currentState != null) {
-				// this is not the very first iteration
-				this.decisionVariablesToBeTriedOut
-						.remove(this.currentDecisionVariable);
-				// TODO >>>>> NEW >>>>>
-				// this.initialState.implementInSimulation();
-				// TODO <<<<< NEW <<<<<
-			}
-		} else {
-			// no more untried decision variables, repeat the least used one
-			this.currentDecisionVariable = (this.surrogateSolution
-					.getLeastEvaluatedDecisionVariables().iterator().next());
-			// TODO >>>>> NEW >>>>>
-			this.stateToBeImplemented = this.surrogateSolution
-					.getDecisionVariable2TransitionSequence()
-					.get(this.currentDecisionVariable).getLastState();
-			// this.surrogateSolution.getDecisionVariable2TransitionSequence()
-			// .get(this.currentDecisionVariable).getLastState()
-			// .implementInSimulation();
-			// TODO <<<<< NEW <<<<<
-		}
-
+	public void initialize() {
+		this.currentDecisionVariable = (this.decisionVariablesToBeTriedOut
+				.iterator()).next();
 		this.currentDecisionVariable.implementInSimulation();
-
-		// TODO >>> NEW >>>
-		if (this.stateToBeImplemented != null) {
-			this.stateToBeImplemented.implementInSimulation();
-			this.stateToBeImplemented = null; // TODO
-		}
-		// TODO <<< NEW <<<
-
-		return this.currentDecisionVariable;
 	}
-
-	private X stateToBeImplemented = null;
-
-	// public void implementNextSimulatorState() {
-	// if (this.stateToBeImplemented != null) {
-	// this.stateToBeImplemented.implementInSimulation();
-	// this.stateToBeImplemented = null; // TODO
-	// }
-	// }
 
 	/**
 	 * To be called once after each simulation iteration. Registers the
-	 * simulation state after that iteration.
+	 * simulation state reached after that iteration and implements a new trial
+	 * decision variable in the simulation.
 	 * 
 	 * @param newState
 	 *            the newly reached simulator state
 	 */
-	public void registerState(final X newState) {
+	public void afterIteration(final X newState) {
 
-		this.checkNextExpectedCall(NextExpectedCall.registerState,
-				NextExpectedCall.implementNextDecisionVariable);
+		/*
+		 * (1) If fromState is not null, then a full transition has been
+		 * observed that now is processed.
+		 */
 
-		// TODO >>>>> NEW >>>>>
-		// if (this.initialState == null) {
-		// this.initialState = newState.deepCopy();
-		// }
-		// TODO <<<<< NEW <<<<<
-
-		if (this.currentState != null) {
+		if (this.fromState != null) {
 
 			// Evaluate the new transition.
-			this.surrogateSolution.addTransition(this.currentState,
+			this.surrogateSolution.addTransition(this.fromState,
 					this.currentDecisionVariable, newState);
 			this.surrogateSolution.evaluate();
 
@@ -206,7 +131,9 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 			this.msg.append("G2 = "
 					+ this.surrogateSolution.getEstimatedExpectedGap2()
 					+ " vs "
-					+ this.maxGap2
+					+ this.surrogateSolution.getConvergenceNoiseVariance()
+					+ "; estimated simulation noise variance = "
+					+ this.surrogateSolution.getTransitionNoiseVariance()
 					+ "; Q = "
 					+ this.objectiveFunction
 							.evaluateState(this.surrogateSolution
@@ -227,7 +154,9 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 			// Possible to remove a solution?
 			if ((this.decisionVariablesToBeTriedOut.size() == 0)
 					&& (this.surrogateSolution.size() > 1)
-					&& (this.surrogateSolution.getEstimatedExpectedGap2() <= this.maxGap2)) {
+					&& (this.surrogateSolution.isConverged())) {
+				// && (this.surrogateSolution.getEstimatedExpectedGap2() <=
+				// this.maxGap2)) {
 
 				SurrogateSolution<X, U> best = this.surrogateSolution;
 				double bestObjectiveFunctionValue = this.objectiveFunction
@@ -236,8 +165,9 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 
 				for (SurrogateSolution<X, U> candidate : this.surrogateSolution
 						.newEvaluatedSubsets()) {
-					if (!this.requireSubsetsToBeConverged
-							|| (candidate.getEstimatedExpectedGap2() <= this.maxGap2)) {
+					// if (candidate.getEstimatedExpectedGap2() <= this.maxGap2)
+					// {
+					if (candidate.isConverged()) {
 						final double candidateObjectiveFunctionValue = this.objectiveFunction
 								.evaluateState(candidate.getEquilibriumState());
 						if (candidateObjectiveFunctionValue < bestObjectiveFunctionValue) {
@@ -248,33 +178,43 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 				}
 
 				this.surrogateSolution = best;
-
-				this.msg.append("NEW SURROGATE SOLUTION GAP = "
-						+ this.surrogateSolution.getEstimatedExpectedGap2()
-						+ "\n");
 			}
 		}
 
-		// new code:
-		if (this.currentState == null) {
-			this.currentState = newState.deepCopy();
-			this.stateToBeImplemented = null;
-		} else if (this.decisionVariablesToBeTriedOut.size() == 0) {
-			this.currentState = newState.deepCopy();
-			this.stateToBeImplemented = null;
+		/*
+		 * (2) Prepare the next iteration.
+		 */
+
+		if (this.decisionVariablesToBeTriedOut.size() > 0) {
+			// there still are untried decision variables, pick one
+			this.currentDecisionVariable = (this.decisionVariablesToBeTriedOut
+					.iterator()).next();
+			this.decisionVariablesToBeTriedOut
+					.remove(this.currentDecisionVariable);
+			if (this.fromState == null) {
+				this.fromState = newState.deepCopy();
+			} else {
+				this.fromState.implementInSimulation();
+			}
 		} else {
-			this.stateToBeImplemented = this.currentState;
-			// this.currentState.implementInSimulation();
+			// no more untried decision variables, repeat the least used one
+			this.currentDecisionVariable = (this.surrogateSolution
+					.getLeastEvaluatedDecisionVariables().iterator().next());
+			// set simulation to last state visited by that decision variable
+			this.fromState = this.surrogateSolution
+					.getDecisionVariable2TransitionSequence()
+					.get(this.currentDecisionVariable).getLastState();
+			this.fromState.implementInSimulation();
 		}
-		// was before:
-		// this.currentState = newState.deepCopy();
+
+		this.currentDecisionVariable.implementInSimulation();
 	}
 
 	public U getCurrentDecisionVariable() {
 		return this.currentDecisionVariable;
 	}
 
-	// TODO experimental code below
+	// TODO experimental, remove again
 	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
 		return this.surrogateSolution.getDecisionVariable2TransitionSequence();
 	}

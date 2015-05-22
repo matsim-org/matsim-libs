@@ -36,16 +36,16 @@ public abstract class MATSimUnevaluatedState<X extends MATSimUnevaluatedState<X>
 
 	// -------------------- MEMBERS --------------------
 
-	protected final Population population;
-
 	protected final Random rnd;
+
+	protected Population population;
 
 	/**
 	 * A map of lists of (deep copies of) all plans of all persons. The plan
 	 * order in the lists matters. Contains an empty list for every person that
 	 * does not have any plans.
 	 */
-	protected final Map<Person, List<Plan>> person2planList = new LinkedHashMap<Person, List<Plan>>();
+	protected Map<Person, List<Plan>> person2planList = null;
 
 	/**
 	 * A map of indices pointing to the currently selected plan of every person.
@@ -55,29 +55,35 @@ public abstract class MATSimUnevaluatedState<X extends MATSimUnevaluatedState<X>
 	 * Uses an index instead of a reference because references do not survive
 	 * deep copies and we want to be robust here.
 	 */
-	protected final Map<Person, Integer> person2selectedPlanIndex = new LinkedHashMap<Person, Integer>();
+	protected Map<Person, Integer> person2selectedPlanIndex = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	protected MATSimUnevaluatedState(final Population population,
 			final Random rnd) {
-		this.population = population;
-		for (Person person : population.getPersons().values()) {
-			if (person.getSelectedPlan() == null) {
-				this.person2selectedPlanIndex.put(person, null);
-			} else {
-				final int selectedPlanIndex = person.getPlans().indexOf(
-						person.getSelectedPlan());
-				if (selectedPlanIndex < 0) {
-					throw new RuntimeException("The selected plan of person "
-							+ person.getId()
-							+ " cannot be found in its plan list.");
-				}
-				this.person2selectedPlanIndex.put(person, selectedPlanIndex);
-			}
-			this.person2planList.put(person, newDeepCopy(person.getPlans()));
-		}
 		this.rnd = rnd;
+		this.population = population;
+		if (population != null) {
+			this.person2planList = new LinkedHashMap<Person, List<Plan>>();
+			this.person2selectedPlanIndex = new LinkedHashMap<Person, Integer>();
+			for (Person person : population.getPersons().values()) {
+				if (person.getSelectedPlan() == null) {
+					this.person2selectedPlanIndex.put(person, null);
+				} else {
+					final int selectedPlanIndex = person.getPlans().indexOf(
+							person.getSelectedPlan());
+					if (selectedPlanIndex < 0) {
+						throw new RuntimeException(
+								"The selected plan of person " + person.getId()
+										+ " cannot be found in its plan list.");
+					}
+					this.person2selectedPlanIndex
+							.put(person, selectedPlanIndex);
+				}
+				this.person2planList
+						.put(person, newDeepCopy(person.getPlans()));
+			}
+		}
 	}
 
 	// -------------------- HELPERS AND INTERNALS --------------------
@@ -154,6 +160,10 @@ public abstract class MATSimUnevaluatedState<X extends MATSimUnevaluatedState<X>
 	public void takeOverConvexCombination(final List<X> states,
 			final List<Double> weights) {
 
+		if (this.population == null) {
+			return; // ------------------------------------------------------
+		}
+
 		final List<Person> shuffledPersonList = new ArrayList<Person>(
 				this.person2planList.keySet());
 		Collections.shuffle(shuffledPersonList);
@@ -178,7 +188,12 @@ public abstract class MATSimUnevaluatedState<X extends MATSimUnevaluatedState<X>
 	}
 
 	@Override
-	public void implementInSimulation() {
+	public void implementInSimulation() throws UnsupportedOperationException {
+
+		if (this.population == null) {
+			throw new UnsupportedOperationException(); // -------------------
+		}
+
 		for (Person person : this.population.getPersons().values()) {
 			person.getPlans().clear();
 			final List<Plan> copiedPlans = newDeepCopy(this.person2planList
@@ -190,4 +205,15 @@ public abstract class MATSimUnevaluatedState<X extends MATSimUnevaluatedState<X>
 					this.person2selectedPlanIndex.get(person)));
 		}
 	}
+
+	@Override
+	public void releaseDeepMemory() {
+		this.population = null;
+		this.person2planList = null;
+		this.person2selectedPlanIndex = null;
+	}
+
+	@Override
+	public abstract X deepCopy();
+
 }

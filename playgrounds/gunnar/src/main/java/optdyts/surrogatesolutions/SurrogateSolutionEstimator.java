@@ -46,15 +46,12 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 
 	// -------------------- CONSTANTS --------------------
 
-	// TODO Replace this by something more intelligent.
-	private final double largestSimulatorEigenvalue = 0.95;
-
-	private final double simulationNoiseVariance;
+	private final double transitionNoiseVariance;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	SurrogateSolutionEstimator(final double simulationNoiseVariance) {
-		this.simulationNoiseVariance = simulationNoiseVariance;
+	SurrogateSolutionEstimator(final double transitionNoiseVariance) {
+		this.transitionNoiseVariance = transitionNoiseVariance;
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -66,7 +63,7 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 		for (int i = 1; i < alphas.size(); i++) {
 			residual.add(deltaList.get(i), alphas.get(i));
 		}
-		return residual.innerProd(residual) + this.simulationNoiseVariance
+		return residual.innerProd(residual) + this.transitionNoiseVariance
 				* alphas.innerProd(alphas);
 	}
 
@@ -116,6 +113,7 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 							+ transitions.size() + " - " + initialAlphas.size()
 							+ " != 0\n");
 		}
+		final double eps = 1e-6;
 		double initialAlphaSum = 0.0;
 		for (Double initialAlphaValue : initialAlphas) {
 			if (initialAlphaValue < 0.0) {
@@ -123,14 +121,14 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 						"an element in initialAlphas has value "
 								+ initialAlphaValue + " < 0.0");
 			}
-			if (initialAlphaValue > 1.0) {
+			if (initialAlphaValue > (1.0 + eps)) {
 				throw new RuntimeException(
 						"an element in initialAlphas has value "
 								+ initialAlphaValue + " > 1.0");
 			}
 			initialAlphaSum += initialAlphaValue;
 		}
-		if (Math.abs(initialAlphaSum - 1.0) > 1e-6) {
+		if (Math.abs(initialAlphaSum - 1.0) > eps) {
 			throw new RuntimeException(
 					"the sum of elements in inititalAlphas is "
 							+ initialAlphaSum + " != 1.0 [+/- 1e-6]");
@@ -189,9 +187,7 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 					}
 				}
 				newAlpha /= (innerProds.get(l, l) - 2.0 * innerProds.get(l, 0)
-						+ innerProds.get(0, 0) + Math.pow(
-						1.0 - this.largestSimulatorEigenvalue, 2.0)
-						* this.simulationNoiseVariance);
+						+ innerProds.get(0, 0) + this.transitionNoiseVariance);
 
 				newAlpha = Math.max(newAlpha, 0.0);
 				newAlpha = Math.min(newAlpha, alphas.get(0) + alphas.get(l));

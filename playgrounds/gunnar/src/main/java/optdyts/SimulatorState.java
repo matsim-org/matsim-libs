@@ -70,7 +70,17 @@ public interface SimulatorState<X extends SimulatorState<X>> {
 	public Vector getReferenceToVectorRepresentation();
 
 	/**
-	 * Sets the simulator to this SimulatorState.
+	 * Sets the simulator to this SimulatorState. Throws an
+	 * UnsupportedOperationException if releaseDeepMemory() has been called at
+	 * least once.
 	 */
-	public void implementInSimulation();
+	public void implementInSimulation() throws UnsupportedOperationException;
+
+	/**
+	 * Releases the memory necessary only for calls to implementInSimulation();
+	 * subsequent calls to implementInSimulation() are expected to through an
+	 * UnsupportedOperationException.
+	 */
+	public void releaseDeepMemory();
+
 }

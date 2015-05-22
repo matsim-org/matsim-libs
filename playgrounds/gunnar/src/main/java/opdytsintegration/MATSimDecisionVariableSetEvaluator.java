@@ -15,10 +15,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 
 import floetteroed.utilities.DynamicData;
 import floetteroed.utilities.math.Vector;
@@ -34,7 +34,7 @@ import floetteroed.utilities.math.Vector;
  *            the decision variable type
  */
 public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends DecisionVariable>
-		implements StartupListener, BeforeMobsimListener {
+		implements IterationStartsListener, IterationEndsListener {
 
 	// -------------------- MEMBERS --------------------
 
@@ -54,8 +54,6 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 
 	// RUNTIME VARIABLES
 
-	private boolean initialIteration = true;
-
 	private SortedSet<Id<Link>> sortedLinkIds = null;
 
 	private DynamicData<Id<Link>> data = null;
@@ -64,11 +62,12 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 
 	public MATSimDecisionVariableSetEvaluator(final Set<U> decisionVariables,
 			final ObjectiveFunction<X> objectiveFunction,
-			final double simulatedNoiseVariance, final double maxGap2,
+			final double transitionNoiseVarianceScale,
+			final double convergenceNoiseVarianceScale,
 			final MATSimStateFactory<X, U> stateFactory) {
 		this.evaluator = new DecisionVariableSetEvaluator<X, U>(
-				decisionVariables, objectiveFunction, simulatedNoiseVariance,
-				maxGap2);
+				decisionVariables, objectiveFunction,
+				transitionNoiseVarianceScale, convergenceNoiseVarianceScale);
 		this.stateFactory = stateFactory;
 	}
 
@@ -100,59 +99,59 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 
 	// --------------- CONTROLLER LISTENER IMPLEMENTATIONS ---------------
 
-	@Override
-	public void notifyStartup(final StartupEvent event) {
-
-		this.evaluator.implementNextDecisionVariable();
-
-		this.data = new DynamicData<Id<Link>>(this.startTime_s, this.binSize_s,
-				this.binCnt);
-		this.sortedLinkIds = new TreeSet<Id<Link>>(event.getControler()
-				.getScenario().getNetwork().getLinks().keySet());
-		event.getControler().getEvents()
-				.addHandler(new LinkEnterEventHandler() {
-					@Override
-					public void reset(final int iteration) {
-					}
-
-					@Override
-					public void handleEvent(final LinkEnterEvent event) {
-						final int bin = Math.min(
-								data.bin((int) event.getTime()),
-								data.getBinCnt() - 1);
-						data.add(event.getLinkId(), bin, 1.0);
-					}
-				});
-	}
+	private boolean isInitialized = false;
 
 	@Override
-	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
+	public void notifyIterationStarts(final IterationStartsEvent event) {
 
-		if (this.initialIteration) {
-			this.initialIteration = false;
-		} else {
+		if (!this.isInitialized) {
 
-			final Vector newStateVector = new Vector(this.sortedLinkIds.size()
-					* this.data.getBinCnt());
-			int i = 0;
-			for (Id<Link> id : this.sortedLinkIds) {
-				for (int bin = 0; bin < this.data.getBinCnt(); bin++) {
-					newStateVector.set(i++, this.data.getBinValue(id, bin));
-				}
-			}
+			this.data = new DynamicData<Id<Link>>(this.startTime_s,
+					this.binSize_s, this.binCnt);
+			this.sortedLinkIds = new TreeSet<Id<Link>>(event.getControler()
+					.getScenario().getNetwork().getLinks().keySet());
+			event.getControler().getEvents()
+					.addHandler(new LinkEnterEventHandler() {
+						@Override
+						public void reset(final int iteration) {
+						}
 
-			final X newState = this.stateFactory.newState(event.getControler()
-					.getScenario().getPopulation(), newStateVector,
-					this.evaluator.getCurrentDecisionVariable());
-			this.evaluator.registerState(newState);
+						@Override
+						public void handleEvent(final LinkEnterEvent event) {
+							final int bin = Math.min(
+									data.bin((int) event.getTime()),
+									data.getBinCnt() - 1);
+							data.add(event.getLinkId(), bin, 1.0);
+						}
+					});
 
-			this.data.clear();
-			this.evaluator.implementNextDecisionVariable();
+			this.evaluator.initialize();
+
+			this.isInitialized = true;
 		}
 	}
 
-	// TODO experimental code below
+	@Override
+	public void notifyIterationEnds(final IterationEndsEvent event) {
 
+		final Vector newStateVector = new Vector(this.sortedLinkIds.size()
+				* this.data.getBinCnt());
+		int i = 0;
+		for (Id<Link> id : this.sortedLinkIds) {
+			for (int bin = 0; bin < this.data.getBinCnt(); bin++) {
+				newStateVector.set(i++, this.data.getBinValue(id, bin));
+			}
+		}
+
+		final X newState = this.stateFactory.newState(event.getControler()
+				.getScenario().getPopulation(), newStateVector,
+				this.evaluator.getCurrentDecisionVariable());
+		this.evaluator.afterIteration(newState);
+
+		this.data.clear();
+	}
+
+	// TODO experimental
 	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
 		return this.evaluator.getDecisionVariable2TransitionSequence();
 	}

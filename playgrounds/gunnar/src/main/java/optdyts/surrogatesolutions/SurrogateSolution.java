@@ -33,6 +33,7 @@ import java.util.Set;
 
 import optdyts.DecisionVariable;
 import optdyts.SimulatorState;
+import floetteroed.utilities.math.Vector;
 
 /**
  * A surrogate solution represents a convex combination of stationary simulator
@@ -48,7 +49,9 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 
 	// PARAMETERS
 
-	private final double simulationNoiseVariance;
+	private final double convergenceNoiseVarianceScale;
+
+	private final double transitionNoiseVarianceScale;
 
 	// DATA TO BE PROCESSED
 
@@ -60,11 +63,13 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public SurrogateSolution(final double simulationNoiseVariance) {
-		this.simulationNoiseVariance = simulationNoiseVariance;
+	public SurrogateSolution(final double convergenceNoiseVarianceScale,
+			final double transitionNoiseVarianceScale) {
+		this.convergenceNoiseVarianceScale = convergenceNoiseVarianceScale;
+		this.transitionNoiseVarianceScale = transitionNoiseVarianceScale;
 	}
 
-	// -------------------- SIMPLE GETTERS --------------------
+	// -------------------- GETTERS --------------------
 
 	public boolean hasProperties() {
 		return (this.properties != null);
@@ -89,6 +94,54 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 	// TODO experimental, should be removed.
 	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
 		return this.decisionVariable2transitionSequence;
+	}
+
+	public Set<U> getLeastEvaluatedDecisionVariables() {
+		final Set<U> result = new LinkedHashSet<U>();
+		int minEvaluationCount = Integer.MAX_VALUE;
+		for (Map.Entry<U, TransitionSequence<X, U>> entry : this.decisionVariable2transitionSequence
+				.entrySet()) {
+			final int candidateEvaluationCount = entry.getValue().size();
+			if (candidateEvaluationCount <= minEvaluationCount) {
+				if (candidateEvaluationCount < minEvaluationCount) {
+					result.clear();
+					minEvaluationCount = candidateEvaluationCount;
+				}
+				final U candidateDecisionVariable = entry.getKey();
+				result.add(candidateDecisionVariable);
+			}
+		}
+		return result;
+	}
+
+	double getAverageLastStateNorm2() {
+		double result = 0;
+		for (Map.Entry<U, TransitionSequence<X, U>> entry : this.decisionVariable2transitionSequence
+				.entrySet()) {
+			final double alpha = (this.hasProperties() ? this
+					.getDecisionVariable2alphaSum().get(entry.getKey())
+					: (1.0 / this.size()));
+			final Vector lastStateVector = entry.getValue().getLastState()
+					.getReferenceToVectorRepresentation();
+			result += alpha * lastStateVector.innerProd(lastStateVector);
+		}
+		return result;
+	}
+
+	public double getConvergenceNoiseVariance() {
+		return this.convergenceNoiseVarianceScale
+				* this.getAverageLastStateNorm2();
+	}
+
+	public double getTransitionNoiseVariance() {
+		return this.transitionNoiseVarianceScale
+				* this.getAverageLastStateNorm2();
+	}
+
+	// TODO new
+	public boolean isConverged() {
+		return (this.properties.getEstimatedExpectedGap2() <= this
+				.getConvergenceNoiseVariance());
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -141,8 +194,10 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 		 * (2) Estimate the surrogate solution.
 		 */
 
+		// TODO: Parameter shall be TRANSITIONNOISEVARIANCE
 		final SurrogateSolutionEstimator<X, U> ssEstimator = new SurrogateSolutionEstimator<X, U>(
-				this.simulationNoiseVariance);
+				this.getTransitionNoiseVariance());
+
 		if (decisionVariable2alphaSum == null) {
 			this.properties = ssEstimator.computeProperties(transitionList);
 		} else {
@@ -182,13 +237,12 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 
 		for (U takeOutDecisionVariable : this.decisionVariable2transitionSequence
 				.keySet()) {
-			final double takeOutAlpha = this.getDecisionVariable2alphaSum()
-					.get(takeOutDecisionVariable);
 
 			// 1.1. Add all transition sequences but one to the new solution.
 
 			final SurrogateSolution<X, U> newSurrogateSolution = new SurrogateSolution<X, U>(
-					this.simulationNoiseVariance);
+					this.convergenceNoiseVarianceScale,
+					this.transitionNoiseVarianceScale);
 			newSurrogateSolution.decisionVariable2transitionSequence
 					.putAll(this.decisionVariable2transitionSequence);
 			newSurrogateSolution
@@ -196,44 +250,28 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 
 			// 1.2. Evaluate the new sub-surrogate solution.
 
+			final double takeOutAlpha = this.getDecisionVariable2alphaSum()
+					.get(takeOutDecisionVariable);
 			if (takeOutAlpha > 0.99) {
 				newSurrogateSolution.evaluate();
 			} else {
-				final Map<U, Double> newAlphas = new LinkedHashMap<U, Double>();
+				final Map<U, Double> newInitialAlphas = new LinkedHashMap<U, Double>();
 				for (U decisionVariable : this.decisionVariable2transitionSequence
 						.keySet()) {
 					if (!decisionVariable.equals(takeOutDecisionVariable)) {
-						newAlphas.put(
+						newInitialAlphas.put(
 								decisionVariable,
 								this.getDecisionVariable2alphaSum().get(
 										decisionVariable)
 										/ (1.0 - takeOutAlpha));
 					}
 				}
-				newSurrogateSolution.evaluate(newAlphas);
+				newSurrogateSolution.evaluate(newInitialAlphas);
 			}
 
 			result.add(newSurrogateSolution);
 		}
 
-		return result;
-	}
-
-	public Set<U> getLeastEvaluatedDecisionVariables() {
-		final Set<U> result = new LinkedHashSet<U>();
-		int minEvaluationCount = Integer.MAX_VALUE;
-		for (Map.Entry<U, TransitionSequence<X, U>> entry : this.decisionVariable2transitionSequence
-				.entrySet()) {
-			final int candidateEvaluationCount = entry.getValue().size();
-			if (candidateEvaluationCount <= minEvaluationCount) {
-				if (candidateEvaluationCount < minEvaluationCount) {
-					result.clear();
-					minEvaluationCount = candidateEvaluationCount;
-				}
-				final U candidateDecisionVariable = entry.getKey();
-				result.add(candidateDecisionVariable);
-			}
-		}
 		return result;
 	}
 }
