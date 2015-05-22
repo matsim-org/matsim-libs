@@ -196,6 +196,9 @@ public class SpatialGridAnalysis {
 		UserBenefitsCalculator userBenefitsCalculator_selected = new UserBenefitsCalculator(scenario.getConfig(), WelfareMeasure.SELECTED, false);
 		userBenefitsCalculator_selected.calculateUtility_money(scenario.getPopulation());
 		
+		double userBenefitsNoHomeLocation = 0.;
+		double causedCostNoHomeLocation = 0.;
+		
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			// try to get the home location
 			Activity homeActivity = null;
@@ -214,6 +217,21 @@ public class SpatialGridAnalysis {
 			
 			if (homeActivity == null) {
 				// an agent without home location
+				double personsMonetizedBenefit = userBenefitsCalculator_selected.getPersonId2MonetizedUtility().get(person.getId());
+				
+				double personsCausedNoiseCost = 0.;
+				
+				if (useNoiseEvents == false) {
+					personsCausedNoiseCost = moneyHandler.getPersonId2amount().get(person.getId());		
+					
+				} else {
+					if (noiseHandler.getPersonId2causedNoiseCost().containsKey(person.getId())) {
+						personsCausedNoiseCost = noiseHandler.getPersonId2causedNoiseCost().get(person.getId());
+					}
+				}
+				
+				userBenefitsNoHomeLocation = userBenefitsNoHomeLocation + personsMonetizedBenefit;
+				causedCostNoHomeLocation = causedCostNoHomeLocation + personsCausedNoiseCost;
 				
 			} else {
 
@@ -275,8 +293,11 @@ public class SpatialGridAnalysis {
 			}
 		}
 			
+		log.info("user benefits of persons without home location: " + userBenefitsNoHomeLocation);	
+		log.info("caused noise costs of persons without home location: " + causedCostNoHomeLocation);		
+
 		// write the results
-				
+			
 		HashMap<Id<ReceiverPoint>,Double> id2xCoord = new HashMap<>();
 		HashMap<Id<ReceiverPoint>,Double> id2yCoord = new HashMap<>();
 		int c = 0;
