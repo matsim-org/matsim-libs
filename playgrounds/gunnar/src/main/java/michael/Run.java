@@ -60,11 +60,19 @@ public class Run {
                         statex = (0.9 * statex) + (0.1 * 100) + Math.random() - 0.5;
                         statey = (0.9 * statey )+ (0.1 * 100) + Math.random() - 0.5;
                     }
+                    @Override
+                    public String toString() {
+                    	return "(100, 100)";
+                    }
                 }, new DecisionVariable() {
                     @Override
                     public void implementInSimulation() {
                         statex = (0.9 * statex) + (0.1 * 20) + Math.random() - 0.5;
                         statey = (0.9 * statey )+ (0.1 * -37)+ Math.random() - 0.5;
+                    }
+                    @Override
+                    public String toString() {
+                    	return "(20, -37)";
                     }
                 }, new DecisionVariable() {
                     @Override
@@ -72,11 +80,19 @@ public class Run {
                         statex = (0.9 * statex) + (0.1 * 0)+ Math.random() - 0.5 ;
                         statey = (0.9 * statey )+ (0.1 * 0) + Math.random() - 0.5;
                     }
+                    @Override
+                    public String toString() {
+                    	return "(0, 0)";
+                    }
                 }, new DecisionVariable() {
                     @Override
                     public void implementInSimulation() {
                         statex = (0.9 * statex) + (0.1 * -37)+ Math.random() - 0.5;
                         statey = (0.9 * statey )+ (0.1 * 20)+ Math.random() - 0.5;
+                    }
+                    @Override
+                    public String toString() {
+                    	return "(-37, 20)";
                     }
                 }, new DecisionVariable() {
                     @Override
@@ -84,10 +100,15 @@ public class Run {
                         statex = (0.9 * statex) + (0.1 * 21)+ Math.random() - 0.5;
                         statey = (0.9 * statey )+ (0.1 * -38)+ Math.random() - 0.5;
                     }
+                    @Override
+                    public String toString() {
+                    	return "(21, -38)";
+                    }
                 })),
                 objectiveFunction,
-                2 * (1.0 / 12.0),
-                1.);
+                0.05 * 0.05, 0.05 * 0.05);
+//                2 * (1.0 / 12.0),
+//                1.);
         while (objectiveFunction.evaluateState(new MySimulatorState(statex, statey)) > 1.0) {
             decisionVariableSetEvaluator.afterIteration(new MySimulatorState(statex , statey));
             System.out.printf("%f,%f", statex, statey);
