@@ -17,7 +17,7 @@ public class VehicleRequestPaths
         @Override
         public double getCost(VehicleRequestPath vrp)
         {
-            return VehicleRequestPaths.calculatePickupBeginTime(vrp) - vrp.request.getT0();
+            return VehicleRequestPaths.getPickupBeginTime(vrp) - vrp.request.getT0();
         }
     };
 
@@ -25,7 +25,7 @@ public class VehicleRequestPaths
         @Override
         public double getCost(VehicleRequestPath vrp)
         {
-            return VehicleRequestPaths.calculatePickupBeginTime(vrp) - vrp.path.getDepartureTime();
+            return VehicleRequestPaths.getPickupBeginTime(vrp) - vrp.path.getDepartureTime();
         }
     };
 
@@ -46,7 +46,7 @@ public class VehicleRequestPaths
     };
 
 
-    public static double calculatePickupBeginTime(VehicleRequestPath vrp)
+    public static double getPickupBeginTime(VehicleRequestPath vrp)
     {
         return Math.max(vrp.request.getT0(), vrp.path.getArrivalTime());
     }
