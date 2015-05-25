@@ -6,7 +6,7 @@ public class RunCL_KT {
 	
 	//Input Dir KT: 
 			final static String INPUT_DIR = "F:/Arbeit-VSP/Santiago/Kai_und_Daniel/Counts/" ;
-			final static String OUTPUT_DIR = "F:/Arbeit-VSP/Santiago/Kai_und_Daniel/Counts/" ;
+			final static String OUTPUT_DIR = "F:/Arbeit-VSP/Santiago/Kai_und_Daniel/Counts2/" ;
 			
 //			//Input Dir DH: 
 //			private static final String INPUT_DIR = "" ;
@@ -14,11 +14,11 @@ public class RunCL_KT {
 
 			//Filename without extention
 			
-			final static String CSIdFILE_NAME = "CSId-LinkId";
-			final static String CSDATAFILE_NAME = "T_FLUJO_TASA";//Count of Vehicle
-			final static String COUNTFILE_NAME = "counts_VEH" ;	//Output-Countfile_name
-//			final static String CSDATAFILE_NAME = "T_VIAJESTEMP"; //Number of Persons = counts per Vehicle * Factor (#Persons / vehicle)
-//			final static String COUNTFILE_NAME = "counts_PERS" ;	//Output-Countfile_name
+			final static String CSIdFILE_NAME = "CSId-LinkId_secondary";
+//			final static String CSDATAFILE_NAME = "T_FLUJO_TASA";//Count of Vehicle
+//			final static String COUNTFILE_NAME = "counts_secondary_VEH" ;	//Output-Countfile_name
+			final static String CSDATAFILE_NAME = "T_VIAJESTEMP"; //Number of Persons = counts per Vehicle * Factor (#Persons / vehicle)
+			final static String COUNTFILE_NAME = "counts_secondary_PERS" ;	//Output-Countfile_name
 //			private static final String CONFIGFILE_NAME = "config";
 			
 			//File
