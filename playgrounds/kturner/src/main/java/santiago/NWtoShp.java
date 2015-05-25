@@ -37,7 +37,7 @@ public class NWtoShp {
 
 
 	//Dateinamen ohne XML-Endung
-	private static final String NETFILE_NAME = "santiago_secondary" ;
+	private static final String NETFILE_NAME = "santiago_tertiary" ;
 	//Ende  Namesdefinition Berlin
 
 	
