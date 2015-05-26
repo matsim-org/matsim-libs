@@ -24,7 +24,6 @@ package playground.vsp.congestion.handlers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +63,8 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	
 	private double amountSum = 0.;
 	
-	private List<CongestionEvent> congestionEventsToProcess = new ArrayList<CongestionEvent>();
+	private Map<Id<Person>, Double> affectedPersonId2delayToProcess = new HashMap<Id<Person>, Double>();
+	private Map<Id<Person>, List<CongestionEvent>> affectedPersonId2congestionEventsToProcess = new HashMap<>();
 	private Map<Id<Person>, Double> personId2currentActivityStartTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, Double> personId2firstActivityEndTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, String> personId2currentActivityType = new HashMap<Id<Person>, String>();
@@ -82,15 +82,33 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	public void reset(int iteration) {
 		this.amountSum = 0.;
 		this.personId2currentActivityStartTime.clear();
-		this.congestionEventsToProcess.clear();
+		this.affectedPersonId2congestionEventsToProcess.clear();
 		this.personId2firstActivityEndTime.clear();
 		this.personId2currentActivityType.clear();
 		this.personId2firstActivityType.clear();
+		this.affectedPersonId2delayToProcess.clear();
 	}
 
 	@Override
 	public void handleEvent(CongestionEvent event) {
-		congestionEventsToProcess.add(event);		
+		
+		// store the congestion event
+		if (affectedPersonId2congestionEventsToProcess.containsKey(event.getAffectedAgentId())) {
+			affectedPersonId2congestionEventsToProcess.get(event.getAffectedAgentId()).add(event);
+		} else {
+			List<CongestionEvent> congestionEventsToProcess = new ArrayList<>();
+			congestionEventsToProcess.add(event);
+			affectedPersonId2congestionEventsToProcess.put(event.getAffectedAgentId(), congestionEventsToProcess);
+		}	
+		
+		// compute the total trip delay
+		if (this.affectedPersonId2delayToProcess.containsKey(event.getAffectedAgentId())) {
+			double delayUpdated = affectedPersonId2delayToProcess.get(event.getAffectedAgentId()) + event.getDelay();
+			affectedPersonId2delayToProcess.put(event.getAffectedAgentId(), delayUpdated);
+		} else {
+			affectedPersonId2delayToProcess.put(event.getAffectedAgentId(), event.getDelay());
+		}
+		
 	}
 	
 	@Override
@@ -107,7 +125,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			// ... now process all congestion events thrown during the trip to the activity which has just ended...
 			processCongestionEvents(event.getPersonId(), this.personId2currentActivityStartTime.get(event.getPersonId()), event.getTime(), event.getLinkId());
 			// ... and remove all processed congestion events. 
-			removeProcessedCongestionEvents(event.getPersonId());
+			this.affectedPersonId2congestionEventsToProcess.remove(event.getPersonId());
 	
 		} else {
 			// This is the first activity. In case the first activity is an overnight activity, being delayed at the overnight activity is considered in a final step.
@@ -117,32 +135,23 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		}
 	}
 
-	private void removeProcessedCongestionEvents(Id<Person> personId) {
-		for (Iterator<CongestionEvent> iterator = this.congestionEventsToProcess.iterator(); iterator.hasNext();) {
-		    CongestionEvent event = iterator.next();
-		    if (event.getAffectedAgentId().toString().equals(personId.toString())) {
-		        iterator.remove();
-		    }
-		}
-	}
-	
 	/*
 	 * This method has to be called at the very end. Here being delayed at the last / overnight activity is taken into account.
 	 */
 	public void processFinalCongestionEvents() {
-		for (CongestionEvent congestionEvent : this.congestionEventsToProcess) {			
-			processCongestionEvents(congestionEvent.getAffectedAgentId(), this.personId2currentActivityStartTime.get(congestionEvent.getAffectedAgentId()), Time.UNDEFINED_TIME, null);
+		for (Id<Person> affectedPersonId : this.affectedPersonId2congestionEventsToProcess.keySet()) {
+			for (CongestionEvent congestionEvent : this.affectedPersonId2congestionEventsToProcess.get(affectedPersonId)) {			
+				processCongestionEvents(congestionEvent.getAffectedAgentId(), this.personId2currentActivityStartTime.get(congestionEvent.getAffectedAgentId()), Time.UNDEFINED_TIME, null);
+			}
 		}
 	}
 	
 	private void processCongestionEvents(Id<Person> personId, double activityStartTime, double activityEndTime, Id<Link> linkId) {
 		
 		// First, compute the agent's total (affected) delay from the previous trip.
-		double totalDelayThisPerson = 0.;
-		for (CongestionEvent congestionEvent : this.congestionEventsToProcess) {
-			if (congestionEvent.getAffectedAgentId().toString().equals(personId.toString())) {
-				totalDelayThisPerson = totalDelayThisPerson + congestionEvent.getDelay();
-			}
+		double totalDelayThisPerson = 0.0;
+		if (this.affectedPersonId2delayToProcess.containsKey(personId)) {
+			totalDelayThisPerson = this.affectedPersonId2delayToProcess.get(personId);
 		}
 		
 		if (totalDelayThisPerson > 0.) {
@@ -180,7 +189,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			double delayCostPerSecond = totalDelayCost / totalDelayThisPerson;
 			
 			// Go through the congestion events and charge each causing agent his/her contribution to the delay cost: caused delay * activity delay cost per second + caused delay * trip delay cost per second
-			for (CongestionEvent congestionEvent : this.congestionEventsToProcess) {
+			for (CongestionEvent congestionEvent : this.affectedPersonId2congestionEventsToProcess.get(personId)) {
 				if (congestionEvent.getAffectedAgentId().toString().equals(personId.toString())) {
 					double amount = congestionEvent.getDelay() * delayCostPerSecond * (-1);
 					
