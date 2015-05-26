@@ -79,7 +79,7 @@ public class CongestionPricingControlerEqualVTTS {
 		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 
 	}
