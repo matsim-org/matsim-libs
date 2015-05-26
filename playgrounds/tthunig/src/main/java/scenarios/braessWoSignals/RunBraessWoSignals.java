@@ -11,7 +11,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
@@ -30,7 +32,7 @@ public class RunBraessWoSignals {
 	private static final Logger log = Logger.getLogger(RunBraessWoSignals.class);
 
 	public static void main(String[] args) {
-		String date = "2015-05-11";
+		String date = "2015-05-21";
 		
 		int numberOfAgents = 60;
 		boolean sameStartTime = true;
@@ -41,17 +43,25 @@ public class RunBraessWoSignals {
 		boolean writeEventsForAllIts = true; // needed for detailed analysis. remind the running time if true
 		boolean writePlansForAllIts = false; // remind the running time if true
 		
-		double middleLinkTT = 200; // in seconds. for deleting use 200
-		/* travel time of the link which is not at the middle route. */
-		double linkTT3 = 20; // in seconds. former TT was 20
-		double linkTT5 = 20; // in seconds. former TT was 20 
+		// tt on the middle link
+		double linkTT4 = 1; // [s]. for deleting use 200
+		/* tt of the link which is not at the middle route. */
+		double linkTT3 = 20; // [s]
+		double linkTT5 = 20; // [s]
+		// tt on the first link where the activity is located
+		double linkTT1 = 1; // [s]
+		
+		boolean useLinkLength200 = true;
+		
+		boolean useLanes = true;
+		String lanesInfo = "4-lanes";
 		
 		boolean enforceZ = false;
 		
-		double capZ = 1800;
-		double capOther = 1800;
+		long capZ = 1800;
+		long capOther = 1800;
 		
-		double increaseLinkTTBy = 0.0; // in seconds. additive. use 0.0 for former travel times. 15*60 e.g. for an increase of 30 min per path
+		double increaseLinkTTBy = 0.0; // [s]. additive. use 0.0 for former travel times. 15*60 e.g. for an increase of 30 min per path
 		
 		double performingUtils = 6.0; // +6 default
 		double travelingUtils = -6.0; // -6 default
@@ -65,10 +75,21 @@ public class RunBraessWoSignals {
 		double propSelectExpBeta = 0.0;
 		double propBestScore = 0.0;
 		
-		double brainExpBeta = 1.0; // default: 1.0. DG used to use 2.0 - better results!?
+		double brainExpBeta = 2.0; // default: 1.0. DG used to use 2.0 - better results!?
 		
-		if (initPlansWithAllRoutes && propReRoute != 0.0)
-			log.warn("ReRoute isn't needed if plans are initialized with all routes.");
+		int ttBinSize = 1; // [s]
+		
+		// choose a sigma for the randomized router
+		// (higher sigma cause more randomness. use 0.0 for no randomness.)
+		double sigma = 0.0;
+		// choose the monetary cost rate for traveled distance
+		// (should be negative. use -12.0 to balance time [h] and distance [m]. 
+		// use -0.00015 to approximately balance travel time and distance in this scenario. 
+		// use -0.0 to use only time.)
+		double monetaryDistanceCostRate = 0.0; // -0.00015;
+		
+		boolean enableLinkToLinkRouting = true;
+		
 		if (!initPlansWithAllRoutes && propReRoute == 0.0)
 			log.warn("ReRoute is needed if plans aren't initialized with all routes. Please increase the reRoute weight!");
 		
@@ -89,11 +110,17 @@ public class RunBraessWoSignals {
 			info += "_cap" + capZ;
 		else
 			info += "_capZ" + capZ + "_capOther" + capOther;		
-		info += "_ttMid" + middleLinkTT + "s";
+		info += "_ttMid" + linkTT4 + "s";
 		if (linkTT3 != 20.0 || linkTT5 != 20.0)
 			info += "_tt3-" + linkTT3 + "s" + "_tt5-" + linkTT5 + "s";
+		if (linkTT1 != 0.0)
+			info += "_tt1-" + linkTT1;
 		if (increaseLinkTTBy != 0.0)
 			info += "_increaseTT+" + increaseLinkTTBy + "s";
+		
+		if (useLinkLength200)
+			info += "_linkLength200m";
+		
 		if (performingUtils != 6.0)
 			info += "_perfUtil" + performingUtils;
 		if (travelingUtils != -6.0)
@@ -115,8 +142,23 @@ public class RunBraessWoSignals {
 		if (propBestScore != 0.0)
 			info += "_bestScore" + propBestScore;
 		if (propSelectExpBeta != 0.0 || propChangeExpBeta != 0.0)
-			info += "_beta" + brainExpBeta;		
+			info += "_beta" + brainExpBeta;	
 		
+		info += "_ttBinSize" + ttBinSize;
+		
+		if (sigma != 0.0)
+			info += "_sigma" + sigma;
+		if (monetaryDistanceCostRate != 0.0)
+			info += "_distCost" + monetaryDistanceCostRate;
+		
+		if (useLanes)
+			info += "_" + lanesInfo;
+		
+		if (enableLinkToLinkRouting)
+			info += "_link2link";
+		else
+			info += "_node2node";
+			
 		String outputDir = inputDir + "matsim-output/" + date + "_" + info + "/";
 		String configFile = inputDir + "config.xml";
 		
@@ -137,7 +179,12 @@ public class RunBraessWoSignals {
 		if (writePlansForAllIts)
 			config.controler().setWritePlansInterval(1);
 		
+		config.scenario().setUseLanes(useLanes);
+		config.network().setLaneDefinitionsFile(inputDir + lanesInfo + capOther + ".xml");
+		
 		config.planCalcScore().setBrainExpBeta(brainExpBeta);
+		
+		config.controler().setLinkToLinkRoutingEnabled(enableLinkToLinkRouting);
 		
 		// adapt strategies
 		Collection<StrategySettings> strategySettings = config.strategy().getStrategySettings();
@@ -195,21 +242,35 @@ public class RunBraessWoSignals {
 		
 		config.planCalcScore().getActivityParams("dummy").setScoringThisActivityAtAll(scoringDummy);
 		
+		config.planCalcScore().setMonetaryDistanceCostRateCar(monetaryDistanceCostRate);
+		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		// adapt the network
+		Link l1 = scenario.getNetwork().getLinks().get(Id.create(1, Link.class));
 		Link l2 = scenario.getNetwork().getLinks().get(Id.create(2, Link.class));
 		Link l3 = scenario.getNetwork().getLinks().get(Id.create(3, Link.class));
 		Link l4 = scenario.getNetwork().getLinks().get(Id.create(4, Link.class));
 		Link l5 = scenario.getNetwork().getLinks().get(Id.create(5, Link.class));
 		Link l6 = scenario.getNetwork().getLinks().get(Id.create(6, Link.class));
 		
-		// set travel time at middle link (by setting link length)
-		l4.setLength(l4.getFreespeed() * middleLinkTT); //instead of 0
+		// set all link length to 200m
+		if (useLinkLength200)
+			for (Link l: scenario.getNetwork().getLinks().values()){
+				if (l.getId() != Id.create(7, Link.class))
+					l.setLength(200);
+			}
 		
-		// set travel time at the links which are not on the middle route (by setting link length)
-		l3.setLength(l3.getFreespeed() * linkTT3);
-		l5.setLength(l5.getFreespeed() * linkTT5);
+		// set travel times at the links (by adapting free speed)
+		l1.setFreespeed(l1.getLength() / linkTT1);
+		l3.setFreespeed(l3.getLength() / linkTT3);
+		l4.setFreespeed(l4.getLength() / linkTT4);
+		l5.setFreespeed(l5.getLength() / linkTT5);
+//		// set travel time at middle link (by setting link length)
+//		l4.setLength(l4.getFreespeed() * middleLinkTT); //instead of 0
+//		// set travel time at the links which are not on the middle route (by setting link length)
+//		l3.setLength(l3.getFreespeed() * linkTT3);
+//		l5.setLength(l5.getFreespeed() * linkTT5);
 		
 		// adapt capacity on all links
 		l2.setCapacity(capZ);
@@ -234,6 +295,17 @@ public class RunBraessWoSignals {
 		
 		Controler controler = new Controler(scenario);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		
+		// adapt sigma for randomized routing
+		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder();
+		builder.setSigma(sigma);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(builder);
+			}
+		});
+				
 		controler.run();
 		
 		// analyze run
