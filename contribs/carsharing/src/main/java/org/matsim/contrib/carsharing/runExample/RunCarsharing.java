@@ -15,37 +15,43 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class RunCarsharing {
 
 	public static void main(String[] args) {
-	Logger.getLogger( "org.matsim.core.controler.Injector" ).setLevel(Level.OFF);
-		
-    	final Config config = ConfigUtils.loadConfig(args[0]);
-    	CarsharingUtils.addConfigModules(config);
-    	
+		Logger.getLogger( "org.matsim.core.controler.Injector" ).setLevel(Level.OFF);
+
+		final Config config = ConfigUtils.loadConfig(args[0]);
+		CarsharingUtils.addConfigModules(config);
+
 		final Scenario sc = ScenarioUtils.loadScenario(config);
-		
+
 		final Controler controler = new Controler( sc );
 		
+		installCarSharing(controler);
+		
+		controler.run();
+
+
+	}
+
+	public static void installCarSharing(final Controler controler) {
+		Scenario sc = controler.getScenario() ;
 		controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bindMobsim().toProvider( CarsharingQsimFactory.class );
-            }
-        });
+			@Override
+			public void install() {
+				bindMobsim().toProvider( CarsharingQsimFactory.class );
+			}
+		});
 
 		controler.setTripRouterFactory(
-                CarsharingUtils.createTripRouterFactory(sc));
+				CarsharingUtils.createTripRouterFactory(sc));
 
 
 		//setting up the scoring function factory, inside different scoring functions are set-up
 		CarsharingScoringFunctionFactory carsharingScoringFunctionFactory = new CarsharingScoringFunctionFactory(
-                  config,
-                  sc.getNetwork());
+				sc.getConfig(),
+				sc.getNetwork());
 		controler.setScoringFunctionFactory(carsharingScoringFunctionFactory);
 
 		controler.addControlerListener(new CarsharingListener(controler,
-                Integer.parseInt(controler.getConfig().getModule("Carsharing").getValue("statsWriterFrequency"))));
-		controler.run();
-
-
+				Integer.parseInt(controler.getConfig().getModule("Carsharing").getValue("statsWriterFrequency"))));
 	}
 
 }
