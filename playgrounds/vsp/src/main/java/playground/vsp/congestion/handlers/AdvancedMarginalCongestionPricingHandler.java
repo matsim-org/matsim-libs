@@ -190,15 +190,11 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			
 			// Go through the congestion events and charge each causing agent his/her contribution to the delay cost: caused delay * activity delay cost per second + caused delay * trip delay cost per second
 			for (CongestionEvent congestionEvent : this.affectedPersonId2congestionEventsToProcess.get(personId)) {
-				if (congestionEvent.getAffectedAgentId().toString().equals(personId.toString())) {
-					double amount = congestionEvent.getDelay() * delayCostPerSecond * (-1);
-					
-					this.amountSum = this.amountSum + amount;
-					
-					PersonMoneyEvent moneyEvent = new PersonMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), amount);
-					this.events.processEvent(moneyEvent);
-					
-				}
+				double amount = congestionEvent.getDelay() * delayCostPerSecond * (-1);
+				this.amountSum = this.amountSum + amount;
+				
+				PersonMoneyEvent moneyEvent = new PersonMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), amount);
+				this.events.processEvent(moneyEvent);				
 			}
 		}
 	}
