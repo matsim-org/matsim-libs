@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.GridUtils;
@@ -25,6 +26,9 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.roadpricing.RoadPricingScheme;
@@ -336,6 +340,8 @@ implements ShutdownListener, StartupListener {
 		// in the following, the data used for gnuplot or QGis is written. dz, feb'15
 		// different separators have to be used to make this output useable by gnuplot or QGis, respectively
 		log.info("Writing plotting data for other analyis into " + adaptedOutputDirectory + " ...");
+		
+//		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SA_Albers, TransformationFactory.WGS84);
 
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
 		
@@ -355,6 +361,13 @@ implements ShutdownListener, StartupListener {
 		// yy for time being, have to assume that this is always there
 		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
+				
+//				Coord saAlbersCoord = new CoordImpl(x + 0.5*spatialGrid.getResolution(),y + 0.5*spatialGrid.getResolution());
+//				Coord wgs84Coord = transformation.transform(saAlbersCoord);
+//				
+//				writer.writeField( wgs84Coord.getX() ) ;
+//				writer.writeField( wgs84Coord.getY() ) ;
+				
 				writer.writeField( x + 0.5*spatialGrid.getResolution() ) ;
 				writer.writeField( y + 0.5*spatialGrid.getResolution() ) ;
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
