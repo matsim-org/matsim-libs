@@ -31,26 +31,30 @@ public class CreateMatrixBasedPtInputs {
 		// Input, output, and parameters
 		
 		// ... for use on cluster
-//		if (args.length < 7 || args.length > 7) {
+//		if (args.length < 8 || args.length > 8) {
 //			throw new RuntimeException("Four argument must be passed.");
 //		}
 //
 //		String networkFile = args[0];
 //		String transitScheduleFile = args[1];
 //		String outputFileRoot = args[2];
-//		boolean measuringPointsAsPTStops = args[3];
-//		double cellSize = args[4];
-//		double departureTime = args[5];
-//		int numberOfThreads = args[6];
+//		Boolean measuringPointsAsPTStops = Boolean.parseBoolean(args[3]);
+//		Double cellSize = Double.parseDouble(args[4]);
+//		Double departureTime = Double.parseDouble(args[5]);
+//		Integer numberOfThreads = Integer.parseInt(args[6]);
+//		String bounds = args[7];
 		
 		// ... for local use
-		String networkFile = "../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/jtlu14i.output_network.xml.gz";
-		String transitScheduleFile = "../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/ITERS/it.300/jtlu14i.300.transitScheduleScored.xml.gz";
-		String outputFileRoot = "";
-		boolean measuringPointsAsPTStops = true;
-		double cellSize = 1000.;
-		double departureTime = 8. * 60 * 60;
-		int numberOfThreads = 1;
+		String networkFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz";
+//		String networkFile = "../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/jtlu14i.output_network.xml.gz";
+		String transitScheduleFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitSchedule.xml.gz";
+//		String transitScheduleFile = "../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/ITERS/it.300/jtlu14i.300.transitScheduleScored.xml.gz";
+		String outputFileRoot = "../../data/accessibility/be/";
+		Boolean measuringPointsAsPTStops = false;
+		Double cellSize = 1000.;
+		Double departureTime = 8. * 60 * 60;
+		Integer numberOfThreads = 1;
+		String bounds = "4550000,5790000,4630000,5850000";
 		
 		log.info("networkFile = " + networkFile + " -- transitScheduleFile = " + transitScheduleFile + " -- outputFileRoot = " + outputFileRoot
 				+ " -- measuringPointsAsPTStops = " + measuringPointsAsPTStops + " -- cellSize = " + cellSize + " -- departureTime = "
@@ -77,8 +81,14 @@ public class CreateMatrixBasedPtInputs {
 		if (measuringPointsAsPTStops == true) {
 			log.info("measuringPointsAsPTStops = " + measuringPointsAsPTStops);
 			
-			// Create measuring points based on a network-dependent bounding box
-			BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+			BoundingBox boundingBox;
+			if (bounds == "network") {
+				boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+			} else {
+				String boundsArray[] = bounds.split(",");				
+				boundingBox = BoundingBox.createBoundingBox(Double.parseDouble(boundsArray[0]),
+						Double.parseDouble(boundsArray[1]), Double.parseDouble(boundsArray[2]), Double.parseDouble(boundsArray[3]));
+			}
 			ActivityFacilitiesImpl measuringPoints;
 			measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(
 					boundingBox.getXMin(), boundingBox.getYMin(), boundingBox.getXMax(), boundingBox.getYMax(), cellSize);
@@ -93,7 +103,7 @@ public class CreateMatrixBasedPtInputs {
 			// Create pt stops file
 			MatrixBasesPtInputUtils.createStopsFileBasedOnMeasuringPoints(scenario,	measuringPoints, outputFileRoot + "measuringPointsAsStops.csv", ",");
 			
-		} else { // i.e. measuringPointsAsPTStops == true
+		} else { // i.e. measuringPointsAsPTStops == false
 			log.info("measuringPointsAsPTStops = " + measuringPointsAsPTStops);
 			
 			// Conversion from TranstiFacilities to coordinates
@@ -104,7 +114,7 @@ public class CreateMatrixBasedPtInputs {
 			}
 
 			// Create pt stops file
-			MatrixBasesPtInputUtils.createStopsFileBasedOnSchedule(scenario,	outputFileRoot + "ptStops.csv", ",");
+			MatrixBasesPtInputUtils.createStopsFileBasedOnSchedule(scenario, outputFileRoot + "ptStops.csv", ",");
 		}
 
 
