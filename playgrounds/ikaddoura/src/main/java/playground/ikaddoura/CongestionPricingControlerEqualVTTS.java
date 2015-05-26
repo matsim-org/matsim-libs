@@ -49,6 +49,7 @@ public class CongestionPricingControlerEqualVTTS {
 	static String configFile;
 
 	public static void main(String[] args) throws IOException {
+		log.info("Starting simulation run with equal VTTS...");
 
 		if (args.length > 0) {
 

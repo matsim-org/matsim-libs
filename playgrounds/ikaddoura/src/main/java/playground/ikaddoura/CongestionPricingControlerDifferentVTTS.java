@@ -49,7 +49,7 @@ public class CongestionPricingControlerDifferentVTTS {
 	static String configFile;
 
 	public static void main(String[] args) throws IOException {
-
+		log.info("Starting simulation run with different VTTS...");
 		if (args.length > 0) {
 
 			configFile = args[0];		
