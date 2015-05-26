@@ -40,8 +40,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-final class TransitAgentImpl implements PTPassengerAgent {
-	// this could probably be made public as long as it remains final. kai, nov'14
+public final class TransitAgentImpl implements PTPassengerAgent {
 
 	private BasicPlanAgentImpl basicAgentDelegate;
 

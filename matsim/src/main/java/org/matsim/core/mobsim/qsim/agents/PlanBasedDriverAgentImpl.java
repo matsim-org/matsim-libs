@@ -23,7 +23,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.DriverAgent;
@@ -36,14 +35,13 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-final class PlanBasedDriverAgentImpl implements DriverAgent {
-	// this could probably be opened up to public as long as it remains final.  kai, nov'14
+public final class PlanBasedDriverAgentImpl implements DriverAgent {
 
 	private static final Logger log = Logger.getLogger(PlanBasedDriverAgentImpl.class);
 
 	private BasicPlanAgentImpl basicPlanAgentDelegate;
 
-	PlanBasedDriverAgentImpl(BasicPlanAgentImpl basicAgent ) {
+	public PlanBasedDriverAgentImpl(BasicPlanAgentImpl basicAgent ) {
 		this.basicPlanAgentDelegate = basicAgent ;
 	}
 	private static int expectedLinkWarnCount = 0;
