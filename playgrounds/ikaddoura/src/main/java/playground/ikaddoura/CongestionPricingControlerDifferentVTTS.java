@@ -50,10 +50,11 @@ public class CongestionPricingControlerDifferentVTTS {
 
 	public static void main(String[] args) throws IOException {
 		log.info("Starting simulation run with different VTTS...");
+		
 		if (args.length > 0) {
 
 			configFile = args[0];		
-			log.info("first argument (config file): "+ configFile);
+			log.info("config file: "+ configFile);
 
 		} else {
 			configFile = "../../runs-svn/internalizationCar/input/config_internalizationCar.xml";
