@@ -310,6 +310,8 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 			route.setVehicleId(Id.create("FF_" + (ffVehId), Vehicle.class));
 
 		carLeg.setRoute(route);
+		
+		// yyyyyy need to get the leg back into the plan !!! yyyyyy
 
 	}
 
