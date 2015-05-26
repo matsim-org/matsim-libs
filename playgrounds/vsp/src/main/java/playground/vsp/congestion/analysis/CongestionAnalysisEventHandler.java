@@ -25,8 +25,10 @@ package playground.vsp.congestion.analysis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -73,7 +75,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 	
 	private Map<Id<Person>, Double> causingAgentId2amountSum = new HashMap <Id<Person>, Double>();
 	private Map<Id<Person>, Double> affectedAgentId2amountSum = new HashMap <Id<Person>, Double>();
-	private List<Id<Person>> persons = new ArrayList<Id<Person>>();
+	private Set<Id<Person>> persons = new HashSet<Id<Person>>();
 	
 	// for pt-distance calculation
 	private Map<Id<Person>,Double> personId2distanceEnterValue = new HashMap<Id<Person>,Double>();
@@ -93,7 +95,7 @@ public class CongestionAnalysisEventHandler implements PersonMoneyEventHandler, 
 			log.warn("Money events may be thrown later than the congestion events... May result in a wrong interpretation of the results. Better use directly the congestion events for analysis.");
 		}
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		log.info("VTTS_car: " + vtts_car);
+		log.info("Anlayzing the congestion events during the simulation. Assuming the following VTTS (equal for all agents): " + vtts_car);
 	}
 
 	@Override

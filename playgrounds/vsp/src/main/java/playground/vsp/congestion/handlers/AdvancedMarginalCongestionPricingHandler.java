@@ -75,8 +75,8 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		this.scenario = scenario;
 		
 		params = new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore());
-		
-		log.info("Computing agent-specific activity delay costs.");
+		log.info("Using different VTTS to translate delays into monetary units.");
+		log.info("Computing the activity delay costs for each agent.");
 	}
 
 	@Override

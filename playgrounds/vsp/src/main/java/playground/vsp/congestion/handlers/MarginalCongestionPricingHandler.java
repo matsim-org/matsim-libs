@@ -51,7 +51,7 @@ public class MarginalCongestionPricingHandler implements CongestionEventHandler 
 		this.events = eventsManager;
 		this.scenario = scenario;
 		this.vtts_car = (this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() - this.scenario.getConfig().planCalcScore().getPerforming_utils_hr()) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		
+		log.info("Using the same VTTS for each agent to translate delays into monetary units.");
 		log.info("VTTS_car: " + vtts_car);
 	}
 

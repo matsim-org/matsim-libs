@@ -26,7 +26,6 @@ package playground.vsp.congestion.controler;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -35,8 +34,6 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.congestion.analysis.CongestionAnalysisEventHandler;
-import playground.vsp.congestion.analysis.CongestionAnalysisWriter;
 import playground.vsp.congestion.handlers.AdvancedMarginalCongestionPricingHandler;
 import playground.vsp.congestion.handlers.TollHandler;
 
@@ -52,7 +49,7 @@ public class AdvancedMarginalCongestionPricingContolerListener implements Startu
 	private TollHandler tollHandler;
 	private EventHandler congestionHandler;
 	private AdvancedMarginalCongestionPricingHandler pricingHandler;
-	private CongestionAnalysisEventHandler extCostHandler;
+//	private CongestionAnalysisEventHandler extCostHandler;
 	
 	/**
 	 * @param scenario
@@ -71,12 +68,12 @@ public class AdvancedMarginalCongestionPricingContolerListener implements Startu
 		EventsManager eventsManager = event.getControler().getEvents();
 		
 		this.pricingHandler = new AdvancedMarginalCongestionPricingHandler(eventsManager, this.scenario);
-		this.extCostHandler = new CongestionAnalysisEventHandler(this.scenario, false);
+//		this.extCostHandler = new CongestionAnalysisEventHandler(this.scenario, false);
 		
 		eventsManager.addHandler(this.congestionHandler);
 		eventsManager.addHandler(this.pricingHandler);
 		eventsManager.addHandler(this.tollHandler);
-		eventsManager.addHandler(this.extCostHandler);
+//		eventsManager.addHandler(this.extCostHandler);
 	}
 
 	@Override
@@ -92,10 +89,10 @@ public class AdvancedMarginalCongestionPricingContolerListener implements Startu
 		
 		// write out analysis every iteration
 		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
-		CongestionAnalysisWriter writerCar = new CongestionAnalysisWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
-		writerCar.writeDetailedResults(TransportMode.car);
-		writerCar.writeAvgTollPerDistance(TransportMode.car);
-		writerCar.writeAvgTollPerTimeBin(TransportMode.car);
+//		CongestionAnalysisWriter writerCar = new CongestionAnalysisWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+//		writerCar.writeDetailedResults(TransportMode.car);
+//		writerCar.writeAvgTollPerDistance(TransportMode.car);
+//		writerCar.writeAvgTollPerTimeBin(TransportMode.car);
 	}
 
 }
