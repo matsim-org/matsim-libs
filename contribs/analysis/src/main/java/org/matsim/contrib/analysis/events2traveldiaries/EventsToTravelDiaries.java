@@ -1,12 +1,13 @@
-package org.matsim.contrib.analysis.travelsummary;
+package org.matsim.contrib.analysis.events2traveldiaries;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.analysis.travelsummary.travelcomponents.*;
+import org.matsim.contrib.analysis.events2traveldiaries.travelcomponents.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
@@ -38,15 +39,15 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 /**
- * @author  pieterfourie, sergioo
- *         <p/>
+ * @author pieterfourie, sergioo
+ *         <p>
  *         Converts events into journeys, trips/stages, transfers and activities
  *         tables. Originally designed for transit scenarios with full transit
- *         simulation, but will work with most teleported modes
- *
+ *         simulation, but should work with most teleported modes
+ *         </p>
  */
 
-public class EventsToTravelSummaryTables implements
+public class EventsToTravelDiaries implements
         TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
         PersonLeavesVehicleEventHandler, PersonDepartureEventHandler,
         PersonArrivalEventHandler, ActivityStartEventHandler,
@@ -54,11 +55,11 @@ public class EventsToTravelSummaryTables implements
         LinkEnterEventHandler, LinkLeaveEventHandler,
         TeleportationArrivalEventHandler, VehicleArrivesAtFacilityEventHandler {
 
-    private final double walkSpeed;
+    private final Network network;
+    private double walkSpeed;
     // Attributes
     private Map<Id, TravellerChain> chains = new HashMap<>();
     private Map<Id, Coord> locations = new HashMap<>();
-    private final Network network;
     private Map<Id, PTVehicle> ptVehicles = new HashMap<>();
     private HashSet<Id> transitDriverIds = new HashSet<>();
     private HashMap<Id, Id> driverIdFromVehicleId = new HashMap<>();
@@ -68,18 +69,25 @@ public class EventsToTravelSummaryTables implements
     private String diagnosticString = "39669_2";
 
 
-    public EventsToTravelSummaryTables(TransitSchedule transitSchedule,
-                                       Network network, Config config) {
-        this(network, config);
+    public EventsToTravelDiaries(TransitSchedule transitSchedule,
+                                 Network network, Config config) {
+
+        this.network = network;
+        this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
         this.transitSchedule = transitSchedule;
         this.isTransitScenario = true;
     }
 
-    public EventsToTravelSummaryTables(Network network, Config config) {
-	    // yy seems a bit overkill to generate a config just to obtain one scalar value. kai, may'15
-	    
-        this.network = network;
-        this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
+    public EventsToTravelDiaries(Scenario scenario) {
+        // yy seems a bit overkill to generate a config just to obtain one scalar value. kai, may'15
+
+        this.network = scenario.getNetwork();
+        isTransitScenario = scenario.getConfig().scenario().isUseTransit() && scenario.getConfig().scenario().isUseVehicles();
+        if (isTransitScenario) {
+            this.transitSchedule = scenario.getTransitSchedule();
+            this.walkSpeed = new TransitRouterConfig(scenario.getConfig()).getBeelineWalkSpeed();
+        }
+
     }
 
     public static void runEventsProcessing(Properties properties) {
@@ -95,7 +103,7 @@ public class EventsToTravelSummaryTables implements
         new MatsimNetworkReader(scenario).readFile(properties.get("networkFile").toString());
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
-        EventsToTravelSummaryTables test;
+        EventsToTravelDiaries test;
         // if(linkTrafficComponent.isSelected()){
         // test = new EventsToPlanElements(
         // scenario.getTransitSchedule(), scenario.getNetwork(),
@@ -103,13 +111,12 @@ public class EventsToTravelSummaryTables implements
         // ,tableSuffixComponent.getText());
         // }else{
         if (isTransit) {
-            test = new EventsToTravelSummaryTables(
+            test = new EventsToTravelDiaries(
                     scenario.getTransitSchedule(), scenario.getNetwork(),
                     scenario.getConfig());
 
         } else {
-            test = new EventsToTravelSummaryTables(scenario.getNetwork(),
-                    scenario.getConfig());
+            test = new EventsToTravelDiaries(scenario);
         }
         // }
         eventsManager.addHandler(test);
@@ -117,7 +124,7 @@ public class EventsToTravelSummaryTables implements
 
         try {
 
-            test.writeSimulationResultsToCSV(properties.get("outputPath").toString(),
+            test.writeSimulationResultsToTabSeparated(properties.get("outputPath").toString(),
                     properties.get("tableSuffix").toString());
 
         } catch (IOException e) {
@@ -132,7 +139,7 @@ public class EventsToTravelSummaryTables implements
     public static void main(String[] args) throws IOException {
         Properties properties = new Properties();
         properties.load(new FileInputStream(new File(args[0])));
-        EventsToTravelSummaryTables.runEventsProcessing(properties);
+        EventsToTravelDiaries.runEventsProcessing(properties);
     }
 
     @Override
@@ -531,39 +538,52 @@ public class EventsToTravelSummaryTables implements
         driverIdFromVehicleId = new HashMap<>();
     }
 
-    public void writeSimulationResultsToCSV(String path, String suffix) throws IOException {
-
-        String actTableName = "matsim_activities" + suffix + ".csv";
+    public void writeSimulationResultsToTabSeparated(String path, String appendage) throws IOException {
+        String actTableName;
+        String journeyTableName;
+        String transferTableName;
+        String tripTableName;
+        if (appendage.matches("[a-zA-Z0-9]*[_]*")) {
+            actTableName = appendage + "matsim_activities.txt";
+            journeyTableName = appendage + "matsim_journeys.txt";
+            transferTableName = appendage + "matsim_transfers.txt";
+            tripTableName = appendage + "matsim_trips.txt";
+        } else {
+            if (appendage.matches("[a-zA-Z0-9]*"))
+                appendage = "_" + appendage;
+            actTableName = "matsim_activities" + appendage + ".txt";
+            journeyTableName = "matsim_journeys" + appendage + ".txt";
+            transferTableName = "matsim_transfers" + appendage + ".txt";
+            tripTableName = "matsim_trips" + appendage + ".txt";
+        }
         BufferedWriter activityWriter =
                 IOUtils.getBufferedWriter(path + "/" + actTableName);
-        activityWriter.write("activity_id,person_id,facility_id,type," +
-                "start_time,end_time,x,y,sample_selector\n");
 
-        String journeyTableName = "matsim_journeys" + suffix + ".csv";
+        activityWriter.write("activity_id\tperson_id\tfacility_id\ttype\t" +
+                "start_time\tend_time\tx\ty\tsample_selector\n");
+
         BufferedWriter journeyWriter =
                 IOUtils.getBufferedWriter(path + "/" + journeyTableName);
-        journeyWriter.write("journey_id,person_id,start_time," +
-                "end_time,distance,main_mode,from_act,to_act," +
-                "in_vehicle_distance,in_vehicle_time," +
-                "access_walk_distance,access_walk_time,access_wait_time," +
-                "first_boarding_stop,egress_walk_distance," +
-                "egress_walk_time,last_alighting_stop," +
-                "transfer_walk_distance,transfer_walk_time," +
-                "transfer_wait_time,sample_selector\n");
+        journeyWriter.write("journey_id\tperson_id\tstart_time\t" +
+                "end_time\tdistance\tmain_mode\tfrom_act\tto_act\t" +
+                "in_vehicle_distance\tin_vehicle_time\t" +
+                "access_walk_distance\taccess_walk_time\taccess_wait_time\t" +
+                "first_boarding_stop\tegress_walk_distance\t" +
+                "egress_walk_time\tlast_alighting_stop\t" +
+                "transfer_walk_distance\ttransfer_walk_time\t" +
+                "transfer_wait_time\tsample_selector\n");
 
-        String tripTableName = "matsim_trips" + suffix + ".csv";
         BufferedWriter tripWriter =
                 IOUtils.getBufferedWriter(path + "/" + tripTableName);
-        tripWriter.write("trip_id,journey_id,start_time,end_time," +
-                "distance,mode,line,route,boarding_stop," +
-                "alighting_stop,sample_selector\n");
+        tripWriter.write("trip_id\tjourney_id\tstart_time\tend_time\t" +
+                "distance\tmode\tline\troute\tboarding_stop\t" +
+                "alighting_stop\tsample_selector\n");
 
-        String transferTableName = "matsim_transfers" + suffix + ".csv";
         BufferedWriter transferWriter =
                 IOUtils.getBufferedWriter(path + "/" + transferTableName);
-        transferWriter.write("transfer_id,journey_id,start_time," +
-                "end_time,from_trip,to_trip,walk_distance," +
-                "walk_time,wait_time,sample_selector\n");
+        transferWriter.write("transfer_id\tjourney_id\tstart_time\t" +
+                "end_time\tfrom_trip\tto_trip\twalk_distance\t" +
+                "walk_time\twait_time\tsample_selector\n");
 
         //read a static field that increments with every inheriting object constructed
         Counter counter = new Counter("Output lines written: ");
@@ -573,7 +593,7 @@ public class EventsToTravelSummaryTables implements
             for (Activity act : chain.getActs()) {
                 try {
                     activityWriter.write(String.format(
-                            "%d,%s,%s,%s,%d,%d,%f,%f,%f\n",
+                            "%d\t%s\t%s\t%s\t%d\t%d\t%f\t%f\t%f\n",
                             act.getElementId(), pax_id,
                             act.getFacility(), act.getType(),
                             (int) act.getStartTime(),
@@ -589,7 +609,7 @@ public class EventsToTravelSummaryTables implements
             for (Journey journey : chain.getJourneys()) {
                 try {
                     journeyWriter.write(String.format(
-                            "%d,%s,%d,%d,%.3f,%s,%d,%d,%.3f,%d,%.3f,%d,%d,%s,%.3f,%d,%s,%.3f,%d,%d,%f\n",
+                            "%d\t%s\t%d\t%d\t%.3f\t%s\t%d\t%d\t%.3f\t%d\t%.3f\t%d\t%d\t%s\t%.3f\t%d\t%s\t%.3f\t%d\t%d\t%f\n",
                             journey.getElementId(),
                             pax_id,
                             (int) journey.getStartTime(),
@@ -617,7 +637,7 @@ public class EventsToTravelSummaryTables implements
                     if (!(journey.isCarJourney() || journey.isTeleportJourney())) {
                         for (Trip trip : journey.getTrips()) {
                             tripWriter.write(String.format(
-                                    "%d,%d,%d,%d,%.3f,%s,%s,%s,%s,%s,%f\n",
+                                    "%d\t%d\t%d\t%d\t%.3f\t%s\t%s\t%s\t%s\t%s\t%f\n",
                                     trip.getElementId(),
                                     journey.getElementId(),
                                     (int) trip.getStartTime(),
@@ -632,7 +652,7 @@ public class EventsToTravelSummaryTables implements
                         }
                         for (Transfer transfer : journey.getTransfers()) {
                             transferWriter.write(String.format(
-                                    "%d,%d,%d,%d,%d,%d,%.3f,%d,%d,%f\n",
+                                    "%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%f\n",
                                     transfer.getElementId(),
                                     journey.getElementId(),
                                     (int) transfer.getStartTime(),
@@ -654,7 +674,7 @@ public class EventsToTravelSummaryTables implements
                         for (Trip trip : journey.getTrips()) {
 
                             tripWriter.write(String.format(
-                                    "%d,%d,%d,%d,%.3f,%s,%s,%s,%s,%s,%f\n",
+                                    "%d\t%d\t%d\t%d\t%.3f\t%s\t%s\t%s\t%s\t%s\t%f\n",
                                     trip.getElementId(),
                                     journey.getElementId(),
                                     (int) trip.getStartTime(),

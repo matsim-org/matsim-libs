@@ -1,4 +1,4 @@
-package org.matsim.contrib.analysis.travelsummary.travelcomponents;
+package org.matsim.contrib.analysis.events2traveldiaries.travelcomponents;
 
 import java.util.LinkedList;
 
