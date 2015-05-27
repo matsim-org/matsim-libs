@@ -255,6 +255,13 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 			return null ;
 		}
 	}
+	public final PlanElement getPreviousPlanElement() {
+		if ( this.currentPlanElementIndex >=1 ) {
+			return this.plan.getPlanElements().get( this.currentPlanElementIndex-1 ) ;
+		} else {
+			return null ;
+		}
+	}
 
 	/* default */ final int getCurrentPlanElementIndex() {
 		// Should this be made public?  

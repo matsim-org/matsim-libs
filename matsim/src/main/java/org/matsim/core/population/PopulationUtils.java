@@ -144,7 +144,10 @@ public final class PopulationUtils {
 		public void setTravelTime(double seconds) {
 			throw new UnsupportedOperationException() ;
 		}
-		
+		@Override
+		public String toString() {
+			return this.delegate.toString() ;
+		}
 	}
 	
 	public static Activity unmodifiableActivity( Activity act ) {
@@ -211,6 +214,11 @@ public final class PopulationUtils {
 		public Id<ActivityFacility> getFacilityId() {
 			return this.delegate.getFacilityId() ;
 		}
+		@Override
+		public String toString() {
+			return this.delegate.toString() ;
+		}
+
 	}
 
 	/**
