@@ -4,13 +4,13 @@ import java.io.File;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
@@ -21,114 +21,339 @@ import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.analysis.AnalyzeBraessSimulation;
 
 /**
- * Class to run a simulation of the braess scenario without signals.
- * It also analyzes the simulation with help of AnalyseBraessSimulation.java.
+ * Class to run a simulation of the braess scenario without signals. It also
+ * analyzes the simulation with help of AnalyseBraessSimulation.java.
  * 
  * @author tthunig
- *
+ * 
  */
 public class RunBraessWoSignals {
+
+	private static final Logger log = Logger
+			.getLogger(RunBraessWoSignals.class);
 	
-	private static final Logger log = Logger.getLogger(RunBraessWoSignals.class);
+	private String inputDir;
+	private String basicConfigFile;
+	private String basicNetworkFile;
+	private String plansFile;
+	private String outputDir;
+	private int iterations;
+	private boolean writeEventsForAllIts;
+	private boolean useLanes;
+	private String lanesInfo;
+	private long capMain;
+	private long capFirstLast;
+	private double[] linkTTs;
+	private double propChangeExpBeta;
+	private double propReRoute;
+	private double propKeepLast;
+	private double propSelectRandom;
+	private double propSelectExpBeta;
+	private double propBestScore;
+	private double brainExpBeta;
+	private int travelTimeBinSize;
+	private double sigma;
+	private double monetaryDistanceCostRate;
+	private boolean enableLinkToLinkRouting;
+
+
+	public RunBraessWoSignals(String inputDir, String basicConfig,
+			String basicNetwork, String plansFile, String outputDir,
+			int iterations, boolean writeEventsForAllIts, double[] linkTTs,
+			boolean useLinkLength200, String lanesInfo,
+			long capMain, long capFirstLast, double propChangeExpBeta,
+			double propReRoute, double propKeepLast, double propSelectRandom,
+			double propSelectExpBeta, double propBestScore,
+			double brainExpBeta, int ttBinSize, double sigma,
+			double monetaryDistanceCostRate, boolean enableLinkToLinkRouting) {
+
+		this.inputDir = inputDir;
+		this.basicConfigFile = basicConfig;
+		this.basicNetworkFile = basicNetwork;
+		this.plansFile = plansFile;
+		this.outputDir = outputDir;
+		this.iterations = iterations;
+		this.writeEventsForAllIts = writeEventsForAllIts;
+		this.useLanes = useLanes;
+		this.lanesInfo = lanesInfo;
+		this.capMain = capMain;
+		this.capFirstLast = capFirstLast;
+		this.linkTTs = linkTTs;
+		this.propChangeExpBeta = propChangeExpBeta;
+		this.propReRoute = propReRoute;
+		this.propKeepLast = propKeepLast;
+		this.propSelectRandom = propSelectRandom;
+		this.propSelectExpBeta = propSelectExpBeta;
+		this.propBestScore = propBestScore;
+		this.brainExpBeta = brainExpBeta;
+		this.travelTimeBinSize = ttBinSize;
+		this.sigma = sigma;
+		this.monetaryDistanceCostRate = monetaryDistanceCostRate;
+		this.enableLinkToLinkRouting = enableLinkToLinkRouting;
+	}
+
+	private void prepareAndRunAndAnalyse() {
+		// write some information
+		log.info("Starts running the simulation from the input directory " + inputDir);
+		log.info("The output will be written to " + outputDir);
+		
+		// prepare the simulation		
+		Config config = adaptConfig();
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		adaptNetwork(scenario);
+
+		// prepare the controller
+		Controler controler = new Controler(scenario);
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		// adapt sigma for randomized routing
+		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder();
+		builder.setSigma(sigma);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(builder);
+			}
+		});
+
+		// run the simulation
+		controler.run();
+
+		// analyze the simulation
+		String analyzeDir = outputDir + "analysis/";
+		new File(analyzeDir).mkdir();
+		AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(
+				outputDir, iterations, analyzeDir);
+		if (writeEventsForAllIts)
+			// analyze all iterations in terms of route choice and travel time
+			analyzer.analyzeAllIt();
+		// analyze the last iteration more detailed
+		analyzer.analyzeLastIt();
+	}
+
+	private Config adaptConfig() {
+		// read config file
+		Config config = ConfigUtils.createConfig();
+		ConfigUtils.loadConfig(config, basicConfigFile);
+
+		// adapt output directory
+		config.controler().setOutputDirectory(outputDir);
+
+		// adapt number of iterations
+		config.controler().setLastIteration(iterations);
+
+		if (writeEventsForAllIts) {
+			// adapt events writing interval
+			config.controler().setWriteEventsInterval(1);
+		}
+
+		// set network and lane properties
+		config.network().setInputFile(basicNetworkFile);
+		config.scenario().setUseLanes(useLanes);
+		config.network().setLaneDefinitionsFile(
+				inputDir + lanesInfo + capMain + "-" + capFirstLast + ".xml");
+
+		config.planCalcScore().setBrainExpBeta(brainExpBeta);
+
+		config.controler().setLinkToLinkRoutingEnabled(enableLinkToLinkRouting);
+		
+		// adapt travelTimeBinSize and travelTimeCalculatorType
+		config.travelTimeCalculator().setTraveltimeBinSize(travelTimeBinSize);
+		log.info("Hash Map is used as default travel time calculator.");
+		config.travelTimeCalculator().setTravelTimeCalculatorType(
+				TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
+
+		// adapt strategies
+		Collection<StrategySettings> strategySettings = config.strategy()
+				.getStrategySettings();
+		for (StrategySettings s : strategySettings) {
+			if (s.getStrategyName().equals("ReRoute")) {
+				s.setWeight(propReRoute);
+				s.setDisableAfter(iterations / 2);
+			}
+			if (s.getStrategyName().equals("ChangeExpBeta")) {
+				s.setWeight(propChangeExpBeta);
+			}
+		}
+
+		StrategySettings keepLastSelectedStrategy = new StrategySettings();
+		keepLastSelectedStrategy.setStrategyName("KeepLastSelected");
+		keepLastSelectedStrategy.setWeight(propKeepLast);
+		keepLastSelectedStrategy.setDisableAfter(iterations / 2);
+		config.strategy().addStrategySettings(keepLastSelectedStrategy);
+
+		StrategySettings selectRandomStrategy = new StrategySettings();
+		selectRandomStrategy.setStrategyName("SelectRandom");
+		selectRandomStrategy.setWeight(propSelectRandom);
+		selectRandomStrategy.setDisableAfter(iterations / 2);
+		config.strategy().addStrategySettings(selectRandomStrategy);
+
+		StrategySettings selExpBetaStrategy = new StrategySettings();
+		selExpBetaStrategy.setStrategyName("SelectExpBeta");
+		selExpBetaStrategy.setWeight(propSelectExpBeta);
+		config.strategy().addStrategySettings(selExpBetaStrategy);
+
+		StrategySettings bestScoreStrategy = new StrategySettings();
+		bestScoreStrategy.setStrategyName("BestScore");
+		bestScoreStrategy.setWeight(propBestScore);
+		config.strategy().addStrategySettings(bestScoreStrategy);
+
+		// set plans file
+		config.plans().setInputFile(plansFile);
+
+		// adapt monetary distance cost rate
+		config.planCalcScore().setMonetaryDistanceCostRateCar(
+				monetaryDistanceCostRate);
+		return config;
+	}
+
+	private void adaptNetwork(Scenario scenario) {
+		// collect all links from the network
+		Link[] links = new Link[7];
+		for (int id = 1; id <= 7; id++){
+			links[id-1] = scenario.getNetwork().getLinks()
+					.get(Id.create(id, Link.class));
+		}
+		
+		log.info("In the basic network all links have length 200m");
+	
+		// set travel times at the links (by adapting free speed)
+		for (int id = 1; id <= 7; id++){
+			if (linkTTs[id-1] != 0.0)
+				links[id-1].setFreespeed(links[id-1].getLength() / linkTTs[id-1]);
+			else // specific linkTT == 0.0
+				log.error("The link travel time can't be zero. Choose at least one second.");
+		}
+	
+		// adapt capacity on all links
+		links[1-1].setCapacity(capFirstLast);
+		for (int id = 2; id <= 6; id++){
+			links[id-1].setCapacity(capMain);
+		}
+		links[7-1].setCapacity(capFirstLast);
+	}
 
 	public static void main(String[] args) {
-		String date = "2015-05-21";
-		
+		String date = "2015-05-27test";
+
 		int numberOfAgents = 60;
 		boolean sameStartTime = true;
 		boolean initPlansWithAllRoutes = true;
-		boolean initPlansWithZRoute = true;
-		
+
 		int iterations = 100;
-		boolean writeEventsForAllIts = true; // needed for detailed analysis. remind the running time if true
-		boolean writePlansForAllIts = false; // remind the running time if true
-		
-		// tt on the middle link
-		double linkTT4 = 1; // [s]. for deleting use 200
+		boolean writeEventsForAllIts = true; // needed for detailed analysis.
+												// remind the running time if
+												// true
+
+		// define travel times on links
+		double[] linkTTs = new double[7];
+		/* tt on the middle link */
+		linkTTs[4 - 1] = 1; // [s]. for deleting use 200
 		/* tt of the link which is not at the middle route. */
-		double linkTT3 = 20; // [s]
-		double linkTT5 = 20; // [s]
-		// tt on the first link where the activity is located
-		double linkTT1 = 1; // [s]
-		
-		boolean useLinkLength200 = true;
-		
-		boolean useLanes = true;
-		String lanesInfo = "4-lanes";
-		
-		boolean enforceZ = false;
-		
-		long capZ = 1800;
-		long capOther = 1800;
-		
-		double increaseLinkTTBy = 0.0; // [s]. additive. use 0.0 for former travel times. 15*60 e.g. for an increase of 30 min per path
-		
-		double performingUtils = 6.0; // +6 default
-		double travelingUtils = -6.0; // -6 default
-		double lateArrivalUtils = -18.0; // default -18
-		boolean scoringDummy = true; // default true
-		
+		linkTTs[3 - 1] = 20; // [s]
+		linkTTs[5 - 1] = 20; // [s]
+		/* tt on the first link where the activity is located */
+		linkTTs[1 - 1] = 1; // [s]
+		linkTTs[7 - 1] = 1; // [s]
+
+		boolean useLanes = false;
+		String lanesInfo = "lanes";
+
+		long capMain = 1800;
+		long capFirstLast = 3600;
+
 		double propChangeExpBeta = 0.9;
 		double propReRoute = 0.1;
 		double propKeepLast = 0.0;
 		double propSelectRandom = 0.0;
 		double propSelectExpBeta = 0.0;
 		double propBestScore = 0.0;
-		
-		double brainExpBeta = 2.0; // default: 1.0. DG used to use 2.0 - better results!?
-		
+
+		double brainExpBeta = 2.0; // default: 1.0. DG used to use 2.0 - better
+									// results!?
+
 		int ttBinSize = 1; // [s]
-		
+
 		// choose a sigma for the randomized router
 		// (higher sigma cause more randomness. use 0.0 for no randomness.)
 		double sigma = 0.0;
 		// choose the monetary cost rate for traveled distance
-		// (should be negative. use -12.0 to balance time [h] and distance [m]. 
-		// use -0.00015 to approximately balance travel time and distance in this scenario. 
+		// (should be negative. use -12.0 to balance time [h] and distance [m].
+		// use -0.00015 to approximately balance travel time and distance in
+		// this scenario.
 		// use -0.0 to use only time.)
 		double monetaryDistanceCostRate = 0.0; // -0.00015;
-		
+
 		boolean enableLinkToLinkRouting = true;
-		
-		if (!initPlansWithAllRoutes && propReRoute == 0.0)
-			log.warn("ReRoute is needed if plans aren't initialized with all routes. Please increase the reRoute weight!");
-		
-		String inputDir = DgPaths.SHAREDSVN + "studies/tthunig/scenarios/BraessWoSignals/";
-		
+
+		String inputDir = DgPaths.SHAREDSVN
+				+ "studies/tthunig/scenarios/BraessWoSignals/";
+
 		// create run name
+		String info = createRunName(numberOfAgents, sameStartTime,
+				initPlansWithAllRoutes, iterations, linkTTs, useLanes,
+				lanesInfo, capMain, propChangeExpBeta, propReRoute,
+				propKeepLast, propSelectRandom, propSelectExpBeta,
+				propBestScore, brainExpBeta, ttBinSize, sigma,
+				monetaryDistanceCostRate, enableLinkToLinkRouting);
+
+		String outputDir = inputDir + "matsim-output/" + date + "_" + info
+				+ "/";
+		String basicConfig = inputDir + "basicConfig.xml";
+		String basicNetwork = inputDir + "basicNetwork.xml";
+		String plansFile = inputDir
+				+ createPlansFileName(numberOfAgents, sameStartTime,
+						initPlansWithAllRoutes);
+
+		RunBraessWoSignals runScript = new RunBraessWoSignals(inputDir,
+				basicConfig, basicNetwork, plansFile, outputDir, iterations,
+				writeEventsForAllIts, linkTTs, useLanes,
+				lanesInfo, capMain, capFirstLast, propChangeExpBeta,
+				propReRoute, propKeepLast, propSelectRandom, propSelectExpBeta,
+				propBestScore, brainExpBeta, ttBinSize, sigma,
+				monetaryDistanceCostRate, enableLinkToLinkRouting);
+		runScript.prepareAndRunAndAnalyse();
+
+	}
+
+	private static String createPlansFileName(int numberOfAgents,
+			boolean sameStartTime, boolean initPlansWithAllRoutes) {
+
+		String plansFile = "plans" + numberOfAgents;
+		if (sameStartTime) {
+			plansFile += "SameStartTime";
+		}
+		if (initPlansWithAllRoutes)
+			plansFile += "AllRoutes";
+		plansFile += ".xml";
+
+		log.info("Use plans file " + plansFile);
+		return plansFile;
+	}
+
+	private static String createRunName(int numberOfAgents,
+			boolean sameStartTime, boolean initPlansWithAllRoutes,
+			int iterations, double[] linkTTs, boolean useLanes,
+			String lanesInfo, long capMain, double propChangeExpBeta,
+			double propReRoute, double propKeepLast, double propSelectRandom,
+			double propSelectExpBeta, double propBestScore,
+			double brainExpBeta, int ttBinSize, double sigma,
+			double monetaryDistanceCostRate, boolean enableLinkToLinkRouting) {
+
 		String info = numberOfAgents + "p";
 		if (sameStartTime)
 			info += "_sameTime";
-		if (initPlansWithZRoute && !initPlansWithAllRoutes)
-			info += "_initZRoute";
 		info += "_" + iterations + "it";
-//		if (writeEventsForAllIts)
-//			info += "_allEvents";
-		if (enforceZ)
-			info += "_enforceZ";
-		if (capZ == capOther)
-			info += "_cap" + capZ;
-		else
-			info += "_capZ" + capZ + "_capOther" + capOther;		
-		info += "_ttMid" + linkTT4 + "s";
-		if (linkTT3 != 20.0 || linkTT5 != 20.0)
-			info += "_tt3-" + linkTT3 + "s" + "_tt5-" + linkTT5 + "s";
-		if (linkTT1 != 0.0)
-			info += "_tt1-" + linkTT1;
-		if (increaseLinkTTBy != 0.0)
-			info += "_increaseTT+" + increaseLinkTTBy + "s";
-		
-		if (useLinkLength200)
-			info += "_linkLength200m";
-		
-		if (performingUtils != 6.0)
-			info += "_perfUtil" + performingUtils;
-		if (travelingUtils != -6.0)
-			info += "_travUtil" + travelingUtils;
-		if (lateArrivalUtils != -18.0)
-			info += "_lateArr" + lateArrivalUtils;
-		if (!scoringDummy)
-			info += "_dontScoreDummyAct";
+
+		info += "_cap" + capMain;
+		info += "_ttMid" + linkTTs[4 - 1] + "s";
+		if (linkTTs[3 - 1] != 20.0 || linkTTs[5 - 1] != 20.0)
+			info += "_tt3-" + linkTTs[3 - 1] + "s" + "_tt5-" + linkTTs[5 - 1]
+					+ "s";
+		if (linkTTs[1 - 1] != 0.0)
+			info += "_tt1-" + linkTTs[1 - 1];
+		if (linkTTs[7 - 1] != 0.0)
+			info += "_tt7-" + linkTTs[7 - 1];
+
 		if (propChangeExpBeta != 0.0)
 			info += "_chExpBeta" + propChangeExpBeta;
 		if (propReRoute != 0.0)
@@ -142,182 +367,23 @@ public class RunBraessWoSignals {
 		if (propBestScore != 0.0)
 			info += "_bestScore" + propBestScore;
 		if (propSelectExpBeta != 0.0 || propChangeExpBeta != 0.0)
-			info += "_beta" + brainExpBeta;	
-		
+			info += "_beta" + brainExpBeta;
+
 		info += "_ttBinSize" + ttBinSize;
-		
+
 		if (sigma != 0.0)
 			info += "_sigma" + sigma;
 		if (monetaryDistanceCostRate != 0.0)
 			info += "_distCost" + monetaryDistanceCostRate;
-		
+
 		if (useLanes)
 			info += "_" + lanesInfo;
-		
+
 		if (enableLinkToLinkRouting)
 			info += "_link2link";
 		else
 			info += "_node2node";
-			
-		String outputDir = inputDir + "matsim-output/" + date + "_" + info + "/";
-		String configFile = inputDir + "config.xml";
-		
-		// read config file
-		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, configFile);
-		
-		// adapt output directory
-		config.controler().setOutputDirectory(outputDir);
-		
-		// adapt number of iterations
-		config.controler().setLastIteration(iterations);
-		
-		if (writeEventsForAllIts){
-			// adapt events writing interval
-			config.controler().setWriteEventsInterval(1);
-		}
-		if (writePlansForAllIts)
-			config.controler().setWritePlansInterval(1);
-		
-		config.scenario().setUseLanes(useLanes);
-		config.network().setLaneDefinitionsFile(inputDir + lanesInfo + capOther + ".xml");
-		
-		config.planCalcScore().setBrainExpBeta(brainExpBeta);
-		
-		config.controler().setLinkToLinkRoutingEnabled(enableLinkToLinkRouting);
-		
-		// adapt strategies
-		Collection<StrategySettings> strategySettings = config.strategy().getStrategySettings();
-		for (StrategySettings s : strategySettings){
-			if (s.getStrategyName().equals("ReRoute")){
-				s.setWeight(propReRoute);
-				s.setDisableAfter(iterations/2);
-			}
-			if (s.getStrategyName().equals("ChangeExpBeta")){
-				s.setWeight(propChangeExpBeta);
-			}
-		}
-		
-		StrategySettings keepLastSelectedStrategy = new StrategySettings();
-		keepLastSelectedStrategy.setStrategyName("KeepLastSelected");
-		keepLastSelectedStrategy.setWeight(propKeepLast);
-		keepLastSelectedStrategy.setDisableAfter(iterations/2);
-		config.strategy().addStrategySettings(keepLastSelectedStrategy);
-		
-		StrategySettings selectRandomStrategy = new StrategySettings();
-		selectRandomStrategy.setStrategyName("SelectRandom");
-		selectRandomStrategy.setWeight(propSelectRandom);
-		selectRandomStrategy.setDisableAfter(iterations/2);
-		config.strategy().addStrategySettings(selectRandomStrategy);
-		
-		StrategySettings selExpBetaStrategy = new StrategySettings();
-		selExpBetaStrategy.setStrategyName("SelectExpBeta");
-		selExpBetaStrategy.setWeight(propSelectExpBeta);
-		config.strategy().addStrategySettings(selExpBetaStrategy);
-		
-		StrategySettings bestScoreStrategy = new StrategySettings();
-		bestScoreStrategy.setStrategyName("BestScore");
-		bestScoreStrategy.setWeight(propBestScore);
-		config.strategy().addStrategySettings(bestScoreStrategy);
-		
-		
-		// adapt plans file
-		String plansFile = "plans" + numberOfAgents;
-		if (sameStartTime){
-			plansFile += "sameStartTime";
-		}
-		if (initPlansWithAllRoutes)
-			plansFile += "AllRoutes";
-		else if (initPlansWithZRoute)
-			plansFile += "RouteZ";
-		plansFile += ".xml";
-		config.plans().setInputFile(inputDir + plansFile);
-		Log.info("Use plans file " + plansFile);
-					
-		
-		// adapt utils
-		config.planCalcScore().setTraveling_utils_hr(travelingUtils);
-		config.planCalcScore().setPerforming_utils_hr(performingUtils);
-		config.planCalcScore().setLateArrival_utils_hr(lateArrivalUtils);
-		
-		config.planCalcScore().getActivityParams("dummy").setScoringThisActivityAtAll(scoringDummy);
-		
-		config.planCalcScore().setMonetaryDistanceCostRateCar(monetaryDistanceCostRate);
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		// adapt the network
-		Link l1 = scenario.getNetwork().getLinks().get(Id.create(1, Link.class));
-		Link l2 = scenario.getNetwork().getLinks().get(Id.create(2, Link.class));
-		Link l3 = scenario.getNetwork().getLinks().get(Id.create(3, Link.class));
-		Link l4 = scenario.getNetwork().getLinks().get(Id.create(4, Link.class));
-		Link l5 = scenario.getNetwork().getLinks().get(Id.create(5, Link.class));
-		Link l6 = scenario.getNetwork().getLinks().get(Id.create(6, Link.class));
-		
-		// set all link length to 200m
-		if (useLinkLength200)
-			for (Link l: scenario.getNetwork().getLinks().values()){
-				if (l.getId() != Id.create(7, Link.class))
-					l.setLength(200);
-			}
-		
-		// set travel times at the links (by adapting free speed)
-		l1.setFreespeed(l1.getLength() / linkTT1);
-		l3.setFreespeed(l3.getLength() / linkTT3);
-		l4.setFreespeed(l4.getLength() / linkTT4);
-		l5.setFreespeed(l5.getLength() / linkTT5);
-//		// set travel time at middle link (by setting link length)
-//		l4.setLength(l4.getFreespeed() * middleLinkTT); //instead of 0
-//		// set travel time at the links which are not on the middle route (by setting link length)
-//		l3.setLength(l3.getFreespeed() * linkTT3);
-//		l5.setLength(l5.getFreespeed() * linkTT5);
-		
-		// adapt capacity on all links
-		l2.setCapacity(capZ);
-		l3.setCapacity(capOther);
-		l4.setCapacity(capZ);
-		l5.setCapacity(capOther);
-		l6.setCapacity(capZ);
-		
-		if (enforceZ){
-			// force agents to use the middle link
-			l3.setFreespeed(0.1);
-			l5.setFreespeed(0.1);
-		}
-		
-		// increase travel time on each link (by increasing link length)
-		// except the middle link and the first and the last link
-		l2.setLength(l2.getLength() + increaseLinkTTBy * l2.getFreespeed());
-		l3.setLength(l3.getLength() + increaseLinkTTBy * l3.getFreespeed());
-		l5.setLength(l5.getLength() + increaseLinkTTBy * l5.getFreespeed());
-		l6.setLength(l6.getLength() + increaseLinkTTBy * l6.getFreespeed());
-		
-		
-		Controler controler = new Controler(scenario);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		
-		// adapt sigma for randomized routing
-		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder();
-		builder.setSigma(sigma);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindTravelDisutilityFactory().toInstance(builder);
-			}
-		});
-				
-		controler.run();
-		
-		// analyze run
-		String analyzeDir = outputDir + "analysis/";
-		new File(analyzeDir).mkdir();
-		AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(outputDir, iterations, analyzeDir);
-		if (writeEventsForAllIts)
-			// analyze all iterations in terms of route choice and travel time
-			analyzer.analyzeAllIt();
-		// analyze the last iteration more detailed
-		analyzer.analyzeLastIt();
-				
+		return info;
 	}
 
 }
