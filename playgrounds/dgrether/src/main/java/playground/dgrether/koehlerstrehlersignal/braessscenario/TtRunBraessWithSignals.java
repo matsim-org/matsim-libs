@@ -294,7 +294,7 @@ public class TtRunBraessWithSignals {
 		String inputDir = DgPaths.SHAREDSVN
 				+ "projects/cottbus/data/scenarios/braess_scenario/";
 		
-		// choose the signal plan: _Green or _NoZ or _BC or _All1s ...
+		// choose the signal plan: _Green or _1sZ or _BC ...
 		String signalControlFile = inputDir + "signalControl_NoZ.xml";
 
 		String basicConfig = inputDir + "basicConfig.xml";
