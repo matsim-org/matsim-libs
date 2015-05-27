@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.analysis.travelsummary;
+package org.matsim.contrib.analysis.events2traveldiaries;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,15 +28,14 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class IntegrationTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
 	@SuppressWarnings("static-method")
 	@Test
 	public final void test() {
 
-		String[] str = { "test/scenarios/equil/output_events.xml.gz" , "test/scenarios/equil/network.xml" } ;
+		String[] str = { "test/scenarios/equil/config.xml", "test/scenarios/equil/output_events.xml.gz", "_test", utils.getOutputDirectory()  } ;
 		// (this works since those files are, in the matsim main repository, in the resources path. kai, may'15)
 		
-		RunEventsToTravelSummaryExample.main( str );
+		RunEventsToTravelDiaries.main(str);
 		
 		// yy missing: something that compares output files to expectations. kai, may'15
 		
