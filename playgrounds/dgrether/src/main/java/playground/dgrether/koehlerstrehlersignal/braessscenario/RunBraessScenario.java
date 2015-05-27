@@ -28,7 +28,7 @@ import playground.dgrether.signalsystems.sylvia.controler.DgSylviaControlerListe
  * Class to run a MATSim simulation of breaess's scenario
  * 
  * @author tthunig
- * 
+ * @deprecated use TtRunBraessWithSignals instead or actualize this class for using btu signals
  */
 public class RunBraessScenario {
 	
@@ -212,7 +212,7 @@ public class RunBraessScenario {
 	 */
 	public static void main(String[] args) {
 
-		String date = "2015-04-15";
+		String date = "2015-05-05";
 		int simulationCase = 3; // 1 - base case, 2 - base case continued, 3 - changed signals
 		
 		// BASE CASE - Case 1
