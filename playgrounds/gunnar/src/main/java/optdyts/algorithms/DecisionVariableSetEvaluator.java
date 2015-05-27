@@ -24,17 +24,13 @@
  */
 package optdyts.algorithms;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 import optdyts.DecisionVariable;
 import optdyts.ObjectiveFunction;
 import optdyts.SimulatorState;
 import optdyts.surrogatesolutions.SurrogateSolution;
-import optdyts.surrogatesolutions.TransitionSequence;
 
 /**
  * 
@@ -47,9 +43,9 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 
 	// CONSTANTS
 
-	private final Set<U> decisionVariablesToBeTriedOut;
+	private final boolean interpolateObjectiveFunctionValues = true;
 
-	private final ObjectiveFunction<X> objectiveFunction;
+	private final Set<U> decisionVariablesToBeTriedOut;
 
 	// MEMBERS
 
@@ -59,7 +55,7 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 
 	private X fromState = null;
 
-	private StringBuffer msg = new StringBuffer(); // TODO only for testing
+	private SearchStatisticsTracker<U> statisticsTracker = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -83,20 +79,31 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 			final double convergenceNoiseVarianceScale) {
 		this.decisionVariablesToBeTriedOut = new LinkedHashSet<U>(
 				decisionVariables);
-		this.objectiveFunction = objectiveFunction;
 		this.surrogateSolution = new SurrogateSolution<X, U>(
-				transitionNoiseVarianceScale, convergenceNoiseVarianceScale);
+				transitionNoiseVarianceScale, convergenceNoiseVarianceScale,
+				objectiveFunction);
 	}
 
-	// -------------------- GETTERS --------------------
+	// -------------------- SETTERS AND GETTERS --------------------
+
+	public boolean getInterpolateObjectiveFunctionValues() {
+		return this.interpolateObjectiveFunctionValues;
+	}
+
+	public void setLogFileName(final String logFileName) {
+		this.statisticsTracker = new SearchStatisticsTracker<U>(logFileName);
+	}
+
+	public String getLogFileName() {
+		if (this.statisticsTracker != null) {
+			return this.statisticsTracker.getFileName();
+		} else {
+			return null;
+		}
+	}
 
 	public U getCurrentDecisionVariable() {
 		return this.currentDecisionVariable;
-	}
-
-	// TODO experimental, remove again
-	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
-		return this.surrogateSolution.getDecisionVariable2TransitionSequence();
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -135,51 +142,24 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 			this.surrogateSolution.evaluate();
 
 			// logging, replace by something more meaningful
-			this.msg.append("G2 = "
-					+ this.surrogateSolution.getEstimatedExpectedGap2()
-					+ " vs "
-					+ this.surrogateSolution.getConvergenceNoiseVariance()
-					+ "; estimated simulation noise variance = "
-					+ this.surrogateSolution.getTransitionNoiseVariance()
-					+ "; Q = "
-					+ this.objectiveFunction
-							.evaluateState(this.surrogateSolution
-									.getEquilibriumState()) + "; M = "
-					+ this.surrogateSolution.size() + "; alpha = "
-					+ this.surrogateSolution.getDecisionVariable2alphaSum()
-					+ "\n");
-			final PrintWriter writer;
-			try {
-				writer = new PrintWriter("fps.txt");
-				writer.println(this.msg.toString());
-				writer.flush();
-				writer.close();
-			} catch (FileNotFoundException e) {
-				throw new RuntimeException(e);
+			if (this.statisticsTracker != null) {
+				this.statisticsTracker.writeToFile(this.surrogateSolution);
 			}
 
 			// Possible to remove a solution?
 			if ((this.decisionVariablesToBeTriedOut.size() == 0)
 					&& (this.surrogateSolution.size() > 1)
 					&& (this.surrogateSolution.isConverged())) {
-
 				SurrogateSolution<X, U> best = this.surrogateSolution;
-				double bestObjectiveFunctionValue = this.objectiveFunction
-						.evaluateState(this.surrogateSolution
-								.getEquilibriumState());
-
 				for (SurrogateSolution<X, U> candidate : this.surrogateSolution
 						.newEvaluatedSubsets()) {
-					if (candidate.isConverged()) {
-						final double candidateObjectiveFunctionValue = this.objectiveFunction
-								.evaluateState(candidate.getEquilibriumState());
-						if (candidateObjectiveFunctionValue < bestObjectiveFunctionValue) {
-							best = candidate;
-							bestObjectiveFunctionValue = candidateObjectiveFunctionValue;
-						}
+					if (candidate.isConverged()
+							&& (candidate
+									.getInterpolatedObjectiveFunctionValue() < best
+									.getInterpolatedObjectiveFunctionValue())) {
+						best = candidate;
 					}
 				}
-
 				this.surrogateSolution = best;
 			}
 		}
@@ -195,7 +175,7 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 			this.decisionVariablesToBeTriedOut
 					.remove(this.currentDecisionVariable);
 			if (this.fromState == null) {
-				this.fromState = newState.deepCopy();
+				this.fromState = newState;
 			} else {
 				this.fromState.implementInSimulation();
 			}
@@ -205,8 +185,7 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 					.getLeastEvaluatedDecisionVariables().iterator().next());
 			// set simulation to last state visited by that decision variable
 			this.fromState = this.surrogateSolution
-					.getDecisionVariable2TransitionSequence()
-					.get(this.currentDecisionVariable).getLastState();
+					.getLastState(this.currentDecisionVariable);
 			this.fromState.implementInSimulation();
 		}
 
