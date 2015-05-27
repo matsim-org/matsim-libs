@@ -10,6 +10,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 public class SubpopulationMembers {
 
@@ -30,14 +31,19 @@ public class SubpopulationMembers {
 		Object[] arr = scenario.getPopulation().getPersons().values().toArray();
 		
 		for (int i = 1; i < size; i++) {
-			if (bla.getAttribute(((Person)arr[i]).getId().toString(), "RT_CARD").equals("false")) {				
+			/*if (bla.getAttribute(((Person)arr[i]).getId().toString(), "RT_CARD").equals("false")) {				
 				scenario.getPopulation().getPersons().remove(((Person)arr[i]).getId());
-			}			
+			}*/			
+			if (bla.getAttribute(((Person)arr[i]).getId().toString(), "RT_CARD").equals("true")) {				
+				bla.putAttribute(((Person)arr[i]).getId().toString(), "subpopulation", "csMembers");
+			}
+			
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4("./plans_only_rt_members_" + args[3] + ".xml.gz");		
+		//new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4("./plans_only_rt_members_" + args[3] + ".xml.gz");		
 		
-		
+		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
+		betaWriter.writeFile("./personAttrSubpop.xml.gz");
 		
 
 	}

@@ -5,39 +5,36 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 public class TwoWayCSFacilityImpl implements TwoWayCSFacility{
 	private final Coord coord;
-	private final Id id;
-	private final Id linkId;
+	private final Id<TwoWayCSFacility> id;
+	private final Id<Link> linkId;
 	private final Map<String, Object> customAttributes = new LinkedHashMap<String, Object>();
 
 	public TwoWayCSFacilityImpl(
-			final Id id,
+			final Id<TwoWayCSFacility> id,
 			final Coord coord,
-			final Id linkId) {
+			final Id<Link> linkId) {
 		this.id = id;
 		this.coord = coord;
 		this.linkId = linkId;
 		
 	}
-		@Override
 		public Coord getCoord() {
 			return coord;
 		}
 
-		@Override
-		public Id getId() {
+		public Id<TwoWayCSFacility> getId() {
 			return id;
 		}
 
-		@Override
 		public Map<String, Object> getCustomAttributes() {
 			return customAttributes;
 		}
 
-		@Override
-		public Id getLinkId() {
+		public Id<Link> getLinkId() {
 			return linkId;
 		}
 }

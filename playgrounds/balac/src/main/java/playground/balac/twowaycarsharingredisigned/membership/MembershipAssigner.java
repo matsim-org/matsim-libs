@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -231,7 +233,8 @@ public class MembershipAssigner {
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		
+		Logger.getLogger( "org.matsim.core.population.PopulationReaderMatsimV4" ).setLevel(Level.OFF);
+
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PopulationReader populationReader = new MatsimPopulationReader(scenario);
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);

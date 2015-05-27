@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -46,7 +45,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
 import playground.balac.freefloating.qsim.FreeFloatingStation;
@@ -54,6 +52,7 @@ import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingStation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
+import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
 
 
@@ -440,11 +439,11 @@ public class AllCSModesSameFleetPersonDriverAgentImpl implements MobsimDriverAge
 		
 		CoordImpl coordStart = new CoordImpl(startLink.getCoord());
 		
-		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", Facility.class), coordStart, startLink.getId());
+		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), coordStart, startLink.getId());
 		
 		CoordImpl coordEnd = new CoordImpl(destinationLink.getCoord());
 
-		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", Facility.class), coordEnd, destinationLink.getId());
+		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), coordEnd, destinationLink.getId());
 		
 		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
 	    	

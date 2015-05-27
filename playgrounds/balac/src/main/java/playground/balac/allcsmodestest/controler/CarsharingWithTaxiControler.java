@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -98,12 +99,7 @@ public class CarsharingWithTaxiControler extends Controler{
 		controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                bindMobsim().toProvider(new Provider<Mobsim>() {
-                    @Override
-                    public Mobsim get() {
-                        return new AllCSModesQsimFactory(sc, controler).createMobsim(controler.getScenario(), controler.getEvents());
-                    }
-                });
+                bindMobsim().toProvider( AllCSModesQsimFactory.class );
             }
         });
 

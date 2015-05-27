@@ -26,9 +26,17 @@ public class TWUsersWithCar {
 		populationReader.readFile(args[0]);		
 		
 		Set<Id> hasCar = new TreeSet<Id>();		
+		int countCar = 0;
+		int countLicence = 0;
+		int countYoung = 0;
 		
 		for (Person person: scenario.getPopulation().getPersons().values()) {
+			if (((PersonImpl)person).getAge() >= 18) {
+			if (!((PersonImpl)person).getCarAvail().equals("never")  && ((PersonImpl)person).hasLicense())
+				countCar++;
 			
+			if (((PersonImpl)person).hasLicense())
+				countLicence++;
 			for (PlanElement pe:person.getSelectedPlan().getPlanElements()) {
 				 if (pe instanceof Leg) {
 					
@@ -40,10 +48,19 @@ public class TWUsersWithCar {
 						}				
 					}
 				 }			
-			}  	
+			}
+			}
+			else
+				countYoung++;
 		}
 	
 		System.out.println(hasCar.size());
+		System.out.println(countCar);
+		System.out.println(countLicence);
+		System.out.println(countYoung);
+
+
+
 	}
 	public static void main(String[] args) {
 

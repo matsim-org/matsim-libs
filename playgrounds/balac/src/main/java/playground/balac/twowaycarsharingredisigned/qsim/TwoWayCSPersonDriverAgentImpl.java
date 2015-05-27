@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -46,9 +45,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
+import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
 
 
@@ -376,11 +375,11 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		
 		CoordImpl coordStart = new CoordImpl(l.getCoord());
 		
-		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", Facility.class), coordStart, l.getId());
+		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), coordStart, l.getId());
 		
 		CoordImpl coordEnd = new CoordImpl(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
 
-		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", Facility.class), coordEnd, leg.getRoute().getEndLinkId());
+		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), coordEnd, leg.getRoute().getEndLinkId());
 		
 		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
 	    	
@@ -428,9 +427,9 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		Network network = scenario.getNetwork();
 		
 		
-		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", Facility.class), network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), leg.getRoute().getStartLinkId());
+		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord(), leg.getRoute().getStartLinkId());
 		
-		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", Facility.class), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord(), leg.getRoute().getEndLinkId());
+		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord(), leg.getRoute().getEndLinkId());
 		
 		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
 	    	
@@ -478,9 +477,9 @@ public class TwoWayCSPersonDriverAgentImpl implements MobsimDriverAgent, MobsimP
 		
 		Link link = map.get(network.getLinks().get(leg.getRoute().getEndLinkId()));
 		
-		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", Facility.class), network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord() , leg.getRoute().getStartLinkId());
+		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), network.getLinks().get(leg.getRoute().getStartLinkId()).getCoord() , leg.getRoute().getStartLinkId());
 		
-		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", Facility.class), link.getCoord(), link.getId());
+		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), link.getCoord(), link.getId());
 		
 		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
 	    	

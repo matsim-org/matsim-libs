@@ -1,11 +1,9 @@
 package playground.balac.allcsmodestest.controler;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.google.inject.Provider;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -15,7 +13,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingContext;
@@ -56,18 +53,12 @@ public class AllCSModesTestControler {
     	
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 		
-		
 		final Controler controler = new Controler( sc );
-
+		
 		controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                bindMobsim().toProvider(new Provider<Mobsim>() {
-                    @Override
-                    public Mobsim get() {
-                        return new AllCSModesQsimFactory(sc, controler).createMobsim(controler.getScenario(), controler.getEvents());
-                    }
-                });
+                bindMobsim().toProvider( AllCSModesQsimFactory.class );
             }
         });
 

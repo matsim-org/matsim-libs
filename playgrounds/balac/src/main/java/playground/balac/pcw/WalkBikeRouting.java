@@ -40,6 +40,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
+import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
 import playground.balac.utils.NetworkLinkUtils;
 import playground.balac.utils.TimeConversion;
@@ -155,13 +156,13 @@ public class WalkBikeRouting {
 				double m = TimeConversion.convertTimeToDouble(arr[10]);
 				
 				
-				TwoWayCSFacilityImpl startFacilityWalk = new TwoWayCSFacilityImpl(Id.create("100", Facility.class), coordStart, lStartWalk.getId());
+				TwoWayCSFacilityImpl startFacilityWalk = new TwoWayCSFacilityImpl(Id.create("100", TwoWayCSFacility.class), coordStart, lStartWalk.getId());
 				
-				TwoWayCSFacilityImpl endFacilityWalk = new TwoWayCSFacilityImpl(Id.create("101", Facility.class), coordEnd, lEndWalk.getId());
+				TwoWayCSFacilityImpl endFacilityWalk = new TwoWayCSFacilityImpl(Id.create("101", TwoWayCSFacility.class), coordEnd, lEndWalk.getId());
 			
-				TwoWayCSFacilityImpl startFacilityBike = new TwoWayCSFacilityImpl(Id.create("100", Facility.class), coordStart, lStartBike.getId());
+				TwoWayCSFacilityImpl startFacilityBike = new TwoWayCSFacilityImpl(Id.create("100", TwoWayCSFacility.class), coordStart, lStartBike.getId());
 				
-				TwoWayCSFacilityImpl endFacilityBike = new TwoWayCSFacilityImpl(Id.create("101", Facility.class), coordEnd, lEndBike.getId());
+				TwoWayCSFacilityImpl endFacilityBike = new TwoWayCSFacilityImpl(Id.create("101", TwoWayCSFacility.class), coordEnd, lEndBike.getId());
 				
 				List<? extends PlanElement> routeWalk =  routingModuleWalk.calcRoute(startFacilityWalk, endFacilityWalk, m * 60, person);
 

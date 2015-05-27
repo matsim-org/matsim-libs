@@ -1,6 +1,5 @@
 package playground.balac.allcsmodestest.qsim;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +20,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -44,7 +42,6 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.facilities.Facility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -63,6 +60,7 @@ import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRD
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSStation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
+import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
 
 
@@ -484,23 +482,19 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 	
 	private void initializeCSVehicleLeg (String mode, double now, Link startLink, Link destinationLink) {
 		double travelTime = 0.0;
-		List<Id<Link>> ids = new ArrayList<Id<Link>>();
-		
-			
-		
+
 		CoordImpl coordStart = new CoordImpl(startLink.getCoord());
 		
-		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", Facility.class), coordStart, startLink.getId());
+		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), coordStart, startLink.getId());
 		
 		CoordImpl coordEnd = new CoordImpl(destinationLink.getCoord());
 
-		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", Facility.class), coordEnd, destinationLink.getId());
+		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), coordEnd, destinationLink.getId());
 		double distance = 0.0;
 		for(PlanElement pe1: this.tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
 	    	
 			if (pe1 instanceof Leg) {
-				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
-	    			travelTime += ((Leg) pe1).getTravelTime();
+    			travelTime += ((Leg) pe1).getTravelTime();
 	    		distance += ((Leg) pe1).getRoute().getDistance();	
 			}
 		}

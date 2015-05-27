@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.google.inject.Provider;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -116,17 +117,12 @@ public class CarsharingMATSimLControler {
 			    controler.addControlerListener(new AllCSModesTestListener(controler,
 			    		Integer.parseInt(controler.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));
 
-			controler.addOverridingModule(new AbstractModule() {
-                @Override
-                public void install() {
-                    bindMobsim().toProvider(new Provider<Mobsim>() {
-                        @Override
-                        public Mobsim get() {
-                            return new AllCSModesQsimFactory(scenario, controler).createMobsim(controler.getScenario(), controler.getEvents());
-                        }
-                    });
-                }
-            });
+			    controler.addOverridingModule(new AbstractModule() {
+		            @Override
+		            public void install() {
+		                bindMobsim().toProvider( AllCSModesQsimFactory.class );
+		            }
+		        });
 
 			controler.setTripRouterFactory(
                     new TripRouterFactory() {

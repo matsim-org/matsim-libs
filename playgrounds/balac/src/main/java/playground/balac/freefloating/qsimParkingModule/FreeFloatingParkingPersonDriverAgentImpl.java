@@ -47,7 +47,9 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
-import playground.balac.freefloating.scenario.FreeFloatingFacilityImpl;
+import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
+import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
+
 
 public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent{
 
@@ -352,10 +354,10 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		
 		CoordImpl coordStart = new CoordImpl(l.getCoord());
 		
-		FreeFloatingFacilityImpl startFacility = new FreeFloatingFacilityImpl(Id.create("1000000000", Facility.class), coordStart, l.getId());
+		TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), coordStart, l.getId());
 		
 		CoordImpl coordEnd = new CoordImpl(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
-		FreeFloatingFacilityImpl endFacility = new FreeFloatingFacilityImpl(Id.create("1000000001", Facility.class), coordEnd, leg.getRoute().getEndLinkId());
+		TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), coordEnd, leg.getRoute().getEndLinkId());
 		
 		
 		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
@@ -412,10 +414,10 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		
 		CoordImpl coordStart = new CoordImpl(scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
 		
-		FreeFloatingFacilityImpl startFacility = new FreeFloatingFacilityImpl(Id.create("1000000000", Facility.class), coordStart, route.getEndLinkId());
+		TwoWayCSFacility startFacility = new TwoWayCSFacilityImpl(Id.create("1000000000", TwoWayCSFacility.class), coordStart, route.getEndLinkId());
 		
 		CoordImpl coordEnd = new CoordImpl(scenario.getNetwork().getLinks().get(parkingSpot.getLinkId()).getCoord());
-		FreeFloatingFacilityImpl endFacility = new FreeFloatingFacilityImpl(Id.create("1000000001", Facility.class), coordEnd, parkingSpot.getLinkId());
+		TwoWayCSFacility endFacility = new TwoWayCSFacilityImpl(Id.create("1000000001", TwoWayCSFacility.class), coordEnd, parkingSpot.getLinkId());
 		
 		
 		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {

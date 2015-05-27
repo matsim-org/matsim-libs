@@ -1,6 +1,7 @@
 package playground.balac.utils;
 
 import com.google.inject.Provider;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -23,6 +24,8 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.Departure;
+
+import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacility;
 import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
 
 import java.io.BufferedReader;
@@ -218,9 +221,9 @@ public class PTRoutingFrequencyV2 {
 			LegImpl leg = new LegImpl("pt");	*/		
 			
 			double m = Double.parseDouble(arr[2]);
-			TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("100", Facility.class), coordStart, lStart.getId());
+			TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("100", TwoWayCSFacility.class), coordStart, lStart.getId());
 			
-			TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("101", Facility.class), coordEnd, lEnd.getId());
+			TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("101", TwoWayCSFacility.class), coordEnd, lEnd.getId());
 			
 			ArrayList<List<? extends PlanElement>> allRoutes = new ArrayList<List<? extends PlanElement>>();
 			

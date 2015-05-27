@@ -14,16 +14,18 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, LinkLeaveEventHandler {
 
-	HashMap<Id, ArrayList<RentalInfo>> twRentalsStats = new HashMap<Id, ArrayList<RentalInfo>>();
-	HashMap<Id, String> arrivals = new HashMap<Id, String>();
-	ArrayList<RentalInfo> arr = new ArrayList<RentalInfo>();
-	HashMap<Id, Boolean> inVehicle = new HashMap<Id, Boolean>();
-	HashMap<Id, Id> personVehicles = new HashMap<Id, Id>();
-	Network network;
+	private HashMap<Id<Person>, ArrayList<RentalInfo>> twRentalsStats = new HashMap<Id<Person>, ArrayList<RentalInfo>>();
+	private HashMap<Id<Person>, String> arrivals = new HashMap<Id<Person>, String>();
+	private ArrayList<RentalInfo> arr = new ArrayList<RentalInfo>();
+	private HashMap<Id<Vehicle>, Id<Person>> personVehicles = new HashMap<Id<Vehicle>, Id<Person>>();
+	private Network network;
 	public CSEventsHandler(Network network) {
 		
 		this.network = network;
@@ -32,11 +34,10 @@ public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, Person
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		twRentalsStats = new HashMap<Id, ArrayList<RentalInfo>>();
-		arrivals = new HashMap<Id, String>();
+		twRentalsStats = new HashMap<Id<Person>, ArrayList<RentalInfo>>();
+		arrivals = new HashMap<Id<Person>, String>();
 		arr = new ArrayList<RentalInfo>();
-		inVehicle = new HashMap<Id, Boolean>();
-		personVehicles = new HashMap<Id, Id>();
+		personVehicles = new HashMap<Id<Vehicle>, Id<Person>>();
 	}
 
 	@Override
@@ -56,7 +57,7 @@ public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, Person
 	public void handleEvent(LinkLeaveEvent event) {
 		// TODO Auto-generated method stub
 		if (event.getVehicleId().toString().startsWith("TW")) {
-			Id perid = personVehicles.get(event.getVehicleId());
+			Id<Person> perid = personVehicles.get(event.getVehicleId());
 			
 			RentalInfo info = twRentalsStats.get(perid).get(twRentalsStats.get(perid).size() - 1);
 			info.vehId = event.getVehicleId();
@@ -93,9 +94,7 @@ public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, Person
 	public void handleEvent(PersonDepartureEvent event) {
 		// TODO Auto-generated method stub
 		
-		inVehicle.put(event.getPersonId(), false);
 		if (event.getLegMode().equals("twowaycarsharing")) {
-			inVehicle.put(event.getPersonId(), true);
 			if (arrivals.get(event.getPersonId()).equals("walk_rb")) {
 				RentalInfo info = twRentalsStats.get(event.getPersonId()).get(twRentalsStats.get(event.getPersonId()).size() - 1);
 				
@@ -142,16 +141,16 @@ public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, Person
 	}
 	
 	public class RentalInfo {
-		private Id personId = null;
+		private Id<Person> personId = null;
 		private double startTime = 0.0;
 		private double endTime = 0.0;
-		private Id startLinkId = null;
+		private Id<Link> startLinkId = null;
 		private double distance = 0.0;
 		private double accessStartTime = 0.0;
 		private double accessEndTime = 0.0;
 		private double egressStartTime = 0.0;
 		private double egressEndTime = 0.0;
-		private Id vehId = null;
+		private Id<Vehicle> vehId = null;
 		public String toString() {
 			
 			return personId + " " + Double.toString(startTime) + " " + Double.toString(endTime) + " " +

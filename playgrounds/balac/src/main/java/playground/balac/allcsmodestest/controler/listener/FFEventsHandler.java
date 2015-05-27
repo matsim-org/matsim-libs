@@ -14,16 +14,18 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 public class FFEventsHandler implements PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, LinkLeaveEventHandler{
-	HashMap<Id, ArrayList<RentalInfoFF>> ffRentalsStats = new HashMap<Id, ArrayList<RentalInfoFF>>();
-	HashMap<Id, String> arrivals = new HashMap<Id, String>();
-	ArrayList<RentalInfoFF> arr = new ArrayList<RentalInfoFF>();
-	HashMap<Id, Boolean> inVehicle = new HashMap<Id, Boolean>();
-	HashMap<Id, Id> personVehicles = new HashMap<Id, Id>();
+	private HashMap<Id<Person>, ArrayList<RentalInfoFF>> ffRentalsStats = new HashMap<Id<Person>, ArrayList<RentalInfoFF>>();
+	private ArrayList<RentalInfoFF> arr = new ArrayList<RentalInfoFF>();
+	private HashMap<Id<Person>, Boolean> inVehicle = new HashMap<Id<Person>, Boolean>();
+	private HashMap<Id<Vehicle>, Id<Person>> personVehicles = new HashMap<Id<Vehicle>, Id<Person>>();
 
-	Network network;
+	private Network network;
 	public FFEventsHandler(Network network) {
 		
 		this.network = network;
@@ -32,11 +34,10 @@ public class FFEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		ffRentalsStats = new HashMap<Id, ArrayList<RentalInfoFF>>();
-		arrivals = new HashMap<Id, String>();
+		ffRentalsStats = new HashMap<Id<Person>, ArrayList<RentalInfoFF>>();
 		arr = new ArrayList<RentalInfoFF>();
-		inVehicle = new HashMap<Id, Boolean>();
-		personVehicles = new HashMap<Id, Id>();
+		inVehicle = new HashMap<Id<Person>, Boolean>();
+		personVehicles = new HashMap<Id<Vehicle>, Id<Person>>();
 
 	}
 	
@@ -56,7 +57,7 @@ public class FFEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (event.getVehicleId().toString().startsWith("FF")) {
-			Id perid = personVehicles.get(event.getVehicleId());
+			Id<Person> perid = personVehicles.get(event.getVehicleId());
 			
 			RentalInfoFF info = ffRentalsStats.get(perid).get(ffRentalsStats.get(perid).size() - 1);
 			info.vehId = event.getVehicleId();
@@ -123,17 +124,17 @@ public class FFEventsHandler implements PersonLeavesVehicleEventHandler, PersonE
 	}
 	
 	public class RentalInfoFF {
-		private Id personId = null;
+		private Id<Person> personId = null;
 		private double startTime = 0.0;
 		private double endTime = 0.0;
-		private Id startLinkId = null;
-		private Id endLinkId = null;
+		private Id<Link> startLinkId = null;
+		private Id<Link> endLinkId = null;
 		private double distance = 0.0;
 		private double accessStartTime = 0.0;
 		private double accessEndTime = 0.0;
 		private double egressStartTime = 0.0;
 		private double egressEndTime = 0.0;
-		private Id vehId = null;
+		private Id<Vehicle> vehId = null;
 		public String toString() {
 			
 			return personId + " " + Double.toString(startTime) + " " + Double.toString(endTime) + " " +

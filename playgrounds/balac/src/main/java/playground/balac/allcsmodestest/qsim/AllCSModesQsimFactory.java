@@ -3,8 +3,6 @@ package playground.balac.allcsmodestest.qsim;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -13,38 +11,46 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.router.TripRouter;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
 import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
 
 import java.io.IOException;
 
-/*
+/**
  *
  *
  *
  */
 
-public class AllCSModesQsimFactory implements MobsimFactory{
+public class AllCSModesQsimFactory implements Provider<Netsim>{
 
 
-	private final Scenario scenario;
-	private final Controler controler;	
+	private final Scenario sc;
+	private final Provider<TripRouter> tripRouterProvider;	
+	private final EventsManager eventsManager;
 	
 	private CarSharingVehicles carSharingVehicles;
-	
-	public AllCSModesQsimFactory(final Scenario scenario, final Controler controler) {
-		
-		this.scenario = scenario;
-		this.controler = controler;
-		carSharingVehicles = null;		
-	}
-	
-		
-	@Override
-	public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
-		carSharingVehicles = new CarSharingVehicles(scenario);
+	@Inject	
+	public AllCSModesQsimFactory(Scenario sc,
+			Provider<TripRouter> tripRouterProvider, EventsManager eventsManager) {
+		this.sc = sc;
+		this.tripRouterProvider = tripRouterProvider;
+		this.eventsManager = eventsManager;
+	}
+
+
+	@Override
+	public Netsim get() {
+
+		
+		
 
 		FreeFloatingVehiclesLocation ffvehiclesLocationqt = null;
 		OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocationqt = null;
@@ -64,23 +70,18 @@ public class AllCSModesQsimFactory implements MobsimFactory{
 
         QNetsimEngineModule.configure(qSim);
 		
-		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
+		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 				
 		AgentFactory agentFactory = null;			
 			
 		try {
-			//adde part
-			//a simple way to place vehicles at the original location at the start of each simulation
-			this.carSharingVehicles.readVehicleLocations();
-			ffvehiclesLocationqt = new FreeFloatingVehiclesLocation
-					(this.controler, this.carSharingVehicles.getFreeFLoatingVehicles());
-			owvehiclesLocationqt = new OneWayCarsharingRDWithParkingVehicleLocation
-					(this.controler, this.carSharingVehicles.getOneWayVehicles());
-			twvehiclesLocationqt = new TwoWayCSVehicleLocation
-					(sc, this.carSharingVehicles.getRoundTripVehicles());
-		
-		agentFactory = new AllCSModesAgentFactory(qSim, scenario, controler, ffvehiclesLocationqt, owvehiclesLocationqt, twvehiclesLocationqt);
+			carSharingVehicles = new CarSharingVehicles(sc);
+		//added part
+		//a simple way to place vehicles at the original location at the start of each simulation
+		this.carSharingVehicles.readVehicleLocations();
+				
+		agentFactory = new AllCSModesAgentFactory(qSim, sc, tripRouterProvider, this.carSharingVehicles);
 		
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
