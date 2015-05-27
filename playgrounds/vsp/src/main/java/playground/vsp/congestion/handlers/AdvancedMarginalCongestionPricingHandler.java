@@ -82,6 +82,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 
 	@Override
 	public void reset(int iteration) {
+		incompletedPlanWarning = 0;
 		this.amountSum = 0.;
 		this.personId2currentActivityStartTime.clear();
 		this.affectedPersonId2congestionEventsToProcess.clear();
@@ -174,7 +175,6 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 				// ... first check if the plan completed is completed, i.e. if the agent has arrived at an activity (after being delayed)
 				if (this.personId2currentActivityType.containsKey(personId) && this.personId2currentActivityStartTime.containsKey(personId)) {
 					// Yes, the plan seems to be completed.
-					// TODO: Reset current values when departing.
 					
 					// ... now the first and last OR overnight activity can be handled. This is figured out by the scoring function itself (depending on the activity types).
 					
