@@ -27,8 +27,10 @@ package playground.vsp.congestion.controler;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
@@ -42,7 +44,7 @@ import playground.vsp.congestion.handlers.TollHandler;
  *
  */
 
-public class AdvancedMarginalCongestionPricingContolerListener implements StartupListener, IterationEndsListener {
+public class AdvancedMarginalCongestionPricingContolerListener implements StartupListener, AfterMobsimListener, IterationEndsListener {
 	private final Logger log = Logger.getLogger(AdvancedMarginalCongestionPricingContolerListener.class);
 
 	private final ScenarioImpl scenario;
@@ -75,13 +77,16 @@ public class AdvancedMarginalCongestionPricingContolerListener implements Startu
 		eventsManager.addHandler(this.tollHandler);
 //		eventsManager.addHandler(this.extCostHandler);
 	}
-
+	
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		this.log.info("Monetize final congestion events...");
 		this.pricingHandler.processFinalCongestionEvents();
 		this.log.info("Monetize final congestion events... Done.");
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
 				
 		this.log.info("Set average tolls for each link Id and time bin...");
 		this.tollHandler.setLinkId2timeBin2avgToll();

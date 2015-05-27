@@ -57,6 +57,8 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 
 	private final static Logger log = Logger.getLogger(AdvancedMarginalCongestionPricingHandler.class);
 
+	private static int incompletedPlanWarning = 0;
+	
 	private final Scenario scenario;
 	private final EventsManager events;
 	private final CharyparNagelScoringParameters params;
@@ -76,7 +78,6 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		
 		params = new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore());
 		log.info("Using different VTTS to translate delays into monetary units. Computing the actual activity delay costs for each agent.");
-		log.info("Improved Version");
 	}
 
 	@Override
@@ -113,23 +114,29 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	}
 	
 	@Override
-	public void handleEvent(ActivityStartEvent event) {
+	public void handleEvent(ActivityStartEvent event) {		
 		this.personId2currentActivityStartTime.put(event.getPersonId(), event.getTime());
 		this.personId2currentActivityType.put(event.getPersonId(), event.getActType());
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
+		
 		if (this.personId2currentActivityStartTime.containsKey(event.getPersonId())) {
 			// This is not the first activity...
+						
+			// ... now process all congestion events thrown during the trip to the activity which has just ended, ...
+			processCongestionEvents(event.getPersonId(), event.getTime(), event.getLinkId());
 			
-			// ... now process all congestion events thrown during the trip to the activity which has just ended...
-			processCongestionEvents(event.getPersonId(), this.personId2currentActivityStartTime.get(event.getPersonId()), event.getTime(), event.getLinkId());
+			// ... update the status of the 'current' activity...
+			this.personId2currentActivityType.remove(event.getPersonId());
+			this.personId2currentActivityStartTime.remove(event.getPersonId());
+			
 			// ... and remove all processed congestion events. 
 			this.affectedPersonId2congestionEventsToProcess.remove(event.getPersonId());
 	
 		} else {
-			// This is the first activity. In case the first activity is an overnight activity, being delayed at the overnight activity is considered in a final step.
+			// This is the first activity. The first and last / overnight activity are / is considered in a final step.
 			// Therefore, the relevant information has to be stored.
 			this.personId2firstActivityEndTime.put(event.getPersonId(), event.getTime());
 			this.personId2firstActivityType.put(event.getPersonId(), event.getActType());
@@ -137,17 +144,17 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	}
 
 	/*
-	 * This method has to be called at the very end. Here being delayed at the last / overnight activity is taken into account.
+	 * This method has to be called after the MobSim. Here, the disutility from being delayed at the last / overnight activity is taken into account.
 	 */
 	public void processFinalCongestionEvents() {
 		for (Id<Person> affectedPersonId : this.affectedPersonId2congestionEventsToProcess.keySet()) {
 			for (CongestionEvent congestionEvent : this.affectedPersonId2congestionEventsToProcess.get(affectedPersonId)) {			
-				processCongestionEvents(congestionEvent.getAffectedAgentId(), this.personId2currentActivityStartTime.get(congestionEvent.getAffectedAgentId()), Time.UNDEFINED_TIME, null);
+				processCongestionEvents(congestionEvent.getAffectedAgentId(), Time.UNDEFINED_TIME, null);
 			}
 		}
 	}
 	
-	private void processCongestionEvents(Id<Person> personId, double activityStartTime, double activityEndTime, Id<Link> linkId) {
+	private void processCongestionEvents(Id<Person> personId, double activityEndTime, Id<Link> linkId) {
 		
 		// First, compute the agent's total (affected) delay from the previous trip.
 		double totalDelayThisPerson = 0.0;
@@ -158,20 +165,41 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		if (totalDelayThisPerson > 0.) {
 			// The agent was delayed on the previous trip...
 			
-			// ... now calculate the agent's disutility from being late at the activity: score(arrivalTime_ohneDelay) - score(arrivalTime_withDelay)
+			// ... now calculate the agent's disutility from being late at the current activity: score(arrivalTime_ohneDelay) - score(arrivalTime_withDelay)			
 			MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction();
 			double activityDelayDisutility = 0.;
 			if (activityEndTime == Time.UNDEFINED_TIME) {
-				// The activity has an undefined end time. Thus, the activity is considered as the last activity...
-				// ... now the first and last OR overnight activity can be handled. This is figured out by the scoring function itself (depending on the activity types).
+				// The end time is undefined...
 				
-				ActivityImpl activityMorning = new ActivityImpl(this.personId2firstActivityType.get(personId), linkId);
-				activityMorning.setEndTime(this.personId2firstActivityEndTime.get(personId));
-				
-				ActivityImpl activityEvening = new ActivityImpl(this.personId2currentActivityType.get(personId), linkId);
-				activityEvening.setStartTime(this.personId2currentActivityStartTime.get(personId));
-				
-				activityDelayDisutility = marginaSumScoringFunction.getOvernightActivityDelayDisutility(params, activityMorning, activityEvening, totalDelayThisPerson);
+				// ... first check if the plan completed is completed, i.e. if the agent has arrived at an activity (after being delayed)
+				if (this.personId2currentActivityType.containsKey(personId) && this.personId2currentActivityStartTime.containsKey(personId)) {
+					// Yes, the plan seems to be completed.
+					// TODO: Reset current values when departing.
+					
+					// ... now the first and last OR overnight activity can be handled. This is figured out by the scoring function itself (depending on the activity types).
+					
+					ActivityImpl activityMorning = new ActivityImpl(this.personId2firstActivityType.get(personId), linkId);
+					activityMorning.setEndTime(this.personId2firstActivityEndTime.get(personId));
+					
+					ActivityImpl activityEvening = new ActivityImpl(this.personId2currentActivityType.get(personId), linkId);
+					activityEvening.setStartTime(this.personId2currentActivityStartTime.get(personId));
+					
+					activityDelayDisutility = marginaSumScoringFunction.getOvernightActivityDelayDisutility(params, activityMorning, activityEvening, totalDelayThisPerson);
+					
+				} else {
+					// No, there is no information about the current activity which indicates that the trip (with the delay) was not completed.
+					if (incompletedPlanWarning <= 10) {
+						log.warn("Agent " + personId + " has not yet completed the plan/trip (the agent is probably stucking). Cannot compute the disutility of being late at this activity. "
+								+ "Something like the disutility of not arriving at the activity is required. Try to avoid this by setting a smaller stuck time period.");
+						log.warn("Setting the disutilty of being delayed on the previous trip using the config parameters; assuming the marginal disutility of being delayed at the (hypothetical) activity to be equal to beta_performing: " + this.params.marginalUtilityOfPerforming_s);
+					
+						if (incompletedPlanWarning == 10) {
+							log.warn("Additional warnings of this type are suppressed.");
+						}
+						incompletedPlanWarning++;
+					}
+					activityDelayDisutility = (totalDelayThisPerson) * this.params.marginalUtilityOfPerforming_s;
+				}
 				
 			} else {
 				// The activity has an end time indicating a 'normal' activity.
@@ -191,10 +219,15 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			
 			// Go through the congestion events and charge each causing agent his/her contribution to the delay cost: caused delay * activity delay cost per second + caused delay * trip delay cost per second
 			for (CongestionEvent congestionEvent : this.affectedPersonId2congestionEventsToProcess.get(personId)) {
+				
 				double amount = congestionEvent.getDelay() * delayCostPerSecond * (-1);
 				this.amountSum = this.amountSum + amount;
 				
-				PersonMoneyEvent moneyEvent = new PersonMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), amount);
+				if (activityEndTime == Time.UNDEFINED_TIME) {
+					activityEndTime = this.scenario.getConfig().qsim().getEndTime();
+				}
+				
+				PersonMoneyEvent moneyEvent = new PersonMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), amount);				
 				this.events.processEvent(moneyEvent);				
 			}
 		}
