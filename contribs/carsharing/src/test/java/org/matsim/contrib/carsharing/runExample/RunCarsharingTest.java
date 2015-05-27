@@ -104,6 +104,7 @@ public class RunCarsharingTest {
 			myAnalysis.testOutput();
 
 		} catch (Exception ee ) {
+			ee.printStackTrace();
 			fail("something went wrong") ;
 		}
 

@@ -183,7 +183,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 	 * This agent retains the copied plan and forgets the original one.  However, the original plan remains in the population file
 	 * (and will be scored).  This is deliberate behavior!
 	 */
-	final Plan getModifiablePlan() {
+	public final Plan getModifiablePlan() {
 		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
 		if (firstTimeToGetModifiablePlan) {
 			firstTimeToGetModifiablePlan = false ;
