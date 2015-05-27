@@ -1,6 +1,6 @@
 package opdytsintegration;
 
-import java.util.Map;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -9,11 +9,8 @@ import optdyts.DecisionVariable;
 import optdyts.ObjectiveFunction;
 import optdyts.SimulatorState;
 import optdyts.algorithms.DecisionVariableSetEvaluator;
-import optdyts.surrogatesolutions.TransitionSequence;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -54,9 +51,15 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 
 	// RUNTIME VARIABLES
 
+	private DynamicDataCollectingEventHandler handler = null;
+
 	private SortedSet<Id<Link>> sortedLinkIds = null;
 
-	private DynamicData<Id<Link>> data = null;
+	private final LinkedList<DynamicData<Id<Link>>> dataList = new LinkedList<DynamicData<Id<Link>>>();
+
+	private int memory = 1;
+
+	// private DynamicData<Id<Link>> data = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -72,6 +75,22 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
+
+	public void setMemory(final int memory) {
+		this.memory = memory;
+	}
+
+	public int getMemory() {
+		return this.memory;
+	}
+
+	public void setLogFileName(final String logFileName) {
+		this.evaluator.setLogFileName(logFileName);
+	}
+
+	public String getLogFileName() {
+		return this.evaluator.getLogFileName();
+	}
 
 	public int getStartTime_s() {
 		return startTime_s;
@@ -99,34 +118,30 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 
 	// --------------- CONTROLLER LISTENER IMPLEMENTATIONS ---------------
 
+	private DynamicData<Id<Link>> newDynamicData() {
+		final DynamicData<Id<Link>> result = new DynamicData<Id<Link>>(
+				this.startTime_s, this.binSize_s, this.binCnt);
+		this.dataList.addFirst(result);
+		while (this.dataList.size() < this.memory) {
+			this.dataList.addFirst(result);
+		}
+		while (this.dataList.size() > this.memory) {
+			this.dataList.removeLast();
+		}
+		return result;
+	}
+
 	private boolean isInitialized = false;
 
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
-
 		if (!this.isInitialized) {
-
-			this.data = new DynamicData<Id<Link>>(this.startTime_s,
-					this.binSize_s, this.binCnt);
 			this.sortedLinkIds = new TreeSet<Id<Link>>(event.getControler()
 					.getScenario().getNetwork().getLinks().keySet());
-			event.getControler().getEvents()
-					.addHandler(new LinkEnterEventHandler() {
-						@Override
-						public void reset(final int iteration) {
-						}
-
-						@Override
-						public void handleEvent(final LinkEnterEvent event) {
-							final int bin = Math.min(
-									data.bin((int) event.getTime()),
-									data.getBinCnt() - 1);
-							data.add(event.getLinkId(), bin, 1.0);
-						}
-					});
-
+			this.handler = new DynamicDataCollectingEventHandler(
+					this.newDynamicData());
+			event.getControler().getEvents().addHandler(this.handler);
 			this.evaluator.initialize();
-
 			this.isInitialized = true;
 		}
 	}
@@ -135,11 +150,13 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 
 		final Vector newStateVector = new Vector(this.sortedLinkIds.size()
-				* this.data.getBinCnt());
+				* this.dataList.get(0).getBinCnt() * this.memory);
 		int i = 0;
 		for (Id<Link> id : this.sortedLinkIds) {
-			for (int bin = 0; bin < this.data.getBinCnt(); bin++) {
-				newStateVector.set(i++, this.data.getBinValue(id, bin));
+			for (DynamicData<Id<Link>> data : this.dataList) {
+				for (int bin = 0; bin < data.getBinCnt(); bin++) {
+					newStateVector.add(i++, data.getBinValue(id, bin));
+				}
 			}
 		}
 
@@ -148,11 +165,6 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 				this.evaluator.getCurrentDecisionVariable());
 		this.evaluator.afterIteration(newState);
 
-		this.data.clear();
-	}
-
-	// TODO experimental
-	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
-		return this.evaluator.getDecisionVariable2TransitionSequence();
+		this.handler.setDynamicData(this.newDynamicData());
 	}
 }

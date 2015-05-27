@@ -24,13 +24,11 @@
  */
 package optdyts.surrogatesolutions;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import optdyts.DecisionVariable;
-import optdyts.SimulatorState;
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -38,42 +36,26 @@ import floetteroed.utilities.math.Vector;
  * 
  * @author Gunnar Flötteröd
  * 
- * @param <X>
- *            the simulator state type
  * @param <U>
  *            the decision variable type
  */
-class SurrogateSolutionProperties<X extends SimulatorState<X>, U extends DecisionVariable> {
+class SurrogateSolutionProperties<U extends DecisionVariable> {
 
 	// -------------------- (CONSTANT) MEMBERS --------------------
 
-	private final X state;
-
 	private final Map<U, Double> decisionVariable2alphaSum;
 
-	private final Double estimatedExpectedGap2;
+	private final double estimatedExpectedGap2;
+
+	private final double interpolatedObjectiveFunctionValue;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	SurrogateSolutionProperties(final List<Transition<X, U>> transitions,
+	SurrogateSolutionProperties(final List<Transition<U>> transitions,
 			final Vector alphas, final Double estimatedExpectedGap2) {
 
 		/*
-		 * (1) Compute surrogate solution state.
-		 */
-
-		final List<X> states = new ArrayList<X>(transitions.size());
-		final List<Double> weights = new ArrayList<Double>(transitions.size());
-		for (int i = 0; i < transitions.size(); i++) {
-			// combining toStates because only those contain deep state copies
-			states.add(transitions.get(i).getToState());
-			weights.add(alphas.get(i));
-		}
-		this.state = transitions.get(0).getToState().deepCopy();
-		this.state.takeOverConvexCombination(states, weights);
-
-		/*
-		 * (2) Compute alpha summaries per decision variable.
+		 * (1) Compute alpha summaries per decision variable.
 		 */
 
 		this.decisionVariable2alphaSum = new LinkedHashMap<U, Double>();
@@ -88,6 +70,16 @@ class SurrogateSolutionProperties<X extends SimulatorState<X>, U extends Decisio
 		}
 
 		/*
+		 * (2) Interpolate objective function value.
+		 */
+		double tmpInterpolObjFctVal = 0;
+		for (int i = 0; i < transitions.size(); i++) {
+			tmpInterpolObjFctVal += alphas.get(i)
+					* transitions.get(i).getObjectiveFunctionValue();
+		}
+		this.interpolatedObjectiveFunctionValue = tmpInterpolObjFctVal;
+
+		/*
 		 * (3) Take over further parameters.
 		 */
 		this.estimatedExpectedGap2 = estimatedExpectedGap2;
@@ -95,16 +87,15 @@ class SurrogateSolutionProperties<X extends SimulatorState<X>, U extends Decisio
 
 	// -------------------- GETTERS --------------------
 
-	X getState() {
-		return this.state;
+	Double getAlphaSum(final U decisionVariable) {
+		return this.decisionVariable2alphaSum.get(decisionVariable);
 	}
 
-	Map<U, Double> getDecisionVariable2alphaSum() {
-		return this.decisionVariable2alphaSum;
-	}
-
-	Double getEstimatedExpectedGap2() {
+	double getEstimatedExpectedGap2() {
 		return this.estimatedExpectedGap2;
 	}
 
+	double getInterpolatedObjectiveFunctionValue() {
+		return this.interpolatedObjectiveFunctionValue;
+	}
 }

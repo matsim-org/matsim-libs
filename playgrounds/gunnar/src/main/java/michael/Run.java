@@ -22,15 +22,14 @@
 
 package michael;
 
-import floetteroed.utilities.math.Vector;
+import java.util.Arrays;
+import java.util.HashSet;
+
 import optdyts.DecisionVariable;
 import optdyts.ObjectiveFunction;
 import optdyts.SimulatorState;
 import optdyts.algorithms.DecisionVariableSetEvaluator;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
+import floetteroed.utilities.math.Vector;
 
 public class Run {
 
@@ -124,20 +123,20 @@ public class Run {
             this.y = y;
         }
 
-        @Override
-        public MySimulatorState deepCopy() {
-            return new MySimulatorState(x, y);
-        }
+//        @Override
+//        public MySimulatorState deepCopy() {
+//            return new MySimulatorState(x, y);
+//        }
 
-        @Override
-        public void takeOverConvexCombination(List<MySimulatorState> states, List<Double> weights) {
-            x = 0;
-            y = 0;
-            for (int i = 0; i < states.size(); i++) {
-                x += states.get(i).x * weights.get(i);
-                y += states.get(i).y * weights.get(i);
-            }
-        }
+//        @Override
+//        public void takeOverConvexCombination(List<MySimulatorState> states, List<Double> weights) {
+//            x = 0;
+//            y = 0;
+//            for (int i = 0; i < states.size(); i++) {
+//                x += states.get(i).x * weights.get(i);
+//                y += states.get(i).y * weights.get(i);
+//            }
+//        }
 
         @Override
         public Vector getReferenceToVectorRepresentation() {
@@ -150,10 +149,10 @@ public class Run {
             statey = y;
         }
 
-        @Override
-        public void releaseDeepMemory() {
-
-        }
+//        @Override
+//        public void releaseDeepMemory() {
+//
+//        }
 
     }
 

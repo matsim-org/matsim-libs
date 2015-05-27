@@ -29,6 +29,7 @@ import java.util.List;
 
 import optdyts.DecisionVariable;
 import optdyts.SimulatorState;
+import floetteroed.utilities.math.Vector;
 
 /**
  * Represents a (possibly non consecutive) sequence of simulator transitions.
@@ -40,57 +41,70 @@ import optdyts.SimulatorState;
  * @param <U>
  *            the decision variable type
  */
-public class TransitionSequence<X extends SimulatorState<X>, U extends DecisionVariable> {
+class TransitionSequence<X extends SimulatorState<X>, U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
-	private final List<Transition<X, U>> transitions = new ArrayList<Transition<X, U>>();
+	private final List<Transition<U>> transitions = new ArrayList<Transition<U>>();
+
+	private X lastState = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	TransitionSequence(final Transition<X, U> firstTransition) {
-		if (firstTransition == null) {
-			throw new RuntimeException("Cannot initialize "
-					+ this.getClass().getSimpleName()
-					+ " with a null transition.");
-		}
-		// the first transition's fromState is needed, do not remove it
-		this.transitions.add(firstTransition);
+	TransitionSequence(final X fromState, final U decisionVariable,
+			final X toState, final double objectiveFunctionValue) {
+		this.addTransition(fromState, decisionVariable, toState,
+				objectiveFunctionValue);
 	}
 
-	void addTransition(final Transition<X, U> transition) {
-		if (!this.getDecisionVariable()
-				.equals(transition.getDecisionVariable())) {
-			throw new RuntimeException("Cannot add "
-					+ transition.getClass().getSimpleName()
-					+ " with decision variable "
-					+ transition.getDecisionVariable() + " to "
-					+ this.getClass().getSimpleName()
-					+ " with decision variable " + this.getDecisionVariable()
-					+ ".");
+	// -------------------- SETTERS --------------------
+
+	void addTransition(final X fromState, final U decisionVariable,
+			final X toState, final double objectiveFunctionValue) {
+
+		if (fromState == null) {
+			throw new RuntimeException("fromState is null");
 		}
-		// for all but the first transition, only the last toState is needed
-		this.getLastState().releaseDeepMemory();
-		transition.getFromState().releaseDeepMemory();
-		this.transitions.add(transition);
+		if (decisionVariable == null) {
+			throw new RuntimeException("decisionVariable is null");
+		}
+		if (toState == null) {
+			throw new RuntimeException("toState is null");
+		}
+		if ((this.size() > 0)
+				&& (!this.getDecisionVariable().equals(decisionVariable))) {
+			throw new RuntimeException("Cannot add "
+					+ " transition with decision variable "
+					+ this.getDecisionVariable() + " to "
+					+ " transition sequence with decision variable "
+					+ this.getDecisionVariable() + ".");
+		}
+
+		final Vector delta = toState.getReferenceToVectorRepresentation()
+				.copy();
+		delta.add(fromState.getReferenceToVectorRepresentation(), -1.0);
+
+		this.transitions.add(new Transition<U>(decisionVariable, delta,
+				objectiveFunctionValue));
+		this.lastState = toState;
 	}
 
 	// -------------------- GETTERS --------------------
 
-	public U getDecisionVariable() {
-		return this.transitions.get(0).getDecisionVariable();
-	}
-
-	public int size() {
+	int size() {
 		return this.transitions.size();
 	}
 
-	public List<Transition<X, U>> getTransitions() {
+	U getDecisionVariable() {
+		return this.transitions.get(0).getDecisionVariable();
+	}
+
+	List<Transition<U>> getTransitions() {
 		return this.transitions;
 	}
 
-	public X getLastState() {
-		return this.transitions.get(this.transitions.size() - 1).getToState();
+	X getLastState() {
+		return this.lastState;
 	}
 
 }

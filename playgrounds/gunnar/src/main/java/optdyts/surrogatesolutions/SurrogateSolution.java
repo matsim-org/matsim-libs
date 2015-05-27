@@ -25,6 +25,7 @@
 package optdyts.surrogatesolutions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import optdyts.DecisionVariable;
+import optdyts.ObjectiveFunction;
 import optdyts.SimulatorState;
 import floetteroed.utilities.math.Vector;
 
@@ -53,20 +55,24 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 
 	private final double convergenceNoiseVarianceScale;
 
+	private final ObjectiveFunction<X> objectiveFunction;
+
 	// DATA TO BE PROCESSED
 
 	private Map<U, TransitionSequence<X, U>> decisionVariable2transitionSequence = new LinkedHashMap<U, TransitionSequence<X, U>>();
 
 	// RESULTS
 
-	private SurrogateSolutionProperties<X, U> properties = null;
+	private SurrogateSolutionProperties<U> properties = null;
 
 	// -------------------- CONSTRUCTION --------------------
 
 	public SurrogateSolution(final double transitionNoiseVarianceScale,
-			final double convergenceNoiseVarianceScale) {
+			final double convergenceNoiseVarianceScale,
+			final ObjectiveFunction<X> objectiveFunction) {
 		this.transitionNoiseVarianceScale = transitionNoiseVarianceScale;
 		this.convergenceNoiseVarianceScale = convergenceNoiseVarianceScale;
+		this.objectiveFunction = objectiveFunction;
 	}
 
 	// -------------------- GETTERS --------------------
@@ -83,17 +89,17 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 		return this.properties.getEstimatedExpectedGap2();
 	}
 
-	public X getEquilibriumState() {
-		return this.properties.getState();
+	public Double getAlphaSum(final U decisionVariable) {
+		return this.properties.getAlphaSum(decisionVariable);
 	}
 
-	public Map<U, Double> getDecisionVariable2alphaSum() {
-		return this.properties.getDecisionVariable2alphaSum();
+	public X getLastState(final U decisionVariable) {
+		return this.decisionVariable2transitionSequence.get(decisionVariable)
+				.getLastState();
 	}
 
-	// TODO experimental, should be removed.
-	public Map<U, TransitionSequence<X, U>> getDecisionVariable2TransitionSequence() {
-		return this.decisionVariable2transitionSequence;
+	public double getInterpolatedObjectiveFunctionValue() {
+		return this.properties.getInterpolatedObjectiveFunctionValue();
 	}
 
 	public Set<U> getLeastEvaluatedDecisionVariables() {
@@ -118,9 +124,8 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 		double result = 0;
 		for (Map.Entry<U, TransitionSequence<X, U>> entry : this.decisionVariable2transitionSequence
 				.entrySet()) {
-			final double alpha = (this.hasProperties() ? this
-					.getDecisionVariable2alphaSum().get(entry.getKey())
-					: (1.0 / this.size()));
+			final double alpha = (this.hasProperties() ? this.getAlphaSum(entry
+					.getKey()) : (1.0 / this.size()));
 			final Vector lastStateVector = entry.getValue().getLastState()
 					.getReferenceToVectorRepresentation();
 			result += alpha * lastStateVector.innerProd(lastStateVector);
@@ -139,24 +144,35 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 	}
 
 	public boolean isConverged() {
-		return (this.properties.getEstimatedExpectedGap2() <= this
-				.getConvergenceNoiseVariance());
+		if (this.hasProperties()) {
+			return (this.properties.getEstimatedExpectedGap2() <= this
+					.getConvergenceNoiseVariance());
+		} else {
+			return false;
+		}
+	}
+
+	public Set<U> getDecisionVariables() {
+		return Collections
+				.unmodifiableSet(this.decisionVariable2transitionSequence
+						.keySet());
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
 
 	public void addTransition(final X fromState, final U decisionVariable,
 			final X toState) {
-		final Transition<X, U> transition = new Transition<X, U>(fromState,
-				decisionVariable, toState);
 		TransitionSequence<X, U> transitionSequence = this.decisionVariable2transitionSequence
-				.get(transition.getDecisionVariable());
+				.get(decisionVariable);
 		if (transitionSequence == null) {
-			transitionSequence = new TransitionSequence<X, U>(transition);
-			this.decisionVariable2transitionSequence.put(
-					transition.getDecisionVariable(), transitionSequence);
+			transitionSequence = new TransitionSequence<X, U>(fromState,
+					decisionVariable, toState,
+					this.objectiveFunction.evaluateState(toState));
+			this.decisionVariable2transitionSequence.put(decisionVariable,
+					transitionSequence);
 		} else {
-			transitionSequence.addTransition(transition);
+			transitionSequence.addTransition(fromState, decisionVariable,
+					toState, this.objectiveFunction.evaluateState(toState));
 		}
 		this.properties = null;
 	}
@@ -183,7 +199,7 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 		 * (1) Create input parameters for SurrogateSolutionEstimator.
 		 */
 
-		final List<Transition<X, U>> transitionList = new ArrayList<Transition<X, U>>();
+		final List<Transition<U>> transitionList = new ArrayList<Transition<U>>();
 		for (TransitionSequence<X, U> implementationPath : this.decisionVariable2transitionSequence
 				.values()) {
 			transitionList.addAll(implementationPath.getTransitions());
@@ -199,7 +215,7 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 			this.properties = ssEstimator.computeProperties(transitionList);
 		} else {
 			final List<Double> initialAlphas = new ArrayList<Double>();
-			for (Transition<X, U> transition : transitionList) {
+			for (Transition<U> transition : transitionList) {
 				final U decisionVariable = transition.getDecisionVariable();
 				initialAlphas.add(decisionVariable2alphaSum
 						.get(decisionVariable)
@@ -239,7 +255,7 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 
 			final SurrogateSolution<X, U> newSurrogateSolution = new SurrogateSolution<X, U>(
 					this.transitionNoiseVarianceScale,
-					this.convergenceNoiseVarianceScale);
+					this.convergenceNoiseVarianceScale, this.objectiveFunction);
 			newSurrogateSolution.decisionVariable2transitionSequence
 					.putAll(this.decisionVariable2transitionSequence);
 			newSurrogateSolution
@@ -247,8 +263,8 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 
 			// 1.2. Evaluate the new surrogate solution subset.
 
-			final double takeOutAlpha = this.getDecisionVariable2alphaSum()
-					.get(takeOutDecisionVariable);
+			final double takeOutAlpha = this
+					.getAlphaSum(takeOutDecisionVariable);
 			if (takeOutAlpha > 0.99) {
 				newSurrogateSolution.evaluate();
 			} else {
@@ -256,10 +272,8 @@ public class SurrogateSolution<X extends SimulatorState<X>, U extends DecisionVa
 				for (U decisionVariable : this.decisionVariable2transitionSequence
 						.keySet()) {
 					if (!decisionVariable.equals(takeOutDecisionVariable)) {
-						newInitialAlphas.put(
-								decisionVariable,
-								this.getDecisionVariable2alphaSum().get(
-										decisionVariable)
+						newInitialAlphas.put(decisionVariable,
+								this.getAlphaSum(decisionVariable)
 										/ (1.0 - takeOutAlpha));
 					}
 				}

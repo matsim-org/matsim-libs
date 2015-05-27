@@ -24,8 +24,6 @@
  */
 package optdyts;
 
-import java.util.List;
-
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -37,28 +35,6 @@ import floetteroed.utilities.math.Vector;
  *            the simulator state type
  */
 public interface SimulatorState<X extends SimulatorState<X>> {
-
-	/**
-	 * Returns a copy of this simulator state. This copy must be "deep" for (i)
-	 * all referenced objects that may be evaluated by an ObjectiveFunction and
-	 * the state's vector representation as returned by
-	 * getReferenceToVectorRepresentation().
-	 * 
-	 * @return a deep copy of this simulator state
-	 */
-	public X deepCopy();
-
-	/**
-	 * Fills this state with a convex combination of the states-List, according
-	 * to the values in the weights-List, which need to be non-negative and sum
-	 * up to one.
-	 * 
-	 * @param states
-	 *            the states to be combined
-	 * @param weights
-	 *            the weights according to which the states are combined
-	 */
-	public void takeOverConvexCombination(List<X> states, List<Double> weights);
 
 	/**
 	 * Returns a reference to a real-valued, fixed-dimensional vector
@@ -76,11 +52,39 @@ public interface SimulatorState<X extends SimulatorState<X>> {
 	 */
 	public void implementInSimulation() throws UnsupportedOperationException;
 
-	/**
-	 * Releases the memory necessary only for calls to implementInSimulation();
-	 * subsequent calls to implementInSimulation() are expected to through an
-	 * UnsupportedOperationException.
-	 */
-	public void releaseDeepMemory();
+	// /**
+	// * Returns a copy of this simulator state. This copy must be "deep" for
+	// (i)
+	// * all referenced objects that may be evaluated by an ObjectiveFunction
+	// and
+	// * the state's vector representation as returned by
+	// * getReferenceToVectorRepresentation().
+	// *
+	// * @return a deep copy of this simulator state
+	// */
+	// public X deepCopy();
+
+	// /**
+	// * Fills this state with a convex combination of the states-List,
+	// according
+	// * to the values in the weights-List, which need to be non-negative and
+	// sum
+	// * up to one.
+	// *
+	// * @param states
+	// * the states to be combined
+	// * @param weights
+	// * the weights according to which the states are combined
+	// */
+	// public void takeOverConvexCombination(List<X> states, List<Double>
+	// weights);
+
+	// /**
+	// * Releases the memory necessary only for calls to
+	// implementInSimulation();
+	// * subsequent calls to implementInSimulation() are expected to through an
+	// * UnsupportedOperationException.
+	// */
+	// public void releaseDeepMemory();
 
 }

@@ -56,12 +56,12 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	private double estimatedExpectedGap2(final List<Vector> deltaList,
+	private double estimatedExpectedGap2(final List<Transition<U>> transitions,
 			final Vector alphas) {
-		final Vector residual = deltaList.get(0).copy();
+		final Vector residual = transitions.get(0).getDelta().copy();
 		residual.mult(alphas.get(0));
 		for (int i = 1; i < alphas.size(); i++) {
-			residual.add(deltaList.get(i), alphas.get(i));
+			residual.add(transitions.get(i).getDelta(), alphas.get(i));
 		}
 		return residual.innerProd(residual) + this.transitionNoiseVariance
 				* alphas.innerProd(alphas);
@@ -73,8 +73,8 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 	 *            transitions.get(i) yields the transition from (k - i) to (k +
 	 *            1 - i)
 	 */
-	SurrogateSolutionProperties<X, U> computeProperties(
-			final List<Transition<X, U>> transitions) {
+	SurrogateSolutionProperties<U> computeProperties(
+			final List<Transition<U>> transitions) {
 		final List<Double> initialAlphas = new ArrayList<Double>(
 				transitions.size());
 		final double weight = 1.0 / transitions.size();
@@ -95,8 +95,8 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 	 *            initialAlphas.get(i) returns the coefficient for the
 	 *            transition from (k - i) to (k + 1 - i)
 	 */
-	SurrogateSolutionProperties<X, U> computeProperties(
-			final List<Transition<X, U>> transitions,
+	SurrogateSolutionProperties<U> computeProperties(
+			final List<Transition<U>> transitions,
 			final List<Double> initialAlphas) {
 
 		/*
@@ -124,49 +124,40 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 			if (initialAlphaValue > (1.0 + eps)) {
 				throw new RuntimeException(
 						"an element in initialAlphas has value "
-								+ initialAlphaValue + " > 1.0");
+								+ initialAlphaValue + " > " + (1.0 + eps));
 			}
 			initialAlphaSum += initialAlphaValue;
 		}
 		if (Math.abs(initialAlphaSum - 1.0) > eps) {
 			throw new RuntimeException(
 					"the sum of elements in inititalAlphas is "
-							+ initialAlphaSum + " != 1.0 [+/- 1e-6]");
+							+ initialAlphaSum + " != 1.0 [+/- " + eps + "]");
 		}
 
 		/*
-		 * (1) Extract first differences of the state sequence.
-		 * 
-		 * TODO Try to get rid of deltaList, just use Transition.getDelta().
+		 * (1) Pre-compute inner products of all state differences.
 		 */
 
-		final List<Vector> deltaList = new ArrayList<Vector>(transitions.size());
+		final Matrix innerProds = new Matrix(transitions.size(),
+				transitions.size());
 		for (int i = 0; i < transitions.size(); i++) {
-			deltaList.add(transitions.get(i).getDelta());
-		}
-
-		/*
-		 * (2) Pre-compute inner products of all state differences.
-		 */
-
-		final Matrix innerProds = new Matrix(deltaList.size(), deltaList.size());
-		for (int i = 0; i < deltaList.size(); i++) {
 			for (int j = 0; j <= i; j++) {
-				final double val = deltaList.get(i).innerProd(deltaList.get(j));
+				final double val = transitions.get(i).getDelta()
+						.innerProd(transitions.get(j).getDelta());
 				innerProds.getRow(i).set(j, val);
 				innerProds.getRow(j).set(i, val);
 			}
 		}
 
 		/*
-		 * (3) Find alphas that minimize estimated expected square gap.
+		 * (2) Find alphas that minimize the estimated expected square gap.
 		 */
 
 		final Vector alphas = new Vector(initialAlphas);
 		alphas.mult(1.0 / alphas.absValueSum());
 
 		boolean noMoreImprovement = false;
-		double estimatedExpectedGap2 = this.estimatedExpectedGap2(deltaList,
+		double estimatedExpectedGap2 = this.estimatedExpectedGap2(transitions,
 				alphas);
 
 		while (!noMoreImprovement) {
@@ -200,10 +191,10 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 			// (3.2) Compute remaining error and decide if to continue.
 
 			final double oldEstimatedExpectedGap2 = estimatedExpectedGap2;
-			estimatedExpectedGap2 = this.estimatedExpectedGap2(deltaList,
+			estimatedExpectedGap2 = this.estimatedExpectedGap2(transitions,
 					alphas);
 			if (Math.abs(oldEstimatedExpectedGap2 - estimatedExpectedGap2)
-					/ oldEstimatedExpectedGap2 <= 1e-6) {
+					/ oldEstimatedExpectedGap2 <= 1e-9) {
 				noMoreImprovement = true;
 			}
 		}
@@ -212,7 +203,7 @@ class SurrogateSolutionEstimator<X extends SimulatorState<X>, U extends Decision
 		 * (4) Compute and return resulting surrogate solution properties.
 		 */
 
-		return new SurrogateSolutionProperties<X, U>(transitions, alphas,
+		return new SurrogateSolutionProperties<U>(transitions, alphas,
 				estimatedExpectedGap2);
 	}
 }

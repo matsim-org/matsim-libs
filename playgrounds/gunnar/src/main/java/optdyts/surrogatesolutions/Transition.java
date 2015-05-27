@@ -21,10 +21,10 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package optdyts.surrogatesolutions;
 
-import optdyts.SimulatorState;
+import optdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -32,62 +32,60 @@ import floetteroed.utilities.math.Vector;
  * 
  * @author Gunnar Flötteröd
  * 
- * @param <X>
- *            the simulator state type
  * @param <U>
  *            the decision variable type
  */
-public class Transition<X extends SimulatorState<X>, U> {
+class Transition<U extends DecisionVariable> {
 
 	// -------------------- CONSTANTS --------------------
 
-	private final X fromState;
-
 	private final U decisionVariable;
-
-	private final X toState;
 
 	private final Vector delta;
 
+	private final double objectiveFunctionValue;
+
 	// -------------------- CONSTRUCTION --------------------
 
-	Transition(final X fromState, final U decisionVariable, final X toState) {
+	/**
+	 * Memorizes *references* to its parameters.
+	 * 
+	 * @param decisionVariable
+	 *            the decision variable used in this transition
+	 * @param delta
+	 *            the move in vector-valued state space representing this
+	 *            transition
+	 * @param objectiveFunctionValue
+	 *            the objective function value of the to-state of this
+	 *            transition
+	 */
+	Transition(final U decisionVariable, final Vector delta,
+			final double objectiveFunctionValue) {
 
-		if (fromState == null) {
-			throw new IllegalArgumentException("fromState is null");
-		}
 		if (decisionVariable == null) {
 			throw new IllegalArgumentException("decisionVariable is null");
 		}
-		if (toState == null) {
-			throw new IllegalArgumentException("toState is null");
+		if (delta == null) {
+			throw new IllegalArgumentException("delta is null");
 		}
 
-		this.fromState = fromState;
 		this.decisionVariable = decisionVariable;
-		this.toState = toState;
-
-		this.delta = this.toState.getReferenceToVectorRepresentation().copy();
-		this.delta.add(this.fromState.getReferenceToVectorRepresentation(),
-				-1.0);
+		this.delta = delta;
+		this.objectiveFunctionValue = objectiveFunctionValue;
 	}
 
 	// -------------------- GETTERS --------------------
 
-	public X getFromState() {
-		return this.fromState;
-	}
-
-	public U getDecisionVariable() {
+	U getDecisionVariable() {
 		return this.decisionVariable;
 	}
 
-	public X getToState() {
-		return this.toState;
+	Vector getDelta() {
+		return this.delta;
 	}
 
-	public Vector getDelta() {
-		return this.delta;
+	double getObjectiveFunctionValue() {
+		return this.objectiveFunctionValue;
 	}
 
 }
