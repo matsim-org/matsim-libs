@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,6 +129,10 @@ public abstract class AbstractModule {
 
     protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindTravelDisutilityFactory() {
         return bind(TravelDisutilityFactory.class);
+    }
+
+    protected final com.google.inject.binder.LinkedBindingBuilder<LeastCostPathCalculatorFactory> bindLeastCostPathCalculatorFactory() {
+        return bind(LeastCostPathCalculatorFactory.class);
     }
 
     protected <T> AnnotatedBindingBuilder<T> bind(Class<T> aClass) {

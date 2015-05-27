@@ -67,16 +67,9 @@ public class ControlerTest {
 		Controler controler = new Controler(new String[]{"test/scenarios/equil/config.xml"});
         assertNotNull(controler.getScenario().getNetwork()); // is required, e.g. for changing the factories
         assertNotNull(controler.getScenario().getPopulation());
-//        assertEquals(0, controler.getScenario().getNetwork().getLinks().size());
-//        assertEquals(0, controler.getScenario().getNetwork().getNodes().size());
-//        assertEquals(0, controler.getScenario().getPopulation().getPersons().size());
         assertEquals(23, controler.getScenario().getNetwork().getLinks().size());
         assertEquals(15, controler.getScenario().getNetwork().getNodes().size());
         assertEquals(100, controler.getScenario().getPopulation().getPersons().size());
-        
-        // note: because scenario is now loaded in the constructor, the collections already contain material after the constructor.
-        // kai, apr'15
-        
 		assertNotNull(controler.getEvents());
 	}
 
@@ -175,10 +168,7 @@ public class ControlerTest {
 		// Run the simulation again
 		controler = new Controler(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 
