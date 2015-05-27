@@ -1,5 +1,7 @@
 package org.matsim.core.mobsim.qsim;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -44,6 +46,7 @@ VisData {
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
     	if ( agent.getExpectedTravelTime()==null || agent.getExpectedTravelTime()==Time.UNDEFINED_TIME ) {
+    		Logger.getLogger( this.getClass() ).info( "mode: " + agent.getMode() );
     		throw new RuntimeException("teleportation does not work when travel time is undefined.  There is also really no magic fix for this,"
     				+ " since otherwise mode choice optimization will eventually lead to all legs teleported.  kai/mz, apr'15") ;
     	}

@@ -38,6 +38,8 @@ public class CarsharingAgentFactory implements AgentFactory{
 		
 		CarsharingPersonDriverAgentImpl agent = new CarsharingPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()),
 				this.simulation, this.scenario, this.carSharingVehicles, this.tripRouter); 
+//		MobsimDriverAgent agent = new CarsharingPersonDriverAgentImplCopy(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation,
+//				this.carSharingVehicles, this.tripRouter); 
 		return agent;
 	}
 }

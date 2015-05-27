@@ -6,7 +6,7 @@ import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 public class CarsharingConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "Carsharing";
 	
-	private String statsWriterFrequency = null;
+	private Integer statsWriterFrequency = null;
 	
 	
 
@@ -16,13 +16,13 @@ public class CarsharingConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter( "statsWriterFrequency" )
-	public String getStatsWriterFrequency() {
+	public Integer getStatsWriterFrequency() {
 		return this.statsWriterFrequency;
 	}
 
 	@StringSetter( "statsWriterFrequency" )
 	public void setStatsWriterFrequency(final String statsWriterFrequency) {
-		this.statsWriterFrequency = statsWriterFrequency;
+		this.statsWriterFrequency = Integer.parseInt( statsWriterFrequency );
 	}
 	
 }

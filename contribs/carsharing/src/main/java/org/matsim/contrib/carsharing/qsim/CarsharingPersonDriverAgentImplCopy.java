@@ -96,15 +96,15 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 	private PlanElement previousPlanElement;
 
 
-	public CarsharingPersonDriverAgentImplCopy(final Person person, final Plan plan, 
-			final Netsim simulation, final Scenario scenario,
+	public CarsharingPersonDriverAgentImplCopy(final Plan plan, final Netsim simulation, 
 			CarSharingVehicles carSharingVehicles, TripRouter tripRouter) {
-		// yy person and plan can be inconsistent.  kai, may'15
-		// yy simulation and scenario can be inconsistent.  kai, may'15
+		Scenario scenario = simulation.getScenario() ;
 
 		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, simulation.getEventsManager(), simulation.getSimTimer() ) ;
 		this.transitAgentDelegate = new TransitAgentImpl( this.basicAgentDelegate ) ;
 		this.driverAgentDelegate = new PlanBasedDriverAgentImpl( this.basicAgentDelegate ) ;
+
+		this.basicAgentDelegate.getModifiablePlan() ; // this makes the plan modifiable
 
 		this.previousPlanElement = this.basicAgentDelegate.getCurrentPlanElement() ;
 
@@ -125,23 +125,20 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
 		this.basicAgentDelegate.endActivityAndComputeNextState(now);
-
-		log.warn( "following method may duplicate code:") ;
 		advanceCSPlan(now);
 	}
 
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
+		if (this.getVehicle()!=null && (this.getVehicle().getId().toString().startsWith("TW") ||
+				this.getVehicle().getId().toString().startsWith("OW") || 
+				this.getVehicle().getId().toString().startsWith("FF")))
+
+			parkCSVehicle( );			
+
 		this.basicAgentDelegate.endLegAndComputeNextState(now);
 		if ( this.getState()!=State.ABORT ) {
 
-			if (this.getVehicle()!=null && (this.getVehicle().getId().toString().startsWith("TW") ||
-					this.getVehicle().getId().toString().startsWith("OW") || 
-					this.getVehicle().getId().toString().startsWith("FF")))
-
-				parkCSVehicle( );			
-
-			log.warn( "following method may duplicate code:") ;
 			advanceCSPlan(now) ;
 		}
 	}	
@@ -176,7 +173,11 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 		// we can either call this before or after the basicPlanAgentImpl.advancePlan.
 		// If we call it after, the leg has already been initialized.  This may or may not be a problem.
 		
-		Leg leg = (Leg) this.basicAgentDelegate.getCurrentPlanElement() ;
+		final PlanElement pe = this.basicAgentDelegate.getCurrentPlanElement();
+		if ( pe instanceof Activity ) {
+			return ;
+		}
+		Leg leg = (Leg) pe ;
 		//start of added stuff
 
 		String mode = leg.getMode();
@@ -188,33 +189,28 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 
 		case "walk_rb":
 			if (nextPlanElement instanceof Leg) {
-
 				initializeTwoWayCarsharingStartWalkLeg(leg, now);
 			}
 			else if (previousPlanElement instanceof Leg) {
-
 				initializeTwoWayCarsharingEndWalkLeg(leg, now);
-
 			}
 			break;
 
 		case "twowaycarsharing": 
-			if (previousPlanElement instanceof Activity &&
-					nextPlanElement instanceof Activity)
-
+			if (previousPlanElement instanceof Activity && nextPlanElement instanceof Activity)
+				// (we are a leg between two activities)
 				initializeTwoWayCSMidleCarLeg(startLinkTW, now);
 
-			else if (previousPlanElement instanceof Leg &&
-					!(nextPlanElement instanceof Leg))
-
+			else if (previousPlanElement instanceof Leg && !(nextPlanElement instanceof Leg))
+				// (we are a leg after a leg but not before a leg)
 				initializeTwoWayCarsharingCarLeg(startLinkTW, now);
 
-			else if (previousPlanElement instanceof Leg && 
-					(nextPlanElement instanceof Leg))
-
+			else if (previousPlanElement instanceof Leg &&  (nextPlanElement instanceof Leg))
+				// (we are a leg between legs) 
 				initializeTwoWayCarsharingEmptyCarLeg(startLinkTW, now);
 
 			else if (nextPlanElement instanceof Leg)
+				// (we are a leg before a leg)
 
 				initializeTwoWayCarsharingEndCarLeg(startLinkTW, now);
 			else 
@@ -249,13 +245,14 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 			break;
 		}
 
-		previousPlanElement = this.basicAgentDelegate.getCurrentPlanElement() ;
+		previousPlanElement = pe ;
 	}
 
 	//added methods
 
 	private void initializeCSWalkLeg(String mode, double now, Link startLink, Link destinationLink) {
-		LegImpl walkLeg = new LegImpl(mode);
+//		LegImpl walkLeg = new LegImpl(mode);
+		Leg walkLeg = (Leg) this.basicAgentDelegate.getCurrentPlanElement() ;
 
 		GenericRouteImpl walkRoute = new GenericRouteImpl(startLink.getId(), destinationLink.getId());
 		final double dist = CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord());
@@ -269,7 +266,7 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 
 		walkLeg.setDepartureTime(now);
 		walkLeg.setTravelTime(travTime);
-		walkLeg.setArrivalTime(now + travTime);
+//		walkLeg.setArrivalTime(now + travTime);
 	}
 
 	private void initializeCSVehicleLeg (String mode, double now, Link startLink, Link destinationLink) {
@@ -292,7 +289,10 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 			}
 		}
 
-		LegImpl carLeg = new LegImpl(mode);
+//		LegImpl carLeg = new LegImpl(mode);
+		Leg carLeg = (Leg) this.basicAgentDelegate.getCurrentPlanElement() ;
+		carLeg.setMode(mode);
+		
 
 		carLeg.setTravelTime( travelTime );
 
@@ -311,8 +311,6 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 
 		carLeg.setRoute(route);
 		
-		// yyyyyy need to get the leg back into the plan !!! yyyyyy
-
 	}
 
 	private void initializeTwoWayCarsharingStartWalkLeg(Leg leg, double now) {

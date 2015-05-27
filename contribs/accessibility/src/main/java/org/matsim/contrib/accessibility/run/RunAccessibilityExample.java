@@ -83,9 +83,7 @@ final public class RunAccessibilityExample {
 		
 		Controler controler = new Controler(scenario) ;
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 		for ( String actType : activityTypes ) {
 			

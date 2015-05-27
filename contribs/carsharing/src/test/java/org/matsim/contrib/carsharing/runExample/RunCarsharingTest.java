@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.FreeFloatingConfigGroup;
 import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
@@ -56,8 +57,9 @@ public class RunCarsharingTest {
 			Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "/config.xml",  
 					new FreeFloatingConfigGroup(), 
 					new OneWayCarsharingConfigGroup(), 
-					new TwoWayCarsharingConfigGroup() ) ;
-
+					new TwoWayCarsharingConfigGroup(),
+					new CarsharingConfigGroup() ) ;
+			
 			config.controler().setOutputDirectory( utils.getOutputDirectory() );
 
 			config.network().setInputFile( utils.getClassInputDirectory()+"/network.xml" );
