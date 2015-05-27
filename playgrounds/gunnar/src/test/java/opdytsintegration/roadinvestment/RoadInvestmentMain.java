@@ -54,9 +54,7 @@ class RoadInvestmentMain {
 		link2freespeed = Collections.unmodifiableMap(link2freespeed);
 		link2capacity = Collections.unmodifiableMap(link2capacity);
 
-		final Random rnd = new Random();
-		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory(
-				rnd);
+		final RoadInvestmentStateFactory stateFactory = new RoadInvestmentStateFactory();
 		final ObjectiveFunction<RoadInvestmentState> objectiveFunction = new RoadInvestmentObjectiveFunction();
 		final Set<RoadInvestmentDecisionVariable> decisionVariables = new LinkedHashSet<RoadInvestmentDecisionVariable>();
 

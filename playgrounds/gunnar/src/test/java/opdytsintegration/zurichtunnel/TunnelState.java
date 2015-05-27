@@ -1,7 +1,5 @@
 package opdytsintegration.zurichtunnel;
 
-import java.util.Random;
-
 import opdytsintegration.MATSimPopulationState;
 import optdyts.SimulatorState;
 
@@ -27,10 +25,9 @@ class TunnelState implements SimulatorState<TunnelState> {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	TunnelState(final Population population, final Vector vectorRepresentation,
-			final Random rnd) {
+	TunnelState(final Population population, final Vector vectorRepresentation) {
 
-		this.populationState = new MATSimPopulationState(population, rnd);
+		this.populationState = new MATSimPopulationState(population);
 		this.vectorRepresentation = vectorRepresentation.copy();
 
 		// double totalScore = 0.0;
@@ -52,15 +49,15 @@ class TunnelState implements SimulatorState<TunnelState> {
 		this.avgScore = totalScore / population.getPersons().size();
 	}
 
-//	private TunnelState(final TunnelState parent) {
-//		if (parent.populationState != null) {
-//			this.populationState = parent.populationState.copy();
-//		} else {
-//			this.populationState = null;
-//		}
-//		this.vectorRepresentation = parent.vectorRepresentation.copy();
-//		this.avgScore = parent.avgScore;
-//	}
+	// private TunnelState(final TunnelState parent) {
+	// if (parent.populationState != null) {
+	// this.populationState = parent.populationState.copy();
+	// } else {
+	// this.populationState = null;
+	// }
+	// this.vectorRepresentation = parent.vectorRepresentation.copy();
+	// this.avgScore = parent.avgScore;
+	// }
 
 	// -------------------- GETTERS --------------------
 
@@ -70,45 +67,45 @@ class TunnelState implements SimulatorState<TunnelState> {
 
 	// --------------- IMPLEMENTATION OF SimulatorState ---------------
 
-//	@Override
-//	public TunnelState deepCopy() {
-//		return new TunnelState(this);
-//	}
+	// @Override
+	// public TunnelState deepCopy() {
+	// return new TunnelState(this);
+	// }
 
 	@Override
 	public Vector getReferenceToVectorRepresentation() {
 		return this.vectorRepresentation;
 	}
 
-//	@Override
-//	public void takeOverConvexCombination(final List<TunnelState> states,
-//			final List<Double> weights) {
-//
-//		// No convex population combination needed.
-//		this.populationState = null;
-//
-//		// No convex vector representation is needed.
-//		this.vectorRepresentation = null;
-//
-//		// this.vectorRepresentation.clear();
-//		this.avgScore = 0.0;
-//		for (int i = 0; i < states.size(); i++) {
-//			final TunnelState state = states.get(i);
-//			final double weight = weights.get(i);
-//			// this.vectorRepresentation.add(
-//			// state.getReferenceToVectorRepresentation(), weight);
-//			this.avgScore += state.getAvgScore() * weight;
-//		}
-//	}
+	// @Override
+	// public void takeOverConvexCombination(final List<TunnelState> states,
+	// final List<Double> weights) {
+	//
+	// // No convex population combination needed.
+	// this.populationState = null;
+	//
+	// // No convex vector representation is needed.
+	// this.vectorRepresentation = null;
+	//
+	// // this.vectorRepresentation.clear();
+	// this.avgScore = 0.0;
+	// for (int i = 0; i < states.size(); i++) {
+	// final TunnelState state = states.get(i);
+	// final double weight = weights.get(i);
+	// // this.vectorRepresentation.add(
+	// // state.getReferenceToVectorRepresentation(), weight);
+	// this.avgScore += state.getAvgScore() * weight;
+	// }
+	// }
 
 	@Override
 	public void implementInSimulation() {
 		this.populationState.implementInSimulation();
 	}
 
-//	@Override
-//	public void releaseDeepMemory() {
-//		this.populationState = null;
-//		this.vectorRepresentation = null; // TODO this is new
-//	}
+	// @Override
+	// public void releaseDeepMemory() {
+	// this.populationState = null;
+	// this.vectorRepresentation = null; // TODO this is new
+	// }
 }

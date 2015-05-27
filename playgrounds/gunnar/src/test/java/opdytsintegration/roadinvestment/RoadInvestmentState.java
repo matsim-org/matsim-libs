@@ -47,9 +47,9 @@ public class RoadInvestmentState // implements
 
 	RoadInvestmentState(final Population population,
 			final Vector vectorRepresentation, final Double betaPay,
-			final Double betaAlloc, final Random rnd) {
+			final Double betaAlloc) {
 
-		this.populationState = new MATSimPopulationState(population, rnd);
+		this.populationState = new MATSimPopulationState(population);
 		// super(population, rnd);
 
 		this.vectorRepresentation = vectorRepresentation.copy();
