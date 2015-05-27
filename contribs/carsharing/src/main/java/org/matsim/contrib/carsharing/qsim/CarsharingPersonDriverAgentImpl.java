@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.carsharing.config.OneWayCarsharingConfigGroup;
 import org.matsim.contrib.carsharing.events.NoParkingSpaceEvent;
 import org.matsim.contrib.carsharing.events.NoVehicleCarSharingEvent;
 import org.matsim.contrib.carsharing.facility.DummyFacility;
@@ -23,7 +24,6 @@ import org.matsim.contrib.carsharing.stations.FreeFloatingStation;
 import org.matsim.contrib.carsharing.stations.OneWayCarsharingStation;
 import org.matsim.contrib.carsharing.stations.TwoWayCarsharingStation;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -38,7 +38,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -64,7 +63,7 @@ import org.matsim.vehicles.Vehicle;
  */
 
 
-public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent {
+public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent {
 
 	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 
@@ -93,10 +92,8 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 	private final TransitAgentImpl transitAgentDelegate ;
 	private final PlanBasedDriverAgentImpl driverAgentDelegate ;
 
-	private PlanElement previousPlanElement;
 
-
-	public CarsharingPersonDriverAgentImplCopy(final Plan plan, final Netsim simulation, 
+	public CarsharingPersonDriverAgentImpl(final Plan plan, final Netsim simulation, 
 			CarSharingVehicles carSharingVehicles, TripRouter tripRouter) {
 		Scenario scenario = simulation.getScenario() ;
 
@@ -104,16 +101,14 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 		this.transitAgentDelegate = new TransitAgentImpl( this.basicAgentDelegate ) ;
 		this.driverAgentDelegate = new PlanBasedDriverAgentImpl( this.basicAgentDelegate ) ;
 
-		this.basicAgentDelegate.getModifiablePlan() ; // this makes the plan modifiable
-
-		this.previousPlanElement = this.basicAgentDelegate.getCurrentPlanElement() ;
+		this.basicAgentDelegate.getModifiablePlan() ; // this lets the agent make a full copy of the plan, which can then be modified
 
 		this.carSharingVehicles = carSharingVehicles;
 
 		this.tripRouter = tripRouter;
 
-		beelineFactor = ((PlansCalcRouteConfigGroup)scenario.getConfig().getModule("planscalcroute")).getBeelineDistanceFactors().get("walk");
-		walkSpeed = (((PlansCalcRouteConfigGroup)scenario.getConfig().getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk"));
+		beelineFactor = scenario.getConfig().plansCalcRoute().getBeelineDistanceFactors().get("walk");
+		walkSpeed = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get("walk");
 		//carsharingVehicleLocations = new ArrayList<ActivityFacility>();
 		mapTW = new HashMap<Link, Link>();
 		mapOW = new HashMap<Link, Link>();
@@ -178,41 +173,42 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 			return ;
 		}
 		Leg leg = (Leg) pe ;
-		//start of added stuff
 
-		String mode = leg.getMode();
-
-		//			PlanElement nextPlanElement = this.plan.getPlanElements().get(this.plan.getPlanElements().indexOf(pe) + 1);
 		PlanElement nextPlanElement = this.basicAgentDelegate.getNextPlanElement() ;
+		PlanElement previousPlanElement = this.basicAgentDelegate.getPreviousPlanElement() ;
 
-		switch (mode) {
+		switch (leg.getMode()) {
 
 		case "walk_rb":
 			if (nextPlanElement instanceof Leg) {
 				initializeTwoWayCarsharingStartWalkLeg(leg, now);
 			}
 			else if (previousPlanElement instanceof Leg) {
-				initializeTwoWayCarsharingEndWalkLeg(leg, now);
+				initializeTwoWayCarsharingEndWalkLeg(leg);
 			}
 			break;
 
 		case "twowaycarsharing": 
-			if (previousPlanElement instanceof Activity && nextPlanElement instanceof Activity)
-				// (we are a leg between two activities)
-				initializeTwoWayCSMidleCarLeg(startLinkTW, now);
-
-			else if (previousPlanElement instanceof Leg && !(nextPlanElement instanceof Leg))
-				// (we are a leg after a leg but not before a leg)
+			// the following switches make rather strong assumptions on the structure of the plans file, see the specific comments.
+			// yyyy Note that this can go wrong, e.g. when you cannot park your CS car in front of an activity. kai, may'15
+			
+			if (previousPlanElement instanceof Activity && nextPlanElement instanceof Activity) {
+				// (we are a leg between two activities.  Since there is no walk leg involved, we assume that we can park on the activity 
+				// link on both sides)
+				initializeTwoWayCSMidleCarLeg(now);
+			}
+			else if (previousPlanElement instanceof Leg && !(nextPlanElement instanceof Leg)) {
+				// (we are a leg after a leg but not before a leg.  The previous leg must have been the walk leg to the station.)
 				initializeTwoWayCarsharingCarLeg(startLinkTW, now);
-
-			else if (previousPlanElement instanceof Leg &&  (nextPlanElement instanceof Leg))
-				// (we are a leg between legs) 
+			}
+			else if (previousPlanElement instanceof Leg &&  (nextPlanElement instanceof Leg)) {
+				// (we are a leg between legs.  yy no idea what this means?!?!) 
 				initializeTwoWayCarsharingEmptyCarLeg(startLinkTW, now);
-
-			else if (nextPlanElement instanceof Leg)
-				// (we are a leg before a leg)
-
-				initializeTwoWayCarsharingEndCarLeg(startLinkTW, now);
+			}
+			else if (nextPlanElement instanceof Leg) {
+				// (we are a leg before a leg.  The next leg must be the walk leg from the station, so this is the last CS car leg.)
+				initializeTwoWayCarsharingEndCarLeg(now);
+			}
 			else 
 				log.error("This should never happen");
 			break;
@@ -241,7 +237,6 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 			initializeOneWayCarsharingCarLeg(startStationOW.getLink(), now);
 			break;
 		default:
-			//				initializeLeg(leg);
 			break;
 		}
 
@@ -250,46 +245,45 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 
 	//added methods
 
-	private void initializeCSWalkLeg(String mode, double now, Link startLink, Link destinationLink) {
-//		LegImpl walkLeg = new LegImpl(mode);
+	private void initializeCSWalkLeg(Link startLink, Link destinationLink) {
+		
 		Leg walkLeg = (Leg) this.basicAgentDelegate.getCurrentPlanElement() ;
 
 		GenericRouteImpl walkRoute = new GenericRouteImpl(startLink.getId(), destinationLink.getId());
-		final double dist = CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord());
-		final double estimatedNetworkDistance = dist * beelineFactor;
-
-		final int travTime = (int) (estimatedNetworkDistance / walkSpeed);
-		walkRoute.setTravelTime(travTime);
-		walkRoute.setDistance(estimatedNetworkDistance);	
-
 		walkLeg.setRoute(walkRoute);
 
-		walkLeg.setDepartureTime(now);
-		walkLeg.setTravelTime(travTime);
+		walkRoute.setTravelTime((int) ((CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord()) * beelineFactor) / walkSpeed));
+		// yy why "int"???  kai, may'15
+		
+		walkRoute.setDistance(CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord()) * beelineFactor);	
+
+//		walkLeg.setDepartureTime(now);
+//		walkLeg.setTravelTime((int) ((CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord()) * beelineFactor) / walkSpeed));
 //		walkLeg.setArrivalTime(now + travTime);
+		// (the above are either obsolete or at least not needed. kai, may'15)
+
 	}
 
 	private void initializeCSVehicleLeg (String mode, double now, Link startLink, Link destinationLink) {
+		
 		double travelTime = 0.0;
 		List<Id<Link>> ids = new ArrayList<Id<Link>>();
 
-		CoordImpl coordStart = new CoordImpl(startLink.getCoord());
+		DummyFacility dummyStartFacility = new DummyFacility(new CoordImpl(startLink.getCoord()), startLink.getId());
 
-		DummyFacility dummyStartFacility = new DummyFacility(coordStart, startLink.getId());
-
-		CoordImpl coordEnd = new CoordImpl(destinationLink.getCoord());
-
-		DummyFacility dummyEndFacility = new DummyFacility(coordEnd, destinationLink.getId());
+		DummyFacility dummyEndFacility = new DummyFacility(new CoordImpl(destinationLink.getCoord()), destinationLink.getId());
 
 		for(PlanElement pe1: this.tripRouter.calcRoute("car", dummyStartFacility, dummyEndFacility, now, this.basicAgentDelegate.getPerson() )) {
-
+			// yyyy the following is memorizing only the last PlanElement that the router generates.  Not sure why this is necessary.
+			// In practice, the router seems to generate exactly one plan element and so there is no problem, but the code remains obscure.
+			// kai, may'15
+			
 			if (pe1 instanceof Leg) {
 				ids = ((NetworkRoute)((Leg) pe1).getRoute()).getLinkIds();
 				travelTime += ((Leg) pe1).getTravelTime();
 			}
 		}
 
-//		LegImpl carLeg = new LegImpl(mode);
 		Leg carLeg = (Leg) this.basicAgentDelegate.getCurrentPlanElement() ;
 		carLeg.setMode(mode);
 		
@@ -302,20 +296,19 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 		route.setLinkIds( startLink.getId(), ids, destinationLink.getId());
 		route.setTravelTime( travelTime);
 
-		if (mode.equals("twowaycarsharing"))
-			route.setVehicleId(Id.create("TW_" + (twVehId), Vehicle.class));
-		else if (mode.equals("onewaycarsharing"))
-			route.setVehicleId(Id.create("OW_" + (owVehId), Vehicle.class));
-		else if (mode.equals("freefloating"))
-			route.setVehicleId(Id.create("FF_" + (ffVehId), Vehicle.class));
-
+		Id<Vehicle> vehId = null ;
+		if (mode.equals("twowaycarsharing")) {
+			vehId = Id.create("TW_" + (twVehId), Vehicle.class);
+		} else if (mode.equals("onewaycarsharing")) {
+			vehId = Id.create("OW_" + (owVehId), Vehicle.class);
+		} else if (mode.equals("freefloating")) {
+			vehId = Id.create("FF_" + (ffVehId), Vehicle.class);
+		}
+		route.setVehicleId( vehId ) ;
 		carLeg.setRoute(route);
-		
 	}
 
 	private void initializeTwoWayCarsharingStartWalkLeg(Leg leg, double now) {
-
-		//		this.setState(MobsimAgent.State.LEG);
 		Route route = leg.getRoute();
 
 		TwoWayCarsharingStation station = findClosestAvailableTWCar(route.getStartLinkId());
@@ -334,24 +327,20 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 
 
 		mapTW.put(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(leg.getRoute().getStartLinkId()), startLinkTW);
-		initializeCSWalkLeg("walk_rb", now, this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()), startLinkTW);
-
+		initializeCSWalkLeg(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()), startLinkTW);
 	}
 
 	private void initializeTwoWayCarsharingCarLeg(Link l, double now) {
-		//		this.setState(MobsimAgent.State.LEG);
-
 		Leg leg =  (Leg) this.getCurrentPlanElement();
 
 		//create route for the car part of the twowaycarsharing trip
 		initializeCSVehicleLeg("twowaycarsharing", now, l, this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(leg.getRoute().getEndLinkId()));
-
-
 	}	
+
 	private void initializeTwoWayCarsharingEmptyCarLeg(Link l, double now) {
-		initializeCSVehicleLeg("twowaycarsharing", now, l, l);		
+			initializeCSVehicleLeg("twowaycarsharing", now, l, l);		
 	}
-	private void initializeTwoWayCSMidleCarLeg(Link l, double now) {
+	private void initializeTwoWayCSMidleCarLeg(double now) {
 		Leg leg =  (Leg) this.getCurrentPlanElement();
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
 		Network network = scenario.getNetwork();
@@ -360,23 +349,23 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 		initializeCSVehicleLeg("twowaycarsharing", now, network.getLinks().get(leg.getRoute().getStartLinkId()), network.getLinks().get(leg.getRoute().getEndLinkId()));
 	}
 
-	private void initializeTwoWayCarsharingEndCarLeg(Link l, double now) {
+	private void initializeTwoWayCarsharingEndCarLeg(double now) {
+
 		Leg leg =  (Leg) this.getCurrentPlanElement();
 		Scenario scenario = this.basicAgentDelegate.getScenario() ;
 		Link link = mapTW.get(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()));
 
 		//create route for the car part of the twowaycarsharing trip
 		initializeCSVehicleLeg("twowaycarsharing", now, scenario.getNetwork().getLinks().get(leg.getRoute().getStartLinkId()), link);
-
 	}
 
-	private void initializeTwoWayCarsharingEndWalkLeg(Leg leg, double now) {
+	private void initializeTwoWayCarsharingEndWalkLeg(Leg leg) {
 		Route route = leg.getRoute();		
 
 		final Network network = this.basicAgentDelegate.getScenario().getNetwork();
 		Link link = mapTW.get(network.getLinks().get(leg.getRoute().getEndLinkId()));
 		mapTW.remove(network.getLinks().get(leg.getRoute().getEndLinkId()));
-		initializeCSWalkLeg("walk_rb", now, link, network.getLinks().get(route.getEndLinkId()));				
+		initializeCSWalkLeg(link, network.getLinks().get(route.getEndLinkId()));				
 
 	}
 
@@ -416,7 +405,7 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 		ffVehId = location.getIDs().get(0);
 		this.carSharingVehicles.getFreeFLoatingVehicles().removeVehicle(location.getLink(), ffVehId);
 		startLinkFF = location.getLink();
-		initializeCSWalkLeg("walk_ff", now, this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()), startLinkFF);
+		initializeCSWalkLeg(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()), startLinkFF);
 	}
 
 	private void initializeFreeFLoatingCarLeg(Link l, double now) {
@@ -453,7 +442,7 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 		owVehId = station.getIDs().get(0);
 		this.carSharingVehicles.getOneWayVehicles().removeVehicle(station, owVehId);
 
-		initializeCSWalkLeg("walk_ow_sb", now, this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()), startStationOW.getLink());
+		initializeCSWalkLeg(this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getStartLinkId()), startStationOW.getLink());
 
 
 	}
@@ -485,7 +474,7 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 	}
 	private void initializeOneWayCarsharingEndWalkLeg(Leg leg, double now) {
 		Route route = leg.getRoute();		
-		initializeCSWalkLeg("walk_ow_sb", now, endStationOW.getLink(), this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()));
+		initializeCSWalkLeg(endStationOW.getLink(), this.basicAgentDelegate.getScenario().getNetwork().getLinks().get(route.getEndLinkId()));
 
 	}
 
@@ -495,7 +484,8 @@ public class CarsharingPersonDriverAgentImplCopy implements MobsimDriverAgent, M
 		//find the closest available car and reserve it (make it unavailable)
 		//if no cars within certain radius return null
 		Link link = scenario.getNetwork().getLinks().get(linkId);
-		double distanceSearch = Double.parseDouble(scenario.getConfig().getModule("OneWayCarsharing").getParams().get("searchDistanceOneWayCarsharing"));
+		final OneWayCarsharingConfigGroup oneWayCSConfig = (OneWayCarsharingConfigGroup) scenario.getConfig().getModule("OneWayCarsharing");
+		double distanceSearch = oneWayCSConfig.getsearchDistance() ;
 
 		Collection<OneWayCarsharingStation> location = this.carSharingVehicles.getOneWayVehicles().getQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), distanceSearch);
 		if (location.isEmpty()) return null;

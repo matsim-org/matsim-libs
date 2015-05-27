@@ -40,4 +40,9 @@ public class DummyFacility implements Facility<DummyFacility>{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		return "[coord=" + coord.toString() + "] [linkId=" + linkId + "]" ;
+	}
 }

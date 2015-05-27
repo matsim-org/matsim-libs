@@ -12,7 +12,7 @@ public class OneWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	
 	private String vehiclelocationsInputFile = null;
 	
-	private String searchDistance = null;
+	private Double searchDistance = null;
 	
 	private String rentalPriceTimeOneWayCarsharing = null;
 	
@@ -69,13 +69,13 @@ public class OneWayCarsharingConfigGroup extends ReflectiveConfigGroup {
 	}
 	
 	@StringGetter( "searchDistanceOneWayCarsharing" )
-	public String getsearchDistance() {
+	public Double getsearchDistance() {
 		return this.searchDistance;
 	}
 
 	@StringSetter( "searchDistanceOneWayCarsharing" )
 	public void setsearchDistance(final String searchDistance) {
-		this.searchDistance = searchDistance;
+		this.searchDistance = Double.parseDouble(searchDistance);
 	}
 	
 	@StringGetter( "timeFeeOneWayCarsharing" )

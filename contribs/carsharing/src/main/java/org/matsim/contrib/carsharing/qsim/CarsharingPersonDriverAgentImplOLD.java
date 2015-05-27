@@ -69,7 +69,7 @@ import org.matsim.vehicles.Vehicle;
  */
 
  
-public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent{
+public class CarsharingPersonDriverAgentImplOLD implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent{
 
 	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 
@@ -127,7 +127,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	private TripRouter tripRouter;
 	
 
-	public CarsharingPersonDriverAgentImpl(final Person person, final Plan plan, 
+	public CarsharingPersonDriverAgentImplOLD(final Person person, final Plan plan, 
 			final Netsim simulation, final Scenario scenario,
 			CarSharingVehicles carSharingVehicles, TripRouter tripRouter) {
 		this.person = person;
@@ -329,10 +329,18 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			switch (mode) {
 			
 			case "walk_rb": if (nextPlanElement instanceof Leg) {
-									
+				log.warn("about to initialize two way start WALK leg") ;
+				log.warn("prevPE=" + previousPlanElement.toString() ) ;
+				log.warn("currPE=" + leg.toString() ) ;
+				log.warn("nextPE=" + nextPlanElement.toString() ) ;
+
 								initializeTwoWayCarsharingStartWalkLeg(leg, now);
 							}
 							else if (previousPlanElement instanceof Leg) {
+								log.warn("about to initialize two way end WALK leg") ;
+								log.warn("prevPE=" + previousPlanElement.toString() ) ;
+								log.warn("currPE=" + leg.toString() ) ;
+								log.warn("nextPE=" + nextPlanElement.toString() ) ;
 				
 								initializeTwoWayCarsharingEndWalkLeg(leg, now);
 				
@@ -340,23 +348,38 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 							break;
 			
 			case "twowaycarsharing": if (previousPlanElement instanceof Activity &&
-										nextPlanElement instanceof Activity)
-									
-										initializeTwoWayCSMidleCarLeg(startLinkTW, now);
-								
-									else if (previousPlanElement instanceof Leg &&
-											!(nextPlanElement instanceof Leg))
-									
-										initializeTwoWayCarsharingCarLeg(startLinkTW, now);
-								
+					nextPlanElement instanceof Activity) {
+				log.warn("about to initialize two way MIDDLE car leg") ;
+				log.warn("prevPE=" + previousPlanElement.toString() ) ;
+				log.warn("currPE=" + leg.toString() ) ;
+				log.warn("nextPE=" + nextPlanElement.toString() ) ;
+				initializeTwoWayCSMidleCarLeg(startLinkTW, now);
+			}				
+			else if (previousPlanElement instanceof Leg &&
+					!(nextPlanElement instanceof Leg)) {
+				log.warn("about to initialize two way NORMAL car leg") ;
+				log.warn("prevPE=" + previousPlanElement.toString() ) ;
+				log.warn("currPE=" + leg.toString() ) ;
+				log.warn("nextPE=" + nextPlanElement.toString() ) ;
+										initializeTwoWayCarsharingCarLeg(startLinkTW, now); 
+			}
 									else if (previousPlanElement instanceof Leg && 
-											(nextPlanElement instanceof Leg))
-									
+											(nextPlanElement instanceof Leg)) {
+										log.warn("about to initialize two way EMPTY car leg") ;
+									log.warn("prevPE=" + previousPlanElement.toString() ) ;
+									log.warn("currPE=" + leg.toString() ) ;
+									log.warn("nextPE=" + nextPlanElement.toString() ) ;
+
 										initializeTwoWayCarsharingEmptyCarLeg(startLinkTW, now);
-								
-									else if (nextPlanElement instanceof Leg)
+									}
+									else if (nextPlanElement instanceof Leg) {
+										log.warn("about to initialize two way EMPTY car leg") ;
+									log.warn("prevPE=" + previousPlanElement.toString() ) ;
+									log.warn("currPE=" + leg.toString() ) ;
+									log.warn("nextPE=" + nextPlanElement.toString() ) ;
 									
 										initializeTwoWayCarsharingEndCarLeg(startLinkTW, now);
+									}
 									else 
 										log.error("This should never happen");
 									break;
@@ -413,7 +436,8 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.cachedRouteLinkIds = null;
 		this.currentLinkIdIndex = 0;
 		this.cachedNextLinkId = null;
-		
+
+		log.warn("initialized CSWalkLeg with mode=" + mode );
 	}
 	
 	private void initializeCSVehicleLeg (String mode, double now, Link startLink, Link destinationLink) {
@@ -444,12 +468,15 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		route.setLinkIds( startLink.getId(), ids, destinationLink.getId());
 		route.setTravelTime( travelTime);
 		
-		if (mode.equals("twowaycarsharing"))
-			route.setVehicleId(Id.create("TW_" + (twVehId), Vehicle.class));
-		else if (mode.equals("onewaycarsharing"))
-			route.setVehicleId(Id.create("OW_" + (owVehId), Vehicle.class));
-		else if (mode.equals("freefloating"))
-			route.setVehicleId(Id.create("FF_" + (ffVehId), Vehicle.class));
+		Id<Vehicle> vehId = null ;
+		if (mode.equals("twowaycarsharing")) {
+			vehId = Id.create("TW_" + (twVehId), Vehicle.class);
+		} else if (mode.equals("onewaycarsharing")) {
+			vehId = Id.create("OW_" + (owVehId), Vehicle.class);
+		} else if (mode.equals("freefloating")) {
+			vehId = Id.create("FF_" + (ffVehId), Vehicle.class);
+		}
+		route.setVehicleId(vehId);
 
 		carLeg.setRoute(route);
 		
@@ -461,7 +488,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.cachedNextLinkId = null;	
 		
 		
-		
+		log.warn("initialized CSVehicleLeg with mode=" + mode  + " and vehicle=" + vehId ) ;
 	}
 	
 	private void initializeTwoWayCarsharingStartWalkLeg(Leg leg, double now) {
