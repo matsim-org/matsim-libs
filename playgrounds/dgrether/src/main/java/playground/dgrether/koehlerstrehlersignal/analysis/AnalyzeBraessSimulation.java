@@ -181,19 +181,20 @@ public class AnalyzeBraessSimulation {
 		// prepare writing
 		PrintStream stream;
 		try {
-			stream = new PrintStream(new File(outputDir + "results.txt"));
+			stream = new PrintStream(new File(outputDir + "routesAndTTs.txt"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
 		}
 		String header = "it\ttotal tt[s]\t#users up\t#users mid\t#users low\tavg tt[s] up\tavg tt[s] mid\tavg tt[s] low";
 		stream.println(header);
-		StringBuffer line = new StringBuffer();
 		
 		double totalTTIt;
 		double[] avgRouteTTsIt;
 		int[] routeUsersIt;
 		for (int i=0; i<=lastIteration; i++){
+			log.info("Starting to analyze iteration " + i + " of " + lastIteration + " iterations.");
+			
 			// analyze single iterations
 			String eventsFilename = runDir.getEventsFilename(i);
 
@@ -210,11 +211,12 @@ public class AnalyzeBraessSimulation {
 			routeUsersIt = handler.getRouteUsers();
 			
 			// write results
+			StringBuffer line = new StringBuffer();
 			line.append(i + "\t" + totalTTIt);
-			for (int j = 0; j < 3; i++) {
+			for (int j = 0; j < 3; j++) {
 				line.append("\t" + routeUsersIt[j]);
 			}
-			for (int j = 0; j < 3; i++) {
+			for (int j = 0; j < 3; j++) {
 				line.append("\t" + avgRouteTTsIt[j]);
 			}
 			stream.println(line.toString());			
