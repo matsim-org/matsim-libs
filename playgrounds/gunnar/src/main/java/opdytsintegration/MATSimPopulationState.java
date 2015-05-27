@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -28,7 +27,7 @@ public class MATSimPopulationState {
 
 	// -------------------- MEMBERS --------------------
 
-	private final Random rnd;
+	// private final Random rnd;
 
 	private final Population population;
 
@@ -51,7 +50,8 @@ public class MATSimPopulationState {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public MATSimPopulationState(final Population population, final Random rnd) {
+	public MATSimPopulationState(final Population population) { // , final
+																// Random rnd) {
 		this.population = population;
 		for (Person person : population.getPersons().values()) {
 			if (person.getSelectedPlan() == null) {
@@ -69,17 +69,17 @@ public class MATSimPopulationState {
 			this.person2planList.put(person, newDeepCopy(person.getPlans()));
 		}
 		// }
-		this.rnd = rnd;
+		// this.rnd = rnd;
 	}
 
 	@Deprecated
 	private MATSimPopulationState(final MATSimPopulationState parent) {
 		this.population = parent.population;
-		this.rnd = parent.rnd;
+		// this.rnd = parent.rnd;
 		this.person2planList.putAll(parent.person2planList);
 		this.person2selectedPlanIndex.putAll(parent.person2selectedPlanIndex);
 	}
-	
+
 	@Deprecated
 	public MATSimPopulationState copy() {
 		return new MATSimPopulationState(this);
@@ -116,7 +116,7 @@ public class MATSimPopulationState {
 
 		final List<Person> shuffledPersonList = new ArrayList<Person>(
 				this.person2planList.keySet());
-		Collections.shuffle(shuffledPersonList, this.rnd);
+		Collections.shuffle(shuffledPersonList); // TODO arbitrarily random
 
 		this.person2planList.clear();
 		this.person2selectedPlanIndex.clear();
