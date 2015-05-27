@@ -32,6 +32,13 @@ class TunnelFactory {
 		final Node toNode = this.network.getNodes().get(
 				Id.create(toNodeName, Node.class));
 
+		// System.out.println("TUNNEL LENGTH is " +
+		// NetworkUtils.getEuclidianDistance(
+		// fromNode.getCoord(), toNode.getCoord()) + " TIME is " +
+		// NetworkUtils.getEuclidianDistance(
+		// fromNode.getCoord(), toNode.getCoord()) / (maxSpeed_km_h *
+		// Units.M_S_PER_KM_H));
+
 		final Id<Link> linkId1 = Id.create(link1Name, Link.class);
 		final Id<Link> linkId2 = Id.create(link2Name, Link.class);
 
@@ -43,13 +50,16 @@ class TunnelFactory {
 	}
 
 	void removeAllTunnels() {
-		// System.out.println(">>>>> number of links BEFORE removeAllTunnels: " + this.network.getLinks().size());
+		// System.out.println(">>>>> number of links BEFORE removeAllTunnels: "
+		// + this.network.getLinks().size());
 		for (Id<Link> linkId : this.allLinkIds) {
 			if (this.network.getLinks().containsKey(linkId)) {
-				System.out.println("REMOVED LINK " + this.network.removeLink(linkId));
+				System.out.println("REMOVED LINK "
+						+ this.network.removeLink(linkId));
 			}
 		}
-		// System.out.println(">>>>> number of links AFTER removeAllTunnels: " + this.network.getLinks().size());
+		// System.out.println(">>>>> number of links AFTER removeAllTunnels: " +
+		// this.network.getLinks().size());
 	}
 
 }

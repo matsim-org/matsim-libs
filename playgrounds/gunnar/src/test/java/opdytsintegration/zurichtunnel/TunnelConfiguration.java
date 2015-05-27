@@ -45,7 +45,7 @@ class TunnelConfiguration implements DecisionVariable {
 			final double freespeed = tunnel.maxSpeed_km_h * Units.M_S_PER_KM_H;
 			final double capacity = tunnel.capacity_veh_h / 3600.0
 					* this.tunnelFactory.network.getCapacityPeriod();
-
+			
 			{
 				final Link l1 = nf.createLink(
 						Id.create(tunnel.link1Id, Link.class), tunnel.fromNode,

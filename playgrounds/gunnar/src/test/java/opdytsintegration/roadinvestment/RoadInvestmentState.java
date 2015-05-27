@@ -3,7 +3,8 @@ package opdytsintegration.roadinvestment;
 import java.util.List;
 import java.util.Random;
 
-import opdytsintegration.MATSimUnevaluatedState;
+import opdytsintegration.MATSimPopulationState;
+import optdyts.SimulatorState;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -17,9 +18,13 @@ import floetteroed.utilities.math.Vector;
  */
 public class RoadInvestmentState // implements
 									// SimulatorState<RoadInvestmentState> {
-		extends MATSimUnevaluatedState<RoadInvestmentState> {
+									// extends
+									// MATSimPopulationState<RoadInvestmentState>
+		implements SimulatorState<RoadInvestmentState> {
 
 	// -------------------- CONSTANTS --------------------
+
+	private MATSimPopulationState populationState = null;
 
 	private Vector vectorRepresentation;
 
@@ -44,7 +49,8 @@ public class RoadInvestmentState // implements
 			final Vector vectorRepresentation, final Double betaPay,
 			final Double betaAlloc, final Random rnd) {
 
-		super(population, rnd);
+		this.populationState = new MATSimPopulationState(population, rnd);
+		// super(population, rnd);
 
 		this.vectorRepresentation = vectorRepresentation.copy();
 		this.betaPay = betaPay;
@@ -57,6 +63,18 @@ public class RoadInvestmentState // implements
 			}
 		}
 		this.avgScore = totalScore / population.getPersons().size();
+	}
+
+	private RoadInvestmentState(final RoadInvestmentState parent) {
+		if (parent.populationState != null) {
+			this.populationState = parent.populationState.copy();
+		} else {
+			this.populationState = null;
+		}
+		this.vectorRepresentation = parent.vectorRepresentation.copy();
+		this.betaPay = parent.betaPay;
+		this.betaAlloc = parent.betaAlloc;
+		this.avgScore = parent.avgScore;
 	}
 
 	// -------------------- GETTERS --------------------
@@ -85,15 +103,16 @@ public class RoadInvestmentState // implements
 
 	// IMPLEMENTATION OF SimulatorState / OVERRIDING OF UnevaluatedMATSimState
 
-	@Override
-	public RoadInvestmentState deepCopy() {
-		final RoadInvestmentState result = new RoadInvestmentState(
-				this.population, this.vectorRepresentation, this.betaPay,
-				this.betaAlloc,
-				// this.avgScore,
-				this.rnd);
-		return result;
-	}
+//	@Override
+//	public RoadInvestmentState deepCopy() {
+//		// final RoadInvestmentState result = new RoadInvestmentState(
+//		// this.population, this.vectorRepresentation, this.betaPay,
+//		// this.betaAlloc,
+//		// // this.avgScore,
+//		// this.rnd);
+//		// return result;
+//		return new RoadInvestmentState(this);
+//	}
 
 	@Override
 	public Vector getReferenceToVectorRepresentation() {
@@ -119,37 +138,41 @@ public class RoadInvestmentState // implements
 	//
 	// }
 
-	@Override
-	public void takeOverConvexCombination(
-			final List<RoadInvestmentState> states, final List<Double> weights) {
-
-		// >>>>> TODO taken out person references >>>>>
-		// TODO !!! This means that there is no convex population combination !!!
-		// super.takeOverConvexCombination(states, weights);
-		// <<<<< TODO taken out person references <<<<<
-
-		this.vectorRepresentation.clear();
-		this.betaPay = 0.0;
-		this.betaAlloc = 0.0;
-		this.avgScore = 0.0;
-
-		for (int i = 0; i < states.size(); i++) {
-			final RoadInvestmentState state = states.get(i);
-			final double weight = weights.get(i);
-			this.vectorRepresentation.add(
-					state.getReferenceToVectorRepresentation(), weight);
-			this.betaPay += state.getBetaPay() * weight;
-			this.betaAlloc += state.getBetaAlloc() * weight;
-			this.avgScore += state.getAvgScore() * weight;
-		}
-	}
+//	@Override
+//	public void takeOverConvexCombination(
+//			final List<RoadInvestmentState> states, final List<Double> weights) {
+//
+//		// >>>>> TODO taken out person references >>>>>
+//		// TODO !!! This means that there is no convex population combination
+//		this.populationState = null;
+//		// super.takeOverConvexCombination(states, weights);
+//		// <<<<< TODO taken out person references <<<<<
+//
+//		this.vectorRepresentation.clear();
+//		this.betaPay = 0.0;
+//		this.betaAlloc = 0.0;
+//		this.avgScore = 0.0;
+//
+//		for (int i = 0; i < states.size(); i++) {
+//			final RoadInvestmentState state = states.get(i);
+//			final double weight = weights.get(i);
+//			this.vectorRepresentation.add(
+//					state.getReferenceToVectorRepresentation(), weight);
+//			this.betaPay += state.getBetaPay() * weight;
+//			this.betaAlloc += state.getBetaAlloc() * weight;
+//			this.avgScore += state.getAvgScore() * weight;
+//		}
+//	}
 
 	@Override
 	public void implementInSimulation() {
-		// >>>>> TODO taken out person references >>>>>
-		super.implementInSimulation();
-		// <<<<< TODO taken out person references <<<<<
-		// throw new UnsupportedOperationException();
+		this.populationState.implementInSimulation();
 	}
+
+//	@Override
+//	public void releaseDeepMemory() {
+//		this.populationState = null;
+//		// super.releaseDeepMemory();
+//	}
 
 }
