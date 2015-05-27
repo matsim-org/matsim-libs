@@ -71,7 +71,9 @@ public class QVehicle extends QItem implements MobsimVehicle {
 		if (capacity == null) {
 			this.passengerCapacity = 4;
 			if (warnCount < 10) {
-				log.warn("No VehicleCapacity set in Vehicle. Using default value of 4.");
+				log.warn("No VehicleCapacity (= maximum number of passengers) set in Vehicle. "
+						+ "Using default value of 4.  This is only a problem if you need vehicles with different "
+						+ "capacities, e.g. for minibuses.");
 				warnCount++;
 				if ( warnCount == 10 ) {
 					log.warn( Gbl.FUTURE_SUPPRESSED ) ;

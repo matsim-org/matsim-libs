@@ -43,8 +43,8 @@ import com.google.inject.Inject;
  * @author nagel
  *
  */
-public class RunCarsharingTests {
-	private final static Logger log = Logger.getLogger( RunCarsharingTests.class ) ;
+public class RunCarsharingTest {
+	private final static Logger log = Logger.getLogger( RunCarsharingTest.class ) ;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 

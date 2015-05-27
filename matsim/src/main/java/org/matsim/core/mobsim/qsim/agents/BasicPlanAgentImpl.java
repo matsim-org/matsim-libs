@@ -26,6 +26,7 @@ import org.matsim.core.mobsim.framework.VehicleUsingAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -55,7 +56,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 
 	public BasicPlanAgentImpl(Plan plan2, Scenario scenario, EventsManager events, MobsimTimer simTimer) {
 
-		this.plan = plan2 ;
+		this.plan = PopulationUtils.unmodifiablePlan(plan2) ;
 		// yy MZ suggests, and I agree, to always give the agent a full plan, and consume that plan as the agent goes.  kai, nov'14
 
 		this.scenario = scenario ;

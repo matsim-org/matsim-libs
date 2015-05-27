@@ -78,7 +78,7 @@ public class KNBangBang {
 		public Mobsim get() {
 			QSim qsim = QSimUtils.createDefaultQSim( scenario, events ) ;
 			
-			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouterFactory.get()));
+//			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouterFactory.get()));
 			
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qsim);
 			OTFClientLive.run(scenario.getConfig(), server);
