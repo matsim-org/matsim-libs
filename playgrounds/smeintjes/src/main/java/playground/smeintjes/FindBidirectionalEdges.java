@@ -26,8 +26,8 @@ import playground.southafrica.utilities.Header;
  * This is done to create two edge lists for ISMAGS: one containing all uni-
  * directional edges, and one containing all bidirectional edges.
  * 
- * @param String the input file name including extension (.txt)
- * @param String the path to the input and output files, including trailing "/"
+ * @param String path to the input file name including extension (.txt)
+ * @param String the path to the folder where output files will be written, including trailing "/"
  * @param String the separator separating the source and destination nodes in the
  * INPUT edge list
  * @param String the separator that should be used in the OUTPUT edge lists.
@@ -93,7 +93,7 @@ public class FindBidirectionalEdges {
 		}
 		edgeList.removeAll(toRemoveList);
 		writeOutput(bidirectionalList, path, "bidirectional.txt", outputSeparator);
-		writeOutput(edgeList, path, "unidirectional.txt", outputSeparator);
+		writeOutput(edgeList, path, "onedirectional.txt", outputSeparator);
 		
 		
 	}
@@ -104,7 +104,7 @@ public class FindBidirectionalEdges {
 		log.info("Writing " + fileName + " to file.");
 		try {
 			BufferedWriter output = new BufferedWriter(
-					new FileWriter(new File(inputPath + "/" + fileName)));
+					new FileWriter(new File(inputPath + fileName)));
 			try {
 					for (Tuple<Integer, Integer> edge : edgeList) {
 						String source = Integer.toString(edge.getFirst());
@@ -137,11 +137,11 @@ public class FindBidirectionalEdges {
 	public static List<Tuple<Integer, Integer>> readInputList(String inputEdgeList,
 			String path, String separator) {
 		
-		log.info("Reading edge list list from " + path + inputEdgeList);
+		log.info("Reading edge list list from " + inputEdgeList);
 		List<Tuple<Integer, Integer>> edgeList = new ArrayList<Tuple<Integer, Integer>>();
 		
 		try {
-			BufferedReader br = IOUtils.getBufferedReader(path + "/" + inputEdgeList);
+			BufferedReader br = IOUtils.getBufferedReader(inputEdgeList);
 			String lines;
 			while ((lines = br.readLine()) != null) {
 				String[] inputString = lines.split(separator);
