@@ -61,7 +61,6 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	
 	private final Scenario scenario;
 	private final EventsManager events;
-	private final CharyparNagelScoringParameters params;
 	
 	private double amountSum = 0.;
 	
@@ -72,17 +71,22 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	private Map<Id<Person>, String> personId2currentActivityType = new HashMap<Id<Person>, String>();
 	private Map<Id<Person>, String> personId2firstActivityType = new HashMap<Id<Person>, String>();
 
+	private MarginalSumScoringFunction marginaSumScoringFunction;
+	
 	public AdvancedMarginalCongestionPricingHandler(EventsManager eventsManager, Scenario scenario) {
+		log.info("Using different VTTS to translate delays into monetary units. Computing the actual activity delay costs for each agent.");
+		
 		this.events = eventsManager;
 		this.scenario = scenario;
 		
-		params = new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore());
-		log.info("Using different VTTS to translate delays into monetary units. Computing the actual activity delay costs for each agent. Version C.");
+		this.marginaSumScoringFunction = new MarginalSumScoringFunction(new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore()));
 	}
 
 	@Override
 	public void reset(int iteration) {
+		
 		incompletedPlanWarning = 0;
+		
 		this.amountSum = 0.;
 		this.personId2currentActivityStartTime.clear();
 		this.affectedPersonId2congestionEventsToProcess.clear();
@@ -127,7 +131,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			// This is not the first activity...
 						
 			// ... now process all congestion events thrown during the trip to the activity which has just ended, ...
-			processCongestionEvents(event.getPersonId(), event.getTime(), event.getLinkId());
+			processCongestionEventsForAffectedPerson(event.getPersonId(), event.getTime(), event.getLinkId());
 			
 			// ... update the status of the 'current' activity...
 			this.personId2currentActivityType.remove(event.getPersonId());
@@ -150,13 +154,11 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	 */
 	public void processFinalCongestionEvents() {
 		for (Id<Person> affectedPersonId : this.affectedPersonId2congestionEventsToProcess.keySet()) {
-			for (CongestionEvent congestionEvent : this.affectedPersonId2congestionEventsToProcess.get(affectedPersonId)) {			
-				processCongestionEvents(congestionEvent.getAffectedAgentId(), Time.UNDEFINED_TIME, null);
-			}
+			processCongestionEventsForAffectedPerson(affectedPersonId, Time.UNDEFINED_TIME, null);
 		}
 	}
 	
-	private void processCongestionEvents(Id<Person> personId, double activityEndTime, Id<Link> linkId) {
+	private void processCongestionEventsForAffectedPerson(Id<Person> personId, double activityEndTime, Id<Link> linkId) {
 		
 		// First, compute the agent's total (affected) delay from the previous trip.
 		double totalDelayThisPerson = 0.0;
@@ -167,7 +169,6 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		if (totalDelayThisPerson > 0.) {
 			// The agent was delayed on the previous trip...
 			// ... now calculate the agent's disutility from being late at the current activity: score(arrivalTime_ohneDelay) - score(arrivalTime_withDelay)			
-			MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction();
 			double activityDelayDisutility = 0.;
 			
 			// First, check if the plan completed is completed, i.e. if the agent has arrived at an activity (after being delayed)
@@ -185,7 +186,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 					ActivityImpl activityEvening = new ActivityImpl(this.personId2currentActivityType.get(personId), linkId);
 					activityEvening.setStartTime(this.personId2currentActivityStartTime.get(personId));
 						
-					activityDelayDisutility = marginaSumScoringFunction.getOvernightActivityDelayDisutility(params, activityMorning, activityEvening, totalDelayThisPerson);
+					activityDelayDisutility = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activityMorning, activityEvening, totalDelayThisPerson);
 					
 				} else {
 					// The activity has an end time indicating a 'normal' activity.
@@ -193,7 +194,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 					ActivityImpl activity = new ActivityImpl(this.personId2currentActivityType.get(personId), linkId);
 					activity.setStartTime(this.personId2currentActivityStartTime.get(personId));
 					activity.setEndTime(activityEndTime);	
-					activityDelayDisutility = marginaSumScoringFunction.getNormalActivityDelayDisutility(params, activity, totalDelayThisPerson);
+					activityDelayDisutility = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity, totalDelayThisPerson);
 				}
 				
 			} else {
@@ -202,14 +203,14 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 				if (incompletedPlanWarning <= 10) {
 					log.warn("Agent " + personId + " has not yet completed the plan/trip (the agent is probably stucking). Cannot compute the disutility of being late at this activity. "
 							+ "Something like the disutility of not arriving at the activity is required. Try to avoid this by setting a smaller stuck time period.");
-					log.warn("Setting the disutilty of being delayed on the previous trip using the config parameters; assuming the marginal disutility of being delayed at the (hypothetical) activity to be equal to beta_performing: " + this.params.marginalUtilityOfPerforming_s);
+					log.warn("Setting the disutilty of being delayed on the previous trip using the config parameters; assuming the marginal disutility of being delayed at the (hypothetical) activity to be equal to beta_performing: " + this.scenario.getConfig().planCalcScore().getPerforming_utils_hr());
 				
 					if (incompletedPlanWarning == 10) {
 						log.warn("Additional warnings of this type are suppressed.");
 					}
 					incompletedPlanWarning++;
 				}
-				activityDelayDisutility = (totalDelayThisPerson) * this.params.marginalUtilityOfPerforming_s;
+				activityDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().planCalcScore().getPerforming_utils_hr();
 			}
 			
 			// Calculate the agent's trip delay disutility (could be done similar to the activity delay disutility).

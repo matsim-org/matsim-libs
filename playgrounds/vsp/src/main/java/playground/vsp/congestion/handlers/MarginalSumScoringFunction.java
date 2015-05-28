@@ -32,13 +32,21 @@ import org.matsim.core.utils.misc.Time;
 public class MarginalSumScoringFunction {
 //	private final static Logger log = Logger.getLogger(MarginalSumScoringFunction.class);
 	
-	public final double getNormalActivityDelayDisutility(CharyparNagelScoringParameters params, Activity activity, double delay) {
+	CharyparNagelActivityScoring activityScoringA;
+	CharyparNagelActivityScoring activityScoringB;
+	
+	public MarginalSumScoringFunction(CharyparNagelScoringParameters params) {
+		activityScoringA = new CharyparNagelActivityScoring(params);
+		activityScoringB = new CharyparNagelActivityScoring(params);
+	}
+
+	public final double getNormalActivityDelayDisutility(Activity activity, double delay) {
 		
-		SumScoringFunction delegateA = new SumScoringFunction() ;
-		delegateA.addScoringFunction(new CharyparNagelActivityScoring(params));
+		SumScoringFunction sumScoringA = new SumScoringFunction() ;
+		sumScoringA.addScoringFunction(activityScoringA);
 		
-		SumScoringFunction delegateB = new SumScoringFunction() ;
-		delegateB.addScoringFunction(new CharyparNagelActivityScoring(params));
+		SumScoringFunction sumScoringB = new SumScoringFunction() ;
+		sumScoringB.addScoringFunction(activityScoringB);
 			
 		if (activity.getStartTime() != Time.UNDEFINED_TIME && activity.getEndTime() != Time.UNDEFINED_TIME) {
         	// activity is not the first and not the last activity
@@ -46,8 +54,8 @@ public class MarginalSumScoringFunction {
         	throw new RuntimeException("Missing start or end time! The provided activity is probably the first or last activity. Aborting...");
         }
 
-		double scoreA0 = delegateA.getScore();
-		double scoreB0 = delegateB.getScore();
+		double scoreA0 = sumScoringA.getScore();
+		double scoreB0 = sumScoringB.getScore();
 
 		Activity activityWithoutDelay = new ActivityImpl(activity);
 		activityWithoutDelay.setStartTime(activity.getStartTime() - delay);
@@ -55,14 +63,14 @@ public class MarginalSumScoringFunction {
 //		log.info("activity: " + activity.toString());
 //		log.info("activityWithoutDelay: " + activityWithoutDelay.toString());
 		
-		delegateA.handleActivity(activity);
-		delegateB.handleActivity(activityWithoutDelay);
+		sumScoringA.handleActivity(activity);
+		sumScoringB.handleActivity(activityWithoutDelay);
 
-		delegateA.finish();
-		delegateB.finish();
+		sumScoringA.finish();
+		sumScoringB.finish();
 		
-		double scoreA1 = delegateA.getScore();
-		double scoreB1 = delegateB.getScore();
+		double scoreA1 = sumScoringA.getScore();
+		double scoreB1 = sumScoringB.getScore();
 		
 		double scoreWithDelay = scoreA1 - scoreA0;
 		double scoreWithoutDelay = scoreB1 - scoreB0;
@@ -71,13 +79,13 @@ public class MarginalSumScoringFunction {
 		return activityDelayDisutility;	
 	}
 	
-	public final double getOvernightActivityDelayDisutility(CharyparNagelScoringParameters params, Activity activityMorning, Activity activityEvening, double delay) {
+	public final double getOvernightActivityDelayDisutility(Activity activityMorning, Activity activityEvening, double delay) {
 		
 		SumScoringFunction delegateA = new SumScoringFunction() ;
-		delegateA.addScoringFunction(new CharyparNagelActivityScoring(params));
+		delegateA.addScoringFunction(activityScoringA);
 		
 		SumScoringFunction delegateB = new SumScoringFunction() ;
-		delegateB.addScoringFunction(new CharyparNagelActivityScoring(params));
+		delegateB.addScoringFunction(activityScoringB);
 		
         if (activityMorning.getStartTime() == Time.UNDEFINED_TIME && activityMorning.getEndTime() != Time.UNDEFINED_TIME) {
         	// 'morningActivity' is the first activity

@@ -78,7 +78,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(plansCalcScoreConfigGroup);
 
-		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction();
+		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
 		Id<Link> linkId = null;
 		
@@ -87,7 +87,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		activity1.setStartTime(10 * 3600.);
 		activity1.setEndTime(16 * 3600.);
 		double delay1 = 0 * 3600.;
-		double activityDelayDisutility1 = marginaSumScoringFunction.getNormalActivityDelayDisutility(params, activity1, delay1);
+		double activityDelayDisutility1 = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity1, delay1);
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility1, MatsimTestUtils.EPSILON);
 
 		// test if a delay results in zero activity delay disutility if the agent would have arrived to late at the activity location anyway
@@ -95,7 +95,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		activity2.setStartTime(19 * 3600.);
 		activity2.setEndTime(20 * 3600.);
 		double delay2 = 0.5 * 3600.;
-		double activityDelayDisutility2 = marginaSumScoringFunction.getNormalActivityDelayDisutility(params, activity2, delay2);
+		double activityDelayDisutility2 = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity2, delay2);
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility2, MatsimTestUtils.EPSILON);
 	
 		// test if a delay results in zero activity delay disutility if the agent would have arrived to early at the activity location anyway
@@ -103,7 +103,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		activity3.setStartTime(4 * 3600.);
 		activity3.setEndTime(5 * 3600.);
 		double delay3 = 0.5 * 3600.;
-		double activityDelayDisutility3 = marginaSumScoringFunction.getNormalActivityDelayDisutility(params, activity3, delay3);
+		double activityDelayDisutility3 = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity3, delay3);
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility3, MatsimTestUtils.EPSILON);
 		
 		// test if a delay results in the right activity delay disutility if the agent would have had more time to perform the activity
@@ -111,10 +111,16 @@ public class AdvancedMarginalCongestionPricingTest {
 		activity4.setStartTime(10 * 3600.);
 		activity4.setEndTime(16 * 3600.);
 		double delay4 = 1 * 3600.;
-		double activityDelayDisutility4 = marginaSumScoringFunction.getNormalActivityDelayDisutility(params, activity4, delay4);
+		double activityDelayDisutility4 = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity4, delay4);
 		// 6 hours --> 65.549424473781 utils
 		// 5 hours --> 60 utils
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 5.549424473781310, activityDelayDisutility4, MatsimTestUtils.EPSILON);
+		
+		// repeat the previous test: test if a delay results in the right activity delay disutility if the agent would have had more time to perform the activity
+		double activityDelayDisutility4b = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity4, delay4);
+		// 6 hours --> 65.549424473781 utils
+		// 5 hours --> 60 utils
+		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 5.549424473781310, activityDelayDisutility4b, MatsimTestUtils.EPSILON);
 	}
 	
 	// test overnight activities with first and last activity of the same type
@@ -132,7 +138,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(plansCalcScoreConfigGroup);
 
-		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction();
+		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
 		Id<Link> linkId = null;
 		
@@ -143,17 +149,23 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		// test if zero delay results in zero activity delay disutility
 		double delay1 = 0 * 3600.;
-		double activityDelayDisutility1 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(params, activity1, activity2, delay1);
+		double activityDelayDisutility1 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activity1, activity2, delay1);
 		// 6 + 7 hours --> 65.763074952494600 utils
 		// 6 + 7 hours --> 65.763074952494600 utils
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility1, MatsimTestUtils.EPSILON);
 	
 		// test if a delay results in the right activity delay disutility
 		double delay2 = 1 * 3600.;
-		double activityDelayDisutility2 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(params, activity1, activity2, delay2);
+		double activityDelayDisutility2 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activity1, activity2, delay2);
 		// 6 + 7 hours --> 65.763074952494600 utils
 		// 7 + 7 hours --> 71.098848947562600 utils
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 5.335773995067980, activityDelayDisutility2, MatsimTestUtils.EPSILON);
+		
+		// repeat the previous test: test if a delay results in the right activity delay disutility
+		double activityDelayDisutility2b = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activity1, activity2, delay2);
+		// 6 + 7 hours --> 65.763074952494600 utils
+		// 7 + 7 hours --> 71.098848947562600 utils
+		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 5.335773995067980, activityDelayDisutility2b, MatsimTestUtils.EPSILON);
 	}
 	
 	// test overnight activities with first and last activity of different types
@@ -177,7 +189,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
 		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(plansCalcScoreConfigGroup);
 
-		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction();
+		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
 		Id<Link> linkId = null;
 		
@@ -188,14 +200,14 @@ public class AdvancedMarginalCongestionPricingTest {
 		
 		// test if zero delay results in zero activity delay disutility
 		double delay1 = 0 * 3600.;
-		double activityDelayDisutility1 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(params, activity1, activity2, delay1);
+		double activityDelayDisutility1 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activity1, activity2, delay1);
 		// 6 --> 10.0934029996839 utils + 7 --> 21.1922519472465 utils = 31.285654946930 utils
 		// 6 --> 10.0934029996839 utils + 7 --> 21.1922519472465 utils = 31.285654946930 utils
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 0., activityDelayDisutility1, MatsimTestUtils.EPSILON);
 	
 		// test if a delay results in the right activity delay disutility
 		double delay2 = 1 * 3600.;
-		double activityDelayDisutility2 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(params, activity1, activity2, delay2);
+		double activityDelayDisutility2 = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activity1, activity2, delay2);
 		// 6 --> 10.0934029996839 utils + 7 --> 21.1922519472465 utils = 31.285654946930 utils
 		// 7 --> 21.1922519472465 utils + 7 --> 21.1922519472465 utils = 42.3845038944931 utils
 		Assert.assertEquals("Wrong disutility from starting an activity with a delay (arriving later at the activity location).", 11.0988489475631, activityDelayDisutility2, MatsimTestUtils.EPSILON);
@@ -253,6 +265,10 @@ public class AdvancedMarginalCongestionPricingTest {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 		
+		// test if there is only one congestion event and only one money event
+		Assert.assertEquals("Wrong number of congestion events.", 1, congestionEvents.size());
+		Assert.assertEquals("Wrong number of money events.", 1, moneyEvents.size());
+
 		// test if the delay is 2 seconds
 		double delay = congestionEvents.get(0).getDelay();
 		Assert.assertEquals("Wrong delay.", 2.0, delay, MatsimTestUtils.EPSILON);
@@ -317,7 +333,11 @@ public class AdvancedMarginalCongestionPricingTest {
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
-				
+		
+		// test if there is only one congestion event and only one money event
+		Assert.assertEquals("Wrong number of congestion events.", 1, congestionEvents.size());
+		Assert.assertEquals("Wrong number of money events.", 1, moneyEvents.size());
+
 		// test if the delay is 2 seconds
 		double delay = congestionEvents.get(0).getDelay();
 		Assert.assertEquals("Wrong delay.", 2.0, delay, MatsimTestUtils.EPSILON);
@@ -336,4 +356,122 @@ public class AdvancedMarginalCongestionPricingTest {
 		double amount = (-1) * (activityDelayDisutility + tripDelayDisutility) / controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 		Assert.assertEquals("Wrong amount.", amount, amountFromEvent, MatsimTestUtils.EPSILON);	
 	 }	
+	
+	// test if the right number of money events are thrown
+	@Test
+	public final void test3(){
+		
+		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config3.xml";
+
+		Controler controler = new Controler(configFile);
+		
+		EventsManager events = controler.getEvents();
+				
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+		final List<PersonMoneyEvent> moneyEvents = new ArrayList<PersonMoneyEvent>();
+
+		events.addHandler( new CongestionEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(CongestionEvent event) {
+//				System.out.println(event.toString());
+				congestionEvents.add(event);
+			}	
+		});
+				
+		events.addHandler( new PersonMoneyEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(PersonMoneyEvent event) {
+//				System.out.println(event.toString());
+				moneyEvents.add(event);
+			}	
+		});
+		
+		TollHandler tollHandler = new TollHandler(controler.getScenario());
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+			}
+		});
+
+		controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.run();
+		
+		// test if there are three congestion events and three money events
+		Assert.assertEquals("Wrong number of congestion events.", 3, congestionEvents.size());
+		Assert.assertEquals("Wrong number of money events.", 3, moneyEvents.size());
+	 }
+	
+	// test if the right number of money events are thrown
+	@Test
+	public final void test4(){
+		
+		String configFile = testUtils.getPackageInputDirectory() + "AdvancedMarginalCongestionPricingTest/config4.xml";
+
+		Controler controler = new Controler(configFile);
+		
+		EventsManager events = controler.getEvents();
+				
+		final List<CongestionEvent> congestionEvents = new ArrayList<CongestionEvent>();
+		final List<PersonMoneyEvent> moneyEvents = new ArrayList<PersonMoneyEvent>();
+
+		events.addHandler( new CongestionEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(CongestionEvent event) {
+				System.out.println(event.toString());
+				congestionEvents.add(event);
+			}	
+		});
+				
+		events.addHandler( new PersonMoneyEventHandler() {
+
+			@Override
+			public void reset(int iteration) {				
+			}
+
+			@Override
+			public void handleEvent(PersonMoneyEvent event) {
+				System.out.println(event.toString());
+				moneyEvents.add(event);
+			}	
+		});
+		
+		TollHandler tollHandler = new TollHandler(controler.getScenario());
+		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
+		controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+			}
+		});
+
+		controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+
+		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.run();
+		
+		// test if there are three congestion events and three money events
+		Assert.assertEquals("Wrong number of congestion events.", 3, congestionEvents.size());
+		Assert.assertEquals("Wrong number of money events.", 3, moneyEvents.size());
+	 }
 }
