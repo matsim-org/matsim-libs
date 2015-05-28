@@ -203,6 +203,9 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			}
 			else if (previousPlanElement instanceof Leg &&  (nextPlanElement instanceof Leg)) {
 				// (we are a leg between legs.  yy no idea what this means?!?!) 
+				// sometimes I encounter legs between the activities on the same link
+				// this in turn can be a subtour and router will produce walk_leg carsharing_leg walk_leg as a result
+				// in order to avoid errors, an empty car leg is created	balac, may'15
 				initializeTwoWayCarsharingEmptyCarLeg(startLinkTW, now);
 			}
 			else if (nextPlanElement instanceof Leg) {
@@ -252,7 +255,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		GenericRouteImpl walkRoute = new GenericRouteImpl(startLink.getId(), destinationLink.getId());
 		walkLeg.setRoute(walkRoute);
 
-		walkRoute.setTravelTime((int) ((CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord()) * beelineFactor) / walkSpeed));
+		walkRoute.setTravelTime( ((CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord()) * beelineFactor) / walkSpeed));
 		// yy why "int"???  kai, may'15
 		
 		walkRoute.setDistance(CoordUtils.calcDistance(startLink.getCoord(), destinationLink.getCoord()) * beelineFactor);	
