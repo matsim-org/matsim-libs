@@ -255,10 +255,14 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			String allDayCarRoutesOfPerson = "";
 			Id<Vehicle> idV = Id.create("car_" + id.toString(), Vehicle.class);
 			Boolean containsCar = false;
-			
+			Boolean firstCarLeg = true;
+			Double carDeparture = null;
 			while (act != lastAct){
 				if (leg.getMode().equals("car")){
 					containsCar = true;
+					if (firstCarLeg)
+						carDeparture = act.getEndTime();
+					firstCarLeg = false;
 //					Id<Vehicle> idV = Id.create("car_" + id.toString()/* + "_" + nextAct.getType()*/, Vehicle.class);
 
 					String route = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds().toString();
@@ -290,7 +294,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 				}
 			}
 			if (containsCar){
-				VehicleInformation vehInfo = new VehicleInformation(idV, vehTypeCar, pli.getFirstActivity().getEndTime(), allDayCarRoutesOfPerson, carStops);
+				VehicleInformation vehInfo = new VehicleInformation(idV, vehTypeCar, carDeparture, allDayCarRoutesOfPerson, carStops);
 				vehicles2BSorted.put(idV, vehInfo);
 			}
 		}
