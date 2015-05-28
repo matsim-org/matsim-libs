@@ -53,7 +53,9 @@ import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.*;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -63,7 +65,7 @@ import static java.lang.Math.*;
 /**
  * Created by fouriep on 5/7/15.
  */
-public class TransitQueryEngineForR {
+public class TransitQueryEngineForR implements Serializable {
     static double minimumAngleDefiningIntersection = toRadians(1);
     Scenario scenario;
     private AtomicInteger numThreads;
@@ -79,6 +81,8 @@ public class TransitQueryEngineForR {
     private Map<Link, Set<ActivityFacility>> links2Facilities = new HashMap<>();
     private int rateCalculationWindowSize;
     private boolean isWeightedAverageValues;
+    private double sampleSizeMultiplierOfActivities = 4;
+    private double timePeriodForRates = 3600;
 
     public TransitQueryEngineForR(int threads, double densityDistance) {
         this(densityDistance);
@@ -94,7 +98,7 @@ public class TransitQueryEngineForR {
     }
 
     public static void main(String[] args) {
-        TransitQueryEngineForR transitQueryEngineForR = new TransitQueryEngineForR(4, 564);
+        TransitQueryEngineForR transitQueryEngineForR = new TransitQueryEngineForR(8, sqrt(1000000 / PI));
         transitQueryEngineForR.loadNetwork(args[0]);
         transitQueryEngineForR.loadTransitSchedule(args[1]);
         transitQueryEngineForR.loadNodeAttrs(args[2]);
@@ -127,14 +131,45 @@ public class TransitQueryEngineForR {
 
 //        double[] interStopDistances = convertDouble(transitQueryEngineForR.getInterStopDistances(from, to, routes, lines));
 //        double[] interStopDistances2 = convertDouble(transitQueryEngineForR.getInterStopDistancesMultiThreaded(from, to, routes, lines));
-        for (int i = 0; i < 100; i++) {
-            transitQueryEngineForR.setIsWeightedAverageValues(!transitQueryEngineForR.isWeightedAverageValues());
-            transitQueryEngineForR.calculateStopStopInfo(from, to, routes, lines, times);
-            System.out.printf("%d..", i);
-        }
+//        for (int i = 0; i < 100; i++) {
+        transitQueryEngineForR.setIsWeightedAverageValues(!transitQueryEngineForR.isWeightedAverageValues());
+        transitQueryEngineForR.calculateStopStopInfo(from, to, routes, lines, times);
+        transitQueryEngineForR.calculateStopStopInfo("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/java.enquiry.input.txt", 10000);
+//        transitQueryEngineForR.writeReport("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/networkinfo.txt");
+        transitQueryEngineForR.writeReport("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/networkinfo.txt");
+        System.out.printf("");
+//        }
 
 
     }
+
+//    public static TransitQueryEngineForR deserializeThis() {
+//        FileInputStream fis;
+//        ;
+//        try {
+//            fis = new FileInputStream("/home/fouriep/serialized.data");
+//            ObjectInputStream ois = new ObjectInputStream(fis);
+//            TransitQueryEngineForR out = (TransitQueryEngineForR) ois.readObject();
+//            ois.close();
+//            return out;
+//        } catch (ClassNotFoundException | IOException e) {
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+
+//    public static void serializeThis(TransitQueryEngineForR transitQueryEngineForR) throws FileNotFoundException {
+//        FileOutputStream fos = new FileOutputStream("/home/fouriep/serialized.data");
+//        try {
+//            ;
+//            ObjectOutputStream oos = new ObjectOutputStream(fos);
+//            oos.writeObject(transitQueryEngineForR);
+//            oos.flush();
+//            oos.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     public static double[] convertDouble(Double[] dists) {
         double[] out = new double[dists.length];
@@ -205,7 +240,7 @@ public class TransitQueryEngineForR {
         for (FacilityActivityCounter counter : facilityToActivityLevelAtTimeMap.values()) {
             counter.finalizeCounters();
             i++;
-            if (i % (total / 10) == 0)
+            if (total > 10 && i % (total / 10) == 0)
                 System.out.printf("%d/%d..", i, total);
         }
 
@@ -248,7 +283,7 @@ public class TransitQueryEngineForR {
             }
             activityFacilities.add(facility);
             i++;
-            if (i % (total / 10) == 0)
+            if (total > 10 && i % (total / 10) == 0)
                 System.out.printf("%d/%d..", i, total);
         }
 
@@ -552,12 +587,12 @@ public class TransitQueryEngineForR {
         return new double[0];
     }
 
-    public double[] getTotalWeightedDegreesTurned() {
+    public double[] getTotalWeightedRadsTurned() {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
             for (StopToStopInfo s : outList) {
-                out[i] = s.getTotalWeightedDegreesTurned();
+                out[i] = s.getTotalWeightedRadsTurned();
                 i++;
             }
             return out;
@@ -701,6 +736,7 @@ public class TransitQueryEngineForR {
             double[] out = new double[outList.size()];
             for (StopToStopInfo s : outList) {
                 out[i] = s.getAverageActivityDepartureRate();
+                ;
                 i++;
             }
             return out;
@@ -714,6 +750,7 @@ public class TransitQueryEngineForR {
             double[] out = new double[outList.size()];
             for (StopToStopInfo s : outList) {
                 out[i] = s.getAverageActivityCountInProgress();
+                ;
                 i++;
             }
             return out;
@@ -760,6 +797,89 @@ public class TransitQueryEngineForR {
         return new double[0];
     }
 
+    public void writeReport(String file) {
+        BufferedWriter writer = IOUtils.getBufferedWriter(file);
+        int failCount = 0;
+        try {
+            writer.write(
+                    "fromX\t" +
+                            "fromy\t" +
+                            "toX\t" +
+                            "toY\t" +
+                            "dist\t" +
+                            "euclideanDist\t" +
+                            "noCarDist\t" +
+                            "freeSpeedTime\t" +
+                            "minCap\t" +
+                            "wAvgCap\t" +
+                            "wAvgLanes\t" +
+                            "squeezeCap\t" +
+                            "nodeCount\t" +
+                            "intersections\t" +
+                            "intDensity\t" +
+                            "wAvIntComplex\t" +
+                            "totIntComplex\t" +
+                            "rTurnsMadeAtInt\t" +
+                            "lTurnsMadeAtInt\t" +
+                            "rTurnsPassed\t" +
+                            "lTurnsPassed\t" +
+                            "intsWRightTurnPassed\t" +
+                            "intsWLeftTurnPassed\t" +
+                            "trafficControlCount\t" +
+                            "tortuosity\t" +
+                            "avgActArrRate\t" +
+                            "avgActDepRate\t" +
+                            "avgActInProg\t" +
+                            "avgActGrowthRate\t" +
+                            "avgActTurnOverRate\n");
+            for (StopToStopInfo s : outList) {
+                if (!s.isSuccess()) {
+                    failCount++;
+                    for (int i = 0; i < 29; i++) {
+                        writer.write("-1\t");
+                    }
+                    writer.write("-1\n");
+                    continue;
+                }
+                writer.write(String.valueOf(s.getFromCoord().getX()) + "\t");
+                writer.write(String.valueOf(s.getFromCoord().getY()) + "\t");
+                writer.write(String.valueOf(s.getToCoord().getX()) + "\t");
+                writer.write(String.valueOf(s.getToCoord().getY()) + "\t");
+                writer.write(String.valueOf(s.getDistance()) + "\t");
+                writer.write(String.valueOf(s.getEuclideanDistance()) + "\t");
+                writer.write(String.valueOf(s.getNoCarsDistance()) + "\t");
+                writer.write(String.valueOf(s.getFreeSpeedTravelTime()) + "\t");
+                writer.write(String.valueOf(s.getMinCap()) + "\t");
+                writer.write(String.valueOf(s.getLengthWeightedAverageCapacity()) + "\t");
+                writer.write(String.valueOf(s.getLengthWeightedAverageLaneCount()) + "\t");
+                writer.write(String.valueOf(s.getSqueezeCap()) + "\t");
+                writer.write(String.valueOf(s.getNodeCount()) + "\t");
+                writer.write(String.valueOf(s.getIntersectionCount()) + "\t");
+                writer.write(String.valueOf(s.getInterSectionDensity()) + "\t");
+                writer.write(String.valueOf(s.getWeightedAvgIntersectionComplexity()) + "\t");
+                writer.write(String.valueOf(s.getTotalIntersectionComplexity()) + "\t");
+                writer.write(String.valueOf(s.getRightTurnsMadeAtIntersections()) + "\t");
+                writer.write(String.valueOf(s.getLeftTurnsMadeAtIntersections()) + "\t");
+                writer.write(String.valueOf(s.getRightTurnsPassedAtIntersection()) + "\t");
+                writer.write(String.valueOf(s.getLeftTurnsPassedAtIntersection()) + "\t");
+                writer.write(String.valueOf(s.getIntersectionsWithOneOrMoreRIGHTTurnsPassed()) + "\t");
+                writer.write(String.valueOf(s.getIntersectionsWithOneOrMoreLEFTTurnsPassed()) + "\t");
+                writer.write(String.valueOf(s.getTrafficControlCount()) + "\t");
+                writer.write(String.valueOf(s.getTotalWeightedRadsTurned()) + "\t");
+                writer.write(String.valueOf(s.getAverageActivityArrivalRate()) + "\t");
+                writer.write(String.valueOf(s.getAverageActivityDepartureRate()) + "\t");
+                writer.write(String.valueOf(s.getAverageActivityCountInProgress()) + "\t");
+                writer.write(String.valueOf(s.getAverageActivityGrowthRate()) + "\t");
+                writer.write(String.valueOf(s.getAverageActivityTurnOverRate()) + "\n");
+            }
+            writer.close();
+            System.err.printf("%d out of %d failed to calculate.", failCount, outList.size());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public Double[] getInterStopDistancesMultiThreaded(String[] fromStops, String[] toStops, String[] routes, String[] lines) {
         List<String[]> fromStopsList = CollectionUtils.split(fromStops, threads);
         List<String[]> toStopsList = CollectionUtils.split(toStops, threads);
@@ -798,7 +918,7 @@ public class TransitQueryEngineForR {
         numThreads = new AtomicInteger(threads);
         List<ParallelQueryExtended> queries = new ArrayList<>();
         for (int i = 0; i < threads; i++) {
-            ParallelQueryExtended pq = new ParallelQueryExtended(fromStopsList.get(i), toStopsList.get(i), routesList.get(i), linesList.get(i), timesList.get(i));
+            ParallelQueryExtended pq = new ParallelQueryExtended(fromStopsList.get(i), toStopsList.get(i), routesList.get(i), linesList.get(i), timesList.get(i), i);
             queries.add(pq);
             Thread slaveThread = new Thread(pq);
             slaveThread.setName("slave_" + i);
@@ -816,6 +936,40 @@ public class TransitQueryEngineForR {
         for (ParallelQueryExtended q : queries) {
             outList.addAll(new ArrayList<StopToStopInfo>(Arrays.asList(q.out)));
         }
+    }
+
+    public void calculateStopStopInfo(String fileName, int limit) {
+        ArrayList<String> fromStops = new ArrayList<>(),
+                toStops = new ArrayList<>(),
+                routes = new ArrayList<>(),
+                lines = new ArrayList<>(),
+                times = new ArrayList<>();
+
+        BufferedReader reader = IOUtils.getBufferedReader(fileName);
+        String txt = "";
+        try {
+            while (limit > 0) {
+                txt = reader.readLine();
+                if (txt == null)
+                    break;
+                String[] split = txt.split("\t");
+                fromStops.add(split[0]);
+                toStops.add(split[1]);
+                routes.add(split[2]);
+                lines.add(split[3]);
+                times.add(split[4]);
+                limit--;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String[] from = fromStops.toArray(new String[fromStops.size()]);
+        String[] to = toStops.toArray(new String[toStops.size()]);
+        String[] route = routes.toArray(new String[routes.size()]);
+        String[] line = lines.toArray(new String[lines.size()]);
+        String[] time = times.toArray(new String[times.size()]);
+
+        calculateStopStopInfo(from, to, route, line, time);
     }
 
     public void loadNodeAttrs(String file) {
@@ -928,7 +1082,7 @@ public class TransitQueryEngineForR {
             for (Node node : myNodes) {
                 calculateIntersectionDensityTypeStuff(node);
                 i++;
-                if (i % (total / 10) == 0)
+                if (total > 10 && i % (total / 10) == 0)
                     System.out.printf("%d/%d..", i, total);
             }
             numThreads.decrementAndGet();
@@ -1327,23 +1481,26 @@ public class TransitQueryEngineForR {
         private final String[] routes;
         private final String[] lines;
         private final StopToStopInfo[] out;
+        private final int number;
 
-        public ParallelQueryExtended(String[] fromStops, String[] toStops, String[] routes, String[] lines, String[] times) {
+        public ParallelQueryExtended(String[] fromStops, String[] toStops, String[] routes, String[] lines, String[] times, int i) {
             this.fromStops = fromStops;
             this.toStops = toStops;
             this.routes = routes;
             this.lines = lines;
             this.times = times;
             this.out = new StopToStopInfo[fromStops.length];
+            this.number = i;
         }
 
         @Override
         public void run() {
+            int tot = fromStops.length / 10;
             for (int i = 0; i < fromStops.length; i++) {
                 out[i] = new StopToStopInfo();
                 out[i].setAll(fromStops[i], toStops[i], routes[i], lines[i], times[i]);
-                if (i % 1000 == 0)
-                    System.out.printf(i + "..");
+                if (tot > 0 && i % tot == 0)
+                    System.out.printf("%02d: %06d / %06d\n", number, i, fromStops.length);
             }
             System.err.println(numThreads.decrementAndGet());
         }
@@ -1374,7 +1531,7 @@ public class TransitQueryEngineForR {
         private int intersectionsWithOneOrMoreRIGHTTurnsPassed = 0;
         private double weightedAvgIntersectionComplexity = 0;
         private double totalIntersectionComplexity = 0;
-        private double totalWeightedDegreesTurned = 0;
+        private double totalWeightedRadsTurned = 0;
         private Set<Node> nodesTraversed;
         private double averageFacilityCount;
         private double averageActivityDepartureRate;
@@ -1415,8 +1572,8 @@ public class TransitQueryEngineForR {
             return rightTurnsPassedAtIntersection;
         }
 
-        public double getTotalWeightedDegreesTurned() {
-            return totalWeightedDegreesTurned;
+        public double getTotalWeightedRadsTurned() {
+            return totalWeightedRadsTurned;
         }
 
         public double getInterSectionDensity() {
@@ -1476,23 +1633,23 @@ public class TransitQueryEngineForR {
         }
 
         public double getAverageActivityArrivalRate() {
-            return averageActivityArrivalRate;
+            return averageActivityArrivalRate * timePeriodForRates * sampleSizeMultiplierOfActivities;
         }
 
         public double getAverageActivityDepartureRate() {
-            return averageActivityDepartureRate;
+            return averageActivityDepartureRate * timePeriodForRates * sampleSizeMultiplierOfActivities;
         }
 
         public double getAverageActivityCountInProgress() {
-            return averageActivityCountInProgress;
+            return averageActivityCountInProgress * sampleSizeMultiplierOfActivities;
         }
 
         public double getAverageActivityGrowthRate() {
-            return averageActivityGrowthRate;
+            return averageActivityGrowthRate * timePeriodForRates * sampleSizeMultiplierOfActivities;
         }
 
         public double getAverageActivityTurnOverRate() {
-            return averageActivityTurnOverRate;
+            return averageActivityTurnOverRate * timePeriodForRates * sampleSizeMultiplierOfActivities;
         }
 
         public double getAverageFacilityCount() {
@@ -1537,6 +1694,7 @@ public class TransitQueryEngineForR {
             }
             if (fromLink == null || toLink == null)
                 return false;
+            euclideanDistance = NetworkUtils.getEuclidianDistance(fromLink.getToNode().getCoord(), toLink.getToNode().getCoord());
 
             NetworkRoute networkRoute = scenario.getTransitSchedule().getTransitLines().get(lineId)
                     .getRoutes().get(routeId).getRoute();
@@ -1597,12 +1755,11 @@ public class TransitQueryEngineForR {
                     }
 
                     distance += link.getLength();
-                    euclideanDistance += NetworkUtils.getEuclidianDistance(link.getToNode().getCoord(), link.getFromNode().getCoord());
                     freeSpeedTravelTime += link.getLength() > 0 ? link.getLength() / link.getFreespeed() : 0;
 
                     //link angles
                     if (prevLinkInRoute != null) {
-                        totalWeightedDegreesTurned += sqrt(pow(NetworkAngleUtils.getAngleBetweenLinks(prevLinkInRoute, link), 2));
+                        totalWeightedRadsTurned += sqrt(pow(NetworkAngleUtils.getAngleBetweenLinks(prevLinkInRoute, link), 2));
                         if (interSections.contains(prevLinkInRoute.getToNode().getId())) {
                             boolean passedLeftTurn = false;
                             boolean passedRightTurn = false;
@@ -1658,7 +1815,7 @@ public class TransitQueryEngineForR {
                 lengthWeightedAverageCapacity /= distance;
                 weightedAvgIntersectionComplexity /= max(1, totalIntersectionComplexity);
                 interSectionDensity /= nodeCount;
-                totalWeightedDegreesTurned /= nodeCount;
+                totalWeightedRadsTurned /= nodeCount;
 
                 //calculate activity-related stuff
                 ActivityLevelAggregator aggregator = new ActivityLevelAggregator();
