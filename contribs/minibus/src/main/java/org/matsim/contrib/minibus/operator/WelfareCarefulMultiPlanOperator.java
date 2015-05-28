@@ -77,7 +77,7 @@ public final class WelfareCarefulMultiPlanOperator extends AbstractOperator {
 		// score all plans
 		for (PPlan plan : delegate.getAllPlans()) {
 			scorePlan(driverId2ScoreMap, plan);
-			double welfareCorrection = getWelfareCorrection(plan.getLine());
+			double welfareCorrection = getWelfareCorrection(plan);
 			plan.setScore(plan.getScore() + welfareCorrection);
 			
 			delegate.score += plan.getScore();
@@ -90,8 +90,8 @@ public final class WelfareCarefulMultiPlanOperator extends AbstractOperator {
 		
 	}
 
-	private double getWelfareCorrection(TransitLine line) {
-		return welfareAnalyzer.getLineId2welfareCorrection(line.getId());
+	private double getWelfareCorrection(PPlan plan) {
+		return welfareAnalyzer.getLineId2welfareCorrection(plan.getId());
 	}
 
 	public Id<Operator> getId() {

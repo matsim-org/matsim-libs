@@ -172,7 +172,8 @@ final class PBox implements Operators {
 	void notifyScoring(ScoringEvent event) {
 		
 		if (this.pConfig.getWelfareMaximization()) {
-			welfareAnalyzer.computeWelfare(event.getControler().getScenario());	
+			welfareAnalyzer.computeWelfare(event.getControler().getScenario());
+			welfareAnalyzer.writeToFile(event);
 		}
 		
 		Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();

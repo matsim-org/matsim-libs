@@ -22,10 +22,15 @@
  */
 package org.matsim.contrib.minibus.operator;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,8 +39,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * 
@@ -50,10 +58,14 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 public class WelfareAnalyzer {
 	private static final Logger log = Logger.getLogger(WelfareAnalyzer.class);
 	
-	Map<Id<TransitLine>, Double> lineId2welfareCorreciton = new HashMap<>();
-	Map<Id<Person>, Double> personId2benefitsBefore = new HashMap<>(); // previous iteration	
+	Map<Id<PPlan>, Double> planId2welfareCorrection = new HashMap<>();
+	Map<Id<Person>, Double> personId2benefitsBefore = new HashMap<>(); // previous iteration
+	Map<Id<Person>, Set<Id<PPlan>>> personId2usedPPlanIds = new HashMap<>();
 	
 	public void computeWelfare(Scenario scenario) {
+		
+		// map to store the pplan ids an agent used in this iteration
+		this.personId2usedPPlanIds = new HashMap<Id<Person>, Set<Id<PPlan>>>();
 		
 		Map<Id<Person>, Double> personId2benefits = new HashMap<>();
 		
@@ -66,18 +78,28 @@ public class WelfareAnalyzer {
 			if (this.personId2benefitsBefore.containsKey(person.getId())){
 				double benefitDifference = benefits - this.personId2benefitsBefore.get(person.getId());
 				
-				if (benefitDifference != 0.) {
+				// this had to be disabled because the output could not be created correctly (used pplan ids were not updated)
+//				if (benefitDifference != 0.) {
 					// allocate the difference in user benefits to the transit line
 									
-					List<Id<TransitLine>> usedTransitLines = new ArrayList<>();
+					List<Id<PPlan>> usedTransitLines = new ArrayList<>();
 					for (PlanElement pE : person.getSelectedPlan().getPlanElements()){
 						if (pE instanceof Leg) {
 							Leg leg = (Leg) pE;
 							if (leg.getMode().equals(TransportMode.pt)) {
+
 								ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-								Id<TransitLine> transitLineId = route.getLineId();
-								usedTransitLines.add(transitLineId);
-							} 						
+								String planIdString = route.getRouteId().toString().replace(route.getLineId().toString() + "-", "");
+								Id<PPlan> planId = Id.create(planIdString, PPlan.class);
+								usedTransitLines.add(planId);
+
+								if(!this.personId2usedPPlanIds.containsKey(person.getId())){
+									this.personId2usedPPlanIds.put(person.getId(), new HashSet<Id<PPlan>>());
+								}
+								
+								this.personId2usedPPlanIds.get(person.getId()).add(planId);
+
+							}
 						}
 					}
 					
@@ -87,12 +109,12 @@ public class WelfareAnalyzer {
 					if (!usedTransitLines.isEmpty()) {
 						double benefitDifferenceEachTransitLine = benefitDifference / usedTransitLines.size();
 						
-						for (Id<TransitLine> transitLineId : usedTransitLines) {
-							if (!lineId2welfareCorreciton.containsKey(transitLineId)){
-								lineId2welfareCorreciton.put(transitLineId, 0.);
+						for (Id<PPlan> planId : usedTransitLines) {
+							if (!planId2welfareCorrection.containsKey(planId)){
+								planId2welfareCorrection.put(planId, 0.);
 							}
-							double userBenefitContributionUpdatedValue = lineId2welfareCorreciton.get(transitLineId) + benefitDifferenceEachTransitLine;
-							lineId2welfareCorreciton.put(transitLineId, userBenefitContributionUpdatedValue);
+							double userBenefitContributionUpdatedValue = planId2welfareCorrection.get(planId) + benefitDifferenceEachTransitLine;
+							planId2welfareCorrection.put(planId, userBenefitContributionUpdatedValue);
 						}
 						
 					} else {
@@ -101,7 +123,7 @@ public class WelfareAnalyzer {
 						log.warn("Problem: The increase in user benefits on other modes is not accounted for.");
 						log.warn("Solution: Allocate the changes in user benefits to the transit lines which are 'responsible' for the improvement. Define responsibility by a relevant area around the transit line.");
 					}
-				}
+//				}
 				
 			} else {
 				log.warn("No score from previous (external) iteration. If this is the first (external) iteration everything is fine.");
@@ -110,14 +132,110 @@ public class WelfareAnalyzer {
 		
 		// save the scores for the next iteration
 		personId2benefitsBefore = personId2benefits;
+		
 	}
 	
-	public double getLineId2welfareCorrection(Id<TransitLine> id) {
-		if (this.lineId2welfareCorreciton.containsKey(id)){
-			return this.lineId2welfareCorreciton.get(id);
+	public double getLineId2welfareCorrection(Id<PPlan> id) {
+		if (this.planId2welfareCorrection.containsKey(id)){
+			return this.planId2welfareCorrection.get(id);
 		} else {
 			return 0.;
 		}
+	}
+
+	public void writeToFile(ScoringEvent event) {
+		
+		String delimiter = ";";
+		
+		// agent stats (agent id, benefits of this iteration, pplan ids the agent used in this iteration)
+		BufferedWriter personStatsWriter = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getIterationPath(event.getIteration()) + "/welfarePersonStats." + Integer.toString(event.getIteration()) + ".txt");
+		
+		Map<Id<PPlan>,Set<Id<Person>>> usedPlans = new HashMap<>();
+		
+		try {
+			
+			personStatsWriter.write("personId" + delimiter + "benefits" + delimiter + "used_pplans");
+			
+			for(Entry<Id<Person>, Double> benefitEntry : this.personId2benefitsBefore.entrySet()){
+				
+				personStatsWriter.newLine();
+				
+				String id = benefitEntry.getKey().toString();
+				String score = Double.toString(benefitEntry.getValue());
+				
+				StringBuffer stB = new StringBuffer();
+				Set<Id<PPlan>> usedPPlanIds = this.personId2usedPPlanIds.get(benefitEntry.getKey());
+				if(usedPPlanIds != null){
+					for(Id<PPlan> planId : usedPPlanIds){
+						
+						if(!usedPlans.containsKey(planId)){
+							
+							usedPlans.put(planId, new HashSet<Id<Person>>());
+							
+						}
+						
+						usedPlans.get(planId).add(benefitEntry.getKey());
+						
+						stB.append(planId + ",");
+					}
+				}
+				
+				personStatsWriter.write(id + delimiter + score + delimiter + stB.toString());
+				
+			}
+			
+			personStatsWriter.flush();
+			personStatsWriter.close();
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
+		}
+		
+		//pplan stats (id, revenues from subsidies, agent ids that used the pplan in this iteration)
+		BufferedWriter planStatsWriter = IOUtils.getBufferedWriter(event.getControler().getControlerIO().getIterationPath(event.getIteration()) + "/welfarePPlanStats." + Integer.toString(event.getIteration()) + ".txt");
+		
+		try {
+			
+			planStatsWriter.write("pplan_id" + delimiter + "revenues" + delimiter + "user_ids");
+			
+			for(Entry<Id<PPlan>, Double> entry : this.planId2welfareCorrection.entrySet()){
+				
+				planStatsWriter.newLine();
+				
+				String id = entry.getKey().toString();
+				String value = entry.getValue().toString();
+				StringBuffer stB = new StringBuffer();
+				
+				for(Entry<Id<Person>,Set<Id<PPlan>>> usedPPlanEntry : this.personId2usedPPlanIds.entrySet()){
+					
+					for(Id<PPlan> pplanId : usedPPlanEntry.getValue()){
+						
+						if(pplanId.toString().equals(id)){
+							
+							stB.append(usedPPlanEntry.getKey().toString() + ",");
+							break;
+							
+						}
+						
+					}
+					
+				}
+				
+				planStatsWriter.write(id + delimiter + value + delimiter + stB.toString());
+				
+			}
+			
+			planStatsWriter.flush();
+			planStatsWriter.close();
+		
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
+		}
+				
 	}
 
 }
