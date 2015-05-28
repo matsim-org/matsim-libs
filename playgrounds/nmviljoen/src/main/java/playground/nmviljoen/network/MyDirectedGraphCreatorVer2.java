@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import playground.nmviljoen.network.salience.SampleNetworkBuilder;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
@@ -85,10 +86,13 @@ public class MyDirectedGraphCreatorVer2 {
 				while ((lineNode = br1.readLine()) != null) {
 					String[] nodeData = lineNode.split(",");
 					counterID = Integer.toString(counter);
-					currentNodeId = nodeData[1]; //for road data files
+					currentNodeId = nodeData[1]; //for maritime data files - NAME
+//					currentNodeId = nodeData[1]; //for road data files
 //					currentNodeId = nodeData[0]; //for test data files
-					currentNodeX = Double.parseDouble(nodeData[3]);//for road data files
-					currentNodeY = Double.parseDouble(nodeData[5]);//for road data files
+					currentNodeX = Double.parseDouble(nodeData[3]);//for maritime data files
+					currentNodeY = Double.parseDouble(nodeData[4]);//for maritime data files
+//					currentNodeX = Double.parseDouble(nodeData[3]);//for road data files
+//					currentNodeY = Double.parseDouble(nodeData[5]);//for road data files
 //					currentNodeX = Double.parseDouble(nodeData[1]);//for test data files
 //					currentNodeY = Double.parseDouble(nodeData[2]);//for test data files
 					currentNode = new NmvNode(counterID,currentNodeId,currentNodeX,currentNodeY);
@@ -137,10 +141,13 @@ public class MyDirectedGraphCreatorVer2 {
 				br2 = new BufferedReader(new FileReader(csvFile2));
 				while ((lineLink = br2.readLine()) != null) {
 					String[] linkData = lineLink.split(",");
-					currentLinkId = linkData[1];//for road data
+					currentLinkId = linkData[0];//for maritime data
+//					currentLinkId = linkData[1];//for road data
 //					currentLinkId = linkData[0];//for test data
-					currentFromId =linkData[3];//for road data
-					currentToId =linkData[5];//for road data
+					currentFromId =linkData[1];//for maritime data
+					currentToId =linkData[2];//for maritime data
+//					currentFromId =linkData[3];//for road data
+//					currentToId =linkData[5];//for road data
 //					currentFromId =linkData[1];//for test data
 //					currentToId =linkData[2];//for test data
 					currentLinkWeight = Double.parseDouble(linkData[weightIndex]);   
@@ -148,7 +155,7 @@ public class MyDirectedGraphCreatorVer2 {
 					indexTo = getNode(nodeList,currentToId);
 					currentTransProb = 0;
 					myGraph.addEdge(new NmvLink(currentLinkId,currentLinkWeight,currentTransProb),nodeList.get(indexFrom),nodeList.get(indexTo),EdgeType.DIRECTED);
-					//System.out.println("Edge "+counter1+" added"); //if you want to track progress
+//					System.out.println("Edge "+counter1+" added"); //if you want to track progress
 					counter1++;
 				}
 
@@ -252,6 +259,7 @@ public class MyDirectedGraphCreatorVer2 {
 
 			//distance statistics
 			String distUnweightedFile = args[18];
+			String graphML= args[20];
 
 
 			//String dijkstraFile = args[10];
@@ -283,8 +291,10 @@ public class MyDirectedGraphCreatorVer2 {
 					JungGraphDistance.calculateAndWriteUnweightedDistances(myApp.myGraph, distUnweightedFile);
 
 
-			 myApp.testFiles(myApp.myGraph, graphTestFile, nodeTestFile, linkTestFile);//self-check procedure
-
+//			 myApp.testFiles(myApp.myGraph, graphTestFile, nodeTestFile, linkTestFile);//self-check procedure
+			
+			//Salience
+					SampleNetworkBuilder.writeGraphML(myApp.myGraph, graphML);
 		}
 		//
 		private int getNode(ArrayList<NmvNode> list,String id){
