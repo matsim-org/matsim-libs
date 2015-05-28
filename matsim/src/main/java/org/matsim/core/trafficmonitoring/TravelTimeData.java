@@ -30,6 +30,11 @@ public interface TravelTimeData {
 //	public abstract void resetTravelTime( final int timeSlot ) ;
 
 	abstract void addTravelTime(final int timeSlot, final double traveltime);
+	
+	/**
+	 * A method to set the travel time directly, to handle some special cases.
+	 */
+	abstract void setTravelTime( final int timeSlot, final double traveltime ) ;
 
 	/**Returns the travel time (presumably in seconds), given both the time slot and the time-of-day for the request.
 	 * <p/>

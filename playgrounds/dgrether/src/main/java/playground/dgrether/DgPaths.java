@@ -29,7 +29,8 @@ public interface DgPaths {
 	
 	final String WORKBASE = DATA + "work/";
 
-	final String REPOS = WORKBASE + "repos/";
+//	final String REPOS = WORKBASE + "repos/";
+	final String REPOS = "/Users/nagel/" ;
 
 	final String WSBASE = WORKBASE + "matsimHeadWorkspace/";
 	

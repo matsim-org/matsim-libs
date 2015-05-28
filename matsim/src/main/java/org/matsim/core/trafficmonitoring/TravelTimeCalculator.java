@@ -387,17 +387,11 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 					// if the travel time that has been measured so far is less than that minimum travel time, then do something:
 					if (travelTime < minTravelTime) {
 
-						// these TWO statements effectively set the travel time to the minTravelTime:
-						//						r.resetTravelTime(i) ; // removing that line again since it makes planomat scores _worse_.  Does
-						// not make sense to me ...  Kai, oct'11
-						r.addTravelTime(i, minTravelTime);
+						r.setTravelTime(i, minTravelTime);
+						// (set the travel time to the smallest possible travel time that makes sense according to the argument above)
 
-						prevTravelTime = minTravelTime;
-						// (it seems a bit odd that this remembers "minTravelTime" and not getTravelTime(.,.), since they do
-						// not need to be the same.  kai, oct'11)
-					} else {
-						prevTravelTime = travelTime;
-					}
+					} 
+					prevTravelTime = r.getTravelTime(i, i * this.timeSlice ) ;
 				}
 				data.needsConsolidation = false;
 			}

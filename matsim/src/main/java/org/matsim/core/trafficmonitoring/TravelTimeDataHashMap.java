@@ -52,14 +52,17 @@ public class TravelTimeDataHashMap implements TravelTimeData {
 		this.travelTimes.clear();
 	}
 	
-//	@Override
-//	public void resetTravelTime( final int timeSlice ) {
-//		TimeStruct curr = this.travelTimes.get(IntegerCache.getInteger(timeSlice));
-//		if ( curr != null ) {
-//			this.travelTimes.remove( curr ) ;
-//		}
-//	}
-
+	@Override
+	public void setTravelTime( final int timeSlice, final double traveltime ) {
+		TimeStruct curr = this.travelTimes.get(IntegerCache.getInteger(timeSlice));
+		if (curr != null) {
+			curr.cnt = 1;
+			curr.timeSum = traveltime;
+		} else {
+			this.travelTimes.put(IntegerCache.getInteger(timeSlice), new TimeStruct(traveltime,1));
+		}
+	}
+	
 	@Override
 	public void addTravelTime(final int timeSlice, final double traveltime) {
 		TimeStruct curr = this.travelTimes.get(IntegerCache.getInteger(timeSlice));

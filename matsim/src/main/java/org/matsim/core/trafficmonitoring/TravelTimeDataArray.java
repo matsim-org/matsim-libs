@@ -58,6 +58,14 @@ public class TravelTimeDataArray implements TravelTimeData {
 //		this.timeCnt[timeSlot] = 0;
 //		this.travelTimes[timeSlot] = -1.0;
 //	}
+	
+	@Override
+	public void setTravelTime( final int timeSlot, final double traveltime ) {
+		this.timeSum[timeSlot] = traveltime ;
+		this.timeCnt[timeSlot] = 1 ;
+		this.travelTimes[timeSlot] = traveltime ; // since this is the only travel time, we do not need to trigger the cache consolidation.
+		// if ever some other value is added, the cache is invalidated in addTravelTime. kai/theresa, may'15
+	}
 
 	@Override
 	public void addTravelTime(final int timeSlot, final double traveltime) {

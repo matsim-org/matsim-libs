@@ -13,6 +13,8 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -137,6 +139,11 @@ public class RunBraessWoSignals {
 
 		// adapt output directory
 		config.controler().setOutputDirectory(outputDir);
+		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
+		
+		config.vspExperimental().setWritingOutputEvents(true);
+		
+		config.planCalcScore().setWriteExperiencedPlans(true);
 
 		// adapt number of iterations
 		config.controler().setLastIteration(iterations);
@@ -168,7 +175,8 @@ public class RunBraessWoSignals {
 		for (StrategySettings s : strategySettings) {
 			if (s.getStrategyName().equals("ReRoute")) {
 				s.setWeight(propReRoute);
-				s.setDisableAfter(iterations / 2);
+//				s.setDisableAfter(iterations / 2);
+				s.setDisableAfter(50) ;
 			}
 			if (s.getStrategyName().equals("ChangeExpBeta")) {
 				s.setWeight(propChangeExpBeta);
@@ -182,9 +190,10 @@ public class RunBraessWoSignals {
 		config.strategy().addStrategySettings(keepLastSelectedStrategy);
 
 		StrategySettings selectRandomStrategy = new StrategySettings();
-		selectRandomStrategy.setStrategyName("SelectRandom");
+		selectRandomStrategy.setStrategyName( DefaultSelector.SelectRandom.toString() );
 		selectRandomStrategy.setWeight(propSelectRandom);
-		selectRandomStrategy.setDisableAfter(iterations / 2);
+//		selectRandomStrategy.setDisableAfter(iterations / 2);
+		selectRandomStrategy.setDisableAfter(900);
 		config.strategy().addStrategySettings(selectRandomStrategy);
 
 		StrategySettings selExpBetaStrategy = new StrategySettings();
@@ -196,6 +205,8 @@ public class RunBraessWoSignals {
 		bestScoreStrategy.setStrategyName("BestScore");
 		bestScoreStrategy.setWeight(propBestScore);
 		config.strategy().addStrategySettings(bestScoreStrategy);
+		
+		config.strategy().setMaxAgentPlanMemorySize(0);
 
 		// set plans file
 		config.plans().setInputFile(plansFile);
@@ -239,7 +250,7 @@ public class RunBraessWoSignals {
 		boolean sameStartTime = true;
 		boolean initPlansWithAllRoutes = true;
 
-		int iterations = 100;
+		int iterations = 1000;
 		boolean writeEventsForAllIts = true; // needed for detailed analysis.
 												// remind the running time if
 												// true
@@ -264,11 +275,11 @@ public class RunBraessWoSignals {
 		double propChangeExpBeta = 0.9;
 		double propReRoute = 0.1;
 		double propKeepLast = 0.0;
-		double propSelectRandom = 0.0;
+		double propSelectRandom = 0.1;
 		double propSelectExpBeta = 0.0;
 		double propBestScore = 0.0;
 
-		double brainExpBeta = 2.0; // default: 1.0. DG used to use 2.0 - better
+		double brainExpBeta = 20.0; // default: 1.0. DG used to use 2.0 - better
 									// results!?
 
 		int ttBinSize = 1; // [s]
@@ -298,6 +309,8 @@ public class RunBraessWoSignals {
 
 		String outputDir = inputDir + "matsim-output/" + date + "_" + info
 				+ "/";
+		outputDir = "/Users/nagel/kairuns/braess/output" ;
+		
 		String basicConfig = inputDir + "basicConfig.xml";
 		String basicNetwork = inputDir + "basicNetwork.xml";
 		String plansFile = inputDir
