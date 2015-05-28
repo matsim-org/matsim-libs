@@ -62,7 +62,7 @@ public class JungCentrality {
 			ArrayList<NmvNode> nodeList) {
 		Transformer<NmvLink, Double> wtTransformer = new Transformer<NmvLink,Double>(){
 			public Double transform(NmvLink link){
-				return link.getWeight();
+				return 1.0/link.getWeight();
 			}
 		};
 		ClosenessCentrality<NmvNode, NmvLink> ranker = new ClosenessCentrality<NmvNode, NmvLink>(myGraph, wtTransformer);
@@ -125,7 +125,31 @@ public class JungCentrality {
 			}
 		}
 		System.out.println("Unweighted Node Betweenness written to file");
-		ranker = null;
+		//edge betweenness
+				BufferedWriter bw2 = IOUtils.getBufferedWriter(edgeBetUnweighted);
+				try{
+					bw2.write("EdgeID,C_B");
+					bw2.newLine();
+					for(int i=0;i<linkList.size();i++)
+					{
+						bw2.write(String.format("%s,%.5f\n", 
+								linkList.get(i).getId(),
+								ranker.getEdgeScore(linkList.get(i))));
+								
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+//					LOG.error("Oops, couldn't write to file.");
+				} finally{
+					try {
+						bw2.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+//						LOG.error("Oops, couldn't close");
+					}
+				}
+				System.out.println("Unweighted Edge Betweenness written to file");
+				ranker = null;
 	}
 
 	public static void calculateAndWriteWeightedBetweenness(DirectedGraph<NmvNode,NmvLink> myGraph,String nodeBetWeighted,
@@ -133,7 +157,7 @@ public class JungCentrality {
 			LinkedList<NmvLink> linkList) {
 		Transformer<NmvLink, Double> wtTransformer = new Transformer<NmvLink,Double>(){
 			public Double transform(NmvLink link){
-				return link.getWeight();
+				return 1.0/link.getWeight();
 			}
 		};
 		BetweennessCentrality<NmvNode, NmvLink> ranker = new BetweennessCentrality<NmvNode, NmvLink>(myGraph,wtTransformer);
@@ -157,6 +181,30 @@ public class JungCentrality {
 		} finally{
 			try {
 				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+//				LOG.error("Oops, couldn't close");
+			}
+		}
+		System.out.println("Weighted Node Betweenness written to file");
+		//edge betweenness
+		BufferedWriter bw2 = IOUtils.getBufferedWriter(edgeBetWeighted);
+		try{
+			bw2.write("EdgeID,C_B");
+			bw2.newLine();
+			for(int i=0;i<linkList.size();i++)
+			{
+				bw2.write(String.format("%s,%.5f\n", 
+						linkList.get(i).getId(),
+						ranker.getEdgeScore(linkList.get(i))));
+						
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+//			LOG.error("Oops, couldn't write to file.");
+		} finally{
+			try {
+				bw2.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 //				LOG.error("Oops, couldn't close");
