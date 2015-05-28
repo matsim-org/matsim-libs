@@ -18,8 +18,8 @@ import patryk.popgen2.Zone;
 
 public class TryOutZoneWriting {
 
-	public static void main(String[] args) {
-
+	public TryOutZoneWriting() {
+		
 		System.out.println("STARTED ...");
 
 		final String networkFile = "./data/network/network_v12_utan_forbifart.xml";
@@ -73,6 +73,16 @@ public class TryOutZoneWriting {
 		writer.write("testmatrix" + sampleFraction + ".xml");
 
 		System.out.println("... DONE");
+
+		
+	}
+	
+	
+	public static void main(String[] args) {
+		
+		final TryOutZoneWriting test = new TryOutZoneWriting();
+		
+		
 	}
 
 }
