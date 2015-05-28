@@ -22,6 +22,10 @@
  */
 package playground.vsp.congestion.handlers;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,6 +74,8 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 	private Map<Id<Person>, Double> personId2firstActivityEndTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, String> personId2currentActivityType = new HashMap<Id<Person>, String>();
 	private Map<Id<Person>, String> personId2firstActivityType = new HashMap<Id<Person>, String>();
+	
+	private Map<Id<Person>, List<Double>> personId2VTTSh = new HashMap<>();
 
 	private MarginalSumScoringFunction marginaSumScoringFunction;
 	
@@ -94,6 +100,8 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		this.personId2currentActivityType.clear();
 		this.personId2firstActivityType.clear();
 		this.affectedPersonId2delayToProcess.clear();
+		
+		this.personId2VTTSh.clear();
 	}
 
 	@Override
@@ -170,6 +178,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 			// The agent was delayed on the previous trip...
 			// ... now calculate the agent's disutility from being late at the current activity: score(arrivalTime_ohneDelay) - score(arrivalTime_withDelay)			
 			double activityDelayDisutility = 0.;
+//			double activityDelayDisutilityOneSec = 0.;
 			
 			// First, check if the plan completed is completed, i.e. if the agent has arrived at an activity (after being delayed)
 			if (this.personId2currentActivityType.containsKey(personId) && this.personId2currentActivityStartTime.containsKey(personId)) {
@@ -187,6 +196,8 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 					activityEvening.setStartTime(this.personId2currentActivityStartTime.get(personId));
 						
 					activityDelayDisutility = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activityMorning, activityEvening, totalDelayThisPerson);
+//					activityDelayDisutilityOneSec = marginaSumScoringFunction.getOvernightActivityDelayDisutility(activityMorning, activityEvening, 1.0);
+
 					
 				} else {
 					// The activity has an end time indicating a 'normal' activity.
@@ -195,6 +206,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 					activity.setStartTime(this.personId2currentActivityStartTime.get(personId));
 					activity.setEndTime(activityEndTime);	
 					activityDelayDisutility = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity, totalDelayThisPerson);
+//					activityDelayDisutilityOneSec = marginaSumScoringFunction.getNormalActivityDelayDisutility(activity, 1.);
 				}
 				
 			} else {
@@ -211,15 +223,26 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 					incompletedPlanWarning++;
 				}
 				activityDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().planCalcScore().getPerforming_utils_hr();
+//				activityDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getPerforming_utils_hr();
 			}
 			
 			// Calculate the agent's trip delay disutility (could be done similar to the activity delay disutility).
 			double tripDelayDisutility = (totalDelayThisPerson / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
+//			double tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
 			
 			// Translate the disutility into monetary units.
 			double totalDelayCost = (activityDelayDisutility + tripDelayDisutility) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 			double delayCostPerSecond = totalDelayCost / totalDelayThisPerson;
+//			double delayCostPerSec_usingActivityDelayOneSec = (activityDelayDisutilityOneSec + tripDelayDisutilityOneSec) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 			
+			// store the VTTS for analysis purposes
+			if (this.personId2VTTSh.containsKey(personId)) {
+				this.personId2VTTSh.get(personId).add(delayCostPerSecond * 3600);
+			} else {
+				List<Double> vTTSh = new ArrayList<>();
+				vTTSh.add(delayCostPerSecond * 3600.);
+				this.personId2VTTSh.put(personId, vTTSh);
+			}
 			// Go through the congestion events and charge each causing agent his/her contribution to the delay cost: caused delay * activity delay cost per second + caused delay * trip delay cost per second
 			
 			for (CongestionEvent congestionEvent : this.affectedPersonId2congestionEventsToProcess.get(personId)) {
@@ -237,6 +260,30 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		}
 	}
 	
+	public void printVTTS(String fileName) {
+		
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write("person Id;VTTS (hour)");
+			bw.newLine();
+			
+			for (Id<Person> personId : this.personId2VTTSh.keySet()){
+				for (Double vTTS : this.personId2VTTSh.get(personId)){
+					bw.write(personId + ";" + vTTS);
+					bw.newLine();		
+				}
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	public double getAmountSum() {
 		return amountSum;
 	}

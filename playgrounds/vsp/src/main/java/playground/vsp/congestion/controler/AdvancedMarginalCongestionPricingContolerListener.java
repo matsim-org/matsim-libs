@@ -83,6 +83,10 @@ public class AdvancedMarginalCongestionPricingContolerListener implements Startu
 		this.log.info("Monetize final congestion events...");
 		this.pricingHandler.processFinalCongestionEvents();
 		this.log.info("Monetize final congestion events... Done.");
+		
+		this.log.info("Writing out VTTS statistics...");
+		this.pricingHandler.printVTTS(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/VTTS_forAllDelayedTrips.csv");
+		this.log.info("Writing out VTTS statistics... Done.");
 	}
 
 	@Override
