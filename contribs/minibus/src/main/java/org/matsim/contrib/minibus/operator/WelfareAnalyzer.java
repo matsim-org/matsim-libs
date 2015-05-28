@@ -24,10 +24,8 @@ package org.matsim.contrib.minibus.operator;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -42,8 +40,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * 
@@ -71,62 +67,63 @@ public class WelfareAnalyzer {
 		
 		for (Person person : scenario.getPopulation().getPersons().values()){
 			
+			for (PlanElement pE : person.getSelectedPlan().getPlanElements()){
+				if (pE instanceof Leg) {
+					Leg leg = (Leg) pE;
+					if (leg.getMode().equals(TransportMode.pt)) {
+
+						ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+						String planIdString = route.getRouteId().toString().replace(route.getLineId().toString() + "-", "");
+						Id<PPlan> planId = Id.create(planIdString, PPlan.class);
+
+						if(!this.personId2usedPPlanIds.containsKey(person.getId())){
+							this.personId2usedPPlanIds.put(person.getId(), new HashSet<Id<PPlan>>());
+						}
+						
+						this.personId2usedPPlanIds.get(person.getId()).add(planId);
+
+					}
+				}
+			}
+						
 			// compute the user benefits and the difference to the previous iteration
 			double benefits = person.getSelectedPlan().getScore() / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 			personId2benefits.put(person.getId(), benefits);
 			
-			if (this.personId2benefitsBefore.containsKey(person.getId())){
-				double benefitDifference = benefits - this.personId2benefitsBefore.get(person.getId());
-				
-				// this had to be disabled because the output could not be created correctly (used pplan ids were not updated)
-//				if (benefitDifference != 0.) {
-					// allocate the difference in user benefits to the transit line
-									
-					List<Id<PPlan>> usedTransitLines = new ArrayList<>();
-					for (PlanElement pE : person.getSelectedPlan().getPlanElements()){
-						if (pE instanceof Leg) {
-							Leg leg = (Leg) pE;
-							if (leg.getMode().equals(TransportMode.pt)) {
-
-								ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-								String planIdString = route.getRouteId().toString().replace(route.getLineId().toString() + "-", "");
-								Id<PPlan> planId = Id.create(planIdString, PPlan.class);
-								usedTransitLines.add(planId);
-
-								if(!this.personId2usedPPlanIds.containsKey(person.getId())){
-									this.personId2usedPPlanIds.put(person.getId(), new HashSet<Id<PPlan>>());
-								}
-								
-								this.personId2usedPPlanIds.get(person.getId()).add(planId);
-
-							}
-						}
-					}
-					
-					// Problem: If a transit user uses several transit lines, all transit lines will be considered to have caused the improvement.
-					// Solution: Find out due to which transit line each transit user is actually improved by (re-)scoring each part / leg.
-					
-					if (!usedTransitLines.isEmpty()) {
-						double benefitDifferenceEachTransitLine = benefitDifference / usedTransitLines.size();
-						
-						for (Id<PPlan> planId : usedTransitLines) {
-							if (!planId2welfareCorrection.containsKey(planId)){
-								planId2welfareCorrection.put(planId, 0.);
-							}
-							double userBenefitContributionUpdatedValue = planId2welfareCorrection.get(planId) + benefitDifferenceEachTransitLine;
-							planId2welfareCorrection.put(planId, userBenefitContributionUpdatedValue);
-						}
-						
-					} else {
-						
-						log.warn("Changes in user benefits which are not allocated to transit lines.");
-						log.warn("Problem: The increase in user benefits on other modes is not accounted for.");
-						log.warn("Solution: Allocate the changes in user benefits to the transit lines which are 'responsible' for the improvement. Define responsibility by a relevant area around the transit line.");
-					}
-//				}
-				
+			double benefitsBefore = 0.;
+			if (this.personId2benefitsBefore.containsKey(person.getId())) {
+				benefitsBefore = this.personId2benefitsBefore.get(person.getId());
 			} else {
-				log.warn("No score from previous (external) iteration. If this is the first (external) iteration everything is fine.");
+				benefitsBefore = -120.;
+				log.warn("There is no information about the user benefits of person " + person.getId() + " in the previous iteration. Setting the benefits in the previous iteration to " + benefitsBefore + ".");
+			}
+				
+			double benefitDifference = benefits - benefitsBefore;
+			
+			if (benefitDifference != 0.) {
+				// allocate the difference in user benefits to the transit routes (PPlanIDs)
+				
+				// Problem: If a transit user uses several transit lines, all transit lines will be considered to have caused the improvement.
+				// TODO: Solution: Find out due to which transit line each transit user is actually improved by (re-)scoring each part / leg.
+						
+				if (personId2usedPPlanIds.containsKey(person.getId())) {
+					double benefitDifferenceEachTransitLine = benefitDifference / personId2usedPPlanIds.get(person.getId()).size();
+					
+					for (Id<PPlan> planId : personId2usedPPlanIds.get(person.getId())) {
+						if (!planId2welfareCorrection.containsKey(planId)){
+							planId2welfareCorrection.put(planId, 0.);
+						}
+						double userBenefitContributionUpdatedValue = planId2welfareCorrection.get(planId) + benefitDifferenceEachTransitLine;
+						planId2welfareCorrection.put(planId, userBenefitContributionUpdatedValue);
+					}
+				} else {
+					
+					log.warn("Changes in user benefits which are not allocated to transit lines.");
+					log.warn("Problem: The increase in user benefits on other modes is not accounted for.");
+					log.warn("Solution: Allocate the changes in user benefits to the transit lines which are 'responsible' for the improvement. Define responsibility by a relevant area around the transit line.");
+				}
+			} else {
+				// the change in user benefits is zero
 			}
 		}
 		
