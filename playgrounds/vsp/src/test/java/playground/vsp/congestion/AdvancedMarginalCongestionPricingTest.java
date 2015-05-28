@@ -378,7 +378,6 @@ public class AdvancedMarginalCongestionPricingTest {
 
 			@Override
 			public void handleEvent(CongestionEvent event) {
-//				System.out.println(event.toString());
 				congestionEvents.add(event);
 			}	
 		});
@@ -391,7 +390,6 @@ public class AdvancedMarginalCongestionPricingTest {
 
 			@Override
 			public void handleEvent(PersonMoneyEvent event) {
-//				System.out.println(event.toString());
 				moneyEvents.add(event);
 			}	
 		});
@@ -437,7 +435,6 @@ public class AdvancedMarginalCongestionPricingTest {
 
 			@Override
 			public void handleEvent(CongestionEvent event) {
-				System.out.println(event.toString());
 				congestionEvents.add(event);
 			}	
 		});
@@ -450,7 +447,6 @@ public class AdvancedMarginalCongestionPricingTest {
 
 			@Override
 			public void handleEvent(PersonMoneyEvent event) {
-				System.out.println(event.toString());
 				moneyEvents.add(event);
 			}	
 		});
