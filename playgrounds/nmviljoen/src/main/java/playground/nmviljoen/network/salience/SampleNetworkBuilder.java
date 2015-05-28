@@ -136,6 +136,7 @@ public class SampleNetworkBuilder {
 		/* Write the network to file. */
 		try {
 			writer.save(graph, IOUtils.getBufferedWriter(filename));
+			System.out.println("GraphML file written " + filename);
 		} catch (UncheckedIOException | IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Could not write graph to " + filename);
