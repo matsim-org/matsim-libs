@@ -233,9 +233,9 @@ public class RunBraessWoSignals {
 	}
 
 	public static void main(String[] args) {
-		String date = "2015-05-27test";
+		String date = "2015-05-28";
 
-		int numberOfAgents = 60;
+		int numberOfAgents = 3600;
 		boolean sameStartTime = true;
 		boolean initPlansWithAllRoutes = true;
 
