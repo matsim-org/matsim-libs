@@ -138,14 +138,19 @@ public final class NetworkImpl implements Network {
 				return;
 			}
 			throw new IllegalArgumentException("There exists already a node with id = " + id.toString() +
-					".\nExisting node: " + node + "\nNode to be added: " + node +
+					".\nExisting node: " + node + "\nNode to be added: " + nn +
 					".\nNode is not added to the network.");
 		}
 		this.nodes.put(id, nn);
 		if (this.nodeQuadTree != null) {
-			// we changed the nodes, invalidate the quadTree
-			this.nodeQuadTree.clear();
-			this.nodeQuadTree = null;
+			if (this.nodeQuadTree.getMinEasting() <= nn.getCoord().getX() && this.nodeQuadTree.getMaxEasting() > nn.getCoord().getX()
+					&& this.nodeQuadTree.getMinNorthing() <= nn.getCoord().getY() && this.nodeQuadTree.getMaxNorthing() > nn.getCoord().getY()) {
+				this.nodeQuadTree.put(nn.getCoord().getX(), nn.getCoord().getY(), nn);
+			} else {
+				// we add a node outside the current bounds, invalidate it
+				this.nodeQuadTree.clear();
+				this.nodeQuadTree = null;
+			}
 		}
 
 		// show counter
