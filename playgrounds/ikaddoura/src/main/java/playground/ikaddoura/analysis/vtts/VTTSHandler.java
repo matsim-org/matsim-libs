@@ -131,9 +131,9 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	}
 
 	/*
-	 * This method has to be called after the MobSim. Here, the the last / overnight activity is taken into account.
+	 * This method has to be called after parsing the events. Here, the the last / overnight activity is taken into account.
 	 */
-	public void processFinalCongestionEvents() {
+	public void computeFinalVTTS() {
 		for (Id<Person> affectedPersonId : this.departedPersonIds) {
 			computeVTTS(affectedPersonId, Time.UNDEFINED_TIME, null);
 		}

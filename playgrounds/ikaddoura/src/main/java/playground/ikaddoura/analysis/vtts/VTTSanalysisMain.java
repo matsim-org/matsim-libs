@@ -56,10 +56,12 @@ public class VTTSanalysisMain {
 	private void run() {
 		
 		String configFile = runDirectory + "output_config.xml.gz";
+		Config config = ConfigUtils.loadConfig(configFile);	
+		int iteration = config.controler().getLastIteration();
+				
 		String populationFile = null;
 		String networkFile = runDirectory + "output_network.xml.gz";
 		
-		Config config = ConfigUtils.loadConfig(configFile);		
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
 		
@@ -68,14 +70,15 @@ public class VTTSanalysisMain {
 		
 		VTTSHandler vttsHandler = new VTTSHandler(scenario);
 		events.addHandler(vttsHandler);
-				
-		int iteration = config.controler().getLastIteration();
+						
 		String eventsFile = runDirectory + "ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
-		
+
 		log.info("Reading the events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		log.info("Reading the events file... Done.");
+		
+		vttsHandler.computeFinalVTTS();
 				
 		vttsHandler.printVTTS(runDirectory + "ITERS/it." + iteration + "/" + iteration + ".VTTS.csv");
 		vttsHandler.printAvgVTTSperPerson(runDirectory + "ITERS/it." + iteration + "/" + iteration + ".avgVTTS.csv"); 
