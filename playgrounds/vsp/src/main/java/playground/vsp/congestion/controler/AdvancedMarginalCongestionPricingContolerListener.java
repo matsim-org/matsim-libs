@@ -45,7 +45,7 @@ import playground.vsp.congestion.handlers.TollHandler;
  */
 
 public class AdvancedMarginalCongestionPricingContolerListener implements StartupListener, AfterMobsimListener, IterationEndsListener {
-	private final Logger log = Logger.getLogger(AdvancedMarginalCongestionPricingContolerListener.class);
+	private final static Logger log = Logger.getLogger(AdvancedMarginalCongestionPricingContolerListener.class);
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
@@ -80,21 +80,23 @@ public class AdvancedMarginalCongestionPricingContolerListener implements Startu
 	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		this.log.info("Monetize final congestion events...");
+		log.info("Monetize final congestion events...");
 		this.pricingHandler.processFinalCongestionEvents();
-		this.log.info("Monetize final congestion events... Done.");
+		log.info("Total monetized amount: " + this.pricingHandler.getAmountSum());
+		log.info("Monetize final congestion events... Done.");
 		
-		this.log.info("Writing out VTTS statistics...");
+		log.info("Writing out VTTS statistics...");
 		this.pricingHandler.printVTTS(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/VTTS_forAllDelayedTrips.csv");
-		this.log.info("Writing out VTTS statistics... Done.");
+		this.pricingHandler.printAvgVTTSperPerson(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/VTTS_AvgPerPerson_forAllDelayedTrips.csv");
+		log.info("Writing out VTTS statistics... Done.");
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 				
-		this.log.info("Set average tolls for each link Id and time bin...");
+		log.info("Set average tolls for each link Id and time bin...");
 		this.tollHandler.setLinkId2timeBin2avgToll();
-		this.log.info("Set average tolls for each link Id and time bin... Done.");
+		log.info("Set average tolls for each link Id and time bin... Done.");
 		
 		// write out analysis every iteration
 		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");

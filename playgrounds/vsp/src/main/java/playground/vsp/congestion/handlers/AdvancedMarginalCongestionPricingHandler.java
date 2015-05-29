@@ -260,13 +260,41 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		}
 	}
 	
+	public void printAvgVTTSperPerson(String fileName) {
+		
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write("person Id;VTTS (money/hour)");
+			bw.newLine();
+			
+			for (Id<Person> personId : this.personId2VTTSh.keySet()){
+				double vttsSum = 0.;
+				double counter = 0;
+				for (Double vTTS : this.personId2VTTSh.get(personId)){
+					vttsSum = vttsSum + vTTS;
+					counter++;
+				}
+				bw.write(personId + ";" + (vttsSum / counter) );
+				bw.newLine();	
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void printVTTS(String fileName) {
 		
 		File file = new File(fileName);
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("person Id;VTTS (hour)");
+			bw.write("person Id;VTTS (money/hour)");
 			bw.newLine();
 			
 			for (Id<Person> personId : this.personId2VTTSh.keySet()){
