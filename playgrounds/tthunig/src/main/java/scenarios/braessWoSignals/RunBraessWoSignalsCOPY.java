@@ -152,8 +152,7 @@ public class RunBraessWoSignalsCOPY {
 				TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
 		
 		// adapt number of iterations
-		int iterations = 1000 ;
-		config.controler().setLastIteration(iterations);
+		config.controler().setLastIteration(1000);
 
 		// remove all strategies possibly defined in basicConfigFile:
 		config.strategy().clearStrategySettings(); // functionality available since 2015/05/31. kai
@@ -177,7 +176,7 @@ public class RunBraessWoSignalsCOPY {
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
 			strat.setWeight( 0.3 ) ;
-			strat.setDisableAfter(600);
+			strat.setDisableAfter( config.controler().getLastIteration() - 50 );
 			config.strategy().addStrategySettings(strat);
 		}
 		{
