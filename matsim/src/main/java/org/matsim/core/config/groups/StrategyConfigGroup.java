@@ -302,6 +302,10 @@ public final class StrategyConfigGroup extends ConfigGroup {
 	public void addStrategySettings(final StrategySettings stratSets) {
 		addParameterSet( stratSets );
 	}
+	
+	public final void clearStrategySettings() {
+		this.clearParameterSetsForType( StrategySettings.SET_NAME ) ;
+	}
 
 	public Collection<StrategySettings> getStrategySettings() {
 		// This does look pretty wrong, but is actually OK,
