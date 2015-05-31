@@ -26,5 +26,12 @@
   		<scope>system</scope>
   		<systemPath>${basedir}/libs/opencsv-3.3.jar</systemPath>	
   	</dependency>
+  	<dependency>
+  		<groupId>gunnarutilities</groupId>
+  		<artifactId>gunnarutilities</artifactId>
+  		<version>0.0</version>
+  		<scope>system</scope>
+  		<systemPath>${basedir}/libs/utilities.jar</systemPath>	
+  	</dependency>
   </dependencies>
 </project>
