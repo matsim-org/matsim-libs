@@ -39,6 +39,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheck
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -161,16 +162,12 @@ public class KNBangBang {
 		// ---
 		
 		final Controler controler = new Controler( scenario ) ;
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
 		controler.setDirtyShutdown(true);
 		
 		controler.addOverridingModule(new AbstractModule(){
-			@Override
-			public void install() {
-				this.bindMobsim().toProvider(KNMobsimProvider.class) ;
+			@Override public void install() {
+				this.bind(Mobsim.class).toProvider(KNMobsimProvider.class) ;
 			}
 		});
 
