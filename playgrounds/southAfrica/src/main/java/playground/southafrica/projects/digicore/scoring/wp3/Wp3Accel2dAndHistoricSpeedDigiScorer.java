@@ -437,8 +437,14 @@ public class Wp3Accel2dAndHistoricSpeedDigiScorer implements DigiScorer {
 
 		/* Consider speed as first risk component. */
 		double speed = Double.parseDouble(sa[8]);
+		double historicAvg = Double.parseDouble(sa[10]);
 		double speedLimit = Double.parseDouble(sa[11]);
-		double speeding = speed / speedLimit;
+		double speeding;
+		if(historicAvg > 0){
+			speeding = speed / historicAvg;
+		} else{
+			speeding = speed / speedLimit;
+		}
 
 		/* Because of the data quality, we need to consider zero speed limits.
 		 * When building the risk model, zero speed limits is associated with no 
