@@ -57,7 +57,7 @@ public class RunBraessWoSignalsCOPY {
 	public RunBraessWoSignalsCOPY(String inputDir, String basicConfig,
 			String basicNetwork, String plansFile, String outputDir,
 			int iterations, boolean writeEventsForAllIts, double[] linkTTs,
-			boolean useLinkLength200, String lanesInfo,
+			boolean useLanes, String lanesInfo,
 			long capMain, long capFirstLast, double propChangeExpBeta,
 			double propReRoute, double propKeepLast, double propSelectRandom,
 			double propSelectExpBeta, double propBestScore,
@@ -70,6 +70,7 @@ public class RunBraessWoSignalsCOPY {
 		this.plansFile = plansFile;
 		this.outputDir = outputDir;
 		this.writeEventsForAllIts = writeEventsForAllIts;
+		this.useLanes = useLanes;
 		this.lanesInfo = lanesInfo;
 		this.capMain = capMain;
 		this.capFirstLast = capFirstLast;
@@ -212,7 +213,7 @@ public class RunBraessWoSignalsCOPY {
 			if (linkTTs[id-1] != 0.0)
 				links[id-1].setFreespeed(links[id-1].getLength() / linkTTs[id-1]);
 			else // specific linkTT == 0.0
-				log.error("The link travel time can't be zero. Choose at least one second.");
+				log.error("link travel time of link " + id + " is zero. Choose at least one second.");
 		}
 	
 		// adapt capacity on all links
@@ -239,6 +240,9 @@ public class RunBraessWoSignalsCOPY {
 		double[] linkTTs = new double[7];
 		/* tt on the middle link */
 		linkTTs[4 - 1] = 1; // [s]. for deleting use 200
+		/* tt of the other links at the middle route. */
+		linkTTs[2 - 1] = 10;
+		linkTTs[6 - 1] = 10;
 		/* tt of the link which is not at the middle route. */
 		linkTTs[3 - 1] = 20; // [s]
 		linkTTs[5 - 1] = 20; // [s]
@@ -259,8 +263,7 @@ public class RunBraessWoSignalsCOPY {
 		double propSelectExpBeta = 0.0;
 		double propBestScore = 0.9;
 
-		double brainExpBeta = 20.0; // default: 1.0. DG used to use 2.0 - better
-									// results!?
+		double brainExpBeta = 20.0; 
 
 		int ttBinSize = 1; // [s]
 
@@ -269,8 +272,8 @@ public class RunBraessWoSignalsCOPY {
 		double sigma = 0.0;
 		// choose the monetary cost rate for traveled distance
 		// (should be negative. use -12.0 to balance time [h] and distance [m].
-		// use -0.00015 to approximately balance travel time and distance in
-		// this scenario.
+		// use -0.00015 to approximately balance the utility of travel time and 
+		// distance in this scenario.
 		// use -0.0 to use only time.)
 		double monetaryDistanceCostRate = 0.0; // -0.00015;
 
