@@ -38,11 +38,14 @@ public class BraessRouteDistributionAndTT implements PersonArrivalEventHandler,
 	private int[] routeUsers;
 
 	private Map<Id<Person>, Double> personDepartureTimes;
-	private Map<Id<Person>, Double> personRouteStartTime; // link enter of link
-															// 2 or 3
+	private Map<Id<Person>, Double> personRouteStartTime; 
+	// link enter of link 2 or 3
+	
 	private Map<Id<Person>, Integer> personRouteChoice;
 	private Map<Double, double[]> routeStartsPerSecond;
 	private Map<Double, double[]> onRoutePerSecond;
+	// contains only agents that are between node 2 and 5 
+	// (i.e. not on link 1 or 7, which are the start and end links)
 
 	public BraessRouteDistributionAndTT() {
 		super();
@@ -125,6 +128,8 @@ public class BraessRouteDistributionAndTT implements PersonArrivalEventHandler,
 				this.onRoutePerSecond.get(personRouteStart + i)[this.personRouteChoice
 						.get(event.getPersonId())]++;
 			}
+			
+			personRouteStartTime.remove(event.getPersonId());
 		}
 	}
 
@@ -157,7 +162,7 @@ public class BraessRouteDistributionAndTT implements PersonArrivalEventHandler,
 		this.routeUsers[personRoute]++;
 
 		this.personDepartureTimes.remove(event.getPersonId());
-		this.personDepartureTimes.remove(event.getPersonId());
+		this.personRouteChoice.remove(event.getPersonId());
 	}
 
 	/**
@@ -187,6 +192,12 @@ public class BraessRouteDistributionAndTT implements PersonArrivalEventHandler,
 		return routeUsers;
 	}
 
+	/**
+	 * Returns a map containing the number of route starts for each time step.
+	 * Thereby a route start is regarded as a link entering of link 2 or 3.
+	 * 
+	 * @return
+	 */
 	public Map<Double, double[]> getRouteStartsPerSecond() {
 		// fill missing time steps between first departure and
 		// last arrival with zero starts
@@ -207,6 +218,13 @@ public class BraessRouteDistributionAndTT implements PersonArrivalEventHandler,
 		return routeStartsPerSecond;
 	}
 
+	/**
+	 * Returns the number of agents on route per time step.
+	 * Thereby an agent is regarded to be on route if he's traveling 
+	 * on a link that is not the first or the last one (link 1 and 7).
+	 * 
+	 * @return
+	 */
 	public Map<Double, double[]> getOnRoutePerSecond() {
 		// already contains entries for all time steps (seconds)
 		// between first departure and last arrival
