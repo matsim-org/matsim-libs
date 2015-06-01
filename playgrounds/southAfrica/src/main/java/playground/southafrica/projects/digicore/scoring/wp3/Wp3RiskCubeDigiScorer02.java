@@ -24,6 +24,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -31,19 +34,20 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.southafrica.projects.digicore.grid.DigicoreRiskCubeGrid;
 import playground.southafrica.projects.digicore.scoring.DigiScorer;
 import playground.southafrica.utilities.Header;
 
 /**
- * For the third work package, this class uses the hard-coded risk categories
- * as provided in the proposal, diagrams 1 (for speed) and 3 (for acceleration).
- * So, in this case, the 'blob' is not really an envelope, but rather risk
- * thresholds set a priori.
+ * For the third work package, this class uses the discretization provided in
+ * the proposal. Instead of using the risk categories associated with each of
+ * the discrete speed and accelerometer classes, we use a <i>data envelope</i>
+ * approach similar to the rhombic dodecahedra, i.e. the 3D blob.
  *
  * @author jwjoubert
  */
-public class Wp3RiskCubeDigiScorer01 implements DigiScorer {
-	final private static Logger LOG = Logger.getLogger(Wp3RiskCubeDigiScorer01.class);
+public class Wp3RiskCubeDigiScorer02 implements DigiScorer {
+	final private static Logger LOG = Logger.getLogger(Wp3RiskCubeDigiScorer02.class);
 	
 	/* Other variables. */
 	private int maxLines = Integer.MAX_VALUE;
@@ -51,17 +55,26 @@ public class Wp3RiskCubeDigiScorer01 implements DigiScorer {
 	private double weight_speed = 0.5;
 	private double weight_accel = 0.5;
 	
+	/* The risk space. */
+	DigicoreRiskCubeGrid grid;
+	
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(Wp3RiskCubeDigiScorer01.class.toString(), args);
+		Header.printHeader(Wp3RiskCubeDigiScorer02.class.toString(), args);
 		String filename = args[0];
 		String outputFolder = args[1];
 		int maxLines = Integer.parseInt(args[2]);
 		double aWeight = Double.parseDouble(args[3]);
 		double sWeight = Double.parseDouble(args[4]);
+
+		List<Double> riskThresholds = new ArrayList<Double>();
+		int argsIndex = 5;
+		while(args.length > argsIndex){
+			riskThresholds.add(Double.parseDouble(args[argsIndex++]));
+		}
 
 		/* Check that the output folder is empty. */
 		File folder = new File(outputFolder);
@@ -71,19 +84,44 @@ public class Wp3RiskCubeDigiScorer01 implements DigiScorer {
 		}
 		folder.mkdirs();
 		
-		Wp3RiskCubeDigiScorer01 wp3rc1 = new Wp3RiskCubeDigiScorer01();
-		wp3rc1.setAccelerationWeight(aWeight);
-		wp3rc1.setSpeedWeight(sWeight);
-		wp3rc1.setMaximumLines(maxLines);
-		wp3rc1.rateIndividuals(filename, outputFolder);
+		Wp3RiskCubeDigiScorer02 wp3rc2 = new Wp3RiskCubeDigiScorer02(riskThresholds);
+		wp3rc2.setAccelerationWeight(aWeight);
+		wp3rc2.setSpeedWeight(sWeight);
+		wp3rc2.setMaximumLines(maxLines);
+		wp3rc2.buildScoringModel(filename);
+		wp3rc2.grid.writeCellCountsAndRiskClasses(outputFolder);
+		wp3rc2.rateIndividuals(filename, outputFolder);
 		
 		Header.printFooter();
 	}
 
+	public Wp3RiskCubeDigiScorer02(List<Double> riskThresholds) {
+		this.grid = new DigicoreRiskCubeGrid(riskThresholds);
+	}
+	
 	@Override
 	public void buildScoringModel(String filename) {
-		/* Do nothing with the data. We do not need to calculate a data envelope. */
-
+		Counter counter = new Counter("   lines # ");
+		BufferedReader br = IOUtils.getBufferedReader(filename);
+		try{
+			String line = null;
+			while( (line = br.readLine()) != null && counter.getCounter() < maxLines){
+				this.grid.incrementCell(line);
+				counter.incCounter();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot read from " + filename);
+		} finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + filename);
+			}
+		}
+		this.grid.setPopulated(true);
+		this.grid.rankGridCells();
 	}
 
 	@Override
@@ -186,35 +224,30 @@ public class Wp3RiskCubeDigiScorer01 implements DigiScorer {
 
 	@Override
 	public RISK_GROUP getRiskGroup(String record) {
-		double accel = convertRiskGroupToDouble(Wp3RiskCube.getRiskCubeAccelRisk(record));
-		double speed = convertRiskGroupToDouble(Wp3RiskCube.getRiskCubeSpeedRisk(record));
+		if(!this.grid.isRanked()){
+			throw new RuntimeException("Cannot rank individuals if grid has not been ranked.");
+		}
 		
-		double riskValue = this.weight_accel*accel + this.weight_speed*speed;
-		if(riskValue <= 0.75){
+		String speed = String.format("%02d", Wp3RiskCube.getRiskCubeSpeedBin(record));
+		String accelX = String.format("%02d", Wp3RiskCube.getRiskcubeAccelXBin(record));
+		String accelY = String.format("%02d", Wp3RiskCube.getRiskcubeAccelYBin(record));
+		String cell = speed + "_" + accelX + "_" + accelY;
+		
+		int riskClass = this.grid.getRiskGroup(cell);
+		switch (riskClass) {
+		case 0:
 			return RISK_GROUP.NONE;
-		} else if(riskValue <= 1.5){
+		case 1:
 			return RISK_GROUP.LOW;
-		} else if (riskValue <= 2.25){
+		case 2:
 			return RISK_GROUP.MEDIUM;
-		} else{
+		case 3:
 			return RISK_GROUP.HIGH;
+		default:
+			throw new RuntimeException("Cannot find a risk class with code " + riskClass);
 		}
 	}
 	
-	private double convertRiskGroupToDouble(RISK_GROUP group){
-		switch (group) {
-		case NONE:
-			return 0.0;
-		case LOW:
-			return 1.0;
-		case MEDIUM:
-			return 2.0;
-		case HIGH:
-			return 3.0;
-		default:
-			throw new RuntimeException("Don't know how to quantify RISK_GROUP " + group);
-		}
-	}
 	
 	private void setAccelerationWeight(double weight){
 		this.weight_accel = weight;
