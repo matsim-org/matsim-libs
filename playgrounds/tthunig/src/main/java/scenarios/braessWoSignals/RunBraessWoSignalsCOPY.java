@@ -34,22 +34,22 @@ public class RunBraessWoSignalsCOPY {
 	private static final Logger log = Logger
 			.getLogger(RunBraessWoSignalsCOPY.class);
 	
-	private String date = "2015-06-01";
+	private final String DATE = "2015-06-01";
 	
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
-	private double sigma = 0.0;
+	private final double SIGMA = 0.0;
 	
-	private String inputDir = DgPaths.SHAREDSVN
+	private final String INPUT_DIR = DgPaths.SHAREDSVN
 			+ "studies/tthunig/scenarios/BraessWoSignals/";
 	
-	private long capMain = 1800;
-	private long capFirstLast = 3600;
+	private final long CAP_MAIN = 1800;
+	private final long CAP_FIRST_LAST = 3600;
 	
 
 	private void prepareAndRunAndAnalyse() {
 		// write some information
-		log.info("Starts running the simulation from input directory " + inputDir);
+		log.info("Starts running the simulation from input directory " + INPUT_DIR);
 		
 		// prepare the simulation		
 		Config config = adaptConfig();
@@ -62,7 +62,7 @@ public class RunBraessWoSignalsCOPY {
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		// adapt sigma for randomized routing
 		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder();
-		builder.setSigma(this.sigma);
+		builder.setSigma(this.SIGMA);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override public void install() {
 				bindTravelDisutilityFactory().toInstance(builder);
@@ -89,17 +89,17 @@ public class RunBraessWoSignalsCOPY {
 	private Config adaptConfig() {
 		// read config file
 		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, inputDir + "basicConfig.xml");
+		ConfigUtils.loadConfig(config, INPUT_DIR + "basicConfig.xml");
 
 		// adapt plans file. (adapt number of agents here)
-		config.plans().setInputFile(inputDir
+		config.plans().setInputFile(INPUT_DIR
 				+ "plans" + 3600 + "SameStartTimeAllRoutes.xml");
 
 		// set network and lane properties
-		config.network().setInputFile(inputDir + "basicNetwork.xml");
+		config.network().setInputFile(INPUT_DIR + "basicNetwork.xml");
 		config.scenario().setUseLanes(false);
 		config.network().setLaneDefinitionsFile(
-				inputDir + "lanes" + capMain + "-" + capFirstLast + ".xml");
+				INPUT_DIR + "lanes" + CAP_MAIN + "-" + CAP_FIRST_LAST + ".xml");
 
 		config.planCalcScore().setBrainExpBeta(20);
 
@@ -186,9 +186,9 @@ public class RunBraessWoSignalsCOPY {
 		for (Link l : scenario.getNetwork().getLinks().values()){
 			if (l.getId().equals(Id.create(1, Link.class)) || 
 					l.getId().equals(Id.create(7, Link.class)))
-				l.setCapacity(capFirstLast);
+				l.setCapacity(CAP_FIRST_LAST);
 			else
-				l.setCapacity(capMain);
+				l.setCapacity(CAP_MAIN);
 		}
 	}
 
@@ -196,7 +196,7 @@ public class RunBraessWoSignalsCOPY {
 
 		Config config = scenario.getConfig();
 
-		String runName = this.date;
+		String runName = this.DATE;
 
 		// get plan information (numberOfAgents, start time, initialized routes)
 		String plansFile = config.plans().getInputFile();
@@ -224,8 +224,8 @@ public class RunBraessWoSignalsCOPY {
 		runName += "_ttBinSize"
 				+ config.travelTimeCalculator().getTraveltimeBinSize();
 
-		if (this.sigma != 0.0)
-			runName += "_sigma" + this.sigma;
+		if (this.SIGMA != 0.0)
+			runName += "_sigma" + this.SIGMA;
 		if (config.planCalcScore().getMonetaryDistanceCostRateCar() != 0.0)
 			runName += "_distCost"
 					+ config.planCalcScore().getMonetaryDistanceCostRateCar();
@@ -242,7 +242,7 @@ public class RunBraessWoSignalsCOPY {
 		else
 			runName += "_node2node";
 
-		String outputDir = inputDir + "matsim-output/" + runName + "/";
+		String outputDir = INPUT_DIR + "matsim-output/" + runName + "/";
 		// outputDir = DgPaths.RUNSSVN + "braess/" + runName + "/";
 		outputDir = "/Users/nagel/kairuns/braess/output";
 
