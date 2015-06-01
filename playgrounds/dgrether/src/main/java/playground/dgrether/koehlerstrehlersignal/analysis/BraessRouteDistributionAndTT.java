@@ -80,6 +80,8 @@ public class BraessRouteDistributionAndTT implements PersonArrivalEventHandler,
 		case "3": // the person uses the lower route
 			route = 2;
 			this.personRouteStartTime.put(personId, event.getTime());
+			// yy why is it plausible to re-set the route start time for this type of persons? kai, may'15
+			
 			break;
 		case "4": // the person uses the middle route
 			route = 1;
