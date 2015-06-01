@@ -54,12 +54,11 @@ public class ReducedLinkCapacityTemporary {
 			// Header
 			out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 			out.newLine();
-			out.write("<!DOCTYPE config SYSTEM \"http://www.matsim.org/files/dtd/networkChangeEvents.xsd\">");
-			out.newLine();
-			out.write("<networkChangeEvents>");
+			out.write("<networkChangeEvents xmlns=\"http://www.matsim.org/files/dtd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd\">");
 			out.newLine();
 			// reduce capacity and speed:
-			out.write("    <networkChangeEvent startTime=\"07:00:00\">"); out.newLine();
+			out.write("    <networkChangeEvent startTime=\"07:00:00\">");
+			out.newLine();
 			for (Link link : network.getLinks().values()) {
 				out.write("        <link refId=\"" + link.getId().toString() + "\"/>");
 				out.newLine();
@@ -71,17 +70,18 @@ public class ReducedLinkCapacityTemporary {
 			out.write("    </networkChangeEvent>");
 			out.newLine();
 			// reset capacity and speed:
-			out.write("    <networkChangeEvent startTime=\"09:00:00\">"); out.newLine();
 			for (Link link : network.getLinks().values()) {
+				out.write("    <networkChangeEvent startTime=\"09:00:00\">");
+				out.newLine();
 				out.write("        <link refId=\"" + link.getId().toString() + "\"/>");
 				out.newLine();
+				out.write("        <flowCapacity type=\"absolute\" value=\"" + link.getCapacity() + "\"/>");
+				out.newLine();
+				out.write("        <freespeed type=\"absolute\" value=\"" + link.getFreespeed() + "\"/>");
+				out.newLine();
+				out.write("    </networkChangeEvent>");
+				out.newLine();
 			}
-			out.write("        <flowCapacity type=\"scaleFactor\" value=\"1.0\"/>");
-			out.newLine();
-			out.write("        <freespeed type=\"scaleFactor\" value=\"1.0\"/>");
-			out.newLine();
-			out.write("    </networkChangeEvent>");
-			out.newLine();
 			// Footer:
 			out.write("</networkChangeEvents>");
 			out.newLine();
