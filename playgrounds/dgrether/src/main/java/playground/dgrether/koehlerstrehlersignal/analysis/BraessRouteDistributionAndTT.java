@@ -69,6 +69,9 @@ public class BraessRouteDistributionAndTT implements PersonArrivalEventHandler,
 	public void handleEvent(LinkEnterEvent event) {
 		Id<Person> personId = event.getPersonId();
 
+		// collect information about route choice and start time.
+		// the route is unique for a link enter event of link 3,4 or 5.
+		// as route start time the link enter time of links 2 and 3 are used.
 		int route = -1;
 		switch (event.getLinkId().toString()) {
 		case "2":
