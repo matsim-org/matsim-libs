@@ -5,8 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
+import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -23,11 +26,18 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CRSFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -50,6 +60,31 @@ public class NetConverter {
 		
 	}
 	
+	public void convertTransitSchedule(String file){
+		
+		Config config = ConfigUtils.createConfig();
+		config.scenario().setUseTransit(true);
+		config.scenario().setUseVehicles(true);
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		
+		TransitScheduleReader ts = new TransitScheduleReader(scenario);
+		ts.readFile(file);
+		
+		PointFeatureFactory.Builder builder = new PointFeatureFactory.Builder();
+		builder.setName("nodes");
+		builder.addAttribute("id", String.class);
+		PointFeatureFactory factory = builder.create();
+		
+		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		
+		for(TransitStopFacility stop : scenario.getTransitSchedule().getFacilities().values()){
+			features.add(factory.createPoint(MGC.coord2Coordinate(stop.getCoord())));
+		}
+		
+		ShapeFileWriter.writeGeometries(features, "C:/Users/Daniel/Documents/work/shared-svn/studies/countries/cl/Kai_und_Daniel/Visualisierungen/stops.shp");
+		
+	}
+	
 	public void convertCoordinates(Network net, String outputFile){
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:3857", "EPSG:32719");
@@ -63,12 +98,16 @@ public class NetConverter {
 		
 	}
 	
-	public void convertNet2Shape(Network net, String outputFile){
+	public void convertNet2Shape(Network net, String crs, String outputFile){
 		
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-		typeBuilder.setName("shape");
-		typeBuilder.add("type", LineString.class);
+		typeBuilder.setCRS(MGC.getCRS(crs));
+		typeBuilder.setName("link feature");
+		typeBuilder.add("Line String", LineString.class);
 		typeBuilder.add("id", String.class);
+		typeBuilder.add("length", Double.class);
+		typeBuilder.add("freespeed", Double.class);
+		typeBuilder.add("capacity", Double.class);
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 		
 		List<SimpleFeature> features = new ArrayList<SimpleFeature>();
@@ -78,16 +117,13 @@ public class NetConverter {
 			Coord from = link.getFromNode().getCoord();
 			Coord to = link.getToNode().getCoord();
 			
-			double fromX = from.getX();
-			double fromY = from.getY();
-			double toX = to.getX();
-			double toY = to.getY();
-			
-			SimpleFeature feature = builder.buildFeature(null, new Object[]{
+			SimpleFeature feature = builder.buildFeature(link.getId().toString(), new Object[]{
 				new GeometryFactory().createLineString(new Coordinate[]{
-						new Coordinate(fromX, fromY), new Coordinate(toX, toY)
-				}),
-				link.getId().toString()
+						MGC.coord2Coordinate(from), MGC.coord2Coordinate(to)}),
+				link.getId().toString(),
+				link.getLength(),
+				link.getFreespeed(),
+				link.getCapacity()
 			});
 			features.add(feature);
 			
