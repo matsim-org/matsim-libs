@@ -517,6 +517,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		QVehicle veh = pollFromVehQueue(veh2Remove); 
 
 		if(seepageAllowed && isSeepModeStorageFree && veh.getVehicle().getType().getId().toString().equals(seepMode) ){
+			// yyyy above line feels quite slow/consuming computer time.  Should be switched off completely when seepage is not used. kai, may'15
 
 		} else {
 			usedStorageCapacity -= veh.getSizeInEquivalents();
