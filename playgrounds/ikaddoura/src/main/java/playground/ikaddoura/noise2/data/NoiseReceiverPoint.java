@@ -52,9 +52,13 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 			
 	// time-specific information
 	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
+	private Map<Id<Link>, Double> linkId2IsolatedImmissionMinusOneCar = new HashMap<Id<Link>, Double>();
+	private Map<Id<Link>, Double> linkId2IsolatedImmissionMinusOneHGV = new HashMap<Id<Link>, Double>(); 
 	private double finalImmission = 0.;
 	private double affectedAgentUnits = 0.;
 	private double damageCosts;
+	private Map<Id<Link>, Double> linkId2MarginalCostCar = new HashMap<Id<Link>, Double>();
+	private Map<Id<Link>, Double> linkId2MarginalCostHGV = new HashMap<Id<Link>, Double>();
 	private double damageCostsPerAffectedAgentUnit;
 
 	public Map<Id<Person>, ArrayList<PersonActivityInfo>> getPersonId2actInfos() {
@@ -121,6 +125,40 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 
 	public void setAffectedAgentUnits(double affectedAgentsUnits) {
 		this.affectedAgentUnits = affectedAgentsUnits;
+	}
+
+	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionMinusOneCar() {
+		return linkId2IsolatedImmissionMinusOneCar;
+	}
+
+	public void setLinkId2IsolatedImmissionMinusOneCar(
+			Map<Id<Link>, Double> linkId2IsolatedImmissionMinusOneCar) {
+		this.linkId2IsolatedImmissionMinusOneCar = linkId2IsolatedImmissionMinusOneCar;
+	}
+
+	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionMinusOneHGV() {
+		return linkId2IsolatedImmissionMinusOneHGV;
+	}
+
+	public void setLinkId2IsolatedImmissionMinusOneHGV(
+			Map<Id<Link>, Double> linkId2IsolatedImmissionMinusOneHGV) {
+		this.linkId2IsolatedImmissionMinusOneHGV = linkId2IsolatedImmissionMinusOneHGV;
+	}
+
+	public Map<Id<Link>, Double> getLinkId2MarginalCostCar() {
+		return linkId2MarginalCostCar;
+	}
+
+	public void setLinkId2MarginalCostCar(Map<Id<Link>, Double> linkId2MarginalCostCar) {
+		this.linkId2MarginalCostCar = linkId2MarginalCostCar;
+	}
+
+	public Map<Id<Link>, Double> getLinkId2MarginalCostHGV() {
+		return linkId2MarginalCostHGV;
+	}
+
+	public void setLinkId2MarginalCostHGV(Map<Id<Link>, Double> linkId2MarginalCostHGV) {
+		this.linkId2MarginalCostHGV = linkId2MarginalCostHGV;
 	}
 
 }

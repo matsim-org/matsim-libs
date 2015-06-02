@@ -44,12 +44,12 @@ public class NoiseLink {
 	private int hgvAgents = 0; // hgvAgents x scaleFactor = hgv
 	private double emission = 0.;
 	
-	private double marginalEmissionCar = 0.;
-	private double marginalEmissionHgv = 0.;
-	private double marginalImmissionCar = 0.;
-	private double marginalImmissionHgv = 0.;
-	private double marginalDamageCostCar = 0.;
-	private double marginalDamageCostHgv = 0.;
+	private double emissionMinusOneCar = 0.;
+	private double emissionMinusOneHGV = 0.;
+	private double immissionMinusOneCar = 0.;
+	private double immissionMinusOneHGV = 0.;
+	private double marginalDamageCostAllReceiverPointsCar = 0.;
+	private double marginalDamageCostAllReceiverPointsHGV = 0.;
 	
 	private double damageCost = 0.; 
 	private double damageCostPerCar = 0.; 
@@ -103,41 +103,41 @@ public class NoiseLink {
 	public void setEmission(double emission) {
 		this.emission = emission;
 	}
-	public double getMarginalEmissionCar() {
-		return marginalEmissionCar;
+	public double getEmissionMinusOneCar() {
+		return emissionMinusOneCar;
 	}
-	public void setMarginalEmissionCar(double marginalEmissionCar) {
-		this.marginalEmissionCar = marginalEmissionCar;
+	public void setEmissionMinusOneCar(double emissionMinusOneCar) {
+		this.emissionMinusOneCar = emissionMinusOneCar;
 	}
-	public double getMarginalEmissionHgv() {
-		return marginalEmissionHgv;
+	public double getEmissionMinusOneHGV() {
+		return emissionMinusOneHGV;
 	}
-	public void setMarginalEmissionHgv(double marginalEmissionHgv) {
-		this.marginalEmissionHgv = marginalEmissionHgv;
+	public void setEmissionMinusOneHGV(double emissionMinusOneHGV) {
+		this.emissionMinusOneHGV = emissionMinusOneHGV;
 	}
-	public double getMarginalImmissionCar() {
-		return marginalImmissionCar;
+	public double getImmissionMinusOneCar() {
+		return immissionMinusOneCar;
 	}
-	public void setMarginalImmissionCar(double marginalImmissionCar) {
-		this.marginalImmissionCar = marginalImmissionCar;
+	public void setImmissionMinusOneCar(double immissionMinusOneCar) {
+		this.immissionMinusOneCar = immissionMinusOneCar;
 	}
-	public double getMarginalImmissionHgv() {
-		return marginalImmissionHgv;
+	public double getImmissionMinusOneHGV() {
+		return immissionMinusOneHGV;
 	}
-	public void setMarginalImmissionHgv(double marginalImmissionHgv) {
-		this.marginalImmissionHgv = marginalImmissionHgv;
+	public void setImmissionMinusOneHGV(double immissionMinusOneHGV) {
+		this.immissionMinusOneHGV = immissionMinusOneHGV;
 	}
-	public double getMarginalDamageCostCar() {
-		return marginalDamageCostCar;
+	public double getMarginalDamageCostAllReceiverPointsCar() {
+		return marginalDamageCostAllReceiverPointsCar;
 	}
-	public void setMarginalDamageCostCar(double marginalDamageCostCar) {
-		this.marginalDamageCostCar = marginalDamageCostCar;
+	public void setMarginalDamageCostAllReceiverPointsCar(double marginalDamageCostAllReceiverPointsCar) {
+		this.marginalDamageCostAllReceiverPointsCar = marginalDamageCostAllReceiverPointsCar;
 	}
-	public double getMarginalDamageCostHgv() {
-		return marginalDamageCostHgv;
+	public double getMarginalDamageCostAllReceiverPointsHGV() {
+		return marginalDamageCostAllReceiverPointsHGV;
 	}
-	public void setMarginalDamageCostHgv(double marginalDamageCostHgv) {
-		this.marginalDamageCostHgv = marginalDamageCostHgv;
+	public void setMarginalDamageCostAllReceiverPointsHGV(double marginalDamageCostAllReceiverPointsHGV) {
+		this.marginalDamageCostAllReceiverPointsHGV = marginalDamageCostAllReceiverPointsHGV;
 	}
 	
 }
