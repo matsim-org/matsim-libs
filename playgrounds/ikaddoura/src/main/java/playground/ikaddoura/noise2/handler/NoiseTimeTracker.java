@@ -702,7 +702,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				p = n_hgv / ((double) n);
 			}
 	
-			double pPlusOneHgv = (n_hgv + 1) / ((double) (n + 1));
+			double pPlusOneHgv = (n_hgv + 1.) / ((double) (n + 1));
 			double pPlusOneCar = n_hgv / ((double) (n + 1));
 							
 			// correction for a sample, multiplicate the scale factor
