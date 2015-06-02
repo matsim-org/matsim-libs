@@ -161,4 +161,21 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		this.linkId2MarginalCostHGV = linkId2MarginalCostHGV;
 	}
 
+	@Override
+	public String toString() {
+		return "NoiseReceiverPoint [personId2actInfos=" + personId2actInfos
+				+ ", linkId2distanceCorrection=" + linkId2distanceCorrection
+				+ ", linkId2angleCorrection=" + linkId2angleCorrection
+				+ ", linkId2IsolatedImmission=" + linkId2IsolatedImmission
+				+ ", linkId2IsolatedImmissionMinusOneCar="
+				+ linkId2IsolatedImmissionMinusOneCar
+				+ ", linkId2IsolatedImmissionMinusOneHGV="
+				+ linkId2IsolatedImmissionMinusOneHGV + ", finalImmission="
+				+ finalImmission + ", affectedAgentUnits=" + affectedAgentUnits
+				+ ", damageCosts=" + damageCosts + ", linkId2MarginalCostCar="
+				+ linkId2MarginalCostCar + ", linkId2MarginalCostHGV="
+				+ linkId2MarginalCostHGV + ", damageCostsPerAffectedAgentUnit="
+				+ damageCostsPerAffectedAgentUnit + "]";
+	}
+
 }

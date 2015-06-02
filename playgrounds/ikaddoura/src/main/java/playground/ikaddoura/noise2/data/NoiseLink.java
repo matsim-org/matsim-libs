@@ -139,5 +139,19 @@ public class NoiseLink {
 	public void setMarginalDamageCostPerHgv(double marginalDamageCostPerHgv) {
 		this.marginalDamageCostPerHgv = marginalDamageCostPerHgv;
 	}
-	
+	@Override
+	public String toString() {
+		return "NoiseLink [id=" + id + ", enteringVehicleIds="
+				+ enteringVehicleIds + ", carAgents=" + carAgents
+				+ ", hgvAgents=" + hgvAgents + ", emission=" + emission
+				+ ", emissionMinusOneCar=" + emissionMinusOneCar
+				+ ", emissionMinusOneHGV=" + emissionMinusOneHGV
+				+ ", immissionMinusOneCar=" + immissionMinusOneCar
+				+ ", immissionMinusOneHGV=" + immissionMinusOneHGV
+				+ ", damageCost=" + damageCost + ", averageDamageCostPerCar="
+				+ averageDamageCostPerCar + ", averageDamageCostPerHgv="
+				+ averageDamageCostPerHgv + ", marginalDamageCostPerCar="
+				+ marginalDamageCostPerCar + ", marginalDamageCostPerHgv="
+				+ marginalDamageCostPerHgv + "]";
+	}
 }

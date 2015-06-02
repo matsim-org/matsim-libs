@@ -740,6 +740,23 @@ public class NoiseTest {
 		// test marginal damages per link, car and time
 		// ############################################
 		
+		// link 2: emission: 56.44189
+		// link 2: emission_minusOneCar: 53.4315
+		
+		// link A5: emission: 86.43028
+		// link A5: emission_minusOneCar: 83.4199
+		
+		// receiver point 16:
+		
+		// isolated immissions: from link2: 50.45464; from link A5: 69.60186; from link B5: 0.0 --> final immission: 69.65439 --> final damage cost: 0.0664164095284536
+		// isolated immission minus one car: from link2: 47.444342917469626; from link A5: 66.59156156942316; from link B5: 0.0
+		
+		// only on link2: minus one car {link2=47.444342917469626, linkA5=69.60186152606298, linkB5=0.0} --> final immission (minus one car on link2): 69.6282075137864 --> noise damage cost (minus one car on link2): 0.06629596291419929
+		// only on linkA5: minus one car {link2=50.45464287410944, linkA5=66.59156156942316, linkB5=0.0} --> final immission (minus one car on linkA5): 66.69599993315697 --> noise damage cost (minus one car on linkA5): 0.05410268756886159
+		
+		// marginal damage cost car link2: 0.00012044661425431036
+		// marginal damage cost car linkA5: 0.012313721959592003
+				
 		line = null;
 		
 		String pathToMarginalDamageLinkCar = runDirectory + "analysis_it.0/marginal_damages_link_car/marginal_damages_link_car_" + Double.toString(endTime) + ".csv";
