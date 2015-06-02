@@ -261,11 +261,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			log.info("Throwing noise events for the affected agents... Done.");
 		}
 		
-		String allocationApproach = "AverageCost";
+		NoiseAllocationApproach allocationApproach = NoiseAllocationApproach.AverageCost;
 		
 		if (this.noiseContext.getNoiseParams().isComputeCausingAgents()) {
 			
-			if (allocationApproach.equals(NoiseAllocationApproach.AverageCost)) {
+			if (allocationApproach == NoiseAllocationApproach.AverageCost) {
 				log.info("Allocating the total damage cost (per receiver point) to the relevant links...");
 				calculateCostSharesPerLinkPerTimeInterval();
 				NoiseWriter.writeLinkDamageInfoPerHour(noiseContext, outputDirectory);
@@ -276,9 +276,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				NoiseWriter.writeLinkAvgCarDamageInfoPerHour(noiseContext, outputDirectory);
 				NoiseWriter.writeLinkAvgHgvDamageInfoPerHour(noiseContext, outputDirectory);
 				log.info("Allocating the damage cost per link to the vehicle categories and vehicles... Done.");
-			}
-			
-			if (allocationApproach.equals(NoiseAllocationApproach.MarginalCost)) {
+			} else if (allocationApproach == NoiseAllocationApproach.MarginalCost) {
 				
 				// For each receiver point we have something like:
 				// Immission_linkA(n)
@@ -299,9 +297,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				
 				calculateMarginalDamageCost();
 				sumUpMarginalDamageCostForAllReceiverPoints();
-			}
-			
-			else {
+			} else {
 				throw new RuntimeException("Unknown noise allocation approach. Aborting...");
 			}
 			
