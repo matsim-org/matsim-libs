@@ -994,9 +994,7 @@ public class NoiseTest {
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.run();
 		
 		// and test i.e. the routing relevant information... TODO
