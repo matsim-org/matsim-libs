@@ -48,8 +48,6 @@ public class NoiseLink {
 	private double emissionMinusOneHGV = 0.;
 	private double immissionMinusOneCar = 0.;
 	private double immissionMinusOneHGV = 0.;
-	private double marginalDamageCostAllReceiverPointsCar = 0.;
-	private double marginalDamageCostAllReceiverPointsHGV = 0.;
 	
 	private double damageCost = 0.; 
 	private double damageCostPerCar = 0.; 
@@ -126,18 +124,6 @@ public class NoiseLink {
 	}
 	public void setImmissionMinusOneHGV(double immissionMinusOneHGV) {
 		this.immissionMinusOneHGV = immissionMinusOneHGV;
-	}
-	public double getMarginalDamageCostAllReceiverPointsCar() {
-		return marginalDamageCostAllReceiverPointsCar;
-	}
-	public void setMarginalDamageCostAllReceiverPointsCar(double marginalDamageCostAllReceiverPointsCar) {
-		this.marginalDamageCostAllReceiverPointsCar = marginalDamageCostAllReceiverPointsCar;
-	}
-	public double getMarginalDamageCostAllReceiverPointsHGV() {
-		return marginalDamageCostAllReceiverPointsHGV;
-	}
-	public void setMarginalDamageCostAllReceiverPointsHGV(double marginalDamageCostAllReceiverPointsHGV) {
-		this.marginalDamageCostAllReceiverPointsHGV = marginalDamageCostAllReceiverPointsHGV;
 	}
 	
 }

@@ -30,6 +30,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
+import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
+
 
 /**
  * Provides the parameters required to compute noise emissions, immissions and damages.
@@ -53,6 +55,8 @@ public class NoiseParameters {
 	private boolean internalizeNoiseDamages = true;
 	private boolean computeCausingAgents = true; 
 	private boolean throwNoiseEventsCaused = true;
+	
+	private NoiseAllocationApproach noiseAllocationApproach = NoiseAllocationApproach.AverageCost;
 		
 	// ########################################################################################################
 			
@@ -196,6 +200,15 @@ public class NoiseParameters {
 	public void setComputeNoiseDamages(boolean computeNoiseDamages) {
 		log.info("Computing noise damages: " + computeNoiseDamages);
 		this.computeNoiseDamages = computeNoiseDamages;
+	}
+
+	public NoiseAllocationApproach getNoiseAllocationApproach() {
+		return noiseAllocationApproach;
+	}
+
+	public void setNoiseAllocationApproach(NoiseAllocationApproach noiseAllocationApproach) {
+		log.info("Noise allocation approach: " + noiseAllocationApproach);
+		this.noiseAllocationApproach = noiseAllocationApproach;
 	}
 	
 }
