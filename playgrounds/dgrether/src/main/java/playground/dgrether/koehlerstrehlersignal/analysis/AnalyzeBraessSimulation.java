@@ -40,6 +40,8 @@ public class AnalyzeBraessSimulation {
 	private int[] routeUsers;
 	private Map<Double, double[]> routeStartsPerSecond;
 	private Map<Double, double[]> onRoutePerSecond;
+	private Map<Double, double[]> avgRouteTTsPerDeparture;
+	private Map<Double, double[]> avgRouteTTsPerArrival;
 
 	public AnalyzeBraessSimulation(String runDirectory, int lastIteration,
 			String outputDir) {
@@ -57,6 +59,8 @@ public class AnalyzeBraessSimulation {
 		writeResults();
 		writeOnRoutes();
 		writeRouteStarts();
+		writeAvgRouteTTsPerDeparture();
+		writeAvgRouteTTsPerArrvial();
 	}
 
 	private void calculateResults() {
@@ -72,14 +76,46 @@ public class AnalyzeBraessSimulation {
 
 		this.totalTT = handler.getTotalTT();
 		this.totalRouteTTs = handler.getTotalRouteTTs();
-		this.avgRouteTTs = handler.getAvgRouteTTs();
+		this.avgRouteTTs = handler.calculateAvgRouteTTs();
 		this.routeUsers = handler.getRouteUsers();
 		this.routeStartsPerSecond = handler.getRouteStartsPerSecond();
 		this.onRoutePerSecond = handler.getOnRoutePerSecond();
+		this.avgRouteTTsPerArrival = handler.calculateAvgRouteTTsPerArrivalTime();
+		this.avgRouteTTsPerDeparture = handler.calculateAvgRouteTTsPerWait2LinkTime();
 		
 		log.info("The total travel time is " + totalTT);
 		log.info(routeUsers[0] + " are using the upper route, " + routeUsers[1] 
 				+ " the middle one and " + routeUsers[2] + " the lower one.");
+	}
+
+	private void writeResults() {
+		PrintStream stream;
+		try {
+			stream = new PrintStream(new File(outputDir + "results.txt"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+	
+		String header = "run\ttotal tt[s]\t#users up\t#users mid\t#users low\tavg tt[s] up\tavg tt[s] mid\tavg tt[s] low\ttotal tt[s] up\ttotal tt[s] mid\ttotal tt[s] low";
+		stream.println(header);
+		StringBuffer line = new StringBuffer();
+		line.append("\t");
+		line.append(totalTT);
+		for (int i = 0; i < 3; i++) {
+			line.append("\t" + routeUsers[i]);
+		}
+		for (int i = 0; i < 3; i++) {
+			line.append("\t" + avgRouteTTs[i]);
+		}
+		for (int i = 0; i < 3; i++) {
+			line.append("\t" + totalRouteTTs[i]);
+		}
+		stream.println(line.toString());
+	
+		stream.close();
+		
+		log.info("output written to " + outputDir + "results.txt");
 	}
 
 	private void writeRouteStarts() {
@@ -142,36 +178,60 @@ public class AnalyzeBraessSimulation {
 		log.info("output written to " + outputDir + "onRoutes.txt");
 	}
 
-	private void writeResults() {
+	private void writeAvgRouteTTsPerDeparture() {
 		PrintStream stream;
 		try {
-			stream = new PrintStream(new File(outputDir + "results.txt"));
+			stream = new PrintStream(new File(outputDir + "avgRouteTTsPerDeparture.txt"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return;
 		}
 
-		String header = "run\ttotal tt[s]\t#users up\t#users mid\t#users low\tavg tt[s] up\tavg tt[s] mid\tavg tt[s] low\ttotal tt[s] up\ttotal tt[s] mid\ttotal tt[s] low";
+		String header = "departureTime\tavg tt up\tavg tt mid\tavg tt low";
 		stream.println(header);
-		StringBuffer line = new StringBuffer();
-		line.append("\t");
-		line.append(totalTT);
-		for (int i = 0; i < 3; i++) {
-			line.append("\t" + routeUsers[i]);
+		for (Double departureTime : this.avgRouteTTsPerDeparture.keySet()) {
+			StringBuffer line = new StringBuffer();
+			double[] avgRouteTTs = this.avgRouteTTsPerDeparture.get(departureTime);
+			
+			line.append(departureTime);
+			for (int i = 0; i < 3; i++) {
+				line.append("\t" + avgRouteTTs[i]);
+			}
+			stream.println(line.toString());
 		}
-		for (int i = 0; i < 3; i++) {
-			line.append("\t" + avgRouteTTs[i]);
-		}
-		for (int i = 0; i < 3; i++) {
-			line.append("\t" + totalRouteTTs[i]);
-		}
-		stream.println(line.toString());
 
 		stream.close();
 		
-		log.info("output written to " + outputDir + "results.txt");
+		log.info("output written to " + outputDir + "avgRouteTTsPerDeparture.txt");
 	}
-	
+
+	private void writeAvgRouteTTsPerArrvial() {
+		PrintStream stream;
+		try {
+			stream = new PrintStream(new File(outputDir + "avgRouteTTsPerArrival.txt"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		String header = "arrivalTime\tavg tt up\tavg tt mid\tavg tt low";
+		stream.println(header);
+		for (Double arrivalTime : this.avgRouteTTsPerArrival.keySet()) {
+			StringBuffer line = new StringBuffer();
+			double[] avgRouteTTs = this.avgRouteTTsPerArrival.get(arrivalTime);
+			
+			line.append(arrivalTime);
+			for (int i = 0; i < 3; i++) {
+				line.append("\t" + avgRouteTTs[i]);
+			}
+			stream.println(line.toString());
+		}
+
+		stream.close();
+		
+		log.info("output written to " + outputDir + "avgRouteTTsPerArrival.txt");
+	}
+
 	/**
 	 * analyzes all iterations in terms of route choice and travel time
 	 */
@@ -207,7 +267,7 @@ public class AnalyzeBraessSimulation {
 
 			// get results
 			totalTTIt = handler.getTotalTT();
-			avgRouteTTsIt = handler.getAvgRouteTTs();
+			avgRouteTTsIt = handler.calculateAvgRouteTTs();
 			routeUsersIt = handler.getRouteUsers();
 			
 			// write results
