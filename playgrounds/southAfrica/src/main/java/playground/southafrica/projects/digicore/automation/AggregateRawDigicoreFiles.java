@@ -91,7 +91,7 @@ public class AggregateRawDigicoreFiles {
 		LOG.info("Splitting the events file by month...");
 		
 		String eventsFile = args[0] + (args[0].endsWith("/") ? "" : "/") + "processed/events.csv.gz";
-		String eventsFolder = args[0] + (args[0].endsWith("/") ? "" : "/") + "processed/";
+		String eventsFolder = args[0] + (args[0].endsWith("/") ? "" : "/") + "monthly/";
 		EventByMonthSplitter.processEventsFile(eventsFile, eventsFolder);
 		
 		LOG.info("Done splitting the events file by month.");
