@@ -74,7 +74,6 @@ public class DataByMonthSplitter {
 		log.info("Splitting file by month...");
 		Counter counter = new Counter("  line # ");
 		
-		List<String> filenames = new ArrayList<String>();
 		List<String> dateList = new ArrayList<String>();
 		String thisFilename = null;
 		String previousFilename = null;
@@ -94,9 +93,6 @@ public class DataByMonthSplitter {
 				String yearMonthDay = sa3[0] + sa3[1] + sa3[2];
 				
 				thisFilename = yearMonth + ".csv";
-				if(!filenames.contains(thisFilename)){
-					filenames.add(thisFilename);
-				}
 				
 				if(!dateList.contains(yearMonthDay)){
 					log.info("---------------------> new date: " + yearMonthDay);
@@ -120,37 +116,7 @@ public class DataByMonthSplitter {
 			br.close();
 		}
 		counter.printCounter();
-		log.info("Done splitting file by month.");
-		
-		/* Compress the monthly events files. */
-		log.info("Compressing each monthly events file...");
-		for(String s : filenames){
-			String fullname = this.outputFolder + (this.outputFolder.endsWith("/") ? "" : "/") + s;
-			BufferedReader br2 = IOUtils.getBufferedReader(fullname);
-			BufferedWriter bw2 = IOUtils.getBufferedWriter(fullname + ".gz");
-			try{
-				String line = null;
-				while((line = br2.readLine()) != null){
-					bw2.write(line);
-					bw2.newLine();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot read/write from compressors.");
-			} finally{
-				try {
-					br2.close();
-					bw2.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw new RuntimeException("Cannot close compressing reader/writer.");
-				}
-			}
-			
-			/* Clean up. */
-			FileUtils.delete(new File(fullname));
-		}
-		log.info("Done compressing monthly events files.");
+		log.info("Done splitting files by month.");
 	}
 
 }
