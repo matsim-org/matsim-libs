@@ -740,22 +740,41 @@ public class NoiseTest {
 		// test marginal damages per link, car and time
 		// ############################################
 		
-		// link 2: emission: 56.44189
-		// link 2: emission_minusOneCar: 53.4315
+		// link 2: emission: 56.44189483793875
+		// link 2: emission_plusOneCar: 58.20280742849556
+		// link 2: emission_plusOneHGV: 58.80174566113962
 		
-		// link A5: emission: 86.43028
-		// link A5: emission_minusOneCar: 83.4199
+		// link A5: emission: 86.43028648510975
+		// link A5: emission_plusOneCar: 88.19119907566656
+		// link A5: emission_plusOneHGV: 86.47455942823328 // TODO: Shouldn't that be larger than emission_plusOneCar ???
+		
+		// link B5: emission: 0
+		// link B5: emission_plusOneCar: 30.710821120439775
+		// link B5: emission_plusOneHGV: 44.32342059450772
 		
 		// receiver point 16:
 		
-		// isolated immissions: from link2: 50.45464; from link A5: 69.60186; from link B5: 0.0 --> final immission: 69.65439 --> final damage cost: 0.0664164095284536
-		// isolated immission minus one car: from link2: 47.444342917469626; from link A5: 66.59156156942316; from link B5: 0.0
+		// isolated immissions: {link2=50.45464287410944, linkA5=69.60186152606298, linkB5=0.0} --> final immission: 69.6543946397625 --> final damage cost: 0.0664164095284536
+		// isolated immission plus one car: {link2=52.21555546466625, linkA5=71.36277411661979, linkB5=12.012377641729797}
+		// isolated immission plus one hgv: {link2=52.81449369731031, linkA5=69.6461344691865, linkB5=25.624977115797748}
 		
-		// only on link2: minus one car {link2=47.444342917469626, linkA5=69.60186152606298, linkB5=0.0} --> final immission (minus one car on link2): 69.6282075137864 --> noise damage cost (minus one car on link2): 0.06629596291419929
-		// only on linkA5: minus one car {link2=50.45464287410944, linkA5=66.59156156942316, linkB5=0.0} --> final immission (minus one car on linkA5): 66.69599993315697 --> noise damage cost (minus one car on linkA5): 0.05410268756886159
+		// only on link2: plus one car {link2=52.21555546466625, linkA5=69.60186152606298, linkB5=0.0} --> final immission (plus one car on link2): 69.68042480833185 --> noise damage cost (plus one car on link2): 0.06653635108691325
+		// only on link2: plus one hgv {link2=52.81449369731031, linkA5=69.60186152606298, linkB5=0.0} --> final immission (plus one hgv on link2): 69.69192251206803 --> noise damage cost (plus one hgv on link2): 0.06658939903919044
 		
-		// marginal damage cost car link2: 0.00012044661425431036
-		// marginal damage cost car linkA5: 0.012313721959592003
+		// only on linkA5: plus one car {link2=50.45464287410944, linkA5=71.36277411661979, linkB5=0.0} --> final immission (plus one car on linkA5): 71.39786670288962 --> noise damage cost (plus one car on linkA5): 0.07494784202184525
+		// only on linkA5: plus one hgv {link2=50.45464287410944, linkA5=69.6461344691865, linkB5=0.0} --> final immission (plus one hgv on linkA5): 69.69813794635571 --> noise damage cost (plus one car on linkA5): 0.06661809333629465
+		
+		// only on linkB5: plus one car {link2=50.45464287410944, linkA5=69.60186152606298, linkB5=12.012377641729797} --> final immission (plus one car on linkB5): 69.65440211426409 --> noise damage cost (plus one car on linkB5): 0.0664164439383374
+		// only on linkB5: plus one hgv {link2=50.45464287410944, linkA5=69.60186152606298, linkB5=25.624977115797748} --> final immission (plus one hgv on linkB5): 69.65456636493948 --> noise damage cost (plus one car on linkB5): 0.06641720009314242
+
+		// marginal damage cost car link2: 0.00011994
+		// marginal damage cost hgv link2: 0.00017299
+		
+		// marginal damage cost car linkA5: 0.00853143
+		// marginal damage cost hgv linkA5: 0.00020168
+		
+		// marginal damage cost car linkA5: 3.440988380343235E-8
+		// marginal damage cost hgv linkA5: 7.905646888239914E-7
 				
 		line = null;
 		
@@ -792,9 +811,9 @@ public class NoiseTest {
 			
 		// TODO: are the values below right?!
 		
-		Assert.assertEquals("Wrong damage per car per link!", 0.000120446614, marginaldamagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong damage per car per link!", 0.012313721960, marginaldamagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong damage per car per link!", 0., marginaldamagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong damage per car per link!", 0.00011994155845965193, marginaldamagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong damage per car per link!", 0.008531432493391652, marginaldamagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong damage per car per link!", 3.440988380343235E-8, marginaldamagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 		
 		// ############################################
 		// test the noise-specific events
@@ -916,16 +935,16 @@ public class NoiseTest {
 			tested = true;
 
 			if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
-				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.012313721960, event.getAmount(), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.008531432493391652, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter++;
 			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
-				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.012313721960, event.getAmount(), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.008531432493391652, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter++;
 			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
-				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.000120446614, event.getAmount(), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.00011994155845965193, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter++;
 			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
-				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.000120446614, event.getAmount(), MatsimTestUtils.EPSILON);
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.00011994155845965193, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter++;
 			} else {
 				Assert.assertEquals("There should either be no further events, or the amount should be zero.", 0., event.getAmount(), MatsimTestUtils.EPSILON);

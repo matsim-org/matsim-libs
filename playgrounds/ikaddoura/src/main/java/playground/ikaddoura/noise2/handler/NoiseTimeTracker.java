@@ -460,27 +460,27 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			Map<Id<Link>, Double> linkId2MarginalCostCar = new HashMap<>();
 			Map<Id<Link>, Double> linkId2MarginalCostHGV = new HashMap<>();
 
-			if (rp.getDamageCosts() != 0.) {
+//			if (rp.getDamageCosts() != 0.) {
+			if (rp.getAffectedAgentUnits() != 0.) {
 				for (Id<Link> linkId : rp.getLinkId2IsolatedImmission().keySet()) {
 					
-					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksMinusOneCarThisLink = new HashMap<Id<Link>, Double>();
-					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksMinusOneHGVThisLink = new HashMap<Id<Link>, Double>();
+					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink = new HashMap<Id<Link>, Double>();
+					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink = new HashMap<Id<Link>, Double>();
 
 					for (Id<Link> linkId2 : rp.getLinkId2IsolatedImmission().keySet()) {
 						if (!(linkId.toString().equals(linkId2.toString()))) {
-							linkId2isolatedImmissionsAllOtherLinksMinusOneCarThisLink.put(linkId2, rp.getLinkId2IsolatedImmission().get(linkId2));
-							linkId2isolatedImmissionsAllOtherLinksMinusOneHGVThisLink.put(linkId2, rp.getLinkId2IsolatedImmission().get(linkId2));
+							linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(linkId2, rp.getLinkId2IsolatedImmission().get(linkId2));
+							linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(linkId2, rp.getLinkId2IsolatedImmission().get(linkId2));
 						}
 					}
-					linkId2isolatedImmissionsAllOtherLinksMinusOneCarThisLink.put(linkId, rp.getLinkId2IsolatedImmissionMinusOneCar().get(linkId));
-					System.out.println(rp.getId() + " -- " + linkId + ": "+ rp.getLinkId2IsolatedImmissionMinusOneHGV().get(linkId));
-					linkId2isolatedImmissionsAllOtherLinksMinusOneHGVThisLink.put(linkId, rp.getLinkId2IsolatedImmissionMinusOneHGV().get(linkId));
+					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(linkId, rp.getLinkId2IsolatedImmissionPlusOneCar().get(linkId));
+					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(linkId, rp.getLinkId2IsolatedImmissionPlusOneHGV().get(linkId));
 					
-					double noiseImmissionMinusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksMinusOneCarThisLink.values());
-					double noiseImmissionMinusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksMinusOneHGVThisLink.values());
+					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.values());
+					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.values());
 					
-					double marginalDamageCostCar = rp.getDamageCosts() - NoiseEquations.calculateDamageCosts(noiseImmissionMinusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
-					double marginalDamageCostHGV = rp.getDamageCosts() - NoiseEquations.calculateDamageCosts(noiseImmissionMinusOneHGVThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
+					double marginalDamageCostCar = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) - rp.getDamageCosts();
+					double marginalDamageCostHGV = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneHGVThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) - rp.getDamageCosts();
 				
 					linkId2MarginalCostCar.put(linkId, marginalDamageCostCar);
 					linkId2MarginalCostHGV.put(linkId, marginalDamageCostHGV);
@@ -600,20 +600,20 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 					
 			Map<Id<Link>, Double> linkId2isolatedImmission = new HashMap<Id<Link>, Double>();
-			Map<Id<Link>, Double> linkId2isolatedImmissionMinusOneCar = new HashMap<Id<Link>, Double>();
-			Map<Id<Link>, Double> linkId2isolatedImmissionMinusOneHGV = new HashMap<Id<Link>, Double>();
+			Map<Id<Link>, Double> linkId2isolatedImmissionPlusOneCar = new HashMap<Id<Link>, Double>();
+			Map<Id<Link>, Double> linkId2isolatedImmissionPlusOneHGV = new HashMap<Id<Link>, Double>();
 			
 			for(Id<Link> linkId : rp.getLinkId2distanceCorrection().keySet()) {
 				if (this.noiseContext.getNoiseParams().getTunnelLinkIDs().contains(linkId)) {
 					linkId2isolatedImmission.put(linkId, 0.);
-					linkId2isolatedImmissionMinusOneCar.put(linkId, 0.);
-					linkId2isolatedImmissionMinusOneHGV.put(linkId, 0.);
+					linkId2isolatedImmissionPlusOneCar.put(linkId, 0.);
+					linkId2isolatedImmissionPlusOneHGV.put(linkId, 0.);
 								 			
 			 	} else {
 				
 			 		double noiseImmission = 0.;
-			 		double noiseImmissionMinusOneCar = 0.;
-			 		double noiseImmissionMinusOneHGV = 0.;
+			 		double noiseImmissionPlusOneCar = 0.;
+			 		double noiseImmissionPlusOneHGV = 0.;
 		 		
 			 		if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
 						if (!(this.noiseContext.getNoiseLinks().get(linkId).getEmission() == 0.)) {
@@ -627,33 +627,33 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 							}
 						}
 						
-						if (!(this.noiseContext.getNoiseLinks().get(linkId).getEmissionMinusOneCar() == 0.)) {
-							noiseImmissionMinusOneCar = this.noiseContext.getNoiseLinks().get(linkId).getEmissionMinusOneCar()
+						if (!(this.noiseContext.getNoiseLinks().get(linkId).getEmissionPlusOneCar() == 0.)) {
+							noiseImmissionPlusOneCar = this.noiseContext.getNoiseLinks().get(linkId).getEmissionPlusOneCar()
 									+ this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2distanceCorrection().get(linkId)
 									+ this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2angleCorrection().get(linkId)
 									;
 							
-							if (noiseImmissionMinusOneCar < 0.) {
-								noiseImmissionMinusOneCar = 0.;
+							if (noiseImmissionPlusOneCar < 0.) {
+								noiseImmissionPlusOneCar = 0.;
 							}
 						}
 						
-						if (!(this.noiseContext.getNoiseLinks().get(linkId).getEmissionMinusOneHGV() == 0.)) {
-							noiseImmissionMinusOneHGV = this.noiseContext.getNoiseLinks().get(linkId).getEmissionMinusOneHGV()
+						if (!(this.noiseContext.getNoiseLinks().get(linkId).getEmissionPlusOneHGV() == 0.)) {
+							noiseImmissionPlusOneHGV = this.noiseContext.getNoiseLinks().get(linkId).getEmissionPlusOneHGV()
 									+ this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2distanceCorrection().get(linkId)
 									+ this.noiseContext.getReceiverPoints().get(rp.getId()).getLinkId2angleCorrection().get(linkId)
 									;
 							
-							if (noiseImmissionMinusOneHGV < 0.) {
-								noiseImmissionMinusOneHGV = 0.;
+							if (noiseImmissionPlusOneHGV < 0.) {
+								noiseImmissionPlusOneHGV = 0.;
 							}
 						}
 
 					}
 			 		
 					linkId2isolatedImmission.put(linkId, noiseImmission);
-					linkId2isolatedImmissionMinusOneCar.put(linkId, noiseImmissionMinusOneCar);
-					linkId2isolatedImmissionMinusOneHGV.put(linkId, noiseImmissionMinusOneHGV);
+					linkId2isolatedImmissionPlusOneCar.put(linkId, noiseImmissionPlusOneCar);
+					linkId2isolatedImmissionPlusOneHGV.put(linkId, noiseImmissionPlusOneHGV);
 			 	}
 			}
 			
@@ -664,8 +664,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			
 			rp.setFinalImmission(finalNoiseImmission);
 			rp.setLinkId2IsolatedImmission(linkId2isolatedImmission);
-			rp.setLinkId2IsolatedImmissionMinusOneCar(linkId2isolatedImmissionMinusOneCar);
-			rp.setLinkId2IsolatedImmissionMinusOneHGV(linkId2isolatedImmissionMinusOneHGV);
+			rp.setLinkId2IsolatedImmissionPlusOneCar(linkId2isolatedImmissionPlusOneCar);
+			rp.setLinkId2IsolatedImmissionPlusOneHGV(linkId2isolatedImmissionPlusOneHGV);
 		}
 	}
 	
@@ -680,99 +680,58 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			double vHdv = vCar;
 			
 			double noiseEmission = 0.;
-			double noiseEmissionMinusOneCar = 0.;
-			double noiseEmissionMinusOneHgv = 0.;
+			double noiseEmissionPlusOneCar = 0.;
+			double noiseEmissionPlusOneHgv = 0.;
 			
 			int n_car = 0;
-			int n_car_minusOneCar = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
 				n_car = this.noiseContext.getNoiseLinks().get(linkId).getCarAgents();
-				if (n_car >= 1) {
-					n_car_minusOneCar = n_car - 1;
-				}
 			}
 			
 			int n_hgv = 0;
-			int n_hgv_minusOneHGV = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
 				n_hgv = this.noiseContext.getNoiseLinks().get(linkId).getHgvAgents();
-				if (n_hgv >= 1) {
-					n_hgv_minusOneHGV = n_hgv - 1;
-				}
 			}
 			int n = n_car + n_hgv;
-						
-			int nMinusOneCar = n_car_minusOneCar + n_hgv;
-			int nMinusOneHgv = n_car + n_hgv_minusOneHGV;
-			
-			if (nMinusOneCar < 0. || nMinusOneHgv < 0. || n < 0. || n_car < 0. || n_hgv < 0. || n_car_minusOneCar < 0. || n_hgv_minusOneHGV < 0.) {
-				throw new RuntimeException("Negative number of cars / hgv. Aborting...");
-			}
-						
+									
 			double p = 0.;
-			double pMinusOneCar = 0.;
-			double pMinusOneHgv = 0.;
 			if(!(n == 0)) {
 				p = n_hgv / ((double) n);
-				pMinusOneHgv = n_hgv_minusOneHGV / ((double) n);
-				
-				if(!(nMinusOneCar == 0)) {
-					pMinusOneCar = n_hgv / ((double) nMinusOneCar);
-				}
 			}
+	
+			double pPlusOneHgv = (n_hgv + 1) / ((double) (n + 1));
+			double pPlusOneCar = n_hgv / ((double) (n + 1));
 							
-			if(!(n == 0)) {
-					
-				// correction for a sample, multiplicate the scale factor
-				n = (int) (n * (this.noiseContext.getNoiseParams().getScaleFactor()));
-					
-				// correction for intervals unequal to 3600 seconds (= one hour)
-				n = (int) (n * (3600. / this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()));
-					
+			// correction for a sample, multiplicate the scale factor
+			n = (int) (n * (this.noiseContext.getNoiseParams().getScaleFactor()));
+				
+			// correction for intervals unequal to 3600 seconds (= one hour)
+			n = (int) (n * (3600. / this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()));
+			
+			if(!(n == 0)) {					
 				double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
 				double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, p);
 				noiseEmission = mittelungspegel + Dv;
-			
-				if (!(nMinusOneCar == 0)) {
-					
-					// correction for a sample, multiplicate the scale factor
-					nMinusOneCar = (int) (nMinusOneCar * (this.noiseContext.getNoiseParams().getScaleFactor()));
-						
-					// correction for intervals unequal to 3600 seconds (= one hour)
-					nMinusOneCar = (int) (nMinusOneCar * (3600. / this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()));
-					
-					double mittelungspegelMinusOneCar = NoiseEquations.calculateMittelungspegelLm(nMinusOneCar, pMinusOneCar);
-					double DvMinusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, pMinusOneCar);
-					noiseEmissionMinusOneCar = mittelungspegelMinusOneCar + DvMinusOneCar;
-				}
-				
-				if (!(nMinusOneHgv == 0)) {
-					
-					// correction for a sample, multiplicate the scale factor
-					nMinusOneHgv = (int) (nMinusOneHgv * (this.noiseContext.getNoiseParams().getScaleFactor()));
-						
-					// correction for intervals unequal to 3600 seconds (= one hour)
-					nMinusOneHgv = (int) (nMinusOneHgv * (3600. / this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()));
-					
-					double mittelungspegelMinusOneHgv = NoiseEquations.calculateMittelungspegelLm(nMinusOneHgv, pMinusOneHgv);
-					double DvMinusOneHgv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, pMinusOneHgv);
-					noiseEmissionMinusOneHgv = mittelungspegelMinusOneHgv + DvMinusOneHgv;
-					
-				}
-			} else {
-				// there is no single car or hgv
 			}
+			
+			double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm((n + 1), pPlusOneCar);
+			double DvPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, pPlusOneCar);
+			noiseEmissionPlusOneCar = mittelungspegelPlusOneCar + DvPlusOneCar;
+			
+			double mittelungspegelPlusOneHgv = NoiseEquations.calculateMittelungspegelLm((n + 1), pPlusOneHgv);
+			double DvPlusOneHgv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(vCar, vHdv, pPlusOneHgv);
+			noiseEmissionPlusOneHgv = mittelungspegelPlusOneHgv + DvPlusOneHgv;
 			
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
 				this.noiseContext.getNoiseLinks().get(linkId).setEmission(noiseEmission);
-				this.noiseContext.getNoiseLinks().get(linkId).setEmissionMinusOneCar(noiseEmissionMinusOneCar);
-				this.noiseContext.getNoiseLinks().get(linkId).setEmissionMinusOneHGV(noiseEmissionMinusOneHgv);
+				this.noiseContext.getNoiseLinks().get(linkId).setEmissionPlusOneCar(noiseEmissionPlusOneCar);
+				this.noiseContext.getNoiseLinks().get(linkId).setEmissionPlusOneHGV(noiseEmissionPlusOneHgv);
 
 			} else {
 				NoiseLink noiseLink = new NoiseLink(linkId);
 				noiseLink.setEmission(noiseEmission);
-				noiseLink.setEmissionMinusOneCar(noiseEmissionMinusOneCar);
-				noiseLink.setEmissionMinusOneHGV(noiseEmissionMinusOneHgv);
+				noiseLink.setEmissionPlusOneCar(noiseEmissionPlusOneCar);
+				noiseLink.setEmissionPlusOneHGV(noiseEmissionPlusOneHgv);
 				this.noiseContext.getNoiseLinks().put(linkId, noiseLink );
 			}
 		}

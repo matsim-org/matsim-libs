@@ -44,10 +44,10 @@ public class NoiseLink {
 	private int hgvAgents = 0; // hgvAgents x scaleFactor = hgv
 	private double emission = 0.;
 	
-	private double emissionMinusOneCar = 0.;
-	private double emissionMinusOneHGV = 0.;
-	private double immissionMinusOneCar = 0.;
-	private double immissionMinusOneHGV = 0.;
+	private double emissionPlusOneCar = 0.;
+	private double emissionPlusOneHGV = 0.;
+	private double immissionPlusOneCar = 0.;
+	private double immissionPlusOneHGV = 0.;
 	
 	private double damageCost = 0.; 
 	private double averageDamageCostPerCar = 0.; 
@@ -103,29 +103,29 @@ public class NoiseLink {
 	public void setEmission(double emission) {
 		this.emission = emission;
 	}
-	public double getEmissionMinusOneCar() {
-		return emissionMinusOneCar;
+	public double getEmissionPlusOneCar() {
+		return emissionPlusOneCar;
 	}
-	public void setEmissionMinusOneCar(double emissionMinusOneCar) {
-		this.emissionMinusOneCar = emissionMinusOneCar;
+	public void setEmissionPlusOneCar(double emissionPlusOneCar) {
+		this.emissionPlusOneCar = emissionPlusOneCar;
 	}
-	public double getEmissionMinusOneHGV() {
-		return emissionMinusOneHGV;
+	public double getEmissionPlusOneHGV() {
+		return emissionPlusOneHGV;
 	}
-	public void setEmissionMinusOneHGV(double emissionMinusOneHGV) {
-		this.emissionMinusOneHGV = emissionMinusOneHGV;
+	public void setEmissionPlusOneHGV(double emissionPlusOneHGV) {
+		this.emissionPlusOneHGV = emissionPlusOneHGV;
 	}
-	public double getImmissionMinusOneCar() {
-		return immissionMinusOneCar;
+	public double getImmissionPlusOneCar() {
+		return immissionPlusOneCar;
 	}
-	public void setImmissionMinusOneCar(double immissionMinusOneCar) {
-		this.immissionMinusOneCar = immissionMinusOneCar;
+	public void setImmissionPlusOneCar(double immissionPlusOneCar) {
+		this.immissionPlusOneCar = immissionPlusOneCar;
 	}
-	public double getImmissionMinusOneHGV() {
-		return immissionMinusOneHGV;
+	public double getImmissionPlusOneHGV() {
+		return immissionPlusOneHGV;
 	}
-	public void setImmissionMinusOneHGV(double immissionMinusOneHGV) {
-		this.immissionMinusOneHGV = immissionMinusOneHGV;
+	public void setImmissionPlusOneHGV(double immissionPlusOneHGV) {
+		this.immissionPlusOneHGV = immissionPlusOneHGV;
 	}
 	public double getMarginalDamageCostPerCar() {
 		return marginalDamageCostPerCar;
@@ -144,14 +144,15 @@ public class NoiseLink {
 		return "NoiseLink [id=" + id + ", enteringVehicleIds="
 				+ enteringVehicleIds + ", carAgents=" + carAgents
 				+ ", hgvAgents=" + hgvAgents + ", emission=" + emission
-				+ ", emissionMinusOneCar=" + emissionMinusOneCar
-				+ ", emissionMinusOneHGV=" + emissionMinusOneHGV
-				+ ", immissionMinusOneCar=" + immissionMinusOneCar
-				+ ", immissionMinusOneHGV=" + immissionMinusOneHGV
+				+ ", emissionPlusOneCar=" + emissionPlusOneCar
+				+ ", emissionPlusOneHGV=" + emissionPlusOneHGV
+				+ ", immissionPlusOneCar=" + immissionPlusOneCar
+				+ ", immissionPlusOneHGV=" + immissionPlusOneHGV
 				+ ", damageCost=" + damageCost + ", averageDamageCostPerCar="
 				+ averageDamageCostPerCar + ", averageDamageCostPerHgv="
 				+ averageDamageCostPerHgv + ", marginalDamageCostPerCar="
 				+ marginalDamageCostPerCar + ", marginalDamageCostPerHgv="
 				+ marginalDamageCostPerHgv + "]";
 	}
+	
 }

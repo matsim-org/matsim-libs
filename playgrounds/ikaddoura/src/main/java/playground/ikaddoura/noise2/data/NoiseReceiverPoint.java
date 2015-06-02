@@ -52,8 +52,8 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 			
 	// time-specific information
 	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
-	private Map<Id<Link>, Double> linkId2IsolatedImmissionMinusOneCar = new HashMap<Id<Link>, Double>();
-	private Map<Id<Link>, Double> linkId2IsolatedImmissionMinusOneHGV = new HashMap<Id<Link>, Double>(); 
+	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneCar = new HashMap<Id<Link>, Double>();
+	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneHGV = new HashMap<Id<Link>, Double>(); 
 	private double finalImmission = 0.;
 	private double affectedAgentUnits = 0.;
 	private double damageCosts;
@@ -127,22 +127,22 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		this.affectedAgentUnits = affectedAgentsUnits;
 	}
 
-	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionMinusOneCar() {
-		return linkId2IsolatedImmissionMinusOneCar;
+	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneCar() {
+		return linkId2IsolatedImmissionPlusOneCar;
 	}
 
-	public void setLinkId2IsolatedImmissionMinusOneCar(
-			Map<Id<Link>, Double> linkId2IsolatedImmissionMinusOneCar) {
-		this.linkId2IsolatedImmissionMinusOneCar = linkId2IsolatedImmissionMinusOneCar;
+	public void setLinkId2IsolatedImmissionPlusOneCar(
+			Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneCar) {
+		this.linkId2IsolatedImmissionPlusOneCar = linkId2IsolatedImmissionPlusOneCar;
 	}
 
-	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionMinusOneHGV() {
-		return linkId2IsolatedImmissionMinusOneHGV;
+	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneHGV() {
+		return linkId2IsolatedImmissionPlusOneHGV;
 	}
 
-	public void setLinkId2IsolatedImmissionMinusOneHGV(
-			Map<Id<Link>, Double> linkId2IsolatedImmissionMinusOneHGV) {
-		this.linkId2IsolatedImmissionMinusOneHGV = linkId2IsolatedImmissionMinusOneHGV;
+	public void setLinkId2IsolatedImmissionPlusOneHGV(
+			Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneHGV) {
+		this.linkId2IsolatedImmissionPlusOneHGV = linkId2IsolatedImmissionPlusOneHGV;
 	}
 
 	public Map<Id<Link>, Double> getLinkId2MarginalCostCar() {
@@ -167,15 +167,14 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 				+ ", linkId2distanceCorrection=" + linkId2distanceCorrection
 				+ ", linkId2angleCorrection=" + linkId2angleCorrection
 				+ ", linkId2IsolatedImmission=" + linkId2IsolatedImmission
-				+ ", linkId2IsolatedImmissionMinusOneCar="
-				+ linkId2IsolatedImmissionMinusOneCar
-				+ ", linkId2IsolatedImmissionMinusOneHGV="
-				+ linkId2IsolatedImmissionMinusOneHGV + ", finalImmission="
+				+ ", linkId2IsolatedImmissionPlusOneCar="
+				+ linkId2IsolatedImmissionPlusOneCar
+				+ ", linkId2IsolatedImmissionPlusOneHGV="
+				+ linkId2IsolatedImmissionPlusOneHGV + ", finalImmission="
 				+ finalImmission + ", affectedAgentUnits=" + affectedAgentUnits
 				+ ", damageCosts=" + damageCosts + ", linkId2MarginalCostCar="
 				+ linkId2MarginalCostCar + ", linkId2MarginalCostHGV="
 				+ linkId2MarginalCostHGV + ", damageCostsPerAffectedAgentUnit="
 				+ damageCostsPerAffectedAgentUnit + "]";
 	}
-
 }
