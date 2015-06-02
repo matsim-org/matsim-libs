@@ -50,8 +50,10 @@ public class NoiseLink {
 	private double immissionMinusOneHGV = 0.;
 	
 	private double damageCost = 0.; 
-	private double damageCostPerCar = 0.; 
-	private double damageCostPerHgv = 0.; 
+	private double averageDamageCostPerCar = 0.; 
+	private double averageDamageCostPerHgv = 0.; 
+	private double marginalDamageCostPerCar = 0.; 
+	private double marginalDamageCostPerHgv = 0.; 
 	
 	public NoiseLink(Id<Link> linkId) {
 		this.id = linkId;
@@ -83,17 +85,17 @@ public class NoiseLink {
 	public void setDamageCost(double damageCost) {
 		this.damageCost = damageCost;
 	}
-	public double getDamageCostPerCar() {
-		return damageCostPerCar;
+	public double getAverageDamageCostPerCar() {
+		return averageDamageCostPerCar;
 	}
-	public void setDamageCostPerCar(double damageCostPerCar) {
-		this.damageCostPerCar = damageCostPerCar;
+	public void setAverageDamageCostPerCar(double damageCostPerCar) {
+		this.averageDamageCostPerCar = damageCostPerCar;
 	}
-	public double getDamageCostPerHgv() {
-		return damageCostPerHgv;
+	public double getAverageDamageCostPerHgv() {
+		return averageDamageCostPerHgv;
 	}
-	public void setDamageCostPerHgv(double damageCostPerHgv) {
-		this.damageCostPerHgv = damageCostPerHgv;
+	public void setAverageDamageCostPerHgv(double damageCostPerHgv) {
+		this.averageDamageCostPerHgv = damageCostPerHgv;
 	}
 	public double getEmission() {
 		return emission;
@@ -124,6 +126,18 @@ public class NoiseLink {
 	}
 	public void setImmissionMinusOneHGV(double immissionMinusOneHGV) {
 		this.immissionMinusOneHGV = immissionMinusOneHGV;
+	}
+	public double getMarginalDamageCostPerCar() {
+		return marginalDamageCostPerCar;
+	}
+	public void setMarginalDamageCostPerCar(double marginalDamageCostPerCar) {
+		this.marginalDamageCostPerCar = marginalDamageCostPerCar;
+	}
+	public double getMarginalDamageCostPerHgv() {
+		return marginalDamageCostPerHgv;
+	}
+	public void setMarginalDamageCostPerHgv(double marginalDamageCostPerHgv) {
+		this.marginalDamageCostPerHgv = marginalDamageCostPerHgv;
 	}
 	
 }

@@ -328,11 +328,11 @@ public class NoiseWriter {
 	public static void writeLinkDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
 		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 		
-		String outputPathDamages = outputPath + "damages_link/";
+		String outputPathDamages = outputPath + "average_damages_link/";
 		File dir = new File(outputPathDamages);
 		dir.mkdirs();
 		
-		String fileName = outputPathDamages + "damages_link_" + timeInterval + ".csv";
+		String fileName = outputPathDamages + "average_damages_link_" + timeInterval + ".csv";
 		
 		File file = new File(fileName);
 		
@@ -374,11 +374,11 @@ public class NoiseWriter {
 	public static void writeLinkAvgCarDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
 		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 		
-		String outputPathDamages = outputPath + "damages_link_car/";
+		String outputPathDamages = outputPath + "average_damages_link_car/";
 		File dir = new File(outputPathDamages);
 		dir.mkdirs();
 		
-		String fileName = outputPathDamages + "damages_link_car_" + timeInterval + ".csv";
+		String fileName = outputPathDamages + "average_damages_link_car_" + timeInterval + ".csv";
 		
 		File file = new File(fileName);
 		
@@ -390,7 +390,7 @@ public class NoiseWriter {
 			
 			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 				
-				bw.write(link.getId() + ";" + link.getDamageCostPerCar());
+				bw.write(link.getId() + ";" + link.getAverageDamageCostPerCar());
 				bw.newLine();
 			}
 			
@@ -420,23 +420,115 @@ public class NoiseWriter {
 	public static void writeLinkAvgHgvDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
 		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
 		
-		String outputPathDamages = outputPath + "damages_link_hgv/";
+		String outputPathDamages = outputPath + "average_damages_link_hgv/";
 		File dir = new File(outputPathDamages);
 		dir.mkdirs();
 		
-		String fileName = outputPathDamages + "damages_link_hgv_" + timeInterval + ".csv";
+		String fileName = outputPathDamages + "average_damages_link_hgv_" + timeInterval + ".csv";
 		
 		File file = new File(fileName);
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			
-			bw.write("Link Id;Average damages per HGV " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.write("Link Id; Average damages per HGV " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 			bw.newLine();
 			
 			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
 				
-				bw.write(link.getId() + ";" + link.getDamageCostPerHgv());
+				bw.write(link.getId() + ";" + link.getAverageDamageCostPerHgv());
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\",\"Real\"");
+						
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}
+
+	public static void writeLinkMarginalCarDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
+		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+		
+		String outputPathDamages = outputPath + "marginal_damages_link_car/";
+		File dir = new File(outputPathDamages);
+		dir.mkdirs();
+		
+		String fileName = outputPathDamages + "marginal_damages_link_car_" + timeInterval + ".csv";
+		
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			
+			bw.write("Link Id;Marginal damages per car " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.newLine();
+			
+			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
+				
+				bw.write(link.getId() + ";" + link.getMarginalDamageCostPerCar());
+				bw.newLine();
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		File file2 = new File(fileName + "t");
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
+			bw.write("\"String\",\"Real\"");
+						
+			bw.newLine();
+			
+			bw.close();
+			log.info("Output written to " + fileName + "t");
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+	}
+
+	public static void writeLinkMarginalHgvDamageInfoPerHour(NoiseContext noiseContext, String outputPath) {
+		double timeInterval = noiseContext.getCurrentTimeBinEndTime();
+		
+		String outputPathDamages = outputPath + "marginal_damages_link_hgv/";
+		File dir = new File(outputPathDamages);
+		dir.mkdirs();
+		
+		String fileName = outputPathDamages + "marginal_damages_link_hgv_" + timeInterval + ".csv";
+		
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			
+			bw.write("Link Id; Marginal damages per HGV " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.newLine();
+			
+			for (NoiseLink link : noiseContext.getNoiseLinks().values()) {
+				
+				bw.write(link.getId() + ";" + link.getMarginalDamageCostPerHgv());
 				bw.newLine();
 			}
 			

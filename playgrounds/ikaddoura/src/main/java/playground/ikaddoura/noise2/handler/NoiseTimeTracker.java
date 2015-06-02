@@ -263,19 +263,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		if (this.noiseContext.getNoiseParams().isComputeCausingAgents()) {
 			
-			if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.AverageCost) {
-				
-				log.info("Average cost approach...");
-				computeAverageDamageCost();
-			
-			} else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.MarginalCost) {
-				
-				log.info("Marginal cost approach...");
-				computeMarginalDamageCost();
-				
-			} else {
-				throw new RuntimeException("Unknown noise allocation approach. Aborting...");
-			}
+			computeAverageDamageCost();
+			computeMarginalDamageCost();
 			
 			if (this.noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
 				log.info("Throwing noise events for the causing agents...");
@@ -422,10 +411,10 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			}
 			
 			if (damageCostPerCar > 0.) {
-				this.noiseContext.getNoiseLinks().get(linkId).setDamageCostPerCar(damageCostPerCar);
+				this.noiseContext.getNoiseLinks().get(linkId).setAverageDamageCostPerCar(damageCostPerCar);
 			}
 			if (damageCostPerHgv > 0.) {
-				this.noiseContext.getNoiseLinks().get(linkId).setDamageCostPerHgv(damageCostPerHgv);			
+				this.noiseContext.getNoiseLinks().get(linkId).setAverageDamageCostPerHgv(damageCostPerHgv);			
 			}
 		}
 	}
@@ -458,6 +447,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		log.info("Summing up the marginal damage cost for each link...");
 		sumUpMarginalDamageCostForAllReceiverPoints();
+		NoiseWriter.writeLinkMarginalCarDamageInfoPerHour(noiseContext, outputDirectory);
+		NoiseWriter.writeLinkMarginalHgvDamageInfoPerHour(noiseContext, outputDirectory);
 		log.info("Summing up the marginal damage cost for each link... Done.");
 	}
 	
@@ -511,11 +502,15 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			double sumHGV = 0.;
 			
 			for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-				sumCar = sumCar + rp.getLinkId2MarginalCostCar().get(link.getId());
-				sumHGV = sumHGV + rp.getLinkId2MarginalCostHGV().get(link.getId());
+				if (rp.getLinkId2MarginalCostCar().containsKey(link.getId())) {
+					sumCar = sumCar + rp.getLinkId2MarginalCostCar().get(link.getId());
+				}
+				if (rp.getLinkId2MarginalCostHGV().containsKey(link.getId())) {
+					sumHGV = sumHGV + rp.getLinkId2MarginalCostHGV().get(link.getId());
+				}
 			}
-			link.setDamageCostPerCar(sumCar);
-			link.setDamageCostPerHgv(sumHGV);
+			link.setMarginalDamageCostPerCar(sumCar);
+			link.setMarginalDamageCostPerHgv(sumHGV);
 		}
 	}
 
@@ -523,9 +518,22 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()) {
 											
-			if (this.noiseContext.getNoiseLinks().containsKey(linkId)){
-				double amountCar = this.noiseContext.getNoiseLinks().get(linkId).getDamageCostPerCar();
-				double amountHdv = this.noiseContext.getNoiseLinks().get(linkId).getDamageCostPerHgv();
+			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
+				
+				double amountCar = 0.;
+				double amountHdv = 0.;
+				
+				if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.AverageCost) {
+					amountCar = this.noiseContext.getNoiseLinks().get(linkId).getAverageDamageCostPerCar();
+					amountHdv = this.noiseContext.getNoiseLinks().get(linkId).getAverageDamageCostPerHgv();
+				
+				} else if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.MarginalCost) {
+					amountCar = this.noiseContext.getNoiseLinks().get(linkId).getMarginalDamageCostPerCar();
+					amountHdv = this.noiseContext.getNoiseLinks().get(linkId).getMarginalDamageCostPerHgv();
+					
+				} else {
+					throw new RuntimeException("Unknown noise allocation approach. Aborting...");
+				}
 				
 				for(Id<Vehicle> vehicleId : this.noiseContext.getNoiseLinks().get(linkId).getEnteringVehicleIds()) {
 					

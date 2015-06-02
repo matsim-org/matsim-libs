@@ -262,7 +262,7 @@ public class NoiseTest {
 		
 		for(double currentTimeSlot : timeSlots){
 			
-			pathToConsideredAgentUnitsFile = runDirectory + "analysis_it.0/consideredAgentUnits/0.consideredAgentUnits_" + Double.toString(currentTimeSlot) + ".csv";
+			pathToConsideredAgentUnitsFile = runDirectory + "analysis_it.0/consideredAgentUnits/consideredAgentUnits_" + Double.toString(currentTimeSlot) + ".csv";
 			
 			br = IOUtils.getBufferedReader(pathToConsideredAgentUnitsFile);
 			
@@ -452,7 +452,7 @@ public class NoiseTest {
 
 		line = null;
 		
-		String pathToEmissionsFile = runDirectory + "analysis_it.0/emissions/0.emission_" + Double.toString(endTime) + ".csv";
+		String pathToEmissionsFile = runDirectory + "analysis_it.0/emissions/emission_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<Link>, Double> emissionsPerLink = new HashMap<Id<Link>, Double>();
 		idxFromKey = new ConcurrentHashMap<String, Integer>();
@@ -538,7 +538,7 @@ public class NoiseTest {
 
 		line = null;
 		
-		String pathToImmissionsFile = runDirectory + "analysis_it.0/immissions/0.immission_" + Double.toString(endTime) + ".csv";
+		String pathToImmissionsFile = runDirectory + "analysis_it.0/immissions/immission_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<ReceiverPoint>, Double> immissionPerReceiverPointId = new HashMap<Id<ReceiverPoint>, Double>();
 		
@@ -603,7 +603,7 @@ public class NoiseTest {
 
 		line = null;
 		
-		String pathToDamagesFile = runDirectory + "analysis_it.0/damages_receiverPoint/0.damages_receiverPoint_" + Double.toString(endTime) + ".csv";
+		String pathToDamagesFile = runDirectory + "analysis_it.0/damages_receiverPoint/damages_receiverPoint_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<ReceiverPoint>, Double> damagesPerReceiverPointId = new HashMap<Id<ReceiverPoint>, Double>();
 		
@@ -659,7 +659,7 @@ public class NoiseTest {
 		
 		line = null;
 		
-		String pathToDamageLinkFile = runDirectory + "analysis_it.0/damages_link/0.damages_link_" + Double.toString(endTime) + ".csv";
+		String pathToDamageLinkFile = runDirectory + "analysis_it.0/average_damages_link/average_damages_link_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<Link>, Double> damagesPerlinkId = new HashMap<Id<Link>, Double>();
 		
@@ -700,7 +700,7 @@ public class NoiseTest {
 		
 		line = null;
 		
-		String pathToDamageLinkCar = runDirectory + "analysis_it.0/damages_link_car/0.damages_link_car_" + Double.toString(endTime) + ".csv";
+		String pathToDamageLinkCar = runDirectory + "analysis_it.0/average_damages_link_car/average_damages_link_car_" + Double.toString(endTime) + ".csv";
 		
 		Map<Id<Link>, Double> damagesPerCar = new HashMap<Id<Link>, Double>();
 		
