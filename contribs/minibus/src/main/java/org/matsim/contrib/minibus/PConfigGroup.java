@@ -703,7 +703,7 @@ public final class PConfigGroup extends ConfigGroup{
 
 	}
 	
-	public void validate(){
+	public void validate(double marginalUtilityOfMoney){
 		if (this.mergeTransitLine) {
 			log.info("All routes of a minibus transit line with the same stop sequence will be merged into one single transit route. Note that the transit schedules written to the output directory do not contain all minibus routes anymore.");
 			
@@ -711,6 +711,14 @@ public final class PConfigGroup extends ConfigGroup{
 				log.warn("Transit lines will be merged. Activate the operator logger to retrieve more detailed information on particular routes.");
 			}
 		}
+		
+		if(this.useFranchise && marginalUtilityOfMoney == 0.){
+			
+			log.error("Paratransit welfare maximization is enabled but marginal utility of money equals 0! This would produce benefits of-Infinity! Aborting...");
+			throw new RuntimeException();
+			
+		}
+		
 	}
 
 	public boolean getWelfareMaximization() {

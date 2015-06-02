@@ -82,7 +82,11 @@ public final class WelfareCarefulMultiPlanOperator extends AbstractOperator {
 			
 			delegate.score += plan.getScore();
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {
-				route.setDescription(plan.toString(delegate.budget + delegate.score));
+				StringBuffer sB = new StringBuffer();
+				sB.append(plan.toString(delegate.budget + delegate.score));
+				sB.append(", welfare_correction: " + welfareCorrection);
+				sB.append(", expenses: " + Double.toString(welfareCorrection - plan.getScore()));
+				route.setDescription(sB.toString());
 			}
 		}
 		

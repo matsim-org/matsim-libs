@@ -53,7 +53,7 @@ public class PModule {
     }
     public void configureControler(final Controler controler) {
         PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
-        pConfig.validate();
+        pConfig.validate(controler.getConfig().planCalcScore().getMarginalUtilityOfMoney());
         PBox pBox = new PBox(pConfig);
         controler.addOverridingModule(new AbstractModule() {
             @Override

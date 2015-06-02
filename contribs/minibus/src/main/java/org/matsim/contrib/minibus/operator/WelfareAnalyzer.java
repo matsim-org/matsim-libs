@@ -40,6 +40,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * 
@@ -57,8 +59,11 @@ public class WelfareAnalyzer {
 	Map<Id<PPlan>, Double> planId2welfareCorrection = new HashMap<>();
 	Map<Id<Person>, Double> personId2benefitsBefore = new HashMap<>(); // previous iteration
 	Map<Id<Person>, Set<Id<PPlan>>> personId2usedPPlanIds = new HashMap<>();
+	Set<Id<PPlan>> existingPPlanIds;
 	
 	public void computeWelfare(Scenario scenario) {
+		
+		this.refreshExistingPPlanIds(scenario);
 		
 		// map to store the pplan ids an agent used in this iteration
 		this.personId2usedPPlanIds = new HashMap<Id<Person>, Set<Id<PPlan>>>();
@@ -68,8 +73,11 @@ public class WelfareAnalyzer {
 		for (Person person : scenario.getPopulation().getPersons().values()){
 			
 			for (PlanElement pE : person.getSelectedPlan().getPlanElements()){
+				
 				if (pE instanceof Leg) {
+					
 					Leg leg = (Leg) pE;
+					
 					if (leg.getMode().equals(TransportMode.pt)) {
 
 						ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
@@ -129,6 +137,24 @@ public class WelfareAnalyzer {
 		
 		// save the scores for the next iteration
 		personId2benefitsBefore = personId2benefits;
+		
+	}
+
+	private void refreshExistingPPlanIds(Scenario scenario) {
+		
+		this.existingPPlanIds = new HashSet<Id<PPlan>>();
+		
+		for(TransitLine transitLine : scenario.getTransitSchedule().getTransitLines().values()){
+			
+			for(TransitRoute transitRoute : transitLine.getRoutes().values()){
+				
+				String planIdString = transitRoute.getId().toString().replace(transitLine.getId().toString() + "-", "");
+				Id<PPlan> planId = Id.create(planIdString, PPlan.class);
+				this.existingPPlanIds.add(planId);
+				
+			}
+			
+		}
 		
 	}
 	
@@ -197,19 +223,20 @@ public class WelfareAnalyzer {
 			
 			planStatsWriter.write("pplan_id" + delimiter + "revenues" + delimiter + "user_ids");
 			
-			for(Entry<Id<PPlan>, Double> entry : this.planId2welfareCorrection.entrySet()){
+			for(Id<PPlan> pplanId : this.existingPPlanIds){
 				
 				planStatsWriter.newLine();
 				
-				String id = entry.getKey().toString();
-				String value = entry.getValue().toString();
+				String id = pplanId.toString();
+				String value = Double.toString(this.getLineId2welfareCorrection(pplanId));
+				
 				StringBuffer stB = new StringBuffer();
 				
 				for(Entry<Id<Person>,Set<Id<PPlan>>> usedPPlanEntry : this.personId2usedPPlanIds.entrySet()){
 					
-					for(Id<PPlan> pplanId : usedPPlanEntry.getValue()){
+					for(Id<PPlan> planId : usedPPlanEntry.getValue()){
 						
-						if(pplanId.toString().equals(id)){
+						if(planId.toString().equals(id)){
 							
 							stB.append(usedPPlanEntry.getKey().toString() + ",");
 							break;
