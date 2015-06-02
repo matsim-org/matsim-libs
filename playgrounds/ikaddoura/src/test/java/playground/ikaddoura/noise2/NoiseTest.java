@@ -65,6 +65,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.noise2.data.GridParameters;
+import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.data.NoiseReceiverPoint;
 import playground.ikaddoura.noise2.data.PersonActivityInfo;
@@ -147,15 +148,15 @@ public class NoiseTest {
 		Assert.assertEquals("wrong immission angle correction for receiver point 8 and link0", immissionCorrection4, noiseContext.getReceiverPoints().get(Id.create("8", ReceiverPoint.class)).getLinkId2angleCorrection().get(Id.create("link0", Link.class)), MatsimTestUtils.EPSILON);
 	}
 	
-	// tests the noise emissions, immissions, considered agent units, damages (receiver points), damages (per link), damages (per vehicle) based on the *.csv output
+	// tests the noise emissions, immissions, considered agent units, damages (receiver points), damages (per link), damages (per vehicle) based on the generated *.csv output
+	// tests the noise events applying the average cost allocation approach
 	@Test
-	public final void test2(){
+	public final void test2a(){
 		
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
 		Controler controler = new Controler(configFile);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		controler.run();
 		
 		// run the noise analysis for the final iteration (offline)
@@ -647,7 +648,7 @@ public class NoiseTest {
 		Assert.assertEquals("Wrong damage!", 0., damagesPerReceiverPointId.get(Id.create("0", ReceiverPoint.class)), MatsimTestUtils.EPSILON);
 		
 		// ############################################
-		// test damages per link and time
+		// test average damages per link and time
 		// ############################################
 		
 		// noise level at receiver point '16': 69.65439464
@@ -695,7 +696,7 @@ public class NoiseTest {
 		Assert.assertEquals("Wrong link's damage contribution!", 0., damagesPerlinkId.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 				
 		// ############################################
-		// test damages per car and time
+		// test average damages per link, car and time
 		// ############################################
 		
 		line = null;
@@ -736,6 +737,49 @@ public class NoiseTest {
 		Assert.assertEquals("Wrong damage per car per link!", 0., damagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
 		
 		// ############################################
+		// test marginal damages per link, car and time
+		// ############################################
+		
+		line = null;
+		
+		String pathToMarginalDamageLinkCar = runDirectory + "analysis_it.0/marginal_damages_link_car/marginal_damages_link_car_" + Double.toString(endTime) + ".csv";
+		
+		Map<Id<Link>, Double> marginaldamagesPerCar = new HashMap<Id<Link>, Double>();
+		
+		idxFromKey = new ConcurrentHashMap<String, Integer>();
+		
+		br = IOUtils.getBufferedReader(pathToMarginalDamageLinkCar);
+		
+		try {
+			
+			line = br.readLine();
+			
+			String[] keys = line.split(separator);
+			for(int i = 0; i < keys.length; i++){
+				idxFromKey.put(keys[i], i);
+			}
+			
+			int idxlinkId = idxFromKey.get("Link Id");
+			int idxDamages = idxFromKey.get("Marginal damages per car " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS));
+			
+			while((line = br.readLine()) != null){
+				
+				keys = line.split(separator);
+				marginaldamagesPerCar.put(Id.create(keys[idxlinkId], Link.class), Double.parseDouble(keys[idxDamages]));
+				
+			}
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			
+		// TODO: are the values below right?!
+		
+		Assert.assertEquals("Wrong damage per car per link!", 0.000120446614, marginaldamagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong damage per car per link!", 0.012313721960, marginaldamagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong damage per car per link!", 0., marginaldamagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
+		
+		// ############################################
 		// test the noise-specific events
 		// ############################################
 
@@ -755,6 +799,116 @@ public class NoiseTest {
 				counter++;
 			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
 				Assert.assertEquals("wrong cost per car for the given link and time interval", 3.992732562920194E-4, event.getAmount(), MatsimTestUtils.EPSILON);
+				counter++;
+			} else {
+				Assert.assertEquals("There should either be no further events, or the amount should be zero.", 0., event.getAmount(), MatsimTestUtils.EPSILON);
+			}
+		}		
+		Assert.assertTrue("No event found to be tested.", tested);
+		Assert.assertEquals("Wrong number of total events.", 4, counter, MatsimTestUtils.EPSILON);
+		
+		boolean tested2 = false;
+		int counter2 = 0;
+		for (NoiseEventAffected event : timeTracker.getNoiseEventsAffected()) {
+			tested2 = true;
+
+			if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test1", Person.class).toString())) && event.getActType().equals("work") ) {
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.020745817449213576, event.getAmount(), MatsimTestUtils.EPSILON);
+				counter2++;
+			} else if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test2", Person.class).toString())) && event.getActType().equals("work")) {
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.017444990107520864, event.getAmount(), MatsimTestUtils.EPSILON);
+				counter2++;
+			} else if (event.getEmergenceTime() == 11 * 3600. && event.getrReceiverPointId().toString().equals(Id.create("16", ReceiverPoint.class).toString()) && event.getAffectedAgentId().toString().equals((Id.create("person_car_test3", Person.class).toString())) && event.getActType().equals("home")) {
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.028225601971719153, event.getAmount(), MatsimTestUtils.EPSILON);
+				counter2++;
+			} else {
+				Assert.assertEquals("There should either be no further events, or the amount should be zero.", 0., event.getAmount(), MatsimTestUtils.EPSILON);
+			}
+			
+		}		
+		Assert.assertTrue("No event found to be tested.", tested2);
+		Assert.assertEquals("Wrong number of total events.", 3, counter2, MatsimTestUtils.EPSILON);
+		
+	 }
+	
+	// same test as before, but using the marginal cost approach
+	@Test
+	public final void test2b(){
+		
+		// start a simple MATSim run with a single iteration
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
+		Controler controler = new Controler(configFile);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		controler.run();
+		
+		// run the noise analysis for the final iteration (offline)
+		
+		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
+		
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(runDirectory + "output_network.xml.gz");
+		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+		config.controler().setOutputDirectory(runDirectory);
+		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
+		
+		GridParameters gridParameters = new GridParameters();
+		gridParameters.setReceiverPointGap(250.);	
+		
+		String[] consideredActivities = {"home", "work"};
+		gridParameters.setConsideredActivitiesForDamages(consideredActivities);
+		
+		NoiseParameters noiseParameters = new NoiseParameters();
+		noiseParameters.setScaleFactor(1.);
+		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
+		
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		
+		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
+		File file = new File(outputFilePath);
+		file.mkdirs();
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		
+		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		events.addHandler(eventWriter);
+			
+		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		noiseContext.initialize();
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
+		
+		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
+		events.addHandler(actTracker);
+		
+		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
+		events.addHandler(timeTracker);
+						
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
+		
+		timeTracker.computeFinalTimeIntervals();
+
+		eventWriter.closeFile();
+			
+		// ############################################
+		// test the noise-specific events
+		// ############################################
+
+		boolean tested = false;
+		int counter = 0;
+		for (NoiseEventCaused event : timeTracker.getNoiseEventsCaused()) {
+			tested = true;
+
+			if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.012313721960, event.getAmount(), MatsimTestUtils.EPSILON);
+				counter++;
+			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("linkA5", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.012313721960, event.getAmount(), MatsimTestUtils.EPSILON);
+				counter++;
+			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test1", Vehicle.class).toString()))) {
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.000120446614, event.getAmount(), MatsimTestUtils.EPSILON);
+				counter++;
+			} else if (event.getEmergenceTime() == 11 * 3600. && event.getLinkId().toString().equals(Id.create("link2", Link.class).toString()) && event.getCausingVehicleId().toString().equals((Id.create("person_car_test2", Vehicle.class).toString()))) {
+				Assert.assertEquals("wrong cost per car for the given link and time interval", 0.000120446614, event.getAmount(), MatsimTestUtils.EPSILON);
 				counter++;
 			} else {
 				Assert.assertEquals("There should either be no further events, or the amount should be zero.", 0., event.getAmount(), MatsimTestUtils.EPSILON);
