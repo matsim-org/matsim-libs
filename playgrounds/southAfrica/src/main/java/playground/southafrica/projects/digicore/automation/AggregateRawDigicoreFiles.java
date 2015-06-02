@@ -82,7 +82,19 @@ public class AggregateRawDigicoreFiles {
 			throw new RuntimeException("Cannot process raw files.");
 		}
 		
+		splitEventsFile(args);
+		
 		Header.printFooter();
+	}
+	
+	public static void splitEventsFile(String[] args){
+		LOG.info("Splitting the events file by month...");
+		
+		String eventsFile = args[0] + (args[0].endsWith("/") ? "" : "/") + "processed/events.csv.gz";
+		String eventsFolder = args[0] + (args[0].endsWith("/") ? "" : "/") + "processed/";
+		EventByMonthSplitter.processEventsFile(eventsFile, eventsFolder);
+		
+		LOG.info("Done splitting the events file by month.");
 	}
 	
 	
