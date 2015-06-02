@@ -479,8 +479,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.values());
 					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.values());
 					
-					double marginalDamageCostCar = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) - rp.getDamageCosts();
-					double marginalDamageCostHGV = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneHGVThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation()) - rp.getDamageCosts();
+					double damageCostsPlusOneCar = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
+					double marginalDamageCostCar = (damageCostsPlusOneCar - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
+					
+					double damageCostsPlusOneHGV = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneHGVThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
+					double marginalDamageCostHGV = (damageCostsPlusOneHGV - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
 				
 					linkId2MarginalCostCar.put(linkId, marginalDamageCostCar);
 					linkId2MarginalCostHGV.put(linkId, marginalDamageCostHGV);
