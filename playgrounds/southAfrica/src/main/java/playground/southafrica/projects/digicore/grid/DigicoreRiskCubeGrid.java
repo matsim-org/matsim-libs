@@ -53,7 +53,7 @@ public class DigicoreRiskCubeGrid extends DigiGrid {
 	
 	
 	public DigicoreRiskCubeGrid(List<Double> riskThresholds) {
-		this.setRiskThresholds(riskThresholds);
+		super.setRiskThresholds(riskThresholds);
 	}
 	
 	@Override
