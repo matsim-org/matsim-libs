@@ -35,6 +35,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.noise2.data.GridParameters;
+import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.routing.TollDisutilityCalculatorFactory;
 
@@ -49,7 +50,8 @@ public class NoiseOnlineControler {
 
 	private static String configFile;
 	private static String setup;
-	
+	private static String approach;
+
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length > 0) {
@@ -60,10 +62,14 @@ public class NoiseOnlineControler {
 			setup = args[1];		
 			log.info("Setup: " + setup);
 			
+			setup = args[2];		
+			log.info("Approach: " + approach);
+			
 		} else {
 			
 			configFile = "/Users/ihab/Desktop/test/config.xml";
-			setup = "berlin1a";
+			setup = "berlin1";
+			approach = "averageCost";
 		}
 				
 		NoiseOnlineControler noiseImmissionControler = new NoiseOnlineControler();
@@ -100,6 +106,17 @@ public class NoiseOnlineControler {
 		// noise parameters
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
+		
+		if (approach.equals("averageCost")) {
+			noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.AverageCost);
+		
+		} else if (approach.equals("marginalCost")) {
+			noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
+		
+		} else {
+			throw new RuntimeException("Unknown noise allocation approach. Aborting...");
+		}
+		
 		noiseParameters.setScaleFactor(10.);
 		
 		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
@@ -162,7 +179,7 @@ public class NoiseOnlineControler {
 		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
 		
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 	}
 	
