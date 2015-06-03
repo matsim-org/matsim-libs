@@ -62,7 +62,7 @@ public class NoiseOnlineControler {
 			setup = args[1];		
 			log.info("Setup: " + setup);
 			
-			setup = args[2];		
+			approach = args[2];		
 			log.info("Approach: " + approach);
 			
 		} else {
