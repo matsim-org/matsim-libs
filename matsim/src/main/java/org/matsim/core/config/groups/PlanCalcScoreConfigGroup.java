@@ -561,8 +561,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			return this.typicalDurationScoreComputation ;
 		}
 		@StringSetter(TYPICAL_DURATION_SCORE_COMPUTATION)
-		public void setTypicalDurationScoreComputation( final String str ) {
-			this.typicalDurationScoreComputation = TypicalDurationScoreComputation.valueOf(str) ;
+		public void setTypicalDurationScoreComputation( TypicalDurationScoreComputation str ) {
+			this.typicalDurationScoreComputation = str ;
 		}
 		
 		@StringGetter( "activityType" )
