@@ -744,9 +744,35 @@ public class NoiseTest {
 		// link 2: emission_plusOneCar: 58.20280742849556
 		// link 2: emission_plusOneHGV: 58.80174566113962
 		
+//		int n = 2;
+//		double p = 0;
+//		double pPlusOneHgv = 1. / 3.;
+//		double pPlusOneCar = 0.;
+//		
+//		double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
+//		System.out.println("m: " + mittelungspegel);
+//		double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(1000 * 3.6, 1000 * 3.6, p);
+//		System.out.println("D: " + Dv);
+//		double noiseEmission = mittelungspegel + Dv;
+//		System.out.println("emission: " + noiseEmission);
+//		
+//		double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm((n + 1), pPlusOneCar);
+//		System.out.println("m plus one car: " + mittelungspegelPlusOneCar);
+//		double DvPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(1000 * 3.6, 1000 * 3.6, pPlusOneCar);
+//		System.out.println("D plus one car: " + DvPlusOneCar);
+//		double noiseEmissionPlusOneCar = mittelungspegelPlusOneCar + DvPlusOneCar;
+//		System.out.println("emission (plus one car): " + noiseEmissionPlusOneCar);
+//		
+//		double mittelungspegelPlusOneHgv = NoiseEquations.calculateMittelungspegelLm((n + 1), pPlusOneHgv);
+//		System.out.println("m plus one HGV: " + mittelungspegelPlusOneHgv);
+//		double DvPlusOneHgv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(1000 * 3.6, 1000 * 3.6, pPlusOneHgv);
+//		System.out.println("D plus one HGV: " + DvPlusOneHgv);
+//		double noiseEmissionPlusOneHgv = mittelungspegelPlusOneHgv + DvPlusOneHgv;
+//		System.out.println("emission (plus one hgv): " + noiseEmissionPlusOneHgv);
+
 		// link A5: emission: 86.43028648510975
 		// link A5: emission_plusOneCar: 88.19119907566656
-		// link A5: emission_plusOneHGV: 86.47455942823328 // TODO: Shouldn't that be larger than emission_plusOneCar ???
+		// link A5: emission_plusOneHGV: 86.47455942823328 // this is due to the Geschwindigkeitskorrektur
 		
 		// link B5: emission: 0
 		// link B5: emission_plusOneCar: 30.710821120439775
@@ -808,9 +834,7 @@ public class NoiseTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-			
-		// TODO: are the values below right?!
-		
+					
 		Assert.assertEquals("Wrong damage per car per link!", 0.00011994155845965193, marginaldamagesPerCar.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong damage per car per link!", 0.008531432493391652, marginaldamagesPerCar.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Wrong damage per car per link!", 3.440988380343235E-8, marginaldamagesPerCar.get(Id.create("linkB5", Link.class)), MatsimTestUtils.EPSILON);
