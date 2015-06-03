@@ -68,12 +68,13 @@ public class Injector {
             guiceModules.add(AbstractModule.toGuiceModule(module));
         }
         com.google.inject.Injector realInjector = bootstrapInjector.createChildInjector(guiceModules);
+        System.out.flush() ; System.err.flush(); 
         for (Map.Entry<Key<?>, Binding<?>> entry : realInjector.getBindings().entrySet()) {
       	  Level level = Level.DEBUG ;
 //            logger.debug(String.format("%s\n-> %s", entry.getKey(), entry.getValue()));
       	  if ( entry.getKey().toString().contains("type=org.matsim") ) {
-      		  logger.log( level, entry.getKey() );
-      		  logger.log( level, "   -> " + entry.getValue().getProvider() ) ;
+      		  logger.log( Level.WARN, entry.getKey() ); System.err.flush();
+      		  logger.log( level, "   -> " + entry.getValue().getProvider() ) ; System.out.flush(); 
       	  }
         }
         return fromGuiceInjector(realInjector);
