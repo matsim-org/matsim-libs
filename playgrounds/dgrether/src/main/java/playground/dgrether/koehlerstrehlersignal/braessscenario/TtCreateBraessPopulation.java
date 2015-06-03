@@ -29,8 +29,8 @@ import playground.dgrether.DgPaths;
 /**
  * Class to create a population for the braess scenario.
  * 
- * Choose the number of persons you like to simulate, 
- * their starting times and their initial routes before running this class.
+ * Choose the number of persons you like to simulate, their starting times and
+ * their initial routes before running this class.
  * 
  * @author tthunig
  */
@@ -45,22 +45,23 @@ public class TtCreateBraessPopulation {
 	}
 
 	/**
-	 * @param args not used
+	 * @param args
+	 *            not used
 	 */
 	public static void main(String[] args) {
-		
-		int numberOfPersons = 3600;
-		boolean sameStartTime = false;
-		boolean createAllRoutes = true;
-		
+
+		int numberOfPersons = 60;
+		boolean sameStartTime = true;
+		boolean createAllRoutes = false;
+
 		String outputDir = DgPaths.SHAREDSVN
 				+ "studies/tthunig/scenarios/BraessWoSignals/";
-//				+ "projects/cottbus/data/scenarios/braess_scenario/";
-		
+		// + "projects/cottbus/data/scenarios/braess_scenario/";
+
 		String popOutputFile = outputDir + "plans" + numberOfPersons;
 		if (sameStartTime)
 			popOutputFile += "SameStartTime";
-		if (createAllRoutes){
+		if (createAllRoutes) {
 			popOutputFile += "AllRoutes";
 		}
 		popOutputFile += ".xml";
@@ -71,12 +72,13 @@ public class TtCreateBraessPopulation {
 		Network network = scenario.getNetwork();
 		Population pop = PopulationUtils.createPopulation(config, network);
 
-		TtCreateBraessPopulation creator = new TtCreateBraessPopulation(pop, network);
+		TtCreateBraessPopulation creator = new TtCreateBraessPopulation(pop,
+				network);
 		creator.createPersons(numberOfPersons, sameStartTime, createAllRoutes);
 		creator.writePersons(popOutputFile);
 	}
 
-	private void writePersons(String popOutputFile) {
+	public void writePersons(String popOutputFile) {
 		new PopulationWriter(population, network).write(popOutputFile);
 	}
 
@@ -85,15 +87,16 @@ public class TtCreateBraessPopulation {
 	 * persons travel from the left to the right through the network as in
 	 * Braess's original paradox.
 	 * 
-	 * If sameStartTime is true, all agents start their trip at 8 am.
-	 * If not, the agents start after each other with one second gaps, 
-	 * the first one at 8 am.
+	 * If sameStartTime is true, all agents start their trip at 8 am. If not,
+	 * the agents start after each other with one second gaps, the first one at
+	 * 8 am.
 	 * 
 	 * @param numberOfPersons
-	 * @param sameStartTime 
-	 * @param createRoutes 
+	 * @param sameStartTime
+	 * @param createRoutes
 	 */
-	private void createPersons(int numberOfPersons, boolean sameStartTime, boolean createAllRoutes) {
+	public void createPersons(int numberOfPersons, boolean sameStartTime,
+			boolean createAllRoutes) {
 
 		for (int i = 0; i < numberOfPersons; i++) {
 
@@ -102,88 +105,96 @@ public class TtCreateBraessPopulation {
 					Id.create(i, Person.class));
 			Plan plan = population.getFactory().createPlan();
 
-			// add a start activity at link 1
-			Activity startAct = population.getFactory()
-					.createActivityFromLinkId("dummy", Id.create(1, Link.class));
-			if (sameStartTime){
+			// add a start activity at link 0
+			Activity startAct = population
+					.getFactory()
+					.createActivityFromLinkId("dummy", Id.create(0, Link.class));
+			if (sameStartTime) {
 				// 8:00 am.
-				startAct.setEndTime(8*3600);
-			}
-			else{
-				 // 8:00 am. plus i seconds
-				startAct.setEndTime(8*3600 + i);
+				startAct.setEndTime(8 * 3600);
+			} else {
+				// 8:00 am. plus i seconds
+				startAct.setEndTime(8 * 3600 + i);
 			}
 			plan.addActivity(startAct);
-			
+
 			// add a leg
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
-			if (createAllRoutes){
+			if (createAllRoutes) {
 				// create a route for the Z path
 				List<Id<Link>> pathZ = new ArrayList<>();
+				pathZ.add(Id.create(1, Link.class));
 				pathZ.add(Id.create(2, Link.class));
 				pathZ.add(Id.create(4, Link.class));
 				pathZ.add(Id.create(6, Link.class));
-				Route routeZ = new LinkNetworkRouteImpl(Id.create(1, Link.class), pathZ , Id.create(7, Link.class));
+				Route routeZ = new LinkNetworkRouteImpl(
+						Id.create(0, Link.class), pathZ, Id.create(7,
+								Link.class));
 				leg.setRoute(routeZ);
-			}		
+			}
 			plan.addLeg(leg);
-			
+
 			// add a drain activity at link 7
-			plan.addActivity(population.getFactory().
-					createActivityFromLinkId("dummy", Id.create(7, Link.class)));
-			
+			plan.addActivity(population.getFactory().createActivityFromLinkId(
+					"dummy", Id.create(7, Link.class)));
+
 			// store information in population
-			person.addPlan(plan);			
+			person.addPlan(plan);
 			population.addPerson(person);
 
 			// copy plan if different routes should be created
-			if (createAllRoutes){
+			if (createAllRoutes) {
 				// create the second plan
 				Plan plan2 = population.getFactory().createPlan();
-				
+
 				// add the same start activity as for the first plan
 				plan2.addActivity(startAct);
-				
+
 				// add a leg with the upper path
-				Leg legUp = population.getFactory().createLeg(TransportMode.car);
+				Leg legUp = population.getFactory()
+						.createLeg(TransportMode.car);
 				List<Id<Link>> pathUp = new ArrayList<>();
+				pathUp.add(Id.create(1, Link.class));
 				pathUp.add(Id.create(2, Link.class));
 				pathUp.add(Id.create(5, Link.class));
-				Route routeUp = new LinkNetworkRouteImpl(Id.create(1, Link.class), 
-						pathUp, Id.create(7, Link.class));
+				Route routeUp = new LinkNetworkRouteImpl(Id.create(0,
+						Link.class), pathUp, Id.create(7, Link.class));
 				legUp.setRoute(routeUp);
 				plan2.addLeg(legUp);
-				
+
 				// add the same drain activity as for the first plan
-				plan2.addActivity(population.getFactory().
-						createActivityFromLinkId("dummy", Id.create(7, Link.class)));
-				
+				plan2.addActivity(population.getFactory()
+						.createActivityFromLinkId("dummy",
+								Id.create(7, Link.class)));
+
 				person.addPlan(plan2);
-				
-				
+
 				// create the third plan
 				Plan plan3 = population.getFactory().createPlan();
 
 				// add the same start activity as for the first plan
 				plan3.addActivity(startAct);
-				
+
 				// add a leg with the lower path
-				Leg legDown = population.getFactory().createLeg(TransportMode.car);
+				Leg legDown = population.getFactory().createLeg(
+						TransportMode.car);
 				List<Id<Link>> pathDown = new ArrayList<>();
+				pathDown.add(Id.create(1, Link.class));
 				pathDown.add(Id.create(3, Link.class));
 				pathDown.add(Id.create(6, Link.class));
-				Route routeDown = new LinkNetworkRouteImpl(Id.create(1, Link.class), 
-						pathDown, Id.create(7, Link.class));
+				Route routeDown = new LinkNetworkRouteImpl(Id.create(0,
+						Link.class), pathDown, Id.create(7, Link.class));
 				legDown.setRoute(routeDown);
 				plan3.addLeg(legDown);
-				
+
 				// add a drain activity at link 7
-				plan3.addActivity(population.getFactory().
-						createActivityFromLinkId("dummy", Id.create(7, Link.class)));
-				
-				person.addPlan(plan3);				
+				plan3.addActivity(population.getFactory()
+						.createActivityFromLinkId("dummy",
+								Id.create(7, Link.class)));
+
+				person.addPlan(plan3);
 			}
-			
+
 		}
 
 	}
