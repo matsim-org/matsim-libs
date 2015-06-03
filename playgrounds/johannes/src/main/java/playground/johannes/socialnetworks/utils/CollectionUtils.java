@@ -21,8 +21,17 @@ package playground.johannes.socialnetworks.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import net.xqj.basex.bin.K;
+import net.xqj.basex.bin.V;
 
 /**
  * @author illenberger
@@ -63,5 +72,33 @@ public class CollectionUtils {
 		} else {
 			throw new IllegalArgumentException("n must not be smaller set size!");
 		}
+	}
+	
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+		return sortByValue(map, false);
+	}
+	
+	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map, boolean decesnding) {
+		int s2 = 1;
+		if(decesnding)
+			s2 = -1;
+		final int sign = s2;
+		
+		List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
+		
+		Collections.sort(list, new Comparator<Map.Entry<K, V>>() {
+
+			@Override
+			public int compare(Entry<K, V> o1, Entry<K, V> o2) {
+				return sign * o1.getValue().compareTo(o2.getValue());
+			}
+		});
+		
+		Map<K, V> sorted = new LinkedHashMap<>();
+		for(Map.Entry<K, V> entry : list) {
+			sorted.put(entry.getKey(), entry.getValue());
+		}
+		
+		return sorted;
 	}
 }

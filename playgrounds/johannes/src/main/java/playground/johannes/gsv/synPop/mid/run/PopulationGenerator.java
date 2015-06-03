@@ -42,6 +42,7 @@ import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.AddReturnPlan;
 import playground.johannes.gsv.synPop.mid.ConstrainedPersonTask;
 import playground.johannes.gsv.synPop.mid.DeletePlansDestination;
+import playground.johannes.gsv.synPop.mid.PersonHHIncomeHandler;
 import playground.johannes.gsv.synPop.mid.InfereVacationsType;
 import playground.johannes.gsv.synPop.mid.JourneyDaysHandler;
 import playground.johannes.gsv.synPop.mid.JourneyDestinationHandler;
@@ -57,7 +58,9 @@ import playground.johannes.gsv.synPop.mid.LegOriginHandler;
 import playground.johannes.gsv.synPop.mid.LegRoundTrip;
 import playground.johannes.gsv.synPop.mid.LegSortedIdHandler;
 import playground.johannes.gsv.synPop.mid.LegStartTimeHandler;
+import playground.johannes.gsv.synPop.mid.PersonAgeHandler;
 import playground.johannes.gsv.synPop.mid.PersonDayHandler;
+import playground.johannes.gsv.synPop.mid.PersonHHMembersHandler;
 import playground.johannes.gsv.synPop.mid.PersonMonthHandler;
 import playground.johannes.gsv.synPop.mid.PersonMunicipalityClassHandler;
 import playground.johannes.gsv.synPop.mid.PersonStateHandler;
@@ -77,10 +80,10 @@ public class PopulationGenerator {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String rootDir = "/home/johannes/gsv/mid2008/raw/";
+		String rootDir = "/home/johannes/gsv/germany-scenario/mid2008/raw/";
 		String personFile = rootDir + "MiD2008_PUF_Personen.txt";
 		String legFile = rootDir + "MiD2008_PUF_Wege.txt";
-		String outFile = "/home/johannes/gsv/mid2008/pop/pop.xml";
+		String outFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml";
 		String journeyFile = rootDir + "MiD2008_PUF_Reisen.txt";
 		/*
 		 * setup text parser
@@ -91,6 +94,9 @@ public class PopulationGenerator {
 		reader.addPersonAttributeHandler(new PersonDayHandler());
 		reader.addPersonAttributeHandler(new PersonStateHandler());
 		reader.addPersonAttributeHandler(new PersonMonthHandler());
+		reader.addPersonAttributeHandler(new PersonHHIncomeHandler());
+		reader.addPersonAttributeHandler(new PersonAgeHandler());
+		reader.addPersonAttributeHandler(new PersonHHMembersHandler());
 		
 		reader.addLegAttributeHandler(new LegSortedIdHandler());
 		reader.addLegAttributeHandler(new LegMainPurposeHandler());

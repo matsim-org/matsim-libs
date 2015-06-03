@@ -60,10 +60,10 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-//		String output = args[2];
-		String output = "/home/johannes/gsv/mid2008/analysis/car.trips.3-1000km/";
-//		String personFile = args[0];
-		String personFile = "/home/johannes/gsv/mid2008/pop/pop.car.3-1000km.trips.xml";
+		String output = args[2];
+//		String output = "/home/johannes/gsv/germany-scenario/mid2008/analysis/car.trips/";
+		String personFile = args[0];
+//		String personFile = "/home/johannes/gsv/germany-scenario/mid2008/pop/pop.car.trips.xml";
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
@@ -104,7 +104,7 @@ public class Analyzer {
 	
 	
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-		task.addTask(new ActivityChainTask());
+		//task.addTask(new ActivityChainTask());
 		task.addTask(new HomeActChainTask());
 		task.addTask(new LegGeoDistanceTask("car"));
 		task.addTask(new LegGeoDistanceTask("car", 100000));

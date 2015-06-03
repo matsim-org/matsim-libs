@@ -86,4 +86,11 @@ public interface CommonKeys {
 	public static final String SUNDAY = "sun";
 	
 	public static final String DATA_SOURCE = "datasource";
+	
+	public static final String HH_INCOME = "hhincome";
+	
+	public static final String HH_MEMBERS = "hhmembers";
+	
+	public static final String PERSON_AGE = "age";
+	
 }

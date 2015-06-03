@@ -97,4 +97,9 @@ public interface MIDKeys {
 	
 	public static final String JOURNEY_DAYS = "journeydays";
 	
+	public static final String HH_INCOME = "hheink";
+	
+	public static final String PERSON_AGE = "hp_altg3";
+	
+	public static final String HH_MEMEBERS = "h02";
 }

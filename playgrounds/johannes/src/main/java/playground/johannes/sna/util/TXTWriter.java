@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.johannes.sna.util;
 
+import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TDoubleObjectHashMap;
 import gnu.trove.TDoubleObjectIterator;
@@ -269,6 +270,28 @@ public class TXTWriter {
 			writer.write(String.valueOf(entry.getValue().getN()));
 			writer.write("\t");
 			writer.write(String.valueOf(entry.getValue().getVariance()));
+			writer.newLine();
+		}
+		
+		writer.close();
+	}
+	
+	public static void writeScatterPlot(TDoubleArrayList col1, TDoubleArrayList col2, String name1, String name2, String filename) throws IOException {
+		if(col1.size() != col2.size()) {
+			throw new RuntimeException(String.format("Unequal numer of rows (col1:%s, col2:%s)", col1.size(), col2.size()));
+		}
+		
+		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+		
+		writer.write(name1);
+		writer.write("\t");
+		writer.write(name2);
+		writer.newLine();
+		
+		for(int i = 0; i < col1.size(); i++) {
+			writer.write(String.valueOf(col1.get(i)));
+			writer.write("\t");
+			writer.write(String.valueOf(col2.get(i)));
 			writer.newLine();
 		}
 		

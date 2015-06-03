@@ -51,9 +51,10 @@ public class DistDistribution {
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse("/home/johannes/sge/prj/matsim/run/874/output/matrices-averaged/miv.sym.xml");
+//		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.de.modena.xml");
 		KeyMatrix m = reader.getMatrix();
 
-		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/zones.gk3.geojson", "NO");
+		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.gk3.geojson", "NO");
 		DistanceCalculator dCalc = new CartesianDistanceCalculator();
 		DescriptivePiStatistics stats = new DescriptivePiStatistics();
 
@@ -76,8 +77,10 @@ public class DistDistribution {
 			}
 		}
 
-		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(50000), true);
-		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/matrices/analysis/distances.de.txt");
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, new LinearDiscretizer(25000), true);
+		Histogram.normalize(hist);
+//		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/tomtom.dist.txt");
+		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/miv-matrix/analysis/distances/874.dist.txt");
 	}
 
 }
