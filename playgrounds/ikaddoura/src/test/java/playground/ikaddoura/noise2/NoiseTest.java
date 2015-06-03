@@ -744,28 +744,40 @@ public class NoiseTest {
 		// link 2: emission_plusOneCar: 58.20280742849556
 		// link 2: emission_plusOneHGV: 58.80174566113962
 		
-//		int n = 2;
-//		double p = 0;
-//		double pPlusOneHgv = 1. / 3.;
-//		double pPlusOneCar = 0.;
+//		int n_car = 0;
+//		int n_hgv = 1;
+//		double v = 35.0;
+//		double scaleFactor = 10.;
 //		
+//		int n = n_car + n_hgv;
+//		int nPlusOneCarOrHgv = n + 1;
+//		double p = n_hgv / (double) n;
+//		
+//		double pPlusOneHgv = (n_hgv + 1.) / ((double) nPlusOneCarOrHgv);
+//		double pPlusOneCar = n_hgv / ((double) nPlusOneCarOrHgv);
+//		
+//		System.out.println("p: " + p + " - pPlusOneCar: " + pPlusOneCar + " - pPlusOneHGV: " + pPlusOneHgv);
+//		
+//		n = (int) (n * scaleFactor);
+//		nPlusOneCarOrHgv = (int) (n * scaleFactor);
+//				
 //		double mittelungspegel = NoiseEquations.calculateMittelungspegelLm(n, p);
 //		System.out.println("m: " + mittelungspegel);
-//		double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(1000 * 3.6, 1000 * 3.6, p);
+//		double Dv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(v, v, p);
 //		System.out.println("D: " + Dv);
 //		double noiseEmission = mittelungspegel + Dv;
 //		System.out.println("emission: " + noiseEmission);
 //		
-//		double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm((n + 1), pPlusOneCar);
+//		double mittelungspegelPlusOneCar = NoiseEquations.calculateMittelungspegelLm(nPlusOneCarOrHgv, pPlusOneCar);
 //		System.out.println("m plus one car: " + mittelungspegelPlusOneCar);
-//		double DvPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(1000 * 3.6, 1000 * 3.6, pPlusOneCar);
+//		double DvPlusOneCar = NoiseEquations.calculateGeschwindigkeitskorrekturDv(v, v, pPlusOneCar);
 //		System.out.println("D plus one car: " + DvPlusOneCar);
 //		double noiseEmissionPlusOneCar = mittelungspegelPlusOneCar + DvPlusOneCar;
 //		System.out.println("emission (plus one car): " + noiseEmissionPlusOneCar);
 //		
-//		double mittelungspegelPlusOneHgv = NoiseEquations.calculateMittelungspegelLm((n + 1), pPlusOneHgv);
+//		double mittelungspegelPlusOneHgv = NoiseEquations.calculateMittelungspegelLm(nPlusOneCarOrHgv, pPlusOneHgv);
 //		System.out.println("m plus one HGV: " + mittelungspegelPlusOneHgv);
-//		double DvPlusOneHgv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(1000 * 3.6, 1000 * 3.6, pPlusOneHgv);
+//		double DvPlusOneHgv = NoiseEquations.calculateGeschwindigkeitskorrekturDv(v, v, pPlusOneHgv);
 //		System.out.println("D plus one HGV: " + DvPlusOneHgv);
 //		double noiseEmissionPlusOneHgv = mittelungspegelPlusOneHgv + DvPlusOneHgv;
 //		System.out.println("emission (plus one hgv): " + noiseEmissionPlusOneHgv);
