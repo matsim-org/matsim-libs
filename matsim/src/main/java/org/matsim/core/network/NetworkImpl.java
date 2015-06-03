@@ -170,10 +170,10 @@ public final class NetworkImpl implements Network {
 		if (n == null) {
 			return null;
 		}
-		HashSet<Link> links = new HashSet<>();
-		links.addAll(n.getInLinks().values());
-		links.addAll(n.getOutLinks().values());
-		for (Link l : links) {
+		HashSet<Link> links1 = new HashSet<>();
+		links1.addAll(n.getInLinks().values());
+		links1.addAll(n.getOutLinks().values());
+		for (Link l : links1) {
 			removeLink(l.getId());
 		}
 		if (this.nodeQuadTree != null) {
