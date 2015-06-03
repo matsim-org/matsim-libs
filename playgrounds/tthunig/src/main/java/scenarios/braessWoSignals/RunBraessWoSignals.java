@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.controler.AbstractModule;
@@ -34,7 +35,7 @@ public class RunBraessWoSignals {
 	private static final Logger log = Logger
 			.getLogger(RunBraessWoSignals.class);
 	
-	private final String DATE = "2015-06-01";
+	private final String DATE = "2015-06-03";
 	
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
@@ -43,8 +44,8 @@ public class RunBraessWoSignals {
 	private final String INPUT_DIR = DgPaths.SHAREDSVN
 			+ "studies/tthunig/scenarios/BraessWoSignals/";
 	
-	private final long CAP_MAIN = 1800;
-	private final long CAP_FIRST_LAST = 3600;
+	private final long CAP_MAIN = 1800; // [veh/h]
+	private final long CAP_FIRST_LAST = 3600; // [veh/h]
 	
 
 	private void prepareAndRunAndAnalyse() {
@@ -52,7 +53,7 @@ public class RunBraessWoSignals {
 		log.info("Starts running the simulation from input directory " + INPUT_DIR);
 		
 		// prepare the simulation		
-		Config config = adaptConfig();
+		Config config = defineConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		adaptNetwork(scenario);
 		createRunNameAndOutputDir(scenario);
@@ -86,86 +87,93 @@ public class RunBraessWoSignals {
 		analyzer.analyzeLastIt();
 	}
 
-	private Config adaptConfig() {
-		// read config file
+	private Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, INPUT_DIR + "basicConfig.xml");
 
-		// adapt plans file. (adapt number of agents here)
+		// set plans file. (adapt number of agents here)
 		config.plans().setInputFile(INPUT_DIR
 				+ "plans" + 3600 + "SameStartTimeAllRoutes.xml");
 
 		// set network and lane properties
 		config.network().setInputFile(INPUT_DIR + "basicNetwork.xml");
-		config.scenario().setUseLanes(false);
+		config.scenario().setUseLanes( false );
 		config.network().setLaneDefinitionsFile(
 				INPUT_DIR + "lanes" + CAP_MAIN + "-" + CAP_FIRST_LAST + ".xml");
 
-		config.planCalcScore().setBrainExpBeta(20);
+		// set brain exp beta
+		config.planCalcScore().setBrainExpBeta( 20 );
 
-		config.controler().setLinkToLinkRoutingEnabled(true);
+		// choose between link to link and node to node routing
+		config.controler().setLinkToLinkRoutingEnabled( true );
 		
-		// adapt travelTimeBinSize and travelTimeCalculatorType
-		config.travelTimeCalculator().setTraveltimeBinSize(1);
+		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
+		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
+		
+		// set travelTimeBinSize
+		config.travelTimeCalculator().setTraveltimeBinSize( 900 );
+		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(
 				TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
 		// hash map and array produce same results. only difference: memory and time.
 		// for small time bins and sparse values hash map is better. theresa, may 2015
 		
-		// adapt number of iterations
-		config.controler().setLastIteration(1000);
+		// set number of iterations
+		config.controler().setLastIteration( 100 );
 
-		// remove all strategies possibly defined in basicConfigFile:
-		config.strategy().clearStrategySettings(); // functionality available since 2015/05/31. kai
-		
 		// define strategies:
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultStrategy.ReRoute.toString() );
 			strat.setWeight( 0.1 ) ;
-			strat.setDisableAfter(50);
+			strat.setDisableAfter( 50 );
 			config.strategy().addStrategySettings(strat);
 		}
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.SelectRandom.toString() );
-			strat.setWeight( 0.3 ) ;
-			strat.setDisableAfter(300);
+			strat.setWeight( 0.0 ) ;
+			strat.setDisableAfter( 300 );
 			config.strategy().addStrategySettings(strat);
 		}
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
-			strat.setWeight( 0.3 ) ;
-			strat.setDisableAfter( config.controler().getLastIteration() - 50 );
+			strat.setWeight( 0.9 ) ;
+			strat.setDisableAfter( config.controler().getLastIteration() );
 			config.strategy().addStrategySettings(strat);
 		}
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.BestScore.toString() );
-			strat.setWeight( 0.3 ) ;
+			strat.setWeight( 0.0 ) ;
 			config.strategy().addStrategySettings(strat);
 		}
 
-		// 0 means unlimited
-		config.strategy().setMaxAgentPlanMemorySize(0);
+		// choose maximal number of plans per agent. 0 means unlimited
+		config.strategy().setMaxAgentPlanMemorySize( 0 );
 		
 		// adapt monetary distance cost rate
 		// (should be negative. use -12.0 to balance time [h] and distance [m].
 		// use -0.00015 to approximately balance the utility of travel time and
 		// distance in this scenario.
 		// use -0.0 to use only time.)
-		config.planCalcScore().setMonetaryDistanceCostRateCar(0.0);
+		config.planCalcScore().setMonetaryDistanceCostRateCar( 0.0 );
 
-		// note: the output directory is set in createRunNameAndOutputDir(...) after all adaptations are done
 		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );		
-	
+		// note: the output directory is defined in createRunNameAndOutputDir(...) after all adaptations are done
+		
 		config.vspExperimental().setWritingOutputEvents(true);
 		config.planCalcScore().setWriteExperiencedPlans(true);
 
 		// adapt events writing interval
 		// use 1 if you like to have a detailed analysis.
-		config.controler().setWriteEventsInterval(1);
+		config.controler().setWriteEventsInterval( 1 );
+		
+		config.controler().setWritePlansInterval( config.controler().getLastIteration() );
+		
+		ActivityParams dummyAct = new ActivityParams("dummy");
+		dummyAct.setTypicalDuration(12 * 3600);
+		config.planCalcScore().addActivityParams(dummyAct);
 		
 		return config;
 	}
@@ -244,7 +252,7 @@ public class RunBraessWoSignals {
 
 		String outputDir = INPUT_DIR + "matsim-output/" + runName + "/";
 		// outputDir = DgPaths.RUNSSVN + "braess/" + runName + "/";
-		outputDir = "/Users/nagel/kairuns/braess/output";
+//		outputDir = "/Users/nagel/kairuns/braess/output";
 
 		config.controler().setOutputDirectory(outputDir);
 		log.info("The output will be written to " + outputDir);
