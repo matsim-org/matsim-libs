@@ -28,6 +28,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.SHPFileCutter;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -190,7 +191,7 @@ public class OsmStats {
 					// make unidirectional
 					int lengthFactor = 1;
 					if (!(isUnidirectional(highwayType)
-							|| this.currentWay.tags.get(TAG_ONEWAY).equals("true")
+							|| (this.currentWay.tags.containsKey(TAG_ONEWAY) && this.currentWay.tags.get(TAG_ONEWAY).equals("true"))
 							|| numberOfLanes == 1)) {
 						// make unidirectional -> double length and half lanes
 						lengthFactor = 2;
