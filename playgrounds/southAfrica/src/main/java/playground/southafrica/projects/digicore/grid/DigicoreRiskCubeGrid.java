@@ -36,7 +36,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.southafrica.projects.digicore.scoring.wp3.Wp3RiskCube;
-import playground.southafrica.projects.digicore.scoring.wp3.Wp3RiskCubeDigiScorer02;
 
 /**
  * Building a custom grid based on the Digicore RiskCube.
@@ -137,7 +136,6 @@ public class DigicoreRiskCubeGrid extends DigiGrid {
 
 	@Override
 	public void rankGridCells() {
-		// TODO Auto-generated method stub
 		Comparator<String> comparator = new Comparator<String>() {
 
 			@Override

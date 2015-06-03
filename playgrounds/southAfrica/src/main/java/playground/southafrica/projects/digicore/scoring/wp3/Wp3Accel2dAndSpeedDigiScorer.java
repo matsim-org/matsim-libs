@@ -409,9 +409,6 @@ public class Wp3Accel2dAndSpeedDigiScorer implements DigiScorer {
 		
 		String[] sa = record.split(",");
 		
-		//FIXME Remove after debugging
-//		String id = sa[1];
-
 		/* Consider speed as first risk component. */
 		double speed = Double.parseDouble(sa[8]);
 		double speedLimit = Double.parseDouble(sa[11]);
