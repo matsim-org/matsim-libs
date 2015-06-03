@@ -445,11 +445,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		calculateMarginalDamageCost();
 		log.info("Computing the marginal damage cost for each link and receiver point... Done.");
 		
-		log.info("Summing up the marginal damage cost for each link...");
-		sumUpMarginalDamageCostForAllReceiverPoints();
+//		log.info("Summing up the marginal damage cost for each link...");
+//		sumUpMarginalDamageCostForAllReceiverPoints();
 		NoiseWriter.writeLinkMarginalCarDamageInfoPerHour(noiseContext, outputDirectory);
 		NoiseWriter.writeLinkMarginalHgvDamageInfoPerHour(noiseContext, outputDirectory);
-		log.info("Summing up the marginal damage cost for each link... Done.");
+//		log.info("Summing up the marginal damage cost for each link... Done.");
 	}
 	
 	/*
@@ -457,8 +457,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	 */
 	private void calculateMarginalDamageCost() {
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			Map<Id<Link>, Double> linkId2MarginalCostCar = new HashMap<>();
-			Map<Id<Link>, Double> linkId2MarginalCostHGV = new HashMap<>();
 
 //			if (rp.getDamageCosts() != 0.) {
 			if (rp.getAffectedAgentUnits() != 0.) {
@@ -479,42 +477,19 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.values());
 					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.values());
 					
-					double damageCostsPlusOneCar = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
-					double marginalDamageCostCar = (damageCostsPlusOneCar - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
+					double damageCostsPlusOneCarThisLink = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
+					double marginalDamageCostCarThisLink = (damageCostsPlusOneCarThisLink - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
 					
-					double damageCostsPlusOneHGV = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneHGVThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
-					double marginalDamageCostHGV = (damageCostsPlusOneHGV - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
-				
-					linkId2MarginalCostCar.put(linkId, marginalDamageCostCar);
-					linkId2MarginalCostHGV.put(linkId, marginalDamageCostHGV);
-				}
-				
-				rp.setLinkId2MarginalCostCar(linkId2MarginalCostCar);
-				rp.setLinkId2MarginalCostHGV(linkId2MarginalCostHGV);
+					double damageCostsPlusOneHGVThisLink = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneHGVThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
+					double marginalDamageCostHGVThisLink = (damageCostsPlusOneHGVThisLink - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
+					
+					double marginalDamageCostCarSum = this.noiseContext.getNoiseLinks().get(linkId).getMarginalDamageCostPerCar() + marginalDamageCostCarThisLink;
+					this.noiseContext.getNoiseLinks().get(linkId).setMarginalDamageCostPerCar(marginalDamageCostCarSum);
+					
+					double marginalDamageCostHGVSum = this.noiseContext.getNoiseLinks().get(linkId).getMarginalDamageCostPerHgv() + marginalDamageCostHGVThisLink;
+					this.noiseContext.getNoiseLinks().get(linkId).setMarginalDamageCostPerHgv(marginalDamageCostHGVSum);
+				}			
 			}	
-		}
-	}
-	
-	/*
-	 * Noise allocation approach: MarginalCost
-	 */
-	private void sumUpMarginalDamageCostForAllReceiverPoints() {
-
-		for (NoiseLink link : this.noiseContext.getNoiseLinks().values()) {
-			
-			double sumCar = 0.;
-			double sumHGV = 0.;
-			
-			for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-				if (rp.getLinkId2MarginalCostCar().containsKey(link.getId())) {
-					sumCar = sumCar + rp.getLinkId2MarginalCostCar().get(link.getId());
-				}
-				if (rp.getLinkId2MarginalCostHGV().containsKey(link.getId())) {
-					sumHGV = sumHGV + rp.getLinkId2MarginalCostHGV().get(link.getId());
-				}
-			}
-			link.setMarginalDamageCostPerCar(sumCar);
-			link.setMarginalDamageCostPerHgv(sumHGV);
 		}
 	}
 

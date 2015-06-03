@@ -57,8 +57,6 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	private double finalImmission = 0.;
 	private double affectedAgentUnits = 0.;
 	private double damageCosts;
-	private Map<Id<Link>, Double> linkId2MarginalCostCar = new HashMap<Id<Link>, Double>();
-	private Map<Id<Link>, Double> linkId2MarginalCostHGV = new HashMap<Id<Link>, Double>();
 	private double damageCostsPerAffectedAgentUnit;
 
 	public Map<Id<Person>, ArrayList<PersonActivityInfo>> getPersonId2actInfos() {
@@ -145,22 +143,6 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		this.linkId2IsolatedImmissionPlusOneHGV = linkId2IsolatedImmissionPlusOneHGV;
 	}
 
-	public Map<Id<Link>, Double> getLinkId2MarginalCostCar() {
-		return linkId2MarginalCostCar;
-	}
-
-	public void setLinkId2MarginalCostCar(Map<Id<Link>, Double> linkId2MarginalCostCar) {
-		this.linkId2MarginalCostCar = linkId2MarginalCostCar;
-	}
-
-	public Map<Id<Link>, Double> getLinkId2MarginalCostHGV() {
-		return linkId2MarginalCostHGV;
-	}
-
-	public void setLinkId2MarginalCostHGV(Map<Id<Link>, Double> linkId2MarginalCostHGV) {
-		this.linkId2MarginalCostHGV = linkId2MarginalCostHGV;
-	}
-
 	@Override
 	public String toString() {
 		return "NoiseReceiverPoint [personId2actInfos=" + personId2actInfos
@@ -172,9 +154,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 				+ ", linkId2IsolatedImmissionPlusOneHGV="
 				+ linkId2IsolatedImmissionPlusOneHGV + ", finalImmission="
 				+ finalImmission + ", affectedAgentUnits=" + affectedAgentUnits
-				+ ", damageCosts=" + damageCosts + ", linkId2MarginalCostCar="
-				+ linkId2MarginalCostCar + ", linkId2MarginalCostHGV="
-				+ linkId2MarginalCostHGV + ", damageCostsPerAffectedAgentUnit="
+				+ ", damageCosts=" + damageCosts + ", damageCostsPerAffectedAgentUnit="
 				+ damageCostsPerAffectedAgentUnit + "]";
 	}
 }
