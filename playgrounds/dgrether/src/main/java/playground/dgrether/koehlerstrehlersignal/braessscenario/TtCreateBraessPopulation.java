@@ -49,32 +49,30 @@ public class TtCreateBraessPopulation {
 	 */
 	public static void main(String[] args) {
 		
-		int numberOfPersons = 60;
+		int numberOfPersons = 3600;
 		boolean sameStartTime = false;
-		boolean createZRoute = true;
 		boolean createAllRoutes = true;
+		
 		String outputDir = DgPaths.SHAREDSVN
 				+ "studies/tthunig/scenarios/BraessWoSignals/";
 //				+ "projects/cottbus/data/scenarios/braess_scenario/";
+		
 		String popOutputFile = outputDir + "plans" + numberOfPersons;
 		if (sameStartTime)
 			popOutputFile += "SameStartTime";
 		if (createAllRoutes){
 			popOutputFile += "AllRoutes";
-			createZRoute = true; // especially... needed while creating legs
 		}
-		else if (createZRoute)
-			popOutputFile += "RouteZ";
 		popOutputFile += ".xml";
 
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(outputDir + "network.xml");
+		config.network().setInputFile(outputDir + "basicNetwork.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 		Population pop = PopulationUtils.createPopulation(config, network);
 
 		TtCreateBraessPopulation creator = new TtCreateBraessPopulation(pop, network);
-		creator.createPersons(numberOfPersons, sameStartTime, createAllRoutes, createZRoute);
+		creator.createPersons(numberOfPersons, sameStartTime, createAllRoutes);
 		creator.writePersons(popOutputFile);
 	}
 
@@ -94,9 +92,8 @@ public class TtCreateBraessPopulation {
 	 * @param numberOfPersons
 	 * @param sameStartTime 
 	 * @param createRoutes 
-	 * @param createZRoute 
 	 */
-	private void createPersons(int numberOfPersons, boolean sameStartTime, boolean createAllRoutes, boolean createZRoute) {
+	private void createPersons(int numberOfPersons, boolean sameStartTime, boolean createAllRoutes) {
 
 		for (int i = 0; i < numberOfPersons; i++) {
 
@@ -120,7 +117,7 @@ public class TtCreateBraessPopulation {
 			
 			// add a leg
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
-			if (createZRoute){
+			if (createAllRoutes){
 				// create a route for the Z path
 				List<Id<Link>> pathZ = new ArrayList<>();
 				pathZ.add(Id.create(2, Link.class));
