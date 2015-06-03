@@ -250,8 +250,7 @@ public class RunBraessWoSignals {
 		else
 			runName += "_node2node";
 
-		String outputDir = INPUT_DIR + "matsim-output/" + runName + "/";
-		// outputDir = DgPaths.RUNSSVN + "braess/" + runName + "/";
+		String outputDir = DgPaths.RUNSSVN + "braess/" + runName + "/";
 //		outputDir = "/Users/nagel/kairuns/braess/output";
 
 		config.controler().setOutputDirectory(outputDir);
