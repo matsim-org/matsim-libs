@@ -443,13 +443,9 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		log.info("Computing the marginal damage cost for each link and receiver point...");
 		calculateMarginalDamageCost();
-		log.info("Computing the marginal damage cost for each link and receiver point... Done.");
-		
-//		log.info("Summing up the marginal damage cost for each link...");
-//		sumUpMarginalDamageCostForAllReceiverPoints();
 		NoiseWriter.writeLinkMarginalCarDamageInfoPerHour(noiseContext, outputDirectory);
 		NoiseWriter.writeLinkMarginalHgvDamageInfoPerHour(noiseContext, outputDirectory);
-//		log.info("Summing up the marginal damage cost for each link... Done.");
+		log.info("Computing the marginal damage cost for each link and receiver point... Done.");
 	}
 	
 	/*
