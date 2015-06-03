@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -14,6 +15,7 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeC
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
@@ -22,6 +24,7 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.analysis.AnalyzeBraessSimulation;
+import playground.dgrether.koehlerstrehlersignal.braessscenario.TtCreateBraessPopulation;
 
 /**
  * Class to run a simulation of the braess scenario without signals. It also
@@ -47,6 +50,11 @@ public class RunBraessWoSignals {
 	private final long CAP_MAIN = 1800; // [veh/h]
 	private final long CAP_FIRST_LAST = 3600; // [veh/h]
 	
+	/* population parameter */
+	private int NUMBER_OF_PERSONS = 60;
+	private boolean SAME_START_TIME = true;
+	private boolean INIT_WITH_ALL_ROUTES = true;
+	
 
 	private void prepareAndRunAndAnalyse() {
 		// write some information
@@ -56,6 +64,7 @@ public class RunBraessWoSignals {
 		Config config = defineConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		adaptNetwork(scenario);
+		createPopulation(scenario);
 		createRunNameAndOutputDir(scenario);
 
 		// prepare the controller
@@ -89,10 +98,6 @@ public class RunBraessWoSignals {
 
 	private Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
-
-		// set plans file. (adapt number of agents here)
-		config.plans().setInputFile(INPUT_DIR
-				+ "plans" + 3600 + "SameStartTimeAllRoutes.xml");
 
 		// set network and lane properties
 		config.network().setInputFile(INPUT_DIR + "basicNetwork.xml");
@@ -181,7 +186,8 @@ public class RunBraessWoSignals {
 	private void adaptNetwork(Scenario scenario) {		
 		// set travel times at the links (by adapting free speed)
 		// note: you only have to adapt the denominator, 
-		// because all links have length 200m in the basic network 
+		// because all links have length 200m in the basic network
+		scenario.getNetwork().getLinks().get(Id.create(0, Link.class)).setFreespeed(200 / 1);
 		scenario.getNetwork().getLinks().get(Id.create(1, Link.class)).setFreespeed(200 / 1);
 		scenario.getNetwork().getLinks().get(Id.create(2, Link.class)).setFreespeed(200 / 10);
 		scenario.getNetwork().getLinks().get(Id.create(3, Link.class)).setFreespeed(200 / 20);
@@ -192,25 +198,33 @@ public class RunBraessWoSignals {
 	
 		// adapt capacity on all links		
 		for (Link l : scenario.getNetwork().getLinks().values()){
-			if (l.getId().equals(Id.create(1, Link.class)) || 
-					l.getId().equals(Id.create(7, Link.class)))
+			if (l.getId().equals(Id.create(0, Link.class)) || 
+					l.getId().equals(Id.create(1, Link.class)) ||
+					l.getId().equals(Id.create(7, Link.class)) )
 				l.setCapacity(CAP_FIRST_LAST);
 			else
 				l.setCapacity(CAP_MAIN);
 		}
 	}
 
+	private void createPopulation(Scenario scenario) {
+		
+		TtCreateBraessPopulation popCreator = 
+				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
+		popCreator.createPersons(NUMBER_OF_PERSONS, SAME_START_TIME, INIT_WITH_ALL_ROUTES);
+	}
+
 	private void createRunNameAndOutputDir(Scenario scenario) {
 
 		Config config = scenario.getConfig();
-
+		
 		String runName = this.DATE;
 
-		// get plan information (numberOfAgents, start time, initialized routes)
-		String plansFile = config.plans().getInputFile();
-		String[] plansDotSlashSplit = (plansFile.split("\\."))[0].split("/");
-		String plansFileName = plansDotSlashSplit[plansDotSlashSplit.length - 1];
-		runName += "_" + plansFileName.substring(5); // adds the plans file name without 'plans'
+		runName += "_" + this.NUMBER_OF_PERSONS + "p";
+		if (this.SAME_START_TIME)
+			runName += "_sameStart";
+		if (this.INIT_WITH_ALL_ROUTES)
+			runName += "_initAllRoutes";
 
 		runName += "_" + config.controler().getLastIteration() + "it";
 
