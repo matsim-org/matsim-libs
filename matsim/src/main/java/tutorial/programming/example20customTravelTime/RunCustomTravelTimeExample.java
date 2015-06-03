@@ -45,34 +45,47 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
  */
 public class RunCustomTravelTimeExample {
 
-    public static void main(String[] args) {
-        String configFilename = "examples/equil/config.xml";
-        Controler controler = new Controler(configFilename);
-        controler.setModules(new AbstractModule() {
-            @Override
-            public void install() {
-                // Include some things from ControlerDefaultsModule.java,
-                // but leave out TravelTimeCalculator.
-                // You can just comment out these lines if you don't want them,
-                // these modules are optional.
-                install(new DefaultMobsimModule());
-                install(new CharyparNagelScoringFunctionModule());
-                install(new TripRouterModule());
-                install(new StrategyManagerModule());
-                install(new LinkStatsModule());
-                install(new VolumesAnalyzerModule());
-                install(new LegHistogramModule());
-                install(new TravelDisutilityModule());
+	public static void main(String[] args) {
+		String configFilename = "examples/equil/config.xml";
+		Controler controler = new Controler(configFilename);
+		controler.setModules(new AbstractModule() {
+			@Override
+			public void install() {
+				// Include some things from ControlerDefaultsModule.java,
+				// but leave out TravelTimeCalculator.
+				// You can just comment out these lines if you don't want them,
+				// these modules are optional.
+				// For an alternative approach (which uses the defaults and just overrides), see below.
+				install(new DefaultMobsimModule());
+				install(new CharyparNagelScoringFunctionModule());
+				install(new TripRouterModule());
+				install(new StrategyManagerModule());
+				install(new LinkStatsModule());
+				install(new VolumesAnalyzerModule());
+				install(new LegHistogramModule());
+				install(new TravelDisutilityModule());
 
-                // Because TravelTimeCalculatorModule is left out,
-                // we have to provide a TravelTime.
-                // This line says: Use this thing here as the TravelTime implementation.
-                // Try removing this line: You will get an error because there is no
-                // TravelTime and someone needs it.
-                bind(TravelTime.class).toInstance(new FreeSpeedTravelTime());
-            }
-        });
-        controler.run();
+				// Because TravelTimeCalculatorModule is left out,
+				// we have to provide a TravelTime.
+				// This line says: Use this thing here as the TravelTime implementation.
+				// Try removing this line: You will get an error because there is no
+				// TravelTime and someone needs it.
+				bind(TravelTime.class).toInstance(new FreeSpeedTravelTime());
+			}
+		});
+		controler.run();
+	}
+	
+	// alternative variant:
+	public static void main2() {
+		String configFilename = "examples/equil/config.xml";
+		Controler controler = new Controler(configFilename);
 
-    }
+		// this uses "addOVERRIDINGModule".  It thus uses the Controler defaults, and overrides them or adds to them.
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install() {
+				this.bind( TravelTime.class ).toInstance( new FreeSpeedTravelTime() );
+			}
+		});
+	}
 }
