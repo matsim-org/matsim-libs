@@ -3,6 +3,7 @@ package playground.tobiqui.master;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -76,7 +77,10 @@ public class Run {
             }
 
             private double firstActivityEndTime(Person o1) {
-                return ((Activity) o1.getSelectedPlan().getPlanElements().get(0)).getEndTime();
+            	if (((Leg) o1.getSelectedPlan().getPlanElements().get(1)).getMode().equals("car"))
+            		return ((Leg) o1.getSelectedPlan().getPlanElements().get(1)).getDepartureTime();
+            	else
+            		return ((Activity) o1.getSelectedPlan().getPlanElements().get(0)).getEndTime();
             }
         });
 
