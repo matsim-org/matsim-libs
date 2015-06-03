@@ -29,8 +29,9 @@ import playground.dgrether.DgPaths;
 /**
  * Class to create a population for the braess scenario.
  * 
- * Choose the number of persons you like to simulate, their starting times and
- * their initial routes before running this class.
+ * Choose the number of persons you like to simulate, 
+ * their starting times and their initial routes 
+ * before running this class or calling the method createPersons(...)
  * 
  * @author tthunig
  */
