@@ -35,10 +35,11 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -52,6 +53,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -67,31 +69,29 @@ import com.google.inject.Provider;
  */
 public class KNBangBang {
 
-	static private final Id<Link> accidentLinkId = Id.createLinkId( "4706699_484108_484109-4706699_484109_26662372");
+	static final Id<Link> accidentLinkId = Id.createLinkId( "4706699_484108_484109-4706699_484109_26662372");
 	static List<Id<Link>> replanningLinkIds = new ArrayList<>() ; 
 
 	private static final class KNMobsimProvider implements Provider<Mobsim> {
 		@Inject private Scenario scenario;
 		@Inject private EventsManager events ;
-		@Inject private Provider<TripRouter> tripRouterFactory;
+		@Inject private TripRouter tripRouter ;
+		@Inject private LeastCostPathCalculatorFactory pathAlgoFactory ;
+
 
 		@Override
 		public Mobsim get() {
 			QSim qsim = QSimUtils.createDefaultQSim( scenario, events ) ;
 			
-//			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouterFactory.get()));
+			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouter, pathAlgoFactory, scenario));
 			
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qsim);
 			OTFClientLive.run(scenario.getConfig(), server);
-//			server.getOTFVisConfig().setColoringScheme( ColoringScheme.telematics );
 			
 			return qsim ;
 		}
 	}
 	
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 		replanningLinkIds.add( Id.createLinkId("4068014_26836040_26836036-4068014_26836036_251045850-4068014_251045850_251045852") ) ;
 
@@ -106,16 +106,23 @@ public class KNBangBang {
 		config.plans().setInputFile("/Users/nagel/kairuns/telematics/reduced-plans.xml.gz");
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		
-		config.controler().setFirstIteration(9);
-		config.controler().setLastIteration(9);
+		config.controler().setFirstIteration(10);
+		config.controler().setLastIteration(10);
 		config.controler().setOutputDirectory("/Users/nagel/kairuns/telematics/output");
+		config.controler().setWriteEventsInterval(10);
+		config.controler().setWritePlansInterval(100);
 		
 		config.qsim().setFlowCapFactor(0.04);
 		config.qsim().setStorageCapFactor(0.06);
 		config.qsim().setStuckTime(100.);
 		config.qsim().setStartTime(6.*3600.);
 		
+		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
+			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
+		}
+		
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
+		config.vspExperimental().setWritingOutputEvents(true);
 		
 		// ---
 		
@@ -174,8 +181,6 @@ public class KNBangBang {
 		Set<String> analyzedModes = new HashSet<>() ;
 		analyzedModes.add( TransportMode.car ) ;
 		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
-//		controler.getEvents().addHandler(travelTime);
-//		controler.getMobsimListeners().add(travelTime);
 		
 		controler.addOverridingModule( new AbstractModule(){
 			@Override
@@ -185,6 +190,7 @@ public class KNBangBang {
 				this.bind( TravelTime.class ).toInstance( travelTime );
 			}
 		}) ;
+		
 		
 		// ---
 		
