@@ -132,7 +132,7 @@ public class MatrixBasesPtInputUtils {
  *
  */
 class ThreadedMatrixCreator implements Runnable {
-//	private static final Logger log = Logger.getLogger(ThreadedMatrixCreator.class);
+	private static final Logger log = Logger.getLogger(ThreadedMatrixCreator.class);
 	
 	Thread thread;
 	Integer threadName;
@@ -204,8 +204,10 @@ class ThreadedMatrixCreator implements Runnable {
 //				int counterRouteWalk = 0;
 								
 				if (legList == null) {
-					throw new RuntimeException("The leg list is null! This should not happen, because -- even if the origin and destination"
-							+ "are the same -- there should be one (transit) walk leg with zero travel time.");
+					//throw new RuntimeException
+					log.error("The leg list is null! This should not happen, because -- even if the "
+							+ "origin and destination are the same -- there should be one (transit) walk leg with zero "
+							+ "travel time. FromLocation = " + fromLocation + " -- ToLocation = " + toLocation);
 				
 				} else { // i.e. leg list is NOT null
 					for(Leg leg : legList) {

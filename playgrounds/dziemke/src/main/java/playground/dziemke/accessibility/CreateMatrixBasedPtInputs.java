@@ -49,13 +49,13 @@ public class CreateMatrixBasedPtInputs {
 //		String networkFile = "../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/jtlu14i.output_network.xml.gz";
 		String transitScheduleFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitSchedule.xml.gz";
 //		String transitScheduleFile = "../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14i/ITERS/it.300/jtlu14i.300.transitScheduleScored.xml.gz";
-		String outputFileRoot = "../../data/accessibility/be/";
+		String outputFileRoot = "../../data/accessibility/be_002/";
 		Boolean measuringPointsAsPTStops = false;
 		Double cellSize = 1000.;
 		Double departureTime = 8. * 60 * 60;
 		Integer numberOfThreads = 1;
 		String bounds = "4550000,5790000,4630000,5850000";
-		
+
 		log.info("networkFile = " + networkFile + " -- transitScheduleFile = " + transitScheduleFile + " -- outputFileRoot = " + outputFileRoot
 				+ " -- measuringPointsAsPTStops = " + measuringPointsAsPTStops + " -- cellSize = " + cellSize + " -- departureTime = "
 				+ departureTime + " -- numberOfThreads = " + numberOfThreads);
