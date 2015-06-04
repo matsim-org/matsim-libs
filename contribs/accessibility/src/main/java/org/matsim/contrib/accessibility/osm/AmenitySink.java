@@ -68,8 +68,8 @@ public class AmenitySink implements Sink {
 	private ActivityFacilities facilities;
 	private ObjectAttributes facilityAttributes;
 	private Map<String,Integer> educationLevelMap;
-	private Map<String, String> typeMap = new TreeMap<>();
-	private Map<String, Integer> typeCount = new TreeMap<>();
+	private Map<String, String> typeMap = new HashMap<>();
+	private Map<String, Integer> typeCount = new HashMap<>();
 	
 	private int errorCounter = 0;
 	private int warningCounter = 0;
@@ -140,7 +140,11 @@ public class AmenitySink implements Sink {
 			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
 			/* Check amenities */
 			String amenity = tags.get("amenity");
-			if(amenity != null){
+			String matsimType = null;
+			if(amenity != null) {
+				matsimType = getActivityType(amenity);
+			}
+			if(matsimType != null){
 				String activityType = getActivityType(amenity);
 				String name = tags.get("name");
 				if(name != null){
@@ -159,10 +163,12 @@ public class AmenitySink implements Sink {
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = aff.createActivityFacility(newId, coord);
 					((ActivityFacilityImpl)af).setDesc(name);
+					facilities.addActivityFacility(af);
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
 				ActivityOption ao = aff.createActivityOption(activityType);
+				af.addActivityOption(ao);
 //				setFacilityDetails(ao);
 //				nodeFacilities++;
 			}
@@ -181,10 +187,12 @@ public class AmenitySink implements Sink {
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = aff.createActivityFacility(newId, coord);					
 					((ActivityFacilityImpl)af).setDesc(name);
+					facilities.addActivityFacility(af);
 				} else{
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
 				ActivityOption ao = aff.createActivityOption("s");
+				af.addActivityOption(ao);
 //				setFacilityDetails(ao);
 //				shoppingCounter++;
 //				nodeFacilities++;
