@@ -54,8 +54,12 @@ public class AnalyzeBraessSimulation {
 	 * starts the analysis of the last iteration 
 	 * without using the main method of this class
 	 */
-	public void analyzeLastIt() {
-		calculateResults();
+	public void analyzeLastItAndWriteResults() {
+		calculateLastItResults();
+		writeLastItAnalysis();
+	}
+
+	private void writeLastItAnalysis() {
 		writeResults();
 		writeOnRoutes();
 		writeRouteStarts();
@@ -63,7 +67,7 @@ public class AnalyzeBraessSimulation {
 		writeAvgRouteTTsPerArrvial();
 	}
 
-	private void calculateResults() {
+	private void calculateLastItResults() {
 		RunResultsLoader runDir = new RunResultsLoader(runDirectory, null);
 		String eventsFilename = runDir.getEventsFilename(lastIteration);
 
@@ -235,7 +239,7 @@ public class AnalyzeBraessSimulation {
 	/**
 	 * analyzes all iterations in terms of route choice and travel time
 	 */
-	public void analyzeAllIt(){
+	public void analyzeAllItAndWriteResults(){
 		RunResultsLoader runDir = new RunResultsLoader(runDirectory, null);
 		
 		// prepare writing
@@ -327,7 +331,7 @@ public class AnalyzeBraessSimulation {
 		
 		AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(
 				runDirectory, lastIteration, outputDir);
-		analyzer.calculateResults();
+		analyzer.calculateLastItResults();
 		analyzer.writeResults();
 		analyzer.writeOnRoutes();
 		analyzer.writeRouteStarts();
@@ -381,7 +385,7 @@ public class AnalyzeBraessSimulation {
 					
 				AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(
 						runDirectory, lastIteration, outputDir);
-				analyzer.calculateResults();
+				analyzer.calculateLastItResults();
 				analyzer.writeResults();
 				// TODO latex writer bei LatexResultsWriter abgucken
 			}

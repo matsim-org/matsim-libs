@@ -135,9 +135,9 @@ public class TtRunBraessWithSignals {
 		AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(outputDir, iterations, analyzeDir);
 		if (writeEventsForAllIts)
 			// analyze all iterations in terms of route choice and travel time
-			analyzer.analyzeAllIt();
+			analyzer.analyzeAllItAndWriteResults();
 		// analyze the last iteration more detailed
-		analyzer.analyzeLastIt();		
+		analyzer.analyzeLastItAndWriteResults();		
 	}
 
 	private Config adaptConfig() {

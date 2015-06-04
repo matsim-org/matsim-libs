@@ -92,9 +92,9 @@ public class RunBraessWoSignals {
 		// if detailed information is available
 		if (config.controler().getWriteEventsInterval() == 1)
 			// analyze all iterations in terms of route choice and travel time
-			analyzer.analyzeAllIt();
+			analyzer.analyzeAllItAndWriteResults();
 		// analyze the last iteration more detailed
-		analyzer.analyzeLastIt();
+		analyzer.analyzeLastItAndWriteResults();
 	}
 
 	private Config defineConfig() {
