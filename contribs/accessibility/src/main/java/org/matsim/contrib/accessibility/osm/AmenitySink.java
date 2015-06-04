@@ -48,6 +48,7 @@ import org.openstreetmap.osmosis.core.container.v0_6.EntityProcessor;
 import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.RelationContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.WayContainer;
+import org.openstreetmap.osmosis.core.domain.v0_6.Entity;
 import org.openstreetmap.osmosis.core.domain.v0_6.EntityType;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
 import org.openstreetmap.osmosis.core.domain.v0_6.Relation;
@@ -109,10 +110,34 @@ public class AmenitySink implements Sink {
 		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
 
 		/* First check all the point features. */
-		int nodeFacilities = 0;
+		processFacilities(aff, nodeMap);
+		
+		/* Second, check for way features. */
+		processFacilities(aff, wayMap);
+
+		/* Thirdly, check for relation. */
+		processFacilities(aff, relationMap);
+		
+		/*TODO Report the final counts of different amenity types. */
+	}
+
+	private Coord getCoord(Entity entity){
+		if(entity instanceof Node){
+			return getNodeCoord((Node)entity);
+		} else if(entity instanceof Way){
+			return getWayCentroid((Way)entity);
+		} else if(entity instanceof Relation){
+			return getRelationCentroid((Relation)entity);
+		}
+		
+		return null;
+	}
+
+	private void processFacilities(ActivityFacilitiesFactory aff,
+			Map<Long,? extends EntityContainer> nodeMap) {
 		for(long n : nodeMap.keySet()){
-			Node node = nodeMap.get(n).getEntity();
-			Map<String, String> tags = new TagCollectionImpl(node.getTags()).buildMap();
+			Entity entity = nodeMap.get(n).getEntity();
+			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
 			/* Check amenities */
 			String amenity = tags.get("amenity");
 			if(amenity != null){
@@ -128,8 +153,8 @@ public class AmenitySink implements Sink {
 				}
 
 				/* Facility identified. Now get the centroid of all members. */ 
-				Coord coord = ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
-				Id<ActivityFacility> newId = Id.create(node.getId(), ActivityFacility.class);
+				Coord coord = getCoord(entity);
+				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = aff.createActivityFacility(newId, coord);
@@ -139,7 +164,7 @@ public class AmenitySink implements Sink {
 				}
 				ActivityOption ao = aff.createActivityOption(activityType);
 //				setFacilityDetails(ao);
-				nodeFacilities++;
+//				nodeFacilities++;
 			}
 			/* Check shops */
 			String shops = tags.get("shop");
@@ -150,8 +175,8 @@ public class AmenitySink implements Sink {
 				}
 
 				/* Facility identified. Now get the centroid of all members. */ 
-				Coord coord = ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
-				Id<ActivityFacility> newId = Id.create(node.getId(), ActivityFacility.class);
+				Coord coord = getCoord(entity);
+				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = aff.createActivityFacility(newId, coord);					
@@ -161,126 +186,10 @@ public class AmenitySink implements Sink {
 				}
 				ActivityOption ao = aff.createActivityOption("s");
 //				setFacilityDetails(ao);
-				shoppingCounter++;
-				nodeFacilities++;
+//				shoppingCounter++;
+//				nodeFacilities++;
 			}
 		}
-		
-		/* Second, check for way features. */
-		int wayFacilities = 0;
-		for(long w : wayMap.keySet()){
-			Way way = wayMap.get(w).getEntity();
-			Map<String, String> tags = new TagCollectionImpl(way.getTags()).buildMap();
-			String amenity = tags.get("amenity");
-			if(amenity != null){
-				String activityType = getActivityType(amenity);
-				String name = tags.get("name");
-				if(name != null){
-					/* Check education level. */
-					if(activityType.equalsIgnoreCase("education")){
-						getEducationLevel(name);
-					}					
-				} else{
-					log.warn("      ---> Amenity " + w + " without a name.");
-				}
-
-				/* Facility identified. Now get the centroid of all members. */ 
-				Coord coord = getWayCentroid(way);
-				Id<ActivityFacility> newId = Id.create(way.getId(), ActivityFacility.class);
-				ActivityFacility af;
-				if(!facilities.getFacilities().containsKey(newId)){
-					af = aff.createActivityFacility(newId, coord);					
-					((ActivityFacilityImpl)af).setDesc(name);
-				} else{
-					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
-				}
-				ActivityOption ao = aff.createActivityOption(activityType);
-//				setFacilityDetails(ao);
-				wayFacilities++;
-			}					
-			/* Check shops */
-			String shops = tags.get("shop");
-			if(shops != null){
-				String name = tags.get("name");
-				if(name == null){
-					log.warn("      ---> Shop " + w + " without a name.");
-				}
-
-				/* Facility identified. Now get the centroid of all members. */ 
-				Coord coord = getWayCentroid(way);
-				Id<ActivityFacility> newId = Id.create(way.getId(), ActivityFacility.class);
-				ActivityFacility af;
-				if(!facilities.getFacilities().containsKey(newId)){
-					af = aff.createActivityFacility(newId, coord);					
-					((ActivityFacilityImpl)af).setDesc(name);
-				} else{
-					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
-				}
-				ActivityOption ao = aff.createActivityOption("s");
-//				setFacilityDetails(ao);
-				shoppingCounter++;
-				nodeFacilities++;
-			}
-		}
-		
-		/* Thirdly, check for relation. */
-		int relationFacilities = 0;
-		for(long r : relationMap.keySet()){
-			Relation relation = relationMap.get(r).getEntity();
-			Map<String, String> tags = new TagCollectionImpl(relation.getTags()).buildMap();
-			String amenity = tags.get("amenity");
-			if(amenity != null){
-				String activityType = getActivityType(amenity);
-				String name = tags.get("name");
-				if(name != null){
-					/* Check education level. */
-					if(activityType.equalsIgnoreCase("e")){
-						getEducationLevel(name);
-					}					
-				} else{
-					log.warn("      ---> Amenity " + r + " without a name.");
-				}
-
-				/* Facility identified. Now get the centroid of all members. */ 
-				Coord coord = getRelationCentroid(relationMap.get(r).getEntity());
-				Id<ActivityFacility> newId = Id.create(relation.getId(), ActivityFacility.class);
-				ActivityFacility af;
-				if(!facilities.getFacilities().containsKey(newId)){
-					af = aff.createActivityFacility(newId, coord);					
-					((ActivityFacilityImpl)af).setDesc(name);
-				} else{
-					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
-				}
-				ActivityOption ao = aff.createActivityOption(activityType);
-//				setFacilityDetails(ao);
-				relationFacilities++;
-			}					
-			/* Check shops */
-			String shops = tags.get("shop");
-			if(shops != null){
-				String name = tags.get("name");
-				if(name == null){
-					log.warn("      ---> Shop " + r + " without a name.");
-				}
-
-				/* Facility identified. Now get the centroid of all members. */ 
-				Coord coord = getRelationCentroid(relationMap.get(r).getEntity());
-				Id<ActivityFacility> newId = Id.create(relation.getId(), ActivityFacility.class);
-				ActivityFacility af;
-				if(!facilities.getFacilities().containsKey(newId)){
-					af = aff.createActivityFacility(newId, coord);					
-					((ActivityFacilityImpl)af).setDesc(name);
-				} else{
-					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
-				}
-				ActivityOption ao = aff.createActivityOption("s");
-//				setFacilityDetails(ao);
-				shoppingCounter++;
-				nodeFacilities++;
-			}
-		}
-		
-		/*TODO Report the final counts of different amenity types. */
 	}
 	
 	
@@ -399,6 +308,10 @@ public class AmenitySink implements Sink {
 		list.add(topRight);
 		
 		return list;
+	}
+	
+	private Coord getNodeCoord(Node node){
+		return ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
 	}
 	
 		
