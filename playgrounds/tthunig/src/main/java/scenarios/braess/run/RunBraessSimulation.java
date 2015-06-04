@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -16,6 +18,7 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.signals.data.SignalsData;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.dgrether.DgPaths;
@@ -29,10 +32,10 @@ import scenarios.braess.createInput.TtCreateBraessPopulation;
  * @author tthunig
  * 
  */
-public class RunBraessWoSignals {
+public class RunBraessSimulation {
 
 	private static final Logger log = Logger
-			.getLogger(RunBraessWoSignals.class);
+			.getLogger(RunBraessSimulation.class);
 	
 	private final String DATE = "2015-06-04";
 	
@@ -55,16 +58,24 @@ public class RunBraessWoSignals {
 	private void prepareRunAndAnalyse() {
 		log.info("Starts running the simulation from input directory " + INPUT_DIR);
 		
-		// prepare the simulation		
+		// prepare config and scenario		
 		Config config = defineConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		adaptNetwork(scenario);
 		createPopulation(scenario);
 		createRunNameAndOutputDir(scenario);
-
+		if (config.scenario().isUseSignalSystems()){
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, 
+					new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+		}
+		
 		// prepare the controller
 		Controler controler = new Controler(scenario);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		if (config.scenario().isUseSignalSystems()){
+			// add the signals module if signal systems are used
+			controler.addOverridingModule(new SignalsModule());
+		}
 		// adapt sigma for randomized routing
 		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder();
 		builder.setSigma(this.SIGMA);
@@ -85,10 +96,16 @@ public class RunBraessWoSignals {
 
 		// set network and lane properties
 		config.network().setInputFile(INPUT_DIR + "basicNetwork.xml");
-		config.scenario().setUseLanes( false );
+		config.scenario().setUseLanes( true );
 		config.network().setLaneDefinitionsFile(
 				INPUT_DIR + "lanes" + CAP_MAIN + "-" + CAP_FIRST_LAST + ".xml");
 
+		// set signal files
+		config.scenario().setUseSignalSystems( false );
+		config.signalSystems().setSignalControlFile(INPUT_DIR + "signalControl_Green.xml");
+		config.signalSystems().setSignalGroupsFile(INPUT_DIR + "signalGroups.xml");
+		config.signalSystems().setSignalSystemFile(INPUT_DIR + "signalSystems.xml");
+		
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta( 20 );
 
@@ -234,9 +251,9 @@ public class RunBraessWoSignals {
 					+ config.planCalcScore().getMonetaryDistanceCostRateCar();
 
 		if (config.scenario().isUseLanes()) {
-			String lanesFile = config.network().getLaneDefinitionsFile();
-			String[] lanesDotSlashSplit = (lanesFile.split("\\."))[0].split("/");
-			String lanesFileName = lanesDotSlashSplit[lanesDotSlashSplit.length - 1];
+			String[] lanesInfoSplit = config.network().getLaneDefinitionsFile()
+					.split("\\.")[0].split("/");
+			String lanesFileName = lanesInfoSplit[lanesInfoSplit.length - 1];
 			runName += "_" + lanesFileName;
 		}
 
@@ -244,6 +261,13 @@ public class RunBraessWoSignals {
 			runName += "_link2link";
 		else
 			runName += "_node2node";
+		
+		if (config.scenario().isUseSignalSystems()){
+			String[] signalsInfoSplit = config.signalSystems().getSignalControlFile()
+					.split("\\.")[0].split("_");
+			String signalsInfo = signalsInfoSplit[signalsInfoSplit.length - 1];
+			runName += "_signals" + signalsInfo;
+		}
 
 		String outputDir = DgPaths.RUNSSVN + "braess/" + runName + "/";
 //		outputDir = "/Users/nagel/kairuns/braess/output";
@@ -253,6 +277,6 @@ public class RunBraessWoSignals {
 	}
 
 	public static void main(String[] args) {
-		new RunBraessWoSignals().prepareRunAndAnalyse();
+		new RunBraessSimulation().prepareRunAndAnalyse();
 	}
 }
