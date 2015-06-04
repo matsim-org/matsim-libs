@@ -37,7 +37,7 @@ public class RunBraessSimulation {
 	private static final Logger log = Logger
 			.getLogger(RunBraessSimulation.class);
 	
-	private final String DATE = "2015-06-04";
+	private final String DATE = "2015-06-05";
 	
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
@@ -185,20 +185,20 @@ public class RunBraessSimulation {
 		// set travel times at the links (by adapting free speed)
 		// note: you only have to adapt the denominator, 
 		// because all links have length 200m in the basic network
-		scenario.getNetwork().getLinks().get(Id.create(0, Link.class)).setFreespeed(200 / 1);
-		scenario.getNetwork().getLinks().get(Id.create(1, Link.class)).setFreespeed(200 / 1);
-		scenario.getNetwork().getLinks().get(Id.create(2, Link.class)).setFreespeed(200 / 10);
-		scenario.getNetwork().getLinks().get(Id.create(3, Link.class)).setFreespeed(200 / 20);
-		scenario.getNetwork().getLinks().get(Id.create(4, Link.class)).setFreespeed(200 / 1);
-		scenario.getNetwork().getLinks().get(Id.create(5, Link.class)).setFreespeed(200 / 20);
-		scenario.getNetwork().getLinks().get(Id.create(6, Link.class)).setFreespeed(200 / 10);
-		scenario.getNetwork().getLinks().get(Id.create(7, Link.class)).setFreespeed(200 / 1);
+		scenario.getNetwork().getLinks().get(Id.createLinkId("0_1")).setFreespeed(200 / 1);
+		scenario.getNetwork().getLinks().get(Id.createLinkId("1_2")).setFreespeed(200 / 1);
+		scenario.getNetwork().getLinks().get(Id.createLinkId("2_3")).setFreespeed(200 / 10);
+		scenario.getNetwork().getLinks().get(Id.createLinkId("2_4")).setFreespeed(200 / 20);
+		scenario.getNetwork().getLinks().get(Id.createLinkId("3_4")).setFreespeed(200 / 1);
+		scenario.getNetwork().getLinks().get(Id.createLinkId("3_5")).setFreespeed(200 / 20);
+		scenario.getNetwork().getLinks().get(Id.createLinkId("4_5")).setFreespeed(200 / 10);
+		scenario.getNetwork().getLinks().get(Id.createLinkId("5_6")).setFreespeed(200 / 1);
 	
 		// adapt capacity on all links		
 		for (Link l : scenario.getNetwork().getLinks().values()){
-			if (l.getId().equals(Id.create(0, Link.class)) || 
-					l.getId().equals(Id.create(1, Link.class)) ||
-					l.getId().equals(Id.create(7, Link.class)) )
+			if (l.getId().equals(Id.createLinkId("0_1")) || 
+					l.getId().equals(Id.createLinkId("1_2")) ||
+					l.getId().equals(Id.createLinkId("5_6")) )
 				l.setCapacity(CAP_FIRST_LAST);
 			else
 				l.setCapacity(CAP_MAIN);
@@ -227,7 +227,7 @@ public class RunBraessSimulation {
 		runName += "_" + config.controler().getLastIteration() + "it";
 
 		Link middleLink = scenario.getNetwork().getLinks()
-				.get(Id.create(4, Link.class));
+				.get(Id.createLinkId("3_4"));
 		runName += "_cap" + middleLink.getCapacity();
 		runName += "_ttMid" + middleLink.getLength()
 				/ middleLink.getFreespeed() + "s";

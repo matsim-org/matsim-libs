@@ -121,13 +121,13 @@ public class TtAnalyzeBraessRouteDistributionAndTT implements PersonArrivalEvent
 		// the route is unique if you get a link enter event of link 3,4 or 5.
 		int route = -1;
 		switch (event.getLinkId().toString()) {
-		case "3": // the person uses the lower route
+		case "2_4": // the person uses the lower route
 			route = 2;
 			break;
-		case "4": // the person uses the middle route
+		case "3_4": // the person uses the middle route
 			route = 1;
 			break;
-		case "5": // the person uses the upper route
+		case "3_5": // the person uses the upper route
 			route = 0;
 			break;
 		default:
