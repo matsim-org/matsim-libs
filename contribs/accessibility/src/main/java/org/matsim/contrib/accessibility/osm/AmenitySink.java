@@ -138,7 +138,7 @@ public class AmenitySink implements Sink {
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
 				ActivityOption ao = aff.createActivityOption(activityType);
-				setFacilityDetails(ao);
+//				setFacilityDetails(ao);
 				nodeFacilities++;
 			}
 			/* Check shops */
@@ -160,7 +160,7 @@ public class AmenitySink implements Sink {
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
 				ActivityOption ao = aff.createActivityOption("s");
-				setFacilityDetails(ao);
+//				setFacilityDetails(ao);
 				shoppingCounter++;
 				nodeFacilities++;
 			}
@@ -195,7 +195,7 @@ public class AmenitySink implements Sink {
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
 				ActivityOption ao = aff.createActivityOption(activityType);
-				setFacilityDetails(ao);
+//				setFacilityDetails(ao);
 				wayFacilities++;
 			}					
 			/* Check shops */
@@ -217,7 +217,7 @@ public class AmenitySink implements Sink {
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
 				ActivityOption ao = aff.createActivityOption("s");
-				setFacilityDetails(ao);
+//				setFacilityDetails(ao);
 				shoppingCounter++;
 				nodeFacilities++;
 			}
@@ -252,7 +252,7 @@ public class AmenitySink implements Sink {
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
 				ActivityOption ao = aff.createActivityOption(activityType);
-				setFacilityDetails(ao);
+//				setFacilityDetails(ao);
 				relationFacilities++;
 			}					
 			/* Check shops */
@@ -274,70 +274,15 @@ public class AmenitySink implements Sink {
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
 				ActivityOption ao = aff.createActivityOption("s");
-				setFacilityDetails(ao);
+//				setFacilityDetails(ao);
 				shoppingCounter++;
 				nodeFacilities++;
 			}
 		}
-		log.info("------------------------------------------------");
-		log.info("Facilities parsed:");
-		log.info("  nodes    : " + nodeFacilities);
-		log.info("  ways     : " + wayFacilities);
-		log.info("  relations: " + relationFacilities);
-		log.info("------------------------------------------------");
-		log.info("Done creating facilities.");
-		log.info("  education  : " + educationCounter);
-		log.info("  leisure    : " + leisureCounter);
-		log.info("  shopping   : " + shoppingCounter);		
-		log.info("  healthcare : " + healthcareCounter);
-		log.info("  police     : " + policeCounter);
-		log.info("  other      : " + otherCounter);
-		log.info("------------------------------------------------");
-		log.info("Level of education:");
-		log.info(" primary  : " + educationLevelMap.get("primary") );
-		log.info(" secondary: " + educationLevelMap.get("secondary") );
-		log.info(" tertiary : " + educationLevelMap.get("tertiary"));
-		log.info(" unknown  : " + educationLevelMap.get("unknown"));
-		log.info("------------------------------------------------");
-		log.info("Errors and warnings:");
-		log.info("  errors  : " + errorCounter);
-		log.info("  warnings: " + warningCounter);
+		
+		/*TODO Report the final counts of different amenity types. */
 	}
 	
-	
-	private void setFacilityDetails(ActivityOption ao){
-		if(ao.getType().equalsIgnoreCase("s")){
-			double r1 = MatsimRandom.getRandom().nextDouble();
-			double starttime = Math.round(r1)*28800 + (1-Math.round(r1))*32400; // either 08:00 or 09:00
-			double r2 = MatsimRandom.getRandom().nextDouble();
-			double closingtime = Math.round(r2)*54000 + (1-Math.round(r2))*68400; // either 17:00 or 19:00
-			ao.addOpeningTime(new OpeningTimeImpl(starttime, closingtime));
-			
-			double r3 = MatsimRandom.getRandom().nextDouble();
-			double capacity = (200 + r3*800) / 10; // random surface between 200 and 1000 m^2.
-			ao.setCapacity(capacity);
-		} else if(ao.getType().equalsIgnoreCase("l")){
-			double r1 = MatsimRandom.getRandom().nextDouble();
-			double starttime = Math.round(r1)*28800 + (1-Math.round(r1))*32400; // either 08:00 or 09:00
-			double r2 = MatsimRandom.getRandom().nextDouble();
-			double closingtime = Math.round(r2)*64800 + (1-Math.round(r2))*79200; // either 18:00 or 22:00
-			ao.addOpeningTime(new OpeningTimeImpl(starttime, closingtime));
-			
-			double r3 = MatsimRandom.getRandom().nextDouble();
-			double capacity = (50 + r3*1950) / 10; // random surface between 50 and 2000 m^2.
-			ao.setCapacity(capacity);
-		} else{
-			double r1 = MatsimRandom.getRandom().nextDouble();
-			double starttime = Math.round(r1)*28800 + (1-Math.round(r1))*32400; // either 08:00 or 09:00
-			double r2 = MatsimRandom.getRandom().nextDouble();
-			double closingtime = Math.round(r2)*54000 + (1-Math.round(r2))*68400; // either 17:00 or 19:00
-			ao.addOpeningTime(new OpeningTimeImpl(starttime, closingtime));
-			
-			double r3 = MatsimRandom.getRandom().nextDouble();
-			double capacity = (200 + r3*800) / 10; // random number between 200 and 1000 m^2.
-			ao.setCapacity(capacity);
-		}
-	}
 	
 	
 	/**
@@ -552,73 +497,6 @@ public class AmenitySink implements Sink {
 		MapUtils.addToInteger(type, typeCount, 0, 1);
 		return type;
 	}
-
-	
-	private String dummy(String amenity){
-		//FIXME Remove into implementation!!
-		/* EDUCATION */
-		if(
-					amenity.equalsIgnoreCase("school") ||
-					amenity.equalsIgnoreCase("kindergarten") ||
-					amenity.equalsIgnoreCase("college") ||
-					amenity.equalsIgnoreCase("university")){
-			educationCounter++;
-			return "e";
-		/* LEISURE */
-		} else if(
-				/* Sustenance */
-					amenity.equalsIgnoreCase("bar") ||
-					amenity.equalsIgnoreCase("cafe") ||
-					amenity.equalsIgnoreCase("fast_food") ||
-					amenity.equalsIgnoreCase("food_court") ||
-					amenity.equalsIgnoreCase("ice_cream") ||
-					amenity.equalsIgnoreCase("pub") ||
-					amenity.equalsIgnoreCase("restaurant") ||
-					/* Entertainment, arts and culture */
-					amenity.equalsIgnoreCase("arts_centre") ||
-					amenity.equalsIgnoreCase("cinema") ||
-					amenity.equalsIgnoreCase("nightclub") ||
-					amenity.equalsIgnoreCase("stripclub") ||
-					amenity.equalsIgnoreCase("theatre") ||
-					/* Other */
-					amenity.equalsIgnoreCase("brothel")){
-			leisureCounter++;
-			return "l";
-		}else if(
-				amenity.equalsIgnoreCase("clinic") ||
-				amenity.equalsIgnoreCase("dentist") ||
-				amenity.equalsIgnoreCase("doctors") ||
-				amenity.equalsIgnoreCase("hospital") ||
-				amenity.equalsIgnoreCase("nursing_home") ||
-				amenity.equalsIgnoreCase("pharmacy")
-				){
-			healthcareCounter++;
-			return "m";
-		} else if(
-				amenity.equalsIgnoreCase("police")
-				){
-			policeCounter++;
-			return "p";
-		/* OTHER */
-		} else if(
-				amenity.equalsIgnoreCase("library") ||
-				amenity.equalsIgnoreCase("car_wash") ||
-				amenity.equalsIgnoreCase("fuel") ||
-				amenity.equalsIgnoreCase("atm") ||
-				amenity.equalsIgnoreCase("bank") ||
-				amenity.equalsIgnoreCase("bureau_de_change") ||
-				amenity.equalsIgnoreCase("social_centre") ||
-				amenity.equalsIgnoreCase("marketplace") ||
-				amenity.equalsIgnoreCase("place_of_worship") ||
-				amenity.equalsIgnoreCase("post_office") ||
-				amenity.equalsIgnoreCase("townhall")						
-				){
-			otherCounter++;
-			return "t";
-		}
-		return null;
-	}
-	
 	
 	
 	private void getEducationLevel(String facilityName){
