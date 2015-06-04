@@ -44,7 +44,7 @@ public class SHPFileCutter implements SpatialEventCutter{
 
 	public SHPFileCutter(String shpFile) {
 		this.shpFile = shpFile;
-		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
+		Set<SimpleFeature> features = new HashSet<>();
 		SHPFileUtil util = new SHPFileUtil();
 		features.addAll(ShapeFileReader.getAllFeatures(shpFile));
 		Geometry area = util.mergeGeometries(features);
