@@ -60,7 +60,7 @@ public class WelfareAnalyzer {
 	private Map<Id<PPlan>, Double> planId2welfareCorrection;
 	private Map<Id<Person>, Double> personId2benefits;
 	private Map<Id<Person>, Set<Id<PPlan>>> personId2usedPPlanIds;
-	Set<Id<PPlan>> existingPPlanIds;
+	private Set<Id<PPlan>> currentPPlanIds;
 	
 	public void computeWelfare(Scenario scenario) {
 		
@@ -68,11 +68,14 @@ public class WelfareAnalyzer {
 		this.personId2usedPPlanIds = new HashMap<>();
 		this.personId2benefits = new HashMap<>();
 		this.planId2welfareCorrection = new HashMap<>();
+		this.currentPPlanIds = new HashSet<Id<PPlan>>();
+		
+		setCurrentPPlanIds(scenario);
 		
 		// Go through the entire population.
 		for (Person person : scenario.getPopulation().getPersons().values()){
 			
-			// Get the corresponding PPlan.
+			// Get the PPlan which is used by this person.
 			for (PlanElement pE : person.getSelectedPlan().getPlanElements()){
 				
 				if (pE instanceof Leg) {
@@ -132,22 +135,17 @@ public class WelfareAnalyzer {
 		}		
 	}
 
-	private void refreshExistingPPlanIds(Scenario scenario) {
-		
-		this.existingPPlanIds = new HashSet<Id<PPlan>>();
-		
-		for(TransitLine transitLine : scenario.getTransitSchedule().getTransitLines().values()){
+	private void setCurrentPPlanIds(Scenario scenario) {
+				
+		for (TransitLine transitLine : scenario.getTransitSchedule().getTransitLines().values()){
 			
-			for(TransitRoute transitRoute : transitLine.getRoutes().values()){
+			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				
 				String planIdString = transitRoute.getId().toString().replace(transitLine.getId().toString() + "-", "");
 				Id<PPlan> planId = Id.create(planIdString, PPlan.class);
-				this.existingPPlanIds.add(planId);
-				
-			}
-			
-		}
-		
+				this.currentPPlanIds.add(planId);
+			}	
+		}	
 	}
 	
 	public double getLineId2welfareCorrection(Id<PPlan> id) {
@@ -215,7 +213,7 @@ public class WelfareAnalyzer {
 			
 			planStatsWriter.write("pplan_id" + delimiter + "revenues" + delimiter + "user_ids");
 			
-			for(Id<PPlan> pplanId : this.existingPPlanIds){
+			for(Id<PPlan> pplanId : this.currentPPlanIds){
 				
 				planStatsWriter.newLine();
 				
