@@ -457,29 +457,56 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			if (rp.getAffectedAgentUnits() != 0.) {
 				for (Id<Link> thisLink : rp.getLinkId2IsolatedImmission().keySet()) {
 					
+//					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink = new HashMap<Id<Link>, Double>();
+//					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink = new HashMap<Id<Link>, Double>();
+//					
+//					for (Id<Link> otherLink : rp.getLinkId2IsolatedImmission().keySet()) {
+//						if (!(thisLink.toString().equals(otherLink.toString()))) {
+//							linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(otherLink, rp.getLinkId2IsolatedImmission().get(otherLink));
+//							linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(otherLink, rp.getLinkId2IsolatedImmission().get(otherLink));
+//						}
+//					}
+//					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneCar().get(thisLink));
+//					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneHGV().get(thisLink));
+										
 					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink = new HashMap<Id<Link>, Double>();
 					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink = new HashMap<Id<Link>, Double>();
-
-					for (Id<Link> otherLink : rp.getLinkId2IsolatedImmission().keySet()) {
-						if (!(thisLink.toString().equals(otherLink.toString()))) {
-							linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(otherLink, rp.getLinkId2IsolatedImmission().get(otherLink));
-							linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(otherLink, rp.getLinkId2IsolatedImmission().get(otherLink));
-						}
-					}
+					
+					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.putAll(rp.getLinkId2IsolatedImmission());
+					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.putAll(rp.getLinkId2IsolatedImmission());
+					
 					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneCar().get(thisLink));
 					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneHGV().get(thisLink));
-					
+										
 					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.values());
 					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.values());
 					
 					double damageCostsPlusOneCarThisLink = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
 					double marginalDamageCostCarThisLink = (damageCostsPlusOneCarThisLink - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
 					
+					if (marginalDamageCostCarThisLink < 0.0) {
+						if (Math.abs(marginalDamageCostCarThisLink) < 0.0000000001) {
+							marginalDamageCostCarThisLink = 0.;
+						} else {
+							log.warn("The marginal damage cost per car on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostCarThisLink + ".");
+							log.warn("final immission: " + rp.getFinalImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostCarThisLink);
+							log.warn("Setting the marginal damage cost per car to 0.");
+							marginalDamageCostCarThisLink = 0.;
+						}
+					}
+					
 					double damageCostsPlusOneHGVThisLink = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneHGVThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
 					double marginalDamageCostHGVThisLink = (damageCostsPlusOneHGVThisLink - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
 					
-					if (marginalDamageCostCarThisLink < 0. || marginalDamageCostHGVThisLink < 0.) {
-						throw new RuntimeException("marginal damage cost car: " + marginalDamageCostCarThisLink + " - marginal damage cost hgv: " + marginalDamageCostHGVThisLink + " - Marginal cost cannot be negative. Aborting...");
+					if (marginalDamageCostHGVThisLink < 0.0) {
+						if (Math.abs(marginalDamageCostHGVThisLink) < 0.0000000001) {
+							marginalDamageCostHGVThisLink = 0.;
+						} else {
+							log.warn("The marginal damage cost per HGV on link " + thisLink.toString() + " for receiver point " + rp.getId().toString() + " is " + marginalDamageCostHGVThisLink + ".");
+							log.warn("final immission: " + rp.getFinalImmission() + " - immission plus one car " + noiseImmissionPlusOneCarThisLink + " - marginal damage cost car: " + marginalDamageCostHGVThisLink);
+							log.warn("Setting the marginal damage cost per HGV to 0.");
+							marginalDamageCostHGVThisLink = 0.;
+						}
 					}
 					
 					double marginalDamageCostCarSum = this.noiseContext.getNoiseLinks().get(thisLink).getMarginalDamageCostPerCar() + marginalDamageCostCarThisLink;
