@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.dgrether.koehlerstrehlersignal.braessscenario;
+package scenarios.braess.createInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +98,7 @@ public class TtCreateBraessPopulation {
 	 */
 	public void createPersons(int numberOfPersons, boolean sameStartTime,
 			boolean createAllRoutes) {
-
+		
 		for (int i = 0; i < numberOfPersons; i++) {
 
 			// create a person and a plan container
@@ -109,7 +109,7 @@ public class TtCreateBraessPopulation {
 			// add a start activity at link 0
 			Activity startAct = population
 					.getFactory()
-					.createActivityFromLinkId("dummy", Id.create(0, Link.class));
+					.createActivityFromLinkId("dummy", Id.createLinkId(0));
 			if (sameStartTime) {
 				// 8:00 am.
 				startAct.setEndTime(8 * 3600);
@@ -124,20 +124,19 @@ public class TtCreateBraessPopulation {
 			if (createAllRoutes) {
 				// create a route for the Z path
 				List<Id<Link>> pathZ = new ArrayList<>();
-				pathZ.add(Id.create(1, Link.class));
-				pathZ.add(Id.create(2, Link.class));
-				pathZ.add(Id.create(4, Link.class));
-				pathZ.add(Id.create(6, Link.class));
+				pathZ.add(Id.createLinkId(1));
+				pathZ.add(Id.createLinkId(2));
+				pathZ.add(Id.createLinkId(4));
+				pathZ.add(Id.createLinkId(6));
 				Route routeZ = new LinkNetworkRouteImpl(
-						Id.create(0, Link.class), pathZ, Id.create(7,
-								Link.class));
+						Id.createLinkId(0), pathZ, Id.createLinkId(7));
 				leg.setRoute(routeZ);
 			}
 			plan.addLeg(leg);
 
 			// add a drain activity at link 7
 			plan.addActivity(population.getFactory().createActivityFromLinkId(
-					"dummy", Id.create(7, Link.class)));
+					"dummy", Id.createLinkId(7)));
 
 			// store information in population
 			person.addPlan(plan);
@@ -155,18 +154,18 @@ public class TtCreateBraessPopulation {
 				Leg legUp = population.getFactory()
 						.createLeg(TransportMode.car);
 				List<Id<Link>> pathUp = new ArrayList<>();
-				pathUp.add(Id.create(1, Link.class));
-				pathUp.add(Id.create(2, Link.class));
-				pathUp.add(Id.create(5, Link.class));
-				Route routeUp = new LinkNetworkRouteImpl(Id.create(0,
-						Link.class), pathUp, Id.create(7, Link.class));
+				pathUp.add(Id.createLinkId(1));
+				pathUp.add(Id.createLinkId(2));
+				pathUp.add(Id.createLinkId(5));
+				Route routeUp = new LinkNetworkRouteImpl(
+						Id.createLinkId(0), pathUp, Id.createLinkId(7));
 				legUp.setRoute(routeUp);
 				plan2.addLeg(legUp);
 
 				// add the same drain activity as for the first plan
 				plan2.addActivity(population.getFactory()
 						.createActivityFromLinkId("dummy",
-								Id.create(7, Link.class)));
+								Id.createLinkId(7)));
 
 				person.addPlan(plan2);
 
@@ -180,24 +179,22 @@ public class TtCreateBraessPopulation {
 				Leg legDown = population.getFactory().createLeg(
 						TransportMode.car);
 				List<Id<Link>> pathDown = new ArrayList<>();
-				pathDown.add(Id.create(1, Link.class));
-				pathDown.add(Id.create(3, Link.class));
-				pathDown.add(Id.create(6, Link.class));
-				Route routeDown = new LinkNetworkRouteImpl(Id.create(0,
-						Link.class), pathDown, Id.create(7, Link.class));
+				pathDown.add(Id.createLinkId(1));
+				pathDown.add(Id.createLinkId(3));
+				pathDown.add(Id.createLinkId(6));
+				Route routeDown = new LinkNetworkRouteImpl(
+						Id.createLinkId(0), pathDown, Id.createLinkId(7));
 				legDown.setRoute(routeDown);
 				plan3.addLeg(legDown);
 
 				// add a drain activity at link 7
 				plan3.addActivity(population.getFactory()
 						.createActivityFromLinkId("dummy",
-								Id.create(7, Link.class)));
+								Id.createLinkId(7)));
 
 				person.addPlan(plan3);
 			}
-
 		}
-
 	}
 
 }

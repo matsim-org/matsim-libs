@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.dgrether.koehlerstrehlersignal.analysis;
+package scenarios.braess.analysis;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Person;
  * @author tthunig
  * 
  */
-public class BraessRouteDistributionAndTT implements PersonArrivalEventHandler,
+public class TtAnalyzeBraessRouteDistributionAndTT implements PersonArrivalEventHandler,
 		PersonDepartureEventHandler, LinkEnterEventHandler,
 		Wait2LinkEventHandler {
 
@@ -61,7 +61,7 @@ public class BraessRouteDistributionAndTT implements PersonArrivalEventHandler,
 	private Map<Double, int[]> routeUsersPerWait2LinkTime;
 	private Map<Double, int[]> routeUsersPerArrivalTime;
 
-	public BraessRouteDistributionAndTT() {
+	public TtAnalyzeBraessRouteDistributionAndTT() {
 		super();
 		reset(0);
 	}

@@ -1,13 +1,9 @@
-package scenarios.braess;
-
-import java.io.File;
-import java.util.Calendar;
+package scenarios.braess.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -16,7 +12,6 @@ import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeC
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
@@ -24,8 +19,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.koehlerstrehlersignal.analysis.AnalyzeBraessSimulation;
-import playground.dgrether.koehlerstrehlersignal.braessscenario.TtCreateBraessPopulation;
+import scenarios.braess.analysis.TtBraessControlerListener;
+import scenarios.braess.createInput.TtCreateBraessPopulation;
 
 /**
  * Class to run a simulation of the braess scenario without signals. It also
@@ -39,7 +34,7 @@ public class RunBraessWoSignals {
 	private static final Logger log = Logger
 			.getLogger(RunBraessWoSignals.class);
 	
-	private final String DATE = "2015-06-03";
+	private final String DATE = "2015-06-04";
 	
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
@@ -57,8 +52,7 @@ public class RunBraessWoSignals {
 	private boolean INIT_WITH_ALL_ROUTES = true;
 	
 
-	private void prepareAndRunAndAnalyse() {
-		// write some information
+	private void prepareRunAndAnalyse() {
 		log.info("Starts running the simulation from input directory " + INPUT_DIR);
 		
 		// prepare the simulation		
@@ -79,22 +73,11 @@ public class RunBraessWoSignals {
 				bindTravelDisutilityFactory().toInstance(builder);
 			}
 		});
-
+		// add a controller listener to analyze results
+		controler.addControlerListener(new TtBraessControlerListener(scenario));
+		
 		// run the simulation
 		controler.run();
-
-		// analyze the simulation
-		String analyzeDir = config.controler().getOutputDirectory() + "analysis/";
-		new File(analyzeDir).mkdir();
-		AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(
-				config.controler().getOutputDirectory(), 
-				config.controler().getLastIteration(), analyzeDir);
-		// if detailed information is available
-		if (config.controler().getWriteEventsInterval() == 1)
-			// analyze all iterations in terms of route choice and travel time
-			analyzer.analyzeAllItAndWriteResults();
-		// analyze the last iteration more detailed
-		analyzer.analyzeLastItAndWriteResults();
 	}
 
 	private Config defineConfig() {
@@ -171,10 +154,7 @@ public class RunBraessWoSignals {
 		config.vspExperimental().setWritingOutputEvents(true);
 		config.planCalcScore().setWriteExperiencedPlans(true);
 
-		// adapt events writing interval
-		// use 1 if you like to have a detailed analysis.
-		config.controler().setWriteEventsInterval( 1 );
-		
+		config.controler().setWriteEventsInterval( config.controler().getLastIteration() );
 		config.controler().setWritePlansInterval( config.controler().getLastIteration() );
 		
 		ActivityParams dummyAct = new ActivityParams("dummy");
@@ -273,6 +253,6 @@ public class RunBraessWoSignals {
 	}
 
 	public static void main(String[] args) {
-		new RunBraessWoSignals().prepareAndRunAndAnalyse();
+		new RunBraessWoSignals().prepareRunAndAnalyse();
 	}
 }

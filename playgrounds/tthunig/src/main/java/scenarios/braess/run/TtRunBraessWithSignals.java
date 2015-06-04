@@ -1,6 +1,5 @@
-package playground.dgrether.koehlerstrehlersignal.braessscenario;
+package scenarios.braess.run;
 
-import java.io.File;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
@@ -22,8 +21,14 @@ import org.matsim.signals.data.SignalsData;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.koehlerstrehlersignal.analysis.AnalyzeBraessSimulation;
+import scenarios.braess.analysis.TtBraessControlerListener;
 
+/**
+ * 
+ * @author Theresa
+ * @deprecated use RunBraessWoSignals and adapt config
+ */
+@Deprecated
 public class TtRunBraessWithSignals {
 	
 	private static final Logger log = Logger.getLogger(TtRunBraessWithSignals.class);
@@ -125,19 +130,11 @@ public class TtRunBraessWithSignals {
 				bindTravelDisutilityFactory().toInstance(builder);
 			}
 		});
+		// add a controller listener to analyze results
+		controler.addControlerListener(new TtBraessControlerListener(scenario));
 		
 		// run the simulation
-		controler.run();
-		
-		// analyze the simulation
-		String analyzeDir = outputDir + "analysis/";
-		new File(analyzeDir).mkdir();
-		AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(outputDir, iterations, analyzeDir);
-		if (writeEventsForAllIts)
-			// analyze all iterations in terms of route choice and travel time
-			analyzer.analyzeAllItAndWriteResults();
-		// analyze the last iteration more detailed
-		analyzer.analyzeLastItAndWriteResults();		
+		controler.run();	
 	}
 
 	private Config adaptConfig() {

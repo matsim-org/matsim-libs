@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.dgrether.koehlerstrehlersignal.analysis;
+package scenarios.braess.analysis;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,14 +19,15 @@ import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.RunResultsLoader;
 
 /**
- * Class to start the analysis of a MATSim simulation of Braess' example.
+ * Class to analyze the event files of a MATSim simulation of Braess' example.
  * 
  * @author tthunig
- * 
+ * @deprecated use the controller listener TtBraessControlerListener instead which analyzes whereas simulating
  */
-public class AnalyzeBraessSimulation {
+@Deprecated
+public class TtRunBraessAnalysisAfterSimulation {
 	
-	private static final Logger log = Logger.getLogger(AnalyzeBraessSimulation.class);
+	private static final Logger log = Logger.getLogger(TtRunBraessAnalysisAfterSimulation.class);
 	
 	// input and output information
 	private String runDirectory;
@@ -43,7 +44,7 @@ public class AnalyzeBraessSimulation {
 	private Map<Double, double[]> avgRouteTTsPerDeparture;
 	private Map<Double, double[]> avgRouteTTsPerArrival;
 
-	public AnalyzeBraessSimulation(String runDirectory, int lastIteration,
+	public TtRunBraessAnalysisAfterSimulation(String runDirectory, int lastIteration,
 			String outputDir) {
 		this.runDirectory = runDirectory;
 		this.outputDir = outputDir;
@@ -72,7 +73,7 @@ public class AnalyzeBraessSimulation {
 		String eventsFilename = runDir.getEventsFilename(lastIteration);
 
 		EventsManager eventsManager = new EventsManagerImpl();
-		BraessRouteDistributionAndTT handler = new BraessRouteDistributionAndTT();
+		TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
 		eventsManager.addHandler(handler);
 
 		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
@@ -263,7 +264,7 @@ public class AnalyzeBraessSimulation {
 			String eventsFilename = runDir.getEventsFilename(i);
 
 			EventsManager eventsManager = new EventsManagerImpl();
-			BraessRouteDistributionAndTT handler = new BraessRouteDistributionAndTT();
+			TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
 			eventsManager.addHandler(handler);
 
 			MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
@@ -308,11 +309,11 @@ public class AnalyzeBraessSimulation {
 		
 		if (args == null || args.length == 0){
 			log.info("run analysis from code");
-			AnalyzeBraessSimulation.runFromCode();
+			TtRunBraessAnalysisAfterSimulation.runFromCode();
 		}
 		else {
 			log.info("run analysis from args");
-			AnalyzeBraessSimulation.runFromArgs(args);
+			TtRunBraessAnalysisAfterSimulation.runFromArgs(args);
 		}
 		
 	}
@@ -329,7 +330,7 @@ public class AnalyzeBraessSimulation {
 
 		int lastIteration = Integer.parseInt(args[1]);
 		
-		AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(
+		TtRunBraessAnalysisAfterSimulation analyzer = new TtRunBraessAnalysisAfterSimulation(
 				runDirectory, lastIteration, outputDir);
 		analyzer.calculateLastItResults();
 		analyzer.writeResults();
@@ -383,7 +384,7 @@ public class AnalyzeBraessSimulation {
 //					lastIteration = 200;
 					lastIteration = lastIterationNonBC;
 					
-				AnalyzeBraessSimulation analyzer = new AnalyzeBraessSimulation(
+				TtRunBraessAnalysisAfterSimulation analyzer = new TtRunBraessAnalysisAfterSimulation(
 						runDirectory, lastIteration, outputDir);
 				analyzer.calculateLastItResults();
 				analyzer.writeResults();

@@ -1,4 +1,4 @@
-package playground.dgrether.koehlerstrehlersignal.braessscenario;
+package scenarios.braess.conversion;
 
 import java.util.List;
 import java.util.Map;
