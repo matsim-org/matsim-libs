@@ -28,8 +28,8 @@ public class KaiTaxiLauncherTest
     public void test()
     {
         String file = "./src/main/resources/mielec-2-peaks_2014_02/params.in";
-        KaiTaxiLauncher.run(file, false, false);//equivalent to (file, false, true)        
-        KaiTaxiLauncher.run(file, true, false);
-        KaiTaxiLauncher.run(file, true, true);
+        KNTaxiLauncher.run(file, false, false);//equivalent to (file, false, true)        
+        KNTaxiLauncher.run(file, true, false);
+        KNTaxiLauncher.run(file, true, true);
     }
 }

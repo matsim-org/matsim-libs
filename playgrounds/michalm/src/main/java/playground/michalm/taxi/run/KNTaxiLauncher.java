@@ -25,9 +25,10 @@ import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.run.VrpPopulationUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 
-class KaiTaxiLauncher
+class KNTaxiLauncher
 {
     /**
      * @param file path to the configuration file (e.g. param.in)
@@ -46,6 +47,10 @@ class KaiTaxiLauncher
                 setEndTimeForFirstActivities(launcher.scenario, 0);
             }
         }
+        
+        OTFVisConfigGroup otfConfig = new OTFVisConfigGroup() ;
+        launcher.scenario.getConfig().addModule( otfConfig );
+        otfConfig.setLinkWidth(2);
 
         launcher.initVrpPathCalculator();
         launcher.simulateIteration();
@@ -69,7 +74,7 @@ class KaiTaxiLauncher
         //path pattern: mielec-2-peaks-new-$supply$-$demand$
         //String file = "d:/eclipse-vsp/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in";
         //String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in";
-        String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/params.in";
+        String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/kaiparams.in";
         run(file, true, false);
     }
 }

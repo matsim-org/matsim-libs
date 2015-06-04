@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.media.opengl.GL2;
 
+import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneLayer;
 import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
@@ -50,7 +51,9 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFGLAbstractDrawable;
 public class OGLSimpleStaticNetLayer implements SceneLayer {
 
 	private final List<OTFGLAbstractDrawable> items = new ArrayList<OTFGLAbstractDrawable>();
-	
+
+	private static Rect cachedRect = null ;
+
 	private static int netDisplList = -1;
 	
 	private static int nItems = 0;
@@ -89,15 +92,17 @@ public class OGLSimpleStaticNetLayer implements SceneLayer {
 
 	private void checkNetList(GL2 gl) {
 		float currentLinkWidth = OTFClientControl.getInstance().getOTFVisConfig().getLinkWidth();
-		if (cachedLinkWidth != currentLinkWidth || items.size() > nItems) {
+		Rect rect = OTFClientControl.getInstance().getMainOTFDrawer().getViewBoundsAsQuadTreeRect() ;
+		if ( cachedLinkWidth != currentLinkWidth || items.size() > nItems || !rect.equals(cachedRect) ) {
 			// If the line width has changed (reason for redrawing)
 			// or if the number of visible links is bigger than last time
-			// (i.e. the user has zoomed out)
+			// (i.e. the user has zoomed out) or the user has resized the window
 			// we need to recreate the display list.
 			gl.glDeleteLists(netDisplList, 1);
 			netDisplList = -2;
 		}
 		if (netDisplList < 0) {
+			cachedRect = rect ;
 			cachedLinkWidth = currentLinkWidth;
 			netDisplList = gl.glGenLists(1);
 			gl.glNewList(netDisplList, GL2.GL_COMPILE);

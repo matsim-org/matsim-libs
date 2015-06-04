@@ -127,23 +127,41 @@ public class KNBangBang {
 		// ---
 		
 		final Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+		preparePopulation(scenario);
+		scheduleAccident(scenario); 
 		
-		for ( Iterator<? extends Person> it = scenario.getPopulation().getPersons().values().iterator() ; it.hasNext() ; ) {
-			Person person = it.next() ;
-			boolean retain = false ;
-			for ( Leg leg : TripStructureUtils.getLegs( person.getSelectedPlan() ) ) {
-				if ( leg.getRoute() instanceof NetworkRoute ) {
-					NetworkRoute route = (NetworkRoute) leg.getRoute() ;
-					if ( route.getLinkIds().contains( accidentLinkId ) ) {
-						retain = true ;
-					}
-				}
-			}
-			if ( !retain ) {
-				it.remove(); 
-			}
-		}
+		// ---
 		
+		final Controler controler = new Controler( scenario ) ;
+		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
+		controler.setDirtyShutdown(true);
+		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override public void install() {
+				this.bind(Mobsim.class).toProvider(KNMobsimProvider.class) ;
+			}
+		});
+
+		Set<String> analyzedModes = new HashSet<>() ;
+		analyzedModes.add( TransportMode.car ) ;
+		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
+		
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install() {
+				this.addEventHandlerBinding().toInstance( travelTime ) ;
+				this.addMobsimListenerBinding().toInstance( travelTime );
+				this.bind( TravelTime.class ).toInstance( travelTime );
+			}
+		}) ;
+		
+		
+		// ---
+		
+		controler.run() ;
+		
+	}
+
+	private static void scheduleAccident(final Scenario scenario) {
 		List<NetworkChangeEvent> events = new ArrayList<>() ;
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		{
@@ -164,38 +182,25 @@ public class KNBangBang {
 			event.setLanesChange(lanesChange);
 			events.add(event) ;
 		}
-		((NetworkImpl) scenario.getNetwork()).setNetworkChangeEvents(events); 
-		
-		// ---
-		
-		final Controler controler = new Controler( scenario ) ;
-		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
-		controler.setDirtyShutdown(true);
-		
-		controler.addOverridingModule(new AbstractModule(){
-			@Override public void install() {
-				this.bind(Mobsim.class).toProvider(KNMobsimProvider.class) ;
-			}
-		});
+		((NetworkImpl) scenario.getNetwork()).setNetworkChangeEvents(events);
+	}
 
-		Set<String> analyzedModes = new HashSet<>() ;
-		analyzedModes.add( TransportMode.car ) ;
-		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
-		
-		controler.addOverridingModule( new AbstractModule(){
-			@Override
-			public void install() {
-				this.addEventHandlerBinding().toInstance( travelTime ) ;
-				this.addMobsimListenerBinding().toInstance( travelTime );
-				this.bind( TravelTime.class ).toInstance( travelTime );
+	private static void preparePopulation(final Scenario scenario) {
+		for ( Iterator<? extends Person> it = scenario.getPopulation().getPersons().values().iterator() ; it.hasNext() ; ) {
+			Person person = it.next() ;
+			boolean retain = false ;
+			for ( Leg leg : TripStructureUtils.getLegs( person.getSelectedPlan() ) ) {
+				if ( leg.getRoute() instanceof NetworkRoute ) {
+					NetworkRoute route = (NetworkRoute) leg.getRoute() ;
+					if ( route.getLinkIds().contains( accidentLinkId ) ) {
+						retain = true ;
+					}
+				}
 			}
-		}) ;
-		
-		
-		// ---
-		
-		controler.run() ;
-		
+			if ( !retain ) {
+				it.remove(); 
+			}
+		}
 	}
 
 }

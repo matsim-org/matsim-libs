@@ -426,6 +426,9 @@ public class QNetsimEngine implements MobsimEngine {
 	}
 
 	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
+		if ( linkId==null) { // seems that this can happen in tests; not sure if it can happen in regular code. kai, jun'15
+			return null ;
+		}
 		QLinkInternalI qLink = network.getNetsimLink(linkId);
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
 	}
