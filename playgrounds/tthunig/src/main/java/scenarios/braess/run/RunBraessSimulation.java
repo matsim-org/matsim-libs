@@ -44,7 +44,7 @@ public class RunBraessSimulation {
 	private final double SIGMA = 0.0;
 	
 	private final String INPUT_DIR = DgPaths.SHAREDSVN
-			+ "studies/tthunig/scenarios/BraessWoSignals/";
+			+ "projects/cottbus/data/scenarios/braess_scenario/";
 	
 	private final long CAP_MAIN = 1800; // [veh/h]
 	private final long CAP_FIRST_LAST = 3600; // [veh/h]
