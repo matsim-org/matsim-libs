@@ -46,8 +46,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 /**
  * 
  * Computes the contribution of each transit line on the overall welfare changes.
- * 
- * First attempt: Allocate the changes in user benefits to the transit lines which are explicitly used by the user.
+ * Allocates the changes in user benefits to the transit lines which are used by the user.
  * 
  * 
  * @author ikaddoura
@@ -55,23 +54,25 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  */
 public class WelfareAnalyzer {
 	private static final Logger log = Logger.getLogger(WelfareAnalyzer.class);
+
+	private Map<Id<Person>, Double> personId2initialBenefits; // TODO
 	
-	Map<Id<PPlan>, Double> planId2welfareCorrection = new HashMap<>();
-	Map<Id<Person>, Double> personId2benefitsBefore = new HashMap<>(); // previous iteration
-	Map<Id<Person>, Set<Id<PPlan>>> personId2usedPPlanIds = new HashMap<>();
+	private Map<Id<PPlan>, Double> planId2welfareCorrection;
+	private Map<Id<Person>, Double> personId2benefits;
+	private Map<Id<Person>, Set<Id<PPlan>>> personId2usedPPlanIds;
 	Set<Id<PPlan>> existingPPlanIds;
 	
 	public void computeWelfare(Scenario scenario) {
 		
-		this.refreshExistingPPlanIds(scenario);
+		// Initialize all maps.
+		this.personId2usedPPlanIds = new HashMap<>();
+		this.personId2benefits = new HashMap<>();
+		this.planId2welfareCorrection = new HashMap<>();
 		
-		// map to store the pplan ids an agent used in this iteration
-		this.personId2usedPPlanIds = new HashMap<Id<Person>, Set<Id<PPlan>>>();
-		
-		Map<Id<Person>, Double> personId2benefits = new HashMap<>();
-		
+		// Go through the entire population.
 		for (Person person : scenario.getPopulation().getPersons().values()){
 			
+			// Get the corresponding PPlan.
 			for (PlanElement pE : person.getSelectedPlan().getPlanElements()){
 				
 				if (pE instanceof Leg) {
@@ -94,19 +95,14 @@ public class WelfareAnalyzer {
 				}
 			}
 						
-			// compute the user benefits and the difference to the previous iteration
+			// Compute the user benefits and the difference to the initial iteration.
 			double benefits = person.getSelectedPlan().getScore() / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 			personId2benefits.put(person.getId(), benefits);
 			
-			double benefitsBefore = 0.;
-			if (this.personId2benefitsBefore.containsKey(person.getId())) {
-				benefitsBefore = this.personId2benefitsBefore.get(person.getId());
-			} else {
-				benefitsBefore = -120.;
-				log.warn("There is no information about the user benefits of person " + person.getId() + " in the previous iteration. Setting the benefits in the previous iteration to " + benefitsBefore + ".");
-			}
+			double benefitsInitialIteration = -120.; // TODO
+			log.warn("There is no information about the user benefits of person " + person.getId() + " in the initial iteration. Setting the benefits in the previous iteration to " + benefitsInitialIteration + ".");
 				
-			double benefitDifference = benefits - benefitsBefore;
+			double benefitDifference = benefits - benefitsInitialIteration;
 			
 			if (benefitDifference != 0.) {
 				// allocate the difference in user benefits to the transit routes (PPlanIDs)
@@ -133,11 +129,7 @@ public class WelfareAnalyzer {
 			} else {
 				// the change in user benefits is zero
 			}
-		}
-		
-		// save the scores for the next iteration
-		personId2benefitsBefore = personId2benefits;
-		
+		}		
 	}
 
 	private void refreshExistingPPlanIds(Scenario scenario) {
@@ -179,7 +171,7 @@ public class WelfareAnalyzer {
 			
 			personStatsWriter.write("personId" + delimiter + "benefits" + delimiter + "used_pplans");
 			
-			for(Entry<Id<Person>, Double> benefitEntry : this.personId2benefitsBefore.entrySet()){
+			for(Entry<Id<Person>, Double> benefitEntry : this.personId2benefits.entrySet()){
 				
 				personStatsWriter.newLine();
 				
