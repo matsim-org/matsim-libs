@@ -387,7 +387,7 @@ abstract class AccessibilityControlerListenerImpl {
 				double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
 
 				// get free speed and congested car travel times on a certain link
-				double freeSpeedOnNearestLink_meterpersec = ((LinkImpl)nearestLink).getFreespeedTravelTime(depatureTime);
+				double freeSpeedOnNearestLink_meterpersec = nearestLink.getLength() / ((LinkImpl)nearestLink).getFreespeedTravelTime(depatureTime);
 				double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
 
 				// travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
