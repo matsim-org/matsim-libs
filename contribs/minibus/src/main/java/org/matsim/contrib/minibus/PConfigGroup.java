@@ -712,36 +712,12 @@ public final class PConfigGroup extends ConfigGroup{
 			}
 		}
 		
-		if(this.useFranchise ){
+		if(this.welfareMaximization){
 			
 			if(marginalUtilityOfMoney == 0.){
 				
 				log.error("Paratransit welfare maximization is enabled but marginal utility of money equals 0! This would produce benefits of-Infinity! Aborting...");
 				throw new RuntimeException();
-				
-			}
-			
-			for(Entry<Id<PStrategySettings>, PStrategySettings> strategyEntry : this.strategies.entrySet()){
-				
-				if(strategyEntry.getValue().getModuleName().equals("ReduceTimeServedRFare")){
-					
-					if(Boolean.parseBoolean(strategyEntry.getValue().getParametersAsArrayList().get(2))){
-						
-						log.error("Welfare maximization is enabled, strategy parameter of ReduceTimeServedRFare to use the collected fare as weight will not work! Aborting...");
-						throw new RuntimeException();
-						
-					}
-					
-				} else if(strategyEntry.getValue().getModuleName().equals("ReduceStopsToBeServedRFare")){
-					
-					if(Boolean.parseBoolean(strategyEntry.getValue().getParametersAsArrayList().get(1))){
-						
-						log.error("Welfare maximization is enabled, strategy parameter of ReduceTimeServedRFare to use the collected fare as weight will not work! Aborting...");
-						throw new RuntimeException();
-						
-					}
-					
-				}
 				
 			}
 			
