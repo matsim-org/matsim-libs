@@ -49,6 +49,7 @@ public class NoiseParameters {
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+	private int writeOutputIteration = 1;
 	
 	private boolean throwNoiseEventsAffected = true;
 	private boolean computeNoiseDamages = true;
@@ -209,6 +210,15 @@ public class NoiseParameters {
 	public void setNoiseAllocationApproach(NoiseAllocationApproach noiseAllocationApproach) {
 		log.info("Noise allocation approach: " + noiseAllocationApproach);
 		this.noiseAllocationApproach = noiseAllocationApproach;
+	}
+
+	public int getWriteOutputIteration() {
+		return writeOutputIteration;
+	}
+
+	public void setWriteOutputIteration(int writeOutputIteration) {
+		log.info("Writing output every " + writeOutputIteration + " iteration.");
+		this.writeOutputIteration = writeOutputIteration;
 	}
 	
 }

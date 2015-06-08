@@ -61,10 +61,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	private static final Logger log = Logger.getLogger(NoiseTimeTracker.class);
 	
 	private final NoiseContext noiseContext;
-	private final String outputDirectoryGeneral;
+	private final String outputDirectoryBasic;
 	private final EventsManager events;
 
 	private String outputDirectory;
+	private int iteration;
 	
 	private boolean collectNoiseEvents = true;
 	private List<NoiseEventCaused> noiseEventsCaused = new ArrayList<NoiseEventCaused>();
@@ -74,7 +75,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	
 	public NoiseTimeTracker(NoiseContext noiseContext, EventsManager events, String outputDirectory) {
 		this.noiseContext = noiseContext;
-		this.outputDirectoryGeneral = outputDirectory;
+		this.outputDirectoryBasic = outputDirectory;
 		this.outputDirectory = outputDirectory;
 		this.events = events;	
 	}
@@ -82,8 +83,10 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	@Override
 	public void reset(int iteration) {
 		
-		this.outputDirectory = this.outputDirectoryGeneral + "it." + iteration + "/";
+		this.outputDirectory = this.outputDirectoryBasic + "it." + iteration + "/";
 		log.info("Setting the output directory to " + outputDirectory);
+		
+		this.iteration = iteration;
 		
 		this.totalCausedNoiseCost = 0.;
 		this.totalAffectedNoiseCost = 0.;
@@ -160,19 +163,19 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		log.info("Calculating noise emissions...");
 		calculateNoiseEmission();
-		NoiseWriter.writeNoiseEmissionStatsPerHour(this.noiseContext, outputDirectory);
+		if (writeOutput()) NoiseWriter.writeNoiseEmissionStatsPerHour(this.noiseContext, outputDirectory);
 		log.info("Calculating noise emissions... Done.");
 		
 		log.info("Calculating noise immissions...");
 		calculateNoiseImmission();
-		NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory);
+		if (writeOutput()) NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory);
 		log.info("Calculating noise immissions... Done.");
 		
 		if (this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
 			
 			log.info("Calculating the number of affected agent units...");
 			calculateAffectedAgentUnits();
-			NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory);
+			if (writeOutput()) NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory);
 			log.info("Calculating the number of affected agent units... Done.");
 		
 			log.info("Calculating noise damage costs...");
@@ -182,6 +185,16 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			
 	}
 		
+	private boolean writeOutput() {
+		if (this.noiseContext.getNoiseParams().getWriteOutputIteration() == 0) {
+			return false;
+		} else if (this.iteration % this.noiseContext.getNoiseParams().getWriteOutputIteration() == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
 	private void calculateAffectedAgentUnits() {
 		
 		for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
@@ -251,7 +264,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		log.info("Calculating noise damage costs for each receiver point...");
 		calculateDamagePerReceiverPoint();
-		NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory);
+		if (writeOutput()) NoiseWriter.writeDamageInfoPerHour(noiseContext, outputDirectory);
 		log.info("Calculating noise damage costs for each receiver point... Done.");
 
 		if (this.noiseContext.getNoiseParams().isThrowNoiseEventsAffected()) {
@@ -303,13 +316,12 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		log.info("Allocating the total damage cost (per receiver point) to the relevant links...");
 		calculateCostSharesPerLinkPerTimeInterval();
-		NoiseWriter.writeLinkDamageInfoPerHour(noiseContext, outputDirectory);
+		if (writeOutput()) NoiseWriter.writeLinkDamageInfoPerHour(noiseContext, outputDirectory);
 		log.info("Allocating the total damage cost (per receiver point) to the relevant links... Done.");
-		
 		log.info("Allocating the damage cost per link to the vehicle categories and vehicles...");
 		calculateCostsPerVehiclePerLinkPerTimeInterval();
-		NoiseWriter.writeLinkAvgCarDamageInfoPerHour(noiseContext, outputDirectory);
-		NoiseWriter.writeLinkAvgHgvDamageInfoPerHour(noiseContext, outputDirectory);
+		if (writeOutput()) NoiseWriter.writeLinkAvgCarDamageInfoPerHour(noiseContext, outputDirectory);
+		if (writeOutput()) NoiseWriter.writeLinkAvgHgvDamageInfoPerHour(noiseContext, outputDirectory);
 		log.info("Allocating the damage cost per link to the vehicle categories and vehicles... Done.");
 	}
 
@@ -443,8 +455,8 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		
 		log.info("Computing the marginal damage cost for each link and receiver point...");
 		calculateMarginalDamageCost();
-		NoiseWriter.writeLinkMarginalCarDamageInfoPerHour(noiseContext, outputDirectory);
-		NoiseWriter.writeLinkMarginalHgvDamageInfoPerHour(noiseContext, outputDirectory);
+		if (writeOutput()) NoiseWriter.writeLinkMarginalCarDamageInfoPerHour(noiseContext, outputDirectory);
+		if (writeOutput()) NoiseWriter.writeLinkMarginalHgvDamageInfoPerHour(noiseContext, outputDirectory);
 		log.info("Computing the marginal damage cost for each link and receiver point... Done.");
 	}
 	
@@ -456,18 +468,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 
 			if (rp.getAffectedAgentUnits() != 0.) {
 				for (Id<Link> thisLink : rp.getLinkId2IsolatedImmission().keySet()) {
-					
-//					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink = new HashMap<Id<Link>, Double>();
-//					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink = new HashMap<Id<Link>, Double>();
-//					
-//					for (Id<Link> otherLink : rp.getLinkId2IsolatedImmission().keySet()) {
-//						if (!(thisLink.toString().equals(otherLink.toString()))) {
-//							linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(otherLink, rp.getLinkId2IsolatedImmission().get(otherLink));
-//							linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(otherLink, rp.getLinkId2IsolatedImmission().get(otherLink));
-//						}
-//					}
-//					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneCar().get(thisLink));
-//					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneHGV().get(thisLink));
 										
 					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink = new HashMap<Id<Link>, Double>();
 					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink = new HashMap<Id<Link>, Double>();
