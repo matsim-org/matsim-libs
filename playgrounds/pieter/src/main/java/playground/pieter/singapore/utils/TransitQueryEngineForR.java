@@ -45,19 +45,18 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.facilities.*;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.*;
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.lang.Math.*;
@@ -97,13 +96,14 @@ public class TransitQueryEngineForR implements Serializable {
         densityArea = PI * pow(densityDistance / 1000, 2);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IllegalAccessException, NoConnectionException, InstantiationException, IOException, SQLException, ClassNotFoundException {
         TransitQueryEngineForR transitQueryEngineForR = new TransitQueryEngineForR(8, sqrt(1000000 / PI));
         transitQueryEngineForR.loadNetwork(args[0]);
         transitQueryEngineForR.loadTransitSchedule(args[1]);
         transitQueryEngineForR.loadNodeAttrs(args[2]);
-        transitQueryEngineForR.loadFacilities(args[3]);
-        transitQueryEngineForR.loadEvents(args[4]);
+//        transitQueryEngineForR.loadFacilities(args[3]);
+//        transitQueryEngineForR.loadEvents(args[4]);
+        transitQueryEngineForR.loadCEPASEvents(args[3]);
         transitQueryEngineForR.setRateCalculationWindowSize(900);
         transitQueryEngineForR.setIsWeightedAverageValues(false);
         System.out.println(String.valueOf(transitQueryEngineForR.getInterStopDistance("46219", "46109", "170_weekday_2-p", "170")));
@@ -134,7 +134,7 @@ public class TransitQueryEngineForR implements Serializable {
 //        for (int i = 0; i < 100; i++) {
         transitQueryEngineForR.setIsWeightedAverageValues(!transitQueryEngineForR.isWeightedAverageValues());
         transitQueryEngineForR.calculateStopStopInfo(from, to, routes, lines, times);
-        transitQueryEngineForR.calculateStopStopInfo("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/java.enquiry.input.txt", 10000);
+        transitQueryEngineForR.calculateStopStopInfo("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/java.enquiry.input.txt", 10000000);
 //        transitQueryEngineForR.writeReport("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/networkinfo.txt");
         transitQueryEngineForR.writeReport("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/networkinfo.txt");
         System.out.printf("");
@@ -182,7 +182,7 @@ public class TransitQueryEngineForR implements Serializable {
     }
 
     public void loadEvents(String arg) {
-        facilityToActivityLevelAtTimeMap = new ConcurrentHashMap<>();
+        facilityToActivityLevelAtTimeMap = new HashMap<>();
         EventsManager eventsManager = EventsUtils.createEventsManager();
         eventsManager.addHandler(new ActivityEndEventHandler() {
             @Override
@@ -232,6 +232,121 @@ public class TransitQueryEngineForR implements Serializable {
             EventWriterXMLFiltered eventWriterXML = new EventWriterXMLFiltered("/home/fouriep/actOnlyEvents.xml");
             eventsManager.addHandler(eventWriterXML);
             new MatsimEventsReader(eventsManager).readFile(arg);
+            eventWriterXML.closeFile();
+        }
+
+        final int total = facilityToActivityLevelAtTimeMap.size();
+        int i = 0;
+        for (FacilityActivityCounter counter : facilityToActivityLevelAtTimeMap.values()) {
+            counter.finalizeCounters();
+            i++;
+            if (total > 10 && i % (total / 10) == 0)
+                System.out.printf("%d/%d..", i, total);
+        }
+
+        //the node calculations take long, so made the maps they write to thread-safe:
+        final List<? extends Node>[] split = CollectionUtils.split(scenario.getNetwork().getNodes().values(), threads);
+        numThreads = new AtomicInteger(threads);
+        DensityCalculator[] calculators = new DensityCalculator[threads];
+        for (int j = 0; j < threads; j++) {
+            calculators[j] = new DensityCalculator(split[j]);
+            new Thread(calculators[j]).start();
+        }
+
+        while (numThreads.get() > 0)
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        for (DensityCalculator d : calculators) {
+            nodes2ActivityLevels.putAll(d.getNodes2ActLevels());
+            intersectionDensities.putAll(d.getIntDensities());
+        }
+    }
+
+    public void loadCEPASEvents(String properties) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException, IOException, NoConnectionException {
+        facilityToActivityLevelAtTimeMap = new HashMap<>();
+        EventsManager eventsManager = EventsUtils.createEventsManager();
+        eventsManager.addHandler(new ActivityEndEventHandler() {
+            @Override
+            public void handleEvent(ActivityEndEvent event) {
+                if (event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
+                    return;
+
+                FacilityActivityCounter facilityActivityCounter = facilityToActivityLevelAtTimeMap.get(event.getFacilityId());
+                if (facilityActivityCounter == null) {
+                    facilityActivityCounter = new FacilityActivityCounter();
+                    facilityToActivityLevelAtTimeMap.put(event.getFacilityId(), facilityActivityCounter);
+                }
+                facilityActivityCounter.registerDeparture((int) event.getTime());
+            }
+
+            @Override
+            public void reset(int iteration) {
+
+            }
+        });
+        eventsManager.addHandler(new ActivityStartEventHandler() {
+            @Override
+            public void handleEvent(ActivityStartEvent event) {
+                if (event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
+                    return;
+
+                FacilityActivityCounter facilityActivityCounter = facilityToActivityLevelAtTimeMap.get(event.getFacilityId());
+                if (facilityActivityCounter == null) {
+                    facilityActivityCounter = new FacilityActivityCounter();
+                    facilityToActivityLevelAtTimeMap.put(event.getFacilityId(), facilityActivityCounter);
+                }
+                facilityActivityCounter.registerArrival((int) event.getTime());
+            }
+
+            @Override
+            public void reset(int iteration) {
+
+            }
+        });
+
+        DataBaseAdmin dba = new DataBaseAdmin(new File(properties));
+        boolean eventsRead = false;
+        try {
+            System.out.println("...Reading from pre-processed events...");
+            new MatsimEventsReader(eventsManager).readFile("/home/fouriep/CEPASEvents.xml");
+            eventsRead = true;
+        } catch (Exception e) {
+        }
+        ActivityFacilitiesFactory fac = new ActivityFacilitiesFactoryImpl();
+        if (!eventsRead) {
+            EventWriterXMLFiltered eventWriterXML = new EventWriterXMLFiltered("/home/fouriep/CEPASEvents.xml");
+            eventsManager.addHandler(eventWriterXML);
+            Map<String, Id<ActivityFacility>> facilitiesToCreate = new HashMap<>();
+            ResultSet resultSet = dba.executeQuery("SELECT DISTINCT stop, x, y FROM u_fouriep.cepas_analysis_actlevel_stops");
+            while (resultSet.next()) {
+                double x = resultSet.getDouble("x");
+                double y = resultSet.getDouble("y");
+                String stop = resultSet.getString("stop");
+                Id<ActivityFacility> facilityId = Id.create(stop, ActivityFacility.class);
+                ActivityFacilityImpl activityFacility = (ActivityFacilityImpl) fac.createActivityFacility(facilityId, CoordUtils.createCoord(x, y));
+                activityFacility.setLinkId(NetworkUtils.getNearestLink(scenario.getNetwork(), activityFacility.getCoord()).getId());
+                scenario.getActivityFacilities().addActivityFacility(activityFacility);
+                facilitiesToCreate.put(stop, activityFacility.getId());
+            }
+
+            resultSet = dba.executeQuery("SELECT stop, t, actType FROM u_fouriep.cepas_analysis_actlevel");
+            while (resultSet.next()) {
+                String stop = resultSet.getString("stop");
+                int t = resultSet.getInt("t");
+                String actType = resultSet.getString("actType");
+                if (actType.equals("actEnd"))
+                    eventsManager.processEvent(new ActivityEndEvent(t, Id.createPersonId(0L),
+                            scenario.getActivityFacilities().getFacilities().get(facilitiesToCreate.get(stop)).getLinkId(),
+                            facilitiesToCreate.get(stop), "dummy"));
+                else {
+                    eventsManager.processEvent(new ActivityStartEvent(t, Id.createPersonId(0L),
+                            scenario.getActivityFacilities().getFacilities().get(facilitiesToCreate.get(stop)).getLinkId(),
+                            facilitiesToCreate.get(stop), "dummy"));
+                }
+            }
             eventWriterXML.closeFile();
         }
 
@@ -1683,11 +1798,11 @@ public class TransitQueryEngineForR implements Serializable {
             Link fromLink = null;
             Link toLink = null;
             for (TransitRouteStop tss : stops) {
-                if (tss.getStopFacility().getId().equals(fromStopId)) {
+                if (Integer.parseInt(tss.getStopFacility().getId().toString()) == Integer.parseInt(fromStopId.toString())) {
                     fromLink = scenario.getNetwork().getLinks().get(tss.getStopFacility().getLinkId());
                     fromCoord = tss.getStopFacility().getCoord();
                 }
-                if (tss.getStopFacility().getId().equals(toStopId)) {
+                if (Integer.parseInt(tss.getStopFacility().getId().toString()) == Integer.parseInt(toStopId.toString())) {
                     toLink = scenario.getNetwork().getLinks().get(tss.getStopFacility().getLinkId());
                     toCoord = tss.getStopFacility().getCoord();
                 }
