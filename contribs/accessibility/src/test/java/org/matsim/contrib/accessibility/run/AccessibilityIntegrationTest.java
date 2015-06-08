@@ -408,51 +408,46 @@ public class AccessibilityIntegrationTest {
 			for(double x = 50; x < 200; x += 100){
 				
 				for(double y = 50; y < 200; y += 100){
-					
-					double expectedFreespeed = 0.;
-					double expectedCar = 0.;
-					double expectedBike = 0.;
-					double expectedWalk = 0.;
-					double expectedPt = 0.;
-					
+
+					final AccessibilityResults expected = new AccessibilityResults();
+
 					if( (x == 50 || x == 150) && y == 50){
 						
-						expectedFreespeed = 2.20583781881484;
-						expectedCar = 2.14860942375311;
-						expectedBike = 2.2257398663221;
-						expectedWalk = 1.70054725728361;
-						expectedPt = 0.461863556339195;
+						expected.accessibilityFreespeed = 2.20583781881484;
+						expected.accessibilityCar = 2.14860942375311;
+						expected.accessibilityBike = 2.2257398663221;
+						expected.accessibilityWalk = 1.70054725728361;
+						expected.accessibilityPt = 0.461863556339195;
 						
 					} else if(x == 50 && y == 150){
 						
-						expectedFreespeed = 2.1555292541877;
-						expectedCar = 2.1555292541877;
-						expectedBike = 2.20170415738971;
-						expectedWalk = 1.88907197432798;
-						expectedPt = 0.461863556339195;
+						expected.accessibilityFreespeed = 2.1555292541877;
+						expected.accessibilityCar = 2.1555292541877;
+						expected.accessibilityBike = 2.20170415738971;
+						expected.accessibilityWalk = 1.88907197432798;
+						expected.accessibilityPt = 0.461863556339195;
 						
 					} else if(x == 150 && y == 150){
 						
-						expectedFreespeed = 2.18445595855523;
-						expectedCar = 2.18445595855523;
-						expectedBike = 2.22089493905874;
-						expectedWalk = 1.9683225787191;
-						expectedPt = 0.624928280738513;
+						expected.accessibilityFreespeed = 2.18445595855523;
+						expected.accessibilityCar = 2.18445595855523;
+						expected.accessibilityBike = 2.22089493905874;
+						expected.accessibilityWalk = 1.9683225787191;
+						expected.accessibilityPt = 0.624928280738513;
 						
 					}
-					
-					double accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freeSpeed).getValue(new CoordImpl(x, y));
-					double accessibilityCar = spatialGrids.get(Modes4Accessibility.car).getValue(new CoordImpl(x, y));
-					double accessibilityBike = spatialGrids.get(Modes4Accessibility.bike).getValue(new CoordImpl(x, y));
-					double accessibilityWalk = spatialGrids.get(Modes4Accessibility.walk).getValue(new CoordImpl(x, y));
-					double accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new CoordImpl(x, y));
-					
-					Assert.assertEquals("Freespeed accessibility at coord " + x + "," + y +" does not match!", expectedFreespeed, accessibilityFreespeed, MatsimTestUtils.EPSILON);
-					Assert.assertEquals("Car accessibility at coord " + x + "," + y +" does not match!", expectedCar, accessibilityCar, MatsimTestUtils.EPSILON);
-					Assert.assertEquals("Bike accessibility at coord " + x + "," + y +" does not match!", expectedBike, accessibilityBike, MatsimTestUtils.EPSILON);
-					Assert.assertEquals("Walk accessibility at coord " + x + "," + y +" does not match!", expectedWalk, accessibilityWalk, MatsimTestUtils.EPSILON);
-					Assert.assertEquals("Pt accessibility at coord " + x + "," + y +" does not match!", expectedPt, accessibilityPt, MatsimTestUtils.EPSILON);
-					
+
+					final AccessibilityResults actual = new AccessibilityResults();
+					actual.accessibilityFreespeed = spatialGrids.get(Modes4Accessibility.freeSpeed).getValue(new CoordImpl(x, y));
+					actual.accessibilityCar = spatialGrids.get(Modes4Accessibility.car).getValue(new CoordImpl(x, y));
+					actual.accessibilityBike = spatialGrids.get(Modes4Accessibility.bike).getValue(new CoordImpl(x, y));
+					actual.accessibilityWalk = spatialGrids.get(Modes4Accessibility.walk).getValue(new CoordImpl(x, y));
+					actual.accessibilityPt = spatialGrids.get(Modes4Accessibility.pt).getValue(new CoordImpl(x, y));
+
+					Assert.assertTrue(
+							"accessibility at coord " + x + "," + y + " does not match for "+
+									expected.nonMatching( actual , MatsimTestUtils.EPSILON ),
+							expected.equals(actual, MatsimTestUtils.EPSILON ) );
 				}
 				
 			}
@@ -460,5 +455,79 @@ public class AccessibilityIntegrationTest {
 			log.info("... done!");
 		}
 	}
-	
+
+	// Allows getting information on all accessibilities,
+	// even if several fails
+	// Would be nicer to make one test per mode
+	private static class AccessibilityResults {
+		double accessibilityFreespeed = Double.NaN;
+		double accessibilityCar = Double.NaN;
+		double accessibilityBike = Double.NaN;
+		double accessibilityWalk = Double.NaN;
+		double accessibilityPt = Double.NaN;
+
+		public String nonMatching(  final AccessibilityResults o , final double epsilon ) {
+            return
+                matchingMessage( "PT ", o.accessibilityPt , accessibilityPt , epsilon ) +
+                matchingMessage( "CAR " , o.accessibilityCar , accessibilityCar , epsilon ) +
+                matchingMessage( "FREESPEED", o.accessibilityFreespeed , accessibilityFreespeed , epsilon ) +
+                matchingMessage( "BIKE ", o.accessibilityBike , accessibilityBike , epsilon ) +
+                matchingMessage( "WALK", o.accessibilityWalk , accessibilityWalk , epsilon );
+		}
+
+		public boolean equals( final AccessibilityResults o , final double epsilon ) {
+			return nonMatching( o , epsilon ).isEmpty();
+		}
+
+		private String matchingMessage( String mode , double d1 , double d2 , double epsilon ) {
+			final boolean match = (Double.isNaN( d1 ) && Double.isNaN( d2 )) ||
+					Math.abs( d1 - d2 ) < epsilon;
+			if ( match ) return "";
+			return mode+" (expected="+d1+", actual="+d2+")";
+		}
+
+		// equals and hashCode automatically generated by intellij
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+
+			AccessibilityResults that = (AccessibilityResults) o;
+
+			if (Double.compare(that.accessibilityFreespeed, accessibilityFreespeed) != 0) return false;
+			if (Double.compare(that.accessibilityCar, accessibilityCar) != 0) return false;
+			if (Double.compare(that.accessibilityBike, accessibilityBike) != 0) return false;
+			if (Double.compare(that.accessibilityWalk, accessibilityWalk) != 0) return false;
+			return Double.compare(that.accessibilityPt, accessibilityPt) == 0;
+
+		}
+
+		@Override
+		public int hashCode() {
+			int result;
+			long temp;
+			temp = Double.doubleToLongBits(accessibilityFreespeed);
+			result = (int) (temp ^ (temp >>> 32));
+			temp = Double.doubleToLongBits(accessibilityCar);
+			result = 31 * result + (int) (temp ^ (temp >>> 32));
+			temp = Double.doubleToLongBits(accessibilityBike);
+			result = 31 * result + (int) (temp ^ (temp >>> 32));
+			temp = Double.doubleToLongBits(accessibilityWalk);
+			result = 31 * result + (int) (temp ^ (temp >>> 32));
+			temp = Double.doubleToLongBits(accessibilityPt);
+			result = 31 * result + (int) (temp ^ (temp >>> 32));
+			return result;
+		}
+
+		@Override
+		public String toString() {
+			return "AccessibilityResults{" +
+					"accessibilityFreespeed=" + accessibilityFreespeed +
+					", accessibilityCar=" + accessibilityCar +
+					", accessibilityBike=" + accessibilityBike +
+					", accessibilityWalk=" + accessibilityWalk +
+					", accessibilityPt=" + accessibilityPt +
+					'}';
+		}
+	}
 }
