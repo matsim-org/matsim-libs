@@ -105,25 +105,10 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 	private boolean useRawSum	; //= false;
 	private double logitScaleParameter;
 	private double inverseOfLogitScaleParameter;
-	private double betaCarTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
-	private double betaCarTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
-	private double betaCarTMC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-	private double betaBikeTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingBike_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-	private double betaBikeTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateBike doesn't exist: 
-	private double betaBikeTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
 	private double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
 	private double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
 	private double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-	private double betaPtTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
-	private double betaPtTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
 
-	private double constCar;
-	private double constBike;
-	private double constWalk;
-	private double constPt;
-
-	private double depatureTime;
-	private double bikeSpeedMeterPerHour = -1;
 	private double walkSpeedMeterPerHour = -1;
 	private Benchmark benchmark;
 	
@@ -173,80 +158,35 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 	 * setting parameter for accessibility calculation
 	 * @param config TODO
 	 */
-	final void initAccessibilityParameters(Config config){
+	final void initAccessibilityParameters(Config config) {
 
 		AccessibilityConfigGroup moduleAPCM = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
 
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore() ;
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
 
-		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0. ) {
-			log.error( "marginal utility of distance for car different from zero but not used in accessibility computations");
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.car).getMarginalUtilityOfDistance() != 0.) {
+			log.error("marginal utility of distance for car different from zero but not used in accessibility computations");
 		}
-		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0. ) {
-			log.error( "marginal utility of distance for pt different from zero but not used in accessibility computations");
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.pt).getMarginalUtilityOfDistance() != 0.) {
+			log.error("marginal utility of distance for pt different from zero but not used in accessibility computations");
 		}
-		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceCostRate() != 0. ) {
-			log.error( "monetary distance cost rate for bike different from zero but not used in accessibility computations");
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.bike).getMonetaryDistanceCostRate() != 0.) {
+			log.error("monetary distance cost rate for bike different from zero but not used in accessibility computations");
 		}
-		if ( planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceCostRate() != 0. ) {
-			log.error( "monetary distance cost rate for walk different from zero but not used in accessibility computations");
+		if (planCalcScoreConfigGroup.getOrCreateModeParams(TransportMode.walk).getMonetaryDistanceCostRate() != 0.) {
+			log.error("monetary distance cost rate for walk different from zero but not used in accessibility computations");
 		}
 
-		useRawSum			= moduleAPCM.isUsingRawSumsWithoutLn();
-		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
-		inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
+		useRawSum = moduleAPCM.isUsingRawSumsWithoutLn();
+		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
+		inverseOfLogitScaleParameter = 1 / (logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		walkSpeedMeterPerHour = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
-		bikeSpeedMeterPerHour = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike) * 3600.; // should be something like 15000
 
-		betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar();
-		betaCarTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
-
-		betaBikeTT		= planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaBikeTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther();
-		betaBikeTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
-
-		betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
-		betaWalkTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
-
-		betaPtTT		= planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
-		betaPtTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt();
-		//		betaPtTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
-
-		constCar		= config.planCalcScore().getConstantCar();
-		constBike		= config.planCalcScore().getConstantBike();
-		constWalk		= config.planCalcScore().getConstantWalk();
-		constPt			= config.planCalcScore().getConstantPt();
-
-		depatureTime 	= moduleAPCM.getTimeOfDay(); // by default = 8.*3600;	
-		// printParameterSettings(); // use only for debugging since otherwise it clutters the logfile (settings are printed as part of config dump)
+		betaWalkTT = planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTD = planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
+		betaWalkTMC = -planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
 	}
 
-	
-	/**
-	 * displays settings
-	 */
-	final void printParameterSettings(){
-		log.info("Computing and writing grid based accessibility measures with following settings:" );
-		log.info("Returning raw sum (not logsum): " + useRawSum);
-		log.info("Logit Scale Parameter: " + logitScaleParameter);
-		log.info("Inverse of logit Scale Parameter: " + inverseOfLogitScaleParameter);
-		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour + " ("+this.walkSpeedMeterPerHour/3600. +" meter/s)");
-		log.info("Bike speed (meter/h): " + this.bikeSpeedMeterPerHour + " ("+this.bikeSpeedMeterPerHour/3600. +" meter/s)");
-		log.info("Depature time (in seconds): " + depatureTime);
-		log.info("Beta Car Travel Time: " + betaCarTT );
-		log.info("Beta Car Travel Distance: " + betaCarTD );
-		log.info("Beta Car Travel Monetary Cost: " + betaCarTMC );
-		log.info("Beta Bike Travel Time: " + betaBikeTT );
-		log.info("Beta Bike Travel Distance: " + betaBikeTD );
-		log.info("Beta Bike Travel Monetary Cost: " + betaBikeTMC );
-		log.info("Beta Walk Travel Time: " + betaWalkTT );
-		log.info("Beta Walk Travel Distance: " + betaWalkTD );
-		log.info("Beta Walk Travel Monetary Cost: " + betaWalkTMC );
-	}
-
-	
 	/**
 	 * This aggregates the disutilities Vjk to get from node j to all k that are attached to j.
 	 * Finally the sum(Vjk) is assigned to node j, which is done in this method.
@@ -479,6 +419,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
         Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
 
 		for ( Map.Entry<Modes4Accessibility, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
+			if ( !isComputingMode.get( calculatorEntry.getKey() ) ) continue; // XXX should be configured by adding only the relevant calculators
 			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility );
 			gcs[ calculatorEntry.getKey().ordinal() ].addExpUtils( expVhk );
 		}
