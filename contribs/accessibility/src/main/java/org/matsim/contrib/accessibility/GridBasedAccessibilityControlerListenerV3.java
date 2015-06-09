@@ -7,11 +7,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
+import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -26,11 +26,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -123,10 +119,11 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author thomas
  * 
  */
-public final class GridBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl 
-implements ShutdownListener, StartupListener { 
+public final class GridBasedAccessibilityControlerListenerV3
+		implements ShutdownListener, StartupListener {
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
-	
+	private final AccessibilityControlerListenerImpl accessibilityControlerListener = new AccessibilityControlerListenerImpl();
+
 	private UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter;
 	private Network network;
 	private Config config;
@@ -158,17 +155,17 @@ implements ShutdownListener, StartupListener {
 
 		log.info("Initializing  ...");
 
-		this.ptMatrix = ptMatrix;	// this could be zero if no input files for pseudo pt are given ...
+		accessibilityControlerListener.ptMatrix = ptMatrix;	// this could be zero if no input files for pseudo pt are given ...
 		assert (config != null);
 		this.config = config ;
 		assert (network != null);
 
-		this.benchmark = new Benchmark();
+		accessibilityControlerListener.benchmark = new Benchmark();
 
-		initAccessibilityParameters(config);
+		accessibilityControlerListener.initAccessibilityParameters(config);
 
 		// aggregating facilities to their nearest node on the road network
-		this.aggregatedOpportunities = aggregatedOpportunities(opportunities, network);
+		accessibilityControlerListener.aggregatedOpportunities = accessibilityControlerListener.aggregatedOpportunities(opportunities, network);
 		// yyyy ignores the "capacities" of the facilities.  kai, mar'14
 		
 		
@@ -193,13 +190,13 @@ implements ShutdownListener, StartupListener {
 		// in case multiple AccessibilityControlerListeners are added to the controller, e.g. if various calculations are done for
 		// different activity types subdirectories are required in order not to confuse the output. dz, '14
 		if (outputSubdirectory == null) {
-			if ( this.urbansimMode ) {
+			if ( accessibilityControlerListener.urbansimMode ) {
 				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(config.controler().getOutputDirectory());
 			}
 		} else {
 			File file = new File(config.controler().getOutputDirectory() + "/" + outputSubdirectory);
 			file.mkdirs();
-			if ( this.urbansimMode ) {
+			if ( accessibilityControlerListener.urbansimMode ) {
 				urbansimAccessibilityWriter = new UrbansimCellBasedAccessibilityCSVWriterV2(
 						config.controler().getOutputDirectory() + "/" + outputSubdirectory);
 			}
@@ -223,7 +220,7 @@ implements ShutdownListener, StartupListener {
 		log.info("Entering notifyShutdown ..." );
 
 		// make sure that measuring points are set.
-		if(this.getMeasuringPoints() == null){
+		if(accessibilityControlerListener.getMeasuringPoints() == null){
 			// yy this test is really a bit late AFTER all the iterations. kai, mar'14
 			
 			log.error("No measuring points found! For this reason no accessibilities can be calculated!");
@@ -243,7 +240,7 @@ implements ShutdownListener, StartupListener {
 		// get the controller and scenario
 		Controler controler = event.getControler();
 
-		int benchmarkID = this.benchmark.addMeasure("cell-based accessibility computation");
+		int benchmarkID = accessibilityControlerListener.benchmark.addMeasure("cell-based accessibility computation");
 
 		// get the car travel times (in seconds)
 		final FreeSpeedTravelTime ttf = new FreeSpeedTravelTime();
@@ -252,25 +249,25 @@ implements ShutdownListener, StartupListener {
 
 		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc, controler.getConfig().planCalcScore() ) ;
 
-		this.scheme = (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+		accessibilityControlerListener.scheme = (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 
 		log.info("Computing and writing cell based accessibility measures ...");
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
-		log.info(getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
+		log.info(accessibilityControlerListener.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 
-		accessibilityComputation( urbansimAccessibilityWriter , ttf, ttc, controler.getScenario(), true, tdFree, tdCongested);
+		accessibilityControlerListener.accessibilityComputation(urbansimAccessibilityWriter, ttf, ttc, controler.getScenario(), true, tdFree, tdCongested);
 		System.out.println();
 
-		if (this.benchmark != null && benchmarkID > 0) {
-			this.benchmark.stoppMeasurement(benchmarkID);
+		if (accessibilityControlerListener.benchmark != null && benchmarkID > 0) {
+			accessibilityControlerListener.benchmark.stoppMeasurement(benchmarkID);
 			log.info("Accessibility computation with "
-					+ getMeasuringPoints().getFacilities().size()
+					+ accessibilityControlerListener.getMeasuringPoints().getFacilities().size()
 					+ " starting points (origins) and "
-					+ this.aggregatedOpportunities.length
+					+ accessibilityControlerListener.aggregatedOpportunities.length
 					+ " destinations (opportunities) took "
-					+ this.benchmark.getDurationInSeconds(benchmarkID)
+					+ accessibilityControlerListener.benchmark.getDurationInSeconds(benchmarkID)
 					+ " seconds ("
-					+ this.benchmark.getDurationInSeconds(benchmarkID)
+					+ accessibilityControlerListener.benchmark.getDurationInSeconds(benchmarkID)
 					/ 60. + " minutes).");
 		}
 		
@@ -278,7 +275,7 @@ implements ShutdownListener, StartupListener {
 		String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
 			
 
-		if ( this.urbansimMode ) {
+		if ( accessibilityControlerListener.urbansimMode ) {
 			urbansimAccessibilityWriter.close();
 		}
 			
@@ -293,10 +290,10 @@ implements ShutdownListener, StartupListener {
 		}
 		
 
-		if(this.spatialGridDataExchangeListenerList != null){
-			log.info("Triggering " + this.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
-			for(int i = 0; i < this.spatialGridDataExchangeListenerList.size(); i++)
-				this.spatialGridDataExchangeListenerList.get(i).setAndProcessSpatialGrids( getAccessibilityGrids() );
+		if(accessibilityControlerListener.spatialGridDataExchangeListenerList != null){
+			log.info("Triggering " + accessibilityControlerListener.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
+			for(int i = 0; i < accessibilityControlerListener.spatialGridDataExchangeListenerList.size(); i++)
+				accessibilityControlerListener.spatialGridDataExchangeListenerList.get(i).setAndProcessSpatialGrids( getAccessibilityGrids() );
 		}
 
 	}
@@ -355,7 +352,7 @@ implements ShutdownListener, StartupListener {
 				writer.writeField( x + 0.5*spatialGrid.getResolution() ) ;
 				writer.writeField( y + 0.5*spatialGrid.getResolution() ) ;
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
-					if ( this.isComputingMode.get(mode) ) {
+					if ( accessibilityControlerListener.isComputingMode.get(mode) ) {
 						final SpatialGrid theSpatialGrid = this.getAccessibilityGrids().get(mode);
 						final double value = theSpatialGrid.getValue(x, y);
 						if ( !Double.isNaN(value ) ) { 
@@ -433,9 +430,9 @@ implements ShutdownListener, StartupListener {
 			throw new RuntimeException("ShapeFile for accessibility computation not found: " + shapeFileName);
 
 		Geometry boundary = GridUtils.getBoundary(shapeFileName);
-		setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize));
+		accessibilityControlerListener.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-			if ( this.isComputingMode.get(mode) ) {
+			if ( accessibilityControlerListener.isComputingMode.get(mode) ) {
 				this.getAccessibilityGrids().put( mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize ) ) ;
 			}
 		}
@@ -485,9 +482,9 @@ implements ShutdownListener, StartupListener {
 	 * @param cellSize double value giving the the side length of the cell in meter
 	 */
 	private void generateGridsAndMeasuringPoints(double minX, double minY, double maxX, double maxY, double cellSize) {
-		setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize));
+		accessibilityControlerListener.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-			if ( this.isComputingMode.get(mode) ) {
+			if ( accessibilityControlerListener.isComputingMode.get(mode) ) {
 				this.getAccessibilityGrids().put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN) ) ;
 			}
 		}
@@ -540,5 +537,29 @@ implements ShutdownListener, StartupListener {
 	 */
 	public void writeToSubdirectoryWithName(String subdirectory) {
 		this.outputSubdirectory = subdirectory;
+	}
+
+	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {
+		accessibilityControlerListener.setComputingAccessibilityForMode(mode, val);
+	}
+
+	public void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface l) {
+		accessibilityControlerListener.addSpatialGridDataExchangeListener(l);
+	}
+
+	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l) {
+		accessibilityControlerListener.addZoneDataExchangeListener(l);
+	}
+
+	public void setUrbansimMode(boolean urbansimMode) {
+		accessibilityControlerListener.setUrbansimMode(urbansimMode);
+	}
+
+	public Map<Modes4Accessibility, SpatialGrid> getAccessibilityGrids() {
+		return accessibilityControlerListener.getAccessibilityGrids();
+	}
+
+	public void addPtMatrix(PtMatrix ptMatrix) {
+		accessibilityControlerListener.addPtMatrix(ptMatrix);
 	}
 }

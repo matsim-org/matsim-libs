@@ -2,7 +2,9 @@ package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
+import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
@@ -14,7 +16,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.facilities.ActivityFacility;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
@@ -56,9 +57,10 @@ import java.util.Map;
  * @author thomas
  *
  */
-public final class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{
+public final class ZoneBasedAccessibilityControlerListenerV3 implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListenerV3.class);
+	private final AccessibilityControlerListenerImpl delegate = new AccessibilityControlerListenerImpl();
 	private UrbanSimZoneCSVWriterV2 urbanSimZoneCSVWriterV2;
 	
 
@@ -82,21 +84,21 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
 		assert(measuringPoints != null);
-		this.setMeasuringPoints(measuringPoints);
+		delegate.setMeasuringPoints(measuringPoints);
 		assert(matsim4opusTempDirectory != null);
-		this.ptMatrix = ptMatrix; // this could be zero of no input files for pseudo pt are given ...
+		delegate.ptMatrix = ptMatrix; // this could be zero of no input files for pseudo pt are given ...
 		assert(scenario != null);
 
-		this.benchmark = new Benchmark();
+		delegate.benchmark = new Benchmark();
 		
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
 		urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory);
-		initAccessibilityParameters(scenario.getConfig());
+		delegate.initAccessibilityParameters(scenario.getConfig());
 
 		// aggregating facilities to their nearest node on the road network
-		this.aggregatedOpportunities = aggregatedOpportunities(opportunities, scenario.getNetwork());
+		delegate.aggregatedOpportunities = delegate.aggregatedOpportunities(opportunities, scenario.getNetwork());
 		// yyyy ignores the "capacities" of the facilities. kai, mar'14
 		
 		
@@ -109,7 +111,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 		
 		// make sure that that at least one tranport mode is selected
 		boolean problem = true ;
-		for ( Boolean bool : this.isComputingMode.values() ) {
+		for ( Boolean bool : delegate.isComputingMode.values() ) {
 			if ( bool == true ) {
 				problem = false ;
 				break ;
@@ -132,7 +134,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 		Controler controler = event.getControler();
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 
-		int benchmarkID = this.benchmark.addMeasure("zone-based accessibility computation");
+		int benchmarkID = delegate.benchmark.addMeasure("zone-based accessibility computation");
 
 		
 		// get the free-speed car travel times (in seconds)
@@ -148,34 +150,58 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new LinkLengthTravelDisutility());
 		
-		this.scheme = (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+		delegate.scheme = (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
 
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
 			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
-			log.info(getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
+			log.info(delegate.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 			
-			accessibilityComputation( urbanSimZoneCSVWriterV2 , ttf,  ttc, controler.getScenario(), false, tdFree, tdCongested);
+			delegate.accessibilityComputation( urbanSimZoneCSVWriterV2 , ttf,  ttc, controler.getScenario(), false, tdFree, tdCongested);
 			
 			System.out.println();
 			// finalizing/closing csv file containing accessibility measures
 			String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
 			urbanSimZoneCSVWriterV2.close(matsimOutputDirectory);
 			
-			if (this.benchmark != null && benchmarkID > 0) {
-				this.benchmark.stoppMeasurement(benchmarkID);
+			if (delegate.benchmark != null && benchmarkID > 0) {
+				delegate.benchmark.stoppMeasurement(benchmarkID);
 				log.info("Accessibility computation with " 
-						+ getMeasuringPoints().getFacilities().size()
+						+ delegate.getMeasuringPoints().getFacilities().size()
 						+ " zones (origins) and "
-						+ this.aggregatedOpportunities.length
+						+ delegate.aggregatedOpportunities.length
 						+ " destinations (opportunities) took "
-						+ this.benchmark.getDurationInSeconds(benchmarkID)
+						+ delegate.benchmark.getDurationInSeconds(benchmarkID)
 						+ " seconds ("
-						+ this.benchmark.getDurationInSeconds(benchmarkID)
+						+ delegate.benchmark.getDurationInSeconds(benchmarkID)
 						/ 60. + " minutes).");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void setComputingAccessibilityForMode(Modes4Accessibility mode, boolean val) {
+		delegate.setComputingAccessibilityForMode(mode, val);
+	}
+
+	public void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface l) {
+		delegate.addSpatialGridDataExchangeListener(l);
+	}
+
+	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l) {
+		delegate.addZoneDataExchangeListener(l);
+	}
+
+	public void setUrbansimMode(boolean urbansimMode) {
+		delegate.setUrbansimMode(urbansimMode);
+	}
+
+	public Map<Modes4Accessibility, SpatialGrid> getAccessibilityGrids() {
+		return delegate.getAccessibilityGrids();
+	}
+
+	public void addPtMatrix(PtMatrix ptMatrix) {
+		delegate.addPtMatrix(ptMatrix);
 	}
 }

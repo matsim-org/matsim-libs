@@ -68,7 +68,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
  * @author thomas, knagel
  *
  */
-/*package*/ class AccessibilityControlerListenerImpl {
+/*package*/ final class AccessibilityControlerListenerImpl {
 
 	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
 
