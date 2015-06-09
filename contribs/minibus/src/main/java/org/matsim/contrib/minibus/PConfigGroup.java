@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.minibus.operator.BasicOperator;
+import org.matsim.contrib.minibus.replanning.ReduceStopsToBeServedRFare;
+import org.matsim.contrib.minibus.replanning.ReduceTimeServedRFare;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
@@ -712,12 +714,43 @@ public final class PConfigGroup extends ConfigGroup{
 			}
 		}
 		
-		if(this.welfareMaximization){
+		if(this.welfareMaximization ){
 			
 			if(marginalUtilityOfMoney == 0.){
 				
 				log.error("Paratransit welfare maximization is enabled but marginal utility of money equals 0! This would produce benefits of-Infinity! Aborting...");
 				throw new RuntimeException();
+				
+			}
+			
+			if(this.earningsPerBoardingPassenger != 0 || this.earningsPerKilometerAndPassenger != 0){
+				
+				log.error("Welfare maximization is enabled, no fares should be collected here. Aborting...");
+				throw new RuntimeException();
+				
+			}
+			
+			for(Entry<Id<PStrategySettings>, PStrategySettings> strategyEntry : this.strategies.entrySet()){
+				
+				if(strategyEntry.getValue().getModuleName().equals(ReduceTimeServedRFare.STRATEGY_NAME)){
+					
+					if(Boolean.parseBoolean(strategyEntry.getValue().getParametersAsArrayList().get(2))){
+						
+						log.error("Welfare maximization is enabled, parameter of strategy " + ReduceTimeServedRFare.STRATEGY_NAME + " to use the collected fare as weight will not work since no fares are collected! Aborting...");
+						throw new RuntimeException();
+						
+					}
+					
+				} else if(strategyEntry.getValue().getModuleName().equals(ReduceStopsToBeServedRFare.STRATEGY_NAME)){
+					
+					if(Boolean.parseBoolean(strategyEntry.getValue().getParametersAsArrayList().get(1))){
+						
+						log.error("Welfare maximization is enabled, parameter of strategy " + ReduceStopsToBeServedRFare.STRATEGY_NAME + " to use the collected fare as weight will not work since no fares are collected! Aborting...");
+						throw new RuntimeException();
+						
+					}
+					
+				}
 				
 			}
 			
