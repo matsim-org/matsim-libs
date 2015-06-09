@@ -149,6 +149,7 @@
 		<module>ucsb</module>
 		<module>vsptelematics</module>
 		<module>vsp</module>
+		<module>vspshk</module>
 		<module>ssix</module>
 		<module>qvanheerden</module>
 		<module>wbean</module>
