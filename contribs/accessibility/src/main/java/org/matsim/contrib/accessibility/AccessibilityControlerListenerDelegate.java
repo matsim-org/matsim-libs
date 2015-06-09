@@ -473,38 +473,15 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
         // captures the distance (as walk time) between the origin via the link to the node:
         Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
-		double distanceMeasuringPoint2Road_meter = distance.getDistancePoint2Road();
-		double distanceRoad2Node_meter = distance.getDistanceRoad2Node();
 
-        // distance to road, and then to node:
+		// distance to road, and then to node:
         double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
 
-        // get free speed and congested car travel times on a certain link
-		double freeSpeedOnNearestLink_meterpersec = nearestLink.getLength() / ttf.getLinkTravelTime(nearestLink, depatureTime, null, null);
-        double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
-
-        // travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
-        double road2NodeFreeSpeedTime_h				= distance.getDistanceRoad2Node() / (freeSpeedOnNearestLink_meterpersec * 3600);
-        double road2NodeCongestedCarTime_h 			= distance.getDistanceRoad2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
-        double road2NodeBikeTime_h					= distance.getDistanceRoad2Node() / this.bikeSpeedMeterPerHour;
-        double road2NodeWalkTime_h					= distance.getDistanceRoad2Node() / this.walkSpeedMeterPerHour;
-        double road2NodeToll_money 					= getToll(nearestLink); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
-
-        // this contains the current toll based on the toll scheme
-        double toll_money 							= 0.;
-        if ( this.scheme != null ) {
-            if(RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType()))
-                toll_money = road2NodeToll_money;
-            else if( RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()))
-                toll_money = road2NodeToll_money * distance.getDistanceRoad2Node();
-            else
-                throw new RuntimeException("accessibility not impelemented for requested toll scheme") ;
-        }
 		// get stored network node (this is the nearest node next to an aggregated work place)
 		Node destinationNode = aggregatedFacility.getNearestNode();
 
 		// disutilities to get on or off the network
-		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distanceMeasuringPoint2Road_meter * betaWalkTD);
+		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
 		double sumExpVjkWalk = aggregatedFacility.getSum();
 
@@ -517,8 +494,24 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 		// total disutility congested car
 		if(this.isComputingMode.get(Modes4Accessibility.car)){
+            // this contains the current toll based on the toll scheme
+			double road2NodeToll_money 					= getToll(nearestLink); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
+            double toll_money 							= 0.;
+            if ( this.scheme != null ) {
+                if(RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType()))
+                    toll_money = road2NodeToll_money;
+                else if( RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()))
+                    toll_money = road2NodeToll_money * distance.getDistanceRoad2Node();
+                else
+                    throw new RuntimeException("accessibility not impelemented for requested toll scheme") ;
+            }
+
+			// travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
+			double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
+			double road2NodeCongestedCarTime_h 			= distance.getDistanceRoad2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
+
 			double congestedCarDisutility = - lcptExtCongestedCarTravelTime.getTree().get(destinationNode.getId()).getCost();	// travel disutility congested car on road network (including toll)
-			double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC);
+			double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distance.getDistanceRoad2Node() * betaCarTD) + (toll_money * betaCarTMC);
 			double expVijCongestedCar = Math.exp(this.logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) );
 			double expVhkCongestedCar = expVhiWalk * expVijCongestedCar * sumExpVjkWalk;
 			gcs[Modes4Accessibility.car.ordinal()].addExpUtils( expVhkCongestedCar );
@@ -526,8 +519,24 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 		// total disutility free speed car
 		if(this.isComputingMode.get(Modes4Accessibility.freeSpeed)){
+            // this contains the current toll based on the toll scheme
+			double road2NodeToll_money 					= getToll(nearestLink); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
+            double toll_money 							= 0.;
+            if ( this.scheme != null ) {
+                if(RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType()))
+                    toll_money = road2NodeToll_money;
+                else if( RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()))
+                    toll_money = road2NodeToll_money * distance.getDistanceRoad2Node();
+                else
+                    throw new RuntimeException("accessibility not impelemented for requested toll scheme") ;
+            }
+
+			// travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
+			double freeSpeedOnNearestLink_meterpersec =  nearestLink.getLength() / ttf.getLinkTravelTime(nearestLink, depatureTime, null, null);
+			double road2NodeFreeSpeedTime_h				= distance.getDistanceRoad2Node() / (freeSpeedOnNearestLink_meterpersec * 3600);
+
 			double freeSpeedCarDisutility = - lcptExtFreeSpeedCarTravelTime.getTree().get(destinationNode.getId()).getCost();	// travel disutility free speed car on road network (including toll)
-			double freeSpeedCarDisutilityRoad2Node = (road2NodeFreeSpeedTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC);
+			double freeSpeedCarDisutilityRoad2Node = (road2NodeFreeSpeedTime_h * betaCarTT) + (distance.getDistanceRoad2Node() * betaCarTD) + (toll_money * betaCarTMC);
 			double expVijFreeSpeedCar = Math.exp(this.logitScaleParameter * (constCar + freeSpeedCarDisutilityRoad2Node + freeSpeedCarDisutility) );
 			double expVhkFreeSpeedCar = expVhiWalk * expVijFreeSpeedCar * sumExpVjkWalk;
 			gcs[Modes4Accessibility.freeSpeed.ordinal()].addExpUtils( expVhkFreeSpeedCar );
@@ -535,8 +544,9 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 		// total disutility bicycle
 		if(this.isComputingMode.get(Modes4Accessibility.bike)){
+			double road2NodeBikeTime_h					= distance.getDistanceRoad2Node() / this.bikeSpeedMeterPerHour;
 			double travelDistance_meter = lcptTravelDistance.getTree().get(destinationNode.getId()).getCost(); 				// travel link distances on road network for bicycle and walk
-			double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaBikeTT) + (distanceRoad2Node_meter * betaBikeTD); // toll or money ???
+			double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaBikeTT) + (distance.getDistanceRoad2Node() * betaBikeTD); // toll or money ???
 			double bikeDisutility = ((travelDistance_meter/this.bikeSpeedMeterPerHour) * betaBikeTT) + (travelDistance_meter * betaBikeTD);// toll or money ???
 			double expVijBike = Math.exp(this.logitScaleParameter * (constBike + bikeDisutility + bikeDisutilityRoad2Node));
 			double expVhkBike = expVhiWalk * expVijBike * sumExpVjkWalk;
@@ -545,8 +555,9 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 		// total disutility walk
 		if(this.isComputingMode.get(Modes4Accessibility.walk)){
+			double road2NodeWalkTime_h					= distance.getDistanceRoad2Node() / this.walkSpeedMeterPerHour;
 			double travelDistance_meter = lcptTravelDistance.getTree().get(destinationNode.getId()).getCost(); 				// travel link distances on road network for bicycle and walk
-			double walkDisutilityRoad2Node = (road2NodeWalkTime_h * betaWalkTT) + (distanceRoad2Node_meter * betaWalkTD);  // toll or money ???
+			double walkDisutilityRoad2Node = (road2NodeWalkTime_h * betaWalkTT) + (distance.getDistanceRoad2Node() * betaWalkTD);  // toll or money ???
 			double walkDisutility = ( (travelDistance_meter / this.walkSpeedMeterPerHour) * betaWalkTT) + ( travelDistance_meter * betaWalkTD);// toll or money ???
 			double expVijWalk = Math.exp(this.logitScaleParameter * (constWalk + walkDisutility + walkDisutilityRoad2Node));
 			double expVhkWalk = expVhiWalk * expVijWalk * sumExpVjkWalk;
