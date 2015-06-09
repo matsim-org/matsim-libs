@@ -70,11 +70,20 @@ public class Injector {
         com.google.inject.Injector realInjector = bootstrapInjector.createChildInjector(guiceModules);
         System.out.flush() ; System.err.flush(); 
         for (Map.Entry<Key<?>, Binding<?>> entry : realInjector.getBindings().entrySet()) {
-      	  Level level = Level.DEBUG ;
+      	  Level level = Level.INFO ;
 //            logger.debug(String.format("%s\n-> %s", entry.getKey(), entry.getValue()));
       	  if ( entry.getKey().toString().contains("type=org.matsim") ) {
-      		  logger.log( Level.WARN, entry.getKey() ); System.err.flush();
+//      		  logger.log( Level.WARN, entry.getKey() ); System.err.flush();
+//      		  logger.log( Level.WARN, entry.getKey().getAnnotation() ); System.err.flush();
+//      		  logger.log( Level.WARN, entry.getKey().getAnnotationType() ); System.err.flush();
+      		  logger.log( level, entry.getKey().getTypeLiteral() ); System.err.flush();
+//      		  logger.log( Level.WARN, entry.getKey().withoutAttributes() ); System.err.flush();
       		  logger.log( level, "   -> " + entry.getValue().getProvider() ) ; System.out.flush(); 
+      		  try {
+      			  logger.log( level, "   -> " + entry.getValue().getProvider().get().getClass() ) ; System.out.flush();
+      		  } catch ( Exception ee ) {
+      			  logger.log( level, "  -> not provided (only a problem if this is truly needed later)" ) ;
+      		  }
       	  }
         }
         return fromGuiceInjector(realInjector);

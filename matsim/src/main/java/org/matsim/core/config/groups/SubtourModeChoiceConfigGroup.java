@@ -56,7 +56,9 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		return toString( chainBasedModes );
 	}
 
-	private String toString( final String[] modes ) {
+	private static String toString( final String[] modes ) {
+		// (not same as toString() because of argument!)
+		
 		StringBuilder b = new StringBuilder();
 
 		if (modes.length > 0) b.append( modes[ 0 ] );
@@ -68,7 +70,7 @@ public final class SubtourModeChoiceConfigGroup extends ReflectiveConfigGroup {
 		return b.toString();
 	}
 
-	private String[] toArray( final String modes ) {
+	private static String[] toArray( final String modes ) {
 		String[] parts = StringUtils.explode(modes, ',');
 
 		for (int i = 0, n = parts.length; i < n; i++) {
