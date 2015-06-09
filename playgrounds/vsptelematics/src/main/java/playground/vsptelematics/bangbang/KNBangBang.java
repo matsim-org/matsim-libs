@@ -51,9 +51,7 @@ import org.matsim.core.network.NetworkChangeEventFactory;
 import org.matsim.core.network.NetworkChangeEventFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -75,19 +73,12 @@ public class KNBangBang {
 	private static final class KNMobsimProvider implements Provider<Mobsim> {
 		@Inject private Scenario scenario;
 		@Inject private EventsManager events ;
-		@Inject private TripRouter tripRouter ;
-		@Inject private LeastCostPathCalculatorFactory pathAlgoFactory ;
-
 
 		@Override
 		public Mobsim get() {
 			QSim qsim = QSimUtils.createDefaultQSim( scenario, events ) ;
-			
-			qsim.addQueueSimulationListeners( new KNWithinDayMobsimListener(this.tripRouter, pathAlgoFactory, scenario));
-			
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qsim);
 			OTFClientLive.run(scenario.getConfig(), server);
-			
 			return qsim ;
 		}
 	}
@@ -136,23 +127,22 @@ public class KNBangBang {
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
 		controler.setDirtyShutdown(true);
 		
-		controler.addOverridingModule(new AbstractModule(){
-			@Override public void install() {
-				this.bind(Mobsim.class).toProvider(KNMobsimProvider.class) ;
-			}
-		});
-
 		Set<String> analyzedModes = new HashSet<>() ;
 		analyzedModes.add( TransportMode.car ) ;
 		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
 		
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
+				this.bind(Mobsim.class).toProvider(KNMobsimProvider.class) ;
+				
+				this.addMobsimListenerBinding().to( KNWithinDayMobsimListener.class );
+
 				this.addEventHandlerBinding().toInstance( travelTime ) ;
 				this.addMobsimListenerBinding().toInstance( travelTime );
 				this.bind( TravelTime.class ).toInstance( travelTime );
 			}
 		}) ;
+		
 		
 		
 		// ---

@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -58,6 +59,8 @@ import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.utils.EditRoutes;
 
+import com.google.inject.Inject;
+
 /**
  * @author nagel
  *
@@ -68,9 +71,7 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 
 	private final TripRouter tripRouter;
 	private final Scenario scenario;
-
-	private Netsim mobsim;
-
+	
 	private class MyTravelTimeAndDisutility implements TravelTime, TravelDisutility {
 		FreespeedTravelTimeAndDisutility delegate = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 		@Override public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
@@ -92,8 +93,9 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		}
 	}
 
-	KNWithinDayMobsimListener(TripRouter tripRouter, LeastCostPathCalculatorFactory pathAlgoFactory, Scenario scenario) {
-		this.tripRouter = tripRouter;
+	@Inject
+	KNWithinDayMobsimListener(TripRouter tripRouter, Scenario scenario, LeastCostPathCalculatorFactory pathAlgoFactory) {
+		this.tripRouter = tripRouter ;
 		this.scenario = scenario ;
 
 		MyTravelTimeAndDisutility fff = new MyTravelTimeAndDisutility() ;
@@ -115,12 +117,10 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
 
-		this.mobsim = (Netsim) event.getQueueSimulation() ;
-
-		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan(mobsim); 
+		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan( (Netsim) event.getQueueSimulation() ); 
 
 		for (MobsimAgent ma : agentsToReplan) {
-			doReplanning(ma);
+			doReplanning(ma, (Netsim) event.getQueueSimulation());
 		}
 	}
 
@@ -149,8 +149,8 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 
 	}
 
-	private boolean doReplanning(MobsimAgent agent ) {
-		double now = mobsim.getSimTimer().getTimeOfDay() ;
+	private boolean doReplanning(MobsimAgent agent, Netsim netsim ) {
+		double now = ((Netsim)netsim).getSimTimer().getTimeOfDay() ;
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ; 
 
