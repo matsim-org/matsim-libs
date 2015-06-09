@@ -108,6 +108,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
+		delegate.initDefaultContributionCalculators( event.getControler() );
 		
 		// make sure that that at least one tranport mode is selected
 		boolean problem = true ;
@@ -132,32 +133,15 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
-        NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 
 		int benchmarkID = delegate.getBenchmark().addMeasure("zone-based accessibility computation");
-
-		
-		// get the free-speed car travel times (in seconds)
-		TravelTime ttf = new FreeSpeedTravelTime() ;
-		TravelDisutility tdFree = controler.getTravelDisutilityFactory().createTravelDisutility(ttf, controler.getConfig().planCalcScore() ) ;
-		LeastCostPathTreeExtended lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttf, tdFree, (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
-
-		// get the congested car travel time (in seconds)
-		TravelTime ttc = controler.getLinkTravelTimes(); // congested
-		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc, controler.getConfig().planCalcScore() ) ;
-		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
-
-		// get travel distance (in meter)
-		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new LinkLengthTravelDisutility());
-		
-		delegate.setScheme((RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
 			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 			log.info(delegate.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 			
-			delegate.accessibilityComputation( urbanSimZoneCSVWriterV2 , ttf,  ttc, controler.getScenario(), false, tdFree, tdCongested);
+			delegate.accessibilityComputation( urbanSimZoneCSVWriterV2 , controler.getScenario(), false);
 			
 			System.out.println();
 			// finalizing/closing csv file containing accessibility measures

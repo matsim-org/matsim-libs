@@ -26,11 +26,13 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
@@ -82,9 +84,10 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 	private Map<Modes4Accessibility,SpatialGrid> accessibilityGrids = new HashMap<Modes4Accessibility,SpatialGrid>() ;
 
 	private Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>() ;
+	private Map<Modes4Accessibility, AccessibilityContributionCalculator> calculators = new HashMap<>();
 
 	private PtMatrix ptMatrix;
-	
+
 	private RoadPricingScheme scheme ;
 
 	private ArrayList<SpatialGridDataExchangeInterface> spatialGridDataExchangeListenerList = null;
@@ -135,6 +138,36 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 		}
 	}
 
+	// XXX Ugly but temporary
+	final void initDefaultContributionCalculators( final Controler controler ) {
+		calculators.put(
+				Modes4Accessibility.car,
+				new NetworkModeAccessibilityContributionCalculator(
+						controler.getLinkTravelTimes(),
+						controler.getTravelDisutilityFactory(),
+						controler.getScenario() ) );
+		calculators.put(
+				Modes4Accessibility.freeSpeed,
+				new NetworkModeAccessibilityContributionCalculator(
+						new FreeSpeedTravelTime(),
+						controler.getTravelDisutilityFactory(),
+						controler.getScenario() ) );
+		calculators.put(
+				Modes4Accessibility.walk,
+				new ConstantSpeedAccessibilityContributionCalculator(
+						TransportMode.walk,
+						controler.getScenario() ) );
+		calculators.put(
+				Modes4Accessibility.bike,
+				new ConstantSpeedAccessibilityContributionCalculator(
+						TransportMode.bike,
+						controler.getScenario() ) );
+		calculators.put(
+				Modes4Accessibility.pt,
+				new MatrixBasedPtAccessibilityContributionCalculator(
+						ptMatrix,
+						controler.getConfig().planCalcScore() ) );
+	}
 	
 	/**
 	 * setting parameter for accessibility calculation
@@ -310,19 +343,8 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 	
 	final void accessibilityComputation(
 			AccessibilityCSVWriter writer,
-			TravelTime ttf,
-			TravelTime ttc,
 			Scenario scenario,
-			boolean isGridBased,
-			TravelDisutility tdFree,
-			TravelDisutility tdCongested) {
-		
-		LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime = new LeastCostPathTreeExtended( ttf, tdFree, (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
-
-		// get travel distance (in meter):
-		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new LinkLengthTravelDisutility());
-
-		LeastCostPathTreeExtended  lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended(ttc, tdCongested, this.scheme ) ;
+			boolean isGridBased ) {
 
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
@@ -366,15 +388,9 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 			Node fromNode = scenario.getNetwork().getNodes().get( nodeId );
 
-			// run Dijkstra on network
-			// this is done once for all origins in the "origins" list, see below
-			if(this.isComputingMode.get(Modes4Accessibility.freeSpeed) ) {
-				lcptExtFreeSpeedCarTravelTime.calculateExtended(scenario.getNetwork(), fromNode, depatureTime);
+			for ( AccessibilityContributionCalculator calculator : calculators.values() ) {
+				calculator.notifyNewOriginNode( fromNode );
 			}
-			if(this.isComputingMode.get(Modes4Accessibility.car) ) {
-				lcptExtCongestedCarTravelTime.calculateExtended(scenario.getNetwork(), fromNode, depatureTime);
-			}
-			lcptTravelDistance.calculate(scenario.getNetwork(), fromNode, depatureTime);
 
 			// get list with origins that are assigned to "fromNode"
 			for ( ActivityFacility origin : aggregatedOrigins.get( nodeId ) ) {
@@ -391,16 +407,10 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
                         computeAndAddExpUtilContributions(
                                 scenario,
-                                lcptExtFreeSpeedCarTravelTime,
-                                lcptExtCongestedCarTravelTime,
-                                lcptTravelDistance,
-                                ttf,
-								ttc,
                                 gcs,
                                 origin,
                                 fromNode,
                                 aggregatedFacility);
-                        // yy terribly long argument list :-(.  I extracted this method but further improvements seem possible :-). kai, feb'14
                     }
                     // --------------------------------------------------------------------------------------------------------------
                     // What does the aggregation of the starting locations save if we do the just ended loop for all starting
@@ -458,11 +468,6 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 	
 	private void computeAndAddExpUtilContributions(
 			Scenario scenario,
-			LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
-			LeastCostPathTreeExtended lcptExtCongestedCarTravelTime,
-			LeastCostPathTree lcptTravelDistance,
-			TravelTime ttf,
-			TravelTime ttc,
 			SumOfExpUtils[] gcs,
 			ActivityFacility origin,
 			Node fromNode,
@@ -484,125 +489,62 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
 		double sumExpVjkWalk = aggregatedFacility.getSum();
 
-		// travel times and distances for pseudo pt
-		if(this.isComputingMode.get(Modes4Accessibility.pt) ){
-			double expVijPt = computeExpUtilContributionPt(fromNode, destinationNode);
-			double expVhkPt = expVijPt * sumExpVjkWalk;
-			gcs[Modes4Accessibility.pt.ordinal()].addExpUtils( expVhkPt );
+		for ( Map.Entry<Modes4Accessibility, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
+			final double expVij = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility );
+			final double expVhk = expVhiWalk * expVij * sumExpVjkWalk;
+			gcs[ calculatorEntry.getKey().ordinal() ].addExpUtils( expVhk );
 		}
-
-		// total disutility congested car
-		if(this.isComputingMode.get(Modes4Accessibility.car)){
-			double expVijCongestedCar =
-					computeExpUtilContributionNetworkMode(
-							lcptExtCongestedCarTravelTime,
-							ttc,
-							nearestLink,
-							distance,
-							destinationNode,
-							scheme, depatureTime, betaCarTT, betaCarTD, betaCarTMC, logitScaleParameter, constCar);
-
-			double expVhkCongestedCar = expVhiWalk * expVijCongestedCar * sumExpVjkWalk;
-			gcs[Modes4Accessibility.car.ordinal()].addExpUtils( expVhkCongestedCar );
-		}
-
-		// total disutility free speed car
-		if(this.isComputingMode.get(Modes4Accessibility.freeSpeed)){
-			double expVijFreeSpeedCar =
-					computeExpUtilContributionNetworkMode(
-							lcptExtFreeSpeedCarTravelTime,
-							ttf,
-							nearestLink,
-							distance,
-							destinationNode,
-							scheme, depatureTime, betaCarTT, betaCarTD, betaCarTMC, logitScaleParameter, constCar);
-			double expVhkFreeSpeedCar = expVhiWalk * expVijFreeSpeedCar * sumExpVjkWalk;
-			gcs[Modes4Accessibility.freeSpeed.ordinal()].addExpUtils( expVhkFreeSpeedCar );
-		}
-
-		// total disutility bicycle
-		if(this.isComputingMode.get(Modes4Accessibility.bike)){
-			double expVijBike = computeExpUtilsContributionBeeline(lcptTravelDistance, distance, destinationNode, bikeSpeedMeterPerHour, betaBikeTT, betaBikeTD, logitScaleParameter, constBike);
-			double expVhkBike = expVhiWalk * expVijBike * sumExpVjkWalk;
-			gcs[Modes4Accessibility.bike.ordinal()].addExpUtils( expVhkBike );
-		}
-
-		// total disutility walk
-		if(this.isComputingMode.get(Modes4Accessibility.walk)){
-			double expVijWalk = computeExpUtilsContributionBeeline(lcptTravelDistance, distance, destinationNode, this.walkSpeedMeterPerHour, betaWalkTT, betaWalkTD, this.logitScaleParameter, constWalk);
-			double expVhkWalk = expVhiWalk * expVijWalk * sumExpVjkWalk;
-			gcs[Modes4Accessibility.walk.ordinal()].addExpUtils( expVhkWalk );
-		}
+//		// travel times and distances for pseudo pt
+//		if(this.isComputingMode.get(Modes4Accessibility.pt) ){
+//			double expVijPt = computeExpUtilContributionPt(fromNode, destinationNode);
+//			double expVhkPt = expVijPt * sumExpVjkWalk;
+//			gcs[Modes4Accessibility.pt.ordinal()].addExpUtils( expVhkPt );
+//		}
+//
+//		// total disutility congested car
+//		if(this.isComputingMode.get(Modes4Accessibility.car)){
+//			double expVijCongestedCar =
+//					computeExpUtilContributionNetworkMode(
+//							lcptExtCongestedCarTravelTime,
+//							ttc,
+//							nearestLink,
+//							distance,
+//							destinationNode,
+//							scheme, depatureTime, betaCarTT, betaCarTD, betaCarTMC, logitScaleParameter, constCar);
+//
+//			double expVhkCongestedCar = expVhiWalk * expVijCongestedCar * sumExpVjkWalk;
+//			gcs[Modes4Accessibility.car.ordinal()].addExpUtils( expVhkCongestedCar );
+//		}
+//
+//		// total disutility free speed car
+//		if(this.isComputingMode.get(Modes4Accessibility.freeSpeed)){
+//			double expVijFreeSpeedCar =
+//					computeExpUtilContributionNetworkMode(
+//							lcptExtFreeSpeedCarTravelTime,
+//							ttf,
+//							nearestLink,
+//							distance,
+//							destinationNode,
+//							scheme, depatureTime, betaCarTT, betaCarTD, betaCarTMC, logitScaleParameter, constCar);
+//			double expVhkFreeSpeedCar = expVhiWalk * expVijFreeSpeedCar * sumExpVjkWalk;
+//			gcs[Modes4Accessibility.freeSpeed.ordinal()].addExpUtils( expVhkFreeSpeedCar );
+//		}
+//
+//		// total disutility bicycle
+//		if(this.isComputingMode.get(Modes4Accessibility.bike)){
+//			double expVijBike = computeExpUtilsContributionBeeline(lcptTravelDistance, distance, destinationNode, bikeSpeedMeterPerHour, betaBikeTT, betaBikeTD, logitScaleParameter, constBike);
+//			double expVhkBike = expVhiWalk * expVijBike * sumExpVjkWalk;
+//			gcs[Modes4Accessibility.bike.ordinal()].addExpUtils( expVhkBike );
+//		}
+//
+//		// total disutility walk
+//		if(this.isComputingMode.get(Modes4Accessibility.walk)){
+//			double expVijWalk = computeExpUtilsContributionBeeline(lcptTravelDistance, distance, destinationNode, this.walkSpeedMeterPerHour, betaWalkTT, betaWalkTD, this.logitScaleParameter, constWalk);
+//			double expVhkWalk = expVhiWalk * expVijWalk * sumExpVjkWalk;
+//			gcs[Modes4Accessibility.walk.ordinal()].addExpUtils( expVhkWalk );
+//		}
 	}
 
-	private static double computeExpUtilsContributionBeeline(
-			LeastCostPathTree lcptTravelDistance,
-			Distances distance,
-			Node destinationNode,
-			double bikeSpeedMeterPerHour, double betaBikeTT, double betaBikeTD, double logitScaleParameter, double constBike) {
-		double road2NodeBikeTime_h					= distance.getDistanceRoad2Node() / bikeSpeedMeterPerHour;
-		double travelDistance_meter = lcptTravelDistance.getTree().get(destinationNode.getId()).getCost(); 				// travel link distances on road network for bicycle and walk
-		double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaBikeTT) + (distance.getDistanceRoad2Node() * betaBikeTD); // toll or money ???
-		double bikeDisutility = ((travelDistance_meter/bikeSpeedMeterPerHour) * betaBikeTT) + (travelDistance_meter * betaBikeTD);// toll or money ???
-		return Math.exp(logitScaleParameter * (constBike + bikeDisutility + bikeDisutilityRoad2Node));
-	}
-
-	private static double computeExpUtilContributionNetworkMode(LeastCostPathTreeExtended lcptExtCongestedCarTravelTime, TravelTime ttc, Link nearestLink, Distances distance, Node destinationNode, RoadPricingScheme scheme, double depatureTime, double betaCarTT, double betaCarTD, double betaCarTMC, double logitScaleParameter, double constCar) {
-		// this contains the current toll based on the toll scheme
-		double road2NodeToll_money = getToll(nearestLink, scheme, depatureTime); // tnicolai: add this to car disutility ??? depends on the road pricing scheme ...
-		double toll_money 							= 0.;
-		if ( scheme != null ) {
-            if(RoadPricingScheme.TOLL_TYPE_CORDON.equals(scheme.getType()))
-                toll_money = road2NodeToll_money;
-            else if( RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(scheme.getType()))
-                toll_money = road2NodeToll_money * distance.getDistanceRoad2Node();
-            else
-                throw new RuntimeException("accessibility not impelemented for requested toll scheme") ;
-        }
-
-		// travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
-		double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
-		double road2NodeCongestedCarTime_h 			= distance.getDistanceRoad2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
-
-		double congestedCarDisutility = - lcptExtCongestedCarTravelTime.getTree().get(destinationNode.getId()).getCost();	// travel disutility congested car on road network (including toll)
-		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distance.getDistanceRoad2Node() * betaCarTD) + (toll_money * betaCarTMC);
-		return Math.exp(logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) );
-	}
-
-	private double computeExpUtilContributionPt(Node fromNode, Node destinationNode) {
-		if ( ptMatrix==null ) {
-            throw new RuntimeException( "pt accessibility does only work when a PtMatrix is provided.  Provide such a matrix, or switch off "
-                    + "the pt accessibility computation, or extend the Java code so that it works for this situation.") ;
-        }
-		// travel time with pt:
-		double ptTravelTime_h	 = ptMatrix.getPtTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
-		// total walking time including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
-		double ptTotalWalkTime_h =ptMatrix.getTotalWalkTravelTime_seconds(fromNode.getCoord(), destinationNode.getCoord()) / 3600.;
-		// total travel distance including walking and pt distance from/to origin/destination location:
-		double ptTravelDistance_meter=ptMatrix.getTotalWalkTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
-		// total walk distance  including (i) to get to pt stop and (ii) to get from destination pt stop to destination location:
-		double ptTotalWalkDistance_meter=ptMatrix.getPtTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
-
-		double ptDisutility = constPt + (ptTotalWalkTime_h * betaWalkTT) + (ptTravelTime_h * betaPtTT) + (ptTotalWalkDistance_meter * betaWalkTD) + (ptTravelDistance_meter * betaPtTD);
-		return Math.exp(this.logitScaleParameter * ptDisutility);
-	}
-
-
-	/**
-	 * @param nearestLink
-	 */
-	static double getToll(
-			final Link nearestLink,
-			final RoadPricingScheme scheme,
-			final double departureTime) {
-		if(scheme != null){
-			Cost cost = scheme.getLinkCostInfo(nearestLink.getId(), departureTime, null, null);
-			if(cost != null)
-				return cost.amount;
-		}
-		return 0.;
-	}
-	
 	public void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {
 		this.isComputingMode.put( mode, val ) ;
 	}

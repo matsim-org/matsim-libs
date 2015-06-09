@@ -218,6 +218,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		}
 		alreadyActive = true ;
 		log.info("Entering notifyShutdown ..." );
+		accessibilityControlerListener.initDefaultContributionCalculators( event.getControler() );
 
 		// make sure that measuring points are set.
 		if(accessibilityControlerListener.getMeasuringPoints() == null){
@@ -242,20 +243,11 @@ public final class GridBasedAccessibilityControlerListenerV3
 
 		int benchmarkID = accessibilityControlerListener.getBenchmark().addMeasure("cell-based accessibility computation");
 
-		// get the car travel times (in seconds)
-		final FreeSpeedTravelTime ttf = new FreeSpeedTravelTime();
-		TravelDisutility tdFree = controler.getTravelDisutilityFactory().createTravelDisutility(ttf, controler.getConfig().planCalcScore() ) ;
-		TravelTime ttc = controler.getLinkTravelTimes(); // congested
-
-		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc, controler.getConfig().planCalcScore() ) ;
-
-		accessibilityControlerListener.setScheme((RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
-
 		log.info("Computing and writing cell based accessibility measures ...");
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 		log.info(accessibilityControlerListener.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 
-		accessibilityControlerListener.accessibilityComputation(urbansimAccessibilityWriter, ttf, ttc, controler.getScenario(), true, tdFree, tdCongested);
+		accessibilityControlerListener.accessibilityComputation(urbansimAccessibilityWriter, controler.getScenario(), true);
 		System.out.println();
 
 		if (accessibilityControlerListener.getBenchmark() != null && benchmarkID > 0) {

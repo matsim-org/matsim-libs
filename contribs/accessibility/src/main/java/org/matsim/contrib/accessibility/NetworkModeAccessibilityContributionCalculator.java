@@ -42,7 +42,6 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 	private final LeastCostPathTreeExtended lcpt;
 
 	public NetworkModeAccessibilityContributionCalculator(
-			final RoadPricingScheme scheme,
 			final TravelTime ttc,
 			final TravelDisutilityFactory travelDisutilityFactory,
 			final Scenario scenario){
@@ -56,7 +55,7 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		this.departureTime = moduleAPCM.getTimeOfDay();
 
 		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore();
-		this.scheme = scheme;
+		this.scheme = (RoadPricingScheme) scenario.getScenarioElement( RoadPricingScheme.ELEMENT_NAME );
 		this.ttc = ttc;
 
 		this.lcpt =
