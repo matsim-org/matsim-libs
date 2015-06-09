@@ -155,17 +155,17 @@ public final class GridBasedAccessibilityControlerListenerV3
 
 		log.info("Initializing  ...");
 
-		accessibilityControlerListener.ptMatrix = ptMatrix;	// this could be zero if no input files for pseudo pt are given ...
+		accessibilityControlerListener.setPtMatrix(ptMatrix);	// this could be zero if no input files for pseudo pt are given ...
 		assert (config != null);
 		this.config = config ;
 		assert (network != null);
 
-		accessibilityControlerListener.benchmark = new Benchmark();
+		accessibilityControlerListener.setBenchmark(new Benchmark());
 
 		accessibilityControlerListener.initAccessibilityParameters(config);
 
 		// aggregating facilities to their nearest node on the road network
-		accessibilityControlerListener.aggregatedOpportunities = accessibilityControlerListener.aggregatedOpportunities(opportunities, network);
+		accessibilityControlerListener.setAggregatedOpportunities(accessibilityControlerListener.aggregatedOpportunities(opportunities, network));
 		// yyyy ignores the "capacities" of the facilities.  kai, mar'14
 		
 		
@@ -240,7 +240,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		// get the controller and scenario
 		Controler controler = event.getControler();
 
-		int benchmarkID = accessibilityControlerListener.benchmark.addMeasure("cell-based accessibility computation");
+		int benchmarkID = accessibilityControlerListener.getBenchmark().addMeasure("cell-based accessibility computation");
 
 		// get the car travel times (in seconds)
 		final FreeSpeedTravelTime ttf = new FreeSpeedTravelTime();
@@ -249,7 +249,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 
 		TravelDisutility tdCongested = controler.getTravelDisutilityFactory().createTravelDisutility(ttc, controler.getConfig().planCalcScore() ) ;
 
-		accessibilityControlerListener.scheme = (RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+		accessibilityControlerListener.setScheme((RoadPricingScheme) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 
 		log.info("Computing and writing cell based accessibility measures ...");
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
@@ -258,16 +258,16 @@ public final class GridBasedAccessibilityControlerListenerV3
 		accessibilityControlerListener.accessibilityComputation(urbansimAccessibilityWriter, ttf, ttc, controler.getScenario(), true, tdFree, tdCongested);
 		System.out.println();
 
-		if (accessibilityControlerListener.benchmark != null && benchmarkID > 0) {
-			accessibilityControlerListener.benchmark.stoppMeasurement(benchmarkID);
+		if (accessibilityControlerListener.getBenchmark() != null && benchmarkID > 0) {
+			accessibilityControlerListener.getBenchmark().stoppMeasurement(benchmarkID);
 			log.info("Accessibility computation with "
 					+ accessibilityControlerListener.getMeasuringPoints().getFacilities().size()
 					+ " starting points (origins) and "
-					+ accessibilityControlerListener.aggregatedOpportunities.length
+					+ accessibilityControlerListener.getAggregatedOpportunities().length
 					+ " destinations (opportunities) took "
-					+ accessibilityControlerListener.benchmark.getDurationInSeconds(benchmarkID)
+					+ accessibilityControlerListener.getBenchmark().getDurationInSeconds(benchmarkID)
 					+ " seconds ("
-					+ accessibilityControlerListener.benchmark.getDurationInSeconds(benchmarkID)
+					+ accessibilityControlerListener.getBenchmark().getDurationInSeconds(benchmarkID)
 					/ 60. + " minutes).");
 		}
 		
@@ -290,10 +290,10 @@ public final class GridBasedAccessibilityControlerListenerV3
 		}
 		
 
-		if(accessibilityControlerListener.spatialGridDataExchangeListenerList != null){
-			log.info("Triggering " + accessibilityControlerListener.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
-			for(int i = 0; i < accessibilityControlerListener.spatialGridDataExchangeListenerList.size(); i++)
-				accessibilityControlerListener.spatialGridDataExchangeListenerList.get(i).setAndProcessSpatialGrids( getAccessibilityGrids() );
+		if(accessibilityControlerListener.getSpatialGridDataExchangeListenerList() != null){
+			log.info("Triggering " + accessibilityControlerListener.getSpatialGridDataExchangeListenerList().size() + " SpatialGridDataExchangeListener(s) ...");
+			for(int i = 0; i < accessibilityControlerListener.getSpatialGridDataExchangeListenerList().size(); i++)
+				accessibilityControlerListener.getSpatialGridDataExchangeListenerList().get(i).setAndProcessSpatialGrids( getAccessibilityGrids() );
 		}
 
 	}
@@ -352,7 +352,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 				writer.writeField( x + 0.5*spatialGrid.getResolution() ) ;
 				writer.writeField( y + 0.5*spatialGrid.getResolution() ) ;
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
-					if ( accessibilityControlerListener.isComputingMode.get(mode) ) {
+					if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
 						final SpatialGrid theSpatialGrid = this.getAccessibilityGrids().get(mode);
 						final double value = theSpatialGrid.getValue(x, y);
 						if ( !Double.isNaN(value ) ) { 
@@ -432,7 +432,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		Geometry boundary = GridUtils.getBoundary(shapeFileName);
 		accessibilityControlerListener.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-			if ( accessibilityControlerListener.isComputingMode.get(mode) ) {
+			if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
 				this.getAccessibilityGrids().put( mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize ) ) ;
 			}
 		}
@@ -484,7 +484,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 	private void generateGridsAndMeasuringPoints(double minX, double minY, double maxX, double maxY, double cellSize) {
 		accessibilityControlerListener.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
-			if ( accessibilityControlerListener.isComputingMode.get(mode) ) {
+			if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
 				this.getAccessibilityGrids().put( mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN) ) ;
 			}
 		}

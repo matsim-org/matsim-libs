@@ -75,21 +75,21 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 	// measuring points (origins) for accessibility calculation
 	private ActivityFacilitiesImpl measuringPoints;
 	// containing parcel coordinates for accessibility feedback
-	ActivityFacilitiesImpl parcels; 
+	private ActivityFacilitiesImpl parcels;
 	// destinations, opportunities like jobs etc ...
-	AggregationObject[] aggregatedOpportunities;
+	private AggregationObject[] aggregatedOpportunities;
 	
 	// storing the accessibility results
 	private Map<Modes4Accessibility,SpatialGrid> accessibilityGrids = new HashMap<Modes4Accessibility,SpatialGrid>() ;
 
-	Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>() ;
+	private Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<Modes4Accessibility,Boolean>() ;
 
-	PtMatrix ptMatrix;
+	private PtMatrix ptMatrix;
 	
-	RoadPricingScheme scheme ;
+	private RoadPricingScheme scheme ;
 
-	ArrayList<SpatialGridDataExchangeInterface> spatialGridDataExchangeListenerList = null;
-	ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListenerList = null;
+	private ArrayList<SpatialGridDataExchangeInterface> spatialGridDataExchangeListenerList = null;
+	private ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListenerList = null;
 
 	// accessibility parameter
 
@@ -123,7 +123,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 	private double depatureTime;
 	private double bikeSpeedMeterPerHour = -1;
 	private double walkSpeedMeterPerHour = -1;
-	Benchmark benchmark;
+	private Benchmark benchmark;
 	
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0 ;
@@ -629,6 +629,49 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 		return accessibilityGrids;
 	}
 
+	public ActivityFacilitiesImpl getParcels() {
+		return parcels;
+	}
+
+	public void setParcels(ActivityFacilitiesImpl parcels) {
+		this.parcels = parcels;
+	}
+
+	public AggregationObject[] getAggregatedOpportunities() {
+		return aggregatedOpportunities;
+	}
+
+	public void setAggregatedOpportunities(AggregationObject[] aggregatedOpportunities) {
+		this.aggregatedOpportunities = aggregatedOpportunities;
+	}
+
+	public Map<Modes4Accessibility, Boolean> getIsComputingMode() {
+		return isComputingMode;
+	}
+
+	public void setPtMatrix(PtMatrix ptMatrix) {
+		this.ptMatrix = ptMatrix;
+	}
+
+	public RoadPricingScheme getScheme() {
+		return scheme;
+	}
+
+	public void setScheme(RoadPricingScheme scheme) {
+		this.scheme = scheme;
+	}
+
+	public ArrayList<SpatialGridDataExchangeInterface> getSpatialGridDataExchangeListenerList() {
+		return spatialGridDataExchangeListenerList;
+	}
+
+	public Benchmark getBenchmark() {
+		return benchmark;
+	}
+
+	public void setBenchmark(Benchmark benchmark) {
+		this.benchmark = benchmark;
+	}
 
 
 	/**

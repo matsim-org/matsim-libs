@@ -86,10 +86,10 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		assert(measuringPoints != null);
 		delegate.setMeasuringPoints(measuringPoints);
 		assert(matsim4opusTempDirectory != null);
-		delegate.ptMatrix = ptMatrix; // this could be zero of no input files for pseudo pt are given ...
+		delegate.setPtMatrix(ptMatrix); // this could be zero of no input files for pseudo pt are given ...
 		assert(scenario != null);
 
-		delegate.benchmark = new Benchmark();
+		delegate.setBenchmark(new Benchmark());
 		
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
@@ -98,7 +98,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		delegate.initAccessibilityParameters(scenario.getConfig());
 
 		// aggregating facilities to their nearest node on the road network
-		delegate.aggregatedOpportunities = delegate.aggregatedOpportunities(opportunities, scenario.getNetwork());
+		delegate.setAggregatedOpportunities(delegate.aggregatedOpportunities(opportunities, scenario.getNetwork()));
 		// yyyy ignores the "capacities" of the facilities. kai, mar'14
 		
 		
@@ -111,7 +111,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		
 		// make sure that that at least one tranport mode is selected
 		boolean problem = true ;
-		for ( Boolean bool : delegate.isComputingMode.values() ) {
+		for ( Boolean bool : delegate.getIsComputingMode().values() ) {
 			if ( bool == true ) {
 				problem = false ;
 				break ;
@@ -134,7 +134,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		Controler controler = event.getControler();
         NetworkImpl network = (NetworkImpl) controler.getScenario().getNetwork();
 
-		int benchmarkID = delegate.benchmark.addMeasure("zone-based accessibility computation");
+		int benchmarkID = delegate.getBenchmark().addMeasure("zone-based accessibility computation");
 
 		
 		// get the free-speed car travel times (in seconds)
@@ -150,7 +150,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 		// get travel distance (in meter)
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new LinkLengthTravelDisutility());
 		
-		delegate.scheme = (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME);
+		delegate.setScheme((RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME));
 
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
@@ -164,16 +164,16 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 			String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
 			urbanSimZoneCSVWriterV2.close(matsimOutputDirectory);
 			
-			if (delegate.benchmark != null && benchmarkID > 0) {
-				delegate.benchmark.stoppMeasurement(benchmarkID);
+			if (delegate.getBenchmark() != null && benchmarkID > 0) {
+				delegate.getBenchmark().stoppMeasurement(benchmarkID);
 				log.info("Accessibility computation with " 
 						+ delegate.getMeasuringPoints().getFacilities().size()
 						+ " zones (origins) and "
-						+ delegate.aggregatedOpportunities.length
+						+ delegate.getAggregatedOpportunities().length
 						+ " destinations (opportunities) took "
-						+ delegate.benchmark.getDurationInSeconds(benchmarkID)
+						+ delegate.getBenchmark().getDurationInSeconds(benchmarkID)
 						+ " seconds ("
-						+ delegate.benchmark.getDurationInSeconds(benchmarkID)
+						+ delegate.getBenchmark().getDurationInSeconds(benchmarkID)
 						/ 60. + " minutes).");
 			}
 		} catch (Exception e) {
