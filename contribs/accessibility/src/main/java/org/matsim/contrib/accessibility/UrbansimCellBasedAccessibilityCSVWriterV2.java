@@ -11,7 +11,7 @@ import org.matsim.facilities.ActivityFacility;
 
 // urbansim accessibility writer; better do not touch except when working on matsim-urbansim integration. kai, feb'14
 // yy move to matsim4urbansim
-final class UrbansimCellBasedAccessibilityCSVWriterV2 {
+final class UrbansimCellBasedAccessibilityCSVWriterV2 implements AccessibilityCSVWriter {
 	private static final Logger log = Logger.getLogger(UrbansimCellBasedAccessibilityCSVWriterV2.class);
 
 	private static final String FILE_NAME= "accessibility_indicators.csv";
@@ -85,7 +85,8 @@ final class UrbansimCellBasedAccessibilityCSVWriterV2 {
 	 * <ul>
 	 * 
 	 */
-	public void writeRecord(ActivityFacility startZone, Node node, Map<Modes4Accessibility,Double> accessibilities ) { 
+	@Override
+	public void writeRecord(ActivityFacility startZone, Node node, Map<Modes4Accessibility,Double> accessibilities ) {
 		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 
 		try{

@@ -68,7 +68,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
  * @author thomas, knagel
  *
  */
-abstract class AccessibilityControlerListenerImpl {
+/*package*/ class AccessibilityControlerListenerImpl {
 
 	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
 
@@ -309,7 +309,14 @@ abstract class AccessibilityControlerListenerImpl {
 	}
 
 	
-	final void accessibilityComputation(TravelTime ttf, TravelTime ttc, Scenario scenario, boolean isGridBased, TravelDisutility tdFree, TravelDisutility tdCongested) {
+	final void accessibilityComputation(
+			AccessibilityCSVWriter writer,
+			TravelTime ttf,
+			TravelTime ttc,
+			Scenario scenario,
+			boolean isGridBased,
+			TravelDisutility tdFree,
+			TravelDisutility tdCongested) {
 		
 		LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime = new LeastCostPathTreeExtended( ttf, tdFree, (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
 
@@ -447,7 +454,7 @@ abstract class AccessibilityControlerListenerImpl {
 
 				if ( this.urbansimMode ) {
 					// writing measured accessibilities for current measuring point 
-					writeCSVData4Urbansim(origin, fromNode, accessibilities ) ;
+					writer.writeRecord(origin, fromNode, accessibilities ) ;
 					// (I think the above is the urbansim output.  Better not touch it. kai, feb'14)
 				}
 				
@@ -604,12 +611,6 @@ abstract class AccessibilityControlerListenerImpl {
 		log.info("... done!");
 	}
 
-	
-	/**
-	 * Writes measured accessibilities as csv format to disc
-	 */
-	abstract void writeCSVData4Urbansim( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility, Double> accessibilities ) ;
-	// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 	
 	// ////////////////////////////////////////////////////////////////////
 	// inner classes

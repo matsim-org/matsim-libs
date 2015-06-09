@@ -155,7 +155,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 			log.info(getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 			
-			accessibilityComputation(ttf,  ttc, controler.getScenario(), false, tdFree, tdCongested);
+			accessibilityComputation( urbanSimZoneCSVWriterV2 , ttf,  ttc, controler.getScenario(), false, tdFree, tdCongested);
 			
 			System.out.println();
 			// finalizing/closing csv file containing accessibility measures
@@ -178,26 +178,4 @@ public final class ZoneBasedAccessibilityControlerListenerV3 extends Accessibili
 			e.printStackTrace();
 		}
 	}
-
-	/**
-	 * Writes the measured accessibility for the current measurePoint instantly
-	 * to disc in csv format.
-	 * 
-	 * @param measurePoint
-	 * @param fromNode
-	 * @param freeSpeedAccessibility
-	 * @param carAccessibility
-	 * @param bikeAccessibility
-	 * @param walkAccessibility
-	 * @param accCsvWriter
-	 */
-	@Override
-	protected void writeCSVData4Urbansim( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
-		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
-		
-		// writing accessibility measures of current measurePoint in csv format
-		// The UrbanSimZoneCSVWriterV2 writer produces URBANSIM INPUT
-		urbanSimZoneCSVWriterV2.write(measurePoint, accessibilities ) ;
-	}
-
 }

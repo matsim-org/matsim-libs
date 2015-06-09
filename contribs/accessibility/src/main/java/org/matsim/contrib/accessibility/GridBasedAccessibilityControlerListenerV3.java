@@ -258,7 +258,7 @@ implements ShutdownListener, StartupListener {
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 		log.info(getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 
-		accessibilityComputation(ttf, ttc, controler.getScenario(), true, tdFree, tdCongested);
+		accessibilityComputation( urbansimAccessibilityWriter , ttf, ttc, controler.getScenario(), true, tdFree, tdCongested);
 		System.out.println();
 
 		if (this.benchmark != null && benchmarkID > 0) {
@@ -301,23 +301,7 @@ implements ShutdownListener, StartupListener {
 
 	}
 
-	
-	/**
-	 * Writes the measured accessibility for the current measurePoint instantly
-	 * to disc in csv format.
-	 * 
-	 * THis is only done when urbansimMode in AccessibilityControlerListenerImpl is set to true
-	 * 
-	 */
-	@Override
-	final void writeCSVData4Urbansim( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility,Double> accessibilities ) {
-		// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
 
-		// writing accessibility measures of current measurePoint in csv format
-		urbansimAccessibilityWriter.writeRecord(measurePoint, fromNode, accessibilities ) ;
-	}
-
-	
 	/**
 	 * This writes the accessibility grid data into the MATSim output directory
 	 */
