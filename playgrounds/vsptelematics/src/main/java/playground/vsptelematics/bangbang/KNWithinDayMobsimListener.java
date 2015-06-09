@@ -30,12 +30,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -44,6 +41,9 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
@@ -57,7 +57,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.withinday.utils.EditRoutes;
 
 import com.google.inject.Inject;
 
@@ -71,6 +70,10 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 
 	private final TripRouter tripRouter;
 	private final Scenario scenario;
+
+	private List<Id<Link>> alternativeLinks;
+
+	private Id<Link> returnId = Id.createLinkId("4706699_26662459_26662476");
 	
 	private class MyTravelTimeAndDisutility implements TravelTime, TravelDisutility {
 		FreespeedTravelTimeAndDisutility delegate = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
@@ -105,12 +108,11 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 				scenario.getNetwork(), routeAlgo);
 
 		for ( Id<Link> currentId : KNBangBang.replanningLinkIds ) {
-			final Id<Link> returnId = Id.createLinkId("4706699_26662459_26662476");
-
 			Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(scenario.getNetwork().getLinks().get(currentId));
 			Facility<ActivityFacility> toFacility = new LinkWrapperFacility(scenario.getNetwork().getLinks().get(returnId));
 
-			List<? extends PlanElement> result = routingModule.calcRoute(fromFacility, toFacility, 0, null) ;
+			final Leg leg = (Leg) routingModule.calcRoute(fromFacility, toFacility, 0, null).get(0);
+			alternativeLinks = ((NetworkRoute)leg.getRoute()).getLinkIds() ;
 		}
 	}
 
@@ -133,7 +135,7 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 			return set;
 		}
 
-		// find agents that are en-route (more interesting case)
+		// find agents that are on the "interesting" links:
 		for ( Id<Link> linkId : KNBangBang.replanningLinkIds ) {
 			NetsimLink link = mobsim.getNetsimNetwork().getNetsimLink( linkId ) ;
 			for (MobsimVehicle vehicle : link.getAllNonParkedVehicles()) {
@@ -150,7 +152,7 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 	}
 
 	private boolean doReplanning(MobsimAgent agent, Netsim netsim ) {
-		double now = ((Netsim)netsim).getSimTimer().getTimeOfDay() ;
+		double now = netsim.getSimTimer().getTimeOfDay() ;
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ; 
 
@@ -167,26 +169,41 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 			return false;
 		}
 
-		List<PlanElement> planElements = plan.getPlanElements() ;
 		final Integer planElementsIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
-		if ( !(planElements.get(planElementsIndex+1) instanceof Activity || !(planElements.get(planElementsIndex+2) instanceof Leg)) ) {
-			log.error( "this version of withinday replanning cannot deal with plans where legs and acts do not alternate; returning ...") ;
-			return false ;
-			// yy is this really needed for what we are doing here (changing an existing route)?  kai, jun'15
-		}
+//		List<PlanElement> planElements = plan.getPlanElements() ;
+//		if ( !(planElements.get(planElementsIndex+1) instanceof Activity || !(planElements.get(planElementsIndex+2) instanceof Leg)) ) {
+//			log.error( "this version of withinday replanning cannot deal with plans where legs and acts do not alternate; returning ...") ;
+//			return false ;
+//			// yy is this really needed for what we are doing here (changing an existing route)?  kai, jun'15
+//		}
 
 		// ---
 
 		final Leg leg = (Leg) plan.getPlanElements().get(planElementsIndex);
-		ArrayList<Id<Link>> previousLinkIds = new ArrayList<>(((NetworkRoute) leg.getRoute()).getLinkIds());
-		// new Route for current Leg.
-		final Id<Link> destinationLinkId = ((Activity) plan.getPlanElements().get(planElementsIndex+1)).getLinkId();
+		final NetworkRoute oldRoute = (NetworkRoute) leg.getRoute();
+		List<Id<Link>> previousLinkIds = new ArrayList<>( oldRoute.getLinkIds() ) ;
+		// the above forces a copy, which I need later
 
-		EditRoutes.relocateCurrentRoute(agent, destinationLinkId, now, scenario.getNetwork(), tripRouter);
+		// method 1:
+//		final Id<Link> destinationLinkId = ((Activity) plan.getPlanElements().get(planElementsIndex+1)).getLinkId();
+//		EditRoutes.relocateCurrentRoute(agent, destinationLinkId, now, scenario.getNetwork(), tripRouter);
+		
+		// method 2:
+		final int idx = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
+		if ( oldRoute.getLinkIds().contains( this.returnId ) ) {
+			List<Id<Link>> copy = new ArrayList<>( oldRoute.getLinkIds() ) ;
+			while (  !copy.get( idx ).equals( this.returnId )  ) {
+				copy.remove( idx ) ;
+			}
+			copy.addAll( idx, this.alternativeLinks ) ;
+			final ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory();
+			NetworkRoute newRoute = (NetworkRoute) modeRouteFactory.createRoute( TransportMode.car, oldRoute.getStartLinkId(), oldRoute.getEndLinkId()) ;
+			newRoute.setLinkIds( oldRoute.getStartLinkId(), copy, oldRoute.getEndLinkId() );
+			leg.setRoute(newRoute);
+		}
 
-		ArrayList<Id<Link>> currentLinkIds = new ArrayList<>(((NetworkRoute) leg.getRoute()).getLinkIds());
-
+		ArrayList<Id<Link>> currentLinkIds = new ArrayList<>( ((NetworkRoute) leg.getRoute()).getLinkIds() ) ;
 		if ( !Arrays.deepEquals(previousLinkIds.toArray(), currentLinkIds.toArray()) ) {
 			log.warn("modified route");
 			this.scenario.getPopulation().getPersonAttributes().putAttribute( agent.getId().toString(), "marker", true ) ;
