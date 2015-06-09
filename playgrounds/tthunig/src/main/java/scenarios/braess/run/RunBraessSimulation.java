@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.core.config.Config;
@@ -37,7 +39,7 @@ public class RunBraessSimulation {
 	private static final Logger log = Logger
 			.getLogger(RunBraessSimulation.class);
 	
-	private final String DATE = "2015-06-05";
+	private final String DATE = "2015-06-09";
 	
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
@@ -50,9 +52,11 @@ public class RunBraessSimulation {
 	private final long CAP_FIRST_LAST = 3600; // [veh/h]
 	
 	/* population parameter */
-	private int NUMBER_OF_PERSONS = 60;
-	private boolean SAME_START_TIME = true;
+	private int NUMBER_OF_PERSONS = 3600;
+	private boolean SAME_START_TIME = false;
 	private boolean INIT_WITH_ALL_ROUTES = true;
+	
+	private boolean SIMULATE_INFLOW_CAP = false;
 	
 
 	private void prepareRunAndAnalyse() {
@@ -96,9 +100,12 @@ public class RunBraessSimulation {
 
 		// set network and lane properties
 		config.network().setInputFile(INPUT_DIR + "basicNetwork.xml");
-		config.scenario().setUseLanes( true );
+		config.scenario().setUseLanes( false );
 		config.network().setLaneDefinitionsFile(
 				INPUT_DIR + "lanes" + CAP_MAIN + "-" + CAP_FIRST_LAST + ".xml");
+
+		// set number of iterations
+		config.controler().setLastIteration( 100 );
 
 		// set signal files
 		config.scenario().setUseSignalSystems( false );
@@ -123,14 +130,11 @@ public class RunBraessSimulation {
 		// hash map and array produce same results. only difference: memory and time.
 		// for small time bins and sparse values hash map is better. theresa, may 2015
 		
-		// set number of iterations
-		config.controler().setLastIteration( 100 );
-
 		// define strategies:
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultStrategy.ReRoute.toString() );
-			strat.setWeight( 0.1 ) ;
+			strat.setWeight( 0.0 ) ;
 			strat.setDisableAfter( 50 );
 			config.strategy().addStrategySettings(strat);
 		}
@@ -144,7 +148,7 @@ public class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
-			strat.setWeight( 0.9 ) ;
+			strat.setWeight( 1.0 ) ;
 			strat.setDisableAfter( config.controler().getLastIteration() );
 			config.strategy().addStrategySettings(strat);
 		}
@@ -152,6 +156,13 @@ public class RunBraessSimulation {
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.BestScore.toString() );
 			strat.setWeight( 0.0 ) ;
+			config.strategy().addStrategySettings(strat);
+		}
+		{
+			StrategySettings strat = new StrategySettings() ;
+			strat.setStrategyName( DefaultSelector.KeepLastSelected.toString() );
+			strat.setWeight( 0.0 ) ;
+			strat.setDisableAfter( config.controler().getLastIteration() - 50 );
 			config.strategy().addStrategySettings(strat);
 		}
 
@@ -178,30 +189,86 @@ public class RunBraessSimulation {
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
 		
+		config.qsim().setStuckTime(3600 * 10.);
+		
 		return config;
 	}
 
-	private void adaptNetwork(Scenario scenario) {		
+	private void adaptNetwork(Scenario scenario) {	
+		Network net = scenario.getNetwork();
+
 		// set travel times at the links (by adapting free speed)
-		// note: you only have to adapt the denominator, 
+		// note: you only have to adapt the denominator (to the desired travel time), 
 		// because all links have length 200m in the basic network
-		scenario.getNetwork().getLinks().get(Id.createLinkId("0_1")).setFreespeed(200 / 1);
-		scenario.getNetwork().getLinks().get(Id.createLinkId("1_2")).setFreespeed(200 / 1);
-		scenario.getNetwork().getLinks().get(Id.createLinkId("2_3")).setFreespeed(200 / 10);
-		scenario.getNetwork().getLinks().get(Id.createLinkId("2_4")).setFreespeed(200 / 20);
-		scenario.getNetwork().getLinks().get(Id.createLinkId("3_4")).setFreespeed(200 / 1);
-		scenario.getNetwork().getLinks().get(Id.createLinkId("3_5")).setFreespeed(200 / 20);
-		scenario.getNetwork().getLinks().get(Id.createLinkId("4_5")).setFreespeed(200 / 10);
-		scenario.getNetwork().getLinks().get(Id.createLinkId("5_6")).setFreespeed(200 / 1);
+		net.getLinks().get(Id.createLinkId("0_1")).setFreespeed(200 / 1);
+		net.getLinks().get(Id.createLinkId("1_2")).setFreespeed(200 / 1);
+		net.getLinks().get(Id.createLinkId("2_3")).setFreespeed(200 / 10);
+		net.getLinks().get(Id.createLinkId("2_4")).setFreespeed(200 / 20);
+		net.getLinks().get(Id.createLinkId("3_4")).setFreespeed(200 / 1);
+		net.getLinks().get(Id.createLinkId("3_5")).setFreespeed(200 / 20);
+		net.getLinks().get(Id.createLinkId("4_5")).setFreespeed(200 / 10);
+		net.getLinks().get(Id.createLinkId("5_6")).setFreespeed(200 / 1);
 	
 		// adapt capacity on all links		
-		for (Link l : scenario.getNetwork().getLinks().values()){
+		for (Link l : net.getLinks().values()){
 			if (l.getId().equals(Id.createLinkId("0_1")) || 
 					l.getId().equals(Id.createLinkId("1_2")) ||
 					l.getId().equals(Id.createLinkId("5_6")) )
 				l.setCapacity(CAP_FIRST_LAST);
 			else
 				l.setCapacity(CAP_MAIN);
+		}
+		
+		// extend network, if inflow capacity should be simulated
+		if (SIMULATE_INFLOW_CAP) {
+			NetworkFactory fac = net.getFactory();
+
+			// create 2 new nodes
+			net.addNode(fac.createNode(Id.createNodeId(7),
+					scenario.createCoord(250, 250)));
+			net.addNode(fac.createNode(Id.createNodeId(8),
+					scenario.createCoord(250, 150)));
+
+			// remove former links 2_3 and 2_4
+			net.getLinks().get(Id.createLinkId("2_3")).setFreespeed(0.1);
+			net.getLinks().get(Id.createLinkId("2_4")).setFreespeed(0.1);
+			/* the following code creates an UnsupportedOperationException
+			because the map is an UnmodifiableMap */
+//			net.getLinks().remove(Id.createLinkId("2_3")); 
+//			net.getLinks().remove(Id.createLinkId("2_4"));
+
+			// create 4 new links
+			Link l = fac.createLink(Id.createLinkId("2_7"),
+					net.getNodes().get(Id.createNodeId(2)),
+					net.getNodes().get(Id.createNodeId(7)));
+			l.setCapacity(CAP_MAIN);
+			l.setLength(10);
+			l.setFreespeed(10 / 1);
+			net.addLink(l);
+			
+			l = fac.createLink(Id.createLinkId("7_3"),
+					net.getNodes().get(Id.createNodeId(7)),
+					net.getNodes().get(Id.createNodeId(3)));
+			l.setCapacity(CAP_MAIN);
+			l.setLength(200);
+			l.setFreespeed(200 / 999);
+			net.addLink(l);
+
+			l = fac.createLink(Id.createLinkId("2_8"),
+					net.getNodes().get(Id.createNodeId(2)),
+					net.getNodes().get(Id.createNodeId(8)));
+			l.setCapacity(CAP_MAIN);
+			l.setLength(10);
+			l.setFreespeed(10 / 1);
+			net.addLink(l);
+			
+			l = fac.createLink(Id.createLinkId("8_4"),
+					net.getNodes().get(Id.createNodeId(8)),
+					net.getNodes().get(Id.createNodeId(4)));
+			l.setCapacity(CAP_MAIN);
+			l.setLength(200);
+			l.setFreespeed(200 / 1999);
+			net.addLink(l);
 		}
 	}
 
@@ -232,6 +299,9 @@ public class RunBraessSimulation {
 		runName += "_ttMid" + middleLink.getLength()
 				/ middleLink.getFreespeed() + "s";
 
+		if (SIMULATE_INFLOW_CAP)
+			runName += "_inflowCap";
+		
 		StrategySettings[] strategies = config.strategy().getStrategySettings()
 				.toArray(new StrategySettings[0]);
 		for (int i = 0; i < strategies.length; i++) {

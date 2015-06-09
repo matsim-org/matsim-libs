@@ -121,7 +121,9 @@ public class TtAnalyzeBraessRouteDistributionAndTT implements PersonArrivalEvent
 		// the route is unique if you get a link enter event of link 3,4 or 5.
 		int route = -1;
 		switch (event.getLinkId().toString()) {
-		case "2_4": // the person uses the lower route
+		case "2_4":
+		case "2_8":
+			// the person uses the lower route
 			route = 2;
 			break;
 		case "3_4": // the person uses the middle route
@@ -156,15 +158,15 @@ public class TtAnalyzeBraessRouteDistributionAndTT implements PersonArrivalEvent
 	public void handleEvent(PersonArrivalEvent event) {
 		if (!this.personDepartureTimes.containsKey(event.getPersonId())) {
 			throw new IllegalStateException(
-					"A person has arrived without departure.");
+					"Person " + event.getPersonId() + " has arrived without departure.");
 		}
 		if (!this.personRouteChoice.containsKey(event.getPersonId())) {
 			throw new IllegalStateException(
-					"An arrived person was not seen on any route.");
+					"Person " + event.getPersonId() + " arrived, but was not seen on any route.");
 		}
 		if (!this.personRouteStartTime.containsKey(event.getPersonId())) {
 			throw new IllegalStateException(
-					"A person arrived without route start (i.e. without wait2link event).");
+					"Person " + event.getPersonId() + " arrived without route start (i.e. without wait2link event).");
 		}
 
 		// calculate total travel time

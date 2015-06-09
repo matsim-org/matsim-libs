@@ -39,10 +39,32 @@ public class TtCreateBraessPopulation {
 
 	private Population population;
 	private Network network;
+	
+	private boolean simulateInflowCap;
 
 	public TtCreateBraessPopulation(Population pop, Network net) {
 		this.population = pop;
 		this.network = net;
+		
+		prepareFields();
+	}
+
+	/**
+	 * Checks whether the network simulates inflow capacity at links 2_3 and 2_4
+	 * or not.
+	 * 
+	 * If the network contains nodes 7 (and 8), it simulates inflow capacity;
+	 * otherwise it doesn't.
+	 * 
+	 * The boolean simulateInflowCap is necessary for creating initial plans in
+	 * createPersons(...)
+	 */
+	private void prepareFields() {
+		
+		if (this.network.getNodes().containsKey(Id.createNodeId(7)))
+			this.simulateInflowCap = true;
+		else
+			this.simulateInflowCap = false;
 	}
 
 	/**
@@ -139,7 +161,13 @@ public class TtCreateBraessPopulation {
 				// create a route for the Z path
 				List<Id<Link>> pathZ = new ArrayList<>();
 				pathZ.add(Id.createLinkId("1_2"));
-				pathZ.add(Id.createLinkId("2_3"));
+				if (!this.simulateInflowCap){
+					pathZ.add(Id.createLinkId("2_3"));
+				}
+				else{
+					pathZ.add(Id.createLinkId("2_7"));
+					pathZ.add(Id.createLinkId("7_3"));
+				}
 				pathZ.add(Id.createLinkId("3_4"));
 				pathZ.add(Id.createLinkId("4_5"));
 				Route routeZ = new LinkNetworkRouteImpl(
@@ -170,7 +198,13 @@ public class TtCreateBraessPopulation {
 						.createLeg(TransportMode.car);
 				List<Id<Link>> pathUp = new ArrayList<>();
 				pathUp.add(Id.createLinkId("1_2"));
-				pathUp.add(Id.createLinkId("2_3"));
+				if (!this.simulateInflowCap){
+					pathUp.add(Id.createLinkId("2_3"));
+				}
+				else{
+					pathUp.add(Id.createLinkId("2_7"));
+					pathUp.add(Id.createLinkId("7_3"));
+				}
 				pathUp.add(Id.createLinkId("3_5"));
 				Route routeUp = new LinkNetworkRouteImpl(
 						Id.createLinkId("0_1"), pathUp, Id.createLinkId("5_6"));
@@ -194,7 +228,13 @@ public class TtCreateBraessPopulation {
 							TransportMode.car);
 					List<Id<Link>> pathDown = new ArrayList<>();
 					pathDown.add(Id.createLinkId("1_2"));
-					pathDown.add(Id.createLinkId("2_4"));
+					if (!this.simulateInflowCap){
+						pathDown.add(Id.createLinkId("2_4"));
+					}
+					else{
+						pathDown.add(Id.createLinkId("2_8"));
+						pathDown.add(Id.createLinkId("8_4"));
+					}
 					pathDown.add(Id.createLinkId("4_5"));
 					Route routeDown = new LinkNetworkRouteImpl(
 							Id.createLinkId("0_1"), pathDown,
