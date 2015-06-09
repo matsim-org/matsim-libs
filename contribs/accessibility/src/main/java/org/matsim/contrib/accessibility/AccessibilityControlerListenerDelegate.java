@@ -166,7 +166,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 				Modes4Accessibility.pt,
 				new MatrixBasedPtAccessibilityContributionCalculator(
 						ptMatrix,
-						controler.getConfig().planCalcScore() ) );
+						controler.getConfig() ) );
 	}
 	
 	/**
@@ -478,71 +478,10 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
         // captures the distance (as walk time) between the origin via the link to the node:
         Distances distance = NetworkUtil.getDistances2Node(origin.getCoord(), nearestLink, fromNode);
 
-		// distance to road, and then to node:
-        double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
-
-		// get stored network node (this is the nearest node next to an aggregated work place)
-		Node destinationNode = aggregatedFacility.getNearestNode();
-
-		// disutilities to get on or off the network
-		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
-		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
-		double sumExpVjkWalk = aggregatedFacility.getSum();
-
 		for ( Map.Entry<Modes4Accessibility, AccessibilityContributionCalculator> calculatorEntry : calculators.entrySet() ) {
-			final double expVij = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility );
-			final double expVhk = expVhiWalk * expVij * sumExpVjkWalk;
+			final double expVhk = calculatorEntry.getValue().computeContributionOfOpportunity( origin , aggregatedFacility );
 			gcs[ calculatorEntry.getKey().ordinal() ].addExpUtils( expVhk );
 		}
-//		// travel times and distances for pseudo pt
-//		if(this.isComputingMode.get(Modes4Accessibility.pt) ){
-//			double expVijPt = computeExpUtilContributionPt(fromNode, destinationNode);
-//			double expVhkPt = expVijPt * sumExpVjkWalk;
-//			gcs[Modes4Accessibility.pt.ordinal()].addExpUtils( expVhkPt );
-//		}
-//
-//		// total disutility congested car
-//		if(this.isComputingMode.get(Modes4Accessibility.car)){
-//			double expVijCongestedCar =
-//					computeExpUtilContributionNetworkMode(
-//							lcptExtCongestedCarTravelTime,
-//							ttc,
-//							nearestLink,
-//							distance,
-//							destinationNode,
-//							scheme, depatureTime, betaCarTT, betaCarTD, betaCarTMC, logitScaleParameter, constCar);
-//
-//			double expVhkCongestedCar = expVhiWalk * expVijCongestedCar * sumExpVjkWalk;
-//			gcs[Modes4Accessibility.car.ordinal()].addExpUtils( expVhkCongestedCar );
-//		}
-//
-//		// total disutility free speed car
-//		if(this.isComputingMode.get(Modes4Accessibility.freeSpeed)){
-//			double expVijFreeSpeedCar =
-//					computeExpUtilContributionNetworkMode(
-//							lcptExtFreeSpeedCarTravelTime,
-//							ttf,
-//							nearestLink,
-//							distance,
-//							destinationNode,
-//							scheme, depatureTime, betaCarTT, betaCarTD, betaCarTMC, logitScaleParameter, constCar);
-//			double expVhkFreeSpeedCar = expVhiWalk * expVijFreeSpeedCar * sumExpVjkWalk;
-//			gcs[Modes4Accessibility.freeSpeed.ordinal()].addExpUtils( expVhkFreeSpeedCar );
-//		}
-//
-//		// total disutility bicycle
-//		if(this.isComputingMode.get(Modes4Accessibility.bike)){
-//			double expVijBike = computeExpUtilsContributionBeeline(lcptTravelDistance, distance, destinationNode, bikeSpeedMeterPerHour, betaBikeTT, betaBikeTD, logitScaleParameter, constBike);
-//			double expVhkBike = expVhiWalk * expVijBike * sumExpVjkWalk;
-//			gcs[Modes4Accessibility.bike.ordinal()].addExpUtils( expVhkBike );
-//		}
-//
-//		// total disutility walk
-//		if(this.isComputingMode.get(Modes4Accessibility.walk)){
-//			double expVijWalk = computeExpUtilsContributionBeeline(lcptTravelDistance, distance, destinationNode, this.walkSpeedMeterPerHour, betaWalkTT, betaWalkTD, this.logitScaleParameter, constWalk);
-//			double expVhkWalk = expVhiWalk * expVijWalk * sumExpVjkWalk;
-//			gcs[Modes4Accessibility.walk.ordinal()].addExpUtils( expVhkWalk );
-//		}
 	}
 
 	public void setComputingAccessibilityForMode( Modes4Accessibility mode, boolean val ) {

@@ -2,6 +2,7 @@ package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
@@ -27,6 +28,9 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 
 	private final Scenario scenario;
 	private final double departureTime;
+	private final double betaWalkTT;
+	private final double betaWalkTD;
+	private final double walkSpeedMeterPerHour;
 
 	private double logitScaleParameter;
 	private double betaTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingBike_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
@@ -63,7 +67,12 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 		betaTT = modeParams.getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaTD = modeParams.getMarginalUtilityOfDistance();
 
+		betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
+
 		constant = modeParams.getConstant();
+
+		this.walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( TransportMode.walk ) * 3600;
 	}
 
 	@Override
@@ -83,10 +92,25 @@ public class ConstantSpeedAccessibilityContributionCalculator implements Accessi
 		// get stored network node (this is the nearest node next to an aggregated work place)
 		Node destinationNode = destination.getNearestNode();
 
+		// TODO: extract this walk part?
+		// In the state found before modularization (june 15), this was anyway not consistent accross modes
+		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
+		// My problem is that I think this is WRONG. The utility to the "aggregation" node is considered only
+		// once, and from the node to each facility considered for each facility. For me, the FULL TRIP
+		// should be considered for each facility... (td, june 15)
+		// distance to road, and then to node:
+        double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
+
+		// disutilities to get on or off the network
+		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distance.getDistancePoint2Road() * betaWalkTD);
+		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
+		double sumExpVjkWalk = destination.getSum();
+
+
 		double road2NodeBikeTime_h					= distance.getDistanceRoad2Node() / speedMeterPerHour;
 		double travelDistance_meter = lcptTravelDistance.getTree().get(destinationNode.getId()).getCost(); 				// travel link distances on road network for bicycle and walk
 		double bikeDisutilityRoad2Node = (road2NodeBikeTime_h * betaTT) + (distance.getDistanceRoad2Node() * betaTD); // toll or money ???
 		double bikeDisutility = ((travelDistance_meter/ speedMeterPerHour) * betaTT) + (travelDistance_meter * betaTD);// toll or money ???
-		return Math.exp(logitScaleParameter * (constant + bikeDisutility + bikeDisutilityRoad2Node));
+		return expVhiWalk * Math.exp(logitScaleParameter * (constant + bikeDisutility + bikeDisutilityRoad2Node)) * sumExpVjkWalk;
 	}
 }

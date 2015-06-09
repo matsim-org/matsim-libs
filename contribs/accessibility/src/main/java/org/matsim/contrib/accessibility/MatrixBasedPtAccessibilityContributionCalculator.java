@@ -1,9 +1,16 @@
 package org.matsim.contrib.accessibility;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
+import org.matsim.contrib.accessibility.utils.Distances;
+import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.facilities.ActivityFacility;
 
 /**
@@ -21,11 +28,12 @@ public class MatrixBasedPtAccessibilityContributionCalculator implements Accessi
 	private final double betaPtTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
 	private final double betaPtTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
 
-	private double constPt;
+	private final double constPt;
 
 	public MatrixBasedPtAccessibilityContributionCalculator(
 			final PtMatrix ptMatrix,
-			final PlanCalcScoreConfigGroup planCalcScoreConfigGroup ) {
+			final Config config ) {
+		final PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
 		this.ptMatrix = ptMatrix;
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
 
@@ -62,6 +70,6 @@ public class MatrixBasedPtAccessibilityContributionCalculator implements Accessi
 		double ptTotalWalkDistance_meter=ptMatrix.getPtTravelDistance_meter(fromNode.getCoord(), destinationNode.getCoord());
 
 		double ptDisutility = constPt + (ptTotalWalkTime_h * betaWalkTT) + (ptTravelTime_h * betaPtTT) + (ptTotalWalkDistance_meter * betaWalkTD) + (ptTravelDistance_meter * betaPtTD);
-		return Math.exp(this.logitScaleParameter * ptDisutility);
+		return destination.getSum() * Math.exp(this.logitScaleParameter * ptDisutility);
 	}
 }
