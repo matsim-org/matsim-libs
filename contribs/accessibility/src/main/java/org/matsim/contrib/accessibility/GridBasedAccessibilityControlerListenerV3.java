@@ -122,7 +122,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public final class GridBasedAccessibilityControlerListenerV3
 		implements ShutdownListener, StartupListener {
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
-	private final AccessibilityControlerListenerImpl accessibilityControlerListener = new AccessibilityControlerListenerImpl();
+	private final AccessibilityControlerListenerDelegate accessibilityControlerListener = new AccessibilityControlerListenerDelegate();
 
 	private UrbansimCellBasedAccessibilityCSVWriterV2 urbansimAccessibilityWriter;
 	private Network network;

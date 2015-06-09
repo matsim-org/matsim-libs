@@ -68,9 +68,9 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
  * @author thomas, knagel
  *
  */
-/*package*/ final class AccessibilityControlerListenerImpl {
+/*package*/ final class AccessibilityControlerListenerDelegate {
 
-	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
+	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerDelegate.class);
 
 	// measuring points (origins) for accessibility calculation
 	private ActivityFacilitiesImpl measuringPoints;
@@ -130,7 +130,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 
 	protected boolean urbansimMode = true;
 
-	AccessibilityControlerListenerImpl() {
+	AccessibilityControlerListenerDelegate() {
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			this.isComputingMode.put( mode, false ) ;
 		}

@@ -60,7 +60,7 @@ import java.util.Map;
 public final class ZoneBasedAccessibilityControlerListenerV3 implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListenerV3.class);
-	private final AccessibilityControlerListenerImpl delegate = new AccessibilityControlerListenerImpl();
+	private final AccessibilityControlerListenerDelegate delegate = new AccessibilityControlerListenerDelegate();
 	private UrbanSimZoneCSVWriterV2 urbanSimZoneCSVWriterV2;
 	
 
