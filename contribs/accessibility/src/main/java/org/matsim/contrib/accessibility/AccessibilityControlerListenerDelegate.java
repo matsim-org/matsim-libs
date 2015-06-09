@@ -649,10 +649,6 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 		return isComputingMode;
 	}
 
-	public void setPtMatrix(PtMatrix ptMatrix) {
-		this.ptMatrix = ptMatrix;
-	}
-
 	public RoadPricingScheme getScheme() {
 		return scheme;
 	}
@@ -695,13 +691,10 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 			return this.sum;
 		}
 	}
-	
-	// new
-	public void addPtMatrix(PtMatrix ptMatrix) {
+
+	public void setPtMatrix(PtMatrix ptMatrix) {
 		this.ptMatrix = ptMatrix;
 	}
-	// end new
-
 
 	ActivityFacilitiesImpl getMeasuringPoints() {
 		return measuringPoints;

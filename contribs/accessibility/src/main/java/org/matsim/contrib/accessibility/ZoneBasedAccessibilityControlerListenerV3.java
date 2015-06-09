@@ -202,6 +202,6 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 	}
 
 	public void addPtMatrix(PtMatrix ptMatrix) {
-		delegate.addPtMatrix(ptMatrix);
+		delegate.setPtMatrix(ptMatrix);
 	}
 }

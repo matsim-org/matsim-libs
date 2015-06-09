@@ -560,6 +560,6 @@ public final class GridBasedAccessibilityControlerListenerV3
 	}
 
 	public void addPtMatrix(PtMatrix ptMatrix) {
-		accessibilityControlerListener.addPtMatrix(ptMatrix);
+		accessibilityControlerListener.setPtMatrix(ptMatrix);
 	}
 }
