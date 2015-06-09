@@ -395,7 +395,8 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
                                 lcptExtFreeSpeedCarTravelTime,
                                 lcptExtCongestedCarTravelTime,
                                 lcptTravelDistance,
-                                ttc,
+                                ttf,
+								ttc,
                                 gcs,
                                 origin,
                                 fromNode,
@@ -461,6 +462,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 			LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
 			LeastCostPathTreeExtended lcptExtCongestedCarTravelTime,
 			LeastCostPathTree lcptTravelDistance,
+			TravelTime ttf,
 			TravelTime ttc,
 			SumOfExpUtils[] gcs,
 			ActivityFacility origin,
@@ -478,7 +480,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
         double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
 
         // get free speed and congested car travel times on a certain link
-        double freeSpeedOnNearestLink_meterpersec = ((LinkImpl)nearestLink).getFreespeedTravelTime(depatureTime);
+		double freeSpeedOnNearestLink_meterpersec = nearestLink.getLength() / ttf.getLinkTravelTime(nearestLink, depatureTime, null, null);
         double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / ttc.getLinkTravelTime(nearestLink, depatureTime, null, null);
 
         // travel time in hours to get from link enter point (position on a link given by orthogonal projection from measuring point) to the corresponding node
