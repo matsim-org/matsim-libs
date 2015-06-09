@@ -258,7 +258,7 @@ implements ShutdownListener, StartupListener {
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 		log.info(getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 
-		accessibilityComputation(ttf, ttc, controler.getScenario(), PARCEL_BASED, tdFree, tdCongested);
+		accessibilityComputation(ttf, ttc, controler.getScenario(), true, tdFree, tdCongested);
 		System.out.println();
 
 		if (this.benchmark != null && benchmarkID > 0) {

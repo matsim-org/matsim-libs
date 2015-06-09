@@ -72,9 +72,6 @@ abstract class AccessibilityControlerListenerImpl {
 
 	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
 
-	int ZONE_BASED 	= 0;
-	int PARCEL_BASED = 1;
-
 	// measuring points (origins) for accessibility calculation
 	private ActivityFacilitiesImpl measuringPoints;
 	// containing parcel coordinates for accessibility feedback
@@ -312,7 +309,7 @@ abstract class AccessibilityControlerListenerImpl {
 	}
 
 	
-	final void accessibilityComputation(TravelTime ttf, TravelTime ttc, Scenario scenario, int runMode, TravelDisutility tdFree, TravelDisutility tdCongested) {
+	final void accessibilityComputation(TravelTime ttf, TravelTime ttc, Scenario scenario, boolean isGridBased, TravelDisutility tdFree, TravelDisutility tdCongested) {
 		
 		LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime = new LeastCostPathTreeExtended( ttf, tdFree, (RoadPricingScheme) scenario.getScenarioElement(RoadPricingScheme.ELEMENT_NAME) ) ;
 
@@ -441,7 +438,7 @@ abstract class AccessibilityControlerListenerImpl {
 							// yyyy why _multiply_ with "inverseOfLogitScaleParameter"??  If anything, would need to take the power:
 							// a * ln(b) = ln( b^a ).  kai, jan'14
 						}
-						if(runMode == PARCEL_BASED){ // only for cell-based accessibility computation
+						if( isGridBased ){ // only for cell-based accessibility computation
 							// assign log sums to current starZone[[???]] object and spatial grid
 							this.accessibilityGrids.get(mode).setValue( accessibilities.get(mode), origin.getCoord().getX(), origin.getCoord().getY() ) ; 
 						}
@@ -610,13 +607,6 @@ abstract class AccessibilityControlerListenerImpl {
 	
 	/**
 	 * Writes measured accessibilities as csv format to disc
-	 * 
-	 * @param measurePoint
-	 * @param fromNode
-	 * @param freeSpeedAccessibility
-	 * @param carAccessibility
-	 * @param bikeAccessibility
-	 * @param walkAccessibility
 	 */
 	abstract void writeCSVData4Urbansim( ActivityFacility measurePoint, Node fromNode, Map<Modes4Accessibility, Double> accessibilities ) ;
 	// (this is what, I think, writes the urbansim data, and should thus better not be touched. kai, feb'14)
