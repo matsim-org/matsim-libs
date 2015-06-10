@@ -22,6 +22,8 @@
 
 package roadclassification;
 
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 
 import java.io.*;
@@ -34,6 +36,8 @@ import java.net.URLConnection;
 public class DownloadExampleData {
 
     public static final String SIOUX_FALLS = "output/sioux-falls.osm";
+
+    public static final CoordinateTransformation COORDINATE_TRANSFORMATION = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3359");
 
     public static void main(String[] args) throws IOException {
         new DownloadExampleData().run();
