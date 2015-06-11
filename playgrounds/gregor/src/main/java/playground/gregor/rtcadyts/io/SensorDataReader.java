@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunJupedSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,57 +16,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.gregor.hybridsim.grpc;
+package playground.gregor.rtcadyts.io;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.matsim.core.utils.misc.StringUtils;
 
-public class RunJupedSim implements Runnable, ExternalSim{
+public class SensorDataReader {
 	
-	private static final Logger log = Logger.getLogger(RunJupedSim.class);
-	private Process p1;
-	
-	@Override
-	public void run() {
-		try {
-			this.p1 = new ProcessBuilder("/Users/laemmel/svn/jpscore/Release/jupedsim","/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/jps_ini.xml").start();
-			logToLog(this.p1);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
-	private static void logToLog(Process p1) throws IOException {
-		{
-			InputStream is = p1.getInputStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String l = br.readLine();
-			while (l != null) {
-				log.info(l);
-				l = br.readLine();
-			}
-		}
-		{
-			InputStream is = p1.getErrorStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String l = br.readLine();
-			while (l != null) {
-				log.error(l);
-				l = br.readLine();
-			}
-		}
-	}
 
-	@Override
-	public void shutdown() {
-		this.p1.destroy();
+	public static SensorDataFrame handle(File f) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(f));
+		String l = br.readLine();
+		l = br.readLine();//sloppy header skipping
+		if (l == null) {
+			br.close();
+			return null;
+		}
+		String[] expl = StringUtils.explode(l, ' ');
+		double time = Double.parseDouble(expl[1]);
+		SensorDataFrame frame = new SensorDataFrame(time);
+		while (l != null){
+			expl = StringUtils.explode(l, ' ');
+			double t = Double.parseDouble(expl[1]);
+			double x = Double.parseDouble(expl[2]);
+			double y = Double.parseDouble(expl[3]);
+			double v = Double.parseDouble(expl[4]);
+			double angle = Double.parseDouble(expl[5]);
+			frame.addVehicle(t, x, y, v, angle);
+			l = br.readLine();
+			
+		}
+		br.close();
+		return frame;
+		
 	}
 
 }

@@ -59,7 +59,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 	
 	public QSimDensityDrawer(Scenario sc) {
 		for (Link l : sc.getNetwork().getLinks().values()) {
-		if (l.getAllowedModes().contains("walk2d")||  l.getCapacity() >= 100000 || l.getFreespeed() > 100 || l.getId().toString().contains("el")) {
+		if (l.getId().toString().contains("jps") ||l.getId().toString().contains("el") || l.getAllowedModes().contains("walk2d")||  l.getCapacity() >= 100000 || l.getFreespeed() > 100 || l.getId().toString().contains("el")) {
 			continue;
 		} 
 
@@ -70,7 +70,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 			width = (float)(l.getNumberOfLanes() * 3.5);
 			isCar = true;
 		} else {
-			width = (float)(l.getCapacity());
+			width = (float)(width);
 		}
 		
 		double dx = l.getToNode().getCoord().getX() - l.getFromNode().getCoord().getX();
@@ -154,7 +154,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, PersonDep
 				p.strokeWeight(li.width);
 			}
 			if (p.zoomer.getZoomScale() <= 5) {
-				p.stroke(li.r,li.g,li.b,li.a);//li.a * fade);
+				p.stroke(li.r,li.g,li.b,128);//li.a * fade);
 			}
 			p.line((float)(li.x0+p.offsetX),(float)-(li.y0+p.offsetY),(float)(li.x1+p.offsetX),(float)-(li.y1+p.offsetY));
 		}

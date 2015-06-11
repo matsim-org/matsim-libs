@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunJupedSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +16,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.gregor;
 
-package playground.gregor.hybridsim.grpc;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-import org.apache.log4j.Logger;
-
-public class RunJupedSim implements Runnable, ExternalSim{
+public class AngleTest {
 	
-	private static final Logger log = Logger.getLogger(RunJupedSim.class);
-	private Process p1;
-	
-	@Override
-	public void run() {
-		try {
-			this.p1 = new ProcessBuilder("/Users/laemmel/svn/jpscore/Release/jupedsim","/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/jps_ini.xml").start();
-			logToLog(this.p1);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public static void main(String [] args) {
+		
+		double x, y;
+		x=0.1; y=1;
+		double angle = getAngle(x,y);
+		System.out.println(angle);
+		x=1; y=0;
+		angle = getAngle(x,y);
+		System.out.println(angle);
+		x=0; y=-1;
+		angle = getAngle(x,y);
+		System.out.println(angle);
+		x=-1; y=0;
+		angle = getAngle(x,y);
+		System.out.println(angle);		
 	}
 
-	private static void logToLog(Process p1) throws IOException {
-		{
-			InputStream is = p1.getInputStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String l = br.readLine();
-			while (l != null) {
-				log.info(l);
-				l = br.readLine();
-			}
+	private static double getAngle(double x, double y) {
+		double angle = Math.atan2(y, x)*180/Math.PI-90.;
+		if (angle < 0) {
+			angle += 360;
+		} else if (angle == 0) {
+			return angle;
 		}
-		{
-			InputStream is = p1.getErrorStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String l = br.readLine();
-			while (l != null) {
-				log.error(l);
-				l = br.readLine();
-			}
-		}
-	}
-
-	@Override
-	public void shutdown() {
-		this.p1.destroy();
+		return 360-angle;
 	}
 
 }

@@ -10,6 +10,7 @@ public class RunAndAnalyze {
 		Constants.EXP_90_DEG = true;
 		ScenGen.main(args);
 		RunMyHybridSim.main(args);
+		
 		Analyzer.main(args);
 	}
 

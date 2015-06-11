@@ -1,5 +1,7 @@
 package playground.gregor.scenariogen.hhw3hybrid;
 
+import org.apache.log4j.Logger;
+
 import playground.gregor.scenariogen.hhw3hybrid.JuPedSimGeomtry.Crossing;
 import playground.gregor.scenariogen.hhw3hybrid.JuPedSimGeomtry.Goal;
 import playground.gregor.scenariogen.hhw3hybrid.JuPedSimGeomtry.Polygon;
@@ -9,6 +11,9 @@ import playground.gregor.scenariogen.hhw3hybrid.JuPedSimGeomtry.Transition;
 import playground.gregor.scenariogen.hhw3hybrid.JuPedSimGeomtry.Vertex;
 
 public class JupedSimGeometryOffsetter {
+	
+	private static final Logger log = Logger.getLogger(JupedSimGeometryOffsetter.class);
+	
 
 	private JuPedSimGeomtry geo;
 
@@ -75,7 +80,8 @@ public class JupedSimGeometryOffsetter {
 				}
 			}
 		}
-		
+			
+		log.info(minX + " " + minY);
 		
 		for (Room r : this.geo.rooms) {
 			for (Subroom s : r.subrooms) {

@@ -174,7 +174,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		for (int x = 0; x <= this.width; x += 128) {
 			for (int y = 0; y <= this.height + 128; y += 128) {
 				PVector d = this.zoomer.getDispToCoord(new PVector(x, y));
-				// coords.add(d);
+				 coords.add(d);
 			}
 		}
 

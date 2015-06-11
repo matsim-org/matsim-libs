@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunJupedSim.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +16,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.gregor.hybridsim.events;
 
-package playground.gregor.hybridsim.grpc;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+public class ExternalAgentConstructEvent extends Event{
 
-import org.apache.log4j.Logger;
-
-public class RunJupedSim implements Runnable, ExternalSim{
+	private Id<Person> id;
+	public ExternalAgentConstructEvent(double time, Id<Person> id) {
+		super(time);
+		this.id = id;
+	}
+	public static final String EVENT_TYPE = "ExternalAgentConstructEvent";
 	
-	private static final Logger log = Logger.getLogger(RunJupedSim.class);
-	private Process p1;
 	
 	@Override
-	public void run() {
-		try {
-			this.p1 = new ProcessBuilder("/Users/laemmel/svn/jpscore/Release/jupedsim","/Users/laemmel/arbeit/papers/2015/trgindia2015/hhwsim/input/jps_ini.xml").start();
-			logToLog(this.p1);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+	public String getEventType() {
+		return EVENT_TYPE;
 	}
-
-	private static void logToLog(Process p1) throws IOException {
-		{
-			InputStream is = p1.getInputStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String l = br.readLine();
-			while (l != null) {
-				log.info(l);
-				l = br.readLine();
-			}
-		}
-		{
-			InputStream is = p1.getErrorStream();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-			String l = br.readLine();
-			while (l != null) {
-				log.error(l);
-				l = br.readLine();
-			}
-		}
-	}
-
-	@Override
-	public void shutdown() {
-		this.p1.destroy();
+	
+	public Id<Person> getId() {
+		return this.id;
 	}
 
 }

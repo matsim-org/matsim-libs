@@ -46,8 +46,7 @@ public final class MATSimInterface {
     }
     private MATSim2ExternPutAgent(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -83,10 +82,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -110,7 +110,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new MATSim2ExternPutAgent(input, extensionRegistry);
+        try {
+          return new MATSim2ExternPutAgent(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -189,8 +198,7 @@ public final class MATSimInterface {
       }
       private Agent(
           com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
         this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -231,10 +239,11 @@ public final class MATSimInterface {
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(this);
+          throw new RuntimeException(e.setUnfinishedMessage(this));
         } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+          throw new RuntimeException(
+              new com.google.protobuf.InvalidProtocolBufferException(
+                  e.getMessage()).setUnfinishedMessage(this));
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -258,7 +267,16 @@ public final class MATSimInterface {
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Agent(input, extensionRegistry);
+          try {
+            return new Agent(input, extensionRegistry);
+          } catch (RuntimeException e) {
+            if (e.getCause() instanceof
+                com.google.protobuf.InvalidProtocolBufferException) {
+              throw (com.google.protobuf.InvalidProtocolBufferException)
+                  e.getCause();
+            }
+            throw e;
+          }
         }
       };
 
@@ -406,7 +424,6 @@ public final class MATSimInterface {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeBytes(1, getIdBytes());
         }
@@ -496,12 +513,17 @@ public final class MATSimInterface {
         return PARSER.parseFrom(input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return new Builder(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent.Agent prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return defaultInstance.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent.Agent prototype) {
+        return defaultInstance.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == defaultInstance
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -877,7 +899,8 @@ public final class MATSimInterface {
       }
 
       // @@protoc_insertion_point(class_scope:org.matsim.hybrid.MATSim2ExternPutAgent.Agent)
-      private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent.Agent defaultInstance;static {
+      private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent.Agent defaultInstance;
+      static {
         defaultInstance = new org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent.Agent();
       }
 
@@ -889,6 +912,8 @@ public final class MATSimInterface {
         return defaultInstance;
       }
 
+      static {
+      }
     }
 
     private int bitField0_;
@@ -925,7 +950,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeMessage(1, getAgent());
       }
@@ -1001,12 +1025,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1257,7 +1286,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.MATSim2ExternPutAgent)
-    private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgent();
     }
 
@@ -1269,6 +1299,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface MATSim2ExternHasSpaceOrBuilder extends
@@ -1311,8 +1343,7 @@ public final class MATSimInterface {
     }
     private MATSim2ExternHasSpace(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -1341,10 +1372,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -1368,7 +1400,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new MATSim2ExternHasSpace(input, extensionRegistry);
+        try {
+          return new MATSim2ExternHasSpace(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -1432,7 +1473,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, getNodeIdBytes());
       }
@@ -1508,12 +1548,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpace prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpace prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -1715,7 +1760,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.MATSim2ExternHasSpace)
-    private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpace defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpace defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpace();
     }
 
@@ -1727,6 +1773,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface MATSim2ExternHasSpaceConfirmedOrBuilder extends
@@ -1764,8 +1812,7 @@ public final class MATSimInterface {
     }
     private MATSim2ExternHasSpaceConfirmed(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -1793,10 +1840,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -1820,7 +1868,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new MATSim2ExternHasSpaceConfirmed(input, extensionRegistry);
+        try {
+          return new MATSim2ExternHasSpaceConfirmed(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -1857,7 +1914,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBool(1, hasSpace_);
       }
@@ -1933,12 +1989,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpaceConfirmed prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpaceConfirmed prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -2094,7 +2155,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.MATSim2ExternHasSpaceConfirmed)
-    private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpaceConfirmed defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpaceConfirmed defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.MATSim2ExternHasSpaceConfirmed();
     }
 
@@ -2106,6 +2168,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface MATSim2ExternPutAgentConfirmedOrBuilder extends
@@ -2133,8 +2197,7 @@ public final class MATSimInterface {
     }
     private MATSim2ExternPutAgentConfirmed(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -2156,10 +2219,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -2183,7 +2247,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new MATSim2ExternPutAgentConfirmed(input, extensionRegistry);
+        try {
+          return new MATSim2ExternPutAgentConfirmed(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -2204,7 +2277,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       unknownFields.writeTo(output);
     }
 
@@ -2273,12 +2345,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -2389,7 +2466,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.MATSim2ExternPutAgentConfirmed)
-    private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.MATSim2ExternPutAgentConfirmed();
     }
 
@@ -2401,6 +2479,1778 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
+  }
+
+  public interface Extern2MATSimTrajectoriesOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.matsim.hybrid.Extern2MATSimTrajectories)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+     */
+    java.util.List<org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent> 
+        getAgentList();
+    /**
+     * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+     */
+    org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent getAgent(int index);
+    /**
+     * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+     */
+    int getAgentCount();
+    /**
+     * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+     */
+    java.util.List<? extends org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.AgentOrBuilder> 
+        getAgentOrBuilderList();
+    /**
+     * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+     */
+    org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.AgentOrBuilder getAgentOrBuilder(
+        int index);
+  }
+  /**
+   * Protobuf type {@code org.matsim.hybrid.Extern2MATSimTrajectories}
+   */
+  public  static final class Extern2MATSimTrajectories extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.matsim.hybrid.Extern2MATSimTrajectories)
+      Extern2MATSimTrajectoriesOrBuilder {
+    // Use Extern2MATSimTrajectories.newBuilder() to construct.
+    private Extern2MATSimTrajectories(com.google.protobuf.GeneratedMessage.Builder builder) {
+      super(builder);
+    }
+    private Extern2MATSimTrajectories() {
+      agent_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Extern2MATSimTrajectories(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 122: {
+              if (!((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+                agent_ = new java.util.ArrayList<org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              agent_.add(input.readMessage(org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.PARSER, extensionRegistry));
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw new RuntimeException(e.setUnfinishedMessage(this));
+      } catch (java.io.IOException e) {
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
+          agent_ = java.util.Collections.unmodifiableList(agent_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.class, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Builder.class);
+    }
+
+    public static final com.google.protobuf.Parser<Extern2MATSimTrajectories> PARSER =
+        new com.google.protobuf.AbstractParser<Extern2MATSimTrajectories>() {
+      public Extern2MATSimTrajectories parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        try {
+          return new Extern2MATSimTrajectories(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Extern2MATSimTrajectories> getParserForType() {
+      return PARSER;
+    }
+
+    public interface AgentOrBuilder extends
+        // @@protoc_insertion_point(interface_extends:org.matsim.hybrid.Extern2MATSimTrajectories.Agent)
+        com.google.protobuf.MessageOrBuilder {
+
+      /**
+       * <code>optional int32 id = 1;</code>
+       */
+      boolean hasId();
+      /**
+       * <code>optional int32 id = 1;</code>
+       */
+      int getId();
+
+      /**
+       * <code>optional double x = 2;</code>
+       */
+      boolean hasX();
+      /**
+       * <code>optional double x = 2;</code>
+       */
+      double getX();
+
+      /**
+       * <code>optional double y = 3;</code>
+       */
+      boolean hasY();
+      /**
+       * <code>optional double y = 3;</code>
+       */
+      double getY();
+
+      /**
+       * <code>optional double z = 4;</code>
+       */
+      boolean hasZ();
+      /**
+       * <code>optional double z = 4;</code>
+       */
+      double getZ();
+
+      /**
+       * <code>optional int32 color = 5;</code>
+       */
+      boolean hasColor();
+      /**
+       * <code>optional int32 color = 5;</code>
+       */
+      int getColor();
+
+      /**
+       * <code>optional double angle = 6;</code>
+       */
+      boolean hasAngle();
+      /**
+       * <code>optional double angle = 6;</code>
+       */
+      double getAngle();
+    }
+    /**
+     * Protobuf type {@code org.matsim.hybrid.Extern2MATSimTrajectories.Agent}
+     */
+    public  static final class Agent extends
+        com.google.protobuf.GeneratedMessage implements
+        // @@protoc_insertion_point(message_implements:org.matsim.hybrid.Extern2MATSimTrajectories.Agent)
+        AgentOrBuilder {
+      // Use Agent.newBuilder() to construct.
+      private Agent(com.google.protobuf.GeneratedMessage.Builder builder) {
+        super(builder);
+      }
+      private Agent() {
+        id_ = 0;
+        x_ = 0D;
+        y_ = 0D;
+        z_ = 0D;
+        color_ = 0;
+        angle_ = 0D;
+      }
+
+      @java.lang.Override
+      public final com.google.protobuf.UnknownFieldSet
+      getUnknownFields() {
+        return this.unknownFields;
+      }
+      private Agent(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+        this();
+        int mutable_bitField0_ = 0;
+        com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+            com.google.protobuf.UnknownFieldSet.newBuilder();
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              default: {
+                if (!parseUnknownField(input, unknownFields,
+                                       extensionRegistry, tag)) {
+                  done = true;
+                }
+                break;
+              }
+              case 8: {
+                bitField0_ |= 0x00000001;
+                id_ = input.readInt32();
+                break;
+              }
+              case 17: {
+                bitField0_ |= 0x00000002;
+                x_ = input.readDouble();
+                break;
+              }
+              case 25: {
+                bitField0_ |= 0x00000004;
+                y_ = input.readDouble();
+                break;
+              }
+              case 33: {
+                bitField0_ |= 0x00000008;
+                z_ = input.readDouble();
+                break;
+              }
+              case 40: {
+                bitField0_ |= 0x00000010;
+                color_ = input.readInt32();
+                break;
+              }
+              case 49: {
+                bitField0_ |= 0x00000020;
+                angle_ = input.readDouble();
+                break;
+              }
+            }
+          }
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw new RuntimeException(e.setUnfinishedMessage(this));
+        } catch (java.io.IOException e) {
+          throw new RuntimeException(
+              new com.google.protobuf.InvalidProtocolBufferException(
+                  e.getMessage()).setUnfinishedMessage(this));
+        } finally {
+          this.unknownFields = unknownFields.build();
+          makeExtensionsImmutable();
+        }
+      }
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_Agent_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_Agent_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.class, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder.class);
+      }
+
+      public static final com.google.protobuf.Parser<Agent> PARSER =
+          new com.google.protobuf.AbstractParser<Agent>() {
+        public Agent parsePartialFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws com.google.protobuf.InvalidProtocolBufferException {
+          try {
+            return new Agent(input, extensionRegistry);
+          } catch (RuntimeException e) {
+            if (e.getCause() instanceof
+                com.google.protobuf.InvalidProtocolBufferException) {
+              throw (com.google.protobuf.InvalidProtocolBufferException)
+                  e.getCause();
+            }
+            throw e;
+          }
+        }
+      };
+
+      @java.lang.Override
+      public com.google.protobuf.Parser<Agent> getParserForType() {
+        return PARSER;
+      }
+
+      private int bitField0_;
+      public static final int ID_FIELD_NUMBER = 1;
+      private int id_;
+      /**
+       * <code>optional int32 id = 1;</code>
+       */
+      public boolean hasId() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>optional int32 id = 1;</code>
+       */
+      public int getId() {
+        return id_;
+      }
+
+      public static final int X_FIELD_NUMBER = 2;
+      private double x_;
+      /**
+       * <code>optional double x = 2;</code>
+       */
+      public boolean hasX() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>optional double x = 2;</code>
+       */
+      public double getX() {
+        return x_;
+      }
+
+      public static final int Y_FIELD_NUMBER = 3;
+      private double y_;
+      /**
+       * <code>optional double y = 3;</code>
+       */
+      public boolean hasY() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional double y = 3;</code>
+       */
+      public double getY() {
+        return y_;
+      }
+
+      public static final int Z_FIELD_NUMBER = 4;
+      private double z_;
+      /**
+       * <code>optional double z = 4;</code>
+       */
+      public boolean hasZ() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional double z = 4;</code>
+       */
+      public double getZ() {
+        return z_;
+      }
+
+      public static final int COLOR_FIELD_NUMBER = 5;
+      private int color_;
+      /**
+       * <code>optional int32 color = 5;</code>
+       */
+      public boolean hasColor() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>optional int32 color = 5;</code>
+       */
+      public int getColor() {
+        return color_;
+      }
+
+      public static final int ANGLE_FIELD_NUMBER = 6;
+      private double angle_;
+      /**
+       * <code>optional double angle = 6;</code>
+       */
+      public boolean hasAngle() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional double angle = 6;</code>
+       */
+      public double getAngle() {
+        return angle_;
+      }
+
+      private byte memoizedIsInitialized = -1;
+      public final boolean isInitialized() {
+        byte isInitialized = memoizedIsInitialized;
+        if (isInitialized == 1) return true;
+        if (isInitialized == 0) return false;
+
+        memoizedIsInitialized = 1;
+        return true;
+      }
+
+      public void writeTo(com.google.protobuf.CodedOutputStream output)
+                          throws java.io.IOException {
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          output.writeInt32(1, id_);
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          output.writeDouble(2, x_);
+        }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          output.writeDouble(3, y_);
+        }
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          output.writeDouble(4, z_);
+        }
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          output.writeInt32(5, color_);
+        }
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          output.writeDouble(6, angle_);
+        }
+        unknownFields.writeTo(output);
+      }
+
+      private int memoizedSerializedSize = -1;
+      public int getSerializedSize() {
+        int size = memoizedSerializedSize;
+        if (size != -1) return size;
+
+        size = 0;
+        if (((bitField0_ & 0x00000001) == 0x00000001)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeInt32Size(1, id_);
+        }
+        if (((bitField0_ & 0x00000002) == 0x00000002)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeDoubleSize(2, x_);
+        }
+        if (((bitField0_ & 0x00000004) == 0x00000004)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeDoubleSize(3, y_);
+        }
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeDoubleSize(4, z_);
+        }
+        if (((bitField0_ & 0x00000010) == 0x00000010)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeInt32Size(5, color_);
+        }
+        if (((bitField0_ & 0x00000020) == 0x00000020)) {
+          size += com.google.protobuf.CodedOutputStream
+            .computeDoubleSize(6, angle_);
+        }
+        size += unknownFields.getSerializedSize();
+        memoizedSerializedSize = size;
+        return size;
+      }
+
+      private static final long serialVersionUID = 0L;
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parseFrom(
+          com.google.protobuf.ByteString data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parseFrom(
+          com.google.protobuf.ByteString data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parseFrom(byte[] data)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data);
+      }
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parseFrom(
+          byte[] data,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return PARSER.parseFrom(data, extensionRegistry);
+      }
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parseFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input);
+      }
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parseFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input, extensionRegistry);
+      }
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parseDelimitedFrom(java.io.InputStream input)
+          throws java.io.IOException {
+        return PARSER.parseDelimitedFrom(input);
+      }
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parseDelimitedFrom(
+          java.io.InputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return PARSER.parseDelimitedFrom(input, extensionRegistry);
+      }
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parseFrom(
+          com.google.protobuf.CodedInputStream input)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input);
+      }
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parseFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        return PARSER.parseFrom(input, extensionRegistry);
+      }
+
+      public Builder newBuilderForType() { return newBuilder(); }
+      public static Builder newBuilder() {
+        return defaultInstance.toBuilder();
+      }
+      public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent prototype) {
+        return defaultInstance.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == defaultInstance
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
+
+      @java.lang.Override
+      protected Builder newBuilderForType(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        Builder builder = new Builder(parent);
+        return builder;
+      }
+      /**
+       * Protobuf type {@code org.matsim.hybrid.Extern2MATSimTrajectories.Agent}
+       */
+      public static final class Builder extends
+          com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+          // @@protoc_insertion_point(builder_implements:org.matsim.hybrid.Extern2MATSimTrajectories.Agent)
+          org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.AgentOrBuilder {
+        public static final com.google.protobuf.Descriptors.Descriptor
+            getDescriptor() {
+          return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_Agent_descriptor;
+        }
+
+        protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+            internalGetFieldAccessorTable() {
+          return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_Agent_fieldAccessorTable
+              .ensureFieldAccessorsInitialized(
+                  org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.class, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder.class);
+        }
+
+        // Construct using org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.newBuilder()
+        private Builder() {
+          maybeForceBuilderInitialization();
+        }
+
+        private Builder(
+            com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+          super(parent);
+          maybeForceBuilderInitialization();
+        }
+        private void maybeForceBuilderInitialization() {
+          if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          }
+        }
+        public Builder clear() {
+          super.clear();
+          id_ = 0;
+          bitField0_ = (bitField0_ & ~0x00000001);
+          x_ = 0D;
+          bitField0_ = (bitField0_ & ~0x00000002);
+          y_ = 0D;
+          bitField0_ = (bitField0_ & ~0x00000004);
+          z_ = 0D;
+          bitField0_ = (bitField0_ & ~0x00000008);
+          color_ = 0;
+          bitField0_ = (bitField0_ & ~0x00000010);
+          angle_ = 0D;
+          bitField0_ = (bitField0_ & ~0x00000020);
+          return this;
+        }
+
+        public com.google.protobuf.Descriptors.Descriptor
+            getDescriptorForType() {
+          return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_Agent_descriptor;
+        }
+
+        public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent getDefaultInstanceForType() {
+          return org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.getDefaultInstance();
+        }
+
+        public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent build() {
+          org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent result = buildPartial();
+          if (!result.isInitialized()) {
+            throw newUninitializedMessageException(result);
+          }
+          return result;
+        }
+
+        public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent buildPartial() {
+          org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent result = new org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent(this);
+          int from_bitField0_ = bitField0_;
+          int to_bitField0_ = 0;
+          if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+            to_bitField0_ |= 0x00000001;
+          }
+          result.id_ = id_;
+          if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+            to_bitField0_ |= 0x00000002;
+          }
+          result.x_ = x_;
+          if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+            to_bitField0_ |= 0x00000004;
+          }
+          result.y_ = y_;
+          if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+            to_bitField0_ |= 0x00000008;
+          }
+          result.z_ = z_;
+          if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+            to_bitField0_ |= 0x00000010;
+          }
+          result.color_ = color_;
+          if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+            to_bitField0_ |= 0x00000020;
+          }
+          result.angle_ = angle_;
+          result.bitField0_ = to_bitField0_;
+          onBuilt();
+          return result;
+        }
+
+        public Builder mergeFrom(com.google.protobuf.Message other) {
+          if (other instanceof org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent) {
+            return mergeFrom((org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent)other);
+          } else {
+            super.mergeFrom(other);
+            return this;
+          }
+        }
+
+        public Builder mergeFrom(org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent other) {
+          if (other == org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.getDefaultInstance()) return this;
+          if (other.hasId()) {
+            setId(other.getId());
+          }
+          if (other.hasX()) {
+            setX(other.getX());
+          }
+          if (other.hasY()) {
+            setY(other.getY());
+          }
+          if (other.hasZ()) {
+            setZ(other.getZ());
+          }
+          if (other.hasColor()) {
+            setColor(other.getColor());
+          }
+          if (other.hasAngle()) {
+            setAngle(other.getAngle());
+          }
+          this.mergeUnknownFields(other.unknownFields);
+          onChanged();
+          return this;
+        }
+
+        public final boolean isInitialized() {
+          return true;
+        }
+
+        public Builder mergeFrom(
+            com.google.protobuf.CodedInputStream input,
+            com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+            throws java.io.IOException {
+          org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent parsedMessage = null;
+          try {
+            parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+          } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+            parsedMessage = (org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent) e.getUnfinishedMessage();
+            throw e;
+          } finally {
+            if (parsedMessage != null) {
+              mergeFrom(parsedMessage);
+            }
+          }
+          return this;
+        }
+        private int bitField0_;
+
+        private int id_ ;
+        /**
+         * <code>optional int32 id = 1;</code>
+         */
+        public boolean hasId() {
+          return ((bitField0_ & 0x00000001) == 0x00000001);
+        }
+        /**
+         * <code>optional int32 id = 1;</code>
+         */
+        public int getId() {
+          return id_;
+        }
+        /**
+         * <code>optional int32 id = 1;</code>
+         */
+        public Builder setId(int value) {
+          bitField0_ |= 0x00000001;
+          id_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional int32 id = 1;</code>
+         */
+        public Builder clearId() {
+          bitField0_ = (bitField0_ & ~0x00000001);
+          id_ = 0;
+          onChanged();
+          return this;
+        }
+
+        private double x_ ;
+        /**
+         * <code>optional double x = 2;</code>
+         */
+        public boolean hasX() {
+          return ((bitField0_ & 0x00000002) == 0x00000002);
+        }
+        /**
+         * <code>optional double x = 2;</code>
+         */
+        public double getX() {
+          return x_;
+        }
+        /**
+         * <code>optional double x = 2;</code>
+         */
+        public Builder setX(double value) {
+          bitField0_ |= 0x00000002;
+          x_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional double x = 2;</code>
+         */
+        public Builder clearX() {
+          bitField0_ = (bitField0_ & ~0x00000002);
+          x_ = 0D;
+          onChanged();
+          return this;
+        }
+
+        private double y_ ;
+        /**
+         * <code>optional double y = 3;</code>
+         */
+        public boolean hasY() {
+          return ((bitField0_ & 0x00000004) == 0x00000004);
+        }
+        /**
+         * <code>optional double y = 3;</code>
+         */
+        public double getY() {
+          return y_;
+        }
+        /**
+         * <code>optional double y = 3;</code>
+         */
+        public Builder setY(double value) {
+          bitField0_ |= 0x00000004;
+          y_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional double y = 3;</code>
+         */
+        public Builder clearY() {
+          bitField0_ = (bitField0_ & ~0x00000004);
+          y_ = 0D;
+          onChanged();
+          return this;
+        }
+
+        private double z_ ;
+        /**
+         * <code>optional double z = 4;</code>
+         */
+        public boolean hasZ() {
+          return ((bitField0_ & 0x00000008) == 0x00000008);
+        }
+        /**
+         * <code>optional double z = 4;</code>
+         */
+        public double getZ() {
+          return z_;
+        }
+        /**
+         * <code>optional double z = 4;</code>
+         */
+        public Builder setZ(double value) {
+          bitField0_ |= 0x00000008;
+          z_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional double z = 4;</code>
+         */
+        public Builder clearZ() {
+          bitField0_ = (bitField0_ & ~0x00000008);
+          z_ = 0D;
+          onChanged();
+          return this;
+        }
+
+        private int color_ ;
+        /**
+         * <code>optional int32 color = 5;</code>
+         */
+        public boolean hasColor() {
+          return ((bitField0_ & 0x00000010) == 0x00000010);
+        }
+        /**
+         * <code>optional int32 color = 5;</code>
+         */
+        public int getColor() {
+          return color_;
+        }
+        /**
+         * <code>optional int32 color = 5;</code>
+         */
+        public Builder setColor(int value) {
+          bitField0_ |= 0x00000010;
+          color_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional int32 color = 5;</code>
+         */
+        public Builder clearColor() {
+          bitField0_ = (bitField0_ & ~0x00000010);
+          color_ = 0;
+          onChanged();
+          return this;
+        }
+
+        private double angle_ ;
+        /**
+         * <code>optional double angle = 6;</code>
+         */
+        public boolean hasAngle() {
+          return ((bitField0_ & 0x00000020) == 0x00000020);
+        }
+        /**
+         * <code>optional double angle = 6;</code>
+         */
+        public double getAngle() {
+          return angle_;
+        }
+        /**
+         * <code>optional double angle = 6;</code>
+         */
+        public Builder setAngle(double value) {
+          bitField0_ |= 0x00000020;
+          angle_ = value;
+          onChanged();
+          return this;
+        }
+        /**
+         * <code>optional double angle = 6;</code>
+         */
+        public Builder clearAngle() {
+          bitField0_ = (bitField0_ & ~0x00000020);
+          angle_ = 0D;
+          onChanged();
+          return this;
+        }
+
+        // @@protoc_insertion_point(builder_scope:org.matsim.hybrid.Extern2MATSimTrajectories.Agent)
+      }
+
+      // @@protoc_insertion_point(class_scope:org.matsim.hybrid.Extern2MATSimTrajectories.Agent)
+      private static final org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent defaultInstance;
+      static {
+        defaultInstance = new org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent();
+      }
+
+      public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent getDefaultInstance() {
+        return defaultInstance;
+      }
+
+      public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent getDefaultInstanceForType() {
+        return defaultInstance;
+      }
+
+      static {
+      }
+    }
+
+    public static final int AGENT_FIELD_NUMBER = 15;
+    private java.util.List<org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent> agent_;
+    /**
+     * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+     */
+    public java.util.List<org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent> getAgentList() {
+      return agent_;
+    }
+    /**
+     * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+     */
+    public java.util.List<? extends org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.AgentOrBuilder> 
+        getAgentOrBuilderList() {
+      return agent_;
+    }
+    /**
+     * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+     */
+    public int getAgentCount() {
+      return agent_.size();
+    }
+    /**
+     * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+     */
+    public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent getAgent(int index) {
+      return agent_.get(index);
+    }
+    /**
+     * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+     */
+    public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.AgentOrBuilder getAgentOrBuilder(
+        int index) {
+      return agent_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < agent_.size(); i++) {
+        output.writeMessage(15, agent_.get(i));
+      }
+      unknownFields.writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < agent_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(15, agent_.get(i));
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
+    }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.matsim.hybrid.Extern2MATSimTrajectories}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.matsim.hybrid.Extern2MATSimTrajectories)
+        org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectoriesOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.class, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Builder.class);
+      }
+
+      // Construct using org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+          getAgentFieldBuilder();
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        if (agentBuilder_ == null) {
+          agent_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          agentBuilder_.clear();
+        }
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_descriptor;
+      }
+
+      public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories getDefaultInstanceForType() {
+        return org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.getDefaultInstance();
+      }
+
+      public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories build() {
+        org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories buildPartial() {
+        org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories result = new org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories(this);
+        int from_bitField0_ = bitField0_;
+        if (agentBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) == 0x00000001)) {
+            agent_ = java.util.Collections.unmodifiableList(agent_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.agent_ = agent_;
+        } else {
+          result.agent_ = agentBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories) {
+          return mergeFrom((org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories other) {
+        if (other == org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.getDefaultInstance()) return this;
+        if (agentBuilder_ == null) {
+          if (!other.agent_.isEmpty()) {
+            if (agent_.isEmpty()) {
+              agent_ = other.agent_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureAgentIsMutable();
+              agent_.addAll(other.agent_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.agent_.isEmpty()) {
+            if (agentBuilder_.isEmpty()) {
+              agentBuilder_.dispose();
+              agentBuilder_ = null;
+              agent_ = other.agent_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              agentBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   getAgentFieldBuilder() : null;
+            } else {
+              agentBuilder_.addAllMessages(other.agent_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent> agent_ =
+        java.util.Collections.emptyList();
+      private void ensureAgentIsMutable() {
+        if (!((bitField0_ & 0x00000001) == 0x00000001)) {
+          agent_ = new java.util.ArrayList<org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent>(agent_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.AgentOrBuilder> agentBuilder_;
+
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public java.util.List<org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent> getAgentList() {
+        if (agentBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(agent_);
+        } else {
+          return agentBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public int getAgentCount() {
+        if (agentBuilder_ == null) {
+          return agent_.size();
+        } else {
+          return agentBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent getAgent(int index) {
+        if (agentBuilder_ == null) {
+          return agent_.get(index);
+        } else {
+          return agentBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public Builder setAgent(
+          int index, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent value) {
+        if (agentBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAgentIsMutable();
+          agent_.set(index, value);
+          onChanged();
+        } else {
+          agentBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public Builder setAgent(
+          int index, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder builderForValue) {
+        if (agentBuilder_ == null) {
+          ensureAgentIsMutable();
+          agent_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          agentBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public Builder addAgent(org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent value) {
+        if (agentBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAgentIsMutable();
+          agent_.add(value);
+          onChanged();
+        } else {
+          agentBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public Builder addAgent(
+          int index, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent value) {
+        if (agentBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAgentIsMutable();
+          agent_.add(index, value);
+          onChanged();
+        } else {
+          agentBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public Builder addAgent(
+          org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder builderForValue) {
+        if (agentBuilder_ == null) {
+          ensureAgentIsMutable();
+          agent_.add(builderForValue.build());
+          onChanged();
+        } else {
+          agentBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public Builder addAgent(
+          int index, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder builderForValue) {
+        if (agentBuilder_ == null) {
+          ensureAgentIsMutable();
+          agent_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          agentBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public Builder addAllAgent(
+          java.lang.Iterable<? extends org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent> values) {
+        if (agentBuilder_ == null) {
+          ensureAgentIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, agent_);
+          onChanged();
+        } else {
+          agentBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public Builder clearAgent() {
+        if (agentBuilder_ == null) {
+          agent_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          agentBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public Builder removeAgent(int index) {
+        if (agentBuilder_ == null) {
+          ensureAgentIsMutable();
+          agent_.remove(index);
+          onChanged();
+        } else {
+          agentBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder getAgentBuilder(
+          int index) {
+        return getAgentFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.AgentOrBuilder getAgentOrBuilder(
+          int index) {
+        if (agentBuilder_ == null) {
+          return agent_.get(index);  } else {
+          return agentBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public java.util.List<? extends org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.AgentOrBuilder> 
+           getAgentOrBuilderList() {
+        if (agentBuilder_ != null) {
+          return agentBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(agent_);
+        }
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder addAgentBuilder() {
+        return getAgentFieldBuilder().addBuilder(
+            org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder addAgentBuilder(
+          int index) {
+        return getAgentFieldBuilder().addBuilder(
+            index, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .org.matsim.hybrid.Extern2MATSimTrajectories.Agent agent = 15;</code>
+       */
+      public java.util.List<org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder> 
+           getAgentBuilderList() {
+        return getAgentFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.AgentOrBuilder> 
+          getAgentFieldBuilder() {
+        if (agentBuilder_ == null) {
+          agentBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.Agent.Builder, org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories.AgentOrBuilder>(
+                  agent_,
+                  ((bitField0_ & 0x00000001) == 0x00000001),
+                  getParentForChildren(),
+                  isClean());
+          agent_ = null;
+        }
+        return agentBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.matsim.hybrid.Extern2MATSimTrajectories)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.matsim.hybrid.Extern2MATSimTrajectories)
+    private static final org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories defaultInstance;
+    static {
+      defaultInstance = new org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories();
+    }
+
+    public static org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public org.matsim.hybrid.MATSimInterface.Extern2MATSimTrajectories getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    static {
+    }
+  }
+
+  public interface MATSim2ExternTrajectoriesReceivedOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:org.matsim.hybrid.MATSim2ExternTrajectoriesReceived)
+      com.google.protobuf.MessageOrBuilder {
+  }
+  /**
+   * Protobuf type {@code org.matsim.hybrid.MATSim2ExternTrajectoriesReceived}
+   */
+  public  static final class MATSim2ExternTrajectoriesReceived extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:org.matsim.hybrid.MATSim2ExternTrajectoriesReceived)
+      MATSim2ExternTrajectoriesReceivedOrBuilder {
+    // Use MATSim2ExternTrajectoriesReceived.newBuilder() to construct.
+    private MATSim2ExternTrajectoriesReceived(com.google.protobuf.GeneratedMessage.Builder builder) {
+      super(builder);
+    }
+    private MATSim2ExternTrajectoriesReceived() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private MATSim2ExternTrajectoriesReceived(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
+      this();
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw new RuntimeException(e.setUnfinishedMessage(this));
+      } catch (java.io.IOException e) {
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_MATSim2ExternTrajectoriesReceived_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_MATSim2ExternTrajectoriesReceived_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived.class, org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived.Builder.class);
+    }
+
+    public static final com.google.protobuf.Parser<MATSim2ExternTrajectoriesReceived> PARSER =
+        new com.google.protobuf.AbstractParser<MATSim2ExternTrajectoriesReceived>() {
+      public MATSim2ExternTrajectoriesReceived parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        try {
+          return new MATSim2ExternTrajectoriesReceived(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<MATSim2ExternTrajectoriesReceived> getParserForType() {
+      return PARSER;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      unknownFields.writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      size += unknownFields.getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
+    }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code org.matsim.hybrid.MATSim2ExternTrajectoriesReceived}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:org.matsim.hybrid.MATSim2ExternTrajectoriesReceived)
+        org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceivedOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_MATSim2ExternTrajectoriesReceived_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_MATSim2ExternTrajectoriesReceived_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived.class, org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived.Builder.class);
+      }
+
+      // Construct using org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      public Builder clear() {
+        super.clear();
+        return this;
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.matsim.hybrid.MATSimInterface.internal_static_org_matsim_hybrid_MATSim2ExternTrajectoriesReceived_descriptor;
+      }
+
+      public org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived getDefaultInstanceForType() {
+        return org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived.getDefaultInstance();
+      }
+
+      public org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived build() {
+        org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived buildPartial() {
+        org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived result = new org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived(this);
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived) {
+          return mergeFrom((org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived other) {
+        if (other == org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived.getDefaultInstance()) return this;
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:org.matsim.hybrid.MATSim2ExternTrajectoriesReceived)
+    }
+
+    // @@protoc_insertion_point(class_scope:org.matsim.hybrid.MATSim2ExternTrajectoriesReceived)
+    private static final org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived defaultInstance;
+    static {
+      defaultInstance = new org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived();
+    }
+
+    public static org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public org.matsim.hybrid.MATSimInterface.MATSim2ExternTrajectoriesReceived getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    static {
+    }
   }
 
   public interface Extern2MATSimOrBuilder extends
@@ -2441,8 +4291,7 @@ public final class MATSimInterface {
     }
     private Extern2MATSim(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -2478,10 +4327,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -2505,7 +4355,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Extern2MATSim(input, extensionRegistry);
+        try {
+          return new Extern2MATSim(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -2569,8 +4428,7 @@ public final class MATSimInterface {
       }
       private Agent(
           com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
         this();
         int mutable_bitField0_ = 0;
         com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -2605,10 +4463,11 @@ public final class MATSimInterface {
             }
           }
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(this);
+          throw new RuntimeException(e.setUnfinishedMessage(this));
         } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(
-              e.getMessage()).setUnfinishedMessage(this);
+          throw new RuntimeException(
+              new com.google.protobuf.InvalidProtocolBufferException(
+                  e.getMessage()).setUnfinishedMessage(this));
         } finally {
           this.unknownFields = unknownFields.build();
           makeExtensionsImmutable();
@@ -2632,7 +4491,16 @@ public final class MATSimInterface {
             com.google.protobuf.CodedInputStream input,
             com.google.protobuf.ExtensionRegistryLite extensionRegistry)
             throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Agent(input, extensionRegistry);
+          try {
+            return new Agent(input, extensionRegistry);
+          } catch (RuntimeException e) {
+            if (e.getCause() instanceof
+                com.google.protobuf.InvalidProtocolBufferException) {
+              throw (com.google.protobuf.InvalidProtocolBufferException)
+                  e.getCause();
+            }
+            throw e;
+          }
         }
       };
 
@@ -2738,7 +4606,6 @@ public final class MATSimInterface {
 
       public void writeTo(com.google.protobuf.CodedOutputStream output)
                           throws java.io.IOException {
-        getSerializedSize();
         if (((bitField0_ & 0x00000001) == 0x00000001)) {
           output.writeBytes(1, getIdBytes());
         }
@@ -2821,12 +4688,17 @@ public final class MATSimInterface {
         return PARSER.parseFrom(input, extensionRegistry);
       }
 
-      public static Builder newBuilder() { return new Builder(); }
       public Builder newBuilderForType() { return newBuilder(); }
-      public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.Extern2MATSim.Agent prototype) {
-        return newBuilder().mergeFrom(prototype);
+      public static Builder newBuilder() {
+        return defaultInstance.toBuilder();
       }
-      public Builder toBuilder() { return newBuilder(this); }
+      public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.Extern2MATSim.Agent prototype) {
+        return defaultInstance.toBuilder().mergeFrom(prototype);
+      }
+      public Builder toBuilder() {
+        return this == defaultInstance
+            ? new Builder() : new Builder().mergeFrom(this);
+      }
 
       @java.lang.Override
       protected Builder newBuilderForType(
@@ -3115,7 +4987,8 @@ public final class MATSimInterface {
       }
 
       // @@protoc_insertion_point(class_scope:org.matsim.hybrid.Extern2MATSim.Agent)
-      private static final org.matsim.hybrid.MATSimInterface.Extern2MATSim.Agent defaultInstance;static {
+      private static final org.matsim.hybrid.MATSimInterface.Extern2MATSim.Agent defaultInstance;
+      static {
         defaultInstance = new org.matsim.hybrid.MATSimInterface.Extern2MATSim.Agent();
       }
 
@@ -3127,6 +5000,8 @@ public final class MATSimInterface {
         return defaultInstance;
       }
 
+      static {
+      }
     }
 
     private int bitField0_;
@@ -3163,7 +5038,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeMessage(1, getAgent());
       }
@@ -3239,12 +5113,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.Extern2MATSim prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.Extern2MATSim prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -3495,7 +5374,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.Extern2MATSim)
-    private static final org.matsim.hybrid.MATSimInterface.Extern2MATSim defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.Extern2MATSim defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.Extern2MATSim();
     }
 
@@ -3507,6 +5387,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface Extern2MATSimConfirmedOrBuilder extends
@@ -3544,8 +5426,7 @@ public final class MATSimInterface {
     }
     private Extern2MATSimConfirmed(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -3573,10 +5454,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -3600,7 +5482,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new Extern2MATSimConfirmed(input, extensionRegistry);
+        try {
+          return new Extern2MATSimConfirmed(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -3637,7 +5528,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBool(1, accepted_);
       }
@@ -3713,12 +5603,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.Extern2MATSimConfirmed prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.Extern2MATSimConfirmed prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -3874,7 +5769,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.Extern2MATSimConfirmed)
-    private static final org.matsim.hybrid.MATSimInterface.Extern2MATSimConfirmed defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.Extern2MATSimConfirmed defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.Extern2MATSimConfirmed();
     }
 
@@ -3886,6 +5782,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface ExternSimStepFinishedOrBuilder extends
@@ -3923,8 +5821,7 @@ public final class MATSimInterface {
     }
     private ExternSimStepFinished(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -3952,10 +5849,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -3979,7 +5877,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExternSimStepFinished(input, extensionRegistry);
+        try {
+          return new ExternSimStepFinished(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -4016,7 +5923,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeDouble(1, time_);
       }
@@ -4092,12 +5998,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternSimStepFinished prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternSimStepFinished prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -4253,7 +6164,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.ExternSimStepFinished)
-    private static final org.matsim.hybrid.MATSimInterface.ExternSimStepFinished defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.ExternSimStepFinished defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.ExternSimStepFinished();
     }
 
@@ -4265,6 +6177,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface ExternSimStepFinishedReceivedOrBuilder extends
@@ -4292,8 +6206,7 @@ public final class MATSimInterface {
     }
     private ExternSimStepFinishedReceived(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -4315,10 +6228,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -4342,7 +6256,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExternSimStepFinishedReceived(input, extensionRegistry);
+        try {
+          return new ExternSimStepFinishedReceived(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -4363,7 +6286,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       unknownFields.writeTo(output);
     }
 
@@ -4432,12 +6354,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternSimStepFinishedReceived prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternSimStepFinishedReceived prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -4548,7 +6475,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.ExternSimStepFinishedReceived)
-    private static final org.matsim.hybrid.MATSimInterface.ExternSimStepFinishedReceived defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.ExternSimStepFinishedReceived defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.ExternSimStepFinishedReceived();
     }
 
@@ -4560,6 +6488,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface ExternDoSimStepOrBuilder extends
@@ -4607,8 +6537,7 @@ public final class MATSimInterface {
     }
     private ExternDoSimStep(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -4641,10 +6570,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -4668,7 +6598,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExternDoSimStep(input, extensionRegistry);
+        try {
+          return new ExternDoSimStep(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -4720,7 +6659,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeDouble(1, fromTime_);
       }
@@ -4803,12 +6741,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternDoSimStep prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternDoSimStep prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -5005,7 +6948,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.ExternDoSimStep)
-    private static final org.matsim.hybrid.MATSimInterface.ExternDoSimStep defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.ExternDoSimStep defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.ExternDoSimStep();
     }
 
@@ -5017,6 +6961,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface ExternDoSimStepReceivedOrBuilder extends
@@ -5044,8 +6990,7 @@ public final class MATSimInterface {
     }
     private ExternDoSimStepReceived(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -5067,10 +7012,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -5094,7 +7040,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExternDoSimStepReceived(input, extensionRegistry);
+        try {
+          return new ExternDoSimStepReceived(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -5115,7 +7070,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       unknownFields.writeTo(output);
     }
 
@@ -5184,12 +7138,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternDoSimStepReceived prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternDoSimStepReceived prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -5300,7 +7259,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.ExternDoSimStepReceived)
-    private static final org.matsim.hybrid.MATSimInterface.ExternDoSimStepReceived defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.ExternDoSimStepReceived defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.ExternDoSimStepReceived();
     }
 
@@ -5312,6 +7272,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface ExternalConnectOrBuilder extends
@@ -5364,8 +7326,7 @@ public final class MATSimInterface {
     }
     private ExternalConnect(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -5399,10 +7360,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -5426,7 +7388,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExternalConnect(input, extensionRegistry);
+        try {
+          return new ExternalConnect(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -5505,7 +7476,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeBytes(1, getHostBytes());
       }
@@ -5588,12 +7558,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternalConnect prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternalConnect prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -5836,7 +7811,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.ExternalConnect)
-    private static final org.matsim.hybrid.MATSimInterface.ExternalConnect defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.ExternalConnect defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.ExternalConnect();
     }
 
@@ -5848,6 +7824,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface ExternalConnectConfirmedOrBuilder extends
@@ -5875,8 +7853,7 @@ public final class MATSimInterface {
     }
     private ExternalConnectConfirmed(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -5898,10 +7875,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -5925,7 +7903,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExternalConnectConfirmed(input, extensionRegistry);
+        try {
+          return new ExternalConnectConfirmed(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -5946,7 +7933,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       unknownFields.writeTo(output);
     }
 
@@ -6015,12 +8001,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternalConnectConfirmed prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternalConnectConfirmed prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -6131,7 +8122,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.ExternalConnectConfirmed)
-    private static final org.matsim.hybrid.MATSimInterface.ExternalConnectConfirmed defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.ExternalConnectConfirmed defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.ExternalConnectConfirmed();
     }
 
@@ -6143,6 +8135,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface ExternOnPrepareSimOrBuilder extends
@@ -6170,8 +8164,7 @@ public final class MATSimInterface {
     }
     private ExternOnPrepareSim(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -6193,10 +8186,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -6220,7 +8214,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExternOnPrepareSim(input, extensionRegistry);
+        try {
+          return new ExternOnPrepareSim(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -6241,7 +8244,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       unknownFields.writeTo(output);
     }
 
@@ -6310,12 +8312,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternOnPrepareSim prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternOnPrepareSim prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -6426,7 +8433,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.ExternOnPrepareSim)
-    private static final org.matsim.hybrid.MATSimInterface.ExternOnPrepareSim defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.ExternOnPrepareSim defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.ExternOnPrepareSim();
     }
 
@@ -6438,6 +8446,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface ExternOnPrepareSimConfirmedOrBuilder extends
@@ -6465,8 +8475,7 @@ public final class MATSimInterface {
     }
     private ExternOnPrepareSimConfirmed(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -6488,10 +8497,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -6515,7 +8525,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExternOnPrepareSimConfirmed(input, extensionRegistry);
+        try {
+          return new ExternOnPrepareSimConfirmed(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -6536,7 +8555,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       unknownFields.writeTo(output);
     }
 
@@ -6605,12 +8623,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternOnPrepareSimConfirmed prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternOnPrepareSimConfirmed prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -6721,7 +8744,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.ExternOnPrepareSimConfirmed)
-    private static final org.matsim.hybrid.MATSimInterface.ExternOnPrepareSimConfirmed defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.ExternOnPrepareSimConfirmed defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.ExternOnPrepareSimConfirmed();
     }
 
@@ -6733,6 +8757,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface ExternAfterSimOrBuilder extends
@@ -6760,8 +8786,7 @@ public final class MATSimInterface {
     }
     private ExternAfterSim(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -6783,10 +8808,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -6810,7 +8836,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExternAfterSim(input, extensionRegistry);
+        try {
+          return new ExternAfterSim(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -6831,7 +8866,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       unknownFields.writeTo(output);
     }
 
@@ -6900,12 +8934,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternAfterSim prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternAfterSim prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -7016,7 +9055,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.ExternAfterSim)
-    private static final org.matsim.hybrid.MATSimInterface.ExternAfterSim defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.ExternAfterSim defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.ExternAfterSim();
     }
 
@@ -7028,6 +9068,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface ExternAfterSimConfirmedOrBuilder extends
@@ -7055,8 +9097,7 @@ public final class MATSimInterface {
     }
     private ExternAfterSimConfirmed(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -7078,10 +9119,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -7105,7 +9147,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExternAfterSimConfirmed(input, extensionRegistry);
+        try {
+          return new ExternAfterSimConfirmed(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -7126,7 +9177,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       unknownFields.writeTo(output);
     }
 
@@ -7195,12 +9245,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -7311,7 +9366,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.ExternAfterSimConfirmed)
-    private static final org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.ExternAfterSimConfirmed();
     }
 
@@ -7323,6 +9379,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface AgentsStuckOrBuilder extends
@@ -7370,8 +9428,7 @@ public final class MATSimInterface {
     }
     private AgentsStuck(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -7403,10 +9460,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
           agentId_ = agentId_.getUnmodifiableView();
@@ -7433,7 +9491,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new AgentsStuck(input, extensionRegistry);
+        try {
+          return new AgentsStuck(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -7483,7 +9550,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       for (int i = 0; i < agentId_.size(); i++) {
         output.writeBytes(1, agentId_.getByteString(i));
       }
@@ -7564,12 +9630,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.AgentsStuck prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.AgentsStuck prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -7792,7 +9863,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.AgentsStuck)
-    private static final org.matsim.hybrid.MATSimInterface.AgentsStuck defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.AgentsStuck defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.AgentsStuck();
     }
 
@@ -7804,6 +9876,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface AgentsStuckConfirmedOrBuilder extends
@@ -7831,8 +9905,7 @@ public final class MATSimInterface {
     }
     private AgentsStuckConfirmed(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -7854,10 +9927,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -7881,7 +9955,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new AgentsStuckConfirmed(input, extensionRegistry);
+        try {
+          return new AgentsStuckConfirmed(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -7902,7 +9985,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       unknownFields.writeTo(output);
     }
 
@@ -7971,12 +10053,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.AgentsStuckConfirmed prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.AgentsStuckConfirmed prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -8087,7 +10174,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.AgentsStuckConfirmed)
-    private static final org.matsim.hybrid.MATSimInterface.AgentsStuckConfirmed defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.AgentsStuckConfirmed defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.AgentsStuckConfirmed();
     }
 
@@ -8099,6 +10187,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface MaximumNumberOfAgentsOrBuilder extends
@@ -8126,8 +10216,7 @@ public final class MATSimInterface {
     }
     private MaximumNumberOfAgents(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
           com.google.protobuf.UnknownFieldSet.newBuilder();
@@ -8149,10 +10238,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -8176,7 +10266,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new MaximumNumberOfAgents(input, extensionRegistry);
+        try {
+          return new MaximumNumberOfAgents(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -8197,7 +10296,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       unknownFields.writeTo(output);
     }
 
@@ -8266,12 +10364,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -8382,7 +10485,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.MaximumNumberOfAgents)
-    private static final org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgents();
     }
 
@@ -8394,6 +10498,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   public interface MaximumNumberOfAgentsConfirmedOrBuilder extends
@@ -8431,8 +10537,7 @@ public final class MATSimInterface {
     }
     private MaximumNumberOfAgentsConfirmed(
         com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry) {
       this();
       int mutable_bitField0_ = 0;
       com.google.protobuf.UnknownFieldSet.Builder unknownFields =
@@ -8460,10 +10565,11 @@ public final class MATSimInterface {
           }
         }
       } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
+        throw new RuntimeException(e.setUnfinishedMessage(this));
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e.getMessage()).setUnfinishedMessage(this);
+        throw new RuntimeException(
+            new com.google.protobuf.InvalidProtocolBufferException(
+                e.getMessage()).setUnfinishedMessage(this));
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -8487,7 +10593,16 @@ public final class MATSimInterface {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new MaximumNumberOfAgentsConfirmed(input, extensionRegistry);
+        try {
+          return new MaximumNumberOfAgentsConfirmed(input, extensionRegistry);
+        } catch (RuntimeException e) {
+          if (e.getCause() instanceof
+              com.google.protobuf.InvalidProtocolBufferException) {
+            throw (com.google.protobuf.InvalidProtocolBufferException)
+                e.getCause();
+          }
+          throw e;
+        }
       }
     };
 
@@ -8524,7 +10639,6 @@ public final class MATSimInterface {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         output.writeInt32(1, number_);
       }
@@ -8600,12 +10714,17 @@ public final class MATSimInterface {
       return PARSER.parseFrom(input, extensionRegistry);
     }
 
-    public static Builder newBuilder() { return new Builder(); }
     public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed prototype) {
-      return newBuilder().mergeFrom(prototype);
+    public static Builder newBuilder() {
+      return defaultInstance.toBuilder();
     }
-    public Builder toBuilder() { return newBuilder(this); }
+    public static Builder newBuilder(org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed prototype) {
+      return defaultInstance.toBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() {
+      return this == defaultInstance
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
 
     @java.lang.Override
     protected Builder newBuilderForType(
@@ -8761,7 +10880,8 @@ public final class MATSimInterface {
     }
 
     // @@protoc_insertion_point(class_scope:org.matsim.hybrid.MaximumNumberOfAgentsConfirmed)
-    private static final org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed defaultInstance;static {
+    private static final org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed defaultInstance;
+    static {
       defaultInstance = new org.matsim.hybrid.MATSimInterface.MaximumNumberOfAgentsConfirmed();
     }
 
@@ -8773,6 +10893,8 @@ public final class MATSimInterface {
       return defaultInstance;
     }
 
+    static {
+    }
   }
 
   private static final com.google.protobuf.Descriptors.Descriptor
@@ -8800,6 +10922,21 @@ public final class MATSimInterface {
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_org_matsim_hybrid_MATSim2ExternPutAgentConfirmed_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_Agent_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_Agent_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_org_matsim_hybrid_MATSim2ExternTrajectoriesReceived_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_org_matsim_hybrid_MATSim2ExternTrajectoriesReceived_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_org_matsim_hybrid_Extern2MATSim_descriptor;
   private static
@@ -8901,52 +11038,60 @@ public final class MATSimInterface {
       "rNode\030\002 \001(\t\022\021\n\tleaveNode\030\003 \001(\t\"\'\n\025MATSim" +
       "2ExternHasSpace\022\016\n\006nodeId\030\001 \001(\t\"2\n\036MATSi" +
       "m2ExternHasSpaceConfirmed\022\020\n\010hasSpace\030\001 " +
-      "\001(\010\" \n\036MATSim2ExternPutAgentConfirmed\"n\n" +
-      "\rExtern2MATSim\0225\n\005agent\030\001 \001(\0132&.org.mats" +
-      "im.hybrid.Extern2MATSim.Agent\032&\n\005Agent\022\n",
-      "\n\002id\030\001 \001(\t\022\021\n\tleaveNode\030\002 \001(\t\"*\n\026Extern2" +
-      "MATSimConfirmed\022\020\n\010accepted\030\001 \001(\010\"%\n\025Ext" +
-      "ernSimStepFinished\022\014\n\004time\030\001 \001(\001\"\037\n\035Exte" +
-      "rnSimStepFinishedReceived\"3\n\017ExternDoSim" +
-      "Step\022\020\n\010fromTime\030\001 \001(\001\022\016\n\006toTime\030\002 \001(\001\"\031" +
-      "\n\027ExternDoSimStepReceived\"-\n\017ExternalCon" +
-      "nect\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\005\"\032\n\030Exte" +
-      "rnalConnectConfirmed\"\024\n\022ExternOnPrepareS" +
-      "im\"\035\n\033ExternOnPrepareSimConfirmed\"\020\n\016Ext" +
-      "ernAfterSim\"\031\n\027ExternAfterSimConfirmed\"\036",
-      "\n\013AgentsStuck\022\017\n\007agentId\030\001 \003(\t\"\026\n\024Agents" +
-      "StuckConfirmed\"\027\n\025MaximumNumberOfAgents\"" +
-      "0\n\036MaximumNumberOfAgentsConfirmed\022\016\n\006num" +
-      "ber\030\001 \001(\0052\253\004\n\026MATSimInterfaceService\022_\n\020" +
-      "reqExtern2MATSim\022 .org.matsim.hybrid.Ext" +
-      "ern2MATSim\032).org.matsim.hybrid.Extern2MA" +
-      "TSimConfirmed\022X\n\rreqAgentStuck\022\036.org.mat" +
-      "sim.hybrid.AgentsStuck\032\'.org.matsim.hybr" +
-      "id.AgentsStuckConfirmed\022e\n\022reqExternalCo" +
-      "nnect\022\".org.matsim.hybrid.ExternalConnec",
-      "t\032+.org.matsim.hybrid.ExternalConnectCon" +
-      "firmed\022v\n\030reqExternSimStepFinished\022(.org" +
-      ".matsim.hybrid.ExternSimStepFinished\0320.o" +
-      "rg.matsim.hybrid.ExternSimStepFinishedRe" +
-      "ceived\022w\n\030reqMaximumNumberOfAgents\022(.org" +
-      ".matsim.hybrid.MaximumNumberOfAgents\0321.o" +
-      "rg.matsim.hybrid.MaximumNumberOfAgentsCo" +
-      "nfirmed2\304\004\n\026ExternInterfaceService\022w\n\030re" +
-      "qMATSim2ExternHasSpace\022(.org.matsim.hybr" +
-      "id.MATSim2ExternHasSpace\0321.org.matsim.hy",
-      "brid.MATSim2ExternHasSpaceConfirmed\022w\n\030r" +
-      "eqMATSim2ExternPutAgent\022(.org.matsim.hyb" +
-      "rid.MATSim2ExternPutAgent\0321.org.matsim.h" +
-      "ybrid.MATSim2ExternPutAgentConfirmed\022d\n\022" +
-      "reqExternDoSimStep\022\".org.matsim.hybrid.E" +
-      "xternDoSimStep\032*.org.matsim.hybrid.Exter" +
-      "nDoSimStepReceived\022n\n\025reqExternOnPrepare" +
-      "Sim\022%.org.matsim.hybrid.ExternOnPrepareS" +
-      "im\032..org.matsim.hybrid.ExternOnPrepareSi" +
-      "mConfirmed\022b\n\021reqExternAfterSim\022!.org.ma",
-      "tsim.hybrid.ExternAfterSim\032*.org.matsim." +
-      "hybrid.ExternAfterSimConfirmedB\026\n\021org.ma" +
-      "tsim.hybrid\210\001\000"
+      "\001(\010\" \n\036MATSim2ExternPutAgentConfirmed\"\262\001" +
+      "\n\031Extern2MATSimTrajectories\022A\n\005agent\030\017 \003" +
+      "(\01322.org.matsim.hybrid.Extern2MATSimTraj",
+      "ectories.Agent\032R\n\005Agent\022\n\n\002id\030\001 \001(\005\022\t\n\001x" +
+      "\030\002 \001(\001\022\t\n\001y\030\003 \001(\001\022\t\n\001z\030\004 \001(\001\022\r\n\005color\030\005 " +
+      "\001(\005\022\r\n\005angle\030\006 \001(\001\"#\n!MATSim2ExternTraje" +
+      "ctoriesReceived\"n\n\rExtern2MATSim\0225\n\005agen" +
+      "t\030\001 \001(\0132&.org.matsim.hybrid.Extern2MATSi" +
+      "m.Agent\032&\n\005Agent\022\n\n\002id\030\001 \001(\t\022\021\n\tleaveNod" +
+      "e\030\002 \001(\t\"*\n\026Extern2MATSimConfirmed\022\020\n\010acc" +
+      "epted\030\001 \001(\010\"%\n\025ExternSimStepFinished\022\014\n\004" +
+      "time\030\001 \001(\001\"\037\n\035ExternSimStepFinishedRecei" +
+      "ved\"3\n\017ExternDoSimStep\022\020\n\010fromTime\030\001 \001(\001",
+      "\022\016\n\006toTime\030\002 \001(\001\"\031\n\027ExternDoSimStepRecei" +
+      "ved\"-\n\017ExternalConnect\022\014\n\004host\030\001 \001(\t\022\014\n\004" +
+      "port\030\002 \001(\005\"\032\n\030ExternalConnectConfirmed\"\024" +
+      "\n\022ExternOnPrepareSim\"\035\n\033ExternOnPrepareS" +
+      "imConfirmed\"\020\n\016ExternAfterSim\"\031\n\027ExternA" +
+      "fterSimConfirmed\"\036\n\013AgentsStuck\022\017\n\007agent" +
+      "Id\030\001 \003(\t\"\026\n\024AgentsStuckConfirmed\"\027\n\025Maxi" +
+      "mumNumberOfAgents\"0\n\036MaximumNumberOfAgen" +
+      "tsConfirmed\022\016\n\006number\030\001 \001(\0052\246\005\n\026MATSimIn" +
+      "terfaceService\022_\n\020reqExtern2MATSim\022 .org",
+      ".matsim.hybrid.Extern2MATSim\032).org.matsi" +
+      "m.hybrid.Extern2MATSimConfirmed\022X\n\rreqAg" +
+      "entStuck\022\036.org.matsim.hybrid.AgentsStuck" +
+      "\032\'.org.matsim.hybrid.AgentsStuckConfirme" +
+      "d\022e\n\022reqExternalConnect\022\".org.matsim.hyb" +
+      "rid.ExternalConnect\032+.org.matsim.hybrid." +
+      "ExternalConnectConfirmed\022v\n\030reqExternSim" +
+      "StepFinished\022(.org.matsim.hybrid.ExternS" +
+      "imStepFinished\0320.org.matsim.hybrid.Exter" +
+      "nSimStepFinishedReceived\022w\n\030reqMaximumNu",
+      "mberOfAgents\022(.org.matsim.hybrid.Maximum" +
+      "NumberOfAgents\0321.org.matsim.hybrid.Maxim" +
+      "umNumberOfAgentsConfirmed\022y\n\023reqSendTraj" +
+      "ectories\022,.org.matsim.hybrid.Extern2MATS" +
+      "imTrajectories\0324.org.matsim.hybrid.MATSi" +
+      "m2ExternTrajectoriesReceived2\304\004\n\026ExternI" +
+      "nterfaceService\022w\n\030reqMATSim2ExternHasSp" +
+      "ace\022(.org.matsim.hybrid.MATSim2ExternHas" +
+      "Space\0321.org.matsim.hybrid.MATSim2ExternH" +
+      "asSpaceConfirmed\022w\n\030reqMATSim2ExternPutA",
+      "gent\022(.org.matsim.hybrid.MATSim2ExternPu" +
+      "tAgent\0321.org.matsim.hybrid.MATSim2Extern" +
+      "PutAgentConfirmed\022d\n\022reqExternDoSimStep\022" +
+      "\".org.matsim.hybrid.ExternDoSimStep\032*.or" +
+      "g.matsim.hybrid.ExternDoSimStepReceived\022" +
+      "n\n\025reqExternOnPrepareSim\022%.org.matsim.hy" +
+      "brid.ExternOnPrepareSim\032..org.matsim.hyb" +
+      "rid.ExternOnPrepareSimConfirmed\022b\n\021reqEx" +
+      "ternAfterSim\022!.org.matsim.hybrid.ExternA" +
+      "fterSim\032*.org.matsim.hybrid.ExternAfterS",
+      "imConfirmedB\026\n\021org.matsim.hybrid\210\001\000"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -8990,8 +11135,26 @@ public final class MATSimInterface {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_MATSim2ExternPutAgentConfirmed_descriptor,
         new java.lang.String[] { });
-    internal_static_org_matsim_hybrid_Extern2MATSim_descriptor =
+    internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_descriptor =
       getDescriptor().getMessageTypes().get(4);
+    internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_descriptor,
+        new java.lang.String[] { "Agent", });
+    internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_Agent_descriptor =
+      internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_descriptor.getNestedTypes().get(0);
+    internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_Agent_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_matsim_hybrid_Extern2MATSimTrajectories_Agent_descriptor,
+        new java.lang.String[] { "Id", "X", "Y", "Z", "Color", "Angle", });
+    internal_static_org_matsim_hybrid_MATSim2ExternTrajectoriesReceived_descriptor =
+      getDescriptor().getMessageTypes().get(5);
+    internal_static_org_matsim_hybrid_MATSim2ExternTrajectoriesReceived_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_org_matsim_hybrid_MATSim2ExternTrajectoriesReceived_descriptor,
+        new java.lang.String[] { });
+    internal_static_org_matsim_hybrid_Extern2MATSim_descriptor =
+      getDescriptor().getMessageTypes().get(6);
     internal_static_org_matsim_hybrid_Extern2MATSim_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_Extern2MATSim_descriptor,
@@ -9003,91 +11166,91 @@ public final class MATSimInterface {
         internal_static_org_matsim_hybrid_Extern2MATSim_Agent_descriptor,
         new java.lang.String[] { "Id", "LeaveNode", });
     internal_static_org_matsim_hybrid_Extern2MATSimConfirmed_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_org_matsim_hybrid_Extern2MATSimConfirmed_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_Extern2MATSimConfirmed_descriptor,
         new java.lang.String[] { "Accepted", });
     internal_static_org_matsim_hybrid_ExternSimStepFinished_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_org_matsim_hybrid_ExternSimStepFinished_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_ExternSimStepFinished_descriptor,
         new java.lang.String[] { "Time", });
     internal_static_org_matsim_hybrid_ExternSimStepFinishedReceived_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_org_matsim_hybrid_ExternSimStepFinishedReceived_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_ExternSimStepFinishedReceived_descriptor,
         new java.lang.String[] { });
     internal_static_org_matsim_hybrid_ExternDoSimStep_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_org_matsim_hybrid_ExternDoSimStep_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_ExternDoSimStep_descriptor,
         new java.lang.String[] { "FromTime", "ToTime", });
     internal_static_org_matsim_hybrid_ExternDoSimStepReceived_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_org_matsim_hybrid_ExternDoSimStepReceived_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_ExternDoSimStepReceived_descriptor,
         new java.lang.String[] { });
     internal_static_org_matsim_hybrid_ExternalConnect_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_org_matsim_hybrid_ExternalConnect_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_ExternalConnect_descriptor,
         new java.lang.String[] { "Host", "Port", });
     internal_static_org_matsim_hybrid_ExternalConnectConfirmed_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_org_matsim_hybrid_ExternalConnectConfirmed_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_ExternalConnectConfirmed_descriptor,
         new java.lang.String[] { });
     internal_static_org_matsim_hybrid_ExternOnPrepareSim_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_org_matsim_hybrid_ExternOnPrepareSim_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_ExternOnPrepareSim_descriptor,
         new java.lang.String[] { });
     internal_static_org_matsim_hybrid_ExternOnPrepareSimConfirmed_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_org_matsim_hybrid_ExternOnPrepareSimConfirmed_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_ExternOnPrepareSimConfirmed_descriptor,
         new java.lang.String[] { });
     internal_static_org_matsim_hybrid_ExternAfterSim_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_org_matsim_hybrid_ExternAfterSim_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_ExternAfterSim_descriptor,
         new java.lang.String[] { });
     internal_static_org_matsim_hybrid_ExternAfterSimConfirmed_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_org_matsim_hybrid_ExternAfterSimConfirmed_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_ExternAfterSimConfirmed_descriptor,
         new java.lang.String[] { });
     internal_static_org_matsim_hybrid_AgentsStuck_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_org_matsim_hybrid_AgentsStuck_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_AgentsStuck_descriptor,
         new java.lang.String[] { "AgentId", });
     internal_static_org_matsim_hybrid_AgentsStuckConfirmed_descriptor =
-      getDescriptor().getMessageTypes().get(17);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_org_matsim_hybrid_AgentsStuckConfirmed_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_AgentsStuckConfirmed_descriptor,
         new java.lang.String[] { });
     internal_static_org_matsim_hybrid_MaximumNumberOfAgents_descriptor =
-      getDescriptor().getMessageTypes().get(18);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_org_matsim_hybrid_MaximumNumberOfAgents_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_MaximumNumberOfAgents_descriptor,
         new java.lang.String[] { });
     internal_static_org_matsim_hybrid_MaximumNumberOfAgentsConfirmed_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_org_matsim_hybrid_MaximumNumberOfAgentsConfirmed_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_org_matsim_hybrid_MaximumNumberOfAgentsConfirmed_descriptor,

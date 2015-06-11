@@ -38,6 +38,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import playground.gregor.casim.events.CASimAgentConstructEvent;
 import playground.gregor.casim.events.CASimAgentConstructEventHandler;
 import playground.gregor.casim.simulation.physics.CAMoveableEntity;
+import playground.gregor.hybridsim.events.ExternalAgentConstructEvent;
+import playground.gregor.hybridsim.events.ExternalAgentConstructEventHanlder;
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEvent;
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEventHandler;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
@@ -66,7 +68,7 @@ public class EventBasedVisDebuggerEngine implements
 		CASimAgentConstructEventHandler, XYVxVyEventsHandler,
 		Sim2DAgentConstructEventHandler, Sim2DAgentDestructEventHandler,
 		NeighborsEventHandler, LineEventHandler, ForceReDrawEventHandler,
-		RectEventHandler, CircleEventHandler {
+		RectEventHandler, CircleEventHandler, ExternalAgentConstructEventHanlder {
 
 	double time;
 	private final EventsBasedVisDebugger vis;
@@ -83,8 +85,8 @@ public class EventBasedVisDebuggerEngine implements
 	private final List<ClockedVisDebuggerAdditionalDrawer> drawers = new ArrayList<ClockedVisDebuggerAdditionalDrawer>();
 	private int nrAgents;
 
-//	 FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/casim/lanes/",
-//	 "png", 20);
+//	 FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/jupedsim/",
+//	 "png", 10);
 
 	FrameSaver fs = null;
 
@@ -251,19 +253,59 @@ public class EventBasedVisDebuggerEngine implements
 		double y2 = y0 - dx * al + dy * al / 4;
 		double z = this.vis.zoomer.getZoomScale();
 		int a = 255;
-		if (z >= 48 && z < 80) {
-			z -= 48;
+		if (z >= 10 && z < 50) {
+			z -= 28;
 			a = (int) (255. / 32 * z + .5);
 		}
 		// a=255;
 		this.vis.addLine(event.getX(), event.getY(),
 				event.getX() + event.getVX() + dy * al,
-				event.getY() + event.getVY() - dx * al, 0, 0, 0, a, 50);
-		this.vis.addTriangle(x0, y0, x1, y1, x2, y2, 0, 0, 0, a, 50, true);
+				event.getY() + event.getVY() - dx * al, 0, 0, 0, a, 15);
+		this.vis.addTriangle(x0, y0, x1, y1, x2, y2, 0, 0, 0, a, 15, true);
 
 		CircleProperty cp = this.circleProperties.get(event.getPersonId());
 		if (cp == null) {
-			cp = this.defaultCp;
+			cp = new CircleProperty();
+			cp.rr = (float) 0.2;//(0.5 / 5.091);
+			int nr = event.getPersonId().toString().hashCode() % 100;
+			int color = (nr / 10) % 3;
+			// if (Integer.parseInt(a.getId().toString()) < 0) {
+			// color = 1;
+			// } else {
+			// color = 2;
+			// }
+			if (color == 1) {
+				cp.r = 255;
+				cp.g = 255 - nr;
+				cp.b = 0;
+				cp.a = 255;
+			} else if (color == 2) {
+				cp.r = nr - nr;
+				cp.g = 0;
+				cp.b = 255;
+				cp.a = 255;
+			} else {
+				cp.r = 0;
+				cp.g = 255;
+				cp.b = 255 - nr;
+				cp.a = 255;
+			}
+
+			if (event.getPersonId().toString().startsWith("g")) {
+				cp.r = 0;
+				cp.g = 255 - nr;
+				cp.b = 0;
+			} else if (event.getPersonId().toString().startsWith("b")) {
+				cp.r = 0;
+				cp.g = 0;
+				cp.b = 255 - nr;
+			} else if (event.getPersonId().toString().startsWith("r")) {
+				cp.r = 255 - nr;
+				cp.g = 0;
+				cp.b = 0;
+			}
+
+			this.circleProperties.put(event.getPersonId(), cp);
 		}
 
 		this.vis.addCircle(event.getX(), event.getY(), cp.rr, cp.r, cp.g, cp.b,
@@ -373,6 +415,51 @@ public class EventBasedVisDebuggerEngine implements
 
 		this.circleProperties.put(a.getId(), cp);
 
+	}
+	
+	@Override
+	public void handleEvent(ExternalAgentConstructEvent a) {
+		CircleProperty cp = new CircleProperty();
+		cp.rr = (float) (0.15);
+		int nr = a.getId().toString().hashCode() % 100;
+		int color = (nr / 10) % 3;
+		// if (Integer.parseInt(a.getId().toString()) < 0) {
+		// color = 1;
+		// } else {
+		// color = 2;
+		// }
+		if (color == 1) {
+			cp.r = 255;
+			cp.g = 255 - nr;
+			cp.b = 0;
+			cp.a = 255;
+		} else if (color == 2) {
+			cp.r = nr - nr;
+			cp.g = 0;
+			cp.b = 255;
+			cp.a = 255;
+		} else {
+			cp.r = 0;
+			cp.g = 255;
+			cp.b = 255 - nr;
+			cp.a = 255;
+		}
+
+		if (a.getId().toString().startsWith("g")) {
+			cp.r = 0;
+			cp.g = 255 - nr;
+			cp.b = 0;
+		} else if (a.getId().toString().startsWith("b")) {
+			cp.r = 0;
+			cp.g = 0;
+			cp.b = 255 - nr;
+		} else if (a.getId().toString().startsWith("r")) {
+			cp.r = 255 - nr;
+			cp.g = 0;
+			cp.b = 0;
+		}
+
+		this.circleProperties.put(a.getId(), cp);
 	}
 
 	@Override
@@ -585,5 +672,7 @@ public class EventBasedVisDebuggerEngine implements
 	public int getNrAgents() {
 		return this.nrAgents;
 	}
+
+
 
 }
