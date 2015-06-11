@@ -73,9 +73,9 @@ public class NoiseCalculationOffline {
 			
 		} else {
 			
-			runDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/";
+			runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/bln4/output/baseCase/";
 			lastIteration = 100;
-			outputDirectory = "../../runs-svn/berlin_internalizationCar/output/baseCase_2/analysis_localRun/";
+			outputDirectory = "/Users/ihab/Desktop/ils4/kaddoura/bln4/output/baseCase/noise_analysis_2/";
 			receiverPointGap = 100.;
 			
 //			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
@@ -119,8 +119,8 @@ public class NoiseCalculationOffline {
 //		gridParameters.setReceiverPointsGridMaxY(yMax);
 		
 		// Berlin Activity Types
-		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-//		String[] consideredActivities = {"home"};
+//		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		String[] consideredActivitiesForDamages = {"home"};
 		gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
 		
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
@@ -131,6 +131,7 @@ public class NoiseCalculationOffline {
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(10.);
 		noiseParameters.setInternalizeNoiseDamages(false);
+		noiseParameters.setComputeCausingAgents(false);
 		
 //		 Berlin Tunnel Link IDs
 		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();

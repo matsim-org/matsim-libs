@@ -154,4 +154,18 @@ public class NoiseEquations {
 		double share = ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) / ((nVehicleType1 * Math.pow(10, 0.1 * lVehicleType1)) + (nVehicleType2 * Math.pow(10, 0.1 * lVehicleType2))));
 		return share;
 	}
+
+	public static double calculateResultingNoiseImmissionPlusOneVehicle(double finalImmission, double immissionIsolatedLink, double immissionIsolatedLinkPlusOneVehicle) {
+		double noiseImmissionPlusOneVehicle = Double.NEGATIVE_INFINITY;
+		if (finalImmission != 0.) {
+			if (immissionIsolatedLink == 0.) {
+				noiseImmissionPlusOneVehicle = 10 * Math.log10( Math.pow(10, (0.1 * immissionIsolatedLinkPlusOneVehicle)) + Math.pow(10, (0.1 * finalImmission)) );
+			} else {
+				noiseImmissionPlusOneVehicle = 10 * Math.log10( Math.pow(10, (0.1 * immissionIsolatedLinkPlusOneVehicle)) - Math.pow(10, (0.1 * immissionIsolatedLink)) + Math.pow(10, (0.1 * finalImmission)) );
+			}
+		} else {
+			noiseImmissionPlusOneVehicle = immissionIsolatedLinkPlusOneVehicle;
+		}
+		return noiseImmissionPlusOneVehicle;
+	}
 }

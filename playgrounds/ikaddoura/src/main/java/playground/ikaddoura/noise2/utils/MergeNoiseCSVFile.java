@@ -46,10 +46,10 @@ public class MergeNoiseCSVFile {
 	private double startTime = 3600.;
 	private double timeBinSize = 3600.;
 	private double endTime = 30. * 3600.;
-	private String pathToFilesToMerge = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/ITERS/it.0/damages_link/";
-	private String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/receiverPoints/receiverPoints.csv";
+	private String pathToFilesToMerge = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_2_marginalCost/ITERS/it.100/damages_receiverPoint/";
+	private String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_2_marginalCost/receiverPoints/receiverPoints.csv";
 	private String separator = ";";
-	private String label = "damages_link";
+	private String label = "damages_receiverPoint";
 	
 	private String outputPath = pathToFilesToMerge;
 	

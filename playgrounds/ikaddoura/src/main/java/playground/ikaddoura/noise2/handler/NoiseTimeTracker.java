@@ -469,17 +469,20 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			if (rp.getAffectedAgentUnits() != 0.) {
 				for (Id<Link> thisLink : rp.getLinkId2IsolatedImmission().keySet()) {
 										
-					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink = new HashMap<Id<Link>, Double>();
-					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink = new HashMap<Id<Link>, Double>();
+//					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink = new HashMap<Id<Link>, Double>();
+//					Map<Id<Link>, Double> linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink = new HashMap<Id<Link>, Double>();
+//					
+//					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.putAll(rp.getLinkId2IsolatedImmission());
+//					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.putAll(rp.getLinkId2IsolatedImmission());
+//					
+//					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneCar().get(thisLink));
+//					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneHGV().get(thisLink));
+//										
+//					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.values());
+//					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.values());
 					
-					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.putAll(rp.getLinkId2IsolatedImmission());
-					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.putAll(rp.getLinkId2IsolatedImmission());
-					
-					linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneCar().get(thisLink));
-					linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.put(thisLink, rp.getLinkId2IsolatedImmissionPlusOneHGV().get(thisLink));
-										
-					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneCarThisLink.values());
-					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmissionsAllOtherLinksPlusOneHGVThisLink.values());
+					double noiseImmissionPlusOneCarThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getFinalImmission(), rp.getLinkId2IsolatedImmission().get(thisLink), rp.getLinkId2IsolatedImmissionPlusOneCar().get(thisLink));
+					double noiseImmissionPlusOneHGVThisLink = NoiseEquations.calculateResultingNoiseImmissionPlusOneVehicle(rp.getFinalImmission(), rp.getLinkId2IsolatedImmission().get(thisLink), rp.getLinkId2IsolatedImmissionPlusOneHGV().get(thisLink));
 					
 					double damageCostsPlusOneCarThisLink = NoiseEquations.calculateDamageCosts(noiseImmissionPlusOneCarThisLink, rp.getAffectedAgentUnits(), this.noiseContext.getCurrentTimeBinEndTime(), this.noiseContext.getNoiseParams().getAnnualCostRate(), this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
 					double marginalDamageCostCarThisLink = (damageCostsPlusOneCarThisLink - rp.getDamageCosts()) / this.noiseContext.getNoiseParams().getScaleFactor();
