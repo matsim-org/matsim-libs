@@ -95,7 +95,8 @@ public final class WelfareCarefulMultiPlanOperator extends AbstractOperator {
 	}
 
 	private double getWelfareCorrection(PPlan plan) {
-		return welfareAnalyzer.getLineId2welfareCorrection(plan.getId());
+		Id<PPlan> pplanId = Id.create(plan.getLine().getId().toString() + "-" + plan.getId().toString(), PPlan.class);
+		return welfareAnalyzer.getLineId2welfareCorrection(pplanId);
 	}
 
 	public Id<Operator> getId() {

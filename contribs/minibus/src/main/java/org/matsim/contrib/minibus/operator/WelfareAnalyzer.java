@@ -85,7 +85,7 @@ public class WelfareAnalyzer {
 					if (leg.getMode().equals(TransportMode.pt)) {
 
 						ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-						String planIdString = route.getRouteId().toString().replace(route.getLineId().toString() + "-", "");
+						String planIdString = route.getRouteId().toString();//.replace(route.getLineId().toString() + "-", "");
 						Id<PPlan> planId = Id.create(planIdString, PPlan.class);
 
 						if(!this.personId2usedPPlanIds.containsKey(person.getId())){
@@ -141,7 +141,7 @@ public class WelfareAnalyzer {
 			
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()){
 				
-				String planIdString = transitRoute.getId().toString().replace(transitLine.getId().toString() + "-", "");
+				String planIdString = transitRoute.getId().toString();
 				Id<PPlan> planId = Id.create(planIdString, PPlan.class);
 				this.currentPPlanIds.add(planId);
 			}	
