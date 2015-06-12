@@ -116,6 +116,7 @@
 		<module>pseudosimulation</module>
 		<module>common</module>
 		<module>eventsBasedPTRouter</module>
+		<module>map2mapmatching</module>
 	</modules>
 	<repositories>
 		<repository>
