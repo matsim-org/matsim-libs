@@ -145,7 +145,7 @@ public class NetworkCleaner implements NetworkRunnable {
 	 * Reducing the network so it only contains nodes included in the biggest Cluster.
 	 * Loop over all nodes and check if they are in the cluster, if not, remove them from the network
 	 */
-	public void reduceToBiggestCluster(Network network, Map<Id<Node>, Node> biggestCluster) {
+	public static void reduceToBiggestCluster(Network network, Map<Id<Node>, Node> biggestCluster) {
 		List<Node> allNodes2 = new ArrayList<>(network.getNodes().values());
 		for (Node node : allNodes2) {
 			if (!biggestCluster.containsKey(node.getId())) {
@@ -160,7 +160,7 @@ public class NetworkCleaner implements NetworkRunnable {
 	@Override
 	public void run(final Network network) {
 		Map<Id<Node>, Node> biggestCluster = this.searchBiggestCluster(network);
-		this.reduceToBiggestCluster(network, biggestCluster);
+		reduceToBiggestCluster(network, biggestCluster);
 	}
 
 	private static DoubleFlagRole getDoubleFlag(final Node n, final Map<Node, DoubleFlagRole> nodeRoles) {
