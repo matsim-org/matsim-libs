@@ -79,11 +79,14 @@ public class Injector {
       		  logger.log( level, entry.getKey().getTypeLiteral() ); System.err.flush();
 //      		  logger.log( Level.WARN, entry.getKey().withoutAttributes() ); System.err.flush();
       		  logger.log( level, "   -> " + entry.getValue().getProvider() ) ; System.out.flush(); 
-      		  try {
-      			  logger.log( level, "   -> " + entry.getValue().getProvider().get().getClass() ) ; System.out.flush();
-      		  } catch ( Exception ee ) {
-      			  logger.log( level, "  -> not provided (only a problem if this is truly needed later)" ) ;
-      		  }
+
+//      		  try {
+//      			  logger.log( level, "   -> " + entry.getValue().getProvider().get().getClass() ) ; System.out.flush();
+//      		  } catch ( Exception ee ) {
+//      			  logger.log( level, "  -> not provided (only a problem if this is truly needed later)" ) ;
+//      		  }
+      		  // the above _instantiates_ the class, which is not what we want ( we just want the name ). 
+      		  
       	  }
         }
         return fromGuiceInjector(realInjector);
