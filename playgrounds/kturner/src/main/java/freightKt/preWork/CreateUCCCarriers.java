@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jsprit.core.problem.VehicleRoutingProblem;
+import jsprit.core.problem.vehicle.VehicleImpl;
+import jsprit.core.problem.vehicle.VehicleType;
+
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.gml.producer.GeometryTransformer;
@@ -21,11 +25,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
+import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
@@ -48,6 +54,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.vehicles.Vehicle;
 import org.opengis.annotation.Obligation;
 import org.opengis.annotation.Specification;
 import org.opengis.annotation.UML;
@@ -72,7 +79,7 @@ class CreateUCCCarriers {
 	 *  1.) Analyse der Carrier aus dem Schroeder/Liedtke-Berlin-Szenario.
 	 *  2.) Erstellung eines Carrier-Files mit der Kette der größten Nachfage (Beachte, dass dabei Frozen, dry, Fresh) 
 	 * 	jeweils eigene Carrier mit eigener Flotten zsammensetzung sind.) -> Hier aldi
-	 * TODO: 3.) Links der Umweltzone einlesen (Maut-file) und die Nachfrage entsprechend auf UCC-Carrier mit ihren Depots und den Elektrofahrzeugen aufteilen.
+	 *  3.) Links der Umweltzone einlesen (Maut-file) und die Nachfrage entsprechend auf UCC-Carrier mit ihren Depots und den Elektrofahrzeugen aufteilen.
 	 */
 
 	//Beginn Namesdefinition KT Für Berlin-Szenario 
@@ -86,8 +93,6 @@ class CreateUCCCarriers {
 	private static final String CARRIERS_NAME = "carrierLEH_v2_withFleet" ;
 	private static final String CARRIERS_2EXTRACT = "aldi" ;
 	private static final String TOLL_NAME = "toll_city_kt";
-	private static final String ZONE_SHAPE_NAME = "Umweltzone/Umweltzone_WGS84";
-	private static final String NETWORK_SHAPE_NAME = "Umweltzone/MatsimNW_conv_Links";
 	//Ende  Namesdefinition Berlin
 
 
@@ -110,16 +115,17 @@ class CreateUCCCarriers {
 	private static final String CARRIERFILE = INPUT_DIR + CARRIERS_NAME + ".xml" ;
 	private static final String CARRIEROUTFILE = INPUT_DIR + CARRIERS_2EXTRACT + ".xml";
 	private static final String TOLLFILE = INPUT_DIR + TOLL_NAME + ".xml";
-	private static final String ZONESHAPEFILE = INPUT_DIR + ZONE_SHAPE_NAME + ".shp";
-	private static final String NETWORKSHAPEFILE = INPUT_DIR + NETWORK_SHAPE_NAME + ".shp";
+	
+	static Carriers carriers = new Carriers() ;
+	static CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 
 	public static void main(String[] args) {
 		createDir(new File(OUTPUT_DIR));
 
 		//Carrier-Stuff
-		Carriers carriers = new Carriers() ;
+//		Carriers carriers = new Carriers() ;
 		new CarrierPlanXmlReaderV2(carriers).read(CARRIERFILE) ;
-		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
+//		CarrierVehicleTypes vehicleTypes = new CarrierVehicleTypes() ;
 		new CarrierVehicleTypeReader(vehicleTypes).read(VEHTYPEFILE) ;
 
 		new CarrierVehicleTypeLoader(carriers).loadVehicleTypes(vehicleTypes) ;
@@ -129,7 +135,6 @@ class CreateUCCCarriers {
 		new CarrierPlanXmlWriterV2(extractedCarriers).write(CARRIEROUTFILE) ;
 		Carriers splittedCarriers = createUCCCarrier(extractedCarriers, TOLLFILE);	//Step3: Nachfrage auf Carrier UCC und normal aufteilen.
 		new CarrierPlanXmlWriterV2(splittedCarriers).write(OUTPUT_DIR +"splittedCarrier.xml");
-		
 		
 		System.out.println("### ENDE ###");
 	}
@@ -188,14 +193,12 @@ class CreateUCCCarriers {
 		return tempCarriers;
 	}
 
-	//TODO:v Step 3: Seperate Carriers in UCC and non UCC-Carrier.
-	//TODO: UCC-Carrier braucht Fahrzeuge.
+	//TODO: Wenn Carrier kein Servie (mehr) hat, dann nicht in splitted Aufnehmen.
 	private static Carriers createUCCCarrier(Carriers carriers,
 			String tollfile2) {
 		
-		Carriers splittedCarriers = new Carriers();
+		Carriers splittedCarriers = new Carriers(); // Carrierfile, welches beide Carrier enthält: sowohl UCC, als auch non UCC
 		
-		// TODO Auto-generated method stub
 		//Read tollfile
 		final RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
@@ -207,11 +210,11 @@ class CreateUCCCarriers {
 			throw new RuntimeException(e);
 		}
 		
-		Set<Id<Link>> tolledLinkIds = scheme.getTolledLinkIds();  //Links des MautSchematas
-		Set<CarrierService> serviceToRemove= new HashSet<CarrierService>(); 
+		Set<Id<Link>> tolledLinkIds = scheme.getTolledLinkIds();  //Link-Ids des MautSchemas
+		Set<CarrierService> serviceToRemove= new HashSet<CarrierService>(); 	//Liste der zum UCC-Carrier übertragenen Services -> wird später aus normalen Carrier entfernt
 		
 		for (Carrier carrier : carriers.getCarriers().values()){
-			Carrier uccCarrier = CarrierImpl.newInstance(Id.create("UCC_"+carrier.getId() , Carrier.class));;
+			Carrier uccCarrier = CarrierImpl.newInstance(Id.create("UCC_"+carrier.getId() , Carrier.class));
 			
 			for (CarrierService service: carrier.getServices()) {
 				if (tolledLinkIds.contains(service.getLocationLinkId())){	//Service liegt in der Maut-Zone (=Umweltzone)
@@ -223,13 +226,59 @@ class CreateUCCCarriers {
 			for (CarrierService service: serviceToRemove){ //neue Schleife, da sonst innerhalb der Schleife das Set modifiziert wird..
 				carrier.getServices().remove(service);	//und lösche ihn aus dem normalen Carrier raus
 			}
-			splittedCarriers.addCarrier(carrier);				//bisherigen Carrier reinschreiben
-			splittedCarriers.addCarrier(uccCarrier);
+			
+			splittedCarriers.addCarrier(carrier); //bisherigen Carrier reinschreiben, darf auch ohne Service sein, da ggf während Laufzeit nachfrage erhält (Depot -> UCC).
+			
+			if (!uccCarrier.getServices().isEmpty()){		//keinen UCC ohne Nachfrage übernehmen.
+				addVehicles(uccCarrier);
+				uccCarrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
+				splittedCarriers.addCarrier(uccCarrier);
+			}
 		}
 		
 		return splittedCarriers;
 	}
 	
+	private static void addVehicles(Carrier uccCarrier) {
+		
+		Set<Id<Link>> uccDepotsLinkIds = new HashSet<Id<Link>>();
+		//Für Berlin-Szenario:
+		uccDepotsLinkIds.add(Id.createLinkId("6874"));	//Nord: Industriegebiet Berliner Großmarkt
+		uccDepotsLinkIds.add(Id.createLinkId("3058"));  //Süd: Gewerbegebiet  Bessermerstraße
+		uccDepotsLinkIds.add(Id.createLinkId("5468"));	//Ost: Gewerbegebiet Herzbergstr /Siegfriedstr.
+		
+		double uccOpeningTime = 8*3600.0;	// 08:00:00 Uhr
+		double uccClosingTime = 21*3600.0;	// 21:00:00 Uhr
+		
+		if (uccCarrier.getId().toString().endsWith("TIEFKUEHL")){
+			
+			for (Id<Link> linkId : uccDepotsLinkIds ){
+			uccCarrier.getCarrierCapabilities().getCarrierVehicles().add( CarrierVehicle.Builder.newInstance(Id.create("light8telectro_frozen", Vehicle.class), linkId)
+					.setType(vehicleTypes.getVehicleTypes().get(Id.create("light8telectro_frozen", VehicleType.class)))
+					.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
+					.build());
+			}
+//			uccCarrier.getCarrierCapabilities().getCarrierVehicles().add(cv_8f);
+		} else {
+			
+			for (Id<Link> linkId : uccDepotsLinkIds ){
+				uccCarrier.getCarrierCapabilities().getCarrierVehicles().add(CarrierVehicle.Builder.newInstance(Id.create("light8telectro", Vehicle.class), linkId)
+					.setType(vehicleTypes.getVehicleTypes().get(Id.create("light8telectro", VehicleType.class)))
+					.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
+					.build());
+			
+			uccCarrier.getCarrierCapabilities().getCarrierVehicles().add(CarrierVehicle.Builder.newInstance(Id.create("medium18telectro", Vehicle.class), linkId)
+					.setType(vehicleTypes.getVehicleTypes().get(Id.create("medium18telectro", VehicleType.class)))
+					.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
+					.build());
+
+			}
+			
+		}
+		
+	}
+
+
 	private static void createDir(File file) {
 		System.out.println("Verzeichnis " + file + " erstellt: "+ file.mkdirs());	
 	}
