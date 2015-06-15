@@ -21,6 +21,13 @@
         <developerConnection>scm:svn:https://svn.code.sf.net/p/matsim/source/matsim/trunk</developerConnection>
         <url>https://svn.code.sf.net/p/matsim/source/matsim/trunk</url>
 	</scm>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>oss-jfrog-artifactory</id>
+			<name>artifactory-snapshots</name>
+			<url>http://oss.jfrog.org/oss-snapshot-local</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<build>
 		<defaultGoal>compiler:compile</defaultGoal>
 		<resources>
