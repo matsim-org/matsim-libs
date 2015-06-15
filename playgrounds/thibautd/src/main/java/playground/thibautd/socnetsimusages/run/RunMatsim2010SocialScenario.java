@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -72,21 +73,29 @@ public class RunMatsim2010SocialScenario {
 		final Scenario scenario = loadScenario(config);
 
 		final Controler controller = new Controler( scenario );
-		controller.addOverridingModule( new JointDecisionProcessModule() );
-		controller.addOverridingModule( new SocnetsimDefaultAnalysisModule() );
-		controller.addOverridingModule( new JointActivitiesScoringModule() );
-		controller.addOverridingModule( new DefaultGroupStrategyRegistryModule() );
-		controller.addOverridingModule( new JointTripsModule() );
-		controller.addOverridingModule( new SocialNetworkModule() );
+		// One needs to add the various features one wants to use in one module to be safe:
+		// this way, if two features conflict, a crash will occur at injection.
+		controller.addOverridingModule(
+				new AbstractModule() {
+					@Override
+					public void install() {
+						install( new JointDecisionProcessModule() );
+						install( new SocnetsimDefaultAnalysisModule() );
+						install( new JointActivitiesScoringModule() );
+						install( new DefaultGroupStrategyRegistryModule() );
+						install( new JointTripsModule() );
+						install( new SocialNetworkModule() );
+					}
+				} );
 
-		controller.setScoringFunctionFactory(
-				new KtiScoringFunctionFactoryWithJointModes(
-					new MATSim2010ScoringFunctionFactory(
-						scenario,
-						new StageActivityTypesImpl(
-							PtConstants.TRANSIT_ACTIVITY_TYPE,
-							JointActingTypes.INTERACTION) ),
-					scenario ) );
+				controller.setScoringFunctionFactory(
+						new KtiScoringFunctionFactoryWithJointModes(
+								new MATSim2010ScoringFunctionFactory(
+										scenario,
+										new StageActivityTypesImpl(
+												PtConstants.TRANSIT_ACTIVITY_TYPE,
+												JointActingTypes.INTERACTION)),
+								scenario));
 
 		controller.run();
 	}
