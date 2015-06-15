@@ -36,31 +36,64 @@ import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**
+ * (1) Read events file and write congestion events for desired implementation.
+ * (2) From congestion events file write various analyses files.
  * @author amit
  */
 
-public class LinkDelayAnalyzerAndWriter {
+public class BAUDelayAnalyzer {
 
 	
-	public LinkDelayAnalyzerAndWriter() {
+	public BAUDelayAnalyzer(String congestionImpl) {
 		scenario = LoadMyScenarios.loadScenarioFromOutputDir(runDir);
 		simulationEndTime = scenario.getConfig().qsim().getEndTime();
 		int lastIt = scenario.getConfig().controler().getLastIteration();
 		eventsFile = runDir+"ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
+		congestionEventsFile = runDir+"/ITERS/it."+lastIt+"/"+lastIt+".events_"+congestionImpl+".xml.gz";
+		this.congestionImpl = congestionImpl;
 	}
 
 	private int noOfTimeBins = 30;
 	private String eventsFile ;
 	private double simulationEndTime;
 	private String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies/bau/";
+	private String congestionEventsFile;
 	private Scenario scenario;
+	private String congestionImpl;
+	
 
 	private final PersonFilter pf = new PersonFilter();
 	
 	public static void main(String[] args) {
-		LinkDelayAnalyzerAndWriter congestionToll = new LinkDelayAnalyzerAndWriter();
-		congestionToll.writeExperiecedAndCausingPersonDelay();
-		congestionToll.writeAverageLinkDelays();
+		BAUDelayAnalyzer analyzer = new BAUDelayAnalyzer("implV3");
+		analyzer.writeCongestionEvents();
+		analyzer.writeExperiecedAndCausingPersonDelay();
+		analyzer.writeAverageLinkDelays();
+		analyzer.writeHourlyCausedDelayForEachPerson();
+	}
+	
+	private void writeCongestionEvents(){
+		new CrossMarginalCongestionEventsWriter(scenario).readAndWrite(congestionImpl);
+	}
+	
+	/**
+	 * Writes timeBin2PersonId2UserGroup2CausedDelay
+	 */
+	private void writeHourlyCausedDelayForEachPerson(){
+		SortedMap<Double, Map<Id<Person>, Double>> timeBin2CausingPerson2Delay = getCausingPersonDelay(noOfTimeBins);
+		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/timeBin2Person2UserGroup2CausedDelay_"+congestionImpl+".txt");
+		try {
+			writer.write("timeBin \t personId \t userGroup \t delayInHr \n");
+			for (double d : timeBin2CausingPerson2Delay.keySet()){
+				for (Id<Person> personId : timeBin2CausingPerson2Delay.get(d).keySet()){
+					writer.write(d+"\t"+personId+"\t"+getUserGroupFromPersonId(personId)+"\t"+timeBin2CausingPerson2Delay.get(d).get(personId) / 3600+"\n");
+				}
+			}
+			writer.close();
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written in file. Reason: "
+					+ e);
+		}
 	}
 	
 	/**
@@ -75,7 +108,7 @@ public class LinkDelayAnalyzerAndWriter {
 		Map<Id<Person>, Double> affectedperson2Delay = timeBin2AffectedPerson2Delay.get(simulationEndTime);
 		Map<Id<Person>, Double> causedPerson2Delay = timeBin2CausingPerson2Delay.get(simulationEndTime);
 		
-		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/affectedAndCausedDelay.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/affectedAndCausedDelay_"+congestionImpl+".txt");
 		
 		try {
 			writer.write("personId\tuserGroup\taffectedDelayInHr\tcausedDelayInHr\n");
@@ -91,16 +124,11 @@ public class LinkDelayAnalyzerAndWriter {
 	
 	/**
 	 * Writes
-	 * <p> timeBin LinkId avgTollPerPerson
+	 * <p> timeBin LinkId avgTollPerPerson.
+	 * <p> Since, these link delays are evaluated from congestion events, implementation varies.
 	 */
 	private void writeAverageLinkDelays (){
 
-		int lastIt = scenario.getConfig().controler().getLastIteration();
-		String congestionImpl = "implV6";
-		String congestionEventsFile = runDir+"/ITERS/it."+lastIt+"/"+lastIt+".events_"+congestionImpl+".xml.gz";
-		
-		new CrossMarginalCongestionEventsWriter(scenario).readAndWrite(congestionImpl);
-		
 		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(congestionEventsFile, scenario, noOfTimeBins);
 		delayAnalyzer.run();
 		
@@ -145,20 +173,12 @@ public class LinkDelayAnalyzerAndWriter {
 	}
 	
 	private SortedMap<Double, Map<Id<Person>, Double>> getCausingPersonDelay(int noOfTimeBin){
-		
-		int lastIt = scenario.getConfig().controler().getLastIteration();
-		String congestionImpl = "implV4";
-		String congestionEventsFile = runDir+"/ITERS/it."+lastIt+"/"+lastIt+".events_"+congestionImpl+".xml.gz";
-		
-		new CrossMarginalCongestionEventsWriter(scenario).readAndWrite(congestionImpl);
-		
 		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(congestionEventsFile, scenario, noOfTimeBin);
 		delayAnalyzer.run();
 		return delayAnalyzer.getTimeBin2CausingPersonId2Delay();
 	}
 	
 	private UserGroup getUserGroupFromPersonId(Id<Person> presonId){
-		
 		for(UserGroup ug :UserGroup.values()){
 			if(pf.isPersonIdFromUserGroup(presonId, ug)){
 				return ug;
