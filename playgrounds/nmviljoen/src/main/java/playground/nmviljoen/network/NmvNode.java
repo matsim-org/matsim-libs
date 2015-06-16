@@ -23,7 +23,11 @@ public class NmvNode implements Comparable<NmvNode>{
 	
 	public String toString() {
 		return "id: " + id + " ("+ X + ";"+ Y + ")";
-	}   
+	}  
+	
+	public String slimString(){
+		return id;
+	}
 	
 	public String getId(){
 		return this.id;
