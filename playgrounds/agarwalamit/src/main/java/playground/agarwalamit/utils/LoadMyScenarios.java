@@ -128,6 +128,7 @@ public class LoadMyScenarios {
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(configFile);
 		config.plans().setInputFile(plansFile);
+		config.plans().setInputPersonAttributeFile(null);
 		config.network().setInputFile(null);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;

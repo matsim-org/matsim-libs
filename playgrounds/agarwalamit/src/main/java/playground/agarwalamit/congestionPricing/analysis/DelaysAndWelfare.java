@@ -37,8 +37,8 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 
 public class DelaysAndWelfare {
 
-	static String clusterPathDesktop = "../../../repos/runs-svn/siouxFalls/run203/policies/";
-	static String [] runCases =  {"bau","v3","v4","v6"};
+	static String clusterPathDesktop = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies/";
+	static String [] runCases =  {"implV3","implV4","implV6"};
 
 	public static void main(String[] args) {
 		
@@ -65,31 +65,31 @@ public class DelaysAndWelfare {
 		CongestionHandlerImplV4 implV4 = null ;
 		CongestionHandlerImplV6 implV6 = null ;
 		switch(runCase){
-		case "v3" :
+		case "implV3" :
 			impl3 = new CongestionHandlerImplV3(manager, (ScenarioImpl) sc);
 			manager.addHandler(impl3);
 			break;
-		case "v4" : 
+		case "implV4" : 
 			implV4 = new CongestionHandlerImplV4(manager, sc);
 			manager.addHandler(implV4);
 			break;
-		case "v6" : 
+		case "implV6" : 
 			implV6 = new CongestionHandlerImplV6(manager, sc);
 			manager.addHandler(implV6);
 			break;
 		}
 
-		reader.readFile(outputDir+"/ITERS/it.1000/1000.events.xml.gz");
+		reader.readFile(outputDir+"/ITERS/it.1500/1500.events.xml.gz");
 
 		switch(runCase){
-		case "v3" :
-			impl3.writeCongestionStats(outputDir+"/ITERS/it.1000/congestionStats.csv");
+		case "implV3" :
+			impl3.writeCongestionStats(outputDir+"/ITERS/it.1500/congestionStats.csv");
 			break;
-		case "v4":
-			implV4.writeCongestionStats(outputDir+"/ITERS/it.1000/congestionStats.csv");
+		case "implV4":
+			implV4.writeCongestionStats(outputDir+"/ITERS/it.1500/congestionStats.csv");
 			break;
-		case "v6":
-			implV6.writeCongestionStats(outputDir+"/ITERS/it.1000/congestionStats.csv");
+		case "implV6":
+			implV6.writeCongestionStats(outputDir+"/ITERS/it.1500/congestionStats.csv");
 			break;
 		}
 	}
