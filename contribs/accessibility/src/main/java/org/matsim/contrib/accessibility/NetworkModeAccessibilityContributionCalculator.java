@@ -108,9 +108,6 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 		// TODO: extract this walk part?
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense.
-		// My problem is that I think this is WRONG. The utility to the "aggregation" node is considered only
-		// once, and from the node to each facility considered for each facility. For me, the FULL TRIP
-		// should be considered for each facility... (td, june 15)
 		// distance to road, and then to node:
         double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Road() / this.walkSpeedMeterPerHour;
 
@@ -138,6 +135,8 @@ public class NetworkModeAccessibilityContributionCalculator implements Accessibi
 
 		double congestedCarDisutility = - lcpt.getTree().get(destinationNode.getId()).getCost();	// travel disutility congested car on road network (including toll)
 		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distance.getDistanceRoad2Node() * betaCarTD) + (toll_money * betaCarTMC);
+		// This is equivalent to the sum of the exponential of the utilities for all destinations (I had to write it on
+		// paper to check it is correct...)
 		return Math.exp(logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) ) *
 				expVhiWalk * sumExpVjkWalk;
 	}
