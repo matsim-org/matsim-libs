@@ -91,29 +91,29 @@ public class KTFreight_v3 {
 
 	private static final Logger log = Logger.getLogger(KTFreight_v3.class) ;
 
-	//	//Beginn Namesdefinition KT Für Berlin-Szenario 
-	//	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/" ;
-	//	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Berlin/1carrier/500it/" ;
-	//	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/";
-	//
-	//	//Dateinamen ohne XML-Endung
-	//	private static final String NETFILE_NAME = "network" ;
-	//	private static final String VEHTYPES_NAME = "vehicleTypes" ;
-	//	private static final String CARRIERS_NAME = "carrier_kt_1_aldi" ;
-	//	private static final String ALGORITHM_NAME = "grid-algorithm" ;
-	//	private static final String TOLL_NAME = "toll_distance_test_kt";
-	//	//Ende  Namesdefinition Berlin
+//		//Beginn Namesdefinition KT Für Berlin-Szenario 
+//		private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/" ;
+//		private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Berlin/aldi/base/" ;
+//		private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/";
+//	
+//		//Dateinamen ohne XML-Endung
+//		private static final String NETFILE_NAME = "network" ;
+//		private static final String VEHTYPES_NAME = "vehicleTypes" ;
+//		private static final String CARRIERS_NAME = "carrier_aldi_splitted" ;
+//		private static final String ALGORITHM_NAME = "grid-algorithm" ;
+//		private static final String TOLL_NAME = "toll_city_kt";
+//		//Ende  Namesdefinition Berlin
 
 
 	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/UCC2/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/Toll/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
 	private static final String NETFILE_NAME = "grid-network" ;
 	private static final String VEHTYPES_NAME = "grid-vehTypes_kt" ;
-	private static final String CARRIERS_NAME = "grid-carrier_ucc" ;
+	private static final String CARRIERS_NAME = "grid-carrier_kt" ;
 	private static final String ALGORITHM_NAME = "grid-algorithm" ;
 	private static final String TOLL_NAME = "grid-tollCordon";
 	//Ende Namesdefinition Grid
@@ -133,21 +133,25 @@ public class KTFreight_v3 {
 
 	private static final boolean addingCongestion = false ;  //doesn't work correctly, KT 10.12.2014
 	private static final boolean addingToll = true;  //added, kt. 07.08.2014
+	private static final boolean usingUCC = false;	 //Using Transshipment-Center, added kt 30.04.2015
 	private static final boolean runMatsim = true;	 //when false only jsprit run will be performed
-	private static final boolean usingUCC = true;	 //Using Transshipment-Center, added kt 30.04.2015
 	private static final int LAST_MATSIM_ITERATION = 0;  //only one iteration for writing events.
-	private static final int LAST_JSPRIT_ITERATION = 100;
-	private static final int NU_OF_TOTAL_RUNS = 1;	
+	private static final int LAST_JSPRIT_ITERATION = 1000;
+	private static final int NU_OF_TOTAL_RUNS = 5;	
 
-	//temporär zum Programieren als Ausgabe
+	//temporär zum Programmieren als Ausgabe
 	private static WriteTextToFile textInfofile; 
 
+	//da immer wieder benutzt.
 	private static RoadPricingSchemeImpl rpscheme = new RoadPricingSchemeImpl();
+	private static VehicleTypeDependentRoadPricingCalculator rpCalculator = new VehicleTypeDependentRoadPricingCalculator();
 
 
 	public static void main(String[] args) {
 
 		for (int i = 1; i<=NU_OF_TOTAL_RUNS; i++) {
+			rpscheme = new RoadPricingSchemeImpl();		//Damit jeweils neu besetzt wird; sonst würde es sich aufkumulieren.
+			rpCalculator = new VehicleTypeDependentRoadPricingCalculator();	//Damit jeweils neu besetzt wird; sonst würde es sich aufkumulieren.
 			runIndex = i;	
 			multipleRun(args);	
 		}
@@ -197,7 +201,10 @@ public class KTFreight_v3 {
 
 		Carriers carriers = createCarriers(vehicleTypes);
 
-
+		/*TODO: usingUCC = false führt im Moment zu Fehlerhaften Ergebnissen, da hier bereits die Services auf neue Carrier mit entsprechenden Standorten aufgeteilt sind.
+		*		Somit so umbauen, dass in einem einem ersten Schritt der Retailer extrahiert wird (unabahängig Ucc/ non UCC)
+		*		Im UCC-Fall, dann erst die Aufteilung der Carrier vornehmen und anschließend das Problem seperat lösen.
+		*/
 		if (usingUCC) {			//Wenn UCC verwendent werden, dann muss das Problem geteilt werden.
 			Carriers uccCarriers = new Carriers();
 			Carriers nonUccCarriers = new Carriers();
@@ -212,45 +219,7 @@ public class KTFreight_v3 {
 			new CarrierPlanXmlWriterV2(uccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_UCC_" + RUN + runIndex+".xml") ;
 			new WriteCarrierScoreInfos(uccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_UCC.txt"), runIndex);
 
-			//Services aus den UCC für die Non-UCC erstellen -> Funktionmiert grundsätzlich, KT 02.05.15
-			//TODO: Voraussetzung prüfen/Angeben, dass UCC-Carrier-ID mit "UCC" beginnt UND mit der 'HauptCarrier'-ID endet: z.B. Carrier1 -> UCC_Carrier1
-			for (Carrier uccC : uccCarriers.getCarriers().values()){
-				for (Carrier nonUccC : nonUccCarriers.getCarriers().values()){
-					if (uccC.getId().toString().endsWith(nonUccC.getId().toString())){				//TODO: Sicherstellen, dass jeder Service auch erstellt wird--> Sicherheitsabfrage, ansonsten Fehler erzeugen!
-						Map<Id<Link>, Integer> demandAtUCC = new HashMap<Id<Link>, Integer>();		//Zählt nachfrage an UCC-LinkID
-						for (ScheduledTour st : uccC.getSelectedPlan().getScheduledTours()){		//für die einzelnen Touren die Nachfrage an den einzelnen Depots zählen
-							Id<Link> uccLocationId = st.getVehicle().getLocation();
-							int demand = 0;
-
-							for (TourElement tourElement : st.getTour().getTourElements()){
-								if(tourElement instanceof ServiceActivity){
-									ServiceActivity serviceAct = (ServiceActivity)tourElement;
-									demand += serviceAct.getService().getCapacityDemand();
-								}
-							}
-							
-							if (demandAtUCC.containsKey(uccLocationId)){
-								demandAtUCC.put(uccLocationId, demandAtUCC.get(uccLocationId)+demand);  
-							} else  {
-								demandAtUCC.put(uccLocationId, demand);
-							}
-						}
-						
-						//neue Services erstellen des nonUccC zum Depot des uccC.
-						for (Id<Link> linkId : demandAtUCC.keySet()){				//Nun erstelle die ganzen Services
-							for (int i = 1; i<=demandAtUCC.get(linkId); i++){
-								CarrierService.Builder csBuilder = CarrierService.Builder.newInstance(Id.create("UCC_"+i, CarrierService.class), linkId);	//
-								csBuilder.setCapacityDemand(1);		//Jeder Service nur Nachfrage = 1, damit Fzg Aufteilugn frei erfolgen kann
-								csBuilder.setServiceDuration(60);	//60sec = 1min
-								csBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(3600, 7200)); //TODO: Zeiten festlegen -> zunächst willkührlich zwischen 1 und 2 Uhr
-//								//TODO: Früheste Abfahrt (earliestVehDepvom UCC bestimmen
-//								csBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Math.max(0, earliestVehDep -60), Math.max(0, earliestVehDep -60))); // zwischen 60 und 30 Minuten bevor das erste Fahrzeug das UCC verlässt. 
-								nonUccC.getServices().add(csBuilder.build());
-							}	
-						}
-					} //end if
-				}
-			}
+			createServicesToUCC(uccCarriers, nonUccCarriers); // Nachfrage den der UCCC ausliefert muss an die Umschlagpunkte geliefert werden. 
 
 			generateCarrierPlans(scenario.getNetwork(), nonUccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die NonUCC-Carriers
 			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_NonUCC" + RUN + runIndex+".xml") ;
@@ -280,6 +249,51 @@ public class KTFreight_v3 {
 		new WriteCarrierScoreInfos(carriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation.txt"), runIndex);
 
 		return carriers;
+	}
+
+
+
+	private static void createServicesToUCC(Carriers uccCarriers,
+			Carriers nonUccCarriers) {
+		//Services aus den UCC für die Non-UCC erstellen -> Funktionmiert grundsätzlich, KT 02.05.15
+		//TODO: Voraussetzung prüfen/Angeben, dass UCC-Carrier-ID mit "UCC" beginnt UND mit der 'HauptCarrier'-ID endet: z.B. Carrier1 -> UCC_Carrier1
+		for (Carrier uccC : uccCarriers.getCarriers().values()){
+			for (Carrier nonUccC : nonUccCarriers.getCarriers().values()){
+				if (uccC.getId().toString().endsWith(nonUccC.getId().toString())){				//TODO: Sicherstellen, dass jeder Service auch erstellt wird--> Sicherheitsabfrage, ansonsten Fehler erzeugen!
+					Map<Id<Link>, Integer> demandAtUCC = new HashMap<Id<Link>, Integer>();		//Zählt nachfrage an UCC-LinkID
+					for (ScheduledTour st : uccC.getSelectedPlan().getScheduledTours()){		//für die einzelnen Touren die Nachfrage an den einzelnen Depots zählen
+						Id<Link> uccLocationId = st.getVehicle().getLocation();
+						int demand = 0;
+
+						for (TourElement tourElement : st.getTour().getTourElements()){
+							if(tourElement instanceof ServiceActivity){
+								ServiceActivity serviceAct = (ServiceActivity)tourElement;
+								demand += serviceAct.getService().getCapacityDemand();
+							}
+						}
+						
+						if (demandAtUCC.containsKey(uccLocationId)){
+							demandAtUCC.put(uccLocationId, demandAtUCC.get(uccLocationId)+demand);  
+						} else  {
+							demandAtUCC.put(uccLocationId, demand);
+						}
+					}
+					
+					//neue Services erstellen des nonUccC zum Depot des uccC.
+					for (Id<Link> linkId : demandAtUCC.keySet()){				//Nun erstelle die ganzen Services
+						for (int i = 1; i<=demandAtUCC.get(linkId); i++){
+							CarrierService.Builder csBuilder = CarrierService.Builder.newInstance(Id.create("UCC_"+i, CarrierService.class), linkId);	//
+							csBuilder.setCapacityDemand(1);		//Jeder Service nur Nachfrage = 1, damit Fzg Aufteilugn frei erfolgen kann
+							csBuilder.setServiceDuration(60);	//60sec = 1min
+							csBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(3600, 7200)); //TODO: Zeiten festlegen -> zunächst willkührlich zwischen 1 und 2 Uhr
+//								//TODO: Früheste Abfahrt (earliestVehDepvom UCC bestimmen
+//								csBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Math.max(0, earliestVehDep -60), Math.max(0, earliestVehDep -60))); // zwischen 60 und 30 Minuten bevor das erste Fahrzeug das UCC verlässt. 
+							nonUccC.getServices().add(csBuilder.build());
+						}	
+					}
+				} //end if
+			}
+		}
 	}
 
 
@@ -456,10 +470,10 @@ public class KTFreight_v3 {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		VehicleTypeDependentRoadPricingCalculator rpCalculator = new VehicleTypeDependentRoadPricingCalculator();
+//		VehicleTypeDependentRoadPricingCalculator rpCalculator = new VehicleTypeDependentRoadPricingCalculator();
 
 
-		//		//Damit alle Carrier die Maut erfahren --> noch unsauber, da auf die einzelnen Vehicles genommen werden --> doppelte Einträge. KT 23.10.14
+		//		TODO//Damit alle Carrier die Maut erfahren --> noch unsauber, da auf die einzelnen Vehicles genommen werden --> doppelte Einträge. KT 23.10.14
 		//		for(Carrier c : carriers.getCarriers().values()){
 		//			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
 		//				Id typeId = v.getVehicleId();
@@ -546,17 +560,24 @@ public class KTFreight_v3 {
 			public ScoringFunction createScoringFunction(final Carrier carrier){
 			SumScoringFunction sumSf = new SumScoringFunction() ;
 			
-//			VehicleFixCostScoring fixCost = new VehicleFixCostScoring(carrier);
-//			sumSf.addScoringFunction(fixCost);
+			VehicleFixCostScoring fixCost = new VehicleFixCostScoring(carrier);
+			sumSf.addScoringFunction(fixCost);
 			
-//			LegScoring legScoring = new LegScoring(carrier);
-//			sumSf.addScoringFunction(legScoring);
+			LegScoring legScoring = new LegScoring(carrier);
+			sumSf.addScoringFunction(legScoring);
 			
-//			ActivityScoring actScoring = new ActivityScoring(carrier);
-//			sumSf.addScoringFunction(actScoring);
+			ActivityScoring actScoring = new ActivityScoring(carrier);
+			sumSf.addScoringFunction(actScoring);
 			
-			MoneyScoring moneyScoring = new MoneyScoring(carrier);
-			sumSf.addScoringFunction(moneyScoring);
+			//TollScoring - liefert nur leider keine Amounts
+//			MoneyScoring moneyScoring = new MoneyScoring(carrier);
+//			sumSf.addScoringFunction(moneyScoring);
+			
+			//TollScoring via Events TODO: an VehicleTypeDependentRPCalc rankommen 
+			TollScoring tollScoring = new TollScoring(carrier, scenario.getNetwork(), rpCalculator) ;
+			sumSf.addScoringFunction(tollScoring);
+		
+		
 			
 			return sumSf;
 			}

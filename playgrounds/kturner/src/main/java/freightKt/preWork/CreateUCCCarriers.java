@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.freight.carrier.Carrier;
+import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
@@ -91,7 +92,7 @@ class CreateUCCCarriers {
 	private static final String NETFILE_NAME = "network" ;
 	private static final String VEHTYPES_NAME = "vehicleTypes" ;
 	private static final String CARRIERS_NAME = "carrierLEH_v2_withFleet" ;
-	private static final String CARRIERS_2EXTRACT = "aldi" ;
+	private static final String CARRIERS_2EXTRACT = "aldi" ;			//Retailer Name, der herausselektiert werden soll.
 	private static final String TOLL_NAME = "toll_city_kt";
 	//Ende  Namesdefinition Berlin
 
@@ -113,7 +114,8 @@ class CreateUCCCarriers {
 	private static final String NETFILE = INPUT_DIR + NETFILE_NAME + ".xml" ;
 	private static final String VEHTYPEFILE = INPUT_DIR + VEHTYPES_NAME + ".xml";
 	private static final String CARRIERFILE = INPUT_DIR + CARRIERS_NAME + ".xml" ;
-	private static final String CARRIEROUTFILE = INPUT_DIR + CARRIERS_2EXTRACT + ".xml";
+	private static final String CARRIEROUTFILE = OUTPUT_DIR + CARRIERS_2EXTRACT + ".xml";
+	private static final String CARRIER_SPLIT_OUTFILE = OUTPUT_DIR + "carrier_" + CARRIERS_2EXTRACT + "_splitted.xml";
 	private static final String TOLLFILE = INPUT_DIR + TOLL_NAME + ".xml";
 	
 	static Carriers carriers = new Carriers() ;
@@ -134,11 +136,15 @@ class CreateUCCCarriers {
 		Carriers extractedCarriers = extractCarrier(carriers, CARRIERS_2EXTRACT); //Step 2a: Extrahieren einzelner Carrier (alle, die mit dem RetailerNamen beginnen)		
 		new CarrierPlanXmlWriterV2(extractedCarriers).write(CARRIEROUTFILE) ;
 		Carriers splittedCarriers = createUCCCarrier(extractedCarriers, TOLLFILE);	//Step3: Nachfrage auf Carrier UCC und normal aufteilen.
-		new CarrierPlanXmlWriterV2(splittedCarriers).write(OUTPUT_DIR +"splittedCarrier.xml");
+		splittedCarriers = renameVehId(splittedCarriers); 							//Step4: VehId je Carrier einzigartig machen, da sonst weitere Vorkommen ingnoriert werden (und somit nicht alle Depots genutzt werden).
+		new CarrierPlanXmlWriterV2(splittedCarriers).write(CARRIER_SPLIT_OUTFILE);
 		
 		System.out.println("### ENDE ###");
 	}
 	
+
+
+
 
 	//Carrier Step 1: Analyse der vorhandenen Carrier
 	private static void calcInfosPerCarrier(Carriers carriers) {
@@ -193,7 +199,7 @@ class CreateUCCCarriers {
 		return tempCarriers;
 	}
 
-	//TODO: Wenn Carrier kein Servie (mehr) hat, dann nicht in splitted Aufnehmen.
+	//Step3: Nachfrage auf Carrier UCC und normal aufteilen.
 	private static Carriers createUCCCarrier(Carriers carriers,
 			String tollfile2) {
 		
@@ -239,6 +245,8 @@ class CreateUCCCarriers {
 		return splittedCarriers;
 	}
 	
+	//Step3b: Fahrzeuge der UCC zuordnen
+	//TODO: Links als Array mit übergeben -> flexibler gestalten.
 	private static void addVehicles(Carrier uccCarrier) {
 		
 		Set<Id<Link>> uccDepotsLinkIds = new HashSet<Id<Link>>();
@@ -278,6 +286,28 @@ class CreateUCCCarriers {
 		
 	}
 
+	//Step4: VehicleId je Carrier um Location erweitern, da sonst weitere Vorkommen auf Grund gleicher VehicleId ingnoriert werden 
+	//		und somit nicht alle Depots genutzt werden.
+	private static Carriers renameVehId(Carriers carriers) {
+		
+		for (Carrier carrier : carriers.getCarriers().values()){
+			//da Änderung der vorhanden Fahrzeuge sonst nicht ging, Umweg über newInstance und setzen der Eigenschaften.
+			CarrierCapabilities tempCc = CarrierCapabilities.newInstance();
+			tempCc.setFleetSize(carrier.getCarrierCapabilities().getFleetSize());
+			//Vehicle neu erstellen, da setVehicleId nicht verfügbar.
+			for (CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()){
+				//
+				tempCc.getCarrierVehicles().add(CarrierVehicle.Builder
+						.newInstance(Id.create(cv.getVehicleId().toString() +"_" + cv.getLocation().toString(), Vehicle.class), cv.getLocation())
+						.setType(cv.getVehicleType())
+						.setEarliestStart(cv.getEarliestStartTime()).setLatestEnd(cv.getLatestEndTime())
+						.build());
+			}
+			carrier.setCarrierCapabilities(tempCc);
+			
+		}		
+		return carriers;
+	}
 
 	private static void createDir(File file) {
 		System.out.println("Verzeichnis " + file + " erstellt: "+ file.mkdirs());	

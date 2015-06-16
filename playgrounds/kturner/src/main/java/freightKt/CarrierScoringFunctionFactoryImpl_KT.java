@@ -4,24 +4,29 @@ import java.io.File;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Defines example carrier scoring function (factory).
  *
  * @author Kt, based on stefan
- * from sschroeder: package org.matsim.contrib.freight.usecases.chessboard;
+ * from sschroeder: package org.matsim.contrib.freight.usecases.chessboard ;
  * 
  * TODO:  MoneyScoring, ActivityScoring anlegen 
  * 
@@ -235,6 +240,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     	
     }  //End Class ActivityScoring
     
+    //TODO: Sollte TollScoring übernehmen, funktioniert jedoch nicht, da keine amounts generiert werden.
     static class MoneyScoring implements SumScoringFunction.MoneyScoring {
 
     	private double score = 0.;
@@ -270,6 +276,52 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 		}
     	
     } // End class MoneyScoring
+    
+    //Alternatives TollScoring von Schroeder {@see org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImp.TollScoring}
+    static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
+
+        private double score = 0.;
+        private Carrier carrier;
+        private Network network;
+
+        private VehicleTypeDependentRoadPricingCalculator roadPricing;
+
+        public TollScoring(Carrier carrier, Network network, VehicleTypeDependentRoadPricingCalculator roadPricing) {
+            this.carrier = carrier;
+            this.roadPricing = roadPricing;
+            this.network = network;
+        }
+
+        @Override
+        public void handleEvent(Event event) {
+            if(event instanceof LinkEnterEvent){
+                CarrierVehicle carrierVehicle = getVehicle(((LinkEnterEvent) event).getVehicleId());
+                if(carrierVehicle == null) throw new IllegalStateException("carrier vehicle missing");
+                double toll = roadPricing.getTollAmount(carrierVehicle.getVehicleType().getId(),network.getLinks().get(((LinkEnterEvent) event).getLinkId()),event.getTime());
+                if(toll > 0.) System.out.println("bing: vehicle " + carrierVehicle.getVehicleId() + " paid toll " + toll + "");
+                score += (-1) * toll;
+            }
+        }
+
+        private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
+            for(CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()){
+                if(v.getVehicleId().equals(vehicleId)){
+                    return v;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public void finish() {
+
+        }
+
+        @Override
+        public double getScore() {
+            return score;
+        }
+    }
     
 	@Override
 	public ScoringFunction createScoringFunction(Carrier carrier) {
