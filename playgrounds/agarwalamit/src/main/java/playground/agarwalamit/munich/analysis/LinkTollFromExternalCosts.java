@@ -37,24 +37,38 @@ import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 
 public class LinkTollFromExternalCosts {
 
-	private final int noOfTimeBin = 1;
-	private final boolean considerCO2Costs = true;
+	private int noOfTimeBin;
+	private boolean considerCO2Costs = true;
 
+	public LinkTollFromExternalCosts (){
+		noOfTimeBin = 1;
+	}
+
+	public LinkTollFromExternalCosts (int noOfTimeBin){
+		this.noOfTimeBin = noOfTimeBin;
+	}
+
+	public LinkTollFromExternalCosts (int noOfTimeBin, boolean considerCO2Costs){
+		this.noOfTimeBin = noOfTimeBin;
+		this.considerCO2Costs = considerCO2Costs;
+	}
 
 	/**
 	 * @param internalizeEmissionOrCongestion emission congestion or both
-	 * Total external costs includes only emission and experienced congestion costs. This is basically toll on each link 
+	 * Total external costs includes only emission and caused congestion costs. This is basically toll on each link 
 	 */
 	public Map<Id<Link>, Double> getLinkToTotalExternalCost(Scenario sc, String internalizeEmissionOrCongestion){
-		
+
+		if(noOfTimeBin!=1) throw new RuntimeException("This method is not yet adapted to more than 1 time bin. Aborting ....");
+		double simEndTime = 30*2400;
 
 		if(internalizeEmissionOrCongestion.equalsIgnoreCase("ei")) return getLink2EmissionToll(sc);
-		else if(internalizeEmissionOrCongestion.equalsIgnoreCase("ci")) return getLink2CongestionToll(sc);
+		else if(internalizeEmissionOrCongestion.equalsIgnoreCase("ci")) return getLink2CongestionToll(sc).get(simEndTime);
 		else if(internalizeEmissionOrCongestion.equalsIgnoreCase("eci")) {
 
-			Map<Id<Link>, Double> link2delaycost =  getLink2CongestionToll(sc);
+			Map<Id<Link>, Double> link2delaycost =  getLink2CongestionToll(sc).get(simEndTime);
 			Map<Id<Link>, Double> link2emissioncost = getLink2EmissionToll(sc);
-			
+
 			Map<Id<Link>, Double> totalCost = new HashMap<Id<Link>, Double>();
 
 			for(Link l : sc.getNetwork().getLinks().values()){
@@ -71,32 +85,33 @@ public class LinkTollFromExternalCosts {
 		} else throw new RuntimeException("Do not recognize the external costs option. Available options are ei, ci or eci. Aborting ...");
 	}
 
-
-
 	/**
 	 * @param sc 
 	 * @return link to caused congestion costs which is basically equal to the toll.
 	 */
-	public Map<Id<Link>, Double> getLink2CongestionToll(Scenario sc){
-		Map<Id<Link>, Double>  linkTolls = new HashMap<Id<Link>, Double>();
+	public Map<Double,Map<Id<Link>, Double>> getLink2CongestionToll(Scenario sc){
+
+		Map<Double, Map<Id<Link>, Double>>  linkTolls = new HashMap<>();
+
 		Config config = sc.getConfig();
-		
+
 		double vtts_car = ((config.planCalcScore().getTraveling_utils_hr()/3600) + 
 				(config.planCalcScore().getPerforming_utils_hr()/3600)) 
 				/ (config.planCalcScore().getMarginalUtilityOfMoney());
-		
+
 		int lastIt = config.controler().getLastIteration();
 		String eventsFile = config.controler().getOutputDirectory()+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 
 		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile,sc,noOfTimeBin);
 		delayAnalyzer.run();
 		Map<Double, Map<Id<Link>, Double>> linkDelays = delayAnalyzer.getTimeBin2LinkId2Delay();
-		
+
 		for (double d :  linkDelays.keySet()){
+			Map<Id<Link>,Double > tolls = new HashMap<>();
 			for (Id<Link> linkid : linkDelays.get(d).keySet()){
-				if(linkDelays.containsKey(linkid)) linkTolls.put(linkid, linkDelays.get(d).get(linkid)*vtts_car);
-				else linkTolls.put(linkid, 0.);
+				tolls.put(linkid, linkDelays.get(d).get(linkid) * vtts_car);
 			}
+			linkTolls.put(d,tolls);
 		}
 		return linkTolls;
 	}
@@ -112,6 +127,7 @@ public class LinkTollFromExternalCosts {
 
 		Map<Id<Link>, Double> linkEmissionCosts = new HashMap<Id<Link>, Double>();
 
+		if(noOfTimeBin!=1) throw new RuntimeException("This method is not yet adapted to more than 1 time bin. Aborting ....");
 
 		for(double d : link2TotalEmissions.keySet()){
 			for(Id<Link> link : sc.getNetwork().getLinks().keySet()){
@@ -121,7 +137,7 @@ public class LinkTollFromExternalCosts {
 
 					if(!str.equals("CO2_TOTAL") || considerCO2Costs){
 						if(link2TotalEmissions.get(d).get(link)!=null && link2TotalEmissions.get(d).get(link).get(str) !=null) 
-							emissionsCosts= ecf.getCostFactor() * link2TotalEmissions.get(d).get(link).get(str);
+							emissionsCosts += ecf.getCostFactor() * link2TotalEmissions.get(d).get(link).get(str);
 					} //else do nothing
 
 				}
