@@ -13,11 +13,16 @@
 		<url>https://svn.code.sf.net/p/matsim/source/contrib/trunk</url>
 	</scm>
 
-    <distributionManagement>
+	<distributionManagement>
         <repository>
-            <id>bintray</id>
-            <url>https://api.bintray.com/maven/matsim/matsim/contrib</url>
-        </repository>
+			<id>bintray</id>
+			<url>https://api.bintray.com/maven/matsim/matsim/contrib</url>
+		</repository>
+		<snapshotRepository>
+			<id>oss-jfrog-artifactory</id>
+			<name>artifactory-snapshots</name>
+			<url>http://oss.jfrog.org/oss-snapshot-local</url>
+		</snapshotRepository>
     </distributionManagement>
 
 	<build>
