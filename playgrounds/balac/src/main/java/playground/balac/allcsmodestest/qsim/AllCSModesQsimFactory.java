@@ -16,15 +16,11 @@ import org.matsim.core.router.TripRouter;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
-import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingVehicleLocation;
-import playground.balac.twowaycarsharingredisigned.qsim.TwoWayCSVehicleLocation;
-
 import java.io.IOException;
 
 /**
  *
- *
+ * @author balacm
  *
  */
 
@@ -48,13 +44,6 @@ public class AllCSModesQsimFactory implements Provider<Netsim>{
 
 	@Override
 	public Netsim get() {
-
-		
-		
-
-		FreeFloatingVehiclesLocation ffvehiclesLocationqt = null;
-		OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocationqt = null;
-		TwoWayCSVehicleLocation twvehiclesLocationqt = null;		
 		
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
@@ -94,7 +83,8 @@ public class AllCSModesQsimFactory implements Provider<Netsim>{
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 		
 		//we need to park carsharing vehicles on the network
-		ParkCSVehicles parkSource = new ParkCSVehicles(sc.getPopulation(), agentFactory, qSim, ffvehiclesLocationqt, owvehiclesLocationqt, twvehiclesLocationqt);
+		ParkCSVehicles parkSource = new ParkCSVehicles(sc.getPopulation(), agentFactory, qSim, this.carSharingVehicles.getFreeFLoatingVehicles(),
+				this.carSharingVehicles.getOneWayVehicles(), this.carSharingVehicles.getRoundTripVehicles());
 		qSim.addAgentSource(agentSource);
 		qSim.addAgentSource(parkSource);
 		return qSim;

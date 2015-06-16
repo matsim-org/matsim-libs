@@ -20,7 +20,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -111,8 +110,6 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 	
 	private Scenario scenario;	
 	
-	private Controler controler;
-	
 	private Link startLinkFF;
 	
 	private Link endLinkOW;
@@ -145,13 +142,12 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 	// c'tor
 
 	public PersonDriverAgentOnlyMembersImpl(final Person person, final Plan plan, 
-			final Netsim simulation, final Scenario scenario, final Controler controler,
+			final Netsim simulation, final Scenario scenario,
 			FreeFloatingVehiclesLocation ffvehiclesLocation, 
 			OneWayCarsharingRDWithParkingVehicleLocation owvehiclesLocation, 
 			TwoWayCSVehicleLocation twvehiclesLocation, TripRouter tripRouter) {
 		this.person = person;
 		this.simulation = simulation;
-		this.controler = controler;
 		this.plan = plan;
 		this.scenario = scenario;
 				
@@ -160,8 +156,8 @@ public class PersonDriverAgentOnlyMembersImpl implements MobsimDriverAgent, Mobs
 		this.twvehiclesLocation = twvehiclesLocation;
 		this.tripRouter = tripRouter;
 		
-		beelineFactor = ((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getBeelineDistanceFactors().get("walk");
-		walkSpeed = (((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk"));
+		beelineFactor = ((PlansCalcRouteConfigGroup)scenario.getConfig().getModule("planscalcroute")).getBeelineDistanceFactors().get("walk");
+		walkSpeed = (((PlansCalcRouteConfigGroup)scenario.getConfig().getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk"));
 		//carsharingVehicleLocations = new ArrayList<ActivityFacility>();
 		mapTW = new HashMap<Link, Link>();
 		mapOW = new HashMap<Link, Link>();
