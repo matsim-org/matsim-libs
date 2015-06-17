@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeData;
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -45,6 +46,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.*;
@@ -66,10 +68,10 @@ import static java.lang.Math.*;
  */
 public class TransitQueryEngineForR implements Serializable {
     static double minimumAngleDefiningIntersection = toRadians(1);
+    private final Map<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, StopStopTimeData>> stopStopTimes = new HashMap<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, StopStopTimeData>>(5000);
     Scenario scenario;
     private AtomicInteger numThreads;
     private int threads = 4;
-    private ArrayList<StopToStopInfo> outList;
     private double densityDistance;
     private double densityArea;
     private HashSet<Id<Node>> trafficControlNodes;
@@ -132,11 +134,12 @@ public class TransitQueryEngineForR implements Serializable {
 //        double[] interStopDistances = convertDouble(transitQueryEngineForR.getInterStopDistances(from, to, routes, lines));
 //        double[] interStopDistances2 = convertDouble(transitQueryEngineForR.getInterStopDistancesMultiThreaded(from, to, routes, lines));
 //        for (int i = 0; i < 100; i++) {
-        transitQueryEngineForR.setIsWeightedAverageValues(!transitQueryEngineForR.isWeightedAverageValues());
+        transitQueryEngineForR.setIsWeightedAverageValues(true);
         transitQueryEngineForR.calculateStopStopInfo(from, to, routes, lines, times);
-        transitQueryEngineForR.calculateStopStopInfo("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/java.enquiry.input.txt", 10000000);
+//        transitQueryEngineForR.calculateStopStopInfo("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/java.enquiry.input.txt", 10000000);
 //        transitQueryEngineForR.writeReport("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/networkinfo.txt");
-        transitQueryEngineForR.writeReport("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/networkinfo.txt");
+//        transitQueryEngineForR.writeReport("/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/networkinfo.txt");
+        transitQueryEngineForR.calculateStopStopInfoForAll(300, "/home/fouriep/latexworkspace/ivtSandbox/papers/workingpapers/2015/singapore/data/fullnetworkinfo300.txt", 100000);
         System.out.printf("");
 //        }
 
@@ -267,6 +270,7 @@ public class TransitQueryEngineForR implements Serializable {
 
     public void loadCEPASEvents(String properties) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException, IOException, NoConnectionException {
         facilityToActivityLevelAtTimeMap = new HashMap<>();
+
         EventsManager eventsManager = EventsUtils.createEventsManager();
         eventsManager.addHandler(new ActivityEndEventHandler() {
             @Override
@@ -307,16 +311,17 @@ public class TransitQueryEngineForR implements Serializable {
             }
         });
 
-        DataBaseAdmin dba = new DataBaseAdmin(new File(properties));
         boolean eventsRead = false;
         try {
             System.out.println("...Reading from pre-processed events...");
+            loadFacilities("/home/fouriep/CEPASFacilities.xml");
             new MatsimEventsReader(eventsManager).readFile("/home/fouriep/CEPASEvents.xml");
             eventsRead = true;
         } catch (Exception e) {
         }
         ActivityFacilitiesFactory fac = new ActivityFacilitiesFactoryImpl();
         if (!eventsRead) {
+            DataBaseAdmin dba = new DataBaseAdmin(new File(properties));
             EventWriterXMLFiltered eventWriterXML = new EventWriterXMLFiltered("/home/fouriep/CEPASEvents.xml");
             eventsManager.addHandler(eventWriterXML);
             Map<String, Id<ActivityFacility>> facilitiesToCreate = new HashMap<>();
@@ -331,6 +336,7 @@ public class TransitQueryEngineForR implements Serializable {
                 scenario.getActivityFacilities().addActivityFacility(activityFacility);
                 facilitiesToCreate.put(stop, activityFacility.getId());
             }
+            new FacilitiesWriter(scenario.getActivityFacilities()).write("/home/fouriep/CEPASFacilities.xml");
 
             resultSet = dba.executeQuery("SELECT stop, t, actType FROM u_fouriep.cepas_analysis_actlevel");
             while (resultSet.next()) {
@@ -350,7 +356,7 @@ public class TransitQueryEngineForR implements Serializable {
             eventWriterXML.closeFile();
         }
 
-        final int total = facilityToActivityLevelAtTimeMap.size();
+        int total = facilityToActivityLevelAtTimeMap.size();
         int i = 0;
         for (FacilityActivityCounter counter : facilityToActivityLevelAtTimeMap.values()) {
             counter.finalizeCounters();
@@ -473,7 +479,7 @@ public class TransitQueryEngineForR implements Serializable {
         return out;
     }
 
-    public boolean[] getSuccess() {
+    public boolean[] getSuccess(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             boolean[] out = new boolean[outList.size()];
@@ -487,7 +493,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new boolean[0];
     }
 
-    public double[] getMinCap() {
+    public double[] getMinCap(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -500,7 +506,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getDistance() {
+    public double[] getDistance(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -513,7 +519,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getNoCarsDistance() {
+    public double[] getNoCarsDistance(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -526,7 +532,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getLengthWeightedAverageLaneCount() {
+    public double[] getLengthWeightedAverageLaneCount(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -539,7 +545,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getLengthWeightedAverageCapacity() {
+    public double[] getLengthWeightedAverageCapacity(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -552,7 +558,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getSqueezeCap() {
+    public double[] getSqueezeCap(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -565,7 +571,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getFromX() {
+    public double[] getFromX(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -582,7 +588,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getToX() {
+    public double[] getToX(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -599,7 +605,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getToY() {
+    public double[] getToY(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -616,7 +622,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getFromY() {
+    public double[] getFromY(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -633,7 +639,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getInterSectionDensity() {
+    public double[] getInterSectionDensity(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -650,7 +656,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getFreeSpeedTravelTime() {
+    public double[] getFreeSpeedTravelTime(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -663,7 +669,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getEuclideanDistance() {
+    public double[] getEuclideanDistance(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -676,7 +682,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getWeightedAvgIntersectionComplexity() {
+    public double[] getWeightedAvgIntersectionComplexity(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -689,7 +695,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getTotalIntersectionComplexity() {
+    public double[] getTotalIntersectionComplexity(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -702,7 +708,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getTotalWeightedRadsTurned() {
+    public double[] getTotalWeightedRadsTurned(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -715,7 +721,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getTrafficControlCount() {
+    public double[] getTrafficControlCount(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -728,7 +734,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public int[] getIntersectionCount() {
+    public int[] getIntersectionCount(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             int[] out = new int[outList.size()];
@@ -741,7 +747,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new int[0];
     }
 
-    public int[] getNodeCount() {
+    public int[] getNodeCount(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             int[] out = new int[outList.size()];
@@ -754,7 +760,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new int[0];
     }
 
-    public int[] getLeftTurnsMadeAtIntersections() {
+    public int[] getLeftTurnsMadeAtIntersections(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             int[] out = new int[outList.size()];
@@ -767,7 +773,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new int[0];
     }
 
-    public int[] getRightTurnsMadeAtIntersections() {
+    public int[] getRightTurnsMadeAtIntersections(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             int[] out = new int[outList.size()];
@@ -780,7 +786,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new int[0];
     }
 
-    public int[] getRightTurnsPassedAtIntersection() {
+    public int[] getRightTurnsPassedAtIntersection(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             int[] out = new int[outList.size()];
@@ -793,7 +799,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new int[0];
     }
 
-    public int[] getLeftTurnsPassedAtIntersection() {
+    public int[] getLeftTurnsPassedAtIntersection(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             int[] out = new int[outList.size()];
@@ -806,7 +812,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new int[0];
     }
 
-    public int[] getIntersectionsWithOneOrMoreLEFTTurnsPassed() {
+    public int[] getIntersectionsWithOneOrMoreLEFTTurnsPassed(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             int[] out = new int[outList.size()];
@@ -819,7 +825,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new int[0];
     }
 
-    public int[] getIntersectionsWithOneOrMoreRIGHTTurnsPassed() {
+    public int[] getIntersectionsWithOneOrMoreRIGHTTurnsPassed(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             int[] out = new int[outList.size()];
@@ -832,7 +838,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new int[0];
     }
 
-    public double[] getAverageActivityArrivalRate() {
+    public double[] getAverageActivityArrivalRate(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -845,7 +851,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getAverageActivityDepartureRate() {
+    public double[] getAverageActivityDepartureRate(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -859,7 +865,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getAverageActivityCountInProgress() {
+    public double[] getAverageActivityCountInProgress(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -873,7 +879,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getAverageActivityGrowthRate() {
+    public double[] getAverageActivityGrowthRate(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -886,7 +892,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getAverageActivityTurnOverRate() {
+    public double[] getAverageActivityTurnOverRate(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -899,7 +905,7 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public double[] getAverageFacilityCount() {
+    public double[] getAverageFacilityCount(List<StopToStopInfo> outList) {
         if (outList != null) {
             int i = 0;
             double[] out = new double[outList.size()];
@@ -912,42 +918,55 @@ public class TransitQueryEngineForR implements Serializable {
         return new double[0];
     }
 
-    public void writeReport(String file) {
-        BufferedWriter writer = IOUtils.getBufferedWriter(file);
+    public void writeReport(String file, boolean append, List<StopToStopInfo> stopToStopInfos) {
+        BufferedWriter writer;
+
+        if (append)
+            writer = IOUtils.getAppendingBufferedWriter(file);
+        else
+            writer = IOUtils.getBufferedWriter(file);
+
         int failCount = 0;
         try {
-            writer.write(
-                    "fromX\t" +
-                            "fromy\t" +
-                            "toX\t" +
-                            "toY\t" +
-                            "dist\t" +
-                            "euclideanDist\t" +
-                            "noCarDist\t" +
-                            "freeSpeedTime\t" +
-                            "minCap\t" +
-                            "wAvgCap\t" +
-                            "wAvgLanes\t" +
-                            "squeezeCap\t" +
-                            "nodeCount\t" +
-                            "intersections\t" +
-                            "intDensity\t" +
-                            "wAvIntComplex\t" +
-                            "totIntComplex\t" +
-                            "rTurnsMadeAtInt\t" +
-                            "lTurnsMadeAtInt\t" +
-                            "rTurnsPassed\t" +
-                            "lTurnsPassed\t" +
-                            "intsWRightTurnPassed\t" +
-                            "intsWLeftTurnPassed\t" +
-                            "trafficControlCount\t" +
-                            "tortuosity\t" +
-                            "avgActArrRate\t" +
-                            "avgActDepRate\t" +
-                            "avgActInProg\t" +
-                            "avgActGrowthRate\t" +
-                            "avgActTurnOverRate\n");
-            for (StopToStopInfo s : outList) {
+            if (!append) {
+                writer.write(
+                        "fromStop\t" +
+                                "toStop\t" +
+                                "line\t" +
+                                "route\t" +
+                                "time\t" +
+                                "fromX\t" +
+                                "fromy\t" +
+                                "toX\t" +
+                                "toY\t" +
+                                "dist\t" +
+                                "euclideanDist\t" +
+                                "noCarDist\t" +
+                                "freeSpeedTime\t" +
+                                "minCap\t" +
+                                "wAvgCap\t" +
+                                "wAvgLanes\t" +
+                                "squeezeCap\t" +
+                                "nodeCount\t" +
+                                "intersections\t" +
+                                "intDensity\t" +
+                                "wAvIntComplex\t" +
+                                "totIntComplex\t" +
+                                "rTurnsMadeAtInt\t" +
+                                "lTurnsMadeAtInt\t" +
+                                "rTurnsPassed\t" +
+                                "lTurnsPassed\t" +
+                                "intsWRightTurnPassed\t" +
+                                "intsWLeftTurnPassed\t" +
+                                "trafficControlCount\t" +
+                                "tortuosity\t" +
+                                "avgActArrRate\t" +
+                                "avgActDepRate\t" +
+                                "avgActInProg\t" +
+                                "avgActGrowthRate\t" +
+                                "avgActTurnOverRate\n");
+            }
+            for (StopToStopInfo s : stopToStopInfos) {
                 if (!s.isSuccess()) {
                     failCount++;
                     for (int i = 0; i < 29; i++) {
@@ -956,6 +975,11 @@ public class TransitQueryEngineForR implements Serializable {
                     writer.write("-1\n");
                     continue;
                 }
+                writer.write(String.valueOf(s.getFromStop()) + "\t");
+                writer.write(String.valueOf(s.getToStop()) + "\t");
+                writer.write(String.valueOf(s.getLine()) + "\t");
+                writer.write(String.valueOf(s.getRoute()) + "\t");
+                writer.write(String.valueOf(s.getTime()) + "\t");
                 writer.write(String.valueOf(s.getFromCoord().getX()) + "\t");
                 writer.write(String.valueOf(s.getFromCoord().getY()) + "\t");
                 writer.write(String.valueOf(s.getToCoord().getX()) + "\t");
@@ -988,7 +1012,7 @@ public class TransitQueryEngineForR implements Serializable {
                 writer.write(String.valueOf(s.getAverageActivityTurnOverRate()) + "\n");
             }
             writer.close();
-            System.err.printf("%d out of %d failed to calculate.", failCount, outList.size());
+            System.err.printf("%d out of %d failed to calculate.", failCount, stopToStopInfos.size());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1024,7 +1048,7 @@ public class TransitQueryEngineForR implements Serializable {
         return outList.toArray(new Double[outList.size()]);
     }
 
-    public void calculateStopStopInfo(String[] fromStops, String[] toStops, String[] routes, String[] lines, String[] times) {
+    public List<StopToStopInfo> calculateStopStopInfo(String[] fromStops, String[] toStops, String[] routes, String[] lines, String[] times) {
         List<String[]> fromStopsList = CollectionUtils.split(fromStops, threads);
         List<String[]> toStopsList = CollectionUtils.split(toStops, threads);
         List<String[]> routesList = CollectionUtils.split(routes, threads);
@@ -1047,13 +1071,14 @@ public class TransitQueryEngineForR implements Serializable {
                 throw new RuntimeException();
             }
         //reassemble the output from threads
-        outList = new ArrayList<>();
+        List<StopToStopInfo> outList = new ArrayList<>();
         for (ParallelQueryExtended q : queries) {
             outList.addAll(new ArrayList<StopToStopInfo>(Arrays.asList(q.out)));
         }
+        return outList;
     }
 
-    public void calculateStopStopInfo(String fileName, int limit) {
+    public List<StopToStopInfo> calculateStopStopInfo(String fileName, int lineReadLimit) {
         ArrayList<String> fromStops = new ArrayList<>(),
                 toStops = new ArrayList<>(),
                 routes = new ArrayList<>(),
@@ -1063,7 +1088,7 @@ public class TransitQueryEngineForR implements Serializable {
         BufferedReader reader = IOUtils.getBufferedReader(fileName);
         String txt = "";
         try {
-            while (limit > 0) {
+            while (lineReadLimit > 0) {
                 txt = reader.readLine();
                 if (txt == null)
                     break;
@@ -1073,7 +1098,7 @@ public class TransitQueryEngineForR implements Serializable {
                 routes.add(split[2]);
                 lines.add(split[3]);
                 times.add(split[4]);
-                limit--;
+                lineReadLimit--;
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -1084,8 +1109,102 @@ public class TransitQueryEngineForR implements Serializable {
         String[] line = lines.toArray(new String[lines.size()]);
         String[] time = times.toArray(new String[times.size()]);
 
-        calculateStopStopInfo(from, to, route, line, time);
+        return calculateStopStopInfo(from, to, route, line, time);
     }
+
+    /**
+     * If the method receives no parameters, it ges ahaead and calculates times for all combinations in the transit sc
+     */
+    public void calculateStopStopInfoForAll(int timeBinSizeInSeconds, String fileName, int batchSize) {
+
+        int startTime = Integer.MAX_VALUE;
+        int endTime = Integer.MIN_VALUE;
+        //don't do it for mrt
+        Map<String, Map<String, List<Tuple<String, String>>>> transitInfo = new HashMap<>();
+        for (TransitLine transitLine : scenario.getTransitSchedule().getTransitLines().values()) {
+            if (transitLine.getId().toString().matches("^[A-Za-z]+"))
+                continue;
+            HashMap<String, List<Tuple<String, String>>> lineInfo = new HashMap<String, List<Tuple<String, String>>>();
+            transitInfo.put(transitLine.getId().toString(), lineInfo);
+            for (TransitRoute route : transitLine.getRoutes().values()) {
+                List<Tuple<String, String>> combinations = new ArrayList<>();
+                lineInfo.put(route.getId().toString(), combinations);
+                for (int s = 0; s < route.getStops().size() - 1; s++) {
+                    combinations.add(
+                            new Tuple<String, String>(
+                                    route.getStops().get(s).getStopFacility().getId().toString(),
+                                    route.getStops().get(s + 1).getStopFacility().getId().toString()
+                            )
+                    );
+                    for (Departure departure : route.getDepartures().values()) {
+                        startTime = (int) min(startTime, departure.getDepartureTime());
+                        endTime = (int) max(endTime, departure.getDepartureTime());
+                    }
+
+                }
+            }
+        }
+
+        endTime += 3600;// to be safe
+        int totalTime = endTime - startTime;
+        int numBins = totalTime / timeBinSizeInSeconds;
+        ArrayList<String> fromStops = new ArrayList<>(),
+                toStops = new ArrayList<>(),
+                routes = new ArrayList<>(),
+                lines = new ArrayList<>(),
+                times = new ArrayList<>();
+
+        int i = 0, batchNumber = 0;
+        for (String l : transitInfo.keySet()) {
+            for (String r : transitInfo.get(l).keySet()) {
+                for (Tuple<String, String> tuple : transitInfo.get(l).get(r)) {
+                    for (int j = 0; j < numBins; j++) {
+                        if (i % batchSize == 0 && i > 0) {
+                            String[] from = fromStops.toArray(new String[i]);
+                            String[] to = toStops.toArray(new String[i]);
+                            String[] route = routes.toArray(new String[i]);
+                            String[] line = lines.toArray(new String[i]);
+                            String[] time = times.toArray(new String[i]);
+
+                            List<StopToStopInfo> stopToStopInfos = calculateStopStopInfo(from, to, route, line, time);
+                            if (batchNumber == 0)
+                                writeReport(fileName, false, stopToStopInfos);
+                            else
+                                writeReport(fileName, true, stopToStopInfos);
+
+                            fromStops = new ArrayList<>();
+                            toStops = new ArrayList<>();
+                            routes = new ArrayList<>();
+                            lines = new ArrayList<>();
+                            times = new ArrayList<>();
+                            i = 0;
+                            batchNumber++;
+                        }
+                        fromStops.add(tuple.getFirst());
+                        toStops.add(tuple.getSecond());
+                        routes.add(r);
+                        lines.add(l);
+                        times.add("" + (j * timeBinSizeInSeconds));
+                        i++;
+                    }
+                }
+            }
+        }
+        //write out the remainder
+        String[] from = fromStops.toArray(new String[i]);
+        String[] to = toStops.toArray(new String[i]);
+        String[] route = routes.toArray(new String[i]);
+        String[] line = lines.toArray(new String[i]);
+        String[] time = times.toArray(new String[i]);
+
+        List<StopToStopInfo> stopToStopInfos = calculateStopStopInfo(from, to, route, line, time);
+        if (batchNumber == 0)
+            writeReport(fileName, false, stopToStopInfos);
+        else
+            writeReport(fileName, true, stopToStopInfos);
+
+    }
+
 
     public void loadNodeAttrs(String file) {
         BufferedReader reader = IOUtils.getBufferedReader(file);
@@ -1463,6 +1582,9 @@ public class TransitQueryEngineForR implements Serializable {
 
             Map.Entry<Integer, Integer> timedvalueSeeker = treeMap.lowerEntry(time);
 
+            if (timedvalueSeeker == null)
+                timedvalueSeeker = treeMap.firstEntry();
+
             if (time - timedvalueSeeker.getKey() > binSize)
                 return out;
 
@@ -1654,6 +1776,36 @@ public class TransitQueryEngineForR implements Serializable {
         private double averageActivityGrowthRate;
         private double averageActivityTurnOverRate;
         private double averageActivityArrivalRate;
+        private String route;
+        private int departureTime;
+        private String fromStop;
+        private String toStop;
+        private String line;
+        private String time;
+
+        public String getRoute() {
+            return route;
+        }
+
+        public int getDepartureTime() {
+            return departureTime;
+        }
+
+        public String getFromStop() {
+            return fromStop;
+        }
+
+        public String getToStop() {
+            return toStop;
+        }
+
+        public String getLine() {
+            return line;
+        }
+
+        public String getTime() {
+            return time;
+        }
 
         public int getIntersectionsWithOneOrMoreLEFTTurnsPassed() {
             return intersectionsWithOneOrMoreLEFTTurnsPassed;
@@ -1772,12 +1924,17 @@ public class TransitQueryEngineForR implements Serializable {
         }
 
         public boolean setAll(String fromStop, String toStop, String route, String line, String time) {
-            int departureTime = Integer.parseInt(time);
+            departureTime = Integer.parseInt(time);
             nodesTraversed = new HashSet<>();
+            this.fromStop = fromStop;
+            this.toStop = toStop;
+            this.line = line;
+            this.route = route;
+            this.time = time;
+
 
             Id routeId = Id.create(route, TransitRoute.class);
             Id lineId = Id.create(line, TransitLine.class);
-
             Id fromStopId = Id.create(fromStop, TransitStopFacility.class);
             Id toStopId = Id.create(toStop, TransitStopFacility.class);
 
