@@ -107,7 +107,7 @@ public class KTFreight_v3 {
 
 	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/Toll/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/Toll_Test/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
@@ -137,7 +137,7 @@ public class KTFreight_v3 {
 	private static final boolean runMatsim = true;	 //when false only jsprit run will be performed
 	private static final int LAST_MATSIM_ITERATION = 0;  //only one iteration for writing events.
 	private static final int LAST_JSPRIT_ITERATION = 1000;
-	private static final int NU_OF_TOTAL_RUNS = 5;	
+	private static final int NU_OF_TOTAL_RUNS = 1;	
 
 	//temporär zum Programmieren als Ausgabe
 	private static WriteTextToFile textInfofile; 
@@ -573,7 +573,6 @@ public class KTFreight_v3 {
 //			MoneyScoring moneyScoring = new MoneyScoring(carrier);
 //			sumSf.addScoringFunction(moneyScoring);
 			
-			//TollScoring via Events TODO: an VehicleTypeDependentRPCalc rankommen 
 			TollScoring tollScoring = new TollScoring(carrier, scenario.getNetwork(), rpCalculator) ;
 			sumSf.addScoringFunction(tollScoring);
 		
