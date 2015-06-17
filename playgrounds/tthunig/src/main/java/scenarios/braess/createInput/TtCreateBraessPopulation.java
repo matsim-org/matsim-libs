@@ -40,8 +40,10 @@ public class TtCreateBraessPopulation {
 	private Population population;
 	private Network network;
 	
-	private boolean simulateInflowCap;
-
+	private boolean simulateInflowCap7 = false;
+	private boolean simulateInflowCap8 = false;
+	private boolean simulateInflowCap9 = false;
+	
 	public TtCreateBraessPopulation(Population pop, Network net) {
 		this.population = pop;
 		this.network = net;
@@ -50,10 +52,10 @@ public class TtCreateBraessPopulation {
 	}
 
 	/**
-	 * Checks whether the network simulates inflow capacity at links 2_3 and 2_4
-	 * or not.
+	 * Checks whether the network simulates inflow capacity at links 2_3, 2_4
+	 * and 4_5 or not.
 	 * 
-	 * If the network contains nodes 7 (and 8), it simulates inflow capacity;
+	 * If the network contains nodes 7, 8 or 9, it simulates inflow capacity;
 	 * otherwise it doesn't.
 	 * 
 	 * The boolean simulateInflowCap is necessary for creating initial plans in
@@ -62,9 +64,11 @@ public class TtCreateBraessPopulation {
 	private void prepareFields() {
 		
 		if (this.network.getNodes().containsKey(Id.createNodeId(7)))
-			this.simulateInflowCap = true;
-		else
-			this.simulateInflowCap = false;
+			this.simulateInflowCap7 = true;
+		if (this.network.getNodes().containsKey(Id.createNodeId(8)))
+			this.simulateInflowCap8 = true;
+		if (this.network.getNodes().containsKey(Id.createNodeId(9)))
+			this.simulateInflowCap9 = true;
 	}
 
 	/**
@@ -105,7 +109,22 @@ public class TtCreateBraessPopulation {
 	}
 	
 	/**
-	 * Calls createPersons(int, boolean, int) with the correct numberOfInitRoutes.
+	 * Calls createPersons(int, boolean, int, Double) with an initial plan
+	 * score of null.
+	 * 
+	 * @param numberOfPersons
+	 * @param sameStartTime
+	 * @param numberOfInitRoutes
+	 */
+	public void createPersons(int numberOfPersons, boolean sameStartTime,
+			int numberOfInitRoutes) {
+		
+		createPersons(numberOfPersons, sameStartTime, numberOfInitRoutes, null);
+	}
+	
+	/**
+	 * Calls createPersons(int, boolean, boolean, Double) with an initial plan
+	 * score of null.
 	 * 
 	 * @param numberOfPersons
 	 * @param sameStartTime
@@ -114,10 +133,25 @@ public class TtCreateBraessPopulation {
 	public void createPersons(int numberOfPersons, boolean sameStartTime,
 			boolean createAllRoutes) {
 		
+		createPersons(numberOfPersons, sameStartTime, createAllRoutes, null);
+	}
+	
+	/**
+	 * Calls createPersons(int, boolean, int) with the correct number of initial
+	 * routes.
+	 * 
+	 * @param numberOfPersons
+	 * @param sameStartTime
+	 * @param createAllRoutes
+	 * @param initPlanScore
+	 */
+	public void createPersons(int numberOfPersons, boolean sameStartTime,
+			boolean createAllRoutes, Double initPlanScore) {
+		
 		if (createAllRoutes)
-			createPersons(numberOfPersons, sameStartTime, 3);
+			createPersons(numberOfPersons, sameStartTime, 3, initPlanScore);
 		else
-			createPersons(numberOfPersons, sameStartTime, 0);
+			createPersons(numberOfPersons, sameStartTime, 0, initPlanScore);
 	}
 
 	/**
@@ -126,15 +160,23 @@ public class TtCreateBraessPopulation {
 	 * Braess's original paradox.
 	 * 
 	 * If sameStartTime is true, all agents start their trip at 8 am. If not,
-	 * the agents start after each other with one second gaps, the first one at
-	 * 8 am.
+	 * the agents start after each other in one second gaps, the first one at 8
+	 * am.
+	 * 
+	 * If numberOfInitRoutes is zero, all agents are initialized with no initial
+	 * routes. If it is three they are initialized with all three routes in this
+	 * scenario, whereby every second agent gets the upper and every other agent
+	 * the lower route as initial selected route.
 	 * 
 	 * @param numberOfPersons
 	 * @param sameStartTime
-	 * @param numberOfInitRoutes number of routes that the agents get as initial plans
+	 * @param numberOfInitRoutes
+	 *            number of routes that the agents get as initial plans
+	 * @param initPlanScore
+	 *            initial score for all plans the persons will get
 	 */
 	public void createPersons(int numberOfPersons, boolean sameStartTime,
-			int numberOfInitRoutes) {
+			int numberOfInitRoutes, Double initPlanScore) {
 		
 		for (int i = 0; i < numberOfPersons; i++) {
 
@@ -161,7 +203,7 @@ public class TtCreateBraessPopulation {
 				// create a route for the Z path
 				List<Id<Link>> pathZ = new ArrayList<>();
 				pathZ.add(Id.createLinkId("1_2"));
-				if (!this.simulateInflowCap){
+				if (!this.simulateInflowCap7){
 					pathZ.add(Id.createLinkId("2_3"));
 				}
 				else{
@@ -169,12 +211,21 @@ public class TtCreateBraessPopulation {
 					pathZ.add(Id.createLinkId("7_3"));
 				}
 				pathZ.add(Id.createLinkId("3_4"));
-				pathZ.add(Id.createLinkId("4_5"));
+				if (!this.simulateInflowCap9){
+					pathZ.add(Id.createLinkId("4_5"));
+				}
+				else{
+					pathZ.add(Id.createLinkId("4_9"));
+					pathZ.add(Id.createLinkId("9_5"));
+				}
 				Route routeZ = new LinkNetworkRouteImpl(
 						Id.createLinkId("0_1"), pathZ, Id.createLinkId("5_6"));
 				leg.setRoute(routeZ);
 			}
 			plan.addLeg(leg);
+			
+			// set an initial plan score
+			plan.setScore(initPlanScore);
 
 			// add a drain activity at link 5_6
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
@@ -198,7 +249,7 @@ public class TtCreateBraessPopulation {
 						.createLeg(TransportMode.car);
 				List<Id<Link>> pathUp = new ArrayList<>();
 				pathUp.add(Id.createLinkId("1_2"));
-				if (!this.simulateInflowCap){
+				if (!this.simulateInflowCap7){
 					pathUp.add(Id.createLinkId("2_3"));
 				}
 				else{
@@ -210,12 +261,20 @@ public class TtCreateBraessPopulation {
 						Id.createLinkId("0_1"), pathUp, Id.createLinkId("5_6"));
 				legUp.setRoute(routeUp);
 				plan2.addLeg(legUp);
-
+				
+				// set an initial plan score
+				plan2.setScore(initPlanScore);
+				
 				// add the same drain activity as for the first plan
 				plan2.addActivity(drainAct);
 
 				person.addPlan(plan2);
 				
+				// select plan2 for every second person (with even id)
+				if (i % 2 == 0){
+					person.setSelectedPlan(plan2);
+				}
+
 				if (numberOfInitRoutes >= 3){
 					// create the third plan
 					Plan plan3 = population.getFactory().createPlan();
@@ -228,24 +287,38 @@ public class TtCreateBraessPopulation {
 							TransportMode.car);
 					List<Id<Link>> pathDown = new ArrayList<>();
 					pathDown.add(Id.createLinkId("1_2"));
-					if (!this.simulateInflowCap){
+					if (!this.simulateInflowCap8){
 						pathDown.add(Id.createLinkId("2_4"));
 					}
 					else{
 						pathDown.add(Id.createLinkId("2_8"));
 						pathDown.add(Id.createLinkId("8_4"));
 					}
-					pathDown.add(Id.createLinkId("4_5"));
+					if (!this.simulateInflowCap9){
+						pathDown.add(Id.createLinkId("4_5"));
+					}
+					else{
+						pathDown.add(Id.createLinkId("4_9"));
+						pathDown.add(Id.createLinkId("9_5"));
+					}
 					Route routeDown = new LinkNetworkRouteImpl(
 							Id.createLinkId("0_1"), pathDown,
 							Id.createLinkId("5_6"));
 					legDown.setRoute(routeDown);
 					plan3.addLeg(legDown);
 
+					// set an initial plan score
+					plan3.setScore(initPlanScore);
+
 					// add the same drain activity as for the first plan
 					plan3.addActivity(drainAct);
 
 					person.addPlan(plan3);
+					
+					// select plan3 for every second person (with odd id)
+					if (i % 2 == 1){
+						person.setSelectedPlan(plan3);
+					}
 				}
 			}
 		}
