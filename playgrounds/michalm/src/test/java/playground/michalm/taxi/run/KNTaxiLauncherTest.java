@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,18 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.ttcalc_error;
+package playground.michalm.taxi.run;
 
-import org.matsim.contrib.otfvis.OTFVis;
+import org.junit.Test;
 
 
-public class SimLauncherOFTVis
+public class KNTaxiLauncherTest
 {
-    public static void main(String[] args)
+    @Test
+    public void test()
     {
-        String cfg = "src/test/java/playground/michalm/ttcalc_error/error_1/config-OFTVis.xml";
-        // cfg = "src/test/java/playground/michalm/ttcalc_error/error_2/config-OFTVis.xml";
-
-        OTFVis.playConfig(cfg);
+        String file = "./src/main/resources/mielec-2-peaks_2014_02/params.in";
+        KNTaxiLauncher.run(file, false, false);//equivalent to (file, false, true)        
+        KNTaxiLauncher.run(file, true, false);
+        KNTaxiLauncher.run(file, true, true);
     }
 }
