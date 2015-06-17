@@ -72,7 +72,7 @@ class KNTaxiLauncher
         //demands: 10, 15, 20, 25, 30, 35, 40
         //supplies: 25, 50
         //path pattern: mielec-2-peaks-new-$supply$-$demand$
-        //String file = "d:/eclipse-vsp/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in";
+        //String file = "./src/main/resources/mielec-2-peaks_2014_02/params-gui.in";
         //String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-50/params.in";
         String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/kaiparams.in";
         run(file, true, false);

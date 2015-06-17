@@ -104,4 +104,15 @@ public class Zones
     {
         return MGC.point2Coord(zone.getMultiPolygon().getCentroid());
     }
+
+
+    public static Map<Id<Centroid>, Centroid> getCentroids(Map<Id<Zone>, Zone> zones)
+    {
+        Map<Id<Centroid>, Centroid> centroids = new LinkedHashMap<>();
+        for (Zone zone : zones.values()) {
+            Centroid centroid = new Centroid(zone);
+            centroids.put(centroid.getId(), centroid);
+        }
+        return centroids;
+    }
 }
