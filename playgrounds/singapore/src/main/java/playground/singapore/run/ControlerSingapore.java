@@ -1,11 +1,15 @@
 package playground.singapore.run;
 
 import com.google.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSModule;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -20,12 +24,10 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityFacilityImpl;
+
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitLocationChoice.TransitLocationChoiceStrategy;
-import playground.singapore.transitRouterEventsBased.TransitRouterEventsWSModule;
-import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
-import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 import java.util.HashSet;
 import java.util.Set;

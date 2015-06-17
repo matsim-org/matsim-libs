@@ -24,6 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import com.google.inject.Provider;
+
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -36,7 +38,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
-import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 
 
 /**

@@ -21,6 +21,10 @@
 package playground.singapore.ptsim;
 
 import com.google.inject.Provider;
+
+import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWLFactory;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -32,10 +36,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouter;
+
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
-import playground.singapore.transitRouterEventsBased.TransitRouterEventsWLFactory;
-import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
-import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -22,6 +22,7 @@ package playground.singapore.ptsim.qnetsimengine;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -36,8 +37,8 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+
 import playground.singapore.ptsim.pt.BoardAlightVehicleTransitStopHandlerFactory;
-import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 
 /**
  * Constructs an instance of the modular QSim based on the required features as per the Config file.
