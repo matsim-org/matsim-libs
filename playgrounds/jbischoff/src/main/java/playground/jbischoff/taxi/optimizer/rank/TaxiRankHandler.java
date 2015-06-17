@@ -73,7 +73,7 @@ public class TaxiRankHandler
             return;
         if (!this.isMonitoredVehicle(event.getPersonId()))
             return;
-        this.ranks.get(event.getLinkId()).addTaxi(vehicles.get(event.getPersonId()));
+        this.ranks.get(event.getLinkId()).removeTaxi(vehicles.get(event.getPersonId()));
     }
 
 
@@ -84,7 +84,7 @@ public class TaxiRankHandler
             return;
         if (!this.isMonitoredVehicle(event.getPersonId()))
             return;
-        this.ranks.get(event.getLinkId()).removeTaxi(vehicles.get(event.getPersonId()));
+        this.ranks.get(event.getLinkId()).addTaxi(vehicles.get(event.getPersonId()));
 
     }
 
