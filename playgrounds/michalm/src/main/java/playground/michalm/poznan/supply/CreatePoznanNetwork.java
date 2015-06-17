@@ -16,23 +16,8 @@ public class CreatePoznanNetwork
 {
     public static void main(String[] args)
     {
-        String dir;
-        String osmFile;
-        String networkFile;
-
-        if (args.length == 3) {
-            dir = args[0];
-            osmFile = dir + args[1];
-            networkFile = dir + args[2];
-        }
-        else if (args.length == 0) {
-            dir = "D:\\bartekp\\poznan\\input\\POZNAN\\2013\\23_01\\";
-            osmFile = dir + "poznan.osm";
-            networkFile = dir + "network.xml";
-        }
-        else {
-            throw new IllegalArgumentException();
-        }
+        String osmFile = "d:/GoogleDrive/Poznan/Osm_2015_02/Source/Poznan_2015_02_05_all.osm";
+        String networkFile = "d:/PP-rad/poznan/test/Poznan_2015_02_05_all.xml";
 
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
@@ -42,7 +27,7 @@ public class CreatePoznanNetwork
                 TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
 
         OsmNetworkReader onr = new OsmNetworkReader(network, coordTrans);
-        /// road same atributes as residential
+        // road -- same attributes as residential
         onr.setHighwayDefaults(1, "motorway", 2, 140.0 / 3.6, 1.0, 2500, true);
         onr.setHighwayDefaults(1, "motorway_link", 1, 70.0 / 3.6, 1.0, 1700, true);
         onr.setHighwayDefaults(2, "trunk", 1, 120.0 / 3.6, 1.0, 2200);
@@ -62,5 +47,4 @@ public class CreatePoznanNetwork
 
         new NetworkCleaner().run(network);
         new NetworkWriter(network).write(networkFile);
-    }
-}
+    }}

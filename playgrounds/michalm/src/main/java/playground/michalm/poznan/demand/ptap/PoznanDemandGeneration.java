@@ -36,7 +36,7 @@ public class PoznanDemandGeneration
 {
     public void generate(String inputDir, String plansFile, String transportMode)
     {
-        String networkFile = inputDir + "Matsim_2015_02/pt_network.xml";
+        String networkFile = inputDir + "Matsim_2015_02/only_A/pt_network.xml";
         String zonesXmlFile = inputDir + "Matsim_2015_02/zones.xml";
         String zonesShpFile = inputDir + "Osm_2015_02/zones.SHP";
 
@@ -84,7 +84,7 @@ public class PoznanDemandGeneration
     public static void main(String[] args)
     {
         String inputDir = "d:/GoogleDrive/Poznan/";
-        String plansFile = "d:/PP-rad/poznan/test/plans.xml.gz";
+        String plansFile = "d:/PP-rad/poznan/test/pt_plans.xml.gz";
         String transportMode = TransportMode.pt;
         new PoznanDemandGeneration().generate(inputDir, plansFile, transportMode);
     }
