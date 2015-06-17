@@ -78,6 +78,8 @@ public class TtBraessResultsWriter {
 		log.info("The total travel time is " + totalTT);
 		log.info(routeUsers[0] + " are using the upper route, " + routeUsers[1] 
 				+ " the middle one and " + routeUsers[2] + " the lower one.");
+		log.info("The average travel times are " + avgRouteTTs[0] + ", " + 
+				avgRouteTTs[1] + " and " + avgRouteTTs[2] + ".");
 		
 		PrintStream stream;
 		String filename = outputDir + "results.txt";
