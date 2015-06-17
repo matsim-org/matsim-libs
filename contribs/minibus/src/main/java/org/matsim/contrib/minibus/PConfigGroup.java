@@ -84,6 +84,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final String ROUTE_PROVIDER = "routeProvider";
 	private static final String SPEED_LIMIT_FOR_STOPS = "speedLimitForStops";
 	private static final String PLANNING_SPEED_FACTOR = "planningSpeedFactor";
+	private static final String DRIVER_REST_TIME = "driverRestTime";
 	private static final String GRID_SIZE = "gridSize";
 	private static final String TIMESLOT_SIZE = "timeSlotSize";
 	private static final String USE_ADAPTIVE_NUMBER_OF_OPERATORS = "useAdaptiveNumberOfOperators";
@@ -140,6 +141,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private String routeProvider = "SimpleCircleScheduleProvider";
 	private double speedLimitForStops = Double.MAX_VALUE;
 	private double planningSpeedFactor = 1.0;
+	private double driverRestTime = 1.0 * 60.0;
 	private double gridSize = Double.MAX_VALUE;
 	private double timeSlotSize = Double.MAX_VALUE;
 	private boolean useAdaptiveNumberOfOperators = false;
@@ -245,6 +247,8 @@ public final class PConfigGroup extends ConfigGroup{
 			this.speedLimitForStops = Double.parseDouble(value);
 		} else if (PLANNING_SPEED_FACTOR.equals(key)){
 			this.planningSpeedFactor = Double.parseDouble(value);
+		} else if (DRIVER_REST_TIME.equals(key)){
+			this.driverRestTime = Double.parseDouble(value);
 		} else if (GRID_SIZE.equals(key)){
 			this.gridSize = Double.parseDouble(value);
 		} else if (TIMESLOT_SIZE.equals(key)){
@@ -330,6 +334,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(ROUTE_PROVIDER, this.routeProvider);
 		map.put(SPEED_LIMIT_FOR_STOPS, Double.toString(this.speedLimitForStops));
 		map.put(PLANNING_SPEED_FACTOR, Double.toString(this.planningSpeedFactor));
+		map.put(DRIVER_REST_TIME, Double.toString(this.driverRestTime));
 		map.put(GRID_SIZE, Double.toString(this.gridSize));
 		map.put(TIMESLOT_SIZE, Double.toString(this.timeSlotSize));
 		map.put(USE_ADAPTIVE_NUMBER_OF_OPERATORS, Boolean.toString(this.useAdaptiveNumberOfOperators));
@@ -392,6 +397,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(ROUTE_PROVIDER, "The route provider used. Currently, there are SimpleCircleScheduleProvider and SimpleBackAndForthScheduleProvider");
 		map.put(SPEED_LIMIT_FOR_STOPS, "Link cannot serve as paratransit stop, if its speed limit is equal or higher than the limit set here. Default is +INF");
 		map.put(PLANNING_SPEED_FACTOR, "Freespeed of link will be modified by factor. Resulting link travel time is written to transit schedule. Default is 1.0 aka freespeed of the link.");
+		map.put(DRIVER_REST_TIME, "The rest time of a driver at the end of a complete tour in seconds. Defaults to 60 seconds.");
 		map.put(GRID_SIZE, "The grid size (length and height) for aggregating stuff in various modules (RandomStopProvider, ActivityLocationsParatransitUser, PFranchise). Default of Double.maxvalue effectively aggregates all data points into one gridPoint");
 		map.put(TIMESLOT_SIZE, "The size of a time slot aggregating stuff in various modules (TimeProvider, CreateNewPlan). Default of Double.maxvalue effectively aggregates all data points into one time slot");
 		map.put(USE_ADAPTIVE_NUMBER_OF_OPERATORS, "Will try to adapt the number of operators to meet the given share of profitable operators if set to true");
@@ -552,6 +558,10 @@ public final class PConfigGroup extends ConfigGroup{
 		return this.planningSpeedFactor;
 	}
 	
+	public double getDriverRestTime(){
+		return this.driverRestTime;
+	}
+	
 	public double getGridSize(){
 		return this.gridSize;
 	}
@@ -598,6 +608,10 @@ public final class PConfigGroup extends ConfigGroup{
 
 	public String getMode() {
 		return this.operationMode;
+	}
+	
+	public boolean getWelfareMaximization() {
+		return this.welfareMaximization;
 	}
 
 	public List<Integer> getTopoTypesForStops() {
@@ -756,10 +770,6 @@ public final class PConfigGroup extends ConfigGroup{
 			
 		}
 		
-	}
-
-	public boolean getWelfareMaximization() {
-		return this.welfareMaximization;
 	}
 
 }

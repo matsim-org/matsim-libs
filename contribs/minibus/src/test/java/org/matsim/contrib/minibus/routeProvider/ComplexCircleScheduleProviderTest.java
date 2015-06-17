@@ -56,7 +56,7 @@ public class ComplexCircleScheduleProviderTest {
 		
 		TransitSchedule tS = CreateStopsForAllCarLinks.createStopsForAllCarLinks(scenario.getNetwork(), pC);
 		
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(tS, scenario.getNetwork(), null, pC.getVehicleMaximumVelocity(), pC.getPlanningSpeedFactor(), pC.getMode());
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(tS, scenario.getNetwork(), null, pC.getVehicleMaximumVelocity(), pC.getPlanningSpeedFactor(), pC.getDriverRestTime(), pC.getMode());
 		
 		Id<Operator> lineId = Id.create("line1", Operator.class);
 		Id<PPlan> routeId = Id.create("route1", PPlan.class);
@@ -115,7 +115,7 @@ public class ComplexCircleScheduleProviderTest {
 		
 		TransitSchedule tS = CreateStopsForAllCarLinks.createStopsForAllCarLinks(scenario.getNetwork(), pC);
 		
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(tS, scenario.getNetwork(), null, pC.getVehicleMaximumVelocity(), pC.getPlanningSpeedFactor(), pC.getMode());
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(tS, scenario.getNetwork(), null, pC.getVehicleMaximumVelocity(), pC.getPlanningSpeedFactor(), pC.getDriverRestTime(), pC.getMode());
 		
 		Id<Operator> lineId = Id.create("line1", Operator.class);
 		Id<PPlan> routeId = Id.create("route1", PPlan.class);
@@ -181,7 +181,7 @@ public class ComplexCircleScheduleProviderTest {
 		PConfigGroup pC = new PConfigGroup();
 		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, scenario.getPopulation(), scenario.getTransitSchedule(), null);
 		
-		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), randomStopProvider, pC.getVehicleMaximumVelocity(), pC.getMode());
+		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), randomStopProvider, pC.getVehicleMaximumVelocity(), pC.getDriverRestTime(), pC.getMode());
 		
 		for (int i = 0; i < 5; i++) {
 			TransitStopFacility stop1 = prov.getRandomTransitStop(0);
@@ -198,7 +198,7 @@ public class ComplexCircleScheduleProviderTest {
 		
 		Id<Operator> lineId = Id.create("1", Operator.class);
 		
-		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), null, pC.getVehicleMaximumVelocity(), pC.getMode());
+		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), null, pC.getVehicleMaximumVelocity(), pC.getDriverRestTime(), pC.getMode());
 		TransitLine line = prov.createEmptyLineFromOperator(lineId);
 		
 		Assert.assertEquals("Transit line ids have to be the same", Id.create(lineId, TransitLine.class), line.getId());

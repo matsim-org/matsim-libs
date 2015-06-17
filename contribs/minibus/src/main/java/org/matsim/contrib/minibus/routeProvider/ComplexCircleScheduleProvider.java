@@ -56,9 +56,10 @@ final class ComplexCircleScheduleProvider implements PRouteProvider {
 	private final LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
 	private final double vehicleMaximumVelocity;
 	private final double planningSpeedFactor;
+	private final double driverRestTime;
 	private final String transportMode;
 	
-	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, double vehicleMaximumVelocity, double planningSpeedFactor, final String transportMode) {
+	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, double vehicleMaximumVelocity, double planningSpeedFactor, double driverRestTime, final String transportMode) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0); // Here, it may make sense to use the variable cost parameters given in the config. Ihab/Daniel may'14
@@ -83,6 +84,7 @@ final class ComplexCircleScheduleProvider implements PRouteProvider {
 		this.randomStopProvider = randomStopProvider;
 		this.vehicleMaximumVelocity = vehicleMaximumVelocity;
 		this.planningSpeedFactor = planningSpeedFactor;
+		this.driverRestTime = driverRestTime;
 		this.transportMode = transportMode;
 	}
 
@@ -109,7 +111,7 @@ final class ComplexCircleScheduleProvider implements PRouteProvider {
 				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
 				departure.setVehicleId(Id.create(transitRoute.getId().toString() + "-" + i, Vehicle.class));
 				transitRoute.addDeparture(departure);
-				j += transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset() + 1 *60;
+				j += transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset() + this.driverRestTime;
 				n++;
 			}
 		}		

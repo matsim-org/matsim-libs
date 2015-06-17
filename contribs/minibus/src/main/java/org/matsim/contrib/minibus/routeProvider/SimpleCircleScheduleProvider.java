@@ -58,8 +58,9 @@ final class SimpleCircleScheduleProvider implements PRouteProvider {
 	private final String transportMode;
 	private final LeastCostPathCalculator routingAlgo;
 	private final double vehicleMaximumVelocity;
+	private final double driverRestTime;
 	
-	public SimpleCircleScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, double vehicleMaximumVelocity, final String transportMode) {
+	public SimpleCircleScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, double vehicleMaximumVelocity, double driverRestTime, final String transportMode) {
 		this.pIdentifier = pIdentifier;
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
@@ -75,6 +76,7 @@ final class SimpleCircleScheduleProvider implements PRouteProvider {
 		((Dijkstra)this.routingAlgo).setModeRestriction(modes);
 		
 		this.vehicleMaximumVelocity = vehicleMaximumVelocity;
+		this.driverRestTime = driverRestTime;
 	}
 
 	@Override
@@ -104,7 +106,7 @@ final class SimpleCircleScheduleProvider implements PRouteProvider {
 				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
 				departure.setVehicleId(Id.create(transitRoute.getId().toString() + "-" + i, Vehicle.class));
 				transitRoute.addDeparture(departure);
-				j += transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset() + 1 *60;
+				j += transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset() + this.driverRestTime;
 				n++;
 			}
 		}		

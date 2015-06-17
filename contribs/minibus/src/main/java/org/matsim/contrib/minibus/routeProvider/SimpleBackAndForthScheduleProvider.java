@@ -58,14 +58,16 @@ final class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	private final RandomStopProvider randomStopProvider;
 	private final String transportMode;
 	private final double vehicleMaximumVelocity;
+	private final double driverRestTime;
 	
-	public SimpleBackAndForthScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, double vehicleMaximumVelocity, String transportMode) {
+	public SimpleBackAndForthScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, double vehicleMaximumVelocity, double driverRestTime, String transportMode) {
 		this.pIdentifier = pIdentifier;
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		this.randomStopProvider = randomStopProvider;
 		this.transportMode = transportMode;
 		this.vehicleMaximumVelocity = vehicleMaximumVelocity;
+		this.driverRestTime = driverRestTime;
 	}
 	
 	@Override
@@ -107,7 +109,7 @@ final class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 				departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
 				departure.setVehicleId(Id.create(pLineId.toString() + "-" + i, Vehicle.class));
 				transitRoute_R.addDeparture(departure);
-				j += transitRoute_R.getStop(startStop).getDepartureOffset() + 1 *60;
+				j += transitRoute_R.getStop(startStop).getDepartureOffset() + this.driverRestTime;
 				n++;
 			}
 		}		

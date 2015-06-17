@@ -72,7 +72,7 @@ public class PScenarioHelper {
 		TransitSchedule sched = CreatePStops.createPStops(sC.getNetwork(), pC);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, sC.getPopulation(), sched, null);
 		
-		PRouteProvider rP = new ComplexCircleScheduleProvider(sched, sC.getNetwork(), randomStopProvider, pC.getPlanningSpeedFactor(), pC.getVehicleMaximumVelocity(), pC.getMode());
+		PRouteProvider rP = new ComplexCircleScheduleProvider(sched, sC.getNetwork(), randomStopProvider, pC.getPlanningSpeedFactor(), pC.getVehicleMaximumVelocity(), pC.getDriverRestTime(), pC.getMode());
 		
 		ArrayList<String> parameter = new ArrayList<>();
 		parameter.add("900");
@@ -343,7 +343,7 @@ public class PScenarioHelper {
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getDriverRestTime(), conf.getMode());
 	
 		Operator coop = new BasicOperator(Id.create(conf.getPIdentifier() + 1, Operator.class), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2111to2333(sched, conf.getPIdentifier()), 0, 0.0);
@@ -358,7 +358,7 @@ public class PScenarioHelper {
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getDriverRestTime(), conf.getMode());
 	
 		Operator coop = new BasicOperator(Id.create(conf.getPIdentifier() + 1, Operator.class), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2333to2111(sched, conf.getPIdentifier()), 0, 0.0);
@@ -373,7 +373,7 @@ public class PScenarioHelper {
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getDriverRestTime(), conf.getMode());
 		Operator coop = new BasicOperator(Id.create(conf.getPIdentifier() + 1, Operator.class), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2414to3444(sched, conf.getPIdentifier()), 0, 0.0);
 		
@@ -387,7 +387,7 @@ public class PScenarioHelper {
 		PConfigGroup conf = new PConfigGroup();
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
-		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
+		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getDriverRestTime(), conf.getMode());
 		Operator coop = new BasicOperator(Id.create(conf.getPIdentifier() + 1, Operator.class), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2111to1314to4443(sched, conf.getPIdentifier()), 0, 0.0);
 		
