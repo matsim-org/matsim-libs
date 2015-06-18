@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package org.matsim.integration.daily.fundamentaldiagram;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,16 +33,16 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CombinedDomainXYPlot;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.jfree.util.ShapeUtilities;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -67,7 +65,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -90,6 +87,8 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
+ * Generates fundamental diagrams for the all combination of link and traffic dynamics for car/bike and car/truck groups.
+ * Also generates car/bike FDs using fast capacity update method.
  * @author amit
  */
 
@@ -99,15 +98,17 @@ public class CreateAutomatedFD {
 	public CreateAutomatedFD(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
 		this.linkDynamics = linkDynamics;
 		this.trafficDynamics = trafficDynamics;
+		this.travelModes = new String [] {"car","bike"};
 	}
-
+	
 	private LinkDynamics linkDynamics;
 	private TrafficDynamics trafficDynamics;
 	
 	@Parameters
 	public static Collection<Object[]> createFds() {
 		Object[] [] fdData = new Object [][] { 
-				{LinkDynamics.FIFO, TrafficDynamics.queue}, 
+				{LinkDynamics.FIFO, TrafficDynamics.queue},
+				{LinkDynamics.FIFO, TrafficDynamics.withHoles}, 
 				{LinkDynamics.PassingQ,TrafficDynamics.queue},
 				{LinkDynamics.PassingQ,TrafficDynamics.withHoles}
 				};
@@ -115,17 +116,23 @@ public class CreateAutomatedFD {
 	}
 	
 	@Test
-	public void FDs(){
+	public void FDs_carTruck(){
+		this.travelModes = new String [] {"car","truck"};
 		run(this.linkDynamics, this.trafficDynamics,false);
 	}
 	
-	@Test public void Fds_fastCapacityUpdate(){
+	@Test
+	public void FDs_carBike(){
+		run(this.linkDynamics, this.trafficDynamics,false);
+	}
+	
+	@Test public void Fds_carBike_fastCapacityUpdate(){
 		run(this.linkDynamics,this.trafficDynamics,true);
 	}
 	
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 	
-	private  final String [] travelModes = {"car","bike"};
+	private String [] travelModes;
 	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId("0");
 	private Scenario scenario;
 	private Map<String, VehicleType> modeVehicleTypes;
@@ -151,12 +158,21 @@ public class CreateAutomatedFD {
 		
 		//equal modal split run
 		Map<String, Integer> minSteps = new HashMap<String, Integer>();
-		minSteps.put(travelModes[0], 1);
-		minSteps.put(travelModes[1], 4);
-
-		int reduceNoOfDataPointsInPlot = 4; // 4 times less points are sufficient to see the plot
 		
-		double networkDensity = 3*(1000/7.5);
+		double pcu1 = modeVehicleTypes.get(travelModes[0]).getPcuEquivalents();
+		double pcu2 = modeVehicleTypes.get(travelModes[1]).getPcuEquivalents();
+		
+		if(pcu1==1 && pcu2 == 0.25) { //car bike
+			minSteps.put(travelModes[0], 1);
+			minSteps.put(travelModes[1], 4);
+		} else { //car truck
+			minSteps.put(travelModes[0], 3);
+			minSteps.put(travelModes[1], 1);
+		}
+		
+		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
+		
+		double networkDensity = 3.*(1000./7.5);
 		int numberOfPoints = (int) Math.ceil(networkDensity/(reduceNoOfDataPointsInPlot * 2.))+5;
 
 		List<Map<String,Integer>> points2Run = new ArrayList<Map<String,Integer>>();
@@ -201,7 +217,7 @@ public class CreateAutomatedFD {
 			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 			
 			Map<String, VehicleType> travelModesTypes = new HashMap<String, VehicleType>();
-			for(String mode :modeVehicleTypes.keySet()){
+			for(String mode :travelModes){
 				travelModesTypes.put(mode, modeVehicleTypes.get(mode));
 			}
 			agentSource.setModeVehicleTypes(travelModesTypes);
@@ -284,15 +300,21 @@ public class CreateAutomatedFD {
 		car.setMaximumVelocity(16.667);
 		car.setPcuEquivalents(1.0);
 		modeVehicleTypes.put("car", car);
-		TravelModesFlowDynamicsUpdator modeUpdator = new TravelModesFlowDynamicsUpdator(car);
-		mode2FlowData.put(car.getId(), modeUpdator);
 
 		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
 		bike.setMaximumVelocity(4.167);
 		bike.setPcuEquivalents(0.25);
 		modeVehicleTypes.put("bike", bike);
-		modeUpdator = new TravelModesFlowDynamicsUpdator(bike);
-		mode2FlowData.put(bike.getId(), modeUpdator);
+		
+		VehicleType truck = VehicleUtils.getFactory().createVehicleType(Id.create("truck",VehicleType.class));
+		truck.setMaximumVelocity(8.33);
+		truck.setPcuEquivalents(3.);
+		modeVehicleTypes.put("truck", truck);
+		
+		for (String mode :travelModes){
+			TravelModesFlowDynamicsUpdator modeUpdator = new TravelModesFlowDynamicsUpdator(modeVehicleTypes.get(mode));
+			mode2FlowData.put(modeVehicleTypes.get(mode).getId(), modeUpdator);
+		}
 	}
 
 	private void createNetwork(){
@@ -320,51 +342,54 @@ public class CreateAutomatedFD {
 
 	private void scatterPlot (Map<Double, Map<String, Tuple<Double, Double>>> inputData, String outFile){
 
-		XYSeries carFlow = new XYSeries("Car flow");
-		XYSeries bikeFlow = new XYSeries("Bike flow");
-		XYSeries carSpeed = new XYSeries("Car speed");
-		XYSeries bikeSpeed = new XYSeries("Bike speed");
+		String mode1 = travelModes[0];
+		String mode2 = travelModes[1];
+		
+		XYSeries carFlow = new XYSeries(mode1+" flow");
+		XYSeries bikeFlow = new XYSeries(mode2+" flow");
+		XYSeries carSpeed = new XYSeries(mode1+" speed");
+		XYSeries bikeSpeed = new XYSeries(mode2+" speed");
 
 		for(double d :inputData.keySet()){
-			carFlow.add(d, inputData.get(d).get(travelModes[0]).getFirst());
-			carSpeed.add(d, inputData.get(d).get(travelModes[0]).getSecond());
+			carFlow.add(d, inputData.get(d).get(mode1).getFirst());
+			carSpeed.add(d, inputData.get(d).get(mode1).getSecond());
 
-			bikeFlow.add(d, inputData.get(d).get(travelModes[1]).getFirst());
-			bikeSpeed.add(d, inputData.get(d).get(travelModes[1]).getSecond());
+			bikeFlow.add(d, inputData.get(d).get(mode2).getFirst());
+			bikeSpeed.add(d, inputData.get(d).get(mode2).getSecond());
 		}
 
+		// flow vs density
 		XYSeriesCollection flowDataset = new XYSeriesCollection();
 		flowDataset.addSeries(carFlow);
 		flowDataset.addSeries(bikeFlow);
-		JFreeChart chart = ChartFactory.createScatterPlot("Fundamental diagrams", "Overall density (PCU/km)", "Flow (PCU/hr)", flowDataset);
 
+		NumberAxis flowAxis = new NumberAxis("Flow (PCU/h)");
+		flowAxis.setRange(0.0, 2100.0);
+		
+		XYPlot plot1 = new XYPlot(flowDataset, null, flowAxis, new XYLineAndShapeRenderer(false,true));
+		plot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+
+		// speed vs density
 		XYSeriesCollection speedDataset = new XYSeriesCollection();
 		speedDataset.addSeries(carSpeed);
 		speedDataset.addSeries(bikeSpeed);
-
-		XYPlot plot = chart.getXYPlot();
-
-		NumberAxis axis1 = (NumberAxis) plot.getRangeAxis();
-        axis1.setRange(0.0, 2100.0);
 		
-		NumberAxis axis2 = new NumberAxis("Speed (m/s)");
-		axis2.setRange(0.0, 17.0);
-		axis2.setLabelFont(new Font("SansSerif", Font.BOLD, 15));
-		plot.setRangeAxisLocation(1,AxisLocation.BOTTOM_OR_RIGHT);
-		plot.setRangeAxis(1, axis2);
-
-		plot.mapDatasetToRangeAxis(1, 1);
-		plot.setDataset(1,speedDataset);
-		plot.setBackgroundPaint(Color.WHITE);
-
-		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
-		renderer.setSeriesLinesVisible(0, false);
-		renderer.setSeriesLinesVisible(1, false);
-		renderer.setSeriesShape(0, ShapeUtilities.createDiamond(4));
-		renderer.setSeriesShape(1, ShapeUtilities.createDownTriangle(4));
-		renderer.setSeriesPaint(0, Color.BLACK);
-		renderer.setSeriesPaint(1, Color.GREEN);
-		plot.setRenderer(1,renderer);
+		NumberAxis speedAxis = new NumberAxis("Speed (m/s)");
+		speedAxis.setRange(0.0, 17.0);
+		
+		XYPlot plot2 = new XYPlot(speedDataset, null, speedAxis, new XYLineAndShapeRenderer(false,true));
+		plot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);
+		
+		NumberAxis densityAxis = new NumberAxis("Overall density (PCU/km)");
+		densityAxis.setRange(0.0,150.00);
+		
+		CombinedDomainXYPlot plot = new CombinedDomainXYPlot(densityAxis);
+		plot.setGap(10.);
+		plot.add(plot1);
+		plot.add(plot2);
+		plot.setOrientation(PlotOrientation.VERTICAL);
+		
+		JFreeChart chart = new JFreeChart("Fundamental diagrams", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
 		try {
 			ChartUtilities.saveChartAsPNG(new File(outFile), chart, 800, 600);
