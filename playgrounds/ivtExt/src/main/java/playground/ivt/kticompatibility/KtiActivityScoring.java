@@ -307,22 +307,31 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 		//}
 		this.score = 0;
 		this.score += this.getTooShortDurationScore();
+		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after short duration!" );
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "score after too short duration: "+score );
 		}
+
 		this.score += this.getWaitingTimeScore();
+		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after waiting time!" );
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "score after waiting time: "+score );
 		}
+
 		this.score += this.getPerformanceScore();
+		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after performance score!" );
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "score after performance: "+score );
 		}
+
 		this.score += this.getFacilityPenaltiesScore();
+		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after facility penalties!" );
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "score after facility penalty: "+score );
 		}
+
 		this.score += this.getNegativeDurationScore();
+		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after negative duration!" );
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "score after negative duration: "+score );
 		}
@@ -389,26 +398,6 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 	public double getNegativeDurationScore() {
 		return (2 * this.params.marginalUtilityOfLateArrival_s * Math.abs(this.accumulatedNegativeDuration));
-	}
-
-	public Map<String, Double> getAccumulatedDurations() {
-		return Collections.unmodifiableMap(this.accumulatedTimeSpentPerforming);
-	}
-
-	public Map<String, Double> getZeroUtilityDurations() {
-		return Collections.unmodifiableMap(this.zeroUtilityDurations);
-	}
-
-	public double getAccumulatedTooShortDuration() {
-		return accumulatedTooShortDuration;
-	}
-
-	public double getTimeSpentWaiting() {
-		return timeSpentWaiting;
-	}
-
-	public double getAccumulatedNegativeDuration() {
-		return accumulatedNegativeDuration;
 	}
 
 	@Override
