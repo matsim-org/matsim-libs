@@ -154,11 +154,13 @@ public class TaxiStatusDataAnalyser
             "yyyyMMddHHmmss");
 
 
-    public static void main(String[] args) throws ParseException
+    public static void main(String[] args) throws ParseException, IOException
     {
 //        String dir = "d:/eclipse-vsp/sustainability-w-michal-and-dlr/data/OD/2014/status/";
 //        String dir = "c:/local_jb/data/taxi_berlin/2014/status/";
-        String dir = "/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014/status/";
+    	
+//        String dir = "/Users/jb/sustainability-w-michal-and-dlr/data/taxi_berlin/2014/status/";
+    	String dir = "C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/taxi_berlin/2014/status/";
         String statusMatricesFile = dir + "statusMatrix.xml.gz";
 
         String averagesFile = dir + "averages.csv";
@@ -171,6 +173,8 @@ public class TaxiStatusDataAnalyser
         String avgStatusMatricesTxtFile = dir + "statusMatrixAvg.txt";
 
         String zonalStatuses = dir + "statusByZone_tuesday.txt";
+        
+        String idleVehiclesPerZoneAndHour = dir + "idleVehiclesPerZoneAndHour.txt";
 
 //
         Matrices statusMatrices = MatrixUtils.readMatrices(statusMatricesFile);
@@ -178,18 +182,90 @@ public class TaxiStatusDataAnalyser
 //                dumpTaxisInSystem(statusMatrices, "20130415000000", "20130421235500", averagesFile,
 //                        taxisOverTimeFile);
 //
-        String start = 	"20140408040000";
-        String end = 	"20140409035500";
+        String start = 	"20140407000000";
+        String end = 	"20140413235500";
         
-        writeStatusByZone(statusMatrices, zonalStatuses, start, end);
-        Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);
-        writeMatrices(hourlyMatrices, hourlyStatusMatricesXmlFile, hourlyStatusMatricesTxtFile);
+//        writeStatusByZone(statusMatrices, zonalStatuses, start, end);
+//        Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);
+//        writeMatrices(hourlyMatrices, hourlyStatusMatricesXmlFile, hourlyStatusMatricesTxtFile);
 //
 //        writeMatrices(calculateAverages(hourlyMatrices, 1./24, Functions.constant("avg")),
 //                avgStatusMatricesXmlFile, avgStatusMatricesTxtFile);
+        writeIdleVehiclesByZoneAndStatus(statusMatrices, idleVehiclesPerZoneAndHour, start, end);
     }
 
+    private static void writeIdleVehiclesByZoneAndStatus(Matrices statusMatrices, String idleVehicles, String start, String end) throws ParseException, IOException
+    {
 
+        Set<String> allZones = new HashSet<String>();
+        for (Matrix matrix : statusMatrices.getMatrices().values()){
+        	allZones.addAll(matrix.getFromLocations().keySet());
+        }
+        
+        BufferedWriter writer = IOUtils.getBufferedWriter(idleVehicles);
+        Date currentTime = STATUS_DATE_FORMAT.parse(start);
+        Date endTime = STATUS_DATE_FORMAT.parse(end);
+       
+        //header
+        writer.append("zone");
+        while (!currentTime.equals(endTime)) {
+        	
+        	if (currentTime.getMinutes() == 00){
+            	writer.append("\t"+STATUS_DATE_FORMAT.format(currentTime));
+            	
+            	}
+        	currentTime = getNextTime(currentTime);
+
+        }
+        
+        for (String zone : allZones){
+            currentTime = STATUS_DATE_FORMAT.parse(start);
+            endTime = STATUS_DATE_FORMAT.parse(end);
+            double hourlyVehicles = 0;
+            writer.newLine();
+            writer.append(zone);
+            while (!currentTime.equals(endTime)) {
+            	
+            	Matrix  m = statusMatrices.getMatrix(STATUS_DATE_FORMAT.format(currentTime));   
+            	if (m!=null){
+            	if (m.getFromLocations().containsKey(zone))
+            	{
+            	for (Entry entry : m.getFromLocEntries(zone)){
+            		switch (entry.getToLocation()){
+            		case "65": 
+            		case "70" : 
+            		case "80" : 
+            		case "83" : 
+            		case "85":
+            		{
+            			hourlyVehicles+=entry.getValue();
+            			break;
+            		} 
+            		default:
+            			break;
+            		
+            	}
+            	}
+            	}
+            	}
+            	if (zone.equals("1011401")){
+            		System.out.println(STATUS_DATE_FORMAT.format(currentTime)+"\t"+hourlyVehicles);
+            	}
+            	if (currentTime.getMinutes() == 55){
+            	writer.append("\t"+hourlyVehicles);
+            	hourlyVehicles = 0;	
+
+            	}
+            
+            	currentTime = getNextTime(currentTime);
+            }
+        
+        }
+        writer.flush();
+        writer.close();
+        }
+   
+    
     private static void writeStatusByZone(Matrices statusMatrices, String zonalStatuses, String start, String end) throws ParseException
     {   
         Date currentTime = STATUS_DATE_FORMAT.parse(start);
