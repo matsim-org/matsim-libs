@@ -72,18 +72,10 @@ import com.google.inject.multibindings.MapBinder;
 /**
  * @author thibautd
  */
-public class DefaultJointStrategiesModule extends AbstractModule {
-    private MapBinder<String, GroupPlanStrategy> planStrategyBinder;
-    private MapBinder<String, GroupLevelPlanSelector> selectorBinder;
-    private MapBinder<String, ExtraPlanRemover> removerBinder;
-    private MapBinder<String, NonInnovativeStrategyFactory> nonInnovativeBinder;
+public class DefaultJointStrategiesModule extends AbstractJointStrategiesModule {
 
 	@Override
 	public void install() {
-		planStrategyBinder = MapBinder.newMapBinder(binder(), String.class, GroupPlanStrategy.class);
-		selectorBinder =  MapBinder.newMapBinder( binder() , String.class , GroupLevelPlanSelector.class );
-		removerBinder =  MapBinder.newMapBinder( binder() , String.class , ExtraPlanRemover.class );
-		nonInnovativeBinder =  MapBinder.newMapBinder( binder() , String.class , NonInnovativeStrategyFactory.class );
 
 		// default factories
 		// ---------------------------------------------------------------------
@@ -215,72 +207,6 @@ public class DefaultJointStrategiesModule extends AbstractModule {
 		addRemoverFactory(
 				"LexicographicPerComposition",
 				LexicographicRemoverFactory.class );
-	}
-
-	public void addFactory(
-			final String name,
-			final Class<? extends Provider<? extends GroupPlanStrategy>> f) {
-		planStrategyBinder.addBinding( name ).toProvider( f );
-	}
-
-	public void addFactory(
-			final String name,
-			final Provider<? extends GroupPlanStrategy> f) {
-		planStrategyBinder.addBinding( name ).toProvider( f );
-	}
-
-	public void addSelectorFactory(
-			final String name,
-			final Provider<GroupLevelPlanSelector> f) {
-		selectorBinder.addBinding( name ).toProvider( f );
-	}
-
-	public void addSelectorAndStrategyFactory(
-			final String name,
-			final Class<? extends NonInnovativeStrategyFactory> f) {
-		// Not really nice, but could not come with something better right now:
-		// still need constructor to be injected,
-		// and the class to provide two providers (which one cannot implement
-		// at the same time)
-		nonInnovativeBinder.addBinding( name ).to( f );
-		addFactory( name , f );
-		addSelectorFactory( name ,
-				new Provider<GroupLevelPlanSelector>() {
-					@Inject Map<String, NonInnovativeStrategyFactory> map;
-
-					@Override
-					public GroupLevelPlanSelector get() {
-						return map.get( name ).createSelector();
-					}
-				} );
-	}
-
-	public void addSelectorAndStrategyFactory(
-			final String name,
-			final NonInnovativeStrategyFactory f) {
-		// Not really nice, but could not come with something better right now:
-		// still need constructor to be injected,
-		// and the class to provide two providers (which one cannot implement
-		// at the same time)
-		nonInnovativeBinder.addBinding( name ).toInstance( f );
-		addFactory( name , f );
-		addSelectorFactory( name ,
-				new Provider<GroupLevelPlanSelector>() {
-					@Inject Map<String, NonInnovativeStrategyFactory> map;
-
-					@Override
-					public GroupLevelPlanSelector get() {
-						return map.get( name ).createSelector();
-					}
-				} );
-	}
-
-	public void addRemoverFactory(
-			final String name,
-			final Class<? extends Provider<ExtraPlanRemover>> f) {
-		removerBinder
-			.addBinding( name )
-			.toProvider( f );
 	}
 
 }
