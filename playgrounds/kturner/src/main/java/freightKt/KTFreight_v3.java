@@ -68,7 +68,9 @@ import org.matsim.vehicles.VehicleType;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -107,7 +109,7 @@ public class KTFreight_v3 {
 
 	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/Toll_Test/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/UCC_Test_NonUcc/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
@@ -116,6 +118,10 @@ public class KTFreight_v3 {
 	private static final String CARRIERS_NAME = "grid-carrier_kt" ;
 	private static final String ALGORITHM_NAME = "grid-algorithm" ;
 	private static final String TOLL_NAME = "grid-tollCordon";
+	private static final String uccC_prefix = "UCC_";		//PRefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
+	private static final String[] retailerNames = {"gridCarrier1", "gridCarrier3"}; //All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if Carrier should be used.
+	private static final String[] uccDepotsLinkIdsString = {"j(0,5)", "j(10,5)" }; //Location of UCC
+
 	//Ende Namesdefinition Grid
 
 
@@ -148,7 +154,6 @@ public class KTFreight_v3 {
 
 
 	public static void main(String[] args) {
-
 		for (int i = 1; i<=NU_OF_TOTAL_RUNS; i++) {
 			rpscheme = new RoadPricingSchemeImpl();		//Damit jeweils neu besetzt wird; sonst würde es sich aufkumulieren.
 			rpCalculator = new VehicleTypeDependentRoadPricingCalculator();	//Damit jeweils neu besetzt wird; sonst würde es sich aufkumulieren.
@@ -200,12 +205,50 @@ public class KTFreight_v3 {
 		CarrierVehicleTypes vehicleTypes = createVehicleTypes();
 
 		Carriers carriers = createCarriers(vehicleTypes);
+	
+		carriers = new UccCarrierCreator().extractCarriers(carriers, retailerNames);
 
-		/*TODO: usingUCC = false führt im Moment zu Fehlerhaften Ergebnissen, da hier bereits die Services auf neue Carrier mit entsprechenden Standorten aufgeteilt sind.
+		/*TODO: usingUCC = false führt im Moment zu fehlerhaften Ergebnissen, da hier bereits die Services auf neue Carrier mit entsprechenden Standorten aufgeteilt sind.
 		*		Somit so umbauen, dass in einem einem ersten Schritt der Retailer extrahiert wird (unabahängig Ucc/ non UCC)
 		*		Im UCC-Fall, dann erst die Aufteilung der Carrier vornehmen und anschließend das Problem seperat lösen.
 		*/
 		if (usingUCC) {			//Wenn UCC verwendent werden, dann muss das Problem geteilt werden.
+			List<Id<Link>> uccDepotsLinkIds = new ArrayList<Id<Link>>();	//Location of UCC
+			for (String linkId : uccDepotsLinkIdsString){
+				uccDepotsLinkIds.add(Id.createLinkId(linkId));
+			}
+			
+//			UccCarrierCreator uccCarrierCreator = new UccCarrierCreator(carriers, vehicleTypes, TOLLFILE, uccC_prefix, retailerNames, uccDepotsLinkIds);
+			UccCarrierCreator uccCarrierCreator = new UccCarrierCreator(carriers, vehicleTypes, TOLLFILE, uccC_prefix, retailerNames, uccDepotsLinkIds, 0.0, 23.0*3600);
+			uccCarrierCreator.createSplittedUccCarrriers();
+			carriers = uccCarrierCreator.getSplittedCarriers();
+			new CarrierPlanXmlWriterV2(carriers).write( TEMP_DIR + "splittedCarriers_" + RUN + runIndex+".xml") ;
+			
+			Carriers uccCarriers = new Carriers();
+			Carriers nonUccCarriers = new Carriers();
+			for (Carrier c : carriers.getCarriers().values()){
+				if (c.getId().toString().startsWith(uccC_prefix)){		//Wenn Carrier ID mit UCC beginnt.
+					uccCarriers.addCarrier(c);
+				} else {
+					nonUccCarriers.addCarrier(c);
+				};
+			}
+			generateCarrierPlans(scenario.getNetwork(), uccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die UCC-Carriers
+			new CarrierPlanXmlWriterV2(uccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_UCC_" + RUN + runIndex+".xml") ;
+			new WriteCarrierScoreInfos(uccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_UCC.txt"), runIndex);
+
+			createServicesToUCC(uccCarriers, nonUccCarriers); // Nachfrage den der UCCC ausliefert muss an die Umschlagpunkte geliefert werden. 
+
+			generateCarrierPlans(scenario.getNetwork(), nonUccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die NonUCC-Carriers
+			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_NonUCC" + RUN + runIndex+".xml") ;
+			new WriteCarrierScoreInfos(nonUccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_NonUCC.txt"), runIndex);
+
+		} else {  // ohne UCCs 
+			generateCarrierPlans(scenario.getNetwork(), carriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs
+		}
+			
+			/*
+			if (usingUCC) {			//Wenn UCC verwendent werden, dann muss das Problem geteilt werden.
 			Carriers uccCarriers = new Carriers();
 			Carriers nonUccCarriers = new Carriers();
 			for (Carrier c : carriers.getCarriers().values()){
@@ -232,10 +275,12 @@ public class KTFreight_v3 {
 			}
 			for (Carrier c : nonUccCarriers.getCarriers().values()){
 				carriers.addCarrier(c);
-			}
+			} 
 		} else {  // ohne UCCs 
 			generateCarrierPlans(scenario.getNetwork(), carriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs
 		}
+		*/
+		
 
 		//### Output nach Jsprit Iteration
 		new CarrierPlanXmlWriterV2(carriers).write( TEMP_DIR + "jsprit_plannedCarriers_" + RUN + runIndex+".xml") ; //Muss in Temp, da OutputDir leer sein muss // setOverwriteFiles gibt es nicht mehr; kt 05.11.2014
