@@ -252,7 +252,7 @@ public class TaxiStatusDataAnalyser
             		System.out.println(STATUS_DATE_FORMAT.format(currentTime)+"\t"+hourlyVehicles);
             	}
             	if (currentTime.getMinutes() == 55){
-            	writer.append("\t"+hourlyVehicles);
+            	writer.append("\t"+hourlyVehicles/12.0);
             	hourlyVehicles = 0;	
 
             	}
