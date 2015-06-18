@@ -21,15 +21,13 @@ package org.matsim.contrib.socnetsim.jointtrips.scoring;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction;
 
 /**
  * @author thibautd
  */
-public class BlackListedActivityScoringFunction implements SumScoringFunction.ActivityScoring, ScoringFunctionAccumulator.ActivityScoring {
+public class BlackListedActivityScoringFunction implements SumScoringFunction.ActivityScoring {
 	private final SumScoringFunction.ActivityScoring delegate;
-	private final ScoringFunctionAccumulator.ActivityScoring accDelegate;
 
 	private final StageActivityTypes blackList;
 
@@ -38,9 +36,6 @@ public class BlackListedActivityScoringFunction implements SumScoringFunction.Ac
 			final SumScoringFunction.ActivityScoring delegate) {
 		this.blackList = blackList;
 		this.delegate = delegate;
-		this.accDelegate = delegate instanceof ScoringFunctionAccumulator.ActivityScoring ?
-			(ScoringFunctionAccumulator.ActivityScoring) delegate :
-			null;
 	}
 
 	@Override
@@ -69,36 +64,6 @@ public class BlackListedActivityScoringFunction implements SumScoringFunction.Ac
 	@Override
 	public double getScore() {
 		return delegate.getScore();
-	}
-
-
-	@Override
-	@Deprecated
-	public void reset() {
-		if ( accDelegate != null ) {
-			accDelegate.reset();
-		}
-		else throw new UnsupportedOperationException();
-	}
-
-	@Override
-	@Deprecated
-	public void startActivity(double time, Activity act) {
-		if ( accDelegate != null ) {
-			if ( blackList.isStageActivity( act.getType() ) ) return;
-			accDelegate.startActivity( time , act );
-		}
-		else throw new UnsupportedOperationException();
-	}
-
-	@Override
-	@Deprecated
-	public void endActivity(double time, Activity act) {
-		if ( accDelegate != null ) {
-			if ( blackList.isStageActivity( act.getType() ) ) return;
-			accDelegate.endActivity( time , act );
-		}
-		else throw new UnsupportedOperationException();
 	}
 }
 
