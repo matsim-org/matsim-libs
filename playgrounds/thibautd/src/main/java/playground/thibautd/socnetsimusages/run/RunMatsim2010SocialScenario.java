@@ -51,6 +51,7 @@ import org.matsim.contrib.socnetsim.run.RunUtils;
 import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
 import playground.thibautd.socnetsimusages.scoring.KtiScoringFunctionFactoryWithJointModes;
 import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
+import playground.thibautd.socnetsimusages.traveltimeequity.EquityStrategiesModule;
 
 /**
  * @author thibautd
@@ -85,6 +86,7 @@ public class RunMatsim2010SocialScenario {
 						install( new DefaultGroupStrategyRegistryModule() );
 						install( new JointTripsModule() );
 						install( new SocialNetworkModule() );
+						install( new EquityStrategiesModule() );
 					}
 				} );
 
