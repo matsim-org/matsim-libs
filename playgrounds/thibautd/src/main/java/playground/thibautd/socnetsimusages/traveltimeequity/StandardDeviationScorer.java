@@ -133,7 +133,7 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 				final double tt =
 						travelTimesRecord.getTravelTimeBefore(
 								arrivalPersons.get( i ),
-								arrivalTimes.get( i ) ) );
+								arrivalTimes.get( i ) );
 
 				travelTimes.adjustOrPutValue(
 						arrivalPersons.get( i ),
@@ -145,7 +145,7 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 				final double tt =
 						travelTimesRecord.getTravelTimeBefore(
 								departurePersons.get( i ),
-								departureTimes.get( i ) ) );
+								departureTimes.get( i ) );
 
 				travelTimes.adjustOrPutValue(
 						departurePersons.get(i),
