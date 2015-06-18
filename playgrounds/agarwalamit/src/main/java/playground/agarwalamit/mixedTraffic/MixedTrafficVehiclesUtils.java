@@ -29,6 +29,7 @@ public class MixedTrafficVehiclesUtils {
 	public final static String bike = TransportMode.bike;
 	public final static String walk = TransportMode.walk;
 	public final static String motorbike = "motorbike";
+	public final static String truck = "truck";
 	
 	/**
 	 * @param travelMode
@@ -43,6 +44,7 @@ public class MixedTrafficVehiclesUtils {
 		case bike: pcu = 0.25; break;
 		case motorbike: pcu = 0.25;break;
 		case walk: pcu = 0.10;break;
+		case truck: pcu = 3.0; break;
 		default: pcu = 1.0; break;
 		}
 		return pcu;
@@ -61,6 +63,7 @@ public class MixedTrafficVehiclesUtils {
 		case bike: speed = 4.17; break;
 		case motorbike: speed = 16.67;break;
 		case walk: speed = 1.2;break;
+		case truck : speed = 8.33; break;
 		default: speed = 16.67; break;
 		}
 		return speed;
