@@ -18,7 +18,9 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.traveltimeequity;
 
+import gnu.trove.TDoubleCollection;
 import gnu.trove.list.array.TDoubleArrayList;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -122,28 +124,38 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 
 		public double calcStdDev() {
 			assert departureTimes.size() == arrivalTimes.size();
-			final TDoubleArrayList travelTimes = new TDoubleArrayList( arrivalTimes.size() * 2 );
+			// for each person, sum the travel times: we do not want to enforce that access and egress of an agent have
+			// the same length, but similarity across agents.
+			final TObjectDoubleHashMap<Id<Person>> travelTimes = new TObjectDoubleHashMap<>();
 
 			assert arrivalTimes.size() == arrivalPersons.size();
 			for ( int i=0; i < arrivalTimes.size(); i++ ) {
-				travelTimes.add(
+				final double tt =
 						travelTimesRecord.getTravelTimeBefore(
 								arrivalPersons.get( i ),
 								arrivalTimes.get( i ) ) );
+
+				travelTimes.adjustOrPutValue(
+						arrivalPersons.get( i ),
+						tt, tt);
 			}
 
 			assert departureTimes.size() == departurePersons.size();
 			for ( int i=0; i < departureTimes.size(); i++ ) {
-				travelTimes.add(
+				final double tt =
 						travelTimesRecord.getTravelTimeBefore(
 								departurePersons.get( i ),
 								departureTimes.get( i ) ) );
+
+				travelTimes.adjustOrPutValue(
+						departurePersons.get(i),
+						tt, tt);
 			}
 
-			return calcStdDev( travelTimes );
+			return calcStdDev( travelTimes.valueCollection() );
 		}
 
-		private double calcStdDev( final TDoubleArrayList travelTimes ) {
+		private double calcStdDev( final TDoubleCollection travelTimes ) {
 			double avg = 0;
 			for ( double tt : travelTimes.toArray() ) avg += tt;
 			avg /= travelTimes.size();
