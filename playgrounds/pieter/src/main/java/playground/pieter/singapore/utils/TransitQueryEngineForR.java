@@ -439,10 +439,13 @@ public class TransitQueryEngineForR implements Serializable {
         Link fromLink = null;
         Link toLink = null;
         for (TransitRouteStop tss : stops) {
-            if (tss.getStopFacility().getId().equals(fromStopId))
+            if (Integer.parseInt(tss.getStopFacility().getId().toString()) == Integer.parseInt(fromStopId.toString())) {
                 fromLink = scenario.getNetwork().getLinks().get(tss.getStopFacility().getLinkId());
-            if (tss.getStopFacility().getId().equals(toStopId))
+            }
+            if (Integer.parseInt(tss.getStopFacility().getId().toString()) == Integer.parseInt(toStopId.toString())) {
                 toLink = scenario.getNetwork().getLinks().get(tss.getStopFacility().getLinkId());
+            }
+
         }
 
         if (fromLink == null || toLink == null)
