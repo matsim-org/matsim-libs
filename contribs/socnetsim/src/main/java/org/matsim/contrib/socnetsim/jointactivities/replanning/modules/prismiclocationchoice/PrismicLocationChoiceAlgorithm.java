@@ -132,18 +132,18 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			final Collection<Subchain> subchains,
 			final ActivityFacility facility) {
 		for ( Subchain subchain : subchains ) {
-			((ActivityImpl) subchain.toMove).setFacilityId(
+			((ActivityImpl) subchain.getToMove()).setFacilityId(
 				facility.getId() );
-			((ActivityImpl) subchain.toMove).setLinkId(
+			((ActivityImpl) subchain.getToMove()).setLinkId(
 				facility.getLinkId() );
-			((ActivityImpl) subchain.toMove).setCoord(
+			((ActivityImpl) subchain.getToMove()).setCoord(
 				facility.getCoord() );
 		}
 	}
 
 	private List<ActivityFacility> identifyPotentialLocations(
 			final Collection<Subchain> subchains) {
-		final String type = CollectionUtils.getElement( 0 , subchains ).toMove.getType();
+		final String type = CollectionUtils.getElement(0, subchains).getToMove().getType();
 		final QuadTree<ActivityFacility> quadTree = facilitiesPerType.get( type );
 
 		// TODO: handle especially case where one agent is far away (ie do choice only for other agents?)
@@ -155,10 +155,10 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 
 			assert !subchains.isEmpty();
 			for ( Subchain subchain : subchains ) {
-				final ActivityFacility start = facilities.getFacilities().get( subchain.start.getFacilityId() );
-				if ( start == null ) throw new RuntimeException( "no facility "+subchain.start.getFacilityId()+" for activity "+subchain.start );
-				final ActivityFacility end = facilities.getFacilities().get( subchain.end.getFacilityId() );
-				if ( end == null ) throw new RuntimeException( "no facility "+subchain.end.getFacilityId()+" for activity "+subchain.end );
+				final ActivityFacility start = facilities.getFacilities().get( subchain.getStart().getFacilityId() );
+				if ( start == null ) throw new RuntimeException( "no facility "+ subchain.getStart().getFacilityId()+" for activity "+ subchain.getStart());
+				final ActivityFacility end = facilities.getFacilities().get( subchain.getEnd().getFacilityId() );
+				if ( end == null ) throw new RuntimeException( "no facility "+ subchain.getEnd().getFacilityId()+" for activity "+ subchain.getEnd());
 
 				final double minDistance = CoordUtils.calcDistance( start.getCoord() , end.getCoord() ) + 1E-9;
 				final Collection<ActivityFacility> prism =
@@ -227,7 +227,7 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 						getRandomSubchain( p , config.getTypes() ) :
 						getRandomSubchain( p , Collections.singleton( type ) );
 				if ( sc != null ) subchainGroup.add( sc );
-				if ( type == null && sc != null ) type = sc.toMove.getType();
+				if ( type == null && sc != null ) type = sc.getToMove().getType();
 			}
 			if ( !subchainGroup.isEmpty() ) groups.add( subchainGroup );
 		}
@@ -261,8 +261,10 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			potentialSubchains.get( random.nextInt( potentialSubchains.size() ) );
 	}
 
-	private static class Subchain {
-		final Activity start, toMove, end;
+	public static class Subchain {
+		private final Activity start;
+		private final Activity toMove;
+		private final Activity end;
 
 		public Subchain(
 				final Activity start,
@@ -272,10 +274,22 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 			this.toMove = toMove;
 			this.end = end;
 		}
+
+		public Activity getStart() {
+			return start;
+		}
+
+		public Activity getToMove() {
+			return toMove;
+		}
+
+		public Activity getEnd() {
+			return end;
+		}
 	}
 
-	public static interface LocationChooser {
-		public ActivityFacility choose(
+	public interface LocationChooser {
+		ActivityFacility choose(
 				Collection<Subchain> subchains,
 				List<ActivityFacility> choiceSet);
 	}
@@ -306,10 +320,10 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 				maxDists[ i ] = Double.NEGATIVE_INFINITY;
 				for ( Subchain subchain : subchains ) {
 					final double dist = CoordUtils.calcDistance(
-							subchain.start.getCoord(),
+							subchain.getStart().getCoord(),
 							fac.getCoord() ) +
 						CoordUtils.calcDistance(
-							subchain.end.getCoord(),
+							subchain.getEnd().getCoord(),
 							fac.getCoord() );
 					if ( dist > maxDists[ i ] ) maxDists[ i ] = dist;
 				}
@@ -339,10 +353,10 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 				double max = Double.NEGATIVE_INFINITY;
 				for ( Subchain subchain : subchains ) {
 					final double dist = CoordUtils.calcDistance(
-							subchain.start.getCoord(),
+							subchain.getStart().getCoord(),
 							fac.getCoord() ) +
 						CoordUtils.calcDistance(
-							subchain.end.getCoord(),
+							subchain.getEnd().getCoord(),
 							fac.getCoord() );
 					if ( dist > max ) max = dist;
 				}
@@ -379,10 +393,10 @@ public class PrismicLocationChoiceAlgorithm implements GenericPlanAlgorithm<Grou
 
 				for ( Subchain subchain : subchains ) {
 					final double dist = CoordUtils.calcDistance(
-							subchain.start.getCoord(),
+							subchain.getStart().getCoord(),
 							fac.getCoord() ) +
 						CoordUtils.calcDistance(
-							subchain.end.getCoord(),
+							subchain.getEnd().getCoord(),
 							fac.getCoord() );
 					if ( dist > vals[ i ] ) vals[ i ] = dist;
 				}
