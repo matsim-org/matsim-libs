@@ -84,7 +84,7 @@ final class PBox implements Operators {
 		
 		if (pConfig.getWelfareMaximization()) {
 			log.info("Objective Function: Welfare");
-			this.welfareAnalyzer = new WelfareAnalyzer();
+			this.welfareAnalyzer = new WelfareAnalyzer(pConfig.getInitialScoresFile());
 		} else {
 			log.info("Objective Function: Operator Profit");
 			this.welfareAnalyzer = null;

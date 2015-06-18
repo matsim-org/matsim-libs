@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.minibus.operator.BasicOperator;
+import org.matsim.contrib.minibus.operator.WelfareCarefulMultiPlanOperator;
 import org.matsim.contrib.minibus.replanning.ReduceStopsToBeServedRFare;
 import org.matsim.contrib.minibus.replanning.ReduceTimeServedRFare;
 import org.matsim.core.config.ConfigGroup;
@@ -105,6 +106,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final String PMODULE_PARAMETER = "ModuleParameter_";
 	
 	private static final String WELFARE_MAXIMIZATION = "welfareMaximization";
+	private static final String INITIAL_SCORES_FILE = "initialScoresFile";
 	
 	// Defaults
 	private String pIdentifier = "p_";
@@ -157,6 +159,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private String topoTypesForStops = null;
 	
 	private boolean welfareMaximization = false;
+	private String initialScoresFile = null;
 
 	// Strategies
 	private final LinkedHashMap<Id<PStrategySettings>, PStrategySettings> strategies = new LinkedHashMap<>();
@@ -289,6 +292,8 @@ public final class PConfigGroup extends ConfigGroup{
 			settings.setParameters(value);
 		} else if (WELFARE_MAXIMIZATION.equals(key)) {
 			this.welfareMaximization = Boolean.parseBoolean(value);
+		} else if(INITIAL_SCORES_FILE.equals(key)){
+			this.initialScoresFile = value;
 		} else {
 			log.error("unknown parameter: " + key + "...");
 		}
@@ -348,6 +353,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(OPERATIONMODE, this.operationMode);
 		map.put(TOPOTYPESFORSTOPS, this.topoTypesForStops);
 		map.put(WELFARE_MAXIMIZATION, Boolean.toString(this.welfareMaximization));
+		map.put(INITIAL_SCORES_FILE, this.initialScoresFile);
 		
 		for (Entry<Id<PStrategySettings>, PStrategySettings> entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), entry.getValue().getModuleName());
@@ -411,6 +417,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
 		map.put(TOPOTYPESFORSTOPS, "comma separated integer-values, as used in NetworkCalcTopoTypes");
 		map.put(WELFARE_MAXIMIZATION, "computes operator revenues based on the change in welfare. EXPERIMENTAL!");
+		map.put(INITIAL_SCORES_FILE, "plan scores of a base case scenario. Needed to compare changes in user benefits during welfare maximization. EXPERIMENTAL!");
 		
 		for (Entry<Id<PStrategySettings>, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), "name of strategy");
@@ -613,6 +620,12 @@ public final class PConfigGroup extends ConfigGroup{
 	public boolean getWelfareMaximization() {
 		return this.welfareMaximization;
 	}
+	
+	public String getInitialScoresFile(){
+		
+		return this.initialScoresFile;
+		
+	}
 
 	public List<Integer> getTopoTypesForStops() {
 		if(this.topoTypesForStops == null){
@@ -730,9 +743,16 @@ public final class PConfigGroup extends ConfigGroup{
 		
 		if(this.welfareMaximization ){
 			
+			if(!this.operatorType.equals(WelfareCarefulMultiPlanOperator.OPERATOR_NAME)){
+				
+				log.error("Welfare maximization is enabled, " + WelfareCarefulMultiPlanOperator.OPERATOR_NAME + " should be used as operator type. Aborting...");
+				throw new RuntimeException();
+				
+			}
+			
 			if(marginalUtilityOfMoney == 0.){
 				
-				log.error("Paratransit welfare maximization is enabled but marginal utility of money equals 0! This would produce benefits of-Infinity! Aborting...");
+				log.error("Welfare maximization is enabled but marginal utility of money equals 0! This would produce benefits of-Infinity! Aborting...");
 				throw new RuntimeException();
 				
 			}
@@ -740,6 +760,13 @@ public final class PConfigGroup extends ConfigGroup{
 			if(this.earningsPerBoardingPassenger != 0 || this.earningsPerKilometerAndPassenger != 0){
 				
 				log.error("Welfare maximization is enabled, no fares should be collected here. Aborting...");
+				throw new RuntimeException();
+				
+			}
+			
+			if(this.initialScoresFile == null){
+				
+				log.error("Welfare maximization is enabled, but no initial scores file given. Aborting...");
 				throw new RuntimeException();
 				
 			}
