@@ -65,7 +65,6 @@ public class CarsharingMATSimLectureScoringFunctionFactory implements ScoringFun
 
 	private final Scenario scenario;
 	private final StageActivityTypes blackList;
-	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 
 	// very expensive to initialize:only do once!
 	private final Map<Id, CharyparNagelScoringParameters> individualParameters = new HashMap< >();
@@ -77,7 +76,6 @@ public class CarsharingMATSimLectureScoringFunctionFactory implements ScoringFun
 			final Scenario scenario,
 			final StageActivityTypes typesNotToScore ) {
 		this.scenario = scenario;
-		this.facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		this.blackList = typesNotToScore;
 	}
 
@@ -104,8 +102,7 @@ public class CarsharingMATSimLectureScoringFunctionFactory implements ScoringFun
 					new KtiActivityScoring(
 						person.getSelectedPlan(),
 						params,
-						facilityPenalties,
-						((ScenarioImpl) scenario).getActivityFacilities() )) );
+						scenario.getActivityFacilities() )) );
 
 		// standard modes
 		scoringFunctionAccumulator.addScoringFunction(

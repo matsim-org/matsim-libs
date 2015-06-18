@@ -63,7 +63,6 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 
 	private final Scenario scenario;
 	private final StageActivityTypes blackList;
-	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 
 	// very expensive to initialize:only do once!
 	private final Map<Id, CharyparNagelScoringParameters> individualParameters = new HashMap< >();
@@ -75,7 +74,6 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			final Scenario scenario,
 			final StageActivityTypes typesNotToScore ) {
 		this.scenario = scenario;
-		this.facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		this.blackList = typesNotToScore;
 	}
 
@@ -102,7 +100,6 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 					new KtiActivityScoring(
 						person.getSelectedPlan(),
 						params,
-						facilityPenalties,
 						((ScenarioImpl) scenario).getActivityFacilities() )) );
 
 		// standard modes

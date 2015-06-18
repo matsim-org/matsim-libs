@@ -70,7 +70,6 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 	// TODO differentiate in any way?
 	public static final double MINIMUM_DURATION = 0.5 * 3600;
 
-	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 	private final ActivityFacilities facilities;
 
 	private static final DayType DEFAULT_DAY = DayType.wed;
@@ -84,9 +83,8 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 	private Plan plan;
 	private CharyparNagelScoringParameters params;
 	
-	public KtiActivityScoring(Plan plan, CharyparNagelScoringParameters params, final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities) {
+	public KtiActivityScoring(Plan plan, CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
 		this.params = params;
-		this.facilityPenalties = facilityPenalties;
 		this.facilities = facilities;
 		this.plan = plan;
 	}
@@ -94,7 +92,6 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 	/*
 	 * Variables only used in activity score calculation.
 	 */
-	private List<ScoringPenalty> penalty = null;
 	private final HashMap<String, Double> accumulatedTimeSpentPerforming = new HashMap<String, Double>();
 	private final HashMap<String, Double> zeroUtilityDurations = new HashMap<String, Double>();
 	private double accumulatedTooShortDuration;
@@ -229,38 +226,6 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 				double duration = activityEnd - activityStart;
 
-				// calculate penalty due to facility load only when:
-				// - activity type is penalized (currently only shop and leisure-type activities)
-				// - duration is bigger than 0
-				if (act.getType().startsWith("shop") || act.getType().startsWith("leisure")) {
-					if (duration > 0) {
-
-						double accumulatedDuration = 0.0;
-						if (this.accumulatedTimeSpentPerforming.containsKey(act.getType())) {
-							accumulatedDuration = this.accumulatedTimeSpentPerforming.get(act.getType());
-						}
-
-						scoreImprovement =
-							this.getPerformanceScore(act.getType(), accumulatedDuration + duration) -
-							this.getPerformanceScore(act.getType(), accumulatedDuration);
-
-						// lazy init of penalty data structure
-						if (this.penalty == null) {
-							this.penalty = new Vector<ScoringPenalty>();
-						}
-						/* Penalty due to facility load:
-						 * Store the temporary score to reduce it in finish() proportionally
-						 * to score and dep. on facility load.
-						 */
-						this.penalty.add(new ScoringPenalty(
-								activityStart,
-								activityEnd,
-								this.facilityPenalties.get(act.getFacilityId()),
-								scoreImprovement));
-					}
-
-				}
-
 				timeSpentPerforming += duration;
 
 			}
@@ -324,30 +289,11 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 			logger.trace( "score after performance: "+score );
 		}
 
-		this.score += this.getFacilityPenaltiesScore();
-		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after facility penalties!" );
-		if ( logger.isTraceEnabled() ) {
-			logger.trace( "score after facility penalty: "+score );
-		}
-
 		this.score += this.getNegativeDurationScore();
 		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after negative duration!" );
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "score after negative duration: "+score );
 		}
-	}
-	
-	public double getFacilityPenaltiesScore() {
-		double facilityPenaltiesScore = 0.0;
-
-		if (this.penalty != null) {
-			// copied from LocationChoiceScoringFunction
-			// reduce score by penalty from capacity restraints
-			for (ScoringPenalty p : penalty) {
-				facilityPenaltiesScore -= p.getPenalty();
-			}
-		}
-		return facilityPenaltiesScore;
 	}
 
 	protected double getPerformanceScore(String actType, double duration) {

@@ -60,7 +60,6 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 	private final KtiLikeScoringConfigGroup ktiConfig;
 	private final CharyparNagelScoringParameters params;
     private final Scenario scenario;
-	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -73,7 +72,6 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 		this.ktiConfig = ktiConfig;
 		this.params = new CharyparNagelScoringParameters(config);
 		this.scenario = scenario;
-		this.facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 		this.blackList = typesNotToScore;
 	}
 
@@ -87,8 +85,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					new KtiActivityScoring(
 						person.getSelectedPlan(),
 						params,
-						facilityPenalties,
-						((ScenarioImpl) scenario).getActivityFacilities() )) );
+						scenario.getActivityFacilities() )) );
 
 		// standard modes
 		scoringFunctionAccumulator.addScoringFunction(
