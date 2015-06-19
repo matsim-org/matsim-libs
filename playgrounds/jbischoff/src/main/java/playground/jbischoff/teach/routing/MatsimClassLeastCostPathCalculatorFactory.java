@@ -34,7 +34,7 @@ public class MatsimClassLeastCostPathCalculatorFactory implements LeastCostPathC
 	@Override
 	public LeastCostPathCalculator createPathCalculator(Network network,
 			TravelDisutility travelCosts, TravelTime travelTimes) {
-		return new MatsimClassRouter(network,null,null);
+		return new MatsimClassDijkstra(network,null,null);
 	}
 
 }

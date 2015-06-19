@@ -48,7 +48,7 @@ public class MatsimClassDijkstra implements LeastCostPathCalculator {
 	private final Network network;
 	private Map<Id<Node>,Double> costToNode = new HashMap<Id<Node>, Double>();
 	private Map<Id<Node>,Id<Node>> previousNodes = new HashMap<Id<Node>, Id<Node>>();
-	PriorityQueue<Id<Node>> queue = new PriorityQueue<Id<Node>>(new Comparator<Id<Node>>() {
+	PriorityQueue<Id<Node>> queue = new PriorityQueue<Id<Node>>(11, new Comparator<Id<Node>>() {
 
 		@Override
 		public int compare(Id<Node> o1, Id<Node> o2) {
