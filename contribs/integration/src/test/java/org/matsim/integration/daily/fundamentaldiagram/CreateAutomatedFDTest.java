@@ -72,6 +72,7 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -100,10 +101,10 @@ public class CreateAutomatedFDTest {
 		this.trafficDynamics = trafficDynamics;
 		this.travelModes = new String [] {"car","bike"};
 	}
-	
+
 	private LinkDynamics linkDynamics;
 	private TrafficDynamics trafficDynamics;
-	
+
 	@Parameters
 	public static Collection<Object[]> createFds() {
 		Object[] [] fdData = new Object [][] { 
@@ -111,57 +112,57 @@ public class CreateAutomatedFDTest {
 				{LinkDynamics.FIFO, TrafficDynamics.withHoles}, 
 				{LinkDynamics.PassingQ,TrafficDynamics.queue},
 				{LinkDynamics.PassingQ,TrafficDynamics.withHoles}
-				};
+		};
 		return Arrays.asList(fdData);
 	}
-	
+
 	@Test
 	public void FDs_carTruck(){
 		this.travelModes = new String [] {"car","truck"};
 		run(this.linkDynamics, this.trafficDynamics,false);
 	}
-	
+
 	@Test
 	public void FDs_carBike(){
 		run(this.linkDynamics, this.trafficDynamics,false);
 	}
-	
+
 	@Test public void Fds_carBike_fastCapacityUpdate(){
 		run(this.linkDynamics,this.trafficDynamics,true);
 	}
-	
+
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
-	
+
 	private String [] travelModes;
 	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId("0");
 	private Scenario scenario;
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
 	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
-	
+
 	private final Logger log = Logger.getLogger(CreateAutomatedFDTest.class);
-	
+
 	private void run(final LinkDynamics linkDynamics, final TrafficDynamics trafficDynamics, final boolean isUsingFastCapacityUpdate) {
-		
+
 		scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 		createNetwork();
-		
+
 		storeVehicleTypeInfo();
-		
+
 		scenario.getConfig().qsim().setMainModes(Arrays.asList(travelModes));
 		scenario.getConfig().qsim().setEndTime(14*3600);
 		scenario.getConfig().qsim().setLinkDynamics(linkDynamics.name());
 		scenario.getConfig().vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.abort );
 		scenario.getConfig().qsim().setTrafficDynamics(trafficDynamics);
-		
+
 		scenario.getConfig().qsim().setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
-		
+
 		//equal modal split run
 		Map<String, Integer> minSteps = new HashMap<String, Integer>();
-		
+
 		double pcu1 = modeVehicleTypes.get(travelModes[0]).getPcuEquivalents();
 		double pcu2 = modeVehicleTypes.get(travelModes[1]).getPcuEquivalents();
-		
+
 		if(pcu1==1 && pcu2 == 0.25) { //car bike
 			minSteps.put(travelModes[0], 1);
 			minSteps.put(travelModes[1], 4);
@@ -169,14 +170,14 @@ public class CreateAutomatedFDTest {
 			minSteps.put(travelModes[0], 3);
 			minSteps.put(travelModes[1], 1);
 		}
-		
+
 		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
-		
+
 		double networkDensity = 3.*(1000./7.5);
 		int numberOfPoints = (int) Math.ceil(networkDensity/(reduceNoOfDataPointsInPlot * 2.))+5;
 
 		List<Map<String,Integer>> points2Run = new ArrayList<Map<String,Integer>>();
-		
+
 		for (int m=1; m<numberOfPoints; m++){
 			Map<String,Integer> pointToRun = new HashMap<>();
 			for (String mode:travelModes){
@@ -187,21 +188,21 @@ public class CreateAutomatedFDTest {
 		}
 
 		Map<Double, Map<String, Tuple<Double, Double>>> outData = new HashMap<Double, Map<String,Tuple<Double,Double>>>();
-		
+
 		for(Map<String, Integer> point2run : points2Run){
-			
+
 			System.out.println("\n \n \t \t Running points "+point2run.toString()+"\n \n");
-			
+
 			createPopulationAndVehicles(point2run);
 
 			for(String mode : point2run.keySet()){
 				this.mode2FlowData.get(modeVehicleTypes.get(mode).getId()).setnumberOfAgents(point2run.get(mode));
 			}
-			
+
 			EventsManager events = EventsUtils.createEventsManager();
 			globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(scenario, mode2FlowData);
 			events.addHandler(globalFlowDynamicsUpdator);
-			
+
 			QSim qSim = new QSim(scenario, events);
 			ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
 			qSim.addMobsimEngine(activityEngine);
@@ -213,9 +214,9 @@ public class CreateAutomatedFDTest {
 			qSim.addMobsimEngine(teleportationEngine);
 
 			AgentFactory agentFactory = new MyAgentFactory(qSim);
-			
+
 			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-			
+
 			Map<String, VehicleType> travelModesTypes = new HashMap<String, VehicleType>();
 			for(String mode :travelModes){
 				travelModesTypes.put(mode, modeVehicleTypes.get(mode));
@@ -223,9 +224,9 @@ public class CreateAutomatedFDTest {
 			agentSource.setModeVehicleTypes(travelModesTypes);
 
 			qSim.addAgentSource(agentSource);
-			
+
 			qSim.run();
-			
+
 			Map<String, Tuple<Double, Double>> mode2FlowSpeed = new HashMap<String, Tuple<Double,Double>>();
 			for(int i=0; i < travelModes.length; i++){
 
@@ -236,7 +237,7 @@ public class CreateAutomatedFDTest {
 				outData.put(globalFlowDynamicsUpdator.getGlobalData().getPermanentDensity(), mode2FlowSpeed);
 			}
 		}
-		
+
 		/*
 		 *	Basically overriding the helper.getOutputDirectory() method, such that,
 		 *	if file directory does not exists or same file already exists, remove and re-creates the whole dir hierarchy so that
@@ -244,21 +245,21 @@ public class CreateAutomatedFDTest {
 		 *	else, just keep adding files in the directory.	
 		 *	This is necessary in order to allow writing different tests results from JUnit parameterization.
 		 */
-		
+
 		String outDir  = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
 		String fileName = linkDynamics+"_"+trafficDynamics+".png";
 		String outFile ;
-		
+
 		if(!new File(outDir).exists() || new File(outDir+fileName).exists()){
 			outFile = helper.getOutputDirectory()+fileName;
 		} else {
 			outFile = outDir+fileName;
 		}
-		
+
 		//plotting data
 		scatterPlot(outData,outFile);
 	}
-	
+
 	private void createPopulationAndVehicles(Map<String, Integer> point2run){
 		Population pop = scenario.getPopulation();
 		pop.getPersons().clear();
@@ -305,12 +306,12 @@ public class CreateAutomatedFDTest {
 		bike.setMaximumVelocity(4.167);
 		bike.setPcuEquivalents(0.25);
 		modeVehicleTypes.put("bike", bike);
-		
+
 		VehicleType truck = VehicleUtils.getFactory().createVehicleType(Id.create("truck",VehicleType.class));
 		truck.setMaximumVelocity(8.33);
 		truck.setPcuEquivalents(3.);
 		modeVehicleTypes.put("truck", truck);
-		
+
 		for (String mode :travelModes){
 			TravelModesFlowDynamicsUpdator modeUpdator = new TravelModesFlowDynamicsUpdator(modeVehicleTypes.get(mode));
 			mode2FlowData.put(modeVehicleTypes.get(mode).getId(), modeUpdator);
@@ -344,7 +345,7 @@ public class CreateAutomatedFDTest {
 
 		String mode1 = travelModes[0];
 		String mode2 = travelModes[1];
-		
+
 		XYSeries carFlow = new XYSeries(mode1+" flow");
 		XYSeries bikeFlow = new XYSeries(mode2+" flow");
 		XYSeries carSpeed = new XYSeries(mode1+" speed");
@@ -365,7 +366,7 @@ public class CreateAutomatedFDTest {
 
 		NumberAxis flowAxis = new NumberAxis("Flow (PCU/h)");
 		flowAxis.setRange(0.0, 2100.0);
-		
+
 		XYPlot plot1 = new XYPlot(flowDataset, null, flowAxis, new XYLineAndShapeRenderer(false,true));
 		plot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
 
@@ -373,22 +374,22 @@ public class CreateAutomatedFDTest {
 		XYSeriesCollection speedDataset = new XYSeriesCollection();
 		speedDataset.addSeries(carSpeed);
 		speedDataset.addSeries(bikeSpeed);
-		
+
 		NumberAxis speedAxis = new NumberAxis("Speed (m/s)");
 		speedAxis.setRange(0.0, 17.0);
-		
+
 		XYPlot plot2 = new XYPlot(speedDataset, null, speedAxis, new XYLineAndShapeRenderer(false,true));
 		plot2.setRangeAxisLocation(AxisLocation.TOP_OR_LEFT);
-		
+
 		NumberAxis densityAxis = new NumberAxis("Overall density (PCU/km)");
 		densityAxis.setRange(0.0,150.00);
-		
+
 		CombinedDomainXYPlot plot = new CombinedDomainXYPlot(densityAxis);
 		plot.setGap(10.);
 		plot.add(plot1);
 		plot.add(plot2);
 		plot.setOrientation(PlotOrientation.VERTICAL);
-		
+
 		JFreeChart chart = new JFreeChart("Fundamental diagrams", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
 		try {
@@ -397,7 +398,7 @@ public class CreateAutomatedFDTest {
 			throw new RuntimeException("Data is not plotted. Reason "+e);
 		}
 	}
-	
+
 	//==============================================
 
 	class TravelModesFlowDynamicsUpdator {
@@ -421,7 +422,7 @@ public class CreateAutomatedFDTest {
 		private boolean flowStability;
 
 		public TravelModesFlowDynamicsUpdator(){}
-		
+
 		public TravelModesFlowDynamicsUpdator(VehicleType vT){
 			this.vehicleType = vT;
 			this.modeId = this.vehicleType.getId();
@@ -661,16 +662,16 @@ public class CreateAutomatedFDTest {
 			return this.lastSeenOnStudiedLinkEnter.size();
 		}
 	}
-	
+
 	//=======================================
-	
+
 	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
 
-		private MyPersonDriverAgentImpl delegate;
+		private PersonDriverAgentImpl delegate;
 		public boolean goHome;
 
 		public MyRoundAndRoundAgent(Person p, Plan unmodifiablePlan, QSim qSim) {
-			this.delegate = new MyPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
+			this.delegate = new PersonDriverAgentImpl(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
 			this.goHome = false;//false at start, modified when all data is extracted.
 		}
 
@@ -709,11 +710,11 @@ public class CreateAutomatedFDTest {
 			return delegate.getExpectedTravelTime();
 		}
 
-        @Override
-        public Double getExpectedTravelDistance() {
-            return delegate.getExpectedTravelDistance();
-        }
-        
+		@Override
+		public Double getExpectedTravelDistance() {
+			return delegate.getExpectedTravelDistance();
+		}
+
 		@Override
 		public final String getMode() {
 			return delegate.getMode();
@@ -745,26 +746,22 @@ public class CreateAutomatedFDTest {
 				goHome = true; 
 			}
 
-			Id<Link> lastLinkOnTriangularTrack = Id.createLinkId("2");
-			Id<Link> lastLinkOfBase = Id.createLinkId("0");
 
-			if(delegate.getCurrentLinkId().equals(lastLinkOnTriangularTrack)){
-				// person is on the last link of track and thus will continue moving on the track
-				Id<Link> afterLeftTurnLinkId = Id.createLinkId((0));
-				delegate.setCachedNextLinkId(afterLeftTurnLinkId);
-				delegate.setCurrentLinkIdIndex(0);
-				return afterLeftTurnLinkId;
-			} else if(delegate.getCurrentLinkId().equals(lastLinkOfBase) && goHome){
-				// if person is on the last link of the base and permament regime is reached.
-				// send person to arrive.
-				Id<Link> afterGoingStraightForwardLinkId = Id.createLinkId("3");
-				delegate.setCachedNextLinkId(afterGoingStraightForwardLinkId);
-				delegate.setCurrentLinkIdIndex(3);//This does work quite well so far and allows to end simulation.
-				return afterGoingStraightForwardLinkId;
-			} else {
-				return delegate.chooseNextLinkId();
+
+			if(delegate.getCurrentLinkId().equals(Id.createLinkId("2"))){
+				return Id.createLinkId("0") ;
+			} else if(delegate.getCurrentLinkId().equals(Id.createLinkId("0")) ) {
+				if ( goHome) {
+					return Id.createLinkId(3) ;
+				} else {
+					return Id.createLinkId(1) ;
+				}
 			}
-		}
+			
+			return null ;
+			
+			// todo amit: fix
+		} 
 
 		@Override
 		public void notifyMoveOverNode(Id<Link> newLinkId) {
@@ -798,7 +795,7 @@ public class CreateAutomatedFDTest {
 		}
 
 	}
-	
+
 	//=======================================
 
 	private static class MyAgentFactory implements AgentFactory {
@@ -815,11 +812,11 @@ public class CreateAutomatedFDTest {
 			return agent;
 		}
 	}
-	
+
 	//=======================================
-	
+
 	class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
-	
+
 		private Scenario scenario;
 		private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModesFlowData;
 		private TravelModesFlowDynamicsUpdator globalFlowData;
@@ -928,5 +925,5 @@ public class CreateAutomatedFDTest {
 			return this.globalFlowData;
 		}
 	}
-	
+
 }
