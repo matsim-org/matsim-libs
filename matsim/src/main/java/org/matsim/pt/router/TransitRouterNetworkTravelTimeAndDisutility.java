@@ -50,7 +50,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	private final PreparedTransitSchedule preparedTransitSchedule;
 
 	/*
-	 * If this constructor is used, every instance used its own PreparedTransitSchedule which might
+	 * If this constructor is used, every instance use its own PreparedTransitSchedule which might
 	 * consume a lot of memory.
 	 * 
 	 * cdobler, nov'12
