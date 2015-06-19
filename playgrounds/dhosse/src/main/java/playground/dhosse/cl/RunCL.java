@@ -9,9 +9,13 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.agarwalamit.munich.inputs.ReadAndAddSubActivities;
 
 public class RunCL {
 
@@ -50,13 +54,6 @@ public class RunCL {
 //		System.out.println(scenario.getNetwork().getLinks().size());
 //		System.out.println(config.network().getInputFile());
 //		new NetConverter().convertNet2Shape(scenario.getNetwork(), "EPSG:32719", visualizationsDir + "santiago_secondary.shp");
-		
-//		for conversion of raw data into matsim plans
-//		CSVToPlans converter = new CSVToPlans(matsimInputDir + "plans.xml.gz", 
-//											  boundariesInputDir + "Boundaries_20150428_085038.shp");
-//		converter.run(databaseFilesDir + "Persona.csv",
-//					  databaseFilesDir + "Export_Viaje.csv",
-//					  databaseFilesDir + "Etapa.csv");
 //		
 //		System.out.println(Time.writeTime(converter.latestStart) + "\t" + Time.writeTime(converter.latestEnd));
 		
@@ -67,9 +64,44 @@ public class RunCL {
 		
 //		OTFVis.playNetwork(path + "santiago_primary.xml.gz");
 		
+//		for conversion of raw data into matsim plans
+//		CSVToPlans converter = new CSVToPlans(matsimInputDir + "plans.xml.gz", 
+//											  boundariesInputDir + "Boundaries_20150428_085038.shp");
+//		converter.run(databaseFilesDir + "Hogar.csv",
+//					  databaseFilesDir + "Persona.csv",
+//					  databaseFilesDir + "Export_Viaje.csv",
+//					  databaseFilesDir + "Etapa.csv");
+		
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, matsimInputDir + "config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		int cnt = 0;
+		
+		for(Person person : scenario.getPopulation().getPersons().values()){
+			
+			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
+				if(pe instanceof Activity){
+					Activity act = (Activity)pe;
+					double start = act.getStartTime();
+					double end = act.getEndTime();
+					if(start > 30*3600 || end > 24 * 3600){
+						cnt++;
+						break;
+					}
+				}
+			}
+			
+		}
+		System.out.println(cnt);
+//		randomizeEndTime(scenario.getPopulation());
+//		
+//		ReadAndAddSubActivities acts = new ReadAndAddSubActivities(matsimInputDir + "config.xml", scenario);
+//		acts.run(config.plans().getInputFile(), matsimInputDir + "config_amit.xml");
+		
+//		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
+//		Controler controler = new Controler(scenario);
+//		controler.run();
 		
 //		new CreateTransitLines(scenario, gtfsFilesDir + "trips.txt", gtfsFilesDir + "stops.txt", gtfsFilesDir + "stop_times.txt", gtfsFilesDir + "frequencies.txt").run("L");
 		
@@ -96,26 +128,11 @@ public class RunCL {
 //		
 //		randomizeEndTime(scenario.getPopulation());
 		
-//		config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
-//		Controler controler = new Controler(scenario);
-//		controler.run();
-		
 //		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
 //		lmdd.init(scenario);
 //		lmdd.preProcessData();
 //		lmdd.postProcessData();
 //		lmdd.writeResults(matsimInputDir);
-		
-//		for(Person person : scenario.getPopulation().getPersons().values()){
-//			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-//				if(pe instanceof Activity){
-//					randomizeEndTime((Activity)pe);
-//				}
-//			}
-//		}
-//		
-//		ReadAndAddSubActivities acts = new ReadAndAddSubActivities(matsimInputDir + "config.xml", scenario);
-//		acts.run(config.plans().getInputFile(), matsimInputDir + "config_amit.xml");
 		
 //		double maxStartTime = Double.NEGATIVE_INFINITY; 
 //		double maxEndTime = Double.NEGATIVE_INFINITY;
@@ -266,7 +283,7 @@ public class RunCL {
 							Activity act2 = (Activity) person.getSelectedPlan().getPlanElements().get(index + 2);
 							
 							if(act2.getType().equals("pt interaction")){
-								System.out.println(person.getId().toString());
+//								System.out.println(person.getId().toString());
 								act2 = (Activity) person.getSelectedPlan().getPlanElements().get(index + 4);
 								
 							}
@@ -299,7 +316,8 @@ public class RunCL {
 		
 		//Box-Muller-Method in order to get a normally distributed variable
 		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
-		double endTime = 10*60 * normal + act.getEndTime();
+		double endTime = 20*60 * normal + act.getEndTime();
+//		if(endTime > 30*3600) endTime = 30 * 3600;
 		act.setEndTime(endTime);
 		
 	}

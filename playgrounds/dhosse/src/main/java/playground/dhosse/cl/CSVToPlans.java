@@ -21,6 +21,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -30,6 +31,8 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.dhosse.cl.population.Etapa;
@@ -40,16 +43,20 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class CSVToPlans {
 	
+	private final String carAvail = "_carAvail";
+	
 	private final String shapefile;
 	private final String ouputPlansFile;
 	
 	private Scenario scenario;
+	private ObjectAttributes agentAttributes;
 	
 	private int legCounter = 0;
 	
 	CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:4326", "EPSG:32719");
 	
 	private Map<String,Persona> personas = new HashMap<>();
+	private Map<String, Integer> hogarId2NVehicles = new HashMap<>();
 	
 	public CSVToPlans(String outputFile){
 		
@@ -64,8 +71,9 @@ public class CSVToPlans {
 		
 	}
 	
-	public void run(String personasFile, String viajesFile, String etapasFile){
+	public void run(String hogaresFile, String personasFile, String viajesFile, String etapasFile){
 		
+		this.readHogares(hogaresFile);
 		this.readPersonas(personasFile);
 		this.readViajes(viajesFile);
 		this.readEtapas(etapasFile);
@@ -76,8 +84,39 @@ public class CSVToPlans {
 		
 	}
 	
+	private void readHogares(String hogaresFile){
+		
+		final int idxHogarId = 0;
+		final int idxNVeh = 11;
+		
+		BufferedReader reader = IOUtils.getBufferedReader(hogaresFile);
+		
+		try {
+			
+			String line = reader.readLine();
+			
+			while( (line = reader.readLine()) != null ){
+				
+				String[] splittedLine = line.split(";");
+				
+				String id = splittedLine[idxHogarId];
+				int nVehicles = Integer.parseInt(splittedLine[idxNVeh]);
+				
+				this.hogarId2NVehicles.put(id, nVehicles);
+				
+			}
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+			
+		}
+		
+	}
+	
 	private void readPersonas(String personasFile){
 		
+		final int idxHogarId = 0;
 		final int idxPersonId = 1;
 		final int idxAge = 2;
 		final int idxSex = 3;
@@ -94,13 +133,15 @@ public class CSVToPlans {
 				
 				String[] splittedLine = line.split(";");
 
+				String hogarId = splittedLine[idxHogarId];
 				String id = splittedLine[idxPersonId];
 				int age = 2012 - Integer.valueOf(splittedLine[idxAge]);
 				String sex = splittedLine[idxSex];
 				String drivingLicence = splittedLine[idxLicence];
+				int nCars = this.hogarId2NVehicles.get(hogarId);
 				String nViajes = splittedLine[idxNViajes];
 				
-				Persona persona = new Persona(id, age, sex, drivingLicence, nViajes);
+				Persona persona = new Persona(id, age, sex, drivingLicence, nCars, nViajes);
 				this.personas.put(id,persona);
 				
 			}
@@ -247,17 +288,23 @@ public class CSVToPlans {
 		Population population = this.scenario.getPopulation();
 		PopulationFactoryImpl popFactory = (PopulationFactoryImpl) population.getFactory();
 		
+		this.agentAttributes = new ObjectAttributes();
+		
 		for(Persona persona : this.personas.values()){
 
 			boolean toAdd = true;
 			
 			if(persona.getId().equals("10430102") || persona.getId().equals("12220001") || persona.getId().equals("14676102") || persona.getId().equals("15520101") ||
 					persona.getId().equals("18982103") || persona.getId().equals("22078102") || persona.getId().equals("23832104") || persona.getId().equals("14510001") ||
-					persona.getId().equals("32430002") || persona.getId().equals("24903102") || persona.getId().equals("11390103")){
+					persona.getId().equals("32430002") || persona.getId().equals("24903102") || persona.getId().equals("11390103") || persona.getId().equals("17135101")){
 				continue;
 			}
 			
 			Person person = popFactory.createPerson(Id.createPersonId(persona.getId()));
+			
+			if(persona.hasCar() && persona.hasDrivingLicence()){
+				agentAttributes.putAttribute(person.getId().toString(), this.carAvail, this.carAvail);
+			}
 			
 			Plan plan = popFactory.createPlan();
 			LinkedList<PlanElement> planElements = new LinkedList<PlanElement>();
@@ -434,8 +481,10 @@ public class CSVToPlans {
 			//a plan needs at least 3 plan elements (act - leg - act)
 			int add = 0;
 			if(plan.getPlanElements().size() > 2){
-				population.addPerson(person);
-				add++;
+				if(!((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
+					population.addPerson(person);
+					add++;
+				}
 			}
 			this.legCounter += add * nLegs;
 			
@@ -459,6 +508,7 @@ public class CSVToPlans {
 	
 	private void write(){
 		
+		new ObjectAttributesXmlWriter(agentAttributes).writeFile("C:/Users/Daniel/Documents/work/shared-svn/studies/countries/cl/Kai_und_Daniel/inputFiles/agentAttributes.xml");
 		new PopulationWriter(this.scenario.getPopulation()).write(this.ouputPlansFile);
 		
 	}
@@ -466,20 +516,20 @@ public class CSVToPlans {
 	private String getActType(int index){
 		
 		switch(index){
-			case 1:
-			case 2: return "work";
-			case 3:
+			case 1: return "work";
+			case 2: return "business";
+			case 3: return "education";
 			case 4: return "education";
+			case 5: return "health";
+			case 6: return "visit";
 			case 7: return "home";
+			case 8: return "other";
+			case 9: return "other";
+			case 10: return "other";
 			case 11: return "shop";
+			case 12: return "other";
 			case 13: return "leisure";
-			case 5:
-			case 6: 
-			case 8:
-			case 9:
-			case 10:
-			case 12:
-			case 14:
+			case 14: return "other";
 			default: return "other"; //not specified
 		}
 		
@@ -489,24 +539,43 @@ public class CSVToPlans {
 		
 		switch(index){
 			case 1: return TransportMode.car;
-			case 2: return "feeder bus";
-			case 3: return "main bus";
-			case 4: return "subway";
+			case 2: return TransportMode.pt;
+			case 3: return TransportMode.pt;
+			case 4: return TransportMode.pt;
 			case 5: return "collective taxi";
-			case 6: return "school bus";
+			case 6: return TransportMode.pt;
 			case 7: return "taxi";
 			case 8: return TransportMode.walk;
 			case 9: return TransportMode.bike;
 			case 10: return "motorcycle";
-			case 11: return "institutional bus";
-			case 12: return "rural bus";
-			case 13: return "school bus";
-			case 14: return "urban bus";
+			case 11: return TransportMode.pt;
+			case 12: return TransportMode.pt;
+			case 13: return TransportMode.pt;
+			case 14: return TransportMode.pt;
 			case 15: return "other";
-			case 16: return "train";
+			case 16: return TransportMode.pt;
 			case 17: return TransportMode.ride;
 			case 18: return TransportMode.ride;
 			default: return TransportMode.other;
+//			case 1: return TransportMode.car;
+//			case 2: return "feeder bus";
+//			case 3: return "main bus";
+//			case 4: return "subway";
+//			case 5: return "collective taxi";
+//			case 6: return "school bus";
+//			case 7: return "taxi";
+//			case 8: return TransportMode.walk;
+//			case 9: return TransportMode.bike;
+//			case 10: return "motorcycle";
+//			case 11: return "institutional bus";
+//			case 12: return "rural bus";
+//			case 13: return "school bus";
+//			case 14: return "urban bus";
+//			case 15: return "other";
+//			case 16: return "train";
+//			case 17: return TransportMode.ride;
+//			case 18: return TransportMode.ride;
+//			default: return TransportMode.other;
 		}
 		
 	}

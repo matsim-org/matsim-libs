@@ -10,21 +10,23 @@ public class Persona {
 	private int age;
 	private int sex;
 	private boolean drivingLicence;
+	private boolean carAvail;
 	
 	private LinkedHashMap<String, Viaje> viajes = new LinkedHashMap<>();
 //	private Viaje[] viajes;
 
 	private int currentIdx = 0;
 	
-	public Persona(String id, int age, String  sex, String drivingLicence, String nViajes){
+	public Persona(String id, int age, String  sex, String drivingLicence, int nCarsAvail, String nViajes){
 		
 		this.id = id;
 		this.age = age;
 		this.sex = Integer.valueOf(sex);
 		this.drivingLicence = setHasDrivingLicence(drivingLicence);
+		this.carAvail = nCarsAvail > 0 ? true : false;
 		
 	}
-
+	
 	private boolean setHasDrivingLicence(String drivingLicence) {
 		
 		if(drivingLicence.equals("1")){
@@ -57,8 +59,12 @@ public class Persona {
 		return sex;
 	}
 
-	public boolean isDrivingLicence() {
+	public boolean hasDrivingLicence() {
 		return drivingLicence;
+	}
+	
+	public boolean hasCar(){
+		return carAvail;
 	}
 
 	public Map<String, Viaje> getViajes() {
