@@ -20,6 +20,8 @@
 
 package org.matsim.core.events;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
@@ -61,13 +63,22 @@ import org.xml.sax.SAXException;
 
 public class EventsReaderXMLv1 extends MatsimXmlParser {
 
+	interface CustomEventMapper<T extends Event> /* extends Function<GenericEvent, T> */ {
+		T apply(GenericEvent event);
+	}
+
 	static public final String EVENT = "event";
 
 	private final EventsManager events;
+	private final Map<String, CustomEventMapper> customEventMappers = new HashMap<>();
 
 	public EventsReaderXMLv1(final EventsManager events) {
 		this.events = events;
 		this.setValidating(false);// events-files have no DTD, thus they cannot validate
+	}
+
+	public void addCustomEventMapper(String eventType, CustomEventMapper cem) {
+		customEventMappers.put(eventType, cem);
 	}
 
 	@Override
@@ -163,7 +174,7 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			Id<TransitStopFacility> destinationStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_DESTINATIONSTOP), TransitStopFacility.class);
 			this.events.processEvent(new AgentWaitingForPtEvent(time, agentId, waitStopId, destinationStopId));
 		} else {
-			Event event = new GenericEvent(eventType, time);
+			GenericEvent event = new GenericEvent(eventType, time);
 			for ( int ii=0; ii<atts.getLength(); ii++ ) {
 				String key = atts.getLocalName(ii);
 				if ( key.equals("time") || key.equals("type") ) {
@@ -172,7 +183,12 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 				String value = atts.getValue(ii);
 				event.getAttributes().put(key, value);
 			}
-			this.events.processEvent(event);
+			CustomEventMapper cem = customEventMappers.get(eventType);
+			if (cem != null) {
+				this.events.processEvent(cem.apply(event));
+			} else {
+				this.events.processEvent(event);
+			}
 		}
 	}
 
