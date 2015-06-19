@@ -161,7 +161,7 @@ public class CadytsAsScorWRndRouter {
 		final TransitSchedule routerSchedule = controler.getScenario().getTransitSchedule();
 		final TransitRouterConfig trConfig = new TransitRouterConfig( config );
 		
-		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.beelineWalkConnectionDistance);
+		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.getBeelineWalkConnectionDistance());
 		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(routerSchedule);
 		final Provider<TransitRouter> randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (preparedSchedule, trConfig, routerNetwork);
 		controler.addOverridingModule(new AbstractModule() {

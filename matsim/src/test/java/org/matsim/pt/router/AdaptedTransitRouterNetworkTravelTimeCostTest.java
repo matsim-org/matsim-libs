@@ -203,7 +203,7 @@ public class AdaptedTransitRouterNetworkTravelTimeCostTest extends TestCase {
 		conf.setUtilityOfLineSwitch_utl(0.0);
 		double cost2 = tc.getLinkTravelDisutility(testLink, 6.0*3600, null, null, null); // use different time because of internal caching effects
 		assertEquals(oldCost, cost1 - cost2, MatsimTestCase.EPSILON);
-		conf.additionalTransferTime = 120.0;
+		conf.setAdditionalTransferTime(120.0);
 		double cost3 = tc.getLinkTravelDisutility(testLink, 5.0*3600, null, null, null);
 		assertEquals(-120.0 * conf.getMarginalUtilityOfWaitingPt_utl_s(), cost3 - cost2, MatsimTestCase.EPSILON);
 		// test with custom value for utility of waiting, just in case too many of the default marginal utilities are 0.0

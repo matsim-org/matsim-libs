@@ -105,7 +105,7 @@ public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRout
 			// (this means that it is a transfer link (walk))
 
 			double transfertime = getLinkTravelTime(link, time, person, vehicle);
-			double waittime = this.originalTransitRouterConfig.additionalTransferTime;
+			double waittime = this.originalTransitRouterConfig.getAdditionalTransferTime();
 			
 			// say that the effective walk time is the transfer time minus some "buffer"
 			double walktime = transfertime - waittime;

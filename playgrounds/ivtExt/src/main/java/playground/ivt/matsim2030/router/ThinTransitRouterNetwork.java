@@ -75,7 +75,7 @@ public class ThinTransitRouterNetwork {
 		final TransitRouterNetwork network =
 			TransitRouterNetwork.createFromSchedule(
 					scenario.getTransitSchedule(), 
-					transitRouterConfig.beelineWalkConnectionDistance);
+					transitRouterConfig.getBeelineWalkConnectionDistance());
 	
 		new RemoveRedundantLinks().run( network );
 		new RemoveRedundantDistanceLinks().run( network );

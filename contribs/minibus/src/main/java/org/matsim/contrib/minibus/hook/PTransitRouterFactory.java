@@ -74,7 +74,7 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 			this.raptorDisutility = new RaptorDisutility(this.transitRouterConfig, this.costPerBoarding, this.costPerMeterTraveled);
 			
 			this.transitRouterQuadTree = new TransitRouterQuadTree(this.raptorDisutility);
-			this.transitRouterQuadTree.initializeFromSchedule(this.schedule, this.transitRouterConfig.beelineWalkConnectionDistance);
+			this.transitRouterQuadTree.initializeFromSchedule(this.schedule, this.transitRouterConfig.getBeelineWalkConnectionDistance());
 		}
 	}
 
@@ -88,7 +88,7 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 					// nothing to do here
 				} else {
 					log.warn("Could not create speedy router, fall back to normal one.");
-					this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.transitRouterConfig.beelineWalkConnectionDistance);
+					this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.transitRouterConfig.getBeelineWalkConnectionDistance());
 				}
 			}
 			needToUpdateRouter = false;

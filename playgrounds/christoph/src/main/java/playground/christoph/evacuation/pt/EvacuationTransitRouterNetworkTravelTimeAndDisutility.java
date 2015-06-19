@@ -134,7 +134,7 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 		}
 		// different transit routes, so it must be a line switch
 		double distance = wrapped.getLength();
-		double time2 = distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
+		double time2 = distance / this.config.getBeelineWalkSpeed() + this.config.getAdditionalTransferTime();
 //		this.cachedTravelTimes.set(time2);
 		bd.cachedTravelTime = time2;
 				

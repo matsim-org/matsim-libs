@@ -42,7 +42,7 @@ public class RandomizedTransitRouterFactory implements Provider<TransitRouter> {
 	RandomizedTransitRouterFactory(Config config, TransitSchedule schedule) {
 		this.trConfig = new TransitRouterConfig(config);
 		this.schedule = schedule;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);
+		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.getBeelineWalkConnectionDistance());
 	}
 	
 	@Override

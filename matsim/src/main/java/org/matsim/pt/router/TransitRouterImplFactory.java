@@ -48,7 +48,7 @@ public class TransitRouterImplFactory implements Provider<TransitRouter> {
 
 	public TransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
 		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, this.config.beelineWalkConnectionDistance);
+		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, this.config.getBeelineWalkConnectionDistance());
 		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
 	}
 

@@ -48,7 +48,7 @@ public class TransitRouterWWImplFactory implements Provider<TransitRouter> {
         this.network = controler.getScenario().getNetwork();
 		this.controler = controler;
 		this.waitTime = waitTime;
-		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, controler.getScenario().getTransitSchedule(), this.config.beelineWalkConnectionDistance);
+		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, controler.getScenario().getTransitSchedule(), this.config.getBeelineWalkConnectionDistance());
 	}
 	@Override
 	public TransitRouter get() {

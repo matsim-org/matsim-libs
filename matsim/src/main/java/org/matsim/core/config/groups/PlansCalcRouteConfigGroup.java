@@ -39,6 +39,10 @@ import org.matsim.core.utils.collections.CollectionUtils;
  * @author mrieser
  */
 public final class PlansCalcRouteConfigGroup extends ConfigGroup {
+	// yy There is a certain degree of messiness in this class because of retrofitting, e.g. making beelineDistance mode-specific while
+	// being backwards compatible.  This could eventually be cleaned up, maybe about a year after introducing it.  kai, jun'15
+	
+	
 	public static final String GROUP_NAME = "planscalcroute";
 
 	private static final String BEELINE_DISTANCE_FACTOR = "beelineDistanceFactor";
@@ -117,6 +121,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 		@StringSetter( "mode" )
 		public void setMode(String mode) {
+			testForLocked() ;
 			this.mode = mode;
 		}
 
@@ -127,6 +132,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 		@StringSetter( "teleportedModeSpeed" )
 		public void setTeleportedModeSpeed(Double teleportedModeSpeed) {
+			testForLocked() ;
 			if ( getTeleportedModeFreespeedFactor() != null && teleportedModeSpeed != null ) {
 				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
 			}
@@ -141,6 +147,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		@StringSetter( "teleportedModeFreespeedFactor" )
 		public void setTeleportedModeFreespeedFactor(
 				Double teleportedModeFreespeedFactor) {
+			testForLocked() ;
 			if ( getTeleportedModeSpeed() != null && teleportedModeFreespeedFactor != null ) {
 				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
 			}
@@ -149,6 +156,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		
 		@StringSetter("beelineDistanceFactor")
 		public void setBeelineDistanceFactor( Double val ) {
+			testForLocked() ;
 			this.beelineDistanceFactorForMode = val ;
 		}
 		@StringGetter("beelineDistanceFactor")
@@ -243,6 +251,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	}
 
 	public void addModeRoutingParams(final ModeRoutingParams pars) {
+		testForLocked() ;
 		addParameterSet( pars );
 	}
 
@@ -250,6 +259,9 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		final Map<String, ModeRoutingParams> map = new LinkedHashMap< >();
 
 		for ( ConfigGroup pars : getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
+			if ( this.isLocked() ) {
+				pars.setLocked(); 
+			}
 			final String mode = ((ModeRoutingParams) pars).getMode();
 			final ModeRoutingParams old =
 				map.put( mode ,
@@ -267,6 +279,9 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 			pars = (ModeRoutingParams) createParameterSet( ModeRoutingParams.SET_TYPE );
 			pars.setMode( mode );
 			addParameterSet( pars );
+		}
+		if ( this.isLocked() ) {
+			pars.setLocked(); 
 		}
 
 		return pars;
@@ -344,6 +359,10 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	public Map<String, Double> getTeleportedModeSpeeds() {
 		final Map<String, Double> map = new LinkedHashMap< >();
 		for ( ModeRoutingParams pars : getModeRoutingParams().values() ) {
+			if ( this.isLocked() ) {
+				pars.setLocked(); 
+			}
+
 			final Double speed = pars.getTeleportedModeSpeed();
 			if ( speed != null ) map.put( pars.getMode() , speed );
 		}
@@ -353,6 +372,10 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	public Map<String, Double> getTeleportedModeFreespeedFactors() {
 		final Map<String, Double> map = new LinkedHashMap< >();
 		for ( ModeRoutingParams pars : getModeRoutingParams().values() ) {
+			if ( this.isLocked() ) {
+				pars.setLocked(); 
+			}
+
 			final Double speed = pars.getTeleportedModeFreespeedFactor();
 			if ( speed != null ) map.put( pars.getMode() , speed );
 		}
@@ -362,6 +385,10 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	public Map<String,Double> getBeelineDistanceFactors() {
 		final Map<String,Double> map = new LinkedHashMap<>() ;
 		for ( ModeRoutingParams pars : getModeRoutingParams().values() ) {
+			if ( this.isLocked() ) {
+				pars.setLocked(); 
+			}
+
 			final Double val = pars.getBeelineDistanceFactor() ;
 			if ( val != null ) map.put( pars.getMode() , val ) ;
 		}
@@ -370,6 +397,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	@Deprecated // use mode-specific factors
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
+		testForLocked() ;
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
 		final ModeRoutingParams pars = new ModeRoutingParams( mode );
 		pars.setTeleportedModeFreespeedFactor( freespeedFactor );
@@ -378,6 +406,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	@Deprecated // use mode-specific factors
 	public void setTeleportedModeSpeed(String mode, double speed) {
+		testForLocked() ;
 		// re-create, to trigger erasing of defaults (normally forbidden, see acceptModeParamsWithoutClearing)
 		final ModeRoutingParams pars = new ModeRoutingParams( mode );
 		pars.setTeleportedModeSpeed( speed );
@@ -391,6 +420,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 
 	@Deprecated // use mode-specific beeline distance factors!
 	public void setBeelineDistanceFactor(double val) {
+		testForLocked() ;
 		// yyyy thinking about this: this should in design maybe not be different from the other teleportation factors (reset everything
 		// if one is set; or possibly disallow setting it at all). kai, feb'15
 		

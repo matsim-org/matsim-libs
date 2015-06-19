@@ -80,9 +80,9 @@ class FareRoutingTestScenario {
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
 				scenario.getConfig().vspExperimental());
 		config.setBeelineWalkSpeed(0.000001); // something very slow, so the agent does not walk over night
-		config.additionalTransferTime = 0;
-		config.searchRadius = 501.;
-		config.extensionRadius = 0;
+		config.setAdditionalTransferTime(0);
+		config.setSearchRadius(501.);
+		config.setExtensionRadius(0);
 		
 		
 		@SuppressWarnings("deprecation")
@@ -97,7 +97,7 @@ class FareRoutingTestScenario {
 		TransitFareTravelDisutility disutility = new TransitFareTravelDisutility(transitRouterNetworkTravelTimeAndDisutility, 
 				scenario.getConfig().planCalcScore(), new TicketMachineImpl(ticketFactory, scenario.getTransitSchedule().getTransitLinesAttributes()));
 		
-		TransitRouterNetwork transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
+		TransitRouterNetwork transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.getBeelineWalkConnectionDistance());
 		
 		TransitRouterImpl router = new TransitRouterImpl(config, new PreparedTransitSchedule(scenario.getTransitSchedule()), transitNetwork, transitRouterNetworkTravelTimeAndDisutility, disutility);
 		

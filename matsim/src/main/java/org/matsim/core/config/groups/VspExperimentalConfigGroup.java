@@ -67,6 +67,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter(VSP_DEFAULTS_CHECKING_LEVEL)
 	public void setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel vspDefaultsCheckingLevel) {
+		testForLocked() ;
 		this.vspDefaultsCheckingLevel = vspDefaultsCheckingLevel;
 	}
 	// ---
@@ -78,6 +79,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter(LOGIT_SCALE_PARAM_FOR_PLANS_REMOVAL)
 	public void setLogitScaleParamForPlansRemoval(double logitScaleParamForPlansRemoval) {
+		testForLocked() ;
 		this.logitScaleParamForPlansRemoval = logitScaleParamForPlansRemoval;
 	}
 	// ---
@@ -89,6 +91,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter(GENERATING_BOARDING_DENIED_EVENT)
 	public void setGeneratingBoardingDeniedEvent(boolean isGeneratingBoardingDeniedEvent) {
+		testForLocked() ;
 		this.isGeneratingBoardingDeniedEvent = isGeneratingBoardingDeniedEvent;
 	}
 	// ---
@@ -100,6 +103,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter(ABLE_TO_OVERWRITE_PT_INTERACTION_PARAMS)
 	public void setAbleToOverwritePtInteractionParams(boolean isAbleToOverwritePtInteractionParams) {
+		testForLocked() ;
 		this.isAbleToOverwritePtInteractionParams = isAbleToOverwritePtInteractionParams;
 	}
 	// ---
@@ -111,6 +115,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter(USING_OPPORTUNITY_COST_OF_TIME_FOR_LOCATION_CHOICE)
 	public void setUsingOpportunityCostOfTimeForLocationChoice(boolean isUsingOpportunityCostOfTimeForLocationChoice) {
+		testForLocked() ;
 		this.isUsingOpportunityCostOfTimeForLocationChoice = isUsingOpportunityCostOfTimeForLocationChoice;
 	}
 	// ---
@@ -146,6 +151,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter(INPUT_MZ05_FILE)
 	public void setInputMZ05File(final String inputMZ05File) {
+		testForLocked() ;
 		this.inputMZ05File = inputMZ05File;
 	}
 	@StringGetter(WRITING_OUTPUT_EVENTS)
@@ -154,6 +160,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter(WRITING_OUTPUT_EVENTS)
 	public void setWritingOutputEvents(boolean writingOutputEvents) {
+		testForLocked() ;
 		this.writingOutputEvents = writingOutputEvents;
 	}
 	

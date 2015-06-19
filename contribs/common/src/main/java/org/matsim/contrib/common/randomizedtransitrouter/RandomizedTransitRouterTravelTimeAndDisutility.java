@@ -52,7 +52,7 @@ import java.util.Map;
 public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRouterNetworkTravelTimeAndDisutility {
 
 	public enum DataCollection {randomizedParameters, additionalInformation}
-	private Id cachedPersonId = null ;
+	private Id<Person> cachedPersonId = null ;
 	private final TransitRouterConfig originalTransitRouterConfig ;
 
 	private double localMarginalUtilityOfTravelTimeWalk_utl_s = Double.NaN ;
@@ -89,7 +89,7 @@ public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRout
 		this.localMarginalUtilityOfWaitingPt_utl_s = routerConfig.getMarginalUtilityOfWaitingPt_utl_s() ;
 		this.localUtilityOfLineSwitch_utl = routerConfig.getUtilityOfLineSwitch_utl() ;
 	}
-	public String getDataCollectionString( DataCollection item ) {
+	public final String getDataCollectionString( DataCollection item ) {
 		return dataCollectionStrings.get(item).toString() ;
 	}
 	
@@ -104,7 +104,7 @@ public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRout
 			// (this means that it is a transfer link (walk))
 
 			double transfertime = getLinkTravelTime(link, time, person, vehicle);
-			double waittime = this.originalTransitRouterConfig.additionalTransferTime;
+			double waittime = this.originalTransitRouterConfig.getAdditionalTransferTime();
 			
 			// say that the effective walk time is the transfer time minus some "buffer"
 			double walktime = transfertime - waittime;
@@ -138,7 +138,7 @@ public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRout
 		return - getTravelTime(person, coord, toCoord) * localMarginalUtilityOfTravelTimeWalk_utl_s ;
 	}
 	
-	public void setDataCollection( DataCollection item, Boolean bbb ) {
+	public final void setDataCollection( DataCollection item, Boolean bbb ) {
 		Logger.getLogger(this.getClass()).info( " settin data collection of " + item.toString() + " to " + bbb.toString() ) ;
 		dataCollectionConfig.put( item, bbb ) ;
 	}

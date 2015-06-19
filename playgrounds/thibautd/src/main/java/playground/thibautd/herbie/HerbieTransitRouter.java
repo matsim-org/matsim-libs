@@ -85,12 +85,12 @@ public class HerbieTransitRouter implements TransitRouter {
 	public List<Leg> calcRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
 
 		// find possible start stops
-		Collection<TransitRouterNetworkNode> fromNodes = this.transitNetwork.getNearestNodes(fromCoord, this.config.searchRadius);
+		Collection<TransitRouterNetworkNode> fromNodes = this.transitNetwork.getNearestNodes(fromCoord, this.config.getSearchRadius());
 		if (fromNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(fromCoord);
 			double distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
-			fromNodes = this.transitNetwork.getNearestNodes(fromCoord, distance + this.config.extensionRadius);
+			fromNodes = this.transitNetwork.getNearestNodes(fromCoord, distance + this.config.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : fromNodes) {
@@ -101,12 +101,12 @@ public class HerbieTransitRouter implements TransitRouter {
 		}
 
 		// find possible end stops
-		Collection<TransitRouterNetworkNode> toNodes = this.transitNetwork.getNearestNodes(toCoord, this.config.searchRadius);
+		Collection<TransitRouterNetworkNode> toNodes = this.transitNetwork.getNearestNodes(toCoord, this.config.getSearchRadius());
 		if (toNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(toCoord);
 			double distance = CoordUtils.calcDistance(toCoord, nearestNode.stop.getStopFacility().getCoord());
-			toNodes = this.transitNetwork.getNearestNodes(toCoord, distance + this.config.extensionRadius);
+			toNodes = this.transitNetwork.getNearestNodes(toCoord, distance + this.config.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : toNodes) {

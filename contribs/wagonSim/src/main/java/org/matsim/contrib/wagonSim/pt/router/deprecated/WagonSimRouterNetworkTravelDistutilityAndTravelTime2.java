@@ -92,7 +92,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTime2 implements Tra
 		TransitRouterNetworkLink l = (TransitRouterNetworkLink) link;
 		if(l.getRoute() == null){
 			// it's a transfer-link, time is fixed by definition
-			tt = transitRouterConfig.additionalTransferTime;
+			tt = transitRouterConfig.getAdditionalTransferTime();
 		}else{
 			double nextDeparture = getNextDeparture(l, time, person, vehicle);
 			// calc the traveltime

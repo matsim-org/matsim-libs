@@ -77,12 +77,12 @@ public class EvacuationTransitRouter implements TransitRouter {
 	
 	public Path calcPath(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {
 		// find possible start stops
-		Collection<TransitRouterNetworkNode> fromNodes = this.routerNetwork.getNearestNodes(fromCoord, this.routerConfig.searchRadius);
+		Collection<TransitRouterNetworkNode> fromNodes = this.routerNetwork.getNearestNodes(fromCoord, this.routerConfig.getSearchRadius());
 		if (fromNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.routerNetwork.getNearestNode(fromCoord);
 			double distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
-			fromNodes = this.routerNetwork.getNearestNodes(fromCoord, distance + this.routerConfig.extensionRadius);
+			fromNodes = this.routerNetwork.getNearestNodes(fromCoord, distance + this.routerConfig.getExtensionRadius());
 		}
 
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
@@ -100,12 +100,12 @@ public class EvacuationTransitRouter implements TransitRouter {
 		Node wrappedFromNode = this.dijkstra.createImaginaryNode(wrappedFromNodes.values());
 		
 		// find possible end stops
-		Collection<TransitRouterNetworkNode> toNodes = this.routerNetwork.getNearestNodes(toCoord, this.routerConfig.searchRadius);
+		Collection<TransitRouterNetworkNode> toNodes = this.routerNetwork.getNearestNodes(toCoord, this.routerConfig.getSearchRadius());
 		if (toNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.routerNetwork.getNearestNode(toCoord);
 			double distance = CoordUtils.calcDistance(toCoord, nearestNode.stop.getStopFacility().getCoord());
-			toNodes = this.routerNetwork.getNearestNodes(toCoord, distance + this.routerConfig.extensionRadius);
+			toNodes = this.routerNetwork.getNearestNodes(toCoord, distance + this.routerConfig.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedToNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : toNodes) {
@@ -140,12 +140,12 @@ public class EvacuationTransitRouter implements TransitRouter {
 	
 	public Path calcExitPath(final Coord fromCoord, final double departureTime, final Person person) {
 		// find possible start stops
-		Collection<TransitRouterNetworkNode> fromNodes = this.routerNetwork.getNearestNodes(fromCoord, this.routerConfig.searchRadius);
+		Collection<TransitRouterNetworkNode> fromNodes = this.routerNetwork.getNearestNodes(fromCoord, this.routerConfig.getSearchRadius());
 		if (fromNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.routerNetwork.getNearestNode(fromCoord);
 			double distance = CoordUtils.calcDistance(fromCoord, nearestNode.stop.getStopFacility().getCoord());
-			fromNodes = this.routerNetwork.getNearestNodes(fromCoord, distance + this.routerConfig.extensionRadius);
+			fromNodes = this.routerNetwork.getNearestNodes(fromCoord, distance + this.routerConfig.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedFromNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkNode node : fromNodes) {

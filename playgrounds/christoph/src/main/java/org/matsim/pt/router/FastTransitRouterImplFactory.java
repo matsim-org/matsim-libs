@@ -36,7 +36,7 @@ public class FastTransitRouterImplFactory implements Provider<TransitRouter> {
 	private final FastTransitDijkstraFactory dijkstraFactory;
 
 	public FastTransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
-		this(schedule, config, TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance));
+		this(schedule, config, TransitRouterNetwork.createFromSchedule(schedule, config.getBeelineWalkConnectionDistance()));
 	}
 	
 	public FastTransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config, TransitRouterNetwork routerNetwork) {

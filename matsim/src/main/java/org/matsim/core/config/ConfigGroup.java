@@ -44,6 +44,7 @@ public class ConfigGroup {
 	private final String name;
 	private final TreeMap<String,String> params;
 	private final Map<String, Collection<ConfigGroup>> parameterSetsPerType = new HashMap<String, Collection<ConfigGroup>>();
+	private boolean locked = false ;
 
 	private final static Logger log = Logger.getLogger(ConfigGroup.class);
 
@@ -186,5 +187,20 @@ public class ConfigGroup {
 	public final Map<String, ? extends Collection<? extends ConfigGroup>> getParameterSets() {
 		// TODO: immutabilize (including lists)
 		return parameterSetsPerType;
+	}
+
+	public final boolean isLocked() {
+		return locked;
+	}
+
+	public void setLocked() {
+		// need to have this non-final to be able to set delegates.  kai, jun'15
+		this.locked = true ;
+	}
+	
+	public final void testForLocked() {
+		if ( locked ) {
+			throw new RuntimeException( "This config group is locked since material from this config group has already been used.") ;
+		}
 	}
 }

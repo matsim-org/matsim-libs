@@ -42,7 +42,7 @@ public class TransitRouterConfig implements MatsimParameters {
 	 * The distance in meters in which stop facilities should be searched for
 	 * around the start and end coordinate.
 	 */
-	public double searchRadius = 1000.0;
+	private double searchRadius = 1000.0;
 
 	/**
 	 * If no stop facility is found around start or end coordinate (see
@@ -54,7 +54,7 @@ public class TransitRouterConfig implements MatsimParameters {
 	 * facilities (e.g. in the opposite direction of the already found
 	 * stop).
 	 */
-	public double extensionRadius = 200.0;
+	private double extensionRadius = 200.0;
 
 	/**
 	 * The distance in meters that agents can walk to get from one stop to
@@ -66,7 +66,7 @@ public class TransitRouterConfig implements MatsimParameters {
 	 * depends on the scoring/cost calculation. But when they are missing, they cannot be used at all.
 	 * mrieser, mar'11
 	 */
-	public double beelineWalkConnectionDistance = 100.0;
+	private double beelineWalkConnectionDistance = 100.0;
 
 	/**
 	 * The minimum time needed for a transfer is calculated based on the distance and the beeline walk speed
@@ -76,7 +76,7 @@ public class TransitRouterConfig implements MatsimParameters {
 	 * "better" transfer connections such as they can indeed be realized by the simulation. This value only
 	 * affects the routing process, not the simulation itself.
 	 */
-	public double additionalTransferTime = 0.0;
+	private double additionalTransferTime = 0.0;
 
 	// =============================================================================================================================
 	// no more public variables below this line
@@ -100,7 +100,8 @@ public class TransitRouterConfig implements MatsimParameters {
 	public TransitRouterConfig(final PlanCalcScoreConfigGroup pcsConfig, final PlansCalcRouteConfigGroup pcrConfig, 
 			final TransitRouterConfigGroup trConfig, final VspExperimentalConfigGroup vspConfig ) 
 	{
-
+		pcsConfig.setLocked(); pcrConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
+		
 		// walk:
 		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk)
 				/ pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor() ;
@@ -117,10 +118,10 @@ public class TransitRouterConfig implements MatsimParameters {
 		this.utilityOfLineSwitch_utl = pcsConfig.getUtilityOfLineSwitch();
 
 		// router:
-		this.searchRadius = trConfig.getSearchRadius();
-		this.extensionRadius = trConfig.getExtensionRadius();
-		this.beelineWalkConnectionDistance = trConfig.getMaxBeelineWalkConnectionDistance();
-		this.additionalTransferTime = trConfig.getAdditionalTransferTime();
+		this.setSearchRadius(trConfig.getSearchRadius());
+		this.setExtensionRadius(trConfig.getExtensionRadius());
+		this.setBeelineWalkConnectionDistance(trConfig.getMaxBeelineWalkConnectionDistance());
+		this.setAdditionalTransferTime(trConfig.getAdditionalTransferTime());
 	}
 
 	public void setUtilityOfLineSwitch_utl(final double utilityOfLineSwitch_utl_sec) {
@@ -184,6 +185,38 @@ public class TransitRouterConfig implements MatsimParameters {
 	 */
 	public double getBeelineWalkSpeed() {
 		return this.beelineWalkSpeed;
+	}
+
+	public double getSearchRadius() {
+		return searchRadius;
+	}
+
+	public void setSearchRadius(double searchRadius) {
+		this.searchRadius = searchRadius;
+	}
+
+	public double getExtensionRadius() {
+		return extensionRadius;
+	}
+
+	public void setExtensionRadius(double extensionRadius) {
+		this.extensionRadius = extensionRadius;
+	}
+
+	public double getBeelineWalkConnectionDistance() {
+		return beelineWalkConnectionDistance;
+	}
+
+	public void setBeelineWalkConnectionDistance(double beelineWalkConnectionDistance) {
+		this.beelineWalkConnectionDistance = beelineWalkConnectionDistance;
+	}
+
+	public double getAdditionalTransferTime() {
+		return additionalTransferTime;
+	}
+
+	public void setAdditionalTransferTime(double additionalTransferTime) {
+		this.additionalTransferTime = additionalTransferTime;
 	}
 
 }

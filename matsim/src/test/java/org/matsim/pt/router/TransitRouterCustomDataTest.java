@@ -42,13 +42,13 @@ public class TransitRouterCustomDataTest {
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
 				scenario.getConfig().vspExperimental());
 		config.setBeelineWalkSpeed(0.1); // something very slow, so the agent does not walk over night
-		config.searchRadius = 200;
+		config.setSearchRadius(200);
 		
 		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config);
 		
 		MockingTransitTravelDisutility disutility = new MockingTransitTravelDisutility(transitRouterNetworkTravelTimeAndDisutility);
 		
-		TransitRouterNetwork transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
+		TransitRouterNetwork transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.getBeelineWalkConnectionDistance());
 
 		TransitRouterImpl router = new TransitRouterImpl(config, new PreparedTransitSchedule(scenario.getTransitSchedule()), transitNetwork, transitRouterNetworkTravelTimeAndDisutility, disutility);
 		

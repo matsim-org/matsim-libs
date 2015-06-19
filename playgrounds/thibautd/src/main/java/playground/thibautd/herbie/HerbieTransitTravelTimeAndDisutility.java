@@ -93,7 +93,7 @@ public class HerbieTransitTravelTimeAndDisutility implements TravelTime, Transit
 			// (old specification)
 			
 			double transfertime = getLinkTravelTime(link, time, person, vehicle);
-			double waittime = config.additionalTransferTime;
+			double waittime = config.getAdditionalTransferTime();
 			
 			// say that the effective walk time is the transfer time minus some "buffer"
 			double walktime = transfertime - waittime;

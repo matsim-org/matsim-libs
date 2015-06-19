@@ -24,7 +24,7 @@ public class TransitDebugger {
 		TransitRouterConfig c = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	
 		log.info("Writing debug transit router network to file...");
-		TransitRouterNetwork transitRouterNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), c.beelineWalkConnectionDistance);
+		TransitRouterNetwork transitRouterNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), c.getBeelineWalkConnectionDistance());
 		new TransitRouterNetworkWriter(transitRouterNetwork).write("../../matsim/mysimulations/census2000V2/input_10pct/OeV/debug_network.xml");
 		log.info("done.");
 		

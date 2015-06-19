@@ -109,7 +109,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 			final Person person, final Vehicle vehicle) {
 		double cost;
 		double transfertime = getLinkTravelTime(link, time, person, vehicle);
-		double waittime = this.config.additionalTransferTime;
+		double waittime = this.config.getAdditionalTransferTime();
 		
 		// say that the effective walk time is the transfer time minus some "buffer"
 		double walktime = transfertime - waittime;
@@ -159,7 +159,7 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 		}
 		// different transit routes, so it must be a line switch
 		double distance = wrapped.getLength();
-		double time2 = distance / this.config.getBeelineWalkSpeed() + this.config.additionalTransferTime;
+		double time2 = distance / this.config.getBeelineWalkSpeed() + this.config.getAdditionalTransferTime();
 		this.cachedTravelTime = time2;
 		return time2;
 	}

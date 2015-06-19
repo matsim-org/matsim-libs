@@ -43,7 +43,7 @@ public class DemoPeter {
 		Controler controler = new Controler(scenario);
 
 		TransitRouterConfig routerConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
-		routerConfig.searchRadius = 2000;
+		routerConfig.setSearchRadius(2000);
 		final MyTransitRouterFactory transitRouterFactory = new MyTransitRouterFactory(((ScenarioImpl) scenario).getTransitSchedule(), routerConfig);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -64,7 +64,7 @@ public class DemoPeter {
 		public MyTransitRouterFactory(final TransitSchedule schedule, final TransitRouterConfig config) {
 			this.schedule = schedule;
 			this.config = config;
-			this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+			this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.getBeelineWalkConnectionDistance());
 		}
 
 		@Override

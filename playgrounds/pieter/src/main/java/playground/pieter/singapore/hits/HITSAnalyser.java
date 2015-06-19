@@ -125,8 +125,8 @@ public class HITSAnalyser {
 						.vspExperimental());
         TransitRouterNetworkWW transitRouterNetwork = TransitRouterNetworkWW.createFromSchedule(
                 scenario.getNetwork(), scenario.getTransitSchedule(),
-                transitRouterConfig.beelineWalkConnectionDistance);
-		TransitRouterNetwork transitScheduleRouterNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), transitRouterConfig.beelineWalkConnectionDistance);
+                transitRouterConfig.getBeelineWalkConnectionDistance());
+		TransitRouterNetwork transitScheduleRouterNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), transitRouterConfig.getBeelineWalkConnectionDistance());
 		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(scenario.getTransitSchedule());
 		transitTravelFunction = new TransitRouterNetworkTravelTimeAndDisutilityWW(transitRouterConfig, scenario.getNetwork(), transitRouterNetwork, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), scenario.getConfig().travelTimeCalculator(), startTime, endTime, preparedTransitSchedule);
 		transitRouter = new TransitRouterVariableImpl(transitRouterConfig,

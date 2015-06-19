@@ -332,7 +332,7 @@ public class StopStopCalculator extends Thread{
 		(new EventsReaderXMLv1(eventsManager)).parse(args[4]);
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental());
-		TransitRouterNetworkWW network = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(), scenario.getTransitSchedule(), transitRouterConfig.beelineWalkConnectionDistance);
+		TransitRouterNetworkWW network = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(), scenario.getTransitSchedule(), transitRouterConfig.getBeelineWalkConnectionDistance());
 		TransitRouterNetworkTravelTimeAndDisutilityWW travelFunction = new TransitRouterNetworkTravelTimeAndDisutilityWW(transitRouterConfig, scenario.getNetwork(), network, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), scenario.getConfig().travelTimeCalculator(), startTime, endTime, new PreparedTransitSchedule(scenario.getTransitSchedule()));
 		PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
 		preProcessDijkstra.run(network);

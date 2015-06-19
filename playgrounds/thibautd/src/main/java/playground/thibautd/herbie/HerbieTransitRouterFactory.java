@@ -54,7 +54,7 @@ public class HerbieTransitRouterFactory implements Provider<TransitRouter> {
 			final TravelScoringFunction travelScoring) {
 		this.schedule = schedule;
 		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.getBeelineWalkConnectionDistance());
 		this.herbieConfig = herbieConfig;
 		this.travelScoring = travelScoring;
 	}

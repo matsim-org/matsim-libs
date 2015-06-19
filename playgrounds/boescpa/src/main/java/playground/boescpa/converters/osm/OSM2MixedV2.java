@@ -56,7 +56,7 @@ import playground.christoph.evacuation.pt.TransitRouterNetworkWriter;
 public class OSM2MixedV2 {
 
 	private final static double maxBeelineWalkConnectingDistance =
-			new TransitRouterConfig(ConfigUtils.createConfig()).beelineWalkConnectionDistance; // = 100
+			new TransitRouterConfig(ConfigUtils.createConfig()).getBeelineWalkConnectionDistance(); // = 100
 
 	private static int cutRadius = 0;
 	private static Coord cutCenter = null;

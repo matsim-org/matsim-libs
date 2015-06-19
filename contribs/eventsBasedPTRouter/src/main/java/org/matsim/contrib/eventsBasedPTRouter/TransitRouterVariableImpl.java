@@ -57,12 +57,12 @@ public class TransitRouterVariableImpl implements TransitRouter {
 	}
 	
 	private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime){
-		Collection<TransitRouterNetworkWW.TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.searchRadius);
+		Collection<TransitRouterNetworkWW.TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.getSearchRadius());
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkWW.TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(coord);
 			double distance = CoordUtils.calcDistance(coord, nearestNode.stop.getStopFacility().getCoord());
-			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.config.extensionRadius);
+			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.config.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<Node, InitialNode>();
 		for (TransitRouterNetworkWW.TransitRouterNetworkNode node : nearestNodes) {

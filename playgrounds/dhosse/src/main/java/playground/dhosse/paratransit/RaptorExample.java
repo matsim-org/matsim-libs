@@ -33,7 +33,7 @@ public class RaptorExample {
 		
 		RaptorDisutility raptorDisutility = new RaptorDisutility(trc, pConfig.getEarningsPerBoardingPassenger(), pConfig.getEarningsPerKilometerAndPassenger());
 		TransitRouterQuadTree trq = new TransitRouterQuadTree(raptorDisutility);
-		trq.initializeFromSchedule(scenario.getTransitSchedule(), trc.beelineWalkConnectionDistance);
+		trq.initializeFromSchedule(scenario.getTransitSchedule(), trc.getBeelineWalkConnectionDistance());
 		Raptor raptor = new Raptor(trq, raptorDisutility, trc);
 		
 		Person person = scenario.getPopulation().getPersons().values().iterator().next();

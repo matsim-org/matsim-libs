@@ -104,7 +104,7 @@ public class SolutionsSearch {
 		}
 		//create and set randomized router factory
 		final TransitRouterConfig trConfig = new TransitRouterConfig( config ) ;
-		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);
+		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.getBeelineWalkConnectionDistance());
 		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(schedule);
 		RndPtRouterFactory rndPtRouterFactory = new RndPtRouterFactory();
 		final Provider<TransitRouter> randomizedTransitRouterFactory = rndPtRouterFactory.createFactory (preparedSchedule, trConfig, routerNetwork, false, false);

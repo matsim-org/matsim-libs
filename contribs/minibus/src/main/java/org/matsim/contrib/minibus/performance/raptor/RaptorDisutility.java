@@ -70,7 +70,7 @@ public class RaptorDisutility {
 		double cost;
 		
 		double transfertime = getTravelTime(fromStop, toStop);
-		double waittime = this.config.additionalTransferTime;
+		double waittime = this.config.getAdditionalTransferTime();
 		
 		// say that the effective walk time is the transfer time minus some "buffer"
 		double walktime = transfertime - waittime;
@@ -104,7 +104,7 @@ public class RaptorDisutility {
 	protected double getTransferTime(Coord coord, Coord toCoord) {
 		double distance = CoordUtils.calcDistance(coord, toCoord);
 		double initialTime = distance / config.getBeelineWalkSpeed();
-		return initialTime + this.config.additionalTransferTime;
+		return initialTime + this.config.getAdditionalTransferTime();
 	}
 	
 	protected double getTravelTime(Coord coord, Coord toCoord) {

@@ -125,7 +125,7 @@ public class CopyOfHITSAnalyserPostgresqlSummary {
 		transitRouterConfig = new MyTransitRouterConfig(scenario.getConfig().planCalcScore(), scenario.getConfig()
 				.plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental());
         TransitRouterNetworkWW transitRouterNetwork = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(),
-                scenario.getTransitSchedule(), transitRouterConfig.beelineWalkConnectionDistance);
+                scenario.getTransitSchedule(), transitRouterConfig.getBeelineWalkConnectionDistance());
 		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(scenario.getTransitSchedule());
 
 		// transitTravelFunction = new

@@ -61,7 +61,7 @@ public class RndPtRouterLauncher2 {
 		//create and set the factory for rndizedRouter 
 		final TransitSchedule routerSchedule = scn.getTransitSchedule();
 		final TransitRouterConfig trConfig = new TransitRouterConfig( config ) ;
-		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.beelineWalkConnectionDistance);
+		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.getBeelineWalkConnectionDistance());
 		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(routerSchedule);
 		final Provider<TransitRouter> rndTrRouterFactory = new RndPtRouterFactory().createFactory (preparedSchedule, trConfig, routerNetwork, true, true);
 		controler.addOverridingModule(new AbstractModule() {

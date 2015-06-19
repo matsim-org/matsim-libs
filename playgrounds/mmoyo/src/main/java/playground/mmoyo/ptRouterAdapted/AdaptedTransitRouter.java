@@ -61,7 +61,7 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 	public AdaptedTransitRouter(TransitRouterConfig myTRConfig, final TransitSchedule schedule) {
 		
 		//super(schedule, myTRConfig, new AdaptedTransitRouterNetworkTravelTimeCost(myTRConfig));
-		this (schedule, myTRConfig, new TransitRouterNetworkTravelTimeAndDisutility(myTRConfig), buildNetwork(schedule, myTRConfig.beelineWalkConnectionDistance ));
+		this (schedule, myTRConfig, new TransitRouterNetworkTravelTimeAndDisutility(myTRConfig), buildNetwork(schedule, myTRConfig.getBeelineWalkConnectionDistance() ));
 		//attention : the transit network is created first in the upper class   with "this.adaptedTransitNetwork = buildNetwork()";
 	}
 
@@ -78,10 +78,10 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 		
 		// progressive stop search*
 		Collection<TransitRouterNetworkNode> fromNodes;
-		double searchRadius = this.getConfig().searchRadius;
+		double searchRadius = this.getConfig().getSearchRadius();
 		do {
 			fromNodes = this.getTransitRouterNetwork().getNearestNodes(fromCoord, searchRadius); // walkRange
-			searchRadius += this.getConfig().extensionRadius;
+			searchRadius += this.getConfig().getExtensionRadius();
 		} while (fromNodes.size() < ((MyTransitRouterConfig)this.getConfig()).minStationsNum);
 		// /////////////////////////////////////////////////
 
@@ -95,10 +95,10 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 
 		// progressive stop search*
 		Collection<TransitRouterNetworkNode> toNodes;
-		searchRadius = this.getConfig().searchRadius;
+		searchRadius = this.getConfig().getSearchRadius();
 		do {
 			toNodes = this.getTransitNetwork().getNearestNodes(toCoord, searchRadius); // walkRange
-			searchRadius += this.getConfig().extensionRadius;
+			searchRadius += this.getConfig().getExtensionRadius();
 		} while (toNodes.size() < ((MyTransitRouterConfig)this.getConfig()).minStationsNum);
 		// //////////////////////////////////////////////////
 
@@ -197,14 +197,14 @@ public class AdaptedTransitRouter extends TransitRouterImpl {
 	public final String toString() {
 		TransitRouterConfig trRoutCfg = this.getConfig();
 
-		return 	"[beelineWalkConnectionDistance=" + trRoutCfg.beelineWalkConnectionDistance + "]" +
+		return 	"[beelineWalkConnectionDistance=" + trRoutCfg.getBeelineWalkConnectionDistance() + "]" +
 				"[beelineWalkSpeed=" + trRoutCfg.getBeelineWalkSpeed() + "]" +
 				"[costLineSwitch_utl=" + (-trRoutCfg.getUtilityOfLineSwitch_utl()) + "]" +
-				"[extensionRadius=" + trRoutCfg.extensionRadius + "]" +
+				"[extensionRadius=" + trRoutCfg.getExtensionRadius() + "]" +
 				"[marginalUtilityOfTravelDistanceTransit=" + trRoutCfg.getMarginalUtilityOfTravelDistancePt_utl_m() + "]" +
 				"[marginalUtilityOfTravelTimeTransit=" + trRoutCfg.getMarginalUtilityOfTravelTimePt_utl_s() + "]" +
 				"[marginalUtilityOfTravelTimeWalk=" + trRoutCfg.getMarginalUtilityOfTravelTimeWalk_utl_s() + "]" +
-				"[searchRadius=" + trRoutCfg.searchRadius + "]" ;
+				"[searchRadius=" + trRoutCfg.getSearchRadius() + "]" ;
 	}
 	
 	// the procedures with * were adapted

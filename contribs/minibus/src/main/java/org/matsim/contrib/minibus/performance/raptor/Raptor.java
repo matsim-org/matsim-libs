@@ -63,12 +63,12 @@ public class Raptor implements TransitRouter {
     }
 
 	private Map<TransitStopFacility, InitialNode> locateWrappedNearestTransitStops(Person person, Coord coord, double departureTime) {
-        Collection<TransitStopFacility> nearestTransitStops = this.transitRouterQuadTree.getNearestTransitStopFacilities(coord, this.config.searchRadius);
+        Collection<TransitStopFacility> nearestTransitStops = this.transitRouterQuadTree.getNearestTransitStopFacilities(coord, this.config.getSearchRadius());
         if (nearestTransitStops.size() < 2) {
             // also enlarge search area if only one stop found, maybe a second one is near the border of the search area
             TransitStopFacility nearestTransitStop = this.transitRouterQuadTree.getNearestTransitStopFacility(coord);
             double distance = CoordUtils.calcDistance(coord, nearestTransitStop.getCoord());
-            nearestTransitStops = this.transitRouterQuadTree.getNearestTransitStopFacilities(coord, distance + this.config.extensionRadius);
+            nearestTransitStops = this.transitRouterQuadTree.getNearestTransitStopFacilities(coord, distance + this.config.getExtensionRadius());
         }
         Map<TransitStopFacility, InitialNode> wrappedNearestTransitStops2AccessCost = new LinkedHashMap<>();
         for (TransitStopFacility node : nearestTransitStops) {

@@ -53,6 +53,7 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( SEARCH_RADIUS )
 	public void setSearchRadius(final double searchRadius) {
+		testForLocked() ;
 		this.searchRadius = searchRadius;
 	}
 
@@ -63,6 +64,7 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( EXTENSION_RADIUS )
 	public void setExtensionRadius(final double extensionRadius) {
+		testForLocked() ;
 		this.extensionRadius = extensionRadius;
 	}
 
@@ -73,6 +75,7 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( MAX_BEELINE_WALK_CONNECTION_DISTANCE )
 	public void setMaxBeelineWalkConnectionDistance(final double maxBeelineWalkConnectionDistance) {
+		testForLocked() ;
 		this.maxBeelineWalkConnectionDistance = maxBeelineWalkConnectionDistance;
 	}
 
@@ -83,6 +86,7 @@ public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( ADDITIONAL_TRANSFER_TIME )
 	public void setAdditionalTransferTime(final double additionalTransferTime) {
+		testForLocked() ;
 		this.additionalTransferTime = additionalTransferTime;
 	}
 

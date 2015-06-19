@@ -41,7 +41,7 @@ public class TransitFareRouterFactoryImpl implements Provider<TransitRouter> {
 		this.scenario = (ScenarioImpl) scenario;
 		this.schedule = scenario.getTransitSchedule();
 		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.getBeelineWalkConnectionDistance());
 		this.agentProperties = ap;
 	}
 	
@@ -49,7 +49,7 @@ public class TransitFareRouterFactoryImpl implements Provider<TransitRouter> {
 		this.scenario = (ScenarioImpl) scenario;
 		this.schedule = scenario.getTransitSchedule();
 		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.getBeelineWalkConnectionDistance());
 		this.agentProperties = null;
 	}
 	

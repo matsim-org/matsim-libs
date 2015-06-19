@@ -49,7 +49,7 @@ public class TransitRouterEventsWSVFactory implements Provider<TransitRouter> {
 		this.config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
 				scenario.getConfig().vspExperimental());
-		routerNetwork = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(), scenario.getTransitSchedule(), this.config.beelineWalkConnectionDistance);
+		routerNetwork = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(), scenario.getTransitSchedule(), this.config.getBeelineWalkConnectionDistance());
 		this.scenario = scenario;
 		this.waitTime = waitTime;
 		this.stopStopTime = stopStopTime;

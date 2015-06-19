@@ -72,7 +72,7 @@ public class MyTransitRouterImpl implements TransitRouter {
 		this.transitTravelDisutility = new MyTransitRouterNetworkTravelTimeAndDisutilityWrapper(config, preparedTransitSchedule);
 		this.travelTime = (TravelTime) transitTravelDisutility;
 		this.config = config;
-		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
+		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.getBeelineWalkConnectionDistance());
 		this.dijkstra = new TransitMultiNodeDijkstra(this.transitNetwork, (TravelDisutility) this.transitTravelDisutility, this.travelTime);
 		//		this.transitNetwork = null; // enable to save memory if no routing should be done
 	}
@@ -95,12 +95,12 @@ public class MyTransitRouterImpl implements TransitRouter {
 	}
 
 	private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime){
-		Collection<TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.searchRadius);
+		Collection<TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.getSearchRadius());
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(coord);
 			double distance = CoordUtils.calcDistance(coord, nearestNode.stop.getStopFacility().getCoord());
-			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.config.extensionRadius);
+			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.config.getExtensionRadius());
 		}
 		
 		Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<Node, InitialNode>();

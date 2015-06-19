@@ -74,7 +74,7 @@ final class WagonSimRouterNetworkTravelDistutilityAndTravelTime implements Trans
 		TransitRouterNetworkLink l = (TransitRouterNetworkLink) link;
 		if(l.getRoute() == null){
 			// it's a transfer-link
-			return this.config.additionalTransferTime;
+			return this.config.getAdditionalTransferTime();
 		}
 		return this.delegate.getLinkTravelTime(link, time, person, vehicle);
 	}

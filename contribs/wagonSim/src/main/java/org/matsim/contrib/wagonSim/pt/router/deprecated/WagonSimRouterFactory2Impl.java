@@ -57,7 +57,7 @@ public class WagonSimRouterFactory2Impl implements Provider<TransitRouter> {
 		this.vehLoad = vehLoad;
 		this.schedule = schedule;
 		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.getBeelineWalkConnectionDistance());
 		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
 		this.locomotiveAttribs = locomotiveAttribs;
 		this.wagonAttribs = wagonAttribs;

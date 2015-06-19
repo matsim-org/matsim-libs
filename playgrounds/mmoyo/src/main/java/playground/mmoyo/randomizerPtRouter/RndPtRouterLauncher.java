@@ -98,7 +98,7 @@ public class RndPtRouterLauncher {
 		final Scenario scn = ScenarioUtils.loadScenario(config);
 		final TransitRouterConfig trConfig = new TransitRouterConfig( config ) ; 
 		final TransitSchedule trSchedule =  scn.getTransitSchedule();
-		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(trSchedule, trConfig.beelineWalkConnectionDistance);
+		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(trSchedule, trConfig.getBeelineWalkConnectionDistance());
 		
 		//set the controler
 		final Controler controler = new Controler(scn);

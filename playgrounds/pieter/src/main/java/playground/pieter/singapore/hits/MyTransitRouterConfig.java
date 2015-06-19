@@ -22,6 +22,6 @@ class MyTransitRouterConfig extends TransitRouterConfig {
 	}
 
 	public void setSearchradius(double radius) {
-		this.searchRadius = radius;
+		this.setSearchRadius(radius);
 	}
 }

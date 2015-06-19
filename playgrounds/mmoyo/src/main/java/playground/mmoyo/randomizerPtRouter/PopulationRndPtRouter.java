@@ -53,7 +53,7 @@ class PopulationRndPtRouter{
 			Scenario scn =dataLoader.loadScenario(configFile);
 			final TransitRouterConfig trConfig = new TransitRouterConfig( scn.getConfig() ) ; 
 			final TransitSchedule schedule = scn.getTransitSchedule();
-			final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);
+			final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.getBeelineWalkConnectionDistance());
 			Population population = scn.getPopulation();
 			
 			//create randomizedPtRouter and PlansCalcTransitRoute

@@ -56,7 +56,7 @@ public class WriteTransitRouterNetwork {
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
 				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		TransitRouterNetwork network = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), 
-				transitRouterConfig.beelineWalkConnectionDistance);
+				transitRouterConfig.getBeelineWalkConnectionDistance());
 		
 		new TransitRouterNetworkWriter(network).write(outputFile);
 	}

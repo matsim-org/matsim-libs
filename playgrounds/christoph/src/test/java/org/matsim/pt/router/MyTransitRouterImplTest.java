@@ -276,7 +276,7 @@ public class MyTransitRouterImplTest {
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
 		config.setUtilityOfLineSwitch_utl(0);
-		assertEquals(0, config.additionalTransferTime, 1e-8);
+		assertEquals(0, config.getAdditionalTransferTime(), 1e-8);
 		TransitRouter router = new MyTransitRouterImpl(config, f.schedule);
 		List<Leg> legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60, null);
 		assertEquals(5, legs.size());
@@ -288,7 +288,7 @@ public class MyTransitRouterImplTest {
 		assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
 		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 
-		config.additionalTransferTime = 3.0*60; // 3 mins already enough, as there is a small distance to walk anyway which adds some time
+		config.setAdditionalTransferTime(3.0*60); // 3 mins already enough, as there is a small distance to walk anyway which adds some time
 		legs = router.calcRoute(f.scenario.createCoord(11900, 5100), f.scenario.createCoord(24100, 4950), 6.0*3600 - 5.0*60, null);
 		assertEquals(3, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -383,8 +383,8 @@ public class MyTransitRouterImplTest {
 	@Test
 	public void testSingleWalkOnly() {
 		WalkFixture f = new WalkFixture();
-		f.routerConfig.searchRadius = 0.8 * CoordUtils.calcDistance(f.coord2, f.coord4);
-		f.routerConfig.extensionRadius = 0.0;
+		f.routerConfig.setSearchRadius(0.8 * CoordUtils.calcDistance(f.coord2, f.coord4));
+		f.routerConfig.setExtensionRadius(0.0);
 
 		TransitRouter router = new MyTransitRouterImpl(f.routerConfig, f.schedule);
 		List<Leg> legs = router.calcRoute(f.coord2, f.coord4, 990, null);
@@ -400,8 +400,8 @@ public class MyTransitRouterImplTest {
 	@Test
 	public void testDoubleWalkOnly() {
 		WalkFixture f = new WalkFixture();
-		f.routerConfig.searchRadius = 0.8 * CoordUtils.calcDistance(f.coord2, f.coord4);
-		f.routerConfig.extensionRadius = 0.0;
+		f.routerConfig.setSearchRadius(0.8 * CoordUtils.calcDistance(f.coord2, f.coord4));
+		f.routerConfig.setExtensionRadius(0.0);
 
 		TransitRouter router = new MyTransitRouterImpl(f.routerConfig, f.schedule);
 		List<Leg> legs = router.calcRoute(f.coord2, f.coord6, 990, null);
@@ -455,19 +455,19 @@ public class MyTransitRouterImplTest {
 			this.routerConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore(),
 					this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 					this.scenario.getConfig().vspExperimental());
-			this.routerConfig.searchRadius = 500.0;
-			this.routerConfig.beelineWalkConnectionDistance = 100.0;
+			this.routerConfig.setSearchRadius(500.0);
+			this.routerConfig.setBeelineWalkConnectionDistance(100.0);
 			this.routerConfig.setBeelineWalkSpeed(10.0); // so the agents can walk the distance in 10 seconds
 
 			double x = 0;
 			this.coord1 = this.scenario.createCoord(x, 0);
 			x += 1000;
 			this.coord2 = this.scenario.createCoord(x, 0);
-			x += (this.routerConfig.beelineWalkConnectionDistance * 0.75);
+			x += (this.routerConfig.getBeelineWalkConnectionDistance() * 0.75);
 			this.coord3 = this.scenario.createCoord(x, -1000);
 			this.coord4 = this.scenario.createCoord(x, 0);
 			this.coord5 = this.scenario.createCoord(x, 1000);
-			x += (this.routerConfig.beelineWalkConnectionDistance * 0.75);
+			x += (this.routerConfig.getBeelineWalkConnectionDistance() * 0.75);
 			this.coord6 = this.scenario.createCoord(x, 0);
 			x += 1000;
 			this.coord7 = this.scenario.createCoord(x, 0);

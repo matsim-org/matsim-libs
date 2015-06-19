@@ -41,7 +41,7 @@ public class HitsRouter {
 		(new EventsReaderXMLv1(eventsManager)).parse(args[4]);
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(), scenario.getConfig().vspExperimental());
-		TransitRouterNetworkWW network = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(), scenario.getTransitSchedule(), transitRouterConfig.beelineWalkConnectionDistance);
+		TransitRouterNetworkWW network = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(), scenario.getTransitSchedule(), transitRouterConfig.getBeelineWalkConnectionDistance());
 		TransitRouterNetworkTravelTimeAndDisutilityWW travelFunction = new TransitRouterNetworkTravelTimeAndDisutilityWW(transitRouterConfig, scenario.getNetwork(), network, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), scenario.getConfig().travelTimeCalculator(), startTime, endTime, new PreparedTransitSchedule(scenario.getTransitSchedule()));
 		TransitRouterVariableImpl transitRouterVariableImpl = new TransitRouterVariableImpl(transitRouterConfig, travelFunction, network, scenario.getNetwork());
 		for(int p=0;p<1000;p++) {

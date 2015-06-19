@@ -79,6 +79,9 @@ public class Injector {
       		  logger.log( level, entry.getKey().getTypeLiteral() ); System.err.flush();
 //      		  logger.log( Level.WARN, entry.getKey().withoutAttributes() ); System.err.flush();
       		  logger.log( level, "   -> " + entry.getValue().getProvider() ) ; System.out.flush(); 
+      		  
+//      		  logger.log( level, "   -> annotation type: " + entry.getValue().getKey().getAnnotationType() ) ;
+//      		  logger.log( level, "   -> annotation: " + entry.getValue().getKey().getAnnotation() ) ;
 
 //      		  try {
 //      			  logger.log( level, "   -> " + entry.getValue().getProvider().get().getClass() ) ; System.out.flush();

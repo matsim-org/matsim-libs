@@ -329,7 +329,14 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public Collection<ActivityParams> getActivityParams() {
-			return (Collection<ActivityParams>) getParameterSets( ActivityParams.SET_TYPE );
+			@SuppressWarnings("unchecked")
+			Collection<ActivityParams> collection = (Collection<ActivityParams>) getParameterSets( ActivityParams.SET_TYPE );
+			for ( ActivityParams params : collection ) {
+				if ( this.isLocked() ) {
+					params.setLocked(); 
+				}
+			}
+			return collection ;
 	}
 
 	public Map<String, ActivityParams> getActivityParamsPerType() {
@@ -343,10 +350,14 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	public Map<String, ModeParams> getModes() {
+		@SuppressWarnings("unchecked")
 		final Collection<ModeParams> modes = (Collection<ModeParams>) getParameterSets( ModeParams.SET_TYPE );
 		final Map<String, ModeParams> map = new LinkedHashMap< >();
 
 		for ( ModeParams pars : modes ) {
+			if ( this.isLocked() ) {
+				pars.setLocked();
+			}
 			map.put( pars.getMode() , pars );
 		}
 
@@ -524,6 +535,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	/* complex classes */
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {
+		// in normal pgm execution, code will presumably lock instance of PlanCalcScoreConfigGroup, but not instance of
+		// ActivityParams.  I will try to pass the locked setting through the getters. kai, jun'15
+		
 		private static final String TYPICAL_DURATION_SCORE_COMPUTATION = "typicalDurationScoreComputation";
 		final static String SET_TYPE = "activityParams";
 		private String type;
@@ -562,6 +576,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		@StringSetter(TYPICAL_DURATION_SCORE_COMPUTATION)
 		public void setTypicalDurationScoreComputation( TypicalDurationScoreComputation str ) {
+			testForLocked() ;
 			this.typicalDurationScoreComputation = str ;
 		}
 		
@@ -572,6 +587,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "activityType" )
 		public void setActivityType(final String type) {
+			testForLocked() ;
 			this.type = type;
 		}
 
@@ -582,6 +598,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "priority" )
 		public void setPriority(final double priority) {
+			testForLocked() ;
 			this.priority = priority;
 		}
 
@@ -596,10 +613,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "typicalDuration" )
 		private void setTypicalDuration(final String typicalDuration) {
+			testForLocked() ;
 			setTypicalDuration( Time.parseTime( typicalDuration ) );
 		}
 
 		public void setTypicalDuration(final double typicalDuration) {
+			testForLocked() ;
 			this.typicalDuration = typicalDuration;
 		}
 
@@ -614,11 +633,13 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "minimalDuration" )
 		private void setMinimalDuration(final String minimalDuration) {
+			testForLocked() ;
 			setMinimalDuration( Time.parseTime( minimalDuration ) );
 		}
 
 		private static int minDurCnt=0 ;
 		public void setMinimalDuration(final double minimalDuration) {
+			testForLocked() ;
 			if ((minimalDuration != Time.UNDEFINED_TIME) && (minDurCnt<1) ) {
 				minDurCnt++ ;
 				log.warn("Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, " +
@@ -637,10 +658,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		@StringSetter( "openingTime" )
 		private void setOpeningTime(final String openingTime) {
+			testForLocked() ;
 			setOpeningTime( Time.parseTime( openingTime ) );
 		}
 
 		public void setOpeningTime(final double openingTime) {
+			testForLocked() ;
 			this.openingTime = openingTime;
 		}
 
@@ -654,10 +677,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		@StringSetter( "latestStartTime" )
 		private void setLatestStartTime(final String latestStartTime) {
+			testForLocked() ;
 			setLatestStartTime( Time.parseTime( latestStartTime ) );
 		}
 
 		public void setLatestStartTime(final double latestStartTime) {
+			testForLocked() ;
 			this.latestStartTime = latestStartTime;
 		}
 
@@ -671,10 +696,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		@StringSetter( "earliestEndTime" )
 		private void setEarliestEndTime(final String earliestEndTime) {
+			testForLocked() ;
 			setEarliestEndTime( Time.parseTime( earliestEndTime ) );
 		}
 
 		public void setEarliestEndTime(final double earliestEndTime) {
+			testForLocked() ;
 			this.earliestEndTime = earliestEndTime;
 		}
 
@@ -688,10 +715,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		@StringSetter( "closingTime" )
 		private void setClosingTime(final String closingTime) {
+			testForLocked() ;
 			setClosingTime( Time.parseTime( closingTime ) );
 		}
 
 		public void setClosingTime(final double closingTime) {
+			testForLocked() ;
 			this.closingTime = closingTime;
 		}
 
@@ -702,6 +731,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "scoringThisActivityAtAll" )
 		public void setScoringThisActivityAtAll(boolean scoringThisActivityAtAll) {
+			testForLocked() ;
 			this.scoringThisActivityAtAll = scoringThisActivityAtAll;
 		}
 	}
@@ -739,6 +769,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "mode" )
 		public void setMode( final String mode ) {
+			testForLocked() ;
 			this.mode = mode;
 		}
 
@@ -749,6 +780,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "marginalUtilityOfTraveling_util_hr" )
 		public void setMarginalUtilityOfTraveling(double traveling) {
+			testForLocked() ;
 			this.traveling = traveling;
 		}
 
@@ -764,6 +796,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "marginalUtilityOfDistance_util_m" )
 		public void setMarginalUtilityOfDistance(double distance) {
+			testForLocked() ;
 			this.distance = distance;
 		}
 
@@ -774,6 +807,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "constant" )
 		public void setConstant(double constant) {
+			testForLocked() ;
 			this.constant = constant;
 		}
 
@@ -784,6 +818,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( "monetaryDistanceCostRate" )
 		public void setMonetaryDistanceCostRate(double monetaryDistanceCostRateCar) {
+			testForLocked() ;
 			this.monetaryDistanceCostRate = monetaryDistanceCostRateCar;
 		}
 
@@ -939,6 +974,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		@StringSetter(FRACTION_OF_ITERATIONS_TO_START_SCORE_MSA)
 		public void setFractionOfIterationsToStartScoreMSA(Double fractionOfIterationsToStartScoreMSA) {
+			testForLocked() ;
 			this.fractionOfIterationsToStartScoreMSA = fractionOfIterationsToStartScoreMSA;
 		}
 
@@ -948,6 +984,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		}
 		@StringSetter( LEARNING_RATE )
 		public void setLearningRate(double learningRate) {
+			testForLocked() ;
 			this.learningRate = learningRate;
 		}
 
@@ -958,6 +995,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( BRAIN_EXP_BETA )
 		public void setBrainExpBeta(double brainExpBeta) {
+			testForLocked() ;
 			this.brainExpBeta = brainExpBeta;
 		}
 
@@ -968,6 +1006,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( PATH_SIZE_LOGIT_BETA )
 		public void setPathSizeLogitBeta(double beta) {
+			testForLocked() ;
 			if ( beta != 0. ) {
 				log.warn("Setting pathSizeLogitBeta different from zero is experimental.  KN, Sep'08") ;
 			}
@@ -981,6 +1020,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( LATE_ARRIVAL )
 		public void setLateArrival_utils_hr(double lateArrival) {
+			testForLocked() ;
 			this.lateArrival = lateArrival;
 		}
 
@@ -991,6 +1031,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( EARLY_DEPARTURE )
 		public void setEarlyDeparture_utils_hr(double earlyDeparture) {
+			testForLocked() ;
 			this.earlyDeparture = earlyDeparture;
 		}
 
@@ -1011,6 +1052,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( MARGINAL_UTL_OF_MONEY )
 		public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+			testForLocked() ;
 			this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 		}
 
@@ -1021,6 +1063,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( UTL_OF_LINE_SWITCH )
 		public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
+			testForLocked() ;
 			this.utilityOfLineSwitch = utilityOfLineSwitch;
 		}
 
@@ -1032,6 +1075,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@StringSetter( USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION )
 		public void setUsingOldScoringBelowZeroUtilityDuration(
 				boolean usingOldScoringBelowZeroUtilityDuration) {
+			testForLocked() ;
 			this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
 		}
 
@@ -1042,6 +1086,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( WRITE_EXPERIENCED_PLANS )
 		public void setWriteExperiencedPlans(boolean writeExperiencedPlans) {
+			testForLocked() ;
 			this.writeExperiencedPlans = writeExperiencedPlans;
 		}
 
@@ -1054,6 +1099,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		@StringSetter( WAITING )
 		public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
+			testForLocked() ;
 			if ( (waiting != 0.) && (setWaitingCnt<1) ) {
 				setWaitingCnt++ ;
 				log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
@@ -1156,5 +1202,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 	public Double getFractionOfIterationsToStartScoreMSA() {
 		return delegate.getFractionOfIterationsToStartScoreMSA() ;
+	}
+	@Override
+	public final void setLocked() {
+		super.setLocked();
+		this.delegate.setLocked();
 	}
 }

@@ -339,7 +339,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			nearestNodes =
 					data.transitNetwork.getNearestNodes(
 							facility.getCoord(),
-							distance + data.config.extensionRadius);
+							distance + data.config.getExtensionRadius());
 		}
 
 		for (TransitRouterNetworkNode node : nearestNodes) {
@@ -557,7 +557,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			this.scenario = scenario;
 			this.preparedTransitSchedule = new PreparedTransitSchedule( scenario.getTransitSchedule() );
 			this.config = new TransitRouterConfig( scenario.getConfig() );
-			this.transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
+			this.transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.getBeelineWalkConnectionDistance());
 		}
 
 		public RoutingData(

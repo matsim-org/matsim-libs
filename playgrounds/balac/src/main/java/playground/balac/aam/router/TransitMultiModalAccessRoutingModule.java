@@ -98,7 +98,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config, preparedTransitSchedule);
 		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
 		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
-		this.transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.beelineWalkConnectionDistance);
+		this.transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.getBeelineWalkConnectionDistance());
 		this.dijkstra = new MultiNodeDijkstra(this.transitNetwork, this.travelDisutility, this.travelTime);
 		this.routers = Arrays.asList( routers );
 	}
@@ -275,7 +275,7 @@ public class TransitMultiModalAccessRoutingModule implements RoutingModule {
 			nearestNodes =
 					this.transitNetwork.getNearestNodes(
 							facility.getCoord(),
-							distance + this.config.extensionRadius);
+							distance + this.config.getExtensionRadius());
 		}
 
 		for (TransitRouterNetworkNode node : nearestNodes) {

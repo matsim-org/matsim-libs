@@ -72,13 +72,13 @@ public class AdaptedLauncher {
 				.getConfig().planCalcScore(), this.scenario.getConfig()
 				.plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 				this.scenario.getConfig().vspExperimental());
-		myTransitRouterConfig.searchRadius = Double.parseDouble(cfg.getParam(
-				"ptRouter", "searchRadius"));
-		myTransitRouterConfig.extensionRadius = Double.parseDouble(cfg
-				.getParam("ptRouter", "extensionRadius"));
-		myTransitRouterConfig.beelineWalkConnectionDistance = Double
+		myTransitRouterConfig.setSearchRadius(Double.parseDouble(cfg.getParam(
+				"ptRouter", "searchRadius")));
+		myTransitRouterConfig.setExtensionRadius(Double.parseDouble(cfg
+				.getParam("ptRouter", "extensionRadius")));
+		myTransitRouterConfig.setBeelineWalkConnectionDistance(Double
 				.parseDouble(cfg.getParam("ptRouter",
-						"beelineWalkConnectionDistance"));
+						"beelineWalkConnectionDistance")));
 		myTransitRouterConfig.allowDirectWalks = Boolean.parseBoolean(cfg
 				.getParam("ptRouter", "allowDirectWalks"));
 		myTransitRouterConfig.minStationsNum = Integer.parseInt(cfg.getParam(

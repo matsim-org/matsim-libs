@@ -62,7 +62,7 @@ public class TransitRouterNetworkReaderWriterTest extends MatsimTestCase {
 				fixture.scenario.getConfig().vspExperimental());
 	
 		log.info("Writing transit router network to file...");
-		TransitRouterNetwork transitRouterNetwork = TransitRouterNetwork.createFromSchedule(fixture.schedule, config.beelineWalkConnectionDistance);
+		TransitRouterNetwork transitRouterNetwork = TransitRouterNetwork.createFromSchedule(fixture.schedule, config.getBeelineWalkConnectionDistance());
 		new TransitRouterNetworkWriter(transitRouterNetwork).write(getOutputDirectory() + "output_network.xml");
 		log.info("done.");
 		

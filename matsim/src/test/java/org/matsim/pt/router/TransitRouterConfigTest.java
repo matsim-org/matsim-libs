@@ -76,10 +76,10 @@ public class TransitRouterConfigTest {
 		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
 		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
 		
-		Assert.assertEquals(128.0, config.additionalTransferTime, 1e-8);
-		Assert.assertEquals(987.6, config.searchRadius, 1e-8);
-		Assert.assertEquals(123.4, config.extensionRadius, 1e-8);
-		Assert.assertEquals(23.4, config.beelineWalkConnectionDistance, 1e-8);
+		Assert.assertEquals(128.0, config.getAdditionalTransferTime(), 1e-8);
+		Assert.assertEquals(987.6, config.getSearchRadius(), 1e-8);
+		Assert.assertEquals(123.4, config.getExtensionRadius(), 1e-8);
+		Assert.assertEquals(23.4, config.getBeelineWalkConnectionDistance(), 1e-8);
 		}
 		
 		// test with marginal utl of time:
@@ -92,10 +92,10 @@ public class TransitRouterConfigTest {
 		Assert.assertEquals(-2.34, config.getUtilityOfLineSwitch_utl(), 1e-8);
 		Assert.assertEquals(1.37 / 1.2, config.getBeelineWalkSpeed(), 1e-8);
 		
-		Assert.assertEquals(128.0, config.additionalTransferTime, 1e-8);
-		Assert.assertEquals(987.6, config.searchRadius, 1e-8);
-		Assert.assertEquals(123.4, config.extensionRadius, 1e-8);
-		Assert.assertEquals(23.4, config.beelineWalkConnectionDistance, 1e-8);
+		Assert.assertEquals(128.0, config.getAdditionalTransferTime(), 1e-8);
+		Assert.assertEquals(987.6, config.getSearchRadius(), 1e-8);
+		Assert.assertEquals(123.4, config.getExtensionRadius(), 1e-8);
+		Assert.assertEquals(23.4, config.getBeelineWalkConnectionDistance(), 1e-8);
 		}
 	}
 }
