@@ -29,6 +29,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.dhosse.cl.population.Etapa;
@@ -114,6 +115,9 @@ public class CSVToPlans {
 		
 	}
 	
+	double latestStart = Double.NEGATIVE_INFINITY;
+	double latestEnd = Double.NEGATIVE_INFINITY;
+	
 	private void readViajes(String viajesFile){
 		
 		final int idxPersonId = 1;
@@ -155,6 +159,9 @@ public class CSVToPlans {
 				String proposito = propString.equals("") ? "other" : this.getActType(Integer.parseInt(propString));
 				String start = splittedLine[idxStartTime];
 				String end = splittedLine[idxEndTime];
+				
+				if(Time.parseTime(end) > latestEnd) latestEnd = Time.parseTime(end);
+				if(Time.parseTime(start) > latestStart) latestStart = Time.parseTime(start);
 				
 				Viaje viaje = new Viaje(id, comunaOrigen, comunaDestino, originX, originY, destinationX, destinationY, proposito, start, end);
 
@@ -241,8 +248,14 @@ public class CSVToPlans {
 		PopulationFactoryImpl popFactory = (PopulationFactoryImpl) population.getFactory();
 		
 		for(Persona persona : this.personas.values()){
-			
+
 			boolean toAdd = true;
+			
+			if(persona.getId().equals("10430102") || persona.getId().equals("12220001") || persona.getId().equals("14676102") || persona.getId().equals("15520101") ||
+					persona.getId().equals("18982103") || persona.getId().equals("22078102") || persona.getId().equals("23832104") || persona.getId().equals("14510001") ||
+					persona.getId().equals("32430002") || persona.getId().equals("24903102") || persona.getId().equals("11390103")){
+				continue;
+			}
 			
 			Person person = popFactory.createPerson(Id.createPersonId(persona.getId()));
 			
@@ -273,10 +286,10 @@ public class CSVToPlans {
 							
 							if(gOrigin == null || gDest == null){
 								
-								origin = new CoordImpl(0,0);
-								destination = new CoordImpl(0,0);
-//								toAdd = false;
-//								break;
+//								origin = new CoordImpl(0,0);
+//								destination = new CoordImpl(0,0);
+								toAdd = false;
+								break;
 								
 							} else{
 							
@@ -294,24 +307,26 @@ public class CSVToPlans {
 					if(idx <= 0){
 						
 						anterior = popFactory.createActivityFromCoord("home", origin);
+						anterior.setStartTime(0.);
 						anterior.setEndTime(viaje.getStartTime());
 						
 					} else{
 						
 						if(planElements.isEmpty()){
 							anterior = popFactory.createActivityFromCoord("home", origin);
+							anterior.setStartTime(0.);
 						} else{
 							anterior = (Activity) planElements.getLast();
 						}
 						
-						if(!anterior.getType().equals("dummy")){
+						if(!anterior.getType().equals("pt interaction")){
 						
 							double endTime = viaje.getStartTime();
 							
-//							if(endTime < 0){
-//								toAdd = false;
-//								break;
-//							}
+							if(endTime < 0){
+								toAdd = false;
+								break;
+							}
 							
 							if(endTime < anterior.getStartTime()){
 								endTime += 24*3600;
@@ -331,29 +346,47 @@ public class CSVToPlans {
 						
 						double startTime = viaje.getEndTime();
 						
-//						if(startTime < 0){
-//							toAdd = false;
-//							break;
-//						}
+						if(startTime < 0){
+							toAdd = false;
+							break;
+						}
 
 						lastActivity = lastActivity == null ? anterior : lastActivity;
 						
-						if(startTime < lastActivity.getEndTime()){
-							startTime += 24*3600;
-						}
+//						if(lastActivity != null){
+							
+							if(startTime < lastActivity.getEndTime()){
+								
+								startTime += 24*3600;
+								
+							}
+							
+//						} else{
+//							
+//							if(startTime < anterior.getEndTime()){
+//								
+//								anterior = null;
+//								
+//							}
+//							
+//						}
 						
 						posterior.setStartTime(startTime);
 						lastActivity = posterior;
 						
 					} else{
 						
-						posterior = popFactory.createActivityFromCoord("dummy", destination);
+						posterior = popFactory.createActivityFromCoord("pt interaction", destination);
 						posterior.setMaximumDuration(0.);
 						
 					}
 						
 					String legMode = this.getLegMode(Integer.valueOf(etapa.getMode()));
+					if(legMode.equals(TransportMode.walk) && (posterior.getType().equals("pt interaction") || posterior.getType().equals("pt interaction"))){
+						legMode = TransportMode.transit_walk;
+					}
 					Leg leg = popFactory.createLeg(legMode);
+//					leg.setTravelTime(posterior.getStartTime() - anterior.getEndTime());
 					
 					if(anterior != null){
 						if(!planElements.isEmpty()){
@@ -361,11 +394,14 @@ public class CSVToPlans {
 								planElements.addLast(anterior);
 							}
 						} else{
-							planElements.addLast(anterior);
+							if(anterior != null){
+								planElements.addLast(anterior);
+							}
 						}
 					}
 					
-					planElements.addLast(leg);
+					if(anterior != null)
+						planElements.addLast(leg);
 					planElements.addLast(posterior);
 					
 					idxEtapa++;
@@ -379,6 +415,8 @@ public class CSVToPlans {
 				idx++;
 				
 			}
+			
+//			if(!toAdd) continue;
 			
 			int nLegs = 0;
 			for(PlanElement pE : planElements){
@@ -451,23 +489,23 @@ public class CSVToPlans {
 		
 		switch(index){
 			case 1: return TransportMode.car;
-			case 8: return TransportMode.walk;
-			case 2:
-			case 3:
-			case 4:
-			case 6:
-			case 11:
-			case 12:
-			case 13:
-			case 14:
-			case 16: return TransportMode.pt;
-			case 5:
+			case 2: return "feeder bus";
+			case 3: return "main bus";
+			case 4: return "subway";
+			case 5: return "collective taxi";
+			case 6: return "school bus";
 			case 7: return "taxi";
+			case 8: return TransportMode.walk;
 			case 9: return TransportMode.bike;
-			case 10:return "motorcycle";
-			case 17: 
-			case 18: return "coDriver";
-			case 15:
+			case 10: return "motorcycle";
+			case 11: return "institutional bus";
+			case 12: return "rural bus";
+			case 13: return "school bus";
+			case 14: return "urban bus";
+			case 15: return "other";
+			case 16: return "train";
+			case 17: return TransportMode.ride;
+			case 18: return TransportMode.ride;
 			default: return TransportMode.other;
 		}
 		
