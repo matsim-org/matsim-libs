@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.function.Supplier;
 
 import org.apache.log4j.Level;
@@ -35,7 +34,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -161,12 +159,12 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 	}
 
 	private static final ThreadLocal<PlanCalcScoreConfigGroup> dummyProvider =
-			ThreadLocal.withInitial(new Supplier<PlanCalcScoreConfigGroup>() {
+			new ThreadLocal<PlanCalcScoreConfigGroup>() {
 				@Override
-				public PlanCalcScoreConfigGroup get() {
+				protected PlanCalcScoreConfigGroup initialValue() {
 					return new PlanCalcScoreConfigGroup();
 				}
-			});
+			};
 	private CharyparNagelScoringParameters createParams(
 			final Person person,
 			final PlanCalcScoreConfigGroup config,
