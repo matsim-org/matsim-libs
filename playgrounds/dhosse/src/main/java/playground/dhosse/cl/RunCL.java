@@ -1,39 +1,17 @@
 package playground.dhosse.cl;
 
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
-
-import playground.agarwalamit.munich.analysis.ActDurationDiffDistribution;
-import playground.agarwalamit.munich.inputs.ReadAndAddSubActivities;
-import playground.dhosse.cl.population.CLModeSpeeds;
-import playground.dhosse.cl.pt.CreateTransitLines;
-import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 public class RunCL {
 
@@ -93,7 +71,7 @@ public class RunCL {
 		ConfigUtils.loadConfig(config, matsimInputDir + "config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		new CreateTransitLines(scenario, gtfsFilesDir + "trips.txt", gtfsFilesDir + "stops.txt", gtfsFilesDir + "stop_times.txt", gtfsFilesDir + "frequencies.txt").run("L");
+//		new CreateTransitLines(scenario, gtfsFilesDir + "trips.txt", gtfsFilesDir + "stops.txt", gtfsFilesDir + "stop_times.txt", gtfsFilesDir + "frequencies.txt").run("L");
 		
 //		Set<Id<Person>> personsToRemove = new HashSet<>();
 //		
