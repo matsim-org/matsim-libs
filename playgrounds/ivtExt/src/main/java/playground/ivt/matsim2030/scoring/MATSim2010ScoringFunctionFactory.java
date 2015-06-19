@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Supplier;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -159,6 +160,13 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		return scoringFunctionAccumulator;
 	}
 
+	private static final ThreadLocal<PlanCalcScoreConfigGroup> dummyProvider =
+			ThreadLocal.withInitial(new Supplier<PlanCalcScoreConfigGroup>() {
+				@Override
+				public PlanCalcScoreConfigGroup get() {
+					return new PlanCalcScoreConfigGroup();
+				}
+			});
 	private CharyparNagelScoringParameters createParams(
 			final Person person,
 			final PlanCalcScoreConfigGroup config,
@@ -171,7 +179,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		// scoring function creation about the (default) non-null PathSizeBeta...
 		Logger.getLogger( PlanCalcScoreConfigGroup.class ).setLevel( Level.ERROR );
 
-		final PlanCalcScoreConfigGroup dummyGroup = new PlanCalcScoreConfigGroup();
+		final PlanCalcScoreConfigGroup dummyGroup = dummyProvider.get();
 		for ( Map.Entry<String, String> e : config.getParams().entrySet() ) {
 			dummyGroup.addParam( e.getKey() , e.getValue() );
 		}
