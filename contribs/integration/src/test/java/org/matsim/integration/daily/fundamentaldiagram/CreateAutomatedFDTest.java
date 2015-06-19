@@ -93,9 +93,9 @@ import org.matsim.vehicles.VehicleUtils;
  */
 
 @RunWith(Parameterized.class)
-public class CreateAutomatedFD {
+public class CreateAutomatedFDTest {
 
-	public CreateAutomatedFD(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
+	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
 		this.linkDynamics = linkDynamics;
 		this.trafficDynamics = trafficDynamics;
 		this.travelModes = new String [] {"car","bike"};
@@ -139,7 +139,7 @@ public class CreateAutomatedFD {
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
 	static GlobalFlowDynamicsUpdator globalFlowDynamicsUpdator;
 	
-	private final Logger log = Logger.getLogger(CreateAutomatedFD.class);
+	private final Logger log = Logger.getLogger(CreateAutomatedFDTest.class);
 	
 	private void run(final LinkDynamics linkDynamics, final TrafficDynamics trafficDynamics, final boolean isUsingFastCapacityUpdate) {
 		
@@ -245,7 +245,7 @@ public class CreateAutomatedFD {
 		 *	This is necessary in order to allow writing different tests results from JUnit parameterization.
 		 */
 		
-		String outDir  = "test/output/" + CreateAutomatedFD.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
+		String outDir  = "test/output/" + CreateAutomatedFDTest.class.getCanonicalName().replace('.', '/') + "/" + helper.getMethodName() + "/";
 		String fileName = linkDynamics+"_"+trafficDynamics+".png";
 		String outFile ;
 		
