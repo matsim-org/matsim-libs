@@ -19,7 +19,12 @@
 
 package playground.johannes.gsv.popsim;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+
+import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
@@ -31,11 +36,11 @@ import playground.johannes.gsv.synPop.sim3.Hamiltonian;
  */
 public class DistanceVector implements Hamiltonian {
 
-	private static final Object AGE_KEY = new Object();
+	public static final Object AGE_KEY = new Object();
 
-	private static final Object INCOME_KEY = new Object();
+	public static final Object INCOME_KEY = new Object();
 	
-	private final Collection<ProxyPerson> referencePop;
+	private final List<ProxyPerson> referencePop;
 
 	private double ageMin = Double.MAX_VALUE;
 	
@@ -49,8 +54,13 @@ public class DistanceVector implements Hamiltonian {
 	
 	private double incomeMaxDelta = 0;
 	
-	public DistanceVector(Collection<ProxyPerson> referencePop) {
-		this.referencePop = referencePop;
+	private static final Logger logger = Logger.getLogger(DistanceVector.class);
+	
+	private final Random random;
+	
+	public DistanceVector(Collection<ProxyPerson> referencePop, Random random) {
+		this.referencePop = new ArrayList<>(referencePop);
+		this.random = random;
 		
 		int cnt = 0;
 		
@@ -80,7 +90,10 @@ public class DistanceVector implements Hamiltonian {
 		
 		double totalDelta = 0;
 		
-		for (ProxyPerson ref : referencePop) {
+//		for (ProxyPerson ref : referencePop) {
+		for(int i = 0; i < 100; i++) {
+			ProxyPerson ref = referencePop.get(random.nextInt(referencePop.size()));
+			
 			Double refAge = getAttribute(ref, CommonKeys.PERSON_AGE, AGE_KEY);
 			Double refIncome = getAttribute(ref, CommonKeys.HH_INCOME, INCOME_KEY);
 			
@@ -90,11 +103,12 @@ public class DistanceVector implements Hamiltonian {
 				
 				double delta = Math.sqrt(deltaAge * deltaAge + deltaIncome * deltaIncome);
 				
-				totalDelta += delta;
+				totalDelta += delta/Math.sqrt(2);
 			}
 		}
 		
-		return totalDelta;
+//		return totalDelta / (double)referencePop.size();
+		return totalDelta / 100.0;
 	}
 
 		

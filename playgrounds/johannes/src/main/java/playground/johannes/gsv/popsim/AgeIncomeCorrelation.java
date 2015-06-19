@@ -20,6 +20,7 @@
 package playground.johannes.gsv.popsim;
 
 import gnu.trove.TDoubleArrayList;
+import gnu.trove.TDoubleDoubleHashMap;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -30,6 +31,8 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
 
@@ -50,22 +53,30 @@ public class AgeIncomeCorrelation extends AnalyzerTask {
 		for(ProxyPerson person : persons) {
 			String aStr = person.getAttribute(CommonKeys.PERSON_AGE);
 			String iStr = person.getAttribute(CommonKeys.HH_INCOME);
-			String mStr = person.getAttribute(CommonKeys.HH_MEMBERS);
+//			String mStr = person.getAttribute(CommonKeys.HH_MEMBERS);
 			
-			if(aStr != null && iStr != null && mStr != null) {
+//			if(aStr != null && iStr != null && mStr != null) {
+			if(aStr != null && iStr != null) {
 				double age = Double.parseDouble(aStr);
 				double income = Double.parseDouble(iStr);
-				double members = Double.parseDouble(mStr);
+//				double members = Double.parseDouble(mStr);
 				
 				ages.add(age);
-				incomes.add(income/members);
+//				incomes.add(income/members);
+				incomes.add(income);
 			}
 		}
 		
 		try {
-			TXTWriter.writeScatterPlot(ages, incomes, "age", "income", getOutputDirectory() + "age.income.txt");
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(ages.toNativeArray(), new LinearDiscretizer(10), false);
+			TXTWriter.writeMap(hist, "age", "n", getOutputDirectory() + "/age.txt");
 			
-			TXTWriter.writeMap(Correlations.mean(ages.toNativeArray(), incomes.toNativeArray()), "age", "income", getOutputDirectory() + "age.income.mean.txt");
+			hist = Histogram.createHistogram(incomes.toNativeArray(), new LinearDiscretizer(1000), false);
+			TXTWriter.writeMap(hist, "income", "n", getOutputDirectory() +  "/income.txt");
+			
+			TXTWriter.writeScatterPlot(ages, incomes, "age", "income", getOutputDirectory() + "/age.income.txt");
+			
+			TXTWriter.writeMap(Correlations.mean(ages.toNativeArray(), incomes.toNativeArray()), "age", "income", getOutputDirectory() + "/age.income.mean.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
