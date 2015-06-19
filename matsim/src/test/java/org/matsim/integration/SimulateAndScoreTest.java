@@ -64,6 +64,26 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
+		
+		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
+		h.setTypicalDuration(16 * 3600);
+		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
+		w.setTypicalDuration(8 * 3600);
+		PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		transitActivityParams.setTypicalDuration(120.0);
+
+		config.planCalcScore().setPerforming_utils_hr(0);
+		config.planCalcScore().setTraveling_utils_hr(0);
+		config.planCalcScore().setTravelingPt_utils_hr(0);
+		config.planCalcScore().setTravelingWalk_utils_hr(0);
+		config.planCalcScore().setMonetaryDistanceCostRateCar(10);
+		config.planCalcScore().setMonetaryDistanceCostRatePt(0);
+		config.planCalcScore().addActivityParams(h);
+		config.planCalcScore().addActivityParams(w);
+		config.planCalcScore().addActivityParams(transitActivityParams);
+		
+		// ---
+		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0, 0));
@@ -181,23 +201,10 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		plansCalcRoute.run(plan);
 		scenario.getPopulation().addPerson(person);
 
+		// ---
+		
 		EventsManager events = EventsUtils.createEventsManager();
 		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
-		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
-		h.setTypicalDuration(16 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams w = new PlanCalcScoreConfigGroup.ActivityParams("w");
-		w.setTypicalDuration(8 * 3600);
-		PlanCalcScoreConfigGroup.ActivityParams transitActivityParams = new PlanCalcScoreConfigGroup.ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-		transitActivityParams.setTypicalDuration(120.0);
-		scenario.getConfig().planCalcScore().setPerforming_utils_hr(0);
-		scenario.getConfig().planCalcScore().setTraveling_utils_hr(0);
-		scenario.getConfig().planCalcScore().setTravelingPt_utils_hr(0);
-		scenario.getConfig().planCalcScore().setTravelingWalk_utils_hr(0);
-		scenario.getConfig().planCalcScore().setMonetaryDistanceCostRateCar(10);
-		scenario.getConfig().planCalcScore().setMonetaryDistanceCostRatePt(0);
-		scenario.getConfig().planCalcScore().addActivityParams(h);
-		scenario.getConfig().planCalcScore().addActivityParams(w);
-		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		EventsToScore scorer = new EventsToScore(scenario, new CharyparNagelScoringFunctionFactory(scenario.getConfig().planCalcScore(), scenario.getNetwork()));
 		events.addHandler(scorer);
 		EventsCollector handler = new EventsCollector();
