@@ -25,12 +25,12 @@ import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesWriter10;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.data.intergreens.v10.IntergreenTimesData;
-import org.matsim.signals.data.intergreens.v10.IntergreenTimesDataFactory;
-import org.matsim.signals.data.intergreens.v10.IntergreensForSignalSystemData;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesDataFactory;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 
 /**

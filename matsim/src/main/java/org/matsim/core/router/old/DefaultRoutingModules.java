@@ -59,10 +59,4 @@ public final class DefaultRoutingModules {
 		return new LegRouterWrapper( mode, popFact, toWrap ) ;
 	}
 
-	public static RoutingModule createInvertedNetworkRouter( String mode, PopulationFactory popFact,  Scenario sc, 
-			LeastCostPathCalculatorFactory leastCostPathCalcFactory, TravelDisutilityFactory travelCostCalculatorFactory, LinkToLinkTravelTime travelTimes  ) {
-		LegRouter toWrap = new InvertedNetworkLegRouter(sc, leastCostPathCalcFactory, travelCostCalculatorFactory, travelTimes) ;
-		return new LegRouterWrapper( mode, popFact, toWrap ) ;
-	}
-
 }

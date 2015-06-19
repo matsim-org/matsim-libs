@@ -24,9 +24,9 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -36,7 +36,7 @@ import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
@@ -73,6 +73,7 @@ public class SignalSystemsIntegrationTest {
 		Controler c = new Controler(config);
 		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
 		c.addOverridingModule(new SignalsModule());
+		c.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
         c.getConfig().controler().setCreateGraphs(false);
         c.setDumpDataAtEnd(false);
@@ -145,6 +146,7 @@ public class SignalSystemsIntegrationTest {
 		Controler c = new Controler(configFile);
 		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
 		c.addOverridingModule(new SignalsModule());
+		c.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
         c.getConfig().controler().setCreateGraphs(false);
         c.setDumpDataAtEnd(false);

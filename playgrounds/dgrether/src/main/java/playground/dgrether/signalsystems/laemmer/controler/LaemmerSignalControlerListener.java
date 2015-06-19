@@ -32,7 +32,7 @@ import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.controler.SignalsControllerListener;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory;

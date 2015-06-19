@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.signals.data.ambertimes.v10;
 
-import java.io.File;
 import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
@@ -31,10 +30,8 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.ambertimes.v10.AmberTimeData;
-import org.matsim.signals.data.ambertimes.v10.AmberTimesData;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 

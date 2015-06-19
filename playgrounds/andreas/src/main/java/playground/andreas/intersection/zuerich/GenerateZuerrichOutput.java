@@ -15,10 +15,10 @@ import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.data.signalcontrol.v20.SignalControlData;
-import org.matsim.signals.data.signalcontrol.v20.SignalSystemControllerData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
 

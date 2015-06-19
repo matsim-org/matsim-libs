@@ -36,12 +36,9 @@ import org.matsim.jaxb.signalgroups20.XMLIdRefType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
 import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
-import org.matsim.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.signals.data.signalgroups.v20.SignalGroupsDataFactory;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.xml.sax.SAXException;
 

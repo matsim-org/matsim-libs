@@ -25,12 +25,11 @@ import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesDataImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsDataImpl;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.data.ambertimes.v10.AmberTimesData;
-import org.matsim.signals.data.intergreens.v10.IntergreenTimesData;
-import org.matsim.signals.data.signalcontrol.v20.SignalControlData;
-import org.matsim.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesData;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 
 
 /**

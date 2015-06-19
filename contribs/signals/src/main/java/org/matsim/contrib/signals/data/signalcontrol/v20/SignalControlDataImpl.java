@@ -23,10 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.signalcontrol.v20.SignalControlData;
-import org.matsim.signals.data.signalcontrol.v20.SignalControlDataFactory;
-import org.matsim.signals.data.signalcontrol.v20.SignalSystemControllerData;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 
 /**

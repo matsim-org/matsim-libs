@@ -38,11 +38,11 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.data.signalcontrol.v20.SignalControlData;
-import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signals.data.signalcontrol.v20.SignalSystemControllerData;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 import playground.dgrether.xvis.control.XVisControl;
 import playground.dgrether.xvis.control.events.ShowPanelEvent;

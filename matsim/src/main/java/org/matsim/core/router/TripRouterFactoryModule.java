@@ -32,7 +32,8 @@ public class TripRouterFactoryModule extends AbstractModule {
         install(new LeastCostPathCalculatorModule());
         install(new TransitRouterModule());
         if (getConfig().controler().isLinkToLinkRoutingEnabled()) {
-            bind(TripRouterFactory.class).to(LinkToLinkTripRouterFactory.class).in(Singleton.class);
+            // Nothing. This needs to be added by the signals module.
+//            bind(TripRouterFactory.class).to(LinkToLinkTripRouterFactory.class).in(Singleton.class);
         } else {
             bind(TripRouterFactory.class).to(DefaultTripRouterFactoryImpl.class).in(Singleton.class);
         }

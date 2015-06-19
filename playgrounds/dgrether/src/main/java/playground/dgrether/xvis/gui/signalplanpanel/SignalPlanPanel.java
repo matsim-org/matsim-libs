@@ -40,8 +40,8 @@ import javax.swing.table.TableCellRenderer;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.signalcontrol.v20.SignalGroupSettingsData;
-import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 
 import playground.dgrether.xvis.control.XVisControl;
 import playground.dgrether.xvis.control.events.SignalGroupsSelectionEvent;

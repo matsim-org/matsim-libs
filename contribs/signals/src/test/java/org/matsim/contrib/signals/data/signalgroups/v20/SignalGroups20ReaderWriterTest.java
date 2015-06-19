@@ -33,11 +33,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.MatsimSignalSystemsReader;
-import org.matsim.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 

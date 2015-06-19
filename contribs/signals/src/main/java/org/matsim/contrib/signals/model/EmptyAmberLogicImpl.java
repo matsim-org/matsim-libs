@@ -23,11 +23,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.model.AmberLogic;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalGroupState;
-import org.matsim.signals.model.SignalGroupStateChangeRequest;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
 
 /**
@@ -46,7 +42,7 @@ public class EmptyAmberLogicImpl implements AmberLogic {
 	public Set<SignalGroupStateChangeRequest> processDropping(double timeSec, Id<SignalSystem> systemId,
 			Id<SignalGroup> signalGroupId) {
 		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
-		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, 
+		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED,
 				timeSec);
 		ret.add(redRequest);
 		return ret;

@@ -32,10 +32,10 @@ import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalPlan;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 
 

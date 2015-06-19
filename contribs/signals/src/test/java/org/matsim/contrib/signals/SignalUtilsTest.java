@@ -28,15 +28,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.signals.data.SignalsDataImpl;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.signals.data.signalsystems.v20.SignalData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemsDataFactory;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 
 public class SignalUtilsTest {

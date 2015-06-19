@@ -24,16 +24,16 @@ import junit.framework.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
-import org.matsim.core.api.experimental.events.handler.SignalGroupStateChangedEventHandler;
+import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
+import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalGroupState;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 import org.matsim.testcases.MatsimTestUtils;
 
 

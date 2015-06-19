@@ -25,12 +25,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.model.AmberLogic;
-import org.matsim.signals.model.IntergreensLogic;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalSystem;
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.data.SignalsData;
 
 /**
  * @author dgrether

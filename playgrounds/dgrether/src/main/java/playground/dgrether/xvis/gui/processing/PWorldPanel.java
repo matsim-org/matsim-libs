@@ -35,7 +35,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLinkWLanes;
-import org.matsim.signals.model.SignalGroupState;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 import org.matsim.signals.vis.VisSignal;
 import org.matsim.signals.vis.VisSignalGroup;
 import org.matsim.signals.vis.VisSignalSystem;

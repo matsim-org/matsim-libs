@@ -20,13 +20,13 @@
 package org.matsim.contrib.signals.data.signalcontrol.v20;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.signalcontrol.v20.SignalControlDataFactory;
-import org.matsim.signals.data.signalcontrol.v20.SignalGroupSettingsData;
-import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signals.data.signalcontrol.v20.SignalSystemControllerData;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalPlan;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 
 /**

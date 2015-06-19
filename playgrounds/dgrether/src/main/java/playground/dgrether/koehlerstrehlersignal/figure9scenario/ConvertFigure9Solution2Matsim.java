@@ -26,8 +26,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.data.signalcontrol.v20.SignalControlData;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;

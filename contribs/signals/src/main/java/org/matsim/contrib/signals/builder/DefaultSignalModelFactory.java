@@ -25,11 +25,11 @@ import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.model.SignalSystemImpl;
 import org.matsim.contrib.signals.model.SignalSystemsManagerImpl;
-import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signals.model.SignalController;
-import org.matsim.signals.model.SignalPlan;
-import org.matsim.signals.model.SignalSystem;
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.model.SignalController;
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 
 /**

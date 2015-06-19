@@ -26,9 +26,9 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.contrib.signals.model.SignalSystemsManagerImpl;
-import org.matsim.signals.model.AmberLogic;
-import org.matsim.signals.model.SignalSystem;
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.model.AmberLogic;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 
 /**

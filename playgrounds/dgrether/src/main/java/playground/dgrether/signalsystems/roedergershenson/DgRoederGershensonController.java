@@ -31,14 +31,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.signals.data.signalsystems.v20.SignalData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalController;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalGroupState;
-import org.matsim.signals.model.SignalPlan;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalController;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 

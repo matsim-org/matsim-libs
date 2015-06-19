@@ -30,10 +30,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.data.signalsystems.v20.SignalData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;

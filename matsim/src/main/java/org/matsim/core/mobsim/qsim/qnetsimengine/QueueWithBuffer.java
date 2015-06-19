@@ -19,12 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -45,10 +39,11 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signals.mobsim.DefaultSignalizeableItem;
 import org.matsim.signals.mobsim.SignalizeableItem;
-import org.matsim.signals.model.SignalGroupState;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
+
+import java.util.*;
 
 /**
  * Separating out the "lane" functionality from the "link" functionality also for QLinkImpl.  Ultimate goal is to unite this class here

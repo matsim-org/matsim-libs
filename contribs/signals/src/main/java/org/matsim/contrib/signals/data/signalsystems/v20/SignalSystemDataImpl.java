@@ -23,10 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.signalsystems.v20.SignalData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
  * @author dgrether

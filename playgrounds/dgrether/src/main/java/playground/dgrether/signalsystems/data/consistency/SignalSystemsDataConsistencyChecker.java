@@ -24,10 +24,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.data.signalsystems.v20.SignalData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 
 
 /**

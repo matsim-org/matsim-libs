@@ -21,13 +21,12 @@ package playground.dgrether.signalsystems.sylvia.model;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalModelFactory;
-import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signals.model.SignalController;
-import org.matsim.signals.model.SignalPlan;
-import org.matsim.signals.model.SignalSystem;
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.model.SignalController;
+import org.matsim.contrib.signals.model.SignalPlan;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.contrib.signals.model.DatabasedSignalPlan;
 
 import playground.dgrether.signalsystems.DgSensorManager;

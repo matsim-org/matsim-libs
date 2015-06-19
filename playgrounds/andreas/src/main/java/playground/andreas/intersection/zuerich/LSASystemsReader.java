@@ -7,9 +7,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 public class LSASystemsReader implements TabularFileHandler {
 

@@ -29,7 +29,7 @@ import javax.media.opengl.GL2;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
-import org.matsim.signals.model.SignalGroupState;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 import org.matsim.signals.vis.VisSignal;
 import org.matsim.signals.vis.VisSignalSystem;
 import org.matsim.vis.otfvis.OTFClientControl;

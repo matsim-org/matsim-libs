@@ -25,14 +25,11 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
+import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
-import org.matsim.signals.data.intergreens.v10.IntergreenTimesData;
-import org.matsim.signals.data.intergreens.v10.IntergreensForSignalSystemData;
-import org.matsim.signals.model.IntergreensLogic;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalGroupState;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
 
 /**

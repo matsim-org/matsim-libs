@@ -30,9 +30,9 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signals.mobsim.SignalizeableItem;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalSystem;
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 
 /**

@@ -35,11 +35,11 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes.XMLSignalSystem;
-import org.matsim.signals.data.intergreens.v10.IntergreenTimesData;
-import org.matsim.signals.data.intergreens.v10.IntergreenTimesDataFactory;
-import org.matsim.signals.data.intergreens.v10.IntergreensForSignalSystemData;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesData;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesDataFactory;
+import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 /**

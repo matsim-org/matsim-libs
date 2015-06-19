@@ -22,10 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.ambertimes.v10.AmberTimeData;
-import org.matsim.signals.data.ambertimes.v10.AmberTimesData;
-import org.matsim.signals.data.ambertimes.v10.AmberTimesDataFactory;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
  * @author jbischoff

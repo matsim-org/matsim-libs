@@ -35,10 +35,8 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem.XMLSignal;
-import org.matsim.signals.data.ambertimes.v10.AmberTimeData;
-import org.matsim.signals.data.ambertimes.v10.AmberTimesData;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 /**

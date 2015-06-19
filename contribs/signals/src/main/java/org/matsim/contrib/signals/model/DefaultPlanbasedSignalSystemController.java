@@ -29,10 +29,6 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.model.SignalController;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalPlan;
-import org.matsim.signals.model.SignalSystem;
 
 
 /**

@@ -23,9 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalGroupState;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
 
 /**

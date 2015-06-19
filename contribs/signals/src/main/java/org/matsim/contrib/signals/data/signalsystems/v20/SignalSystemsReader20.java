@@ -40,12 +40,9 @@ import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLTurningMoveRestrictions;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.signals.data.signalsystems.v20.SignalData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemsDataFactory;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.xml.sax.SAXException;
 

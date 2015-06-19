@@ -21,9 +21,9 @@ package playground.dgrether.signalsystems.laemmer.model;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalController;
-import org.matsim.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalController;
+import org.matsim.contrib.signals.model.SignalGroup;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 import playground.dgrether.signalsystems.utils.DgAbstractSignalController;

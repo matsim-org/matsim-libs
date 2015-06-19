@@ -20,9 +20,7 @@
 package org.matsim.contrib.signals.data.ambertimes.v10;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.ambertimes.v10.AmberTimeData;
-import org.matsim.signals.data.ambertimes.v10.AmberTimesDataFactory;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 
 /**

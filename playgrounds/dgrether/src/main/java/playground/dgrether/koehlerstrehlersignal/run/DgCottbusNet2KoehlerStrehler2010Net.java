@@ -21,7 +21,7 @@ package playground.dgrether.koehlerstrehlersignal.run;
 
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsData;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.conversion.M2KS2010NetworkConverter;

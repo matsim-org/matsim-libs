@@ -40,8 +40,8 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 

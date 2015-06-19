@@ -20,7 +20,7 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.dgrether.DgPaths;

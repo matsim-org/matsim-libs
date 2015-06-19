@@ -25,10 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.signalcontrol.v20.SignalGroupSettingsData;
-import org.matsim.signals.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalPlan;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 
 
 /**

@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;

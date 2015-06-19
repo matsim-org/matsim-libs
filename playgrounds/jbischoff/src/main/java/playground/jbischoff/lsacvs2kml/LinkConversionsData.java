@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystem;
 
 public class LinkConversionsData {
 	private Map<Id<Link>,Id<Link>> cdata;

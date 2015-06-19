@@ -20,10 +20,8 @@
 package org.matsim.contrib.signals.data.signalgroups.v20;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.signals.data.signalgroups.v20.SignalGroupsDataFactory;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
 /**
  * @author jbischoff
  * 

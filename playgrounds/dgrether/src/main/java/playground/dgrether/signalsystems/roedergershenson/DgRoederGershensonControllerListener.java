@@ -29,12 +29,12 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.controler.SignalsControllerListener;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.signals.model.SignalSystem;
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 

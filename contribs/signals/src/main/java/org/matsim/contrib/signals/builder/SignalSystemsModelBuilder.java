@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.builder;
 
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 
 /**

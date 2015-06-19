@@ -19,10 +19,11 @@
  * *********************************************************************** */
 package org.matsim.signals.vis;
 
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.signals.model.SignalGroupState;
 
 
 /**

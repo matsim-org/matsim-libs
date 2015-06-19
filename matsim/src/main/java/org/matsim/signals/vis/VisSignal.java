@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package org.matsim.signals.vis;
 
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
+import org.matsim.lanes.vis.VisLinkWLanes;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.matsim.lanes.vis.VisLinkWLanes;
-import org.matsim.signals.model.SignalGroupState;
 
 
 /**

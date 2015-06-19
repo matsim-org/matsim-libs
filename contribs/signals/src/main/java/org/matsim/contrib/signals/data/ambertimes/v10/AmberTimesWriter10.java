@@ -42,9 +42,7 @@ import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLAmber;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLRedAmber;
 import org.matsim.jaxb.amberTimes10.XMLGlobalDefaultsType;
 import org.matsim.jaxb.amberTimes10.XMLGlobalDefaultsType.XMLAmberTimeGreen;
-import org.matsim.signals.data.ambertimes.v10.AmberTimeData;
-import org.matsim.signals.data.ambertimes.v10.AmberTimesData;
-import org.matsim.signals.model.Signal;
+import org.matsim.contrib.signals.model.Signal;
 
 
 /**

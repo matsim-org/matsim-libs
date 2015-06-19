@@ -28,7 +28,6 @@ import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesReader10;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlReader20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsReader20;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsReader20;
-import org.matsim.signals.data.SignalsData;
 
 
 /**

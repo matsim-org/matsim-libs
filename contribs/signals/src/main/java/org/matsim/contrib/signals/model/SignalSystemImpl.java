@@ -26,14 +26,8 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalController;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalGroupState;
-import org.matsim.signals.model.SignalGroupStateChangeRequest;
-import org.matsim.signals.model.SignalSystem;
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
 
 /**

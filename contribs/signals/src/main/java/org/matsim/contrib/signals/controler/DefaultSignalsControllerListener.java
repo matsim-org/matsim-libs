@@ -28,8 +28,8 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.signals.data.SignalsData;
-import org.matsim.signals.model.SignalSystemsManager;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.model.SignalSystemsManager;
 
 
 /**

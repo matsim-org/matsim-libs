@@ -23,14 +23,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.signals.data.ambertimes.v10.AmberTimeData;
-import org.matsim.signals.data.ambertimes.v10.AmberTimesData;
-import org.matsim.signals.model.AmberLogic;
-import org.matsim.signals.model.Signal;
-import org.matsim.signals.model.SignalGroup;
-import org.matsim.signals.model.SignalGroupState;
-import org.matsim.signals.model.SignalGroupStateChangeRequest;
-import org.matsim.signals.model.SignalSystem;
+import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimeData;
+import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesData;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
 
 /**
@@ -61,7 +56,7 @@ public class AmberLogicImpl implements AmberLogic {
 		}
 		
 		if (amber != null){
-			SignalGroupStateChangeRequest amberRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.YELLOW, 
+			SignalGroupStateChangeRequest amberRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.YELLOW,
 					timeSec);
 			ret.add(amberRequest);
 			SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, 

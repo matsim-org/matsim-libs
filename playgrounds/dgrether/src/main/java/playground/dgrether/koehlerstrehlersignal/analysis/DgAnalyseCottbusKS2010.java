@@ -54,7 +54,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsReader20;
-import org.matsim.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.FactoryException;

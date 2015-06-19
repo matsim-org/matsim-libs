@@ -24,7 +24,7 @@ package playground.sergioo.passivePlanning2012.core.router;
 
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.LeastCostPathCalculatorModule;
-import org.matsim.core.router.LinkToLinkTripRouterFactory;
+import org.matsim.contrib.signals.router.LinkToLinkTripRouterFactory;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.pt.router.TransitRouterModule;
 

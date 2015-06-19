@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.signals.mobsim.SignalizeableItem;
-import org.matsim.signals.model.SignalGroupState;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
 import java.util.HashMap;
 import java.util.Map;

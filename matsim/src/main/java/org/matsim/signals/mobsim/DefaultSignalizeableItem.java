@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package org.matsim.signals.mobsim;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.signals.model.SignalGroupState;
 
 
 /**
