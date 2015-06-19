@@ -53,6 +53,8 @@ import java.util.List;
 public class MyPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent {
 	// renamed this from DefaultPersonDriverAgent to PersonDriverAgentImpl to mark that people should (in my view) not
 	// use this class directly.  kai, nov'10
+	
+	// yyyyyy this needs to be adapted to new standards !!!! kai, jun'15
 
 	private static final Logger log = Logger.getLogger(MyPersonDriverAgentImpl.class);
 

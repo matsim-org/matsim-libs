@@ -93,15 +93,6 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 	private ArrayList<SpatialGridDataExchangeInterface> spatialGridDataExchangeListenerList = null;
 	private ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListenerList = null;
 
-	// accessibility parameter
-
-	// yy I find it quite awkward to generate all these lines of computational code just to copy variables from one place to the other. I assume that
-	// one learns to do so in adapter classes, since one does not want changes on one side of the adapter to trigger to the other side of the adapter. 
-	// However, the following alternatives seem feasible:
-	// * replace those package-wide variables by getters that take the info directly from the other side so that the structure becomes clear
-	// * alternatively, use a more intelligent data structure in the sense of beta[car][TD].
-	// kai, jul'13
-
 	private boolean useRawSum	; //= false;
 	private double logitScaleParameter;
 	private double inverseOfLogitScaleParameter;
@@ -538,7 +529,7 @@ import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 		}
 	}
 
-	public void setPtMatrix(PtMatrix ptMatrix) {
+	public final void setPtMatrix(PtMatrix ptMatrix) {
 		this.ptMatrix = ptMatrix;
 	}
 

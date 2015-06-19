@@ -264,7 +264,7 @@ abstract class AbstractOperator implements Operator{
 		}
 	}
 
-	protected void scorePlan(Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap, PPlan plan) {
+	protected final void scorePlan(Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap, PPlan plan) {
 		double totalLineScore = 0.0;
 		int totalTripsServed = 0;
 		
