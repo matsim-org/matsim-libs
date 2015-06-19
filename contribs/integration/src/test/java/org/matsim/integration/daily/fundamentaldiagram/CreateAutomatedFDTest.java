@@ -134,7 +134,7 @@ public class CreateAutomatedFDTest {
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
 	private String [] travelModes;
-	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId("0");
+	public final Id<Link> flowDynamicsMeasurementLinkId = Id.createLinkId(0);
 	private Scenario scenario;
 	private Map<String, VehicleType> modeVehicleTypes;
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
@@ -174,7 +174,9 @@ public class CreateAutomatedFDTest {
 		int reduceNoOfDataPointsInPlot = 4; // 1--> will generate all possible data points;
 
 		double networkDensity = 3.*(1000./7.5);
-		int numberOfPoints = (int) Math.ceil(networkDensity/(reduceNoOfDataPointsInPlot * 2.))+5;
+		double sumOfPCUInEachStep = (modeVehicleTypes.get(travelModes[0]).getPcuEquivalents() * minSteps.get(travelModes[0]) ) + 
+				(modeVehicleTypes.get(travelModes[1]).getPcuEquivalents() * minSteps.get(travelModes[1]) );
+		int numberOfPoints = (int) Math.ceil(networkDensity/(reduceNoOfDataPointsInPlot * sumOfPCUInEachStep))+5;
 
 		List<Map<String,Integer>> points2Run = new ArrayList<Map<String,Integer>>();
 
@@ -241,7 +243,7 @@ public class CreateAutomatedFDTest {
 		/*
 		 *	Basically overriding the helper.getOutputDirectory() method, such that,
 		 *	if file directory does not exists or same file already exists, remove and re-creates the whole dir hierarchy so that
-		 *	all existing files are re-written but 
+		 *	all existing files are re-written 
 		 *	else, just keep adding files in the directory.	
 		 *	This is necessary in order to allow writing different tests results from JUnit parameterization.
 		 */
@@ -270,21 +272,21 @@ public class CreateAutomatedFDTest {
 				Person p = pop.getFactory().createPerson(Id.createPersonId(popSizeSoFar));
 				Plan plan = pop.getFactory().createPlan();
 
-				Activity actHome = pop.getFactory().createActivityFromLinkId("home", Id.createLinkId("-1"));
+				Activity actHome = pop.getFactory().createActivityFromLinkId("home", Id.createLinkId("home"));
 				actHome.setEndTime((new Random().nextDouble())*900);
 				plan.addActivity(actHome);
 
 				Leg leg = pop.getFactory().createLeg(mode);
-				NetworkRoute route = new LinkNetworkRouteImpl(Id.createLinkId("-1"), Id.createLinkId("3"));
+				NetworkRoute route = new LinkNetworkRouteImpl(Id.createLinkId("home"), Id.createLinkId("work"));
 				List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
-				routeLinks.add(Id.createLinkId("0"));
-				routeLinks.add(Id.createLinkId("1"));
-				routeLinks.add(Id.createLinkId("2"));
-				route.setLinkIds(Id.createLinkId("-1"), routeLinks, Id.createLinkId("3"));
+				routeLinks.add(Id.createLinkId(0));
+				routeLinks.add(Id.createLinkId(1));
+				routeLinks.add(Id.createLinkId(2));
+				route.setLinkIds(Id.createLinkId("home"), routeLinks, Id.createLinkId("work"));
 				leg.setRoute(route);
 				plan.addLeg(leg);
 
-				Activity workHome = pop.getFactory().createActivityFromLinkId("work", Id.createLinkId("3"));
+				Activity workHome = pop.getFactory().createActivityFromLinkId("work", Id.createLinkId("work"));
 				plan.addActivity(workHome);
 
 				p.addPlan(plan);
@@ -321,17 +323,17 @@ public class CreateAutomatedFDTest {
 	private void createNetwork(){
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node nodeHome = network.createAndAddNode(Id.createNodeId("-1"), scenario.createCoord(-50, 0));
-		Node node1 = network.createAndAddNode(Id.createNodeId("0"), scenario.createCoord(0, 0));
-		Node node2 = network.createAndAddNode(Id.createNodeId("1"), scenario.createCoord(1000, 0));
-		Node node3 = network.createAndAddNode(Id.createNodeId("2"), scenario.createCoord(500, 866.0));
-		Node nodeWork = network.createAndAddNode(Id.createNodeId("3"), scenario.createCoord(1050,0));
+		Node nodeHome = network.createAndAddNode(Id.createNodeId("home"), scenario.createCoord(-50, 0));
+		Node node1 = network.createAndAddNode(Id.createNodeId(0), scenario.createCoord(0, 0));
+		Node node2 = network.createAndAddNode(Id.createNodeId(1), scenario.createCoord(1000, 0));
+		Node node3 = network.createAndAddNode(Id.createNodeId(2), scenario.createCoord(500, 866.0));
+		Node nodeWork = network.createAndAddNode(Id.createNodeId("work"), scenario.createCoord(1050,0));
 
-		network.createAndAddLink(Id.createLinkId("-1"), nodeHome, node1, 25, 60, 27000, 1);
-		network.createAndAddLink(Id.createLinkId("0"), node1, node2, 1000, 60, 2700, 1);
-		network.createAndAddLink(Id.createLinkId("1"), node2, node3, 1000, 60, 2700, 1);
-		network.createAndAddLink(Id.createLinkId("2"), node3, node1, 1000, 60, 2700, 1);
-		network.createAndAddLink(Id.createLinkId("3"), node2, nodeWork, 25, 60, 27000, 1);
+		network.createAndAddLink(Id.createLinkId("home"), nodeHome, node1, 25, 60, 27000, 1);
+		network.createAndAddLink(Id.createLinkId(0), node1, node2, 1000, 60, 2700, 1);
+		network.createAndAddLink(Id.createLinkId(1), node2, node3, 1000, 60, 2700, 1);
+		network.createAndAddLink(Id.createLinkId(2), node3, node1, 1000, 60, 2700, 1);
+		network.createAndAddLink(Id.createLinkId("work"), node2, nodeWork, 25, 60, 27000, 1);
 
 		Set<String> allowedModes = new HashSet<String>();
 		allowedModes.addAll(Arrays.asList(travelModes));
@@ -668,11 +670,11 @@ public class CreateAutomatedFDTest {
 	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
 
 		private PersonDriverAgentImpl delegate;
-		public boolean goHome;
+		public boolean isArriving;
 
 		public MyRoundAndRoundAgent(Person p, Plan unmodifiablePlan, QSim qSim) {
 			this.delegate = new PersonDriverAgentImpl(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
-			this.goHome = false;//false at start, modified when all data is extracted.
+			this.isArriving = false;//false at start, modified when all data is extracted.
 		}
 
 		@Override
@@ -743,24 +745,23 @@ public class CreateAutomatedFDTest {
 		@Override
 		public Id<Link> chooseNextLinkId() {
 			if (globalFlowDynamicsUpdator.isPermanent()){ 
-				goHome = true; 
+				isArriving = true; 
 			}
 
-
-
-			if(delegate.getCurrentLinkId().equals(Id.createLinkId("2"))){
-				return Id.createLinkId("0") ;
-			} else if(delegate.getCurrentLinkId().equals(Id.createLinkId("0")) ) {
-				if ( goHome) {
-					return Id.createLinkId(3) ;
+			if(delegate.getCurrentLinkId().equals(Id.createLinkId("home"))){
+				return Id.createLinkId(0);
+			} else if(delegate.getCurrentLinkId().equals(Id.createLinkId(0))){
+				if ( isArriving) {
+					return Id.createLinkId("work") ;
 				} else {
 					return Id.createLinkId(1) ;
 				}
-			}
+			} else if(delegate.getCurrentLinkId().equals(Id.createLinkId(1))){
+				return Id.createLinkId(2);
+			} else if(delegate.getCurrentLinkId().equals(Id.createLinkId(2))){
+				return Id.createLinkId(0);
+			} else return delegate.chooseNextLinkId();
 			
-			return null ;
-			
-			// todo amit: fix
 		} 
 
 		@Override
