@@ -109,7 +109,7 @@ public class KTFreight_v3 {
 
 	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/UCC_Test_NonUcc/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/UCC_Test_Ucc2/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
@@ -139,7 +139,7 @@ public class KTFreight_v3 {
 
 	private static final boolean addingCongestion = false ;  //doesn't work correctly, KT 10.12.2014
 	private static final boolean addingToll = true;  //added, kt. 07.08.2014
-	private static final boolean usingUCC = false;	 //Using Transshipment-Center, added kt 30.04.2015
+	private static final boolean usingUCC = true;	 //Using Transshipment-Center, added kt 30.04.2015
 	private static final boolean runMatsim = true;	 //when false only jsprit run will be performed
 	private static final int LAST_MATSIM_ITERATION = 0;  //only one iteration for writing events.
 	private static final int LAST_JSPRIT_ITERATION = 1000;
@@ -237,7 +237,7 @@ public class KTFreight_v3 {
 			new CarrierPlanXmlWriterV2(uccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_UCC_" + RUN + runIndex+".xml") ;
 			new WriteCarrierScoreInfos(uccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_UCC.txt"), runIndex);
 
-			createServicesToUCC(uccCarriers, nonUccCarriers); // Nachfrage den der UCCC ausliefert muss an die Umschlagpunkte geliefert werden. 
+			nonUccCarriers = uccCarrierCreator.createServicesToUCC(uccCarriers, nonUccCarriers); // Nachfrage den der UCCC ausliefert muss an die Umschlagpunkte geliefert werden. 
 
 			generateCarrierPlans(scenario.getNetwork(), nonUccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die NonUCC-Carriers
 			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_NonUCC" + RUN + runIndex+".xml") ;
@@ -298,48 +298,7 @@ public class KTFreight_v3 {
 
 
 
-	private static void createServicesToUCC(Carriers uccCarriers,
-			Carriers nonUccCarriers) {
-		//Services aus den UCC für die Non-UCC erstellen -> Funktionmiert grundsätzlich, KT 02.05.15
-		//TODO: Voraussetzung prüfen/Angeben, dass UCC-Carrier-ID mit "UCC" beginnt UND mit der 'HauptCarrier'-ID endet: z.B. Carrier1 -> UCC_Carrier1
-		for (Carrier uccC : uccCarriers.getCarriers().values()){
-			for (Carrier nonUccC : nonUccCarriers.getCarriers().values()){
-				if (uccC.getId().toString().endsWith(nonUccC.getId().toString())){				//TODO: Sicherstellen, dass jeder Service auch erstellt wird--> Sicherheitsabfrage, ansonsten Fehler erzeugen!
-					Map<Id<Link>, Integer> demandAtUCC = new HashMap<Id<Link>, Integer>();		//Zählt nachfrage an UCC-LinkID
-					for (ScheduledTour st : uccC.getSelectedPlan().getScheduledTours()){		//für die einzelnen Touren die Nachfrage an den einzelnen Depots zählen
-						Id<Link> uccLocationId = st.getVehicle().getLocation();
-						int demand = 0;
-
-						for (TourElement tourElement : st.getTour().getTourElements()){
-							if(tourElement instanceof ServiceActivity){
-								ServiceActivity serviceAct = (ServiceActivity)tourElement;
-								demand += serviceAct.getService().getCapacityDemand();
-							}
-						}
-						
-						if (demandAtUCC.containsKey(uccLocationId)){
-							demandAtUCC.put(uccLocationId, demandAtUCC.get(uccLocationId)+demand);  
-						} else  {
-							demandAtUCC.put(uccLocationId, demand);
-						}
-					}
-					
-					//neue Services erstellen des nonUccC zum Depot des uccC.
-					for (Id<Link> linkId : demandAtUCC.keySet()){				//Nun erstelle die ganzen Services
-						for (int i = 1; i<=demandAtUCC.get(linkId); i++){
-							CarrierService.Builder csBuilder = CarrierService.Builder.newInstance(Id.create("UCC_"+i, CarrierService.class), linkId);	//
-							csBuilder.setCapacityDemand(1);		//Jeder Service nur Nachfrage = 1, damit Fzg Aufteilugn frei erfolgen kann
-							csBuilder.setServiceDuration(60);	//60sec = 1min
-							csBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(3600, 7200)); //TODO: Zeiten festlegen -> zunächst willkührlich zwischen 1 und 2 Uhr
-//								//TODO: Früheste Abfahrt (earliestVehDepvom UCC bestimmen
-//								csBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Math.max(0, earliestVehDep -60), Math.max(0, earliestVehDep -60))); // zwischen 60 und 30 Minuten bevor das erste Fahrzeug das UCC verlässt. 
-							nonUccC.getServices().add(csBuilder.build());
-						}	
-					}
-				} //end if
-			}
-		}
-	}
+	
 
 
 	private static void matsimRun(Scenario scenario, Carriers carriers) {

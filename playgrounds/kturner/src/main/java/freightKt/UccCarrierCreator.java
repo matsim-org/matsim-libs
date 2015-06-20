@@ -1,6 +1,7 @@
 package freightKt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,16 +10,21 @@ import java.util.TreeMap;
 
 //import jsprit.core.problem.vehicle.VehicleType;
 
+import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
+import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.vehicles.Vehicle;
@@ -201,7 +207,8 @@ class UccCarrierCreator {
 			splittedCarriers.addCarrier(carrier); //bisherigen Carrier reinschreiben, darf auch ohne Service sein, da ggf während Laufzeit nachfrage erhält (Depot -> UCC).
 
 			if (!uccCarrier.getServices().isEmpty()){		//keinen UCC ohne Nachfrage übernehmen.
-				addVehicles(uccCarrier, vehicleTypes, uccDepotsLinkIds2, uccOpeningTime, uccClosingTime);
+				TimeWindow tw = calcMaxRangeOfStartTimeWindow(uccCarrier);
+				addVehicles(uccCarrier, vehicleTypes, uccDepotsLinkIds2, Math.max(0, tw.getStart() -3600), Math.min(24*3500, tw.getEnd() +3600)); //Depotzeiten: Zeitfenster +- 1h
 				uccCarrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
 				splittedCarriers.addCarrier(uccCarrier);
 			}
@@ -211,7 +218,6 @@ class UccCarrierCreator {
 	}
 
 
-	//TODO: Öffnungszeiten UCC ausgliedern?
 	//TODO: Absichern, dass zu erstellende VehicleType auch in VehicleTypes vorhanden sind! 
 	/*
 	 * Step3b: Elektro-Fahrzeug-Typen den UCC zuordnen
@@ -291,5 +297,78 @@ class UccCarrierCreator {
 		return carriers;
 	}
 
+	Carriers createServicesToUCC(Carriers uccCarriers,	Carriers nonUccCarriers) {
+		//Services aus den UCC für die Non-UCC erstellen -> Funktionmiert grundsätzlich, KT 02.05.15
+		for (Carrier uccC : uccCarriers.getCarriers().values()){
+			for (Carrier nonUccC : nonUccCarriers.getCarriers().values()){
+				if (uccC.getId().toString().endsWith(nonUccC.getId().toString())){				//TODO: Sicherstellen, dass jeder Service auch erstellt wird--> Sicherheitsabfrage, ansonsten Fehler erzeugen!
+					Map<Id<Link>, Integer> demandAtUCC = new HashMap<Id<Link>, Integer>();		//Zählt nachfrage an UCC-LinkID
+					for (ScheduledTour st : uccC.getSelectedPlan().getScheduledTours()){		//für die einzelnen Touren die Nachfrage an den einzelnen Depots zählen
+						Id<Link> uccLocationId = st.getVehicle().getLocation();
+						int demand = 0;
 
+						for (TourElement tourElement : st.getTour().getTourElements()){
+							if(tourElement instanceof ServiceActivity){
+								ServiceActivity serviceAct = (ServiceActivity)tourElement;
+								demand += serviceAct.getService().getCapacityDemand();
+							}
+						}
+						
+						if (demandAtUCC.containsKey(uccLocationId)){
+							demandAtUCC.put(uccLocationId, demandAtUCC.get(uccLocationId)+demand);  
+						} else  {
+							demandAtUCC.put(uccLocationId, demand);
+						}
+					}
+					
+					//neue Services erstellen des nonUccC zum Depot des uccC.
+					for (Id<Link> linkId : demandAtUCC.keySet()){				//Nun erstelle die ganzen Services
+						for (int i = 1; i<=demandAtUCC.get(linkId); i++){
+							CarrierService.Builder csBuilder = CarrierService.Builder.newInstance(Id.create(uccC_prefix+i, CarrierService.class), linkId);	//
+							csBuilder.setCapacityDemand(1);		//Jeder Service nur Nachfrage = 1, damit Fzg Aufteilung frei erfolgen kann
+							csBuilder.setServiceDuration(60);	//60sec = 1min
+							double earliestVehDep = calcEarliestDep(uccC ,linkId);	
+							csBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Math.max(0, earliestVehDep -7200), Math.max(0, earliestVehDep -1800))); // zwischen 120 und 30 Minuten bevor das erste Fahrzeug das UCC verlässt. 
+							nonUccC.getServices().add(csBuilder.build());
+						}	
+					}
+				} //end if
+			}
+		}
+	return nonUccCarriers;	
+	}
+
+	//Früheste Abfahrt eines Fahrzeuges des Carriers vom Angebenenen Depot
+//	TODO: Test gegen Null (Link und cv.getEarliestStartTime)
+	private double calcEarliestDep(Carrier carrier, Id<Link> linkId) {
+		double earliestDepTime = 24*3600.0; 	//24 Uhr 
+		  for (CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()) {
+			  if (cv.getLocation() == linkId){
+					 if (cv.getEarliestStartTime() < earliestDepTime) {
+						 earliestDepTime = cv.getEarliestStartTime();
+					 } 
+			  }
+		  }
+		return earliestDepTime;
+	}
+
+	/**
+	 * Gibt die maximale Spanne (früheste Startzeit, späteste Endzeit) 
+	 * der Service-Zeiten des Carriers an, zu denen ein Service begonnen werden darf.
+	 */
+	private TimeWindow calcMaxRangeOfStartTimeWindow(Carrier carrier){
+		double earliestServiceStartBeginTime = 24*3600.0; 	//24 Uhr 
+		double latestServiceStartEndTime = 0.0;
+		for (CarrierService cs : carrier.getServices()) {
+			if (cs.getServiceStartTimeWindow().getStart() < earliestServiceStartBeginTime) {
+				earliestServiceStartBeginTime = cs.getServiceStartTimeWindow().getStart();
+			}
+			if (cs.getServiceStartTimeWindow().getEnd() > latestServiceStartEndTime) {
+				latestServiceStartEndTime = cs.getServiceStartTimeWindow().getEnd();
+			}
+		}
+		Assert.assertTrue(earliestServiceStartBeginTime <= latestServiceStartEndTime);
+		TimeWindow timeWindow = TimeWindow.newInstance(earliestServiceStartBeginTime, latestServiceStartEndTime);
+		return timeWindow;
+	}
 }
