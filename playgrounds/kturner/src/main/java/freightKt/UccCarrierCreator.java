@@ -39,14 +39,12 @@ class UccCarrierCreator {
 	 * UCC: Urban Consolidation Center -> transshipment center 
 	 */
 
-
-
 	private Carriers carriers ;
 	private CarrierVehicleTypes vehicleTypes  ;	
-	private String tollfile ;
+	private String zonefile ;
 	private String uccC_prefix;		//PRefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
-	private String[] retailerNames;
-	private List<Id<Link>> uccDepotsLinkIds = new ArrayList<Id<Link>>();;	//Location of UCC
+	private ArrayList<String> retailerNames = new ArrayList<String>();
+	private ArrayList<Id<Link>> uccDepotsLinkIds = new ArrayList<Id<Link>>();;	//Location of UCC
 
 
 	double uccOpeningTime;
@@ -73,24 +71,24 @@ class UccCarrierCreator {
 
 
 	/**
-	 * Constructor, sets uccOpeningTime: 08:00:00 and uccClosingTime: 21:00:00 
+	 * Constructor, sets uccOpeningTime to 06:00:00 and uccClosingTime to 21:00:00 
 	 * @param carriers: carriers to be handled
 	 * @param vehicleTypes: vehicleTypes for solving the problem (must include the vehTypes of later used UCCcarriers)
-	 * @param tollfile: path of tollfile -> Services at links defined here were moved to UccCarrier
+	 * @param zonefile: path of zonefile -> Services at links defined here were moved to UccCarrier
 	 * @param uccC_prefix: prefix of UccCarrier-Id (<UccC_prefix><CarrierName>)
 	 * @param retailerNames: Array of all retailer/carrier to extract. (begin of CarrierId)
 	 * @param uccDepotsLinkIds: locations at which UCCs were created
 	 */
 	UccCarrierCreator(Carriers carriers,	CarrierVehicleTypes vehicleTypes, 
-			String tollfile,  String uccC_prefix,
-			String[] retailerNames, List<Id<Link>> uccDepotsLinkIds) {
-		this.tollfile = tollfile;
+			String zonefile,  String uccC_prefix,
+			ArrayList<String> retailerNames, ArrayList<Id<Link>> uccDepotsLinkIds) {
+		this.zonefile = zonefile;
 		this.carriers = carriers;
 		this.vehicleTypes = vehicleTypes;
 		this.uccC_prefix = uccC_prefix;
 		this.retailerNames = retailerNames;
 		this.uccDepotsLinkIds = uccDepotsLinkIds;
-		uccOpeningTime = 8*3600.0;	// 08:00:00 Uhr
+		uccOpeningTime = 6*3600.0;	// 06:00:00 Uhr
 		uccClosingTime = 21*3600.0;	// 21:00:00 Uhr
 	}
 
@@ -98,7 +96,7 @@ class UccCarrierCreator {
 	 * Constructor 
 	 * @param carriers: carriers to be handled
 	 * @param vehicleTypes: vehicleTypes for solving the problem (must include the vehTypes of later used UCCcarriers)
-	 * @param tollfile: path of tollfile -> Services at links defined here were moved to UccCarrier
+	 * @param zonefile: path of zonefile -> Services at links defined here were moved to UccCarrier
 	 * @param uccC_prefix: prefix of UccCarrier-Id (<UccC_prefix><CarrierName>)
 	 * @param retailerNames: Array of all retailer/carrier to extract. (begin of CarrierId)
 	 * @param uccDepotsLinkIds: locations at which UCCs were created
@@ -106,14 +104,14 @@ class UccCarrierCreator {
 	 * @param uccClosingTime: ClosingTime for the UCC (= latest return for vehicles delivering from UCC)
 	 */
 	UccCarrierCreator(Carriers carriers,	CarrierVehicleTypes vehicleTypes, 
-			String tollfile,  String uccC_prefix,
-			String[] retailerNames, List<Id<Link>> uccDepotsLinkIds,
+			String zonefile,  String uccC_prefix,
+			ArrayList<String> retailernames, ArrayList<Id<Link>> uccDepotsLinkIds,
 			double uccOpeningTime, double uccClosingTime) {
-		this.tollfile = tollfile;
+		this.zonefile = zonefile;
 		this.carriers = carriers;
 		this.vehicleTypes = vehicleTypes;
 		this.uccC_prefix = uccC_prefix;
-		this.retailerNames = retailerNames;
+		this.retailerNames = retailernames;
 		this.uccDepotsLinkIds = uccDepotsLinkIds;
 		this.uccOpeningTime = uccOpeningTime;
 		this.uccClosingTime = uccClosingTime;
@@ -125,7 +123,7 @@ class UccCarrierCreator {
 	 * @param carriers: carriers to be handled
 	 * @param retailerNames: Array of all retailer/carrier to extract. (begin of CarrierId)
 	 */
-	UccCarrierCreator(Carriers carriers, String[] retailerNames) {
+	UccCarrierCreator(Carriers carriers, ArrayList<String> retailerNames) {
 		this.carriers = carriers;
 		this.retailerNames = retailerNames;
 	}
@@ -136,9 +134,14 @@ class UccCarrierCreator {
 
 	 void createSplittedUccCarrriers() {
 		//Step1 Analysis of Carriers: not done here any more....
-		extractedCarriers = extractCarriers(carriers, retailerNames); //Step 2: Extrahieren einzelner Carrier (alle, die mit dem RetailerNamen beginnen)		
-		splittedCarriers = createUCCCarrier(extractedCarriers, vehicleTypes, tollfile, uccDepotsLinkIds, uccOpeningTime, uccClosingTime);	//Step3: Nachfrage auf Carrier UCC und normal aufteilen.
-		splittedCarriers = renameVehId(splittedCarriers); 				//Step4: VehId je Carrier einzigartig machen, da sonst weitere Vorkommen ignoriert werden (und somit nicht alle Depots genutzt werden).
+		//Step 2: Extrahieren einzelner Carrier (alle, die mit dem RetailerNamen beginnen)
+		extractedCarriers = extractCarriers(carriers, retailerNames); 		
+		//Step3: Nachfrage auf Carrier UCC und normal aufteilen.
+		splittedCarriers = createUCCCarrier(extractedCarriers, vehicleTypes, 
+				zonefile, uccDepotsLinkIds, uccOpeningTime, uccClosingTime);	
+		//Step4: VehId je Carrier einzigartig machen, da sonst weitere Vorkommen 
+		//		ignoriert werden (und somit nicht alle Depots genutzt werden).
+		splittedCarriers = renameVehId(splittedCarriers); 				
 
 		System.out.println("### ENDE: UCCCarriers.run ###");
 	}
@@ -152,7 +155,7 @@ class UccCarrierCreator {
 	 * @return carriers with Id starting with retailerName or 
 	 * 			if retailerNames == null the unmodified carriers.
 	 */
-	Carriers extractCarriers(Carriers carriers, String[] retailerNames) {
+	Carriers extractCarriers(Carriers carriers, ArrayList<String> retailerNames) {
 		if (retailerNames == null) {
 			return carriers;
 		}
@@ -161,7 +164,7 @@ class UccCarrierCreator {
 		for (Carrier carrier : carriers.getCarriers().values()){
 			carrierId = carrier.getId().toString();
 			for (String retailerName : retailerNames)
-				if (carrierId.startsWith(retailerName)){			//Carriername beginnt mit Retailername
+				if (carrierId.startsWith(retailerName)){	//Carriername beginnt mit Retailername
 					tempCarriers.addCarrier(carrier);
 				}
 		}
@@ -174,21 +177,25 @@ class UccCarrierCreator {
 	 * Sollte der ursprüngliche Carrier danach keine Nachfrage mehr haben, so bleibt er erhalten, da er später noch 
 	 * die UCC beliefern muss.
 	 */
-	Carriers createUCCCarrier(Carriers carriers, CarrierVehicleTypes vehicleTypes, String tollfile, List<Id<Link>> uccDepotsLinkIds2, double uccOpeningTime, double uccClosingTime) {
+	Carriers createUCCCarrier(Carriers carriers, CarrierVehicleTypes vehicleTypes, 
+			String zonefile, List<Id<Link>> uccDepotsLinkIds2, double uccOpeningTime, 
+			double uccClosingTime) {
 
-		Carriers splittedCarriers = new Carriers(); // Carrierfile, welches beide Carrier enthält: sowohl UCC, als auch non UCC
+		// Carrierfile, welches beide Carrier enthält: sowohl UCC, als auch non UCC
+		Carriers splittedCarriers = new Carriers(); 
 
-		//Read tollfile
+		//Read zonefile
 		final RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
-			rpReader.parse(tollfile);
+			rpReader.parse(zonefile);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 
 		Set<Id<Link>> tolledLinkIds = scheme.getTolledLinkIds();  //Link-Ids des MautSchemas
-		Set<CarrierService> serviceToRemove= new HashSet<CarrierService>(); 	//Liste der zum UCC-Carrier übertragenen Services -> wird später aus normalen Carrier entfernt
+		//Liste der zum UCC-Carrier übertragenen Services -> wird später aus normalen Carrier entfernt
+		Set<CarrierService> serviceToRemove= new HashSet<CarrierService>(); 	
 
 		for (Carrier carrier : carriers.getCarriers().values()){
 			Carrier uccCarrier = CarrierImpl.newInstance(Id.create(uccC_prefix + carrier.getId() , Carrier.class));
@@ -200,20 +207,24 @@ class UccCarrierCreator {
 				}
 			}
 
-			for (CarrierService service: serviceToRemove){ //neue Schleife, da sonst innerhalb der Schleife das Set modifiziert wird..
+			//neue Schleife, da sonst innerhalb der Schleife das Set modifiziert wird..
+			for (CarrierService service: serviceToRemove){ 
 				carrier.getServices().remove(service);	//und lösche ihn aus dem normalen Carrier raus
 			}
 
-			splittedCarriers.addCarrier(carrier); //bisherigen Carrier reinschreiben, darf auch ohne Service sein, da ggf während Laufzeit nachfrage erhält (Depot -> UCC).
+			//bisherigen Carrier reinschreiben, darf auch ohne Service sein, 
+			//da ggf während Laufzeit nachfrage erhält (Depot -> UCC).
+			splittedCarriers.addCarrier(carrier); 
 
 			if (!uccCarrier.getServices().isEmpty()){		//keinen UCC ohne Nachfrage übernehmen.
 				TimeWindow tw = calcMaxRangeOfStartTimeWindow(uccCarrier);
-				addVehicles(uccCarrier, vehicleTypes, uccDepotsLinkIds2, Math.max(0, tw.getStart() -3600), Math.min(24*3500, tw.getEnd() +3600)); //Depotzeiten: Zeitfenster +- 1h
+				//Depotzeiten: Zeitfenster +- 1h
+				addVehicles(uccCarrier, vehicleTypes, uccDepotsLinkIds2, 
+						Math.max(0, tw.getStart() -3600), Math.min(24*3500, tw.getEnd() +3600)); 
 				uccCarrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
 				splittedCarriers.addCarrier(uccCarrier);
 			}
 		}
-
 		return splittedCarriers;
 	}
 
@@ -224,34 +235,32 @@ class UccCarrierCreator {
 	 * Dabei gilt, dass frozen nur über den light8telectro_frozen verfügt  und alle anderen
 	 * light8telectro und medium18telectro verfügen. Es werden Fahrzeuge für jedes Depot angelegt.
 	 */
-	void addVehicles(Carrier Carrier, CarrierVehicleTypes vehicleTypes, List<Id<Link>> uccDepotsLinkIds, double uccOpeningTime, double uccClosingTime) {
+	void addVehicles(Carrier Carrier, CarrierVehicleTypes vehicleTypes, 
+			List<Id<Link>> uccDepotsLinkIds, double uccOpeningTime, double uccClosingTime) {
 
 		if (Carrier.getId().toString().endsWith("TIEFKUEHL")){
-
 			for (Id<Link> linkId : uccDepotsLinkIds ){
-				Carrier.getCarrierCapabilities().getCarrierVehicles().add( CarrierVehicle.Builder.newInstance(Id.create("light8telectro_frozen", Vehicle.class), linkId)
+				Carrier.getCarrierCapabilities().getCarrierVehicles()
+					.add(CarrierVehicle.Builder.newInstance(Id.create("light8telectro_frozen", Vehicle.class), linkId)
 						.setType(vehicleTypes.getVehicleTypes().get(Id.create("light8telectro_frozen", VehicleType.class)))
 						.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
 						.build());
 			}
-
 		} else {
-
 			for (Id<Link> linkId : uccDepotsLinkIds ){
-				Carrier.getCarrierCapabilities().getCarrierVehicles().add(CarrierVehicle.Builder.newInstance(Id.create("light8telectro", Vehicle.class), linkId)
+				Carrier.getCarrierCapabilities().getCarrierVehicles()
+					.add(CarrierVehicle.Builder.newInstance(Id.create("light8telectro", Vehicle.class), linkId)
 						.setType(vehicleTypes.getVehicleTypes().get(Id.create("light8telectro", VehicleType.class)))
 						.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
 						.build());
 
-				Carrier.getCarrierCapabilities().getCarrierVehicles().add(CarrierVehicle.Builder.newInstance(Id.create("medium18telectro", Vehicle.class), linkId)
+				Carrier.getCarrierCapabilities().getCarrierVehicles()
+					.add(CarrierVehicle.Builder.newInstance(Id.create("medium18telectro", Vehicle.class), linkId)
 						.setType(vehicleTypes.getVehicleTypes().get(Id.create("medium18telectro", VehicleType.class)))
 						.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
 						.build());
-
 			}
-
 		}
-
 	}
 
 	/* Step4: 
@@ -269,7 +278,8 @@ class UccCarrierCreator {
 			//zählt mit, wie oft Id für diesen Carrier vergeben wurde
 			Map<String, Integer> nuOfVehPerId = new TreeMap<String, Integer>();
 			
-			//da Änderung der vorhanden Fahrzeuge sonst nicht ging, Umweg über temporären neuen Carrier & setzen der Eigenschaften.
+			//da Änderung der vorhanden Fahrzeuge sonst nicht ging, Umweg über 
+			//temporären neuen Carrier & setzen der Eigenschaften.
 			CarrierCapabilities tempCc = CarrierCapabilities.newInstance();
 			tempCc.setFleetSize(carrier.getCarrierCapabilities().getFleetSize());
 			for (CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()){
@@ -283,7 +293,8 @@ class UccCarrierCreator {
 					newVehId = vehIdwLink + alph.get(nuOfVehPerId.get(vehIdwLink)-1);
 				}	
 				
-				//Vehicle neu erstellen, da setVehicleId nicht verfügbar. Dabei eindeutigen Buchstaben für jede VehId-DepotLink-Kombination einfügen
+				//Vehicle neu erstellen, da setVehicleId nicht verfügbar.
+				//Dabei eindeutigen Buchstaben für jede VehId-DepotLink-Kombination einfügen
 				//TODO: Abischerung gegen Leerlaufen des Alphabet-Arrays  (mehr als 26 mal verwendet erstellen.)
 				tempCc.getCarrierVehicles().add(CarrierVehicle.Builder
 						.newInstance(Id.create(newVehId, Vehicle.class), cv.getLocation())
@@ -301,9 +312,14 @@ class UccCarrierCreator {
 		//Services aus den UCC für die Non-UCC erstellen -> Funktionmiert grundsätzlich, KT 02.05.15
 		for (Carrier uccC : uccCarriers.getCarriers().values()){
 			for (Carrier nonUccC : nonUccCarriers.getCarriers().values()){
-				if (uccC.getId().toString().endsWith(nonUccC.getId().toString())){				//TODO: Sicherstellen, dass jeder Service auch erstellt wird--> Sicherheitsabfrage, ansonsten Fehler erzeugen!
-					Map<Id<Link>, Integer> demandAtUCC = new HashMap<Id<Link>, Integer>();		//Zählt nachfrage an UCC-LinkID
-					for (ScheduledTour st : uccC.getSelectedPlan().getScheduledTours()){		//für die einzelnen Touren die Nachfrage an den einzelnen Depots zählen
+				//TODO: Sicherstellen, dass jeder Service auch erstellt wird--> Sicherheitsabfrage, ansonsten Fehler erzeugen!
+//				if (uccC.getId().toString().endsWith(nonUccC.getId().toString())){	//TODO: Besser, weil exakter: prefix + nonUccC-Id		
+				if (uccC.getId().toString().equals(uccC_prefix+nonUccC.getId().toString())){
+					
+					//Zählt nachfrage an UCC-LinkID
+					Map<Id<Link>, Integer> demandAtUCC = new HashMap<Id<Link>, Integer>();
+					//für die einzelnen Touren die Nachfrage an den einzelnen Depots zählen
+					for (ScheduledTour st : uccC.getSelectedPlan().getScheduledTours()){
 						Id<Link> uccLocationId = st.getVehicle().getLocation();
 						int demand = 0;
 
@@ -321,14 +337,19 @@ class UccCarrierCreator {
 						}
 					}
 					
+					//TODO: Sicherstellen, dass bisher kein Service mit UCC_Prefix existiert, da sonst doppelte Einträge -> Fehler
 					//neue Services erstellen des nonUccC zum Depot des uccC.
 					for (Id<Link> linkId : demandAtUCC.keySet()){				//Nun erstelle die ganzen Services
 						for (int i = 1; i<=demandAtUCC.get(linkId); i++){
-							CarrierService.Builder csBuilder = CarrierService.Builder.newInstance(Id.create(uccC_prefix+i, CarrierService.class), linkId);	//
-							csBuilder.setCapacityDemand(1);		//Jeder Service nur Nachfrage = 1, damit Fzg Aufteilung frei erfolgen kann
-							csBuilder.setServiceDuration(60);	//60sec = 1min
 							double earliestVehDep = calcEarliestDep(uccC ,linkId);	
-							csBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(Math.max(0, earliestVehDep -7200), Math.max(0, earliestVehDep -1800))); // zwischen 120 und 30 Minuten bevor das erste Fahrzeug das UCC verlässt. 
+							CarrierService.Builder csBuilder = CarrierService.Builder
+								.newInstance(Id.create("to_"+uccC_prefix+linkId.toString()+"_"+i, CarrierService.class), linkId)
+							//Jeder Service nur Nachfrage = 1, damit Fzg Aufteilung frei erfolgen kann
+								.setCapacityDemand(1)		
+								.setServiceDuration(60)	//60sec = 1min
+							// zwischen 120 und 30 Minuten bevor das erste Fahrzeug das UCC verlässt. 
+								.setServiceStartTimeWindow(TimeWindow.newInstance(
+									Math.max(0, earliestVehDep -7200), Math.max(0, earliestVehDep -1800))); 
 							nonUccC.getServices().add(csBuilder.build());
 						}	
 					}
