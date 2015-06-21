@@ -4,71 +4,45 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.gml.producer.GeometryTransformer;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.freight.carrier.Carrier;
-import org.matsim.contrib.freight.carrier.CarrierImpl;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlReaderV2;
-import org.matsim.contrib.freight.carrier.CarrierPlanXmlWriterV2;
-import org.matsim.contrib.freight.carrier.CarrierService;
-import org.matsim.contrib.freight.carrier.CarrierVehicle;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeLoader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
-import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
-import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
-import org.matsim.core.utils.gis.PolylineFeatureFactory.Builder;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.opengis.annotation.Obligation;
-import org.opengis.annotation.Specification;
-import org.opengis.annotation.UML;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.metadata.extent.Extent;
-import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.cs.CoordinateSystem;
-import org.opengis.util.GenericName;
-import org.opengis.util.InternationalString;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 class ExtractTolledLinksFromLEZ {
 
 	/**
-	 * @author: Kturner
-	 * Extrahiert die Link-Ids eines Netzwerkes, welche Innerhalb einer Zone (Hier Umweltzone - LowEmissionZone) liegen und gibt diese als Textdatei aus.
+	 * @author: Kturner 
+	 * 
+	 * Extrahiert die Link-Ids eines Netzwerkes, welche innerhalb einer Zone 
+	 * (Hier Umweltzone - LowEmissionZone) liegen und gibt diese als Textdatei aus -> "_area". 
+	 *         
+	 * Extrahiert zusätzlich die Links, welche den Cordon der Zone bilden. ->   "_cordon" 
+	 * 
+	 * Die Ausgabe erfolgt dergestalt, dass sie direkt zur Definition eines 
+	 * Roadpricing-Files verwendet werden kann (copy-paste). 
+	 * 
+	 * Für beide Varianten werden zusätzlich noch .shp-Files erstellt und ausgegeben 
+	 * 
 	 * TODO: TollFile direkt aus den Links erstellen. Aktuell wird die LinkListe manuell kopiert.
 	 */
 
@@ -78,9 +52,10 @@ class ExtractTolledLinksFromLEZ {
 
 	//Dateinamen ohne XML-Endung
 	private static final String NETFILE_NAME = "network" ;
-	private static final String TOLL_NAME = "toll_city_kt";
+	//	private static final String TOLL_NAME = "toll_city_kt";
 	private static final String ZONE_SHAPE_NAME = "Umweltzone/Umweltzone_WGS84";
-	private static final String NETWORK_SHAPE_NAME = "Umweltzone/MatsimNW_conv_Links";
+	private static final String NETWORK_SHAPE_LINKS_NAME = "Umweltzone/MatsimNW_conv_Links";
+	private static final String NETWORK_SHAPE_NODES_NAME = "Umweltzone/MatsimNW_conv_Nodes";
 	//Ende  Namesdefinition Berlin
 
 
@@ -91,14 +66,19 @@ class ExtractTolledLinksFromLEZ {
 	//
 	//	//Dateinamen ohne XML-Endung
 	//	private static final String NETFILE_NAME = "grid-network" ;
-	//	private static final String TOLL_NAME = "grid-tollCordon";
+	//	//private static final String TOLL_NAME = "grid-tollCordon";
 	//	//Ende Namesdefinition Grid
 
 
 	private static final String NETFILE = INPUT_DIR + NETFILE_NAME + ".xml" ;
-	private static final String TOLLFILE = INPUT_DIR + TOLL_NAME + ".xml";
 	private static final String ZONESHAPEFILE = INPUT_DIR + ZONE_SHAPE_NAME + ".shp";
-	private static final String NETWORKSHAPEFILE = INPUT_DIR + NETWORK_SHAPE_NAME + ".shp";
+	private static final String NETWORKSHAPEFILE_LINKS = INPUT_DIR + NETWORK_SHAPE_LINKS_NAME + ".shp";
+	private static final String NETWORKSHAPEFILE_NODES = INPUT_DIR + NETWORK_SHAPE_NODES_NAME + ".shp";
+	//	private static final String TOLLFILE = INPUT_DIR + TOLL_NAME + ".xml";	//Für Output 
+
+	//Korrekturen für Cordon Maut - BerlinSzenario:
+	private static final ArrayList<String> removeLinks = new ArrayList<String>(Arrays.asList("7689", "7845", "7673", "6867", "3612", "3605", "6972", "5490", "7360", "3629", "3687", "3787", "3794"));
+	private static final ArrayList<String> addLinks =  new ArrayList<String>(Arrays.asList("7682", "5367", "3682", "3697", "3778", "3791"));
 
 	public static void main(String[] args) {
 		createDir(new File(OUTPUT_DIR));
@@ -109,13 +89,18 @@ class ExtractTolledLinksFromLEZ {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		convertNet2Shape(scenario.getNetwork(), OUTPUT_DIR); //Step 1: Netzwerk zusammenbringen -> Richtige Konvertierung gefunden ;-)
-		extractTollLinks(NETWORKSHAPEFILE, ZONESHAPEFILE ,OUTPUT_DIR); //Step 2: Links für Tollfile herausschreiben 
-//		TODO: TollFile direkt aus den Links erstellen. Aktuell wird die LinkListe manuell kopiert.
-	
-		
+
+		Collection<SimpleFeature>  zoneFeatures = new ShapeFileReader().readFileAndInitialize(ZONESHAPEFILE);
+		Collection<SimpleFeature>  linkFeatures = new ShapeFileReader().readFileAndInitialize(NETWORKSHAPEFILE_LINKS);
+		Collection<SimpleFeature>  nodeFeatures = new ShapeFileReader().readFileAndInitialize(NETWORKSHAPEFILE_NODES);
+
+		ArrayList<String> nodesInZone = calcNodesInZone(zoneFeatures, nodeFeatures);
+		extractTollLinksArea(linkFeatures, nodesInZone, zoneFeatures ,OUTPUT_DIR); //Step 2: Links für Tollfile herausschreiben 
+		extractTollLinksCordon(linkFeatures, nodesInZone, zoneFeatures ,OUTPUT_DIR); //Step 2: Links für Tollfile herausschreiben -> Definiton der CordonLinks
+
 		System.out.println("### ENDE ###");
 	}
-	
+
 
 	//NW Step1: Convert Matsim-Network to Shap-File.
 	private static void convertNet2Shape(Network network, String outputDir){
@@ -142,7 +127,8 @@ class ExtractTolledLinksFromLEZ {
 			Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 			Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());
 			SimpleFeature ft = linkFactory.createPolyline(new Coordinate [] {fromNodeCoordinate, linkCoordinate, toNodeCoordinate},
-					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
+					new Object [] {link.getId().toString(), link.getFromNode().getId().toString(),link.getToNode().getId().toString(), 
+									link.getLength(), ((LinkImpl)link).getType(), link.getCapacity(), link.getFreespeed()}, null);
 			features.add(ft);
 		}   
 		ShapeFileWriter.writeGeometries(features, outputDir+"MatsimNW_conv_Links.shp");
@@ -163,7 +149,8 @@ class ExtractTolledLinksFromLEZ {
 		ShapeFileWriter.writeGeometries(features, outputDir+"MatsimNW_conv_Nodes.shp");
 	}
 
-	//Convert coordinates of NW from Gauß-Krueger (Potsdam) [EPSG: 31468] to coordinate-format of low-emission-zone WGS84 [EPSG:4326]
+	//Convert coordinates of NW from Gauß-Krueger (Potsdam) [EPSG: 31468]
+	//to coordinate-format of low-emission-zone WGS84 [EPSG:4326]
 	private static Network convertCoordinates(Network net){
 
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:31468", "EPSG:4326");
@@ -176,27 +163,27 @@ class ExtractTolledLinksFromLEZ {
 		return net;
 	}
 
-	//NW-Step2: Extract all Features of NW-Shape which are within the ZoneShape, write there IDs into a .txt-File 
+	//NW-Step2a: Extract all Features of NW-Shape which are within the ZoneShape, write there IDs into a .txt-File 
 	// which is designed in a way, that it can get copied easily to a tollFill and create a .shp-File with this Features
-	private static void extractTollLinks(String networkShapefile, String zoneShapefile, String outputDir) {
-
-		Collection<SimpleFeature>  zoneFeatures = new ShapeFileReader().readFileAndInitialize(zoneShapefile);
-		Collection<SimpleFeature>  networkFeatures = new ShapeFileReader().readFileAndInitialize(networkShapefile);
+	private static void extractTollLinksArea(Collection<SimpleFeature> linkFeatures, 
+			ArrayList<String> nodesInZone, Collection<SimpleFeature> zoneFeatures, String outputDir) {
 
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		FileWriter writer;
 		try {
-			writer = new FileWriter(new File(outputDir + "tollLinks.txt")); //- falls die Datei bereits existiert wird diese überschrieben
-			//			writer = new FileWriter(outputDir + "tollLinks.txt", true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
-
+			writer = new FileWriter(new File(outputDir + "tollLinks_area.txt")); //- falls die Datei bereits existiert wird diese überschrieben
+		
 			for (SimpleFeature zoneFeature : zoneFeatures){
-				for(SimpleFeature networkFeature : networkFeatures){ 
+				for(SimpleFeature linkFeature : linkFeatures){ 
 					Geometry zoneGeometry = (Geometry) zoneFeature.getDefaultGeometry();
-					Geometry networkGeometry = (Geometry) networkFeature.getDefaultGeometry();
-					if(zoneGeometry.contains(networkGeometry)) {
-						features.add(networkFeature);
+					Geometry networkGeometry = (Geometry) linkFeature.getDefaultGeometry();
+					if( ( zoneGeometry.contains(networkGeometry) 		 // Link innerhalb der Zone
+							|| (zoneGeometry.crosses(networkGeometry) && (nodesInZone.contains(linkFeature.getAttribute("toID"))) )	 //Link kreuzt Zonengrenze von außen nach innen.
+							|| addLinks.contains(linkFeature.getAttribute("ID")) ) //Link soll manuell hinzugefügt werden
+							&& !removeLinks.contains(linkFeature.getAttribute("ID")) ){
+						features.add(linkFeature);
 						// Text wird in den Stream geschrieben
-						writer.write("<link id= \"" + networkFeature.getAttribute("ID") +"\" />");
+						writer.write("<link id= \"" + linkFeature.getAttribute("ID") +"\" />");
 						writer.write(System.getProperty("line.separator"));
 					}
 				}
@@ -207,9 +194,59 @@ class ExtractTolledLinksFromLEZ {
 			e.printStackTrace();
 		}
 		System.out.println("Datei geschrieben.");
-		ShapeFileWriter.writeGeometries(features, outputDir+"TolledLinks.shp");
+		ShapeFileWriter.writeGeometries(features, outputDir+"TolledLinks_area.shp");
 	}
-	
+
+	//NW-Step2b: Extract all Features of NW-Shape which are defining the ZoneShape, write there IDs into a .txt-File 
+	// which is designed in a way, that it can get copied easily to a tollFill and create a .shp-File with this Features
+	private static void extractTollLinksCordon(Collection<SimpleFeature> linkFeatures, 
+			ArrayList<String> nodesInZone, Collection<SimpleFeature> zoneFeatures, String outputDir) {
+
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		FileWriter writer;
+		try {
+			writer = new FileWriter(new File(outputDir + "tollLinks_Cordon.txt")); //- falls die Datei bereits existiert wird diese überschrieben
+			//			writer = new FileWriter(outputDir + "tollLinks.txt", true);  //true ---> wird ans Ende und nicht an den Anfang geschrieben
+			for (SimpleFeature zoneFeature : zoneFeatures){
+				for(SimpleFeature linkFeature : linkFeatures){ 
+					Geometry zoneGeometry = (Geometry) zoneFeature.getDefaultGeometry();
+					Geometry networkGeometry = (Geometry) linkFeature.getDefaultGeometry();
+
+					if( ( (zoneGeometry.crosses(networkGeometry) && (nodesInZone.contains(linkFeature.getAttribute("toID"))) )	 //Link kreuzt Zonengrenze von außen nach innen.
+							|| addLinks.contains(linkFeature.getAttribute("ID")) ) //Link soll manuell hinzugefügt werden
+							&& !removeLinks.contains(linkFeature.getAttribute("ID")) ){
+				
+						features.add(linkFeature);
+						writer.write("<link id= \"" + linkFeature.getAttribute("ID") +"\" />");
+						writer.write(System.getProperty("line.separator"));
+					}
+				}
+			}
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Datei geschrieben.");
+		ShapeFileWriter.writeGeometries(features, outputDir+"TolledLinks_Cordon.shp");
+	}
+
+	private static ArrayList<String> calcNodesInZone(Collection<SimpleFeature> zoneFeatures, 
+			Collection<SimpleFeature> nodeFeatures){
+
+		ArrayList<String> nodesInZone = new  ArrayList<String>();
+		for (SimpleFeature zoneFeature : zoneFeatures){
+			for(SimpleFeature networkFeature : nodeFeatures){ 
+				Geometry zoneGeometry = (Geometry) zoneFeature.getDefaultGeometry();
+				Geometry networkGeometry = (Geometry) networkFeature.getDefaultGeometry();
+				if(zoneGeometry.contains(networkGeometry)) {
+					nodesInZone.add(networkFeature.getAttribute("ID").toString());
+				}
+			}
+		}
+		return nodesInZone;
+	}
+
 	private static void createDir(File file) {
 		System.out.println("Verzeichnis " + file + " erstellt: "+ file.mkdirs());	
 	}
