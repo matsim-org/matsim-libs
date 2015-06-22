@@ -8,7 +8,8 @@ import playground.michalm.util.ParameterFileReader;
 
 class TaxiLauncherParams
 {
-    static TaxiLauncherParams readParams(String paramFile)
+
+      static TaxiLauncherParams readParams(String paramFile)
     {
         Map<String, String> params = ParameterFileReader.readParametersToMap(paramFile);
         String dir = new File(paramFile).getParent() + '/';
@@ -60,17 +61,23 @@ class TaxiLauncherParams
     String histogramOutDir;
     String eventsOutFile;
 
+    public static final String INPUT_DIR = "inputDir";
+    public static final String NET_FILE = "netFile";
+    public static final String PLANS_FILE = "plansFile";
+
+    public static final String TAXI_CUSTOMERS_FILE = "taxiCustomersFile";
 
     TaxiLauncherParams(Map<String, String> params)
     {
         this.params = params;
 
-        inputDir = params.get("inputDir");
-        netFile = getInputPath("netFile");
-        plansFile = getInputPath("plansFile");
+	inputDir = params.get(INPUT_DIR);
+	netFile = getInputPath(NET_FILE);
+	plansFile = getInputPath(PLANS_FILE);
 
-        taxiCustomersFile = getInputPath("taxiCustomersFile");
-        ranksFile = getInputPath("ranksFile");
+	taxiCustomersFile = getInputPath(TAXI_CUSTOMERS_FILE);
+        final String RANKS_FILE = "ranksFile";
+	ranksFile = getInputPath(RANKS_FILE);
         taxisFile = getInputPath("taxisFile");
 
         eventsFile = getInputPath("eventsFile");

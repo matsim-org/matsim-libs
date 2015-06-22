@@ -19,6 +19,7 @@
 
 package playground.michalm.taxi.run;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.*;
@@ -37,7 +38,42 @@ class KNTaxiLauncher
      */
     public static void run(String file, boolean removeNonPassengers, boolean endActivitiesAtTimeZero)
     {
-        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(TaxiLauncherParams.readParams(file));
+	    Map<String, String> params = new HashMap<>() ;
+	    
+	    params.put("inputDir","/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/") ;
+	    
+	    params.put("netFile", "../mielec-2-peaks-new/network.xml") ;
+	    params.put("plansFile", "../mielec-2-peaks-new/output/ITERS/it.20/20.plans.xml.gz") ;
+	    params.put("eventsFile", "../mielec-2-peaks-new/output/ITERS/it.20/20.events.xml.gz") ;
+	    
+	    params.put("taxisCustomersFile", "taxiCustomers_40_pc.txt") ;
+	    params.put("taxisFile",          "taxis-25.xml" ) ; 
+	    params.put("ranksFile",          "taxi_ranks-0.xml" ) ;
+
+	    params.put("algorithmConfig",        "FIFO_RES_TW_FF" ) ;
+
+	    params.put( "nearestRequestsLimit",    "0" ) ;
+	    params.put( "nearestVehiclesLimit",   "0" ) ;
+
+	    params.put( "destinationKnown",       "!true" ) ;
+	    params.put( "onlineVehicleTracker",   "true" ) ;
+	    params.put( "advanceRequestSubmission", "!true" ) ;
+	    params.put( "pickupDuration",         "1" ) ;
+	    params.put( "dropoffDuration",        "1" ) ;
+
+	    params.put( "otfVis",                 "true" ) ;
+
+	    params.put( "vrpOutFiles",            "!true" ) ;
+	    params.put( "vrpOutDirName",          "vrp_output" ) ;
+
+	    params.put( "outHistogram",          "!true" ) ;
+	    params.put( "histogramOutDirName",    "histograms" ) ;
+
+	    params.put( "writeSimEvents",         "!true" ) ;
+
+	    
+	    SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher( new TaxiLauncherParams( params ) );
+//        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(TaxiLauncherParams.readParams(file));
 
         if (removeNonPassengers) {
             VrpPopulationUtils

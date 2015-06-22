@@ -18,7 +18,7 @@
  * Quickstart from command line (without eclipse):<ol>
  * <li> Create an empty directory and cd into it.
  * <li> Download minibus-0.X.0-SNAPSHOT-rXXXXX.zip from <a href="http://matsim.org/files/builds/"> matsim.org</a> into that directory and unzip its content.
- * <li> Get the illustrative scenario from <a href="http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/examples/countries/atlantis/minibus/"> VSP, TU Berlin</a>, and place it in the same directory.
+ * <li> Get the illustrative scenario from <a href="http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/"> VSP, TU Berlin</a>, and place it in the same directory.
  * <li> Run the scenario from the command line by typing <br>
  * <code> java -Xmx2000m -jar minibus-0.X.0-SNAPSHOT.jar config.xml
  * </code>

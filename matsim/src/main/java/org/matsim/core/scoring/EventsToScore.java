@@ -98,7 +98,6 @@ public class EventsToScore implements BasicEventHandler {
 		
 		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA()!=null ) {
 			final int diff = config.controler().getLastIteration() - config.controler().getFirstIteration();
-			log.warn( " diff=" + diff ) ;
 			this.scoreMSAstartsAtIteration = (int) (diff 
 				* config.planCalcScore().getFractionOfIterationsToStartScoreMSA() + config.controler().getFirstIteration());
 		}
