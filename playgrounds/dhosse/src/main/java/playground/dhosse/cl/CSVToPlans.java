@@ -43,7 +43,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class CSVToPlans {
 	
-	private final String carAvail = "_carAvail";
+	private final String carAvail = "carAvail";
 	
 	private final String shapefile;
 	private final String ouputPlansFile;
@@ -57,6 +57,7 @@ public class CSVToPlans {
 	
 	private Map<String,Persona> personas = new HashMap<>();
 	private Map<String, Integer> hogarId2NVehicles = new HashMap<>();
+	private Map<String, Coord> hogarId2Coord = new HashMap<>();
 	
 	public CSVToPlans(String outputFile){
 		
@@ -87,6 +88,8 @@ public class CSVToPlans {
 	private void readHogares(String hogaresFile){
 		
 		final int idxHogarId = 0;
+		final int idxCoordX = 4;
+		final int idxCoordY = 5;
 		final int idxNVeh = 11;
 		
 		BufferedReader reader = IOUtils.getBufferedReader(hogaresFile);
@@ -103,6 +106,10 @@ public class CSVToPlans {
 				int nVehicles = Integer.parseInt(splittedLine[idxNVeh]);
 				
 				this.hogarId2NVehicles.put(id, nVehicles);
+				
+				String x = splittedLine[idxCoordX].replace("," , ".");
+				String y = splittedLine[idxCoordY].replace("," , ".");
+				this.hogarId2Coord.put(id, new CoordImpl(x, y));
 				
 			}
 			
@@ -122,6 +129,8 @@ public class CSVToPlans {
 		final int idxSex = 3;
 		final int idxNViajes = 5;
 		final int idxLicence = 6;
+		final int idxCoordX = 16;
+		final int idxCoordY = 17;
 		
 		BufferedReader reader = IOUtils.getBufferedReader(personasFile);
 		
@@ -142,6 +151,14 @@ public class CSVToPlans {
 				String nViajes = splittedLine[idxNViajes];
 				
 				Persona persona = new Persona(id, age, sex, drivingLicence, nCars, nViajes);
+				persona.setHomeCoord(this.hogarId2Coord.get(hogarId));
+				
+				String x = splittedLine[idxCoordX].replace("," , ".");
+				String y = splittedLine[idxCoordY].replace("," , ".");
+				if(!x.equals("") && !y.equals("")){
+					persona.setWorkCoord(new CoordImpl(x, y));
+				}
+				
 				this.personas.put(id,persona);
 				
 			}
@@ -294,17 +311,14 @@ public class CSVToPlans {
 
 			boolean toAdd = true;
 			
-			if(persona.getId().equals("10430102") || persona.getId().equals("12220001") || persona.getId().equals("14676102") || persona.getId().equals("15520101") ||
-					persona.getId().equals("18982103") || persona.getId().equals("22078102") || persona.getId().equals("23832104") || persona.getId().equals("14510001") ||
-					persona.getId().equals("32430002") || persona.getId().equals("24903102") || persona.getId().equals("11390103") || persona.getId().equals("17135101")){
-				continue;
-			}
+//			if(persona.getId().equals("10430102") || persona.getId().equals("12220001") || persona.getId().equals("14676102") || persona.getId().equals("15520101") ||
+//					persona.getId().equals("18982103") || persona.getId().equals("22078102") || persona.getId().equals("23832104") || persona.getId().equals("14510001") ||
+//					persona.getId().equals("32430002") || persona.getId().equals("24903102") || persona.getId().equals("11390103") || persona.getId().equals("17135101") ||
+//					persona.getId().equals("16709103")){
+//				continue;
+//			}
 			
 			Person person = popFactory.createPerson(Id.createPersonId(persona.getId()));
-			
-			if(persona.hasCar() && persona.hasDrivingLicence()){
-				agentAttributes.putAttribute(person.getId().toString(), this.carAvail, this.carAvail);
-			}
 			
 			Plan plan = popFactory.createPlan();
 			LinkedList<PlanElement> planElements = new LinkedList<PlanElement>();
@@ -320,6 +334,9 @@ public class CSVToPlans {
 					
 					Coord origin = etapa.getOrigin();
 					Coord destination = etapa.getDestination();
+					if(viaje.getEtapas().indexOf(etapa) >= viaje.getEtapas().size() - 1){
+						destination = viaje.getDestination() != null ? viaje.getDestination() : etapa.getDestination();
+					}
 					
 					if((origin == null || destination == null) || origin.getX() == 0 || origin.getY() == 0 || destination.getX() == 0 || destination.getY() == 0){
 						
@@ -333,8 +350,6 @@ public class CSVToPlans {
 							
 							if(gOrigin == null || gDest == null){
 								
-//								origin = new CoordImpl(0,0);
-//								destination = new CoordImpl(0,0);
 								toAdd = false;
 								break;
 								
@@ -353,19 +368,29 @@ public class CSVToPlans {
 					
 					if(idx <= 0){
 						
-						anterior = popFactory.createActivityFromCoord("home", origin);
-						anterior.setStartTime(0.);
+						String actType = "other";
+						
+						if(Math.abs(origin.getX() - persona.getHomeCoord().getX()) <= 1.0 && Math.abs(origin.getY() - persona.getHomeCoord().getY()) <= 1){
+							
+							actType = "home";
+							
+						} else if(persona.getWorkCoord() != null){
+							
+							if(Math.abs(origin.getX() - persona.getWorkCoord().getX()) <= 1.0 && Math.abs(origin.getY() - persona.getWorkCoord().getY()) <= 1){
+								
+								actType = "work";
+								
+							}
+							
+						}
+						
+						anterior = popFactory.createActivityFromCoord(actType, origin);
 						anterior.setEndTime(viaje.getStartTime());
 						
 					} else{
 						
-						if(planElements.isEmpty()){
-							anterior = popFactory.createActivityFromCoord("home", origin);
-							anterior.setStartTime(0.);
-						} else{
-							anterior = (Activity) planElements.getLast();
-						}
-						
+						anterior = (Activity) planElements.getLast();
+												
 						if(!anterior.getType().equals("pt interaction")){
 						
 							double endTime = viaje.getStartTime();
@@ -389,7 +414,16 @@ public class CSVToPlans {
 					
 					if(idxEtapa >= viaje.getEtapas().size() - 1){
 						
-						posterior = popFactory.createActivityFromCoord(viaje.getProposito(), destination);
+						String proposito = viaje.getProposito();
+						if(proposito.equals("home")){
+							destination = persona.getHomeCoord();
+						} else if(persona.getWorkCoord() != null){
+							if(proposito.equals("work")){
+								destination = persona.getWorkCoord();
+							}
+						}
+						
+						posterior = popFactory.createActivityFromCoord(proposito, destination);
 						
 						double startTime = viaje.getEndTime();
 						
@@ -400,24 +434,12 @@ public class CSVToPlans {
 
 						lastActivity = lastActivity == null ? anterior : lastActivity;
 						
-//						if(lastActivity != null){
+						if(startTime < lastActivity.getEndTime()){
 							
-							if(startTime < lastActivity.getEndTime()){
-								
-								startTime += 24*3600;
-								
-							}
+							startTime += 24*3600;
 							
-//						} else{
-//							
-//							if(startTime < anterior.getEndTime()){
-//								
-//								anterior = null;
-//								
-//							}
-//							
-//						}
-						
+						}
+							
 						posterior.setStartTime(startTime);
 						lastActivity = posterior;
 						
@@ -429,11 +451,15 @@ public class CSVToPlans {
 					}
 						
 					String legMode = this.getLegMode(Integer.valueOf(etapa.getMode()));
+					
+					if(persona.hasCar() && persona.hasDrivingLicence() && isCarOrPTUser(legMode)){
+						agentAttributes.putAttribute(person.getId().toString(), this.carAvail, this.carAvail);
+					}
+					
 					if(legMode.equals(TransportMode.walk) && (posterior.getType().equals("pt interaction") || posterior.getType().equals("pt interaction"))){
 						legMode = TransportMode.transit_walk;
 					}
 					Leg leg = popFactory.createLeg(legMode);
-//					leg.setTravelTime(posterior.getStartTime() - anterior.getEndTime());
 					
 					if(anterior != null){
 						if(!planElements.isEmpty()){
@@ -508,7 +534,7 @@ public class CSVToPlans {
 	
 	private void write(){
 		
-		new ObjectAttributesXmlWriter(agentAttributes).writeFile("C:/Users/Daniel/Documents/work/shared-svn/studies/countries/cl/Kai_und_Daniel/inputFiles/agentAttributes.xml");
+		new ObjectAttributesXmlWriter(agentAttributes).writeFile("C:/Users/dhosse/workspace/shared-svn/studies/countries/cl/Kai_und_Daniel/inputFiles/agentAttributes.xml");
 		new PopulationWriter(this.scenario.getPopulation()).write(this.ouputPlansFile);
 		
 	}
@@ -538,45 +564,53 @@ public class CSVToPlans {
 	private String getLegMode(int index){
 		
 		switch(index){
-			case 1: return TransportMode.car;
-			case 2: return TransportMode.pt;
-			case 3: return TransportMode.pt;
-			case 4: return TransportMode.pt;
-			case 5: return "collective taxi";
-			case 6: return TransportMode.pt;
-			case 7: return "taxi";
-			case 8: return TransportMode.walk;
-			case 9: return TransportMode.bike;
-			case 10: return "motorcycle";
-			case 11: return TransportMode.pt;
-			case 12: return TransportMode.pt;
-			case 13: return TransportMode.pt;
-			case 14: return TransportMode.pt;
-			case 15: return "other";
-			case 16: return TransportMode.pt;
-			case 17: return TransportMode.ride;
-			case 18: return TransportMode.ride;
-			default: return TransportMode.other;
 //			case 1: return TransportMode.car;
-//			case 2: return "feeder bus";
-//			case 3: return "main bus";
-//			case 4: return "subway";
+//			case 2: return TransportMode.pt;
+//			case 3: return TransportMode.pt;
+//			case 4: return TransportMode.pt;
 //			case 5: return "collective taxi";
-//			case 6: return "school bus";
+//			case 6: return TransportMode.pt;
 //			case 7: return "taxi";
 //			case 8: return TransportMode.walk;
 //			case 9: return TransportMode.bike;
 //			case 10: return "motorcycle";
-//			case 11: return "institutional bus";
-//			case 12: return "rural bus";
-//			case 13: return "school bus";
-//			case 14: return "urban bus";
+//			case 11: return TransportMode.pt;
+//			case 12: return TransportMode.pt;
+//			case 13: return TransportMode.pt;
+//			case 14: return TransportMode.pt;
 //			case 15: return "other";
-//			case 16: return "train";
+//			case 16: return TransportMode.pt;
 //			case 17: return TransportMode.ride;
 //			case 18: return TransportMode.ride;
 //			default: return TransportMode.other;
+			case 1: return TransportMode.car;
+			case 2: return "feeder bus";
+			case 3: return "main bus";
+			case 4: return "subway";
+			case 5: return "collective taxi";
+			case 6: return "school bus";
+			case 7: return "taxi";
+			case 8: return TransportMode.walk;
+			case 9: return TransportMode.bike;
+			case 10: return "motorcycle";
+			case 11: return "institutional bus";
+			case 12: return "rural bus";
+			case 13: return "school bus";
+			case 14: return "urban bus";
+			case 15: return "other";
+			case 16: return "train";
+			case 17: return TransportMode.ride;
+			case 18: return TransportMode.ride;
+			default: return TransportMode.other;
 		}
+		
+	}
+	
+	private boolean isCarOrPTUser(String legMode){
+		
+//		return legMode.equals(TransportMode.car) || legMode.equals(TransportMode.pt);
+		return legMode.equals(TransportMode.car) || legMode.equals("feeder bus") || legMode.equals("main bus") || legMode.equals("subway")
+				|| legMode.equals("institutional bus") || legMode.equals("rural bus") || legMode.equals("urban bus") || legMode.equals("train");
 		
 	}
 	

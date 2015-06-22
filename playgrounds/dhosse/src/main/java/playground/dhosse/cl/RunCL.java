@@ -14,12 +14,13 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Time;
 
 import playground.agarwalamit.munich.inputs.ReadAndAddSubActivities;
 
 public class RunCL {
 
-	static String svnWorkingDir = "C:/Users/Daniel/Documents/work/shared-svn/studies/countries/cl/";
+	static String svnWorkingDir = "C:/Users/dhosse/workspace/shared-svn/studies/countries/cl/";
 	static String workingDirInputFiles = svnWorkingDir + "Kai_und_Daniel/";
 	static String boundariesInputDir = workingDirInputFiles + "exported_boundaries/";
 	static String databaseFilesDir = workingDirInputFiles + "exportedFilesFromDatabase/";
@@ -65,37 +66,42 @@ public class RunCL {
 //		OTFVis.playNetwork(path + "santiago_primary.xml.gz");
 		
 //		for conversion of raw data into matsim plans
-//		CSVToPlans converter = new CSVToPlans(matsimInputDir + "plans.xml.gz", 
-//											  boundariesInputDir + "Boundaries_20150428_085038.shp");
-//		converter.run(databaseFilesDir + "Hogar.csv",
-//					  databaseFilesDir + "Persona.csv",
-//					  databaseFilesDir + "Export_Viaje.csv",
-//					  databaseFilesDir + "Etapa.csv");
+		CSVToPlans converter = new CSVToPlans(matsimInputDir + "plans.xml.gz", 
+											  boundariesInputDir + "Boundaries_20150428_085038.shp");
+		converter.run(databaseFilesDir + "Hogar.csv",
+					  databaseFilesDir + "Persona.csv",
+					  databaseFilesDir + "Export_Viaje.csv",
+					  databaseFilesDir + "Etapa.csv");
 		
-		Config config = ConfigUtils.createConfig();
-		ConfigUtils.loadConfig(config, matsimInputDir + "config.xml");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+//		Config config = ConfigUtils.createConfig();
+//		ConfigUtils.loadConfig(config, matsimInputDir + "config.xml");
+//		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		int cnt = 0;
 		
-		for(Person person : scenario.getPopulation().getPersons().values()){
-			
-			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-				if(pe instanceof Activity){
-					Activity act = (Activity)pe;
-					double start = act.getStartTime();
-					double end = act.getEndTime();
-					if(start > 30*3600 || end > 24 * 3600){
-						cnt++;
-						break;
-					}
-				}
-			}
-			
-		}
-		System.out.println(cnt);
+		
 //		randomizeEndTime(scenario.getPopulation());
 //		
+//		new PopulationWriter(scenario.getPopulation()).write(matsimInputDir + "plans_rand.xml");
+		
+//		int cnt = 0;
+//		double latestEndTime = Double.NEGATIVE_INFINITY;
+//		double latestStartTime = Double.NEGATIVE_INFINITY;
+//		
+//		for(Person person : scenario.getPopulation().getPersons().values()){
+//			
+//			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
+//				if(pe instanceof Activity){
+//					Activity act = (Activity)pe;
+//					double start = act.getStartTime();
+//					double end = act.getEndTime();
+//					if(start > latestStartTime) latestStartTime = start;
+//					if(end > latestEndTime) latestEndTime = end;
+//				}
+//			}
+//			
+//		}
+//		System.out.println(Time.writeTime(latestStartTime) + "\t" + Time.writeTime(latestEndTime));
+		
 //		ReadAndAddSubActivities acts = new ReadAndAddSubActivities(matsimInputDir + "config.xml", scenario);
 //		acts.run(config.plans().getInputFile(), matsimInputDir + "config_amit.xml");
 		
@@ -126,9 +132,8 @@ public class RunCL {
 //			scenario.getPopulation().getPersons().remove(key);
 //		}
 //		
-//		randomizeEndTime(scenario.getPopulation());
-		
-//		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
+
+		//		LegModeDistanceDistribution lmdd = new LegModeDistanceDistribution();
 //		lmdd.init(scenario);
 //		lmdd.preProcessData();
 //		lmdd.postProcessData();
@@ -289,10 +294,12 @@ public class RunCL {
 							}
 							
 							double ttime = act2.getStartTime() - act.getEndTime();
+//							double acttime = act2.getEndTime() - act2.getStartTime();
 							
 							createRandomEndTime(random, act);
 							
 							act2.setStartTime(act.getEndTime() + ttime);
+//							act2.setEndTime(act2.getStartTime() + acttime);
 							
 						}
 						
@@ -316,7 +323,7 @@ public class RunCL {
 		
 		//Box-Muller-Method in order to get a normally distributed variable
 		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
-		double endTime = 20*60 * normal + act.getEndTime();
+		double endTime = 5*60 * normal + act.getEndTime();
 //		if(endTime > 30*3600) endTime = 30 * 3600;
 		act.setEndTime(endTime);
 		

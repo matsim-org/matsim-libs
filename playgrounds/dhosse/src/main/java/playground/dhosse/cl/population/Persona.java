@@ -1,8 +1,9 @@
 package playground.dhosse.cl.population;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.matsim.api.core.v01.Coord;
 
 public class Persona {
 	
@@ -13,6 +14,9 @@ public class Persona {
 	private boolean carAvail;
 	
 	private LinkedHashMap<String, Viaje> viajes = new LinkedHashMap<>();
+	
+	private Coord homeCoord;
+	private Coord workCoord;
 //	private Viaje[] viajes;
 
 	private int currentIdx = 0;
@@ -69,6 +73,22 @@ public class Persona {
 
 	public Map<String, Viaje> getViajes() {
 		return viajes;
+	}
+
+	public Coord getHomeCoord() {
+		return homeCoord;
+	}
+
+	public void setHomeCoord(Coord homeCoord) {
+		this.homeCoord = homeCoord;
+	}
+
+	public Coord getWorkCoord() {
+		return workCoord;
+	}
+
+	public void setWorkCoord(Coord workCoord) {
+		this.workCoord = workCoord;
 	}
 
 }
