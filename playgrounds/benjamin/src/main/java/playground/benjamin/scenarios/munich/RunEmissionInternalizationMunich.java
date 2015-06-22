@@ -21,6 +21,7 @@ package playground.benjamin.scenarios.munich;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
@@ -82,10 +83,8 @@ public class RunEmissionInternalizationMunich {
 		controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.addOverridingModule(new OTFVisModule());
 		controler.run();
 	}
 }

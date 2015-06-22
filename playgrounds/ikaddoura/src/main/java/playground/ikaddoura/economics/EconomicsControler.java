@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
@@ -129,7 +130,7 @@ public class EconomicsControler {
 		controler.getConfig().controler().setOverwriteFileSetting(
 				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 		controler.getConfig().controler().setCreateGraphs(true);
-        controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addOverridingModule(new OTFVisModule());
 		controler.run();
 		
 	}
@@ -168,7 +169,7 @@ public class EconomicsControler {
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.getConfig().controler().setCreateGraphs(true);
-        controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addOverridingModule(new OTFVisModule());
 		controler.run();
 		
 	}
@@ -197,11 +198,9 @@ public class EconomicsControler {
 		controler.addControlerListener(analysis);
 
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(true);
-        controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addOverridingModule(new OTFVisModule());
 		controler.run();
 	}
 
@@ -231,12 +230,10 @@ public class EconomicsControler {
 			DemandFunctionControlerListener demandFunctionControlerListener = new DemandFunctionControlerListener();
 
 			controler.getConfig().controler().setOverwriteFileSetting(
-					true ?
-							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+					OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 			controler.getConfig().controler().setCreateGraphs(false);
             controler.addControlerListener(demandFunctionControlerListener);
-			controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+			controler.addOverridingModule(new OTFVisModule());
 			controler.run();
 			
 			// analysis
@@ -296,12 +293,10 @@ public class EconomicsControler {
 			CostFunctionsControlerListener economicsControlerListener = new CostFunctionsControlerListener((ScenarioImpl) controler.getScenario());
 
 			controler.getConfig().controler().setOverwriteFileSetting(
-					true ?
-							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+					OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 			controler.getConfig().controler().setCreateGraphs(false);
             controler.addControlerListener(economicsControlerListener);
-			controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
+			controler.addOverridingModule(new OTFVisModule());
 			controler.run();
 			
 			// analysis

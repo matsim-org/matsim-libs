@@ -21,6 +21,7 @@ package air.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -42,11 +43,9 @@ public class FlightController {
 	public void run(Scenario scenario) {
 		Controler controler = new Controler(scenario);
 		FlightConfigModule flightConfig = new FlightConfigModule(controler.getConfig());
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addOverridingModule(new OTFVisModule());
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		ControlerListener lis = new SfFlightTimeControlerListener();
 		controler.addControlerListener(lis);
 		if (flightConfig.doRandomizedTTAndDisutilityRouting()) {

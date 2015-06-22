@@ -61,10 +61,12 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
-import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -130,8 +132,6 @@ public class Controler extends AbstractController {
 
 	private final List<MobsimListener> simulationListeners = new ArrayList<>();
 
-	private SnapshotWriterFactoryRegister snapshotWriterRegister;
-
 	private boolean dumpDataAtEnd = true; 
 
     public static void main(final String[] args) {
@@ -195,8 +195,6 @@ public class Controler extends AbstractController {
 			this.scenario  = ScenarioUtils.createScenario(this.config);
 			ScenarioUtils.loadScenario(this.scenario );
 		}
-		SnapshotWriterRegistrar snapshotWriterRegistrar = new SnapshotWriterRegistrar();
-		this.snapshotWriterRegister = snapshotWriterRegistrar.getFactoryRegister();
 		this.events = EventsUtils.createEventsManager(this.config);
 		this.controlerListenerManager.setControler(this);
 		this.config.parallelEventHandling().makeLocked();
@@ -373,11 +371,7 @@ public class Controler extends AbstractController {
 
 			if (config.controler().getWriteSnapshotsInterval() != 0 && this.getIterationNumber() % config.controler().getWriteSnapshotsInterval() == 0) {
 				SnapshotWriterManager manager = new SnapshotWriterManager(config);
-				for (String snapshotFormat : this.config.controler().getSnapshotFormat()) {
-					SnapshotWriterFactory snapshotWriterFactory = this.snapshotWriterRegister.getInstance(snapshotFormat);
-					String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-					String fileName = this.getControlerIO().getIterationFilename(this.getIterationNumber(), baseFileName);
-					SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenario );
+				for (SnapshotWriter snapshotWriter : this.injector.getSnapshotWriters()) {
 					manager.addSnapshotWriter(snapshotWriter);
 				}
 				((ObservableMobsim) simulation).addQueueSimulationListeners(manager);
@@ -560,10 +554,6 @@ public class Controler extends AbstractController {
         }
         this.modules = Arrays.asList(modules);
     }
-
-	public final void addSnapshotWriterFactory(final String snapshotWriterName, final SnapshotWriterFactory snapshotWriterFactory) {
-		this.snapshotWriterRegister.register(snapshotWriterName, snapshotWriterFactory);
-	}
 
 
 	// ******** --------- *******

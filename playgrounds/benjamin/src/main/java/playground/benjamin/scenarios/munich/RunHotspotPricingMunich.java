@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
@@ -102,10 +103,8 @@ public class RunHotspotPricingMunich {
 		controler.addControlerListener(iecl);
 
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		controler.addOverridingModule(new OTFVisModule());
 		controler.run();
 	}
 

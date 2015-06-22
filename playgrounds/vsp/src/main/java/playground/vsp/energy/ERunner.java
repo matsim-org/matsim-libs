@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -78,7 +79,7 @@ public class ERunner {
 	
 	public void run(){
 		Controler c = new Controler(this.sc);
-		c.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		c.addOverridingModule(new OTFVisModule());
 		TrafficStateControlerListener trafficState = new TrafficStateControlerListener();
 		c.addControlerListener(trafficState);
 		

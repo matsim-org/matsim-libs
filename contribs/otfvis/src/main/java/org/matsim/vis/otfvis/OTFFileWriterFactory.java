@@ -21,20 +21,31 @@
 package org.matsim.vis.otfvis;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
-import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 
-public class OTFFileWriterFactory implements SnapshotWriterFactory {
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 
-	@Override
-	public SnapshotWriter createSnapshotWriter(String filename, Scenario scenario) {
-		OTFFileWriter writer = new OTFFileWriter(scenario, filename);
-		return writer;
+public class OTFFileWriterFactory implements Provider<SnapshotWriter> {
+
+	private Scenario scenario;
+	private OutputDirectoryHierarchy controlerIO;
+	private final int iteration;
+
+	@Inject
+	OTFFileWriterFactory(Scenario scenario, @Named("iteration") int iteration, OutputDirectoryHierarchy controlerIO) {
+		this.scenario = scenario;
+		this.iteration = iteration;
+		this.controlerIO = controlerIO;
 	}
 
 	@Override
-	public String getPreferredBaseFilename() {
-		return "otfvis.mvi";
+	public SnapshotWriter get() {
+		String fileName = controlerIO.getIterationFilename(iteration, "otfvis.mvi");
+		OTFFileWriter writer = new OTFFileWriter(scenario, fileName);
+		return writer;
 	}
 
 }

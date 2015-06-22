@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -95,7 +96,7 @@ public class MyFirstControler {
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		controler.setDumpDataAtEnd(true);
         controler.getConfig().controler().setCreateGraphs(true);
-        controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addOverridingModule(new OTFVisModule());
 
 		if(seepage){
 			controler.addOverridingModule(new AbstractModule() {

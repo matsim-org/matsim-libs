@@ -23,6 +23,7 @@ package playground.kai.otfvis;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -86,7 +87,7 @@ public class TransitControler {
 				});
 			}
 		});
-		tc.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		tc.addOverridingModule(new OTFVisModule());
 		//		tc.setCreateGraphs(false);
 		
 		tc.run();

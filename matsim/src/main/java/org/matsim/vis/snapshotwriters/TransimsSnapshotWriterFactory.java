@@ -20,19 +20,25 @@
 
 package org.matsim.vis.snapshotwriters;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 
-public class TransimsSnapshotWriterFactory implements SnapshotWriterFactory {
+import javax.inject.Named;
+import javax.inject.Provider;
 
-	@Override
-	public SnapshotWriter createSnapshotWriter(String filename,
-			Scenario scenario) {
-		return new TransimsSnapshotWriter(filename);
+class TransimsSnapshotWriterFactory implements Provider<SnapshotWriter> {
+
+	private OutputDirectoryHierarchy controlerIO;
+	private final int iteration;
+
+	TransimsSnapshotWriterFactory(OutputDirectoryHierarchy controlerIO, @Named("iteration") int iteration) {
+		this.iteration = iteration;
+		this.controlerIO = controlerIO;
 	}
 
 	@Override
-	public String getPreferredBaseFilename() {
-		return "T.veh.gz";
+	public SnapshotWriter get() {
+		String fileName = controlerIO.getIterationFilename(iteration, "T.veh.gz");
+		return new TransimsSnapshotWriter(fileName);
 	}
 
 }

@@ -20,6 +20,7 @@
 
 package org.matsim.vis.otfvis.checklists;
 
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -38,7 +39,7 @@ public class T2_StartControler {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		con.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		con.addOverridingModule(new OTFVisModule());
 		con.run();
 		System.out.println("\n Queue-Sim is done. Output:" + con.getConfig().controler().getOutputDirectory());
 		con = new Controler(config2);
@@ -46,7 +47,7 @@ public class T2_StartControler {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		con.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		con.addOverridingModule(new OTFVisModule());
 		con.run();
 		System.out.println("\n QSim is done. Output:" + con.getConfig().controler().getOutputDirectory());
 	}

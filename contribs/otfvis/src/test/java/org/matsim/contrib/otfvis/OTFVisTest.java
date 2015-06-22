@@ -25,19 +25,12 @@ package org.matsim.contrib.otfvis;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.SnapshotWriterFactoryRegister;
-import org.matsim.core.controler.SnapshotWriterRegistrar;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
-import org.matsim.vis.snapshotwriters.SnapshotWriter;
-import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 
 import java.io.File;
 import java.util.Arrays;
@@ -77,7 +70,7 @@ public class OTFVisTest extends MatsimTestCase {
 		qSimConfigGroup.setSnapshotStyle("equiDist");
 
 		final Controler controler = new Controler(config);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addOverridingModule(new OTFVisModule());
 		controler.getConfig().controler().setOverwriteFileSetting(
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
@@ -89,18 +82,6 @@ public class OTFVisTest extends MatsimTestCase {
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
 		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
-	}
-
-
-	public void testGivesInstanceForOtfvisSnapshotWriter() {
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		SnapshotWriterRegistrar registrar = new SnapshotWriterRegistrar();
-		SnapshotWriterFactoryRegister register = registrar.getFactoryRegister();
-		register.register("otfvis", new OTFFileWriterFactory());
-		SnapshotWriterFactory factory = register.getInstance("otfvis");
-		SnapshotWriter snapshotWriter = factory.createSnapshotWriter(getOutputDirectory() + factory.getPreferredBaseFilename(), scenario);
-		snapshotWriter.finish();
 	}
 
 }

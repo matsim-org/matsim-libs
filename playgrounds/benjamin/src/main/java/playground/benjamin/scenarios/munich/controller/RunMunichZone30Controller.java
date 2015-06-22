@@ -64,9 +64,8 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
+import org.matsim.vis.otfvis.OTFFileWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
-import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
 /**
@@ -248,10 +247,8 @@ public class RunMunichZone30Controller extends AbstractController {
 			// yyyy would be nice to have the following encapsulated in some way:
 			// === begin ===
 			SnapshotWriterManager manager = new SnapshotWriterManager(config);
-			SnapshotWriterFactory snapshotWriterFactory = new OTFFileWriterFactory() ;
-			String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-			String fileName = getControlerIO().getIterationFilename(this.getIterationNumber(), baseFileName);
-			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, this.scenario);
+			String fileName = getControlerIO().getIterationFilename(this.getIterationNumber(), "otfvis.mvi");
+			SnapshotWriter snapshotWriter = new OTFFileWriter(this.scenario, fileName);
 			manager.addSnapshotWriter(snapshotWriter);
 			// === end ===
 			qSim.addQueueSimulationListeners(manager);

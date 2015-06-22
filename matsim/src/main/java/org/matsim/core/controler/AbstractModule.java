@@ -39,6 +39,7 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +65,7 @@ public abstract class AbstractModule {
     private Multibinder<EventHandler> eventHandlerMultibinder;
     private Multibinder<ControlerListener> controlerListenerMultibinder;
     private Multibinder<MobsimListener> mobsimListenerMultibinder;
+    private Multibinder<SnapshotWriter> snapshotWriterMultibinder;
     private MapBinder<String, GenericPlanSelector<Plan, Person>> planSelectorForRemovalMultibinder;
     private MapBinder<String, PlanStrategy> planStrategyMultibinder;
 
@@ -84,6 +86,7 @@ public abstract class AbstractModule {
         // not in this class.
         this.binder = binder.skipSources(AbstractModule.class);
         this.mobsimListenerMultibinder = Multibinder.newSetBinder(this.binder, MobsimListener.class);
+        this.snapshotWriterMultibinder = Multibinder.newSetBinder(this.binder, SnapshotWriter.class);
         this.eventHandlerMultibinder = Multibinder.newSetBinder(this.binder, EventHandler.class);
         this.controlerListenerMultibinder = Multibinder.newSetBinder(this.binder, ControlerListener.class);
         this.planStrategyMultibinder = MapBinder.newMapBinder(this.binder, String.class, PlanStrategy.class);
@@ -125,6 +128,10 @@ public abstract class AbstractModule {
 
     protected final com.google.inject.binder.LinkedBindingBuilder<MobsimListener> addMobsimListenerBinding() {
         return mobsimListenerMultibinder.addBinding();
+    }
+
+    protected final com.google.inject.binder.LinkedBindingBuilder<SnapshotWriter> addSnapshotWriterBinding() {
+        return snapshotWriterMultibinder.addBinding();
     }
 
     protected final com.google.inject.binder.LinkedBindingBuilder<TravelDisutilityFactory> bindTravelDisutilityFactory() {

@@ -1,5 +1,6 @@
 package playground.mkillat.staedtebau;
 
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -19,7 +20,7 @@ public class MyControlerPt {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		controler1.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler1.addOverridingModule(new OTFVisModule());
 
 		controler1.run();
 		

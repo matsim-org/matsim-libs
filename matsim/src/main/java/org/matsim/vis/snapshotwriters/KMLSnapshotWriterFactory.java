@@ -21,19 +21,31 @@
 package org.matsim.vis.snapshotwriters;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-public class KMLSnapshotWriterFactory implements SnapshotWriterFactory {
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 
-	@Override
-	public SnapshotWriter createSnapshotWriter(String filename, Scenario scenario) {
-		String coordSystem = scenario.getConfig().global().getCoordinateSystem();
-		return new KmlSnapshotWriter(filename, TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84));
+class KMLSnapshotWriterFactory implements Provider<SnapshotWriter> {
+
+	private Scenario scenario;
+	private OutputDirectoryHierarchy controlerIO;
+	private final int iteration;
+
+	@Inject
+	KMLSnapshotWriterFactory(Scenario scenario, OutputDirectoryHierarchy controlerIO, @Named("iteration") int iteration) {
+		this.scenario = scenario;
+		this.controlerIO = controlerIO;
+		this.iteration = iteration;
 	}
 
-	@Override
-	public String getPreferredBaseFilename() {
-		return "googleearth.kmz";
+	public SnapshotWriter get() {
+		String baseFileName = "googleearth.kmz";
+		String fileName = controlerIO.getIterationFilename(iteration, baseFileName);
+		String coordSystem = scenario.getConfig().global().getCoordinateSystem();
+		return new KmlSnapshotWriter(fileName, TransformationFactory.getCoordinateTransformation(coordSystem, TransformationFactory.WGS84));
 	}
 
 }

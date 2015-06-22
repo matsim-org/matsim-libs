@@ -27,6 +27,7 @@ package playground.vsp.congestion;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -80,7 +81,7 @@ public class RunSimpleExample {
 //		controler.addControlerListener(new AverageCongestionPricingControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler ));
 		controler.addControlerListener(new MarginalCongestionPricingContolerListener(controler.getScenario(), tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addOverridingModule(new OTFVisModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 

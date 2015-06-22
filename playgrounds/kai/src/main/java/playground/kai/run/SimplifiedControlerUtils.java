@@ -39,9 +39,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
+import org.matsim.vis.otfvis.OTFFileWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
-import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
 /**
@@ -135,10 +134,8 @@ public class SimplifiedControlerUtils {
 			// yyyy would be nice to have the following encapsulated in some way:
 			// === begin ===
 			SnapshotWriterManager manager = new SnapshotWriterManager(sc.getConfig());
-			SnapshotWriterFactory snapshotWriterFactory = new OTFFileWriterFactory() ;
-			String baseFileName = snapshotWriterFactory.getPreferredBaseFilename();
-			String fileName = controlerIO.getIterationFilename(iteration, baseFileName);
-			SnapshotWriter snapshotWriter = snapshotWriterFactory.createSnapshotWriter(fileName, sc);
+			String fileName = controlerIO.getIterationFilename(iteration, "otfvis.mvi");
+			SnapshotWriter snapshotWriter = new OTFFileWriter(sc, fileName);
 			manager.addSnapshotWriter(snapshotWriter);
 			// === end ===
 			qSim.addQueueSimulationListeners(manager);

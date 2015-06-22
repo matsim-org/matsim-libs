@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.core.config.Config;
@@ -89,7 +90,7 @@ public class RunBraessSimulation {
 		
 		// prepare the controller
 		Controler controler = new Controler(scenario);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		controler.addOverridingModule(new OTFVisModule());
 		if (config.scenario().isUseSignalSystems()){
 			// add the signals module if signal systems are used
 			controler.addOverridingModule(new SignalsModule());

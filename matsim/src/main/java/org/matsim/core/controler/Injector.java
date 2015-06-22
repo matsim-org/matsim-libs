@@ -34,6 +34,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.selectors.GenericPlanSelector;
+import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -159,6 +160,13 @@ public class Injector {
     public Set<MobsimListener> getMobsimListeners() {
         return injector.getInstance(Key.get(
                 new TypeLiteral<Set<MobsimListener>>() {
+                }
+        ));
+    }
+
+    public Set<SnapshotWriter> getSnapshotWriters() {
+        return injector.getInstance(Key.get(
+                new TypeLiteral<Set<SnapshotWriter>>() {
                 }
         ));
     }
