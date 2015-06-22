@@ -9,7 +9,7 @@ import playground.michalm.util.ParameterFileReader;
 class TaxiLauncherParams
 {
 
-      static TaxiLauncherParams readParams(String paramFile)
+    static TaxiLauncherParams readParams(String paramFile)
     {
         Map<String, String> params = ParameterFileReader.readParametersToMap(paramFile);
         String dir = new File(paramFile).getParent() + '/';
@@ -31,14 +31,14 @@ class TaxiLauncherParams
     private Map<String, String> params;
 
     String inputDir;
-    
+
     String netFile;
     String plansFile;
-    
+
     String taxiCustomersFile;
     String taxisFile;
     String ranksFile;
-    
+
     String eventsFile;
     String changeEventsFile;
     AlgorithmConfig algorithmConfig;
@@ -53,9 +53,9 @@ class TaxiLauncherParams
 
     Double pickupDuration;
     Double dropoffDuration;
-    
+
     Boolean otfVis;
-    
+
     String outputDir;
     String vrpOutDir;
     String histogramOutDir;
@@ -67,17 +67,17 @@ class TaxiLauncherParams
 
     public static final String TAXI_CUSTOMERS_FILE = "taxiCustomersFile";
 
+
     TaxiLauncherParams(Map<String, String> params)
     {
         this.params = params;
 
-	inputDir = params.get(INPUT_DIR);
-	netFile = getInputPath(NET_FILE);
-	plansFile = getInputPath(PLANS_FILE);
+        inputDir = params.get(INPUT_DIR);
+        netFile = getInputPath(NET_FILE);
+        plansFile = getInputPath(PLANS_FILE);
 
-	taxiCustomersFile = getInputPath(TAXI_CUSTOMERS_FILE);
-        final String RANKS_FILE = "ranksFile";
-	ranksFile = getInputPath(RANKS_FILE);
+        taxiCustomersFile = getInputPath(TAXI_CUSTOMERS_FILE);
+        ranksFile = getInputPath("ranksFile");
         taxisFile = getInputPath("taxisFile");
 
         eventsFile = getInputPath("eventsFile");
@@ -92,11 +92,11 @@ class TaxiLauncherParams
         advanceRequestSubmission = getBoolean("advanceRequestSubmission");
         destinationKnown = getBoolean("destinationKnown");
         vehicleDiversion = getBoolean("vehicleDiversion");
-        
+
         if (vehicleDiversion && !onlineVehicleTracker) {
             throw new IllegalArgumentException("Diversion requires online tracking");
         }
-        
+
         pickupDuration = getDouble("pickupDuration");
         dropoffDuration = getDouble("dropoffDuration");
 
