@@ -270,7 +270,7 @@ public class InitialPlansConsistencyCheck {
 			List<String> acts = person2ActivityType.get(p);
 			if(!acts.get(0).equals(acts.get(acts.size()-1))){
 				warnCount++;
-				if(pf.isPersonFromMID(p.getId())) urbanPersons++;
+				if(pf.isPersonIdFromUserGroup(p.getId(),UserGroup.URBAN)) urbanPersons++;
 
 				if(actSeq2Count.containsKey(acts.toString())){
 					int countSoFar = actSeq2Count.get(acts.toString());
