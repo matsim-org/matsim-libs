@@ -49,16 +49,13 @@ public class AddingActivitiesInPlans {
 
 	public AddingActivitiesInPlans(Scenario scenario) {
 		this.sc = scenario;
-		//		params = sc.getConfig().planCalcScore();
 		actType2TypDurMinDur = new TreeMap<String, Tuple<Double,Double>>();
 		log.warn("Minimum duration for any sub activity is defined as half of new tyical duration.");
 		log.warn("Least integer of actual activity duration of an activity is set to typical duration.");
-		//		log.warn("If a person do not have actual duration, plans for such persons remain unchanged. Because such plans do not have either of act end or start time.");
 	}
 
 	public static final Logger log = Logger.getLogger(AddingActivitiesInPlans.class.getSimpleName());
 	private Scenario sc ;
-	//	private PlanCalcScoreConfigGroup params;
 	private int zeroDurCount =0;
 	private SortedMap<String, Tuple<Double, Double>> actType2TypDurMinDur;
 	private Scenario scOut;
@@ -81,7 +78,7 @@ public class AddingActivitiesInPlans {
 	public SortedMap<String, Tuple<Double, Double>> getActivityType2TypicalAndMinimalDuration(){
 		return actType2TypDurMinDur;
 	}
-int counter =0;
+	
 	public void run(){
 
 		scOut = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -222,6 +219,7 @@ int counter =0;
 					} 
 				}
 				popOut.addPerson(pOut);
+			
 			} else if(pf.isPersonIdFromUserGroup(p.getId(), UserGroup.COMMUTER) || pf.isPersonIdFromUserGroup(p.getId(), UserGroup.REV_COMMUTER) ){
 				//removing end time from the last act
 				Person pOut = popFactory.createPerson(p.getId());
@@ -265,9 +263,9 @@ int counter =0;
 			dur = 1800;
 			timeShift = 1800;
 		} else if (duration < 0){
-			log.warn("Duration is negative. Setting it to minimum dur of 1800");
-			timeShift = - duration + 1800;
-			duration = 1800;
+			throw new RuntimeException("Duration is negative. Setting it to minimum dur of 1800");
+//			timeShift = - duration + 1800;
+//			duration = 1800;
 		} else dur = duration;
 
 		return new Tuple<Double, Double>(dur, timeShift);
