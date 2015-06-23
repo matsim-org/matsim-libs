@@ -83,7 +83,7 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 	private Plan plan;
 	private CharyparNagelScoringParameters params;
 	
-	public KtiActivityScoring(Plan plan, CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
+	public KtiActivityScoring(final Plan plan, final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
 		this.params = params;
 		this.facilities = facilities;
 		this.plan = plan;
@@ -116,7 +116,7 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 	private Activity activityWithoutStart = null;
 	@Override
-	public void endActivity(double time, Activity act) {
+	public void endActivity(final double time, final Activity act) {
 		lock.checkLock();
 		assert time == act.getEndTime();
 		final double startTime = act.getStartTime();
@@ -134,7 +134,7 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 	}
 
 	@Override
-	public void startActivity(double time, Activity act) {
+	public void startActivity(final double time, final Activity act) {
 		lock.checkLock();
 
 		if ( act.getEndTime() == Time.UNDEFINED_TIME ) {
@@ -156,7 +156,7 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 		}
 	}
 
-	private void handleActivity(double arrivalTime, double departureTime, Activity act) {
+	private void handleActivity(final double arrivalTime, final double departureTime, final Activity act) {
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "handling activity "+act+" from "+Time.writeTime( arrivalTime )+" to "+Time.writeTime( departureTime ) ); 
 		}
@@ -165,7 +165,7 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 		// null params are allowed if there are Desires.
 		if ( utilityParams != null && !utilityParams.isScoreAtAll() ) return;
 
-		double fromArrivalToDeparture = departureTime - arrivalTime;
+		final double fromArrivalToDeparture = departureTime - arrivalTime;
 
 		// technical penalty: negative activity durations are penalized heavily
 		// so that 24 hour plans are enforced (home activity must not start later than it ended)
@@ -184,7 +184,7 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element,
 			// assume facility is always open
-			ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
+			final ActivityOption actOpt = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(act.getType());
 
 			if (actOpt == null) {
 				logger.error("Agent wants to perform an activity whose type is not available in the planned facility.");
@@ -206,17 +206,14 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 
 			// calculate effective activity duration bounded by opening times
 			double timeSpentPerforming = 0.0; // accumulates performance intervals for this activity
-			double activityStart, activityEnd; // hold effective activity start and end due to facility opening times
-			double scoreImprovement; // calculate score improvement only as basis for facility load penalties
-			double openingTime, closingTime; // hold time information of an opening time interval
 			for (OpeningTime openTime : openTimes) {
 
 				// see explanation comments for processing opening time intervals in super class
-				openingTime = openTime.getStartTime();
-				closingTime = openTime.getEndTime();
+				final double openingTime = openTime.getStartTime();
+				final double closingTime = openTime.getEndTime();
 
-				activityStart = Math.max(arrivalTime, openingTime);
-				activityEnd = Math.min(departureTime, closingTime);
+				double activityStart = Math.max(arrivalTime, openingTime);
+				double activityEnd = Math.min(departureTime, closingTime);
 
 				if ((openingTime > departureTime) || (closingTime < arrivalTime)) {
 					// agent could not perform action
@@ -224,9 +221,7 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 					activityEnd = departureTime;
 				}
 
-				double duration = activityEnd - activityStart;
-
-				timeSpentPerforming += duration;
+				timeSpentPerforming += activityEnd - activityStart;
 
 			}
 
@@ -273,30 +268,34 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 		this.score = 0;
 		this.score += this.getTooShortDurationScore();
 		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after short duration!" );
+		if ( Double.isInfinite( score ) ) throw new RuntimeException( "Infinite score after short duration!" );
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "score after too short duration: "+score );
 		}
 
 		this.score += this.getWaitingTimeScore();
 		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after waiting time!" );
+		if ( Double.isInfinite( score ) ) throw new RuntimeException( "Infinite score after waiting time!" );
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "score after waiting time: "+score );
 		}
 
 		this.score += this.getPerformanceScore();
 		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after performance score!" );
+		if ( Double.isInfinite( score ) ) throw new RuntimeException( "Infinite score after performance score!" );
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "score after performance: "+score );
 		}
 
 		this.score += this.getNegativeDurationScore();
 		if ( Double.isNaN( score ) ) throw new RuntimeException( "Score NaN after negative duration!" );
+		if ( Double.isInfinite( score ) ) throw new RuntimeException( "Infinite score after negative duration!" );
 		if ( logger.isTraceEnabled() ) {
 			logger.trace( "score after negative duration: "+score );
 		}
 	}
 
-	protected double getPerformanceScore(String actType, double duration) {
+	protected double getPerformanceScore(final String actType, final double duration) {
 		final PersonImpl person = (PersonImpl) plan.getPerson();
 		final Desires desires = person.getDesires();
 		final double typicalDuration =
@@ -305,25 +304,23 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 				params.utilParams.get( actType ).getTypicalDuration();
 
 		// initialize zero utility durations here for better code readability, because we only need them here
-		double zeroUtilityDuration;
-		if (this.zeroUtilityDurations.containsKey(actType)) {
-			zeroUtilityDuration = this.zeroUtilityDurations.get(actType);
-		} else {
-			zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / DEFAULT_PRIORITY);
+		if ( !this.zeroUtilityDurations.containsKey(actType) ) {
+			final double zeroUtilityDuration = (typicalDuration / 3600.0) * Math.exp( -10.0 / (typicalDuration / 3600.0) / DEFAULT_PRIORITY);
 			this.zeroUtilityDurations.put(actType, zeroUtilityDuration);
 		}
 
-		double tmpScore = 0.0;
 		if (duration > 0.0) {
-			double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
-			* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
-			double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
-			tmpScore = Math.max(0, Math.max(utilPerf, utilWait));
-		} else if (duration < 0.0) {
+			final double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
+				* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
+			final double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
+			return Math.max(0, Math.max(utilPerf, utilWait));
+		}
+
+		if (duration < 0.0) {
 			logger.error("Accumulated activity durations < 0.0 must not happen.");
 		}
 
-		return tmpScore;
+		return 0;
 	}
 
 	public double getTooShortDurationScore() {
