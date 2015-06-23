@@ -174,7 +174,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 
 		// this is ugly, but otherwise there are warnings logged for each
 		// scoring function creation about the (default) non-null PathSizeBeta...
-		Logger.getLogger( PlanCalcScoreConfigGroup.class ).setLevel( Level.ERROR );
+		Logger.getLogger( PlanCalcScoreConfigGroup.class ).setLevel( Level.OFF );
 
 		final PlanCalcScoreConfigGroup dummyGroup = dummyProvider.get();
 		for ( Map.Entry<String, String> e : config.getParams().entrySet() ) {
