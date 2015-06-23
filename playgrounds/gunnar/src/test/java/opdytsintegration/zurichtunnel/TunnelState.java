@@ -13,7 +13,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  * 
  */
-class TunnelState implements SimulatorState<TunnelState> {
+class TunnelState implements SimulatorState {
 
 	// -------------------- CONSTANTS --------------------
 

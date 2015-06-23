@@ -203,21 +203,23 @@ class RoadInvestmentMain {
 		decisionVariables.clear();
 		decisionVariables.addAll(shuffle);
 
-		final double transitionNoiseVarianceScale = 0.01;
-		final double convergenceNoiseVarianceScale = 0.01;
-
+		// final double convergenceNoiseVarianceScale = 0.001;
+		final double maximumRelativeGap = 0.05;
+		
 		final MATSimDecisionVariableSetEvaluator<RoadInvestmentState, RoadInvestmentDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadInvestmentState, RoadInvestmentDecisionVariable>(
 				decisionVariables, objectiveFunction,
-				transitionNoiseVarianceScale, convergenceNoiseVarianceScale,
-				stateFactory);
+				// convergenceNoiseVarianceScale, 
+				stateFactory, 5, maximumRelativeGap);
 
-		predictor.setLogFileName("tunnel-log.txt");
-		predictor.setMemory(1);
+		predictor.setLogFileName("road-investment-equil.txt");
+		predictor.setMemory(10);
 		predictor.setStartTime_s(5 * 60 * 60);
 		predictor.setBinSize_s(15 * 60);
 		predictor.setBinCnt(4 * 4);
 		controler.addControlerListener(predictor);
 		controler.run();
+
+		// predictor.testCrossValidation();
 
 		System.out.println("... DONE.");
 

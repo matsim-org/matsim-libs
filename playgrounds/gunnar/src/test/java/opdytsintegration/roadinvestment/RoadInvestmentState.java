@@ -1,8 +1,5 @@
 package opdytsintegration.roadinvestment;
 
-import java.util.List;
-import java.util.Random;
-
 import opdytsintegration.MATSimPopulationState;
 import optdyts.SimulatorState;
 
@@ -20,7 +17,7 @@ public class RoadInvestmentState // implements
 									// SimulatorState<RoadInvestmentState> {
 									// extends
 									// MATSimPopulationState<RoadInvestmentState>
-		implements SimulatorState<RoadInvestmentState> {
+		implements SimulatorState {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -65,17 +62,17 @@ public class RoadInvestmentState // implements
 		this.avgScore = totalScore / population.getPersons().size();
 	}
 
-	private RoadInvestmentState(final RoadInvestmentState parent) {
-		if (parent.populationState != null) {
-			this.populationState = parent.populationState.copy();
-		} else {
-			this.populationState = null;
-		}
-		this.vectorRepresentation = parent.vectorRepresentation.copy();
-		this.betaPay = parent.betaPay;
-		this.betaAlloc = parent.betaAlloc;
-		this.avgScore = parent.avgScore;
-	}
+//	private RoadInvestmentState(final RoadInvestmentState parent) {
+//		if (parent.populationState != null) {
+//			this.populationState = parent.populationState.copy();
+//		} else {
+//			this.populationState = null;
+//		}
+//		this.vectorRepresentation = parent.vectorRepresentation.copy();
+//		this.betaPay = parent.betaPay;
+//		this.betaAlloc = parent.betaAlloc;
+//		this.avgScore = parent.avgScore;
+//	}
 
 	// -------------------- GETTERS --------------------
 

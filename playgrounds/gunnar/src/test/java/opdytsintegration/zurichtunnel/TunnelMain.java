@@ -121,13 +121,13 @@ class TunnelMain {
 
 		// AND RUN THE ENTIRE THING
 
-		final double transitionNoiseVarianceScale = 0.01;
-		final double convergenceNoiseVarianceScale = 0.01;
+		// final double convergenceNoiseVarianceScale = 0.01;
+		final double maximumRelativeGap = 0.05;
 
 		final MATSimDecisionVariableSetEvaluator<TunnelState, TunnelConfiguration> predictor = new MATSimDecisionVariableSetEvaluator<TunnelState, TunnelConfiguration>(
 				decisionVariables, objectiveFunction,
-				transitionNoiseVarianceScale, convergenceNoiseVarianceScale,
-				stateFactory);
+				// convergenceNoiseVarianceScale,
+				stateFactory, 5, maximumRelativeGap);
 		predictor.setLogFileName("tunnel-log.txt");
 		predictor.setMemory(1);
 		predictor.setBinSize_s(15 * 60);

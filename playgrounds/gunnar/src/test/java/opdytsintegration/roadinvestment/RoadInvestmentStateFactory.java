@@ -1,7 +1,5 @@
 package opdytsintegration.roadinvestment;
 
-import java.util.Random;
-
 import opdytsintegration.MATSimStateFactory;
 
 import org.matsim.api.core.v01.population.Population;
