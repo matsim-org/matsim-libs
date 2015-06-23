@@ -195,7 +195,7 @@ public class EventsToScore implements BasicEventHandler {
 					}
 					plan.setScore(newScore);
 					if ( plan.getScore().isNaN() ) {
-						log.warn("score is NaN; plan:" + plan.toString() );
+						log.warn("score is NaN; plan:" + plan.toString()+" with lrn: " + this.learningRate + " oldScore: " + oldScore + " simScore: " + score + " newScore: " + newScore );
 					}
 				} else {
 //					double alpha = 1./(this.iteration - this.scoreMSAstartsAtIteration + 1) ;
