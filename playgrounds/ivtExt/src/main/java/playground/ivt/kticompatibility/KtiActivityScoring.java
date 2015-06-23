@@ -312,8 +312,7 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 		if (duration > 0.0) {
 			final double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
 				* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
-			final double utilWait = this.params.marginalUtilityOfWaiting_s * duration;
-			return Math.max(0, Math.max(utilPerf, utilWait));
+			return Math.max(0, utilPerf);
 		}
 
 		if (duration < 0.0) {
