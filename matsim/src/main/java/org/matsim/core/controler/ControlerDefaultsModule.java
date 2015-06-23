@@ -37,6 +37,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.counts.CountsModule;
 import org.matsim.population.VspPlansCleanerModule;
 import org.matsim.pt.counts.PtCountsModule;
+import org.matsim.vis.snapshotwriters.SnapshotWritersModule;
 
 public class ControlerDefaultsModule extends AbstractModule {
     @Override
@@ -56,7 +57,7 @@ public class ControlerDefaultsModule extends AbstractModule {
         install(new CountsModule());
         install(new PtCountsModule());
         install(new VspPlansCleanerModule());
-//        install(new SignalsModule());
+        install(new SnapshotWritersModule());
 
     	/* Comment by kai (mz thinks it is not helpful): The framework eventually calls the above method, which calls the include 
         * methods , which (fairly quickly) call their own install methods, etc.  Eventually, everything is resolved down to the
