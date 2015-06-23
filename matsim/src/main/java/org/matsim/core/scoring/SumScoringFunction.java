@@ -122,6 +122,11 @@ public final class SumScoringFunction implements ScoringFunction {
 			if (log.isTraceEnabled()) {
 				log.trace("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is: " + contribution);
 			}
+			if ( Double.isNaN( contribution ) ) {
+				// I consider this dangerous enough to justify a crash. If somebody has strong arguments for NaN scores,
+				// one might change this to "log.error(...)". td june 15
+				throw new RuntimeException( "Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is NaN! Behavior with NaN scores is undefined." );
+			}
             score += contribution;
 		}
 		return score;
