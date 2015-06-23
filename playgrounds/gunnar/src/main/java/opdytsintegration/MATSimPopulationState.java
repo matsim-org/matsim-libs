@@ -27,8 +27,6 @@ public class MATSimPopulationState {
 
 	// -------------------- MEMBERS --------------------
 
-	// private final Random rnd;
-
 	private final Population population;
 
 	/**
@@ -50,8 +48,7 @@ public class MATSimPopulationState {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public MATSimPopulationState(final Population population) { // , final
-																// Random rnd) {
+	public MATSimPopulationState(final Population population) {
 		this.population = population;
 		for (Person person : population.getPersons().values()) {
 			if (person.getSelectedPlan() == null) {

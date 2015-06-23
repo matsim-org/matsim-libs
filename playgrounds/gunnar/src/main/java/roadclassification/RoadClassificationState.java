@@ -6,7 +6,7 @@ import floetteroed.utilities.math.Vector;
 import opdytsintegration.AbstractMATSimState;
 
 public class RoadClassificationState extends
-		AbstractMATSimState<RoadClassificationState> {
+		AbstractMATSimState {
 
 	public RoadClassificationState(Population population,
 			Vector vectorRepresentation) {

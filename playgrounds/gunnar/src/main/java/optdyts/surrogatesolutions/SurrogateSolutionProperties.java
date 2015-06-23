@@ -24,78 +24,124 @@
  */
 package optdyts.surrogatesolutions;
 
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import optdyts.DecisionVariable;
-import floetteroed.utilities.math.Vector;
 
 /**
  * A data container representing the properties of a surrogate solution.
  * 
  * @author Gunnar Flötteröd
- * 
- * @param <U>
- *            the decision variable type
  */
-class SurrogateSolutionProperties<U extends DecisionVariable> {
+class SurrogateSolutionProperties {
 
 	// -------------------- (CONSTANT) MEMBERS --------------------
 
-	private final Map<U, Double> decisionVariable2alphaSum;
+	private final Map<? extends DecisionVariable, Double> decisionVariable2alphaSum;
 
-	private final double estimatedExpectedGap2;
+	// private final double gap2;
 
 	private final double interpolatedObjectiveFunctionValue;
 
+	private final double interpolatedFromStateEuclideanNorm;
+
+	// private final double regularizationScale;
+
+	private final double equivalentAveragingIterations;
+
+	private final double absoluteConvergenceGap;
+
 	// -------------------- CONSTRUCTION --------------------
 
-	SurrogateSolutionProperties(final List<Transition<U>> transitions,
-			final Vector alphas, final Double estimatedExpectedGap2) {
-
-		/*
-		 * (1) Compute alpha summaries per decision variable.
-		 */
-
-		this.decisionVariable2alphaSum = new LinkedHashMap<U, Double>();
-		for (int i = 0; i < transitions.size(); i++) {
-			final U decisionVariable = transitions.get(i).getDecisionVariable();
-			final Double alphaSumSoFar = this.decisionVariable2alphaSum
-					.get(decisionVariable);
-			this.decisionVariable2alphaSum.put(
-					decisionVariable,
-					(alphaSumSoFar == null ? 0.0 : alphaSumSoFar)
-							+ alphas.get(i));
-		}
-
-		/*
-		 * (2) Interpolate objective function value.
-		 */
-		double tmpInterpolObjFctVal = 0;
-		for (int i = 0; i < transitions.size(); i++) {
-			tmpInterpolObjFctVal += alphas.get(i)
-					* transitions.get(i).getObjectiveFunctionValue();
-		}
-		this.interpolatedObjectiveFunctionValue = tmpInterpolObjFctVal;
-
-		/*
-		 * (3) Take over further parameters.
-		 */
-		this.estimatedExpectedGap2 = estimatedExpectedGap2;
+	SurrogateSolutionProperties(
+			final Map<? extends DecisionVariable, Double> decisionVariable2alphaSum,
+			final double interpolatedObjectiveFunctionValue,
+			final double interpolatedFromStateEuclideanNorm,
+			final double equivalentAveragingIterations,
+			final double absoluteConvergenceGap) {
+		this.decisionVariable2alphaSum = decisionVariable2alphaSum;
+		this.interpolatedObjectiveFunctionValue = interpolatedObjectiveFunctionValue;
+		this.interpolatedFromStateEuclideanNorm = interpolatedFromStateEuclideanNorm;
+		this.equivalentAveragingIterations = equivalentAveragingIterations;
+		this.absoluteConvergenceGap = absoluteConvergenceGap;
 	}
+
+	// SurrogateSolutionProperties(final List<Transition<U>> transitions,
+	// final Vector alphas, final Double gap2,
+	// final double regularizationScale,
+	// final double equivalentAveragingIterations,
+	// final double absoluteConvergenceGap) {
+	//
+	// /*
+	// * (1) Compute alpha summaries per decision variable.
+	// */
+	// this.decisionVariable2alphaSum = new LinkedHashMap<U, Double>();
+	// for (int i = 0; i < transitions.size(); i++) {
+	// final U decisionVariable = transitions.get(i).getDecisionVariable();
+	// final Double alphaSumSoFar = this.decisionVariable2alphaSum
+	// .get(decisionVariable);
+	// this.decisionVariable2alphaSum.put(
+	// decisionVariable,
+	// (alphaSumSoFar == null ? 0.0 : alphaSumSoFar)
+	// + alphas.get(i));
+	// }
+	//
+	// /*
+	// * (2) Interpolate objective function value.
+	// */
+	// double tmpInterpolObjFctVal = 0;
+	// double tmpInterpolFromStateNorm = 0;
+	// for (int i = 0; i < transitions.size(); i++) {
+	// tmpInterpolObjFctVal += alphas.get(i)
+	// * transitions.get(i).getObjectiveFunctionValue();
+	// tmpInterpolFromStateNorm += alphas.get(i)
+	// * transitions.get(i).getFromStateEuclideanNorm();
+	// }
+	// this.interpolatedObjectiveFunctionValue = tmpInterpolObjFctVal;
+	// this.interpolatedFromStateEuclideanNorm = tmpInterpolFromStateNorm;
+	//
+	// /*
+	// * (3) Take over further parameters.
+	// */
+	// // this.gap2 = gap2;
+	// // this.regularizationScale = regularizationScale;
+	// this.equivalentAveragingIterations = equivalentAveragingIterations;
+	// this.absoluteConvergenceGap = absoluteConvergenceGap;
+	// }
 
 	// -------------------- GETTERS --------------------
 
-	Double getAlphaSum(final U decisionVariable) {
+	Double getAlphaSum(final DecisionVariable decisionVariable) {
 		return this.decisionVariable2alphaSum.get(decisionVariable);
 	}
 
-	double getEstimatedExpectedGap2() {
-		return this.estimatedExpectedGap2;
-	}
+	// double getGap2() {
+	// return this.gap2;
+	// }
 
 	double getInterpolatedObjectiveFunctionValue() {
 		return this.interpolatedObjectiveFunctionValue;
 	}
+
+	double getInterpolatedFromStateEuclideanNorm() {
+		return this.interpolatedFromStateEuclideanNorm;
+	}
+
+	// double getRegularizationScale() {
+	// return this.regularizationScale;
+	// }
+
+	double getEquivalentAveragingIterations() {
+		return this.equivalentAveragingIterations;
+	}
+
+	double getAbsoluteConvergenceGap() {
+		return this.absoluteConvergenceGap;
+	}
+
+	public boolean isConverged(final double maximumRelativeGap) {
+		return (this.absoluteConvergenceGap <= maximumRelativeGap
+				* this.interpolatedFromStateEuclideanNorm);
+	}
+
 }

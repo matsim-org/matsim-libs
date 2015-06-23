@@ -11,8 +11,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  * 
  */
-public abstract class AbstractMATSimState<X extends AbstractMATSimState<X>>
-		implements SimulatorState<X> {
+public abstract class AbstractMATSimState implements SimulatorState {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -28,7 +27,7 @@ public abstract class AbstractMATSimState<X extends AbstractMATSimState<X>>
 		this.vectorRepresentation = vectorRepresentation.copy();
 	}
 
-	// IMPLEMENTATION OF SimulatorState / OVERRIDING OF UnevaluatedMATSimState
+	// --------------- IMPLEMENTATION OF SimulatorState ---------------
 
 	@Override
 	public Vector getReferenceToVectorRepresentation() {

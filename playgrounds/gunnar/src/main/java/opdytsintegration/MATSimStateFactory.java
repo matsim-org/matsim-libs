@@ -13,8 +13,10 @@ import floetteroed.utilities.math.Vector;
  *
  * @param <X>
  *            the simulator state
+ * @param <U>
+ *            the decision variable type
  */
-public interface MATSimStateFactory<X extends SimulatorState<X>, U extends DecisionVariable> {
+public interface MATSimStateFactory<X extends SimulatorState, U extends DecisionVariable> {
 
 	/**
 	 * Creates a new object representation of the current MATSim simulation

@@ -22,13 +22,13 @@ public class SearchStatisticsTracker<U extends DecisionVariable> {
 
 	public SearchStatisticsTracker(final String fileName) {
 		this.fileName = fileName;
-
 		try {
 			final BufferedWriter writer = new BufferedWriter(new FileWriter(
 					this.fileName, false));
-			writer.write("equilibriumGap2\t");
-			writer.write("maxEquilibriumGap2\t");
+			writer.write("equilibriumGap\t");
+			writer.write("maxEquilibriumGap\t");
 			writer.write("converged\t");
+			writer.write("equivalentAverageIterations\t");
 			writer.write("Q\t");
 			writer.write("M\t");
 			writer.write("u\t");
@@ -56,23 +56,37 @@ public class SearchStatisticsTracker<U extends DecisionVariable> {
 			final BufferedWriter writer = new BufferedWriter(new FileWriter(
 					this.fileName, true));
 
-			writer.write(Double.toString(surrogateSolution
-					.getEstimatedExpectedGap2()) + "\t");
-			writer.write(Double.toString(surrogateSolution
-					.getConvergenceNoiseVariance()) + "\t");
-			writer.write(Boolean.toString(surrogateSolution.isConverged())
-					+ "\t");
-			writer.write(Double.toString(surrogateSolution
-					.getInterpolatedObjectiveFunctionValue()) + "\t");
-			writer.write(Integer.toString(surrogateSolution.size()) + "\t");
-			for (U decisionVariable : surrogateSolution.getDecisionVariables()) {
-				writer.write(decisionVariable + "\t");
-				writer.write(surrogateSolution.getAlphaSum(decisionVariable)
+			if (surrogateSolution.hasProperties()) {
+		
+				writer.write(Double.toString(surrogateSolution
+						.getAbsoluteConvergenceGap()) + "\t");
+				writer.write(Double.toString(surrogateSolution
+						.getMaximumRelativeGap()
+						* surrogateSolution.getInterpolatedFromStateEuclideanNorm())
 						+ "\t");
+				writer.write(Boolean.toString(surrogateSolution.isConverged())
+						+ "\t");
+				writer.write(Double.toString(surrogateSolution
+						.getEquivalentAveragingIterations()) + "\t");
+				writer.write(Double.toString(surrogateSolution
+						.getInterpolatedObjectiveFunctionValue()) + "\t");
+				writer.write(Integer.toString(surrogateSolution.size()) + "\t");
+				for (U decisionVariable : surrogateSolution.getDecisionVariables()) {
+					writer.write(decisionVariable + "\t");
+					writer.write(surrogateSolution.getAlphaSum(decisionVariable)
+							+ "\t");
+				}
+
+			} else {
+
+				writer.write("--\t--\t--\t--\t--\t--");
+				
 			}
+			
 			writer.newLine();
 			writer.flush();
 			writer.close();
+
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

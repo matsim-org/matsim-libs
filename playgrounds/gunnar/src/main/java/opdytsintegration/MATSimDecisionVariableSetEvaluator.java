@@ -30,7 +30,7 @@ import floetteroed.utilities.math.Vector;
  * @param <U>
  *            the decision variable type
  */
-public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends DecisionVariable>
+public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U extends DecisionVariable>
 		implements IterationStartsListener, IterationEndsListener {
 
 	// -------------------- MEMBERS --------------------
@@ -65,12 +65,11 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState<X>, U e
 
 	public MATSimDecisionVariableSetEvaluator(final Set<U> decisionVariables,
 			final ObjectiveFunction<X> objectiveFunction,
-			final double transitionNoiseVarianceScale,
-			final double convergenceNoiseVarianceScale,
-			final MATSimStateFactory<X, U> stateFactory) {
+			final MATSimStateFactory<X, U> stateFactory,
+			final int minimumAverageIterations, final double maximumRelativeGap) {
 		this.evaluator = new DecisionVariableSetEvaluator<X, U>(
-				decisionVariables, objectiveFunction,
-				transitionNoiseVarianceScale, convergenceNoiseVarianceScale);
+				decisionVariables, objectiveFunction, minimumAverageIterations,
+				maximumRelativeGap);
 		this.stateFactory = stateFactory;
 	}
 

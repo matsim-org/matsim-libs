@@ -21,13 +21,13 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package optdyts;
 
 /**
  * A decision variable is a set of parameters that may be chosen such that an
- * objective function, represented by an instance of ObjectiveFunction, attains
- * its minimal value.
+ * objective function, represented by an instance of ObjectiveFunction, is
+ * minimized.
  * 
  * @author Gunnar Flötteröd
  *
@@ -36,8 +36,8 @@ public interface DecisionVariable {
 
 	/**
 	 * Implements the effect of this decision variable in the simulation,
-	 * meaning that the next simulation transition is according to the value of
-	 * this decision variable.
+	 * meaning that the next simulation transition is according to this decision
+	 * variable.
 	 */
 	public void implementInSimulation();
 

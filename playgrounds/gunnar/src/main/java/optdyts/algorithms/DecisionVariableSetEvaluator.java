@@ -37,7 +37,7 @@ import optdyts.surrogatesolutions.SurrogateSolution;
  * @author Gunnar Flötteröd
  * 
  */
-public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends DecisionVariable> {
+public class DecisionVariableSetEvaluator<X extends SimulatorState, U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -64,24 +64,20 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState<X>, U extends
 	 *            the decision variables to be tried out
 	 * @param objectiveFunction
 	 *            represents the objective function that is to be minimized
-	 * @param transitionNoiseVarianceScale
-	 *            defines an estimate of the simulation transition noise as
-	 *            (transitionNoiseVarianceScale * the square norm of the current
-	 *            simulator state)
-	 * @param convergenceNoiseVarianceScale
-	 *            defines the convergence threshold
-	 *            (convergenceNoiseVarianceScale * the square norm of the
-	 *            current simulator state)
+	 * @param minimumAverageIterations
+	 *            the number of iterations over which the simulation output
+	 *            should be averaged to be considered "sufficiently noise free"
+	 * @param maximumRelativeGap
+	 *            the relative gap below which two subsequent and averaged
+	 *            simulation iterations are considered to be converged
 	 */
 	public DecisionVariableSetEvaluator(final Set<U> decisionVariables,
 			final ObjectiveFunction<X> objectiveFunction,
-			final double transitionNoiseVarianceScale,
-			final double convergenceNoiseVarianceScale) {
+			final int minimumAverageIterations, final double maximumRelativeGap) {
 		this.decisionVariablesToBeTriedOut = new LinkedHashSet<U>(
 				decisionVariables);
-		this.surrogateSolution = new SurrogateSolution<X, U>(
-				transitionNoiseVarianceScale, convergenceNoiseVarianceScale,
-				objectiveFunction);
+		this.surrogateSolution = new SurrogateSolution<X, U>(objectiveFunction,
+				minimumAverageIterations, maximumRelativeGap);
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------

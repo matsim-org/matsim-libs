@@ -21,7 +21,7 @@
  *
  * contact: gunnar.floetteroed@abe.kth.se
  *
- */ 
+ */
 package optdyts;
 
 /**
@@ -33,13 +33,13 @@ package optdyts;
  * @param <X>
  *            the simulator state type
  */
-public interface ObjectiveFunction<X extends SimulatorState<X>> {
+public interface ObjectiveFunction<X extends SimulatorState> {
 
 	/**
 	 * @param state
 	 *            the state that is to be evaluated
 	 * 
-	 * @return the objective function value assigned to state
+	 * @return the objective function value assigned to the state
 	 */
 	public double evaluateState(X state);
 

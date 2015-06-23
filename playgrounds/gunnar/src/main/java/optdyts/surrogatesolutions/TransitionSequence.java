@@ -24,7 +24,7 @@
  */
 package optdyts.surrogatesolutions;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import optdyts.DecisionVariable;
@@ -41,11 +41,11 @@ import floetteroed.utilities.math.Vector;
  * @param <U>
  *            the decision variable type
  */
-class TransitionSequence<X extends SimulatorState<X>, U extends DecisionVariable> {
+class TransitionSequence<X extends SimulatorState, U extends DecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
-	private final List<Transition<U>> transitions = new ArrayList<Transition<U>>();
+	private final LinkedList<Transition<U>> transitions = new LinkedList<Transition<U>>();
 
 	private X lastState = null;
 
@@ -63,17 +63,22 @@ class TransitionSequence<X extends SimulatorState<X>, U extends DecisionVariable
 			final X toState, final double objectiveFunctionValue) {
 
 		if (fromState == null) {
-			throw new RuntimeException("fromState is null");
+			throw new IllegalArgumentException("fromState is null");
 		}
 		if (decisionVariable == null) {
-			throw new RuntimeException("decisionVariable is null");
+			throw new IllegalArgumentException("decisionVariable is null");
 		}
 		if (toState == null) {
-			throw new RuntimeException("toState is null");
+			throw new IllegalArgumentException("toState is null");
+		}
+		if (Double.isInfinite(objectiveFunctionValue)
+				|| Double.isNaN(objectiveFunctionValue)) {
+			throw new IllegalArgumentException("objectiveFunctionValue is "
+					+ objectiveFunctionValue);
 		}
 		if ((this.size() > 0)
 				&& (!this.getDecisionVariable().equals(decisionVariable))) {
-			throw new RuntimeException("Cannot add "
+			throw new IllegalArgumentException("Cannot add "
 					+ " transition with decision variable "
 					+ this.getDecisionVariable() + " to "
 					+ " transition sequence with decision variable "
@@ -85,7 +90,9 @@ class TransitionSequence<X extends SimulatorState<X>, U extends DecisionVariable
 		delta.add(fromState.getReferenceToVectorRepresentation(), -1.0);
 
 		this.transitions.add(new Transition<U>(decisionVariable, delta,
-				objectiveFunctionValue));
+				objectiveFunctionValue, fromState
+						.getReferenceToVectorRepresentation().euclNorm(),
+				toState.getReferenceToVectorRepresentation().euclNorm()));
 		this.lastState = toState;
 	}
 
@@ -96,7 +103,7 @@ class TransitionSequence<X extends SimulatorState<X>, U extends DecisionVariable
 	}
 
 	U getDecisionVariable() {
-		return this.transitions.get(0).getDecisionVariable();
+		return this.transitions.getFirst().getDecisionVariable();
 	}
 
 	List<Transition<U>> getTransitions() {

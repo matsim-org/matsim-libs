@@ -45,6 +45,10 @@ class Transition<U extends DecisionVariable> {
 
 	private final double objectiveFunctionValue;
 
+	private final double fromStateEuclideanNorm;
+
+	private final double toStateEuclideanNorm;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	/**
@@ -60,7 +64,9 @@ class Transition<U extends DecisionVariable> {
 	 *            transition
 	 */
 	Transition(final U decisionVariable, final Vector delta,
-			final double objectiveFunctionValue) {
+			final double objectiveFunctionValue,
+			final double fromStateEuclideanNorm,
+			final double toStateEuclideanNorm) {
 
 		if (decisionVariable == null) {
 			throw new IllegalArgumentException("decisionVariable is null");
@@ -68,10 +74,20 @@ class Transition<U extends DecisionVariable> {
 		if (delta == null) {
 			throw new IllegalArgumentException("delta is null");
 		}
+		if (fromStateEuclideanNorm < 0) {
+			throw new IllegalArgumentException("fromStateEuclideanNorm is "
+					+ fromStateEuclideanNorm + " < 0");
+		}
+		if (toStateEuclideanNorm < 0) {
+			throw new IllegalArgumentException("toStateEuclideanNorm is "
+					+ toStateEuclideanNorm + " < 0");
+		}
 
 		this.decisionVariable = decisionVariable;
 		this.delta = delta;
 		this.objectiveFunctionValue = objectiveFunctionValue;
+		this.fromStateEuclideanNorm = fromStateEuclideanNorm;
+		this.toStateEuclideanNorm = toStateEuclideanNorm;
 	}
 
 	// -------------------- GETTERS --------------------
@@ -88,4 +104,12 @@ class Transition<U extends DecisionVariable> {
 		return this.objectiveFunctionValue;
 	}
 
+	double getFromStateEuclideanNorm() {
+		return this.fromStateEuclideanNorm;
+	}
+	
+	double getToStateEuclideanNorm() {
+		return this.toStateEuclideanNorm;
+	}
+	
 }

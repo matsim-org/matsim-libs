@@ -31,10 +31,8 @@ import floetteroed.utilities.math.Vector;
  * 
  * @author Gunnar Flötteröd
  * 
- * @param <X>
- *            the simulator state type
  */
-public interface SimulatorState<X extends SimulatorState<X>> {
+public interface SimulatorState {
 
 	/**
 	 * Returns a reference to a real-valued, fixed-dimensional vector
@@ -46,45 +44,44 @@ public interface SimulatorState<X extends SimulatorState<X>> {
 	public Vector getReferenceToVectorRepresentation();
 
 	/**
-	 * Sets the simulator to this SimulatorState. Throws an
-	 * UnsupportedOperationException if releaseDeepMemory() has been called at
-	 * least once.
+	 * Sets the simulator to this SimulatorState, meaning that the next
+	 * simulation transition starts out from this state.
 	 */
-	public void implementInSimulation() throws UnsupportedOperationException;
-
-	// /**
-	// * Returns a copy of this simulator state. This copy must be "deep" for
-	// (i)
-	// * all referenced objects that may be evaluated by an ObjectiveFunction
-	// and
-	// * the state's vector representation as returned by
-	// * getReferenceToVectorRepresentation().
-	// *
-	// * @return a deep copy of this simulator state
-	// */
-	// public X deepCopy();
-
-	// /**
-	// * Fills this state with a convex combination of the states-List,
-	// according
-	// * to the values in the weights-List, which need to be non-negative and
-	// sum
-	// * up to one.
-	// *
-	// * @param states
-	// * the states to be combined
-	// * @param weights
-	// * the weights according to which the states are combined
-	// */
-	// public void takeOverConvexCombination(List<X> states, List<Double>
-	// weights);
-
-	// /**
-	// * Releases the memory necessary only for calls to
-	// implementInSimulation();
-	// * subsequent calls to implementInSimulation() are expected to through an
-	// * UnsupportedOperationException.
-	// */
-	// public void releaseDeepMemory();
+	public void implementInSimulation();
 
 }
+
+// /**
+// * Returns a copy of this simulator state. This copy must be "deep" for
+// (i)
+// * all referenced objects that may be evaluated by an ObjectiveFunction
+// and
+// * the state's vector representation as returned by
+// * getReferenceToVectorRepresentation().
+// *
+// * @return a deep copy of this simulator state
+// */
+// public X deepCopy();
+
+// /**
+// * Fills this state with a convex combination of the states-List,
+// according
+// * to the values in the weights-List, which need to be non-negative and
+// sum
+// * up to one.
+// *
+// * @param states
+// * the states to be combined
+// * @param weights
+// * the weights according to which the states are combined
+// */
+// public void takeOverConvexCombination(List<X> states, List<Double>
+// weights);
+
+// /**
+// * Releases the memory necessary only for calls to
+// implementInSimulation();
+// * subsequent calls to implementInSimulation() are expected to through an
+// * UnsupportedOperationException.
+// */
+// public void releaseDeepMemory();
