@@ -221,7 +221,7 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 			return this;
 		}
 
-		public CharyparNagelScoringParameters createCharyparNagelScoringParameters() {
+		public CharyparNagelScoringParameters create() {
 			return new CharyparNagelScoringParameters(
 					Collections.unmodifiableMap( utilParams ),
 					Collections.unmodifiableMap( modeParams ),

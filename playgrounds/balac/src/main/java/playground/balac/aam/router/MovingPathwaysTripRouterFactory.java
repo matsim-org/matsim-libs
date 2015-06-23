@@ -46,7 +46,7 @@ public class MovingPathwaysTripRouterFactory implements TripRouterFactory{
 
 
 		final CharyparNagelScoringParameters scoringParams =
-				CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).createCharyparNagelScoringParameters();
+				CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create();
 		
 	/*	
 		router.setRoutingModule(TransportMode.pt,

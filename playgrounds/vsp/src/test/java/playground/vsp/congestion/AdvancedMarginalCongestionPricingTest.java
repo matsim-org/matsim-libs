@@ -43,7 +43,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.events.CongestionEvent;
@@ -77,7 +76,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).createCharyparNagelScoringParameters();
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -137,7 +136,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).createCharyparNagelScoringParameters();
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -188,7 +187,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).createCharyparNagelScoringParameters();
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).create();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		

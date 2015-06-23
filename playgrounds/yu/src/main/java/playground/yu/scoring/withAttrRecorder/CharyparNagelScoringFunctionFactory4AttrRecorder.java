@@ -42,7 +42,7 @@ public class CharyparNagelScoringFunctionFactory4AttrRecorder extends
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters();
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config).create();
 		ScoringFunctionAccumulatorWithAttrRecorder scoringFunctionAccumulator = new ScoringFunctionAccumulatorWithAttrRecorder(
 				params);
 		scoringFunctionAccumulator

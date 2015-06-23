@@ -25,15 +25,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.PersonImpl;
@@ -224,7 +221,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		}
 
 		final CharyparNagelScoringParameters params =
-				builder.createCharyparNagelScoringParameters();
+				builder.create();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}

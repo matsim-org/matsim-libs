@@ -247,7 +247,7 @@ public class CarsharingMATSimLectureScoringFunctionFactory implements ScoringFun
 		}
 
 		final CharyparNagelScoringParameters params =
-				CharyparNagelScoringParameters.getBuilder(dummyGroup).createCharyparNagelScoringParameters();
+				CharyparNagelScoringParameters.getBuilder(dummyGroup).create();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}

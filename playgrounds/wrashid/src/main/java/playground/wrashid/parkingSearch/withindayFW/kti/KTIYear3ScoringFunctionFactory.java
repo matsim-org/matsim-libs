@@ -63,17 +63,17 @@ public class KTIYear3ScoringFunctionFactory extends org.matsim.core.scoring.func
 
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
 				person.getSelectedPlan(),
-				CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(),
+				CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(),
 				this.facilityPenalties,
 				this.facilities));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
 				person.getSelectedPlan(),
-				CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(),
+				CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(),
 				scenario.getConfig(),
                 scenario.getNetwork(),
 				this.ktiConfigGroup));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
 		
 		return scoringFunctionAccumulator;
 	}

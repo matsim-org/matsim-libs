@@ -47,7 +47,7 @@ public class CharyparNagelScoringFunctionFactoryWithLeftTurnPenalty extends
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters();
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create();
 		ScoringFunctionAccumulatorWithLeftTurnPenalty scoringFunctionAccumulator = new ScoringFunctionAccumulatorWithLeftTurnPenalty(
 				params);
 		scoringFunctionAccumulator

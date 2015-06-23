@@ -85,7 +85,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 		this.events = eventsManager;
 		this.scenario = scenario;
 
-		this.marginaSumScoringFunction = new MarginalSumScoringFunction(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).createCharyparNagelScoringParameters());
+		this.marginaSumScoringFunction = new MarginalSumScoringFunction(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create());
 	}
 
 	@Override

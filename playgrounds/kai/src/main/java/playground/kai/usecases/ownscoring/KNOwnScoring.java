@@ -52,7 +52,7 @@ public class KNOwnScoring {
 		ScoringFunctionFactory scoringFunctionFactory = new ScoringFunctionFactory(){
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).createCharyparNagelScoringParameters();
+				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create();
 
 				MySumScoringFunction sumScoringFunction = new MySumScoringFunction() ;
 				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));

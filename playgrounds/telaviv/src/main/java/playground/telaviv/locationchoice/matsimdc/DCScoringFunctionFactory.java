@@ -84,7 +84,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 			this.dcCalculator = new CalculateDestinationChoice(this.dcContext.getScenario());
 			this.dcCalculator.calculateVTODForDCModule();
 
-		this.params = CharyparNagelScoringParameters.getBuilder(this.config.planCalcScore()).createCharyparNagelScoringParameters();
+		this.params = CharyparNagelScoringParameters.getBuilder(this.config.planCalcScore()).create();
 			
 			// actually not necessary here:
 //			this.dcCalculator.calculateDynamicFactors(
@@ -110,8 +110,8 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 					this.facilityToZoneIndexMap,
 					this.dcCalculator);
 		scoringFunctionAccumulator.addScoringFunction(activityScoringFunction);
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(), controler.getScenario().getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(), controler.getScenario().getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
 		return scoringFunctionAccumulator;
 		

@@ -60,7 +60,7 @@ public class ActivityFitnessLandscape {
 
 		CharyparNagelActivityScoring testee =
 			new CharyparNagelActivityScoring(
-					CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters());
+					CharyparNagelScoringParameters.getBuilder(config).create());
 
 		final Activity shortAct = new ActivityImpl( SHORT_TYPE , Id.create( 1 , Link.class ) );
 		final Activity longAct = new ActivityImpl( LONG_TYPE , Id.create( 1 , Link.class ) );
@@ -78,7 +78,7 @@ public class ActivityFitnessLandscape {
 		for ( double shortTime = 0; shortTime < 24 * 3600; shortTime += 360 ) {
 			if ( Math.abs( shortTime - SHORT_DUR ) < 1 ) continue;
 			testee = new CharyparNagelActivityScoring(
-					CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters());
+					CharyparNagelScoringParameters.getBuilder(config).create());
 
 			final double longTime = 24 * 3600 - shortTime;
 			now = shortTime;

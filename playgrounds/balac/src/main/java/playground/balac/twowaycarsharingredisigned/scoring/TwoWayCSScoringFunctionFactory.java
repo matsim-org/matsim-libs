@@ -30,12 +30,12 @@ public class TwoWayCSScoringFunctionFactory extends org.matsim.core.scoring.func
 
 		  scoringFunctionAccumulator.addScoringFunction(
 	      new TwoWayCSLegScoringFunction((PlanImpl)plan,
-				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(),
+				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(),
 	      this.config, 
 	      network));
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
+		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
+		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
 	    return scoringFunctionAccumulator;
 	  }
 }

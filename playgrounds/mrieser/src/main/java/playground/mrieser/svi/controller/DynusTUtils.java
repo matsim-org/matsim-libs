@@ -92,9 +92,9 @@ public abstract class DynusTUtils {
 				}
 			});
 			log.info("DynusT will be used as exclusive mobility simulation. Make sure that re-routing is *not* enabled as replanning strategy, as it will have no effect.");
-			controler.setScoringFunctionFactory(new DynusTScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
+			controler.setScoringFunctionFactory(new DynusTScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
 		} else {
-			controler.setScoringFunctionFactory(new MixedScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
+			controler.setScoringFunctionFactory(new MixedScoringFunctionFactory(dc, ttMatrix, dc.getActToZoneMapping(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create()));
 		}
 	}
 }

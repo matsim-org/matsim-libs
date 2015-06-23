@@ -111,7 +111,7 @@ public class Controler_launcher {
 		});
 
 		//set scoring functions
-		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(); //M
+		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(); //M
 		//final boolean useBruteForce =Boolean.parseBoolean(config.getParam("cadytsPt", "useBruteForce")); 
 		CadytsConfigGroup cptcg = (CadytsConfigGroup) controler.getConfig().getModule(CadytsConfigGroup.GROUP_NAME);
 		final boolean useBruteForce = Boolean.parseBoolean(cptcg.getParams().get("useBruteForce"));

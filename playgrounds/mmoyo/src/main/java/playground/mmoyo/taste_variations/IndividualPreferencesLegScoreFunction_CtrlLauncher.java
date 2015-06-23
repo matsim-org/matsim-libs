@@ -70,7 +70,7 @@ public class IndividualPreferencesLegScoreFunction_CtrlLauncher {
 		
 		//leg scoring based on data obtained with least square calculation of individual preferences 
 		final Map <Id, IndividualPreferences> svdMap = new SVDValuesAsObjAttrReader(pop.getPersons().keySet()).readFile(svdSolutionsFile);
-		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(scn.getConfig().planCalcScore()).createCharyparNagelScoringParameters(); //M
+		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(scn.getConfig().planCalcScore()).create(); //M
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {

@@ -178,7 +178,7 @@ public class CadytsIntegrationTest {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters();
+				CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create();
 
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));

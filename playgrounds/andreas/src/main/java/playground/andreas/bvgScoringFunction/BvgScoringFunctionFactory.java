@@ -47,7 +47,7 @@ public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 	private final Network network;
 
 	public BvgScoringFunctionFactory(final PlanCalcScoreConfigGroup charyparNagelConfig, final BvgScoringFunctionConfigGroup bvgConfig, Network network) {
-		this.charyparNagelConfigParameters = CharyparNagelScoringParameters.getBuilder(charyparNagelConfig).createCharyparNagelScoringParameters();
+		this.charyparNagelConfigParameters = CharyparNagelScoringParameters.getBuilder(charyparNagelConfig).create();
 		this.bvgParameters = new BvgScoringFunctionParameters(bvgConfig);
 		this.utilityOfLineSwitch = charyparNagelConfig.getUtilityOfLineSwitch();
 		this.network = network;

@@ -66,7 +66,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 			final PlanCalcScoreConfigGroup config,
 			final Scenario scenario) {
 		this.ktiConfig = ktiConfig;
-		this.params = CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters();
+		this.params = CharyparNagelScoringParameters.getBuilder(config).create();
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;
 	}

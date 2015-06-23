@@ -42,7 +42,7 @@ public class DesiresAndOpenTimesScoringFunctionFactory implements ScoringFunctio
     private Scenario scenario;
 
     public DesiresAndOpenTimesScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
-		this.params = CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters();
+		this.params = CharyparNagelScoringParameters.getBuilder(config).create();
 		this.scenario = scenario;
 	}
 

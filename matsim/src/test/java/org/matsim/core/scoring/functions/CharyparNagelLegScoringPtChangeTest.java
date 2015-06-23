@@ -121,7 +121,7 @@ public class CharyparNagelLegScoringPtChangeTest {
 		conf.setUtilityOfLineSwitch( random.nextDouble() * 1000 );
 
 		return new CharyparNagelLegScoring(
-				CharyparNagelScoringParameters.getBuilder(conf).createCharyparNagelScoringParameters(),
+				CharyparNagelScoringParameters.getBuilder(conf).create(),
 				network);
 	}
 

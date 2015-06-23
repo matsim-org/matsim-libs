@@ -115,7 +115,7 @@ public class CadytsIntegration_launcher {
 
 
 		//set scoring functions
-		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(); //M
+		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(); //M
 		
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override

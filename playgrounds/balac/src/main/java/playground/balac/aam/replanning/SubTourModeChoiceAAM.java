@@ -47,7 +47,7 @@ public class SubTourModeChoiceAAM extends AbstractMultithreadedModule {
 				scenario.getConfig().subtourModeChoice().getModes(),
 						scenario.getConfig().subtourModeChoice().getChainBasedModes(),
 								scenario.getConfig().subtourModeChoice().considerCarAvailability(),
-				CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).createCharyparNagelScoringParameters(),
+				CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create(),
 				Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor")),
 				Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk")),
 				Double.parseDouble(scenario.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_pt")),

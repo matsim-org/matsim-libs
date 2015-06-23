@@ -76,7 +76,7 @@ public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFacto
 			 * values in them due to using the same config. Still much better from a memory performance
 			 * point of view than giving each ScoringFunction its own copy of the params.
 			 */
-			this.params = CharyparNagelScoringParameters.getBuilder(this.config).createCharyparNagelScoringParameters();
+			this.params = CharyparNagelScoringParameters.getBuilder(this.config).create();
 		}
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();

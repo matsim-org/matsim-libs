@@ -66,7 +66,7 @@ final class RunFreight {
 				SumScoringFunction sum = new SumScoringFunction();
 
 				/* Add leg and money scoring. */
-				CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters();
+				CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create();
 				final LegScoring legScoringFunction = new CharyparNagelLegScoring(params , scenario.getNetwork());
 				final MoneyScoring moneyScoringFunction = new CharyparNagelMoneyScoring(params);
 				sum.addScoringFunction(legScoringFunction);

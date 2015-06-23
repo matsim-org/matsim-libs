@@ -88,7 +88,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-		this.scoringFunction = new ActivityScoringFunction(plan, CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters(), this.controler.getScenario().getActivityFacilities());
+		this.scoringFunction = new ActivityScoringFunction(plan, CharyparNagelScoringParameters.getBuilder(config).create(), this.controler.getScenario().getActivityFacilities());
 		this.scoringFunction.setSign(this.sign);
 		this.scoringFunction.setSizeScore(this.sizeScore);
 		this.scoringFunction.setDensityScore(this.densityScore);
@@ -97,11 +97,11 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 
 		scoringFunctionAccumulator.addScoringFunction(this.scoringFunction);
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.functions.CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters(), controler.getScenario().getNetwork()));
+				new org.matsim.core.scoring.functions.CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(config).create(), controler.getScenario().getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters()));
+				new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config).create()));
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters()));
+				new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config).create()));
 
 		return scoringFunctionAccumulator;
 	}

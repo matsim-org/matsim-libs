@@ -64,7 +64,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 			final ScoringFunctionConfigGroup group,
 			final Scenario scenario) {
 		this.scenario = scenario;
-		this.params = CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters();
+		this.params = CharyparNagelScoringParameters.getBuilder(config).create();
 		this.group = group;
 		this.delegate = new KtiLikeActivitiesScoringFunctionFactory(
 			typesNotToScore,
@@ -88,7 +88,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 			final ScoringFunctionConfigGroup group,
 			final Scenario scenario) {
 		this.scenario = scenario;
-		this.params = CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters();
+		this.params = CharyparNagelScoringParameters.getBuilder(config).create();
 		this.group = group;
 		this.delegate = delegate;
 	}

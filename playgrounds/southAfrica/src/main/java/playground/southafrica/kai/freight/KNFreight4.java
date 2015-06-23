@@ -323,9 +323,9 @@ public class KNFreight4 {
 			public ScoringFunction createScoringFunction(final Carrier carrier) {
 				SumScoringFunction sum = new SumScoringFunction() ;
 				// yyyyyy I am almost sure that we better use separate scoring functions for carriers. kai, oct'13
-				sum.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).createCharyparNagelScoringParameters(),
+				sum.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create(),
 						scenario.getNetwork() ) ) ;
-				sum.addScoringFunction( new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).createCharyparNagelScoringParameters()) ) ;
+				sum.addScoringFunction( new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create()) ) ;
 				ActivityScoring scoringFunction = new ActivityScoring() {
 					private double score = 0. ;
 					private final double margUtlOfTime_s = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600. ;

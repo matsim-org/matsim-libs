@@ -47,7 +47,7 @@ public class SubTourModeChoiceCS extends AbstractMultithreadedModule {
 				config.subtourModeChoice().getModes(),
 				config.subtourModeChoice().getChainBasedModes(),
 				config.subtourModeChoice().considerCarAvailability(),
-				CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(),
+				CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).create(),
 				((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getBeelineDistanceFactors().get("walk"),
 				(((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk")),
 				(((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getTeleportedModeSpeeds().get("pt"))

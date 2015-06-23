@@ -186,7 +186,7 @@ public class DestTripUtilOffset_perfRatio extends
 
 		CharyparNagelScoringParameters params;
 		params = CharyparNagelScoringParameters.getBuilder(ConfigUtils.loadConfig(
-				configFilename).planCalcScore()).createCharyparNagelScoringParameters();
+				configFilename).planCalcScore()).create();
 		int arStartTime = 7, arEndTime = 20, lowerLimit = 50;
 		// double interval = 0.25;
 
