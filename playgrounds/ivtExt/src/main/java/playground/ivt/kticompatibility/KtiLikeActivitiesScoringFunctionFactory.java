@@ -20,17 +20,13 @@
 package playground.ivt.kticompatibility;
 
 import java.util.Collection;
-import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -70,7 +66,7 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 			final PlanCalcScoreConfigGroup config,
 			final Scenario scenario) {
 		this.ktiConfig = ktiConfig;
-		this.params = new CharyparNagelScoringParameters(config);
+		this.params = CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters();
 		this.scenario = scenario;
 		this.blackList = typesNotToScore;
 	}

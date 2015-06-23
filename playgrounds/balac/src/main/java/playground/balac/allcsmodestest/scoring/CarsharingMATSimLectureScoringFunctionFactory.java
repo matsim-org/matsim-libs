@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -34,14 +33,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
@@ -250,7 +247,7 @@ public class CarsharingMATSimLectureScoringFunctionFactory implements ScoringFun
 		}
 
 		final CharyparNagelScoringParameters params =
-			new CharyparNagelScoringParameters( dummyGroup );
+				CharyparNagelScoringParameters.getBuilder(dummyGroup).createCharyparNagelScoringParameters();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}

@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
@@ -34,7 +33,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.households.Income;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.households.PersonHouseholdMapping;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 
 /**
  * @author dgrether
@@ -52,7 +50,7 @@ public class IncomeScoringFunctionFactory implements ScoringFunctionFactory {
 	public IncomeScoringFunctionFactory(Config config, PersonHouseholdMapping hhmapping, Network network) {
 		this.config = config;
 		this.configGroup = config.planCalcScore();
-		this.params = new CharyparNagelScoringParameters(configGroup);
+		this.params = CharyparNagelScoringParameters.getBuilder(configGroup).createCharyparNagelScoringParameters();
 		this.hhdb = hhmapping;
 		this.network = network;
 	}

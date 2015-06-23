@@ -22,8 +22,6 @@ package org.matsim.core.scoring.functions;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.core.api.internal.MatsimParameters;
@@ -33,7 +31,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.pt.PtConstants;
 
 public class CharyparNagelScoringParameters implements MatsimParameters {
-	
+
 	public static class Mode {
 		private Mode(
 				double marginalUtilityOfTraveling_s,
@@ -65,58 +63,178 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 	
 	public final boolean usingOldScoringBelowZeroUtilityDuration ;
 
-	public CharyparNagelScoringParameters(final PlanCalcScoreConfigGroup config) {
-		this.usingOldScoringBelowZeroUtilityDuration = config.isUsingOldScoringBelowZeroUtilityDuration() ;
-		
-		marginalUtilityOfWaiting_s = config.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
-		marginalUtilityOfLateArrival_s = config.getLateArrival_utils_hr() / 3600.0;
-		marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture_utils_hr() / 3600.0;
-		marginalUtilityOfWaitingPt_s = config.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 ;
-		marginalUtilityOfPerforming_s = config.getPerforming_utils_hr() / 3600.0;
-		utilityOfLineSwitch = config.getUtilityOfLineSwitch() ;
-		marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
-		scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
-				marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
-
-		SortedMap<String,ActivityUtilityParameters> tmpUtlParams = new TreeMap<String, ActivityUtilityParameters>() ;
-		for (ActivityParams params : config.getActivityParams()) {
-			ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
-			// the following was introduced in nov'12.  Also see setupTransitSimulation in Controler.  kai, nov'12
-			if (params.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-				factory.setScoreAtAll(false) ;
-			}
-			tmpUtlParams.put(params.getActivityType(), factory.create() ) ;
-		}
-		utilParams = Collections.unmodifiableMap(tmpUtlParams );
-		
-		SortedMap<String, Mode> tmpModeParams = new TreeMap<String, Mode>() ;
-		Map<String, ModeParams> modes = config.getModes();
-		double worstMarginalUtilityOfTraveling_s = 0.0;
-		for (Entry<String, ModeParams> mode : modes.entrySet()) {
-			String modeName = mode.getKey();
-			ModeParams modeParams = mode.getValue();
-			double marginalUtilityOfTraveling_s = modeParams.getMarginalUtilityOfTraveling() / 3600.0;
-			worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, marginalUtilityOfTraveling_s);
-			double marginalUtilityOfDistance_m = modeParams.getMarginalUtilityOfDistance();
-			double monetaryDistanceCostRate = modeParams.getMonetaryDistanceCostRate();
-			double constant = modeParams.getConstant();
-			Mode newModeParams = new Mode(
-					marginalUtilityOfTraveling_s,
-					marginalUtilityOfDistance_m,
-					monetaryDistanceCostRate,
-					constant);
-			tmpModeParams.put(modeName, newModeParams);
-		}
-		modeParams = Collections.unmodifiableMap(tmpModeParams);
-		
-		abortedPlanScore = Math.min(
-				Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),
-				Math.min(worstMarginalUtilityOfTraveling_s-marginalUtilityOfPerforming_s, marginalUtilityOfWaiting_s-marginalUtilityOfPerforming_s)
-				) * 3600.0 * 24.0; // SCENARIO_DURATION
-		// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
-		// This rather complicated definition has to do with the fact that exp(some_large_number) relatively quickly becomes Inf.
-		// In consequence, the abortedPlanScore needs to be more strongly negative than anything else, but not much more.  
-		// kai, feb'12
+	public CharyparNagelScoringParameters(
+			final Map<String, ActivityUtilityParameters> utilParams,
+			final Map<String, Mode> modeParams,
+			final double marginalUtilityOfWaiting_s,
+			final double marginalUtilityOfLateArrival_s,
+			final double marginalUtilityOfEarlyDeparture_s,
+			final double marginalUtilityOfWaitingPt_s,
+			final double marginalUtilityOfPerforming_s,
+			final double utilityOfLineSwitch,
+			final double marginalUtilityOfMoney,
+			final double abortedPlanScore,
+			final boolean scoreActs,
+			final boolean usingOldScoringBelowZeroUtilityDuration) {
+		this.utilParams = utilParams;
+		this.modeParams = modeParams;
+		this.marginalUtilityOfWaiting_s = marginalUtilityOfWaiting_s;
+		this.marginalUtilityOfLateArrival_s = marginalUtilityOfLateArrival_s;
+		this.marginalUtilityOfEarlyDeparture_s = marginalUtilityOfEarlyDeparture_s;
+		this.marginalUtilityOfWaitingPt_s = marginalUtilityOfWaitingPt_s;
+		this.marginalUtilityOfPerforming_s = marginalUtilityOfPerforming_s;
+		this.utilityOfLineSwitch = utilityOfLineSwitch;
+		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+		this.abortedPlanScore = abortedPlanScore;
+		this.scoreActs = scoreActs;
+		this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
 	}
 
+	public static CharyparNagelScoringParametersBuilder getBuilder( final PlanCalcScoreConfigGroup config ) {
+		return new CharyparNagelScoringParametersBuilder( config );
+	}
+
+	public static final class CharyparNagelScoringParametersBuilder {
+		private final Map<String, ActivityUtilityParameters> utilParams;
+		private final Map<String, Mode> modeParams;
+
+		private double marginalUtilityOfWaiting_s;
+		private double marginalUtilityOfLateArrival_s;
+		private double marginalUtilityOfEarlyDeparture_s;
+		private double marginalUtilityOfWaitingPt_s;
+		private double marginalUtilityOfPerforming_s;
+		private double utilityOfLineSwitch;
+		private double marginalUtilityOfMoney;
+		private double abortedPlanScore;
+		private boolean scoreActs;
+		private boolean usingOldScoringBelowZeroUtilityDuration;
+
+		private CharyparNagelScoringParametersBuilder( final PlanCalcScoreConfigGroup config ) {
+			this.usingOldScoringBelowZeroUtilityDuration = config.isUsingOldScoringBelowZeroUtilityDuration() ;
+
+			marginalUtilityOfWaiting_s = config.getMarginalUtlOfWaiting_utils_hr() / 3600.0;
+			marginalUtilityOfLateArrival_s = config.getLateArrival_utils_hr() / 3600.0;
+			marginalUtilityOfEarlyDeparture_s = config.getEarlyDeparture_utils_hr() / 3600.0;
+			marginalUtilityOfWaitingPt_s = config.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 ;
+			marginalUtilityOfPerforming_s = config.getPerforming_utils_hr() / 3600.0;
+			utilityOfLineSwitch = config.getUtilityOfLineSwitch() ;
+			marginalUtilityOfMoney = config.getMarginalUtilityOfMoney() ;
+			scoreActs = marginalUtilityOfPerforming_s != 0 || marginalUtilityOfWaiting_s != 0 ||
+					marginalUtilityOfLateArrival_s != 0 || marginalUtilityOfEarlyDeparture_s != 0;
+
+			utilParams = new TreeMap<String, ActivityUtilityParameters>() ;
+			for (ActivityParams params : config.getActivityParams()) {
+				ActivityUtilityParameters.Builder factory = new ActivityUtilityParameters.Builder(params) ;
+				// the following was introduced in nov'12.  Also see setupTransitSimulation in Controler.  kai, nov'12
+				if (params.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+					factory.setScoreAtAll(false) ;
+				}
+				utilParams.put(params.getActivityType(), factory.create() ) ;
+			}
+
+			modeParams = new TreeMap<String, Mode>() ;
+			Map<String, PlanCalcScoreConfigGroup.ModeParams> modes = config.getModes();
+			double worstMarginalUtilityOfTraveling_s = 0.0;
+			for (Map.Entry<String, PlanCalcScoreConfigGroup.ModeParams> mode : modes.entrySet()) {
+				String modeName = mode.getKey();
+				ModeParams params = mode.getValue();
+				double marginalUtilityOfTraveling_s = params.getMarginalUtilityOfTraveling() / 3600.0;
+				worstMarginalUtilityOfTraveling_s = Math.min(worstMarginalUtilityOfTraveling_s, marginalUtilityOfTraveling_s);
+				double marginalUtilityOfDistance_m = params.getMarginalUtilityOfDistance();
+				double monetaryDistanceCostRate = params.getMonetaryDistanceCostRate();
+				double constant = params.getConstant();
+				Mode newModeParams = new Mode(
+						marginalUtilityOfTraveling_s,
+						marginalUtilityOfDistance_m,
+						monetaryDistanceCostRate,
+						constant);
+				modeParams.put(modeName, newModeParams);
+			}
+
+			abortedPlanScore = Math.min(
+					Math.min(marginalUtilityOfLateArrival_s, marginalUtilityOfEarlyDeparture_s),
+					Math.min(worstMarginalUtilityOfTraveling_s-marginalUtilityOfPerforming_s, marginalUtilityOfWaiting_s-marginalUtilityOfPerforming_s)
+					) * 3600.0 * 24.0; // SCENARIO_DURATION
+			// TODO 24 has to be replaced by a variable like scenario_dur (see also other places below)
+			// This rather complicated definition has to do with the fact that exp(some_large_number) relatively quickly becomes Inf.
+			// In consequence, the abortedPlanScore needs to be more strongly negative than anything else, but not much more.
+			// kai, feb'12
+		}
+
+		public CharyparNagelScoringParametersBuilder withActivityParameters(String activityType, ActivityUtilityParameters params) {
+			this.utilParams.put( activityType , params );
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withModeParameters(String mode, Mode params) {
+			this.modeParams.put( mode , params );
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfWaiting_s(double marginalUtilityOfWaiting_s) {
+			this.marginalUtilityOfWaiting_s = marginalUtilityOfWaiting_s;
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfLateArrival_s(double marginalUtilityOfLateArrival_s) {
+			this.marginalUtilityOfLateArrival_s = marginalUtilityOfLateArrival_s;
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfEarlyDeparture_s(double marginalUtilityOfEarlyDeparture_s) {
+			this.marginalUtilityOfEarlyDeparture_s = marginalUtilityOfEarlyDeparture_s;
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfWaitingPt_s(double marginalUtilityOfWaitingPt_s) {
+			this.marginalUtilityOfWaitingPt_s = marginalUtilityOfWaitingPt_s;
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfPerforming_s(double marginalUtilityOfPerforming_s) {
+			this.marginalUtilityOfPerforming_s = marginalUtilityOfPerforming_s;
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withUtilityOfLineSwitch(double utilityOfLineSwitch) {
+			this.utilityOfLineSwitch = utilityOfLineSwitch;
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+			this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withAbortedPlanScore(double abortedPlanScore) {
+			this.abortedPlanScore = abortedPlanScore;
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withScoreActs(boolean scoreActs) {
+			this.scoreActs = scoreActs;
+			return this;
+		}
+
+		public CharyparNagelScoringParametersBuilder withUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
+			this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
+			return this;
+		}
+
+		public CharyparNagelScoringParameters createCharyparNagelScoringParameters() {
+			return new CharyparNagelScoringParameters(
+					Collections.unmodifiableMap( utilParams ),
+					Collections.unmodifiableMap( modeParams ),
+					marginalUtilityOfWaiting_s,
+					marginalUtilityOfLateArrival_s,
+					marginalUtilityOfEarlyDeparture_s,
+					marginalUtilityOfWaitingPt_s,
+					marginalUtilityOfPerforming_s,
+					utilityOfLineSwitch,
+					marginalUtilityOfMoney,
+					abortedPlanScore,
+					scoreActs,
+					usingOldScoringBelowZeroUtilityDuration);
+		}
+	}
 }

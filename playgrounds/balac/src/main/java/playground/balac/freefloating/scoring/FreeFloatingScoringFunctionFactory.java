@@ -32,16 +32,16 @@ public class FreeFloatingScoringFunctionFactory extends org.matsim.core.scoring.
 	  public ScoringFunction createNewScoringFunction(Person person)
 	  {
 		  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-	    
-	    scoringFunctionAccumulator.addScoringFunction(
-	      new FreeFloatingLegScoringFunction((PlanImpl)person.getSelectedPlan(), 
-	      new CharyparNagelScoringParameters(config.planCalcScore()), 
+
+		  scoringFunctionAccumulator.addScoringFunction(
+	      new FreeFloatingLegScoringFunction((PlanImpl)person.getSelectedPlan(),
+				  CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(),
 	      this.config, 
 	      network));
-	    scoringFunctionAccumulator.addScoringFunction(new KtiActivtyWithoutPenaltiesScoring(person.getSelectedPlan(), new CharyparNagelScoringParameters(config.planCalcScore()), null, ((ScenarioImpl) scenario).getActivityFacilities()));
-		   
-	    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
-	    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+		  scoringFunctionAccumulator.addScoringFunction(new KtiActivtyWithoutPenaltiesScoring(person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(), null, ((ScenarioImpl) scenario).getActivityFacilities()));
+
+		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
+		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
 	   return scoringFunctionAccumulator;
 	  }
 }

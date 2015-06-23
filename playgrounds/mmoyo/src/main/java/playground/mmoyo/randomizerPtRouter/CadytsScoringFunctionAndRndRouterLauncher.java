@@ -135,7 +135,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 
 
 		//set scoring functions
-		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()); //M
+		final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(); //M
 		
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override

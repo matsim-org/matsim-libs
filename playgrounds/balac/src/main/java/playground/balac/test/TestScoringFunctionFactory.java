@@ -34,13 +34,13 @@ public class TestScoringFunctionFactory extends org.matsim.core.scoring.function
 	 public ScoringFunction createNewScoringFunction(Person person)
 	  {
 		  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
-	    
-		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), network));
-	    scoringFunctionAccumulator.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), new CharyparNagelScoringParameters(config.planCalcScore()), scenario));
+
+		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(), network));
+		  scoringFunctionAccumulator.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(), scenario));
 	    //scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
-		   
-	    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
-	    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+
+		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
+		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
 	    return scoringFunctionAccumulator;
 	  }
 

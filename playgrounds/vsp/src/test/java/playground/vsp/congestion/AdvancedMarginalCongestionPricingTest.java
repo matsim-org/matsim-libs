@@ -77,7 +77,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(plansCalcScoreConfigGroup);
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).createCharyparNagelScoringParameters();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -137,7 +137,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(plansCalcScoreConfigGroup);
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).createCharyparNagelScoringParameters();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		
@@ -188,7 +188,7 @@ public class AdvancedMarginalCongestionPricingTest {
 		plansCalcScoreConfigGroup.setLateArrival_utils_hr(0.);
 		plansCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(0.);
 		plansCalcScoreConfigGroup.setPerforming_utils_hr(6.);
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(plansCalcScoreConfigGroup);
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(plansCalcScoreConfigGroup).createCharyparNagelScoringParameters();
 
 		MarginalSumScoringFunction marginaSumScoringFunction = new MarginalSumScoringFunction(params);
 		

@@ -71,8 +71,8 @@ public class AvignonScoringFunctionFactory extends org.matsim.core.scoring.funct
                     lcContext);
 		}
 		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-        scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), controler.getScenario().getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(), controler.getScenario().getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
 		return scoringFunctionAccumulator;
 	}
 

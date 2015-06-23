@@ -45,7 +45,7 @@ public class BKickIncomeScoringFunctionFactory implements ScoringFunctionFactory
     public BKickIncomeScoringFunctionFactory(
             PlanCalcScoreConfigGroup charyparNagelScoring, PersonHouseholdMapping hhmapping, Network network) {
 		this.configGroup = charyparNagelScoring;
-		this.params = new CharyparNagelScoringParameters(configGroup);
+		this.params = CharyparNagelScoringParameters.getBuilder(configGroup).createCharyparNagelScoringParameters();
 		this.hhdb = hhmapping;
         this.network = network;
 	}

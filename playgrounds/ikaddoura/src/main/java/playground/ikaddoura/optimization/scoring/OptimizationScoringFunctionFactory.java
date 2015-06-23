@@ -39,7 +39,7 @@ public class OptimizationScoringFunctionFactory implements ScoringFunctionFactor
 	
 
 	public OptimizationScoringFunctionFactory(final PlanCalcScoreConfigGroup planCalcScoreConfigGroup, Network network, double stuckScore) {
-		this.params = new CharyparNagelScoringParameters(planCalcScoreConfigGroup);
+		this.params = CharyparNagelScoringParameters.getBuilder(planCalcScoreConfigGroup).createCharyparNagelScoringParameters();
 		this.network = network;
 		this.STUCKING_SCORE = stuckScore;
 	}

@@ -46,16 +46,16 @@ public class CharyparNagelScoringFunctionFactoryWithDetailedLegScoreRecord
 	public ScoringFunction createNewScoringFunction(Person person) {
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator
-				.addScoringFunction(new CharyparNagelActivityScoring(new CharyparNagelScoringParameters(config)));
+				.addScoringFunction(new CharyparNagelActivityScoring(CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters()));
 
 		LegScoringFunctionWithDetailedRecord legScoring = new LegScoringFunctionWithDetailedRecord(
-				person.getSelectedPlan(), new CharyparNagelScoringParameters(config), network);
+				person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters(), network);
 		scoringFunctionAccumulator.addScoringFunction(legScoring);
 
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(
-				new CharyparNagelScoringParameters(config)));
+				CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters()));
 		scoringFunctionAccumulator
-				.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config)));
+				.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters()));
 		return scoringFunctionAccumulator;
 	}
 }

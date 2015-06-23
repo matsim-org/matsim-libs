@@ -42,17 +42,17 @@ public class FtScoringFunctionFactory extends CharyparNagelScoringFunctionFactor
     ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
     scoringFunctionAccumulator.addScoringFunction(
-      new ActivityScoringFunction(person.getSelectedPlan(), 
-      new CharyparNagelScoringParameters(config.planCalcScore()), 
+      new ActivityScoringFunction(person.getSelectedPlan(),
+              CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(),
       this.facilityPenalties, 
       this.facilities));
     scoringFunctionAccumulator.addScoringFunction(
-      new LegScoringFunction((PlanImpl)person, 
-      new CharyparNagelScoringParameters(config.planCalcScore()), 
+      new LegScoringFunction((PlanImpl)person,
+              CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(),
       this.config, 
       this.ftConfigGroup, network));
-    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
-    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
+    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
 
     return scoringFunctionAccumulator;
   }

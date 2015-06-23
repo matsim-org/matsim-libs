@@ -63,21 +63,21 @@ public class HerbieScoringFunctionFactory extends org.matsim.core.scoring.functi
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		
 //		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(plan, super.getParams()));
-		
+
 		scoringFunctionAccumulator.addScoringFunction(new ActivityScoringFunction(
-				person.getSelectedPlan(), 
-				new CharyparNagelScoringParameters(config.planCalcScore()), 
+				person.getSelectedPlan(),
+				CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(),
 				this.facilityPenalties,
 				this.facilities,
 				this.config));
 		scoringFunctionAccumulator.addScoringFunction(new LegScoringFunction(
-				person.getSelectedPlan(), 
-				new CharyparNagelScoringParameters(config.planCalcScore()),
+				person.getSelectedPlan(),
+				CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(),
 				config,
 				this.network,
 				this.ktiConfigGroup));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
-		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
+		scoringFunctionAccumulator.addScoringFunction(new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
 		
 		return scoringFunctionAccumulator;
 	}

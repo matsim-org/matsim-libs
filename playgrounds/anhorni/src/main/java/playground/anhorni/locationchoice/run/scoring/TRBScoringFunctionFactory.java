@@ -88,7 +88,7 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-        this.scoringFunction = new ActivityScoringFunction(plan, new CharyparNagelScoringParameters(config), this.controler.getScenario().getActivityFacilities());
+		this.scoringFunction = new ActivityScoringFunction(plan, CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters(), this.controler.getScenario().getActivityFacilities());
 		this.scoringFunction.setSign(this.sign);
 		this.scoringFunction.setSizeScore(this.sizeScore);
 		this.scoringFunction.setDensityScore(this.densityScore);
@@ -96,12 +96,12 @@ public class TRBScoringFunctionFactory extends org.matsim.core.scoring.functions
 		this.scoringFunction.setShoppingScoreAdditionals(this.shoppingScoreAdditionals);
 
 		scoringFunctionAccumulator.addScoringFunction(this.scoringFunction);
-        scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.functions.CharyparNagelLegScoring(new CharyparNagelScoringParameters(config), controler.getScenario().getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config)));
+				new org.matsim.core.scoring.functions.CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters(), controler.getScenario().getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
-				new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config)));
+				new org.matsim.core.scoring.functions.CharyparNagelMoneyScoring(CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters()));
+		scoringFunctionAccumulator.addScoringFunction(
+				new org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters()));
 
 		return scoringFunctionAccumulator;
 	}

@@ -27,16 +27,16 @@ public class CarsharingScoringFunctionFactory extends org.matsim.core.scoring.fu
 		SumScoringFunction scoringFunctionSum = new SumScoringFunction();
 	    //this is the main difference, since we need a special scoring for carsharing legs
 		scoringFunctionSum.addScoringFunction(
-	    new CarsharingLegScoringFunction(new CharyparNagelScoringParameters(config.planCalcScore()), 
+	    new CarsharingLegScoringFunction(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(),
 	    								 this.config, 
 	    								 this.network));
 		scoringFunctionSum.addScoringFunction(
-				new CharyparNagelLegScoring( 
-			    new CharyparNagelScoringParameters(config.planCalcScore()), this.network) 
+				new CharyparNagelLegScoring(
+						CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters(), this.network)
 			    );
 		//the remaining scoring functions can be changed and adapted to the needs of the user
-		scoringFunctionSum.addScoringFunction(new CharyparNagelActivityScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
-		scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+		scoringFunctionSum.addScoringFunction(new CharyparNagelActivityScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
+		scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters()));
 	    return scoringFunctionSum;
 	  }
 }

@@ -248,7 +248,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		}
 
 		final CharyparNagelScoringParameters params =
-			new CharyparNagelScoringParameters( dummyGroup );
+				CharyparNagelScoringParameters.getBuilder(dummyGroup).createCharyparNagelScoringParameters();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}

@@ -48,7 +48,7 @@ public class GautengScoringFunctionFactory implements ScoringFunctionFactory {
 
 	public GautengScoringFunctionFactory(Scenario scenario, double baseValueOfTime, double valueOfTimeMultiplier) {
 		this.scenario = scenario ;
-		this.params = new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore());
+		this.params = CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).createCharyparNagelScoringParameters();
 		this.utlOfMon = new GautengUtilityOfMoney( scenario, baseValueOfTime, valueOfTimeMultiplier) ;
 		this.subPopulationAttributeName = scenario.getConfig().plans().getSubpopulationAttributeName() ;
 		this.personAttributes = this.scenario.getPopulation().getPersonAttributes();

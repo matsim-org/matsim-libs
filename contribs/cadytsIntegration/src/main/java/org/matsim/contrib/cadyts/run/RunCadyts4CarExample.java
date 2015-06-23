@@ -63,8 +63,8 @@ public class RunCadyts4CarExample {
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				
-				final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
+
+				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters();
 				
 				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));

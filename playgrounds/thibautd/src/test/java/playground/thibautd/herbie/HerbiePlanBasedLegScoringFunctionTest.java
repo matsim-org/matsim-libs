@@ -279,7 +279,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		config.planCalcScore().setMarginalUtlOfDistanceOther( -9 );
 		config.planCalcScore().setMonetaryDistanceCostRateCar( -1 );
 		config.planCalcScore().setMonetaryDistanceCostRatePt( -2 );
-		params = new CharyparNagelScoringParameters( config.planCalcScore() );
+		params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters();
 	}
 
 	//private void initPlans() {

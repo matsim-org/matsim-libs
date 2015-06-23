@@ -107,7 +107,7 @@ public class UtilityByPartsAnalyzer extends AbstractAnalyisModule {
 	private ScoringFunctionFactory getScoringFunctionFactory(final Scenario sc){
 		ScoringFunctionFactory sfFactory = new ScoringFunctionFactory() {
 
-			CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(sc.getConfig().planCalcScore());
+			CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(sc.getConfig().planCalcScore()).createCharyparNagelScoringParameters();
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {

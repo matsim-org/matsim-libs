@@ -52,7 +52,7 @@ public class LocationChoiceScoringFunctionFactory implements ScoringFunctionFact
 
     public LocationChoiceScoringFunctionFactory(final PlanCalcScoreConfigGroup config,
                                                 final TreeMap<Id, FacilityPenalty> facilityPenalties, final ActivityFacilities facilities, Network network) {
-		this.params = new CharyparNagelScoringParameters(config);
+		this.params = CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters();
 		this.facilityPenalties = facilityPenalties;
 		this.facilities = facilities;
         this.network = network;

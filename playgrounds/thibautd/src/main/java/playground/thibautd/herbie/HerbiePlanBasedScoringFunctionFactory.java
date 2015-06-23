@@ -56,7 +56,7 @@ public class HerbiePlanBasedScoringFunctionFactory implements ScoringFunctionFac
 			final TreeMap<Id, FacilityPenalty> facilityPenalties,
 			final ActivityFacilities facilities, 
 			final Network network) {
-		this.params = new CharyparNagelScoringParameters( config.planCalcScore() );
+		this.params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters();
 		this.config = config;
 		this.ktiConfigGroup = ktiConfigGroup;
 		this.facilityPenalties = facilityPenalties;

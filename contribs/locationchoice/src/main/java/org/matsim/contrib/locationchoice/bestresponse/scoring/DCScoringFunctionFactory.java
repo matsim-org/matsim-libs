@@ -59,9 +59,9 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 		} else {
 			scoringFunction = new DCActivityScoringFunction(person.getSelectedPlan(), this.lcContext);
 		}
-		scoringFunctionAccumulator.addScoringFunction(scoringFunction);		
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore()), scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore())));
+		scoringFunctionAccumulator.addScoringFunction(scoringFunction);
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).createCharyparNagelScoringParameters(), scenario.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).createCharyparNagelScoringParameters()));
 		return scoringFunctionAccumulator;
 	}
 }

@@ -71,7 +71,7 @@ public class RunTwoRoutes {
             @Override
             public ScoringFunction createNewScoringFunction(Person person) {
                 SumScoringFunction sumScoringFunction = new SumScoringFunction();
-                sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(scenario.getConfig().planCalcScore()), scenario.getNetwork()));
+                sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).createCharyparNagelScoringParameters(), scenario.getNetwork()));
                 return sumScoringFunction;
             }
         });

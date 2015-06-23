@@ -70,7 +70,7 @@ public class AgentInteractionScoringFunctionFactory extends CharyparNagelScoring
 			ActTypeConverter actTypeConverter, HashSet<String> flexibleTypes) {
 
 		super(config, network);
-		this.params = new CharyparNagelScoringParameters(config);
+		this.params = CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters();
 		this.facilities = facilities;
 		this.network = network1;
 		this.scaleNumberOfPersons = scaleNumberOfPersons;

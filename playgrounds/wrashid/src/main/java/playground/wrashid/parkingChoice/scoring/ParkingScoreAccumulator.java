@@ -61,7 +61,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
         this.parkingManager = parkingManager;
 
         controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-            CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(controler.getConfig().planCalcScore());
+            CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(controler.getConfig().planCalcScore()).createCharyparNagelScoringParameters();
             @Override
             public ScoringFunction createNewScoringFunction(Person person) {
                 SumScoringFunction sumScoringFunction = new SumScoringFunction();

@@ -152,8 +152,7 @@ public final class RunWithRoadPricing {
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
 
-				final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(
-						config.planCalcScore());
+				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(config.planCalcScore()).createCharyparNagelScoringParameters();
 
 				SumScoringFunction sumScoringFunction = new SumScoringFunction();
 				sumScoringFunction

@@ -47,7 +47,7 @@ public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 	public EmissionScoringFunctionFactory(Controler controler) {
 		this.controler = controler;
 		this.configGroup = controler.getConfig().planCalcScore();
-		this.params = new CharyparNagelScoringParameters(configGroup);
+		this.params = CharyparNagelScoringParameters.getBuilder(configGroup).createCharyparNagelScoringParameters();
 		this.network = controler.getScenario().getNetwork();
 		this.scoringFromEmissions = new ScoringFromEmissions(params);
 	}
@@ -56,7 +56,7 @@ public class EmissionScoringFunctionFactory implements ScoringFunctionFactory {
 	public ScoringFunction createNewScoringFunction(Person person) {
 		
 		PlanCalcScoreConfigGroup configGroup = controler.getConfig().planCalcScore();
-		CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(configGroup);
+		CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(configGroup).createCharyparNagelScoringParameters();
 		Network network = controler.getScenario().getNetwork();
 		
 		ScoringFunctionAccumulator accumulator = new ScoringFunctionAccumulator();

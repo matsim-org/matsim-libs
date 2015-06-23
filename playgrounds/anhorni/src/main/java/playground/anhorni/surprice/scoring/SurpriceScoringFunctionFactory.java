@@ -53,20 +53,20 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 	public ScoringFunction createNewScoringFunction(Person person) {			
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 
-        scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
-				person.getSelectedPlan(), new CharyparNagelScoringParameters(config), controler.getConfig(), this.controler.getScenario().getActivityFacilities(),
+		scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
+				person.getSelectedPlan(), CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters(), controler.getConfig(), this.controler.getScenario().getActivityFacilities(),
 				this.day));
 
-        scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
-				new CharyparNagelScoringParameters(config),
+		scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
+				CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters(),
                 this.controler.getScenario().getNetwork(),
 				this.memories.getMemory(person.getId()),
 				this.day, (PersonImpl)person, 
 				(Double)this.preferences.getAttribute(person.getId().toString(), "dudm")));
 		
-		if (Boolean.parseBoolean(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
+		if (Boolean.parseBoolean(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {
 			scoringFunctionAccumulator.addScoringFunction(new SupriceTollScoringFunction(
-					new CharyparNagelScoringParameters(config), (PersonImpl)person, this.day,
+					CharyparNagelScoringParameters.getBuilder(config).createCharyparNagelScoringParameters(), (PersonImpl)person, this.day,
 					(Double)this.preferences.getAttribute(person.getId().toString(), "dudm")));
 		}				
 		//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));

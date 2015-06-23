@@ -104,7 +104,7 @@ public class IndividualPreferencesValues4LegScore_CtrlLauncher {
 				persCalcScoreCnfigGroup.setMarginalUtilityOfMoney(1.0); // it must be 1. this is because marginalUtilityOfDistancePt_m = MonetaryDistanceCostRatePt * MarginalUtilityOfMoney!!   
 				
 				//set scoring functions
-				CharyparNagelScoringParameters personalizedParams = new CharyparNagelScoringParameters(persCalcScoreCnfigGroup);
+				CharyparNagelScoringParameters personalizedParams = CharyparNagelScoringParameters.getBuilder(persCalcScoreCnfigGroup).createCharyparNagelScoringParameters();
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(personalizedParams)) ;
 				//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(personalizedParams, controler.getScenario().getNetwork()));

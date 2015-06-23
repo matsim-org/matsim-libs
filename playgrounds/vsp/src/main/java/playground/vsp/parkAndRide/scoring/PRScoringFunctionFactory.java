@@ -46,7 +46,7 @@ public class PRScoringFunctionFactory implements ScoringFunctionFactory {
 
 	public PRScoringFunctionFactory(final PlanCalcScoreConfigGroup charyparNagelConfig, Network network, double intermodalTransferPenalty) {
 		log.info("Extending the ordinary activity scoring function by a park-and-ride specific activity scoring function.");
-		this.charyparNagelConfigParameters = new CharyparNagelScoringParameters(charyparNagelConfig);
+		this.charyparNagelConfigParameters = CharyparNagelScoringParameters.getBuilder(charyparNagelConfig).createCharyparNagelScoringParameters();
 		this.interModalTransferPenalty = intermodalTransferPenalty;
 		log.info("The intermodal transfer penalty for each park-and-ride activity is set to " + this.interModalTransferPenalty);
 		this.network = network;
