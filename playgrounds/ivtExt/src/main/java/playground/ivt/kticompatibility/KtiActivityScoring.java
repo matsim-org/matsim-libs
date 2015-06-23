@@ -106,12 +106,12 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 	@Override
 	public void handleActivity(final Activity act) {
 		startActivity( act.getStartTime() , act );
-		endActivity( act.getEndTime() , act );
+		endActivity(act.getEndTime(), act);
 	}
 
 	@Override
 	public void handleLastActivity(final Activity act) {
-		startActivity( act.getStartTime() , act );
+		startActivity(act.getStartTime(), act);
 	}
 
 	private Activity activityWithoutStart = null;
@@ -312,6 +312,13 @@ public class KtiActivityScoring implements ActivityScoring, ScoringFunctionAccum
 		if (duration > 0.0) {
 			final double utilPerf = this.params.marginalUtilityOfPerforming_s * typicalDuration
 				* Math.log((duration / 3600.0) / this.zeroUtilityDurations.get(actType));
+			if ( Double.isNaN( utilPerf ) || utilPerf == Double.POSITIVE_INFINITY ) {
+				throw new RuntimeException( "Invalid score for activity type "+actType+
+							", utilPerf="+params.marginalUtilityOfPerforming_s +
+							", typicalDuration="+typicalDuration+
+							", duration (s)="+duration+
+							", zeroUtilityDuration="+zeroUtilityDurations.get(actType) );
+			}
 			return Math.max(0, utilPerf);
 		}
 
