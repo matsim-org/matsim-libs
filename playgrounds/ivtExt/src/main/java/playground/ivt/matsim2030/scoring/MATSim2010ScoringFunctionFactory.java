@@ -43,9 +43,11 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.CharyparNagelScoringParametersBuilder;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.ivt.kticompatibility.KtiActivityScoring;
@@ -157,13 +159,6 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		return scoringFunctionAccumulator;
 	}
 
-	private static final ThreadLocal<PlanCalcScoreConfigGroup> dummyProvider =
-			new ThreadLocal<PlanCalcScoreConfigGroup>() {
-				@Override
-				protected PlanCalcScoreConfigGroup initialValue() {
-					return new PlanCalcScoreConfigGroup();
-				}
-			};
 	private CharyparNagelScoringParameters createParams(
 			final Person person,
 			final PlanCalcScoreConfigGroup config,
@@ -172,27 +167,8 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			return individualParameters.get( person.getId() );
 		}
 
-		// this is ugly, but otherwise there are warnings logged for each
-		// scoring function creation about the (default) non-null PathSizeBeta...
-		Logger.getLogger( PlanCalcScoreConfigGroup.class ).setLevel( Level.OFF );
-
-		final PlanCalcScoreConfigGroup dummyGroup = dummyProvider.get();
-		for ( Map.Entry<String, String> e : config.getParams().entrySet() ) {
-			dummyGroup.addParam( e.getKey() , e.getValue() );
-		}
-
-		for ( Collection<? extends ConfigGroup> sets : config.getParameterSets().values() ) {
-			for ( ConfigGroup set : sets ) {
-				final ConfigGroup dummySet = dummyGroup.createParameterSet( set.getName() );
-
-				for ( Map.Entry<String, String> e : set.getParams().entrySet() ) {
-					dummySet.addParam( e.getKey() , e.getValue() );
-				}
-
-				dummyGroup.addParameterSet( dummySet );
-			}
-		}
-
+		final CharyparNagelScoringParametersBuilder builder =
+				CharyparNagelScoringParameters.getBuilder( config );
 		final Set<String> handledTypes = new HashSet<String>();
 		for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan() , blackList ) ) {
 			// XXX works only if no variation of type of activities between plans
@@ -204,11 +180,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			// used (for instance if individual preferences are ill-specified).
 			// This should become nicer once we have a better format for specifying
 			// utility parameters in the config.
-			ActivityParams actParams = dummyGroup.getActivityParams( act.getType() );
-			if ( actParams == null ) {
-				actParams = new ActivityParams( act.getType() );
-				dummyGroup.addActivityParams( actParams );
-			}
+			ActivityParams actParams =  new ActivityParams( act.getType() );
 
 			final Double earliestEndTime =
 					(Double) personAttributes.getAttribute(
@@ -245,10 +217,14 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 				actParams.setScoringThisActivityAtAll( true );
 				actParams.setTypicalDuration( typicalDuration );
 			}
+
+			builder.withActivityParameters(
+					act.getType(),
+					new ActivityUtilityParameters.Builder( actParams ).create() );
 		}
 
 		final CharyparNagelScoringParameters params =
-				CharyparNagelScoringParameters.getBuilder(dummyGroup).createCharyparNagelScoringParameters();
+				builder.createCharyparNagelScoringParameters();
 		individualParameters.put( person.getId() , params );
 		return params;
 	}
