@@ -212,7 +212,7 @@ class RoadInvestmentMain {
 				stateFactory, 5, maximumRelativeGap);
 
 		predictor.setLogFileName("road-investment-equil.txt");
-		predictor.setMemory(10);
+		predictor.setMemory(1);
 		predictor.setStartTime_s(5 * 60 * 60);
 		predictor.setBinSize_s(15 * 60);
 		predictor.setBinCnt(4 * 4);

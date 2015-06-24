@@ -1,7 +1,6 @@
 package opdytsintegration.roadinvestment;
 
-import opdytsintegration.MATSimPopulationState;
-import optdyts.SimulatorState;
+import opdytsintegration.MATSimState;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -13,17 +12,13 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  * 
  */
-public class RoadInvestmentState // implements
-									// SimulatorState<RoadInvestmentState> {
-									// extends
-									// MATSimPopulationState<RoadInvestmentState>
-		implements SimulatorState {
+public class RoadInvestmentState extends MATSimState {
 
 	// -------------------- CONSTANTS --------------------
 
-	private MATSimPopulationState populationState = null;
+//	private MATSimPopulationState populationState = null;
 
-	private Vector vectorRepresentation;
+//	private Vector vectorRepresentation;
 
 	private Double betaPay;
 
@@ -46,10 +41,11 @@ public class RoadInvestmentState // implements
 			final Vector vectorRepresentation, final Double betaPay,
 			final Double betaAlloc) {
 
-		this.populationState = new MATSimPopulationState(population);
+		super(population, vectorRepresentation);
+//		this.populationState = new MATSimPopulationState(population);
 		// super(population, rnd);
 
-		this.vectorRepresentation = vectorRepresentation.copy();
+//		this.vectorRepresentation = vectorRepresentation.copy();
 		this.betaPay = betaPay;
 		this.betaAlloc = betaAlloc;
 
@@ -111,10 +107,10 @@ public class RoadInvestmentState // implements
 //		return new RoadInvestmentState(this);
 //	}
 
-	@Override
-	public Vector getReferenceToVectorRepresentation() {
-		return this.vectorRepresentation;
-	}
+//	@Override
+//	public Vector getReferenceToVectorRepresentation() {
+//		return this.vectorRepresentation;
+//	}
 
 	// @Override
 	// @Deprecated
@@ -161,10 +157,10 @@ public class RoadInvestmentState // implements
 //		}
 //	}
 
-	@Override
-	public void implementInSimulation() {
-		this.populationState.implementInSimulation();
-	}
+//	@Override
+//	public void implementInSimulation() {
+//		this.populationState.implementInSimulation();
+//	}
 
 //	@Override
 //	public void releaseDeepMemory() {

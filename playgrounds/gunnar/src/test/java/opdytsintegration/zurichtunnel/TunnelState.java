@@ -1,7 +1,6 @@
 package opdytsintegration.zurichtunnel;
 
-import opdytsintegration.MATSimPopulationState;
-import optdyts.SimulatorState;
+import opdytsintegration.MATSimState;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -13,13 +12,13 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  * 
  */
-class TunnelState implements SimulatorState {
+class TunnelState extends MATSimState {
 
 	// -------------------- CONSTANTS --------------------
 
-	private final MATSimPopulationState populationState;
+	// private final MATSimPopulationState populationState;
 
-	private final Vector vectorRepresentation;
+	// private final Vector vectorRepresentation;
 
 	private final double avgScore;
 
@@ -27,8 +26,10 @@ class TunnelState implements SimulatorState {
 
 	TunnelState(final Population population, final Vector vectorRepresentation) {
 
-		this.populationState = new MATSimPopulationState(population);
-		this.vectorRepresentation = vectorRepresentation.copy();
+		super(population, vectorRepresentation);
+
+		// this.populationState = new MATSimPopulationState(population);
+		// this.vectorRepresentation = vectorRepresentation.copy();
 
 		// double totalScore = 0.0;
 		// int totalPlans = 0;
@@ -72,10 +73,10 @@ class TunnelState implements SimulatorState {
 	// return new TunnelState(this);
 	// }
 
-	@Override
-	public Vector getReferenceToVectorRepresentation() {
-		return this.vectorRepresentation;
-	}
+	// @Override
+	// public Vector getReferenceToVectorRepresentation() {
+	// return this.vectorRepresentation;
+	// }
 
 	// @Override
 	// public void takeOverConvexCombination(final List<TunnelState> states,
@@ -98,10 +99,10 @@ class TunnelState implements SimulatorState {
 	// }
 	// }
 
-	@Override
-	public void implementInSimulation() {
-		this.populationState.implementInSimulation();
-	}
+	// @Override
+	// public void implementInSimulation() {
+	// this.populationState.implementInSimulation();
+	// }
 
 	// @Override
 	// public void releaseDeepMemory() {
