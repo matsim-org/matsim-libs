@@ -16,12 +16,12 @@ import playground.singapore.ptsim.TransitSheduleToNetwork;
 public class PTLinkSpeedCalculatorWithPreCalcTimes implements LinkSpeedCalculator, AfterMobsimListener {
 
     private final boolean timesAreLogarithms;
+    private final double timeForMRTAccellerationAndDecelleration = 15;
     private StopStopTime stopStopTime = null;
-    private int totalCount=0;
+    private int totalCount = 0;
     private int errorCount = 0;
 
     /**
-     *
      * @param stopStopTime
      * @param timesAreLogarithms a signal that times are natural logarithms, indicating that variance is not null
      */
@@ -38,9 +38,13 @@ public class PTLinkSpeedCalculatorWithPreCalcTimes implements LinkSpeedCalculato
         if (parts.length == 2) {
             totalCount++;
             travelTime = stopStopTime.getStopStopTime(Id.create(parts[0], TransitStopFacility.class), Id.create(parts[1], TransitStopFacility.class), time);
-            if(timesAreLogarithms){
+            if (parts[0].matches("^[A-Z]+")) {//hotfix for mrt links that go too fast, assumes a simple acccelleration and decelleration
+                travelTime = link.getLength() / link.getFreespeed() + timeForMRTAccellerationAndDecelleration / 2;
+                travelTime = timesAreLogarithms ? Math.log(travelTime) : travelTime;
+            }
+            if (timesAreLogarithms) {
                 double variance = stopStopTime.getStopStopTimeVariance(Id.create(parts[0], TransitStopFacility.class), Id.create(parts[1], TransitStopFacility.class), time);
-                variance = Math.max(0.005,variance);
+                variance = Math.max(0.005, variance);
                 double r = MatsimRandom.getRandom().nextDouble();
                 try {
                     travelTime = new NormalDistributionImpl(travelTime, Math.sqrt(variance)).inverseCumulativeProbability(r);
@@ -70,9 +74,9 @@ public class PTLinkSpeedCalculatorWithPreCalcTimes implements LinkSpeedCalculato
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
         System.out.println("**************************************************");
-        System.out.println("total calls to speedcalc = "+getTotalCount()+", total errors = "+getErrorCount());
+        System.out.println("total calls to speedcalc = " + getTotalCount() + ", total errors = " + getErrorCount());
         System.out.println("**************************************************");
-        errorCount=0;
-        totalCount=0;
+        errorCount = 0;
+        totalCount = 0;
     }
 }
