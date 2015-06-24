@@ -142,7 +142,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 	 * methods.
 	 */
 	public int getVolumesArraySize() {
-		return this.maxSlotIndex - 1;
+		return this.maxSlotIndex + 1;
 	}
 	
 	/*
