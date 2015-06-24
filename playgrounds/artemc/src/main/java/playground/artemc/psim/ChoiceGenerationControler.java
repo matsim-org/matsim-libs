@@ -154,6 +154,7 @@ public class ChoiceGenerationControler implements BeforeMobsimListener {
 			}
 		});
 		controler.addControlerListener(this);
+        controler.run();
     }
 
 	public void run() {

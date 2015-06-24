@@ -49,7 +49,7 @@ public 	 class Trip extends TravelComponent {
 	}
 
 	public void setMode(String mode) {
-		this.mode = mode;
+		this.mode = mode.trim();
 	}
 
 	public double getDistance() {

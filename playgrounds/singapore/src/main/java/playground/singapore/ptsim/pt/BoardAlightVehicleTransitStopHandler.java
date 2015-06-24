@@ -24,7 +24,7 @@ public class BoardAlightVehicleTransitStopHandler implements TransitStopHandler 
 	private static final double openDoorsDuration = 1.0;
 	private static final double closeDoorsDuration = 1.0;
 	private static final double NON_UNIFORM_DOOR_OPERATION = 1.0;
-	private static final double ACC_DEC_DELAY = 8.0;
+	private static final double ACC_DEC_DELAY = 6.0;
 	
 	//Attributes
 	private TransitStopFacility lastHandledStop = new TransitScheduleFactoryImpl().createTransitStopFacility(Id.create("", TransitStopFacility.class), null, true);

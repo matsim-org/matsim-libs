@@ -23,8 +23,12 @@ package playground.singapore.ptsim;
 import com.google.inject.Provider;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculatorSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimePreCalcSerializable;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -65,7 +69,7 @@ public class ControlerWSPreCalcTimes {
         ConfigUtils.loadConfig(config, args[0]);
 
         final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-        final StopStopTime preloadedStopStopTimes = new StopStopTimePreCalcSerializable(args[1], controler.getScenario());
+        final StopStopTime preloadedStopStopTimes = new StopStopTimePreCalcSerializable(args[1], controler.getScenario(),true);
 
 //        final TravelTimeAndDistanceBasedTravelDisutilityFactory disutilityFactory =
 //                new TravelTimeAndDistanceBasedTravelDisutilityFactory();
@@ -78,12 +82,22 @@ public class ControlerWSPreCalcTimes {
 //        disutilityFactory.setSigma(0.3);
 //        controler.addOverridingModule(new RandomizedTransitRouterModule());
 
-        final WaitTimeCalculatorSerializable waitTimeCalculatorSerializable = new WaitTimeCalculatorSerializable(
+        final WaitTimeStuckCalculator waitTimeStuckCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(),
                 controler.getScenario().getTransitSchedule(),
                 controler.getScenario().getConfig());
+
+        final StopStopTimeCalculator stopStopTimeCalculatorSerializable = new StopStopTimeCalculator(
+                controler.getScenario().getTransitSchedule(),
+                controler.getScenario().getConfig());
+
         controler.getEvents().addHandler(
-                waitTimeCalculatorSerializable
+                waitTimeStuckCalculator
         );
+        controler.getEvents().addHandler(
+                stopStopTimeCalculatorSerializable
+        );
+        final PTLinkSpeedCalculatorWithPreCalcTimes linkSpeedCalculatorWithPreCalcTimes = new PTLinkSpeedCalculatorWithPreCalcTimes(preloadedStopStopTimes, true);
+        controler.addControlerListener(linkSpeedCalculatorWithPreCalcTimes);
         //
         controler.addOverridingModule(new AbstractModule() {
 
@@ -91,7 +105,7 @@ public class ControlerWSPreCalcTimes {
 
             public void install() {
                 bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(),
-                        waitTimeCalculatorSerializable.getWaitTimes(), preloadedStopStopTimes));
+                        waitTimeStuckCalculator.getWaitTimes(), stopStopTimeCalculatorSerializable.getStopStopTimes()));
 
                 bindMobsim().toProvider(new Provider<Mobsim>() {
 
@@ -112,7 +126,7 @@ public class ControlerWSPreCalcTimes {
                         qSim.addActivityHandler(activityEngine);
                         //
                         QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
-                        netsimEngine.setLinkSpeedCalculator(new PTLinkSpeedCalculatorWithPreCalcTimes(preloadedStopStopTimes));
+                        netsimEngine.setLinkSpeedCalculator(linkSpeedCalculatorWithPreCalcTimes);
                         qSim.addMobsimEngine(netsimEngine);
                         qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
                         //

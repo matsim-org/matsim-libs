@@ -523,7 +523,7 @@ public class EventsToTravelSummaryTables implements
 				IOUtils.getBufferedWriter(path + "/" + actTableName),
 				CsvPreference.STANDARD_PREFERENCE);
 		activityWriter.write("activity_id", "person_id", "facility_id", "type",
-				"start_time", "end_time", "sample_selector");
+				"start_time", "end_time","x","y", "sample_selector");
 
 		String journeyTableName = "matsim_journeys" + suffix + ".csv";
 		CsvListWriter journeyWriter = new CsvListWriter(
@@ -565,10 +565,12 @@ public class EventsToTravelSummaryTables implements
 							act.getFacility(), act.getType(),
 							new Integer((int) act.getStartTime()),
 							new Integer((int) act.getEndTime()),
+                            new Double(act.getCoord().getX()),
+                            new Double(act.getCoord().getY()),
 							new Double(Math.random()) };
 					activityWriter.write(args);
 				} catch (Exception e) {
-					System.out.println("HARK!");
+					System.out.println("Couldn't print activity chain!");
 					// System.err.println(act);
 					;
 				}

@@ -25,6 +25,12 @@ public class StopStopTimePreCalcSerializable implements StopStopTime, Serializab
 
     private final Map<String, Map<String, Map<Integer, Tuple<Double, Double>>>> stopStopTimes = new HashMap<>(5000);
     private final Scenario scenario;
+
+    public boolean isLogarithmic() {
+        return logarithmic;
+    }
+
+    private final boolean logarithmic;
     private int nfeCounter = 0;
     private int aiobCounter = 0;
     private int errorCounter = 0;
@@ -38,10 +44,12 @@ public class StopStopTimePreCalcSerializable implements StopStopTime, Serializab
      * Needs at minimum one record per stop-to-stop combination.
      * Times at which records are recorded needn't be regular intervals, because a TreeMap is used.
      *
-     * @param inputFile: path to the tab-separated file.Format is fromStopId (String), toStopId (String), time of record (seconds, double),
-     *                   travelTime (seconds, double), travelTimeVariance (seconds**2, double). No headings or row numbers.
+     * @param inputFile   path to the tab-separated file.Format is fromStopId (String), toStopId (String), time of record (seconds, double),
+     *                    travelTime (seconds, double), travelTimeVariance (seconds**2, double). No headings or row numbers.
+     * @param logarithmic if times are recorded as logarithms (normally distributed residuals)
      */
-    public StopStopTimePreCalcSerializable(String inputFile, Scenario scenario) {
+    public StopStopTimePreCalcSerializable(String inputFile, Scenario scenario, boolean logarithmic) {
+        this.logarithmic = logarithmic;
         this.scenario = scenario;
         BufferedReader reader = IOUtils.getBufferedReader(inputFile);
         String txt = "";
@@ -134,7 +142,10 @@ public class StopStopTimePreCalcSerializable implements StopStopTime, Serializab
                                 Link link = scenario.getNetwork().getLinks().get(id);
                                 freeSpeedTravelTime += link.getLength() / link.getFreespeed();
                             }
-                            timeData.put(0, new Tuple<Double, Double>(freeSpeedTravelTime,0.0));
+                            if (logarithmic)
+                                timeData.put(0, new Tuple<Double, Double>(Math.log(freeSpeedTravelTime), 0.005));
+                            else
+                                timeData.put(0, new Tuple<Double, Double>(freeSpeedTravelTime, 0.0));
 
                         } catch (NullPointerException ne) {
                             System.err.printf("Couldnt create STOP-STOP entry for for from: %s, to: %s, route: %s, line: %s\n",
