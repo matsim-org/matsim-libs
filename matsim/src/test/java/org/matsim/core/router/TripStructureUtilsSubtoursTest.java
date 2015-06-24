@@ -464,7 +464,7 @@ public class TripStructureUtilsSubtoursTest {
 					childSubtour2));
 	}
 
-	private Fixture createSingleTourComingFromSomewhereElse(boolean anchorAtFacilities) {
+	private static Fixture createSingleTourComingFromSomewhereElse(final boolean anchorAtFacilities) {
 		final PopulationFactory fact = createPopulationFactory();
 		final Plan plan = fact.createPlan();
 		Activity somewhereElse = createActivityFromLocationId(anchorAtFacilities, fact, "somewhere else", Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class));
@@ -481,8 +481,50 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg(leg3);
 		Activity home2 = createActivityFromLocationId(anchorAtFacilities, fact, "home", Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class));
 		plan.addActivity(home2);
-		Subtour subtour1 = new Subtour(Collections.singletonList(
-				new Trip(somewhereElse, Collections.<PlanElement>singletonList(leg1), home1)), false);
+		Subtour subtour1 = new Subtour(
+				Arrays.asList(
+					new Trip(somewhereElse, Collections.<PlanElement>singletonList(leg1), home1),
+					new Trip(home1, Collections.<PlanElement>singletonList(leg2), work),
+					new Trip(work, Collections.<PlanElement>singletonList(leg3), home2)),
+				false);
+		Subtour subtour2 = new Subtour(Arrays.asList(
+				new Trip(home1, Collections.<PlanElement>singletonList(leg2), work),
+				new Trip(work, Collections.<PlanElement>singletonList(leg3), home2)), true);
+		subtour2.parent = subtour1;
+		subtour1.children.add(subtour2);
+		return new Fixture(anchorAtFacilities, plan, Arrays.asList(
+				subtour1,
+				subtour2));
+	}
+
+	private static Fixture createSingleTourGoingToSomewhereElse(final boolean anchorAtFacilities) {
+		final PopulationFactory fact = createPopulationFactory();
+		final Plan plan = fact.createPlan();
+
+		Activity home1 = createActivityFromLocationId(anchorAtFacilities, fact, "home", Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		plan.addActivity(home1);
+		Leg leg2 = fact.createLeg("some mode");
+		plan.addLeg(leg2);
+
+		Activity work = createActivityFromLocationId(anchorAtFacilities, fact, "work", Id.create(3, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		plan.addActivity(work);
+		Leg leg3 = fact.createLeg("some mode");
+		plan.addLeg(leg3);
+
+		Activity home2 = createActivityFromLocationId(anchorAtFacilities, fact, "home", Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		plan.addActivity(home2);
+		Leg leg1 = fact.createLeg("some mode");
+		plan.addLeg(leg1);
+
+		Activity somewhereElse = createActivityFromLocationId(anchorAtFacilities, fact, "somewhere else", Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		plan.addActivity(somewhereElse);
+
+		Subtour subtour1 = new Subtour(
+				Arrays.asList(
+					new Trip(home1, Collections.<PlanElement>singletonList(leg2), work),
+					new Trip(work, Collections.<PlanElement>singletonList(leg3), home2),
+					new Trip(home2, Collections.<PlanElement>singletonList(leg1), somewhereElse)),
+				false);
 		Subtour subtour2 = new Subtour(Arrays.asList(
 				new Trip(home1, Collections.<PlanElement>singletonList(leg2), work),
 				new Trip(work, Collections.<PlanElement>singletonList(leg3), home2)), true);
@@ -727,7 +769,10 @@ public class TripStructureUtilsSubtoursTest {
 	}
 
 	@Test
-	public void testOpenPlan2() { performTest( createSingleTourComingFromSomewhereElse(useFacilitiesAsAnchorPoint));}
+	public void testTripFromSomewhereElse() { performTest( createSingleTourComingFromSomewhereElse(useFacilitiesAsAnchorPoint));}
+
+	@Test
+	public void testTripToSomewhereElse() { performTest( createSingleTourGoingToSomewhereElse(useFacilitiesAsAnchorPoint));}
 
 	private static void performTest(final Fixture fixture) {
 		final Collection<Subtour> subtours =

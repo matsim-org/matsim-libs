@@ -255,19 +255,14 @@ public class TripStructureUtils {
 		}
 
 		if (nonAllocatedTrips.size() != 0) {
-			// "open" plan
-			final Trip firstNonAllocated = nonAllocatedTrips.get( 0 );
-			final Trip lastNonAllocated = nonAllocatedTrips.get( nonAllocatedTrips.size() - 1 );
-
-			final int indexFirst = trips.indexOf( firstNonAllocated );
-			final int indexLast = trips.indexOf( lastNonAllocated ) + 1;
-
+			// "open" plan: the root is the sequence of all trips,
+			// even if it is not closed
 			addSubtourAndUpdateParents(
 					subtours,
 					new Subtour(
-						indexFirst,
-						indexLast,
-						new ArrayList<>( trips.subList( indexFirst , indexLast ) ),
+						0,
+						trips.size(),
+						new ArrayList<>( trips ),
 						false));
 		}
 
@@ -286,8 +281,8 @@ public class TripStructureUtils {
 			// the trips are parsed in sequence, so it is not possible
 			// that a existing subtour contains elements later than the
 			// end of the new subtour.
-//			assert existingSubtour.startIndex < newSubtour.endIndex;
-//			assert existingSubtour.endIndex < newSubtour.endIndex;
+			assert existingSubtour.startIndex < newSubtour.endIndex;
+			assert existingSubtour.endIndex <= newSubtour.endIndex;
 
 			existingSubtour.parent = newSubtour;
 			newSubtour.children.add( existingSubtour );
