@@ -20,6 +20,7 @@ package playground.agarwalamit.munich;
 
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -50,6 +51,7 @@ public class ExtendedPersonFilter extends PersonFilter {
 
 	public ExtendedPersonFilter (){
 		this.shapeFile = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		Logger.getLogger(ExtendedPersonFilter.class).info("Reading Munich city area shape file...");
 		this.munichFeatures = ShapeFileReader.getAllFeatures(this.shapeFile);
 	}
 
