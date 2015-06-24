@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunSiteVisitIdentifier.java                                                                        *
+ * WasteUtils.java
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,47 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 /**
  * 
  */
 package playground.jjoubert.projects.wasteCollection.dataHandling;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 /**
- * Class to run different instances of the {@link SiteVisitIdentifier} class.
+ * A few general utilities to use with the City of Cape Town waste collection
+ * data handling.
  * 
  * @author jwjoubert
  */
-public class RunSiteVisitIdentifier {
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-//		SiteVisitIdentifier.main(getOneDayArgumentsForMacMini());
-		SiteVisitIdentifier.main(getOneDayArgumentsForMacbook());
+public class WasteUtils {
+	
+	private WasteUtils() {
+		/* Hide the constructor. */
 	}
 	
-	
-	public static String[] getOneDayArgumentsForMacMini(){
-		String[] result = {
-				"/Users/jwjoubert/Documents/Projects/CapeTownWaste/data/waste.txt.gz",
-				"200000",
-				"/Users/jwjoubert/Documents/Projects/CapeTownWaste/wasteSiteCoordinates.csv",
-				"/Users/jwjoubert/Documents/Projects/CapeTownWaste/wasteSiteVisits.csv",
-		};
+	public static String convertGregorianCalendarToDate(GregorianCalendar cal){
+		String s = "";
 		
-		return result;
+		int year = cal.get(Calendar.YEAR);
+		int month = cal.get(Calendar.MONTH) + 1;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		
+		int hour = cal.get(Calendar.HOUR_OF_DAY);
+		int min = cal.get(Calendar.MINUTE);
+		int sec = cal.get(Calendar.SECOND);
+		
+		s = String.format("%02d/%02d/%04d %02d:%02d:%02d", day, month, year, hour, min, sec);
+		return s;
 	}
 
-	public static String[] getOneDayArgumentsForMacbook(){
-		String[] result = {
-				"/Users/jwjoubert/Downloads/wasteSample.txt",
-				"200000",
-				"/Volumes/Nifty/workspace/coct-data/WasteSiteCoordinates.csv",
-				"/Volumes/Nifty/workspace/coct-data/WasteSiteVisits.csv"
-		};
-		
-		return result;
-	}
-	
 }

@@ -22,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
@@ -45,7 +46,7 @@ import playground.southafrica.utilities.Header;
 public class SiteVisitIdentifier {
 	private final static Logger LOG = Logger.getLogger(SiteVisitIdentifier.class);
 	private final static Double DISTANCE_THRESHOLD = 50.0;
-	private final static Double MINUTE_THRESHOLD = 60.0;
+	private final static Double MINUTE_THRESHOLD = 120.0;
 	
 	private static CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
 	private Map<Id<Vehicle>, Map<String, List<GregorianCalendar>>> map = new TreeMap<Id<Vehicle>, Map<String, List<GregorianCalendar>>>();
@@ -87,30 +88,51 @@ public class SiteVisitIdentifier {
 			LOG.info(String.format("   \\_ %s (%.0f;%.0f)", site, coordMap.get(site).getX(), coordMap.get(site).getY()));
 		}
 		
-		new SiteVisitIdentifier().ProcessGpsRecords(gpsFile, maxLines);
-		
-		/* Write them alllll to file. */
-		BufferedWriter bw = IOUtils.getBufferedWriter(output);
-		try{
-			bw.write("VehId,date,dayOfWeek,site,arrivalTime");
-			bw.newLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot write to " + output);
-		} finally{
-			try {
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + output);
-			}
-		}
+		SiteVisitIdentifier svi = new SiteVisitIdentifier();
+		svi.ProcessGpsRecords(gpsFile, maxLines);
+		svi.writeSiteVisitsToFile(output);
 		
 		Header.printFooter();
 	}
 	
 	public SiteVisitIdentifier() {
 		// TODO Auto-generated constructor stub
+	}
+	
+	public void writeSiteVisitsToFile(String filename){
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		try{
+			bw.write("VehId,date,dayOfWeek,site");
+			bw.newLine();
+			
+			/* Convert each site visit to a line in the output. */
+			for(Id<Vehicle> vehicleId : map.keySet()){
+				Map<String, List<GregorianCalendar>> vehicleVisits = map.get(vehicleId);
+				for(String site : vehicleVisits.keySet()){
+					List<GregorianCalendar> visits = vehicleVisits.get(site);
+					for(GregorianCalendar visit : visits){
+						bw.write(convertVisitToString(vehicleId, site, visit));
+					}
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + filename);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + filename);
+			}
+		}
+	}
+	
+	private String convertVisitToString(Id<Vehicle> vehicleId, String site, GregorianCalendar cal){
+		String date = WasteUtils.convertGregorianCalendarToDate(cal);
+		int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
+		String s = String.format("%s,%s,%d,%s\n", vehicleId.toString(), date, dayOfWeek, site);
+		return s;
 	}
 	
 	public void processGpsRecords(String filename){
