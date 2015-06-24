@@ -177,15 +177,17 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			// used (for instance if individual preferences are ill-specified).
 			// This should become nicer once we have a better format for specifying
 			// utility parameters in the config.
-			ActivityParams actParams =  new ActivityParams( act.getType() );
+			final ActivityUtilityParameters.Builder typeBuilder =
+					new ActivityUtilityParameters.Builder(
+							config.getActivityParams( act.getType() ) );
 
 			final Double earliestEndTime =
 					(Double) personAttributes.getAttribute(
 						id,
 						"earliestEndTime_"+act.getType() );
 			if ( earliestEndTime != null ) {
-				actParams.setScoringThisActivityAtAll( true );
-				actParams.setEarliestEndTime( earliestEndTime );
+				typeBuilder.setScoreAtAll( true );
+				typeBuilder.setEarliestEndTime( earliestEndTime );
 			}
 
 			final Double latestStartTime =
@@ -193,8 +195,8 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 						id,
 						"latestStartTime_"+act.getType() );
 			if ( latestStartTime != null ) {
-				actParams.setScoringThisActivityAtAll( true );
-				actParams.setLatestStartTime( latestStartTime );
+				typeBuilder.setScoreAtAll( true );
+				typeBuilder.setLatestStartTime( latestStartTime );
 			}
 
 			final Double minimalDuration =
@@ -202,8 +204,8 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 						id,
 						"minimalDuration_"+act.getType() );
 			if ( minimalDuration != null ) {
-				actParams.setScoringThisActivityAtAll( true );
-				actParams.setMinimalDuration( minimalDuration );
+				typeBuilder.setScoreAtAll( true );
+				typeBuilder.setMinimalDuration( minimalDuration );
 			}
 
 			final Double typicalDuration =
@@ -211,13 +213,13 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 						id,
 						"typicalDuration_"+act.getType() );
 			if ( typicalDuration != null ) {
-				actParams.setScoringThisActivityAtAll( true );
-				actParams.setTypicalDuration( typicalDuration );
+				typeBuilder.setScoreAtAll( true );
+				typeBuilder.setTypicalDuration_s( typicalDuration );
 			}
 
 			builder.withActivityParameters(
 					act.getType(),
-					new ActivityUtilityParameters.Builder( actParams ).create() );
+					typeBuilder.create() );
 		}
 
 		final CharyparNagelScoringParameters params =
