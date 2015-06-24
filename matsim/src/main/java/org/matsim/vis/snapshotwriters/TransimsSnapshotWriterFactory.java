@@ -20,6 +20,7 @@
 
 package org.matsim.vis.snapshotwriters;
 
+import com.google.inject.Inject;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 import javax.inject.Named;
@@ -30,6 +31,7 @@ class TransimsSnapshotWriterFactory implements Provider<SnapshotWriter> {
 	private OutputDirectoryHierarchy controlerIO;
 	private final int iteration;
 
+	@Inject
 	TransimsSnapshotWriterFactory(OutputDirectoryHierarchy controlerIO, @Named("iteration") int iteration) {
 		this.iteration = iteration;
 		this.controlerIO = controlerIO;
