@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.population.Population;
 import floetteroed.utilities.math.Vector;
 
 /**
+ * A factory for MATSim simulation states.
  * 
  * @author Gunnar Flötteröd
  *
@@ -15,6 +16,9 @@ import floetteroed.utilities.math.Vector;
  *            the simulator state
  * @param <U>
  *            the decision variable type
+ * 
+ * @see SimulatorState
+ * @see DecisionVariable
  */
 public interface MATSimStateFactory<X extends SimulatorState, U extends DecisionVariable> {
 
