@@ -24,6 +24,7 @@
  */
 package optdyts;
 
+
 /**
  * Represents an objective function that maps a SimulatorState on a real-valued
  * number. The "better" the state the lower its objective function value.

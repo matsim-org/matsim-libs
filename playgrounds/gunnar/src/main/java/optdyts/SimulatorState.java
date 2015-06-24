@@ -1,3 +1,4 @@
+package optdyts;
 /*
  * Opdyts - Optimization of dynamic traffic simulations
  *
@@ -22,7 +23,7 @@
  * contact: gunnar.floetteroed@abe.kth.se
  *
  */
-package optdyts;
+
 
 import floetteroed.utilities.math.Vector;
 
