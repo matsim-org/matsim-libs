@@ -179,14 +179,16 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			// utility parameters in the config.
 			final ActivityUtilityParameters.Builder typeBuilder =
 					new ActivityUtilityParameters.Builder(
-							config.getActivityParams( act.getType() ) );
+							config.getActivityParams( act.getType() ) != null ?
+									config.getActivityParams( act.getType() ) :
+									new ActivityParams( act.getType() ) );
 
 			final Double earliestEndTime =
 					(Double) personAttributes.getAttribute(
 						id,
 						"earliestEndTime_"+act.getType() );
 			if ( earliestEndTime != null ) {
-				typeBuilder.setScoreAtAll( true );
+				typeBuilder.setScoreAtAll(true);
 				typeBuilder.setEarliestEndTime( earliestEndTime );
 			}
 
@@ -195,8 +197,8 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 						id,
 						"latestStartTime_"+act.getType() );
 			if ( latestStartTime != null ) {
-				typeBuilder.setScoreAtAll( true );
-				typeBuilder.setLatestStartTime( latestStartTime );
+				typeBuilder.setScoreAtAll(true);
+				typeBuilder.setLatestStartTime(latestStartTime);
 			}
 
 			final Double minimalDuration =
@@ -205,7 +207,7 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 						"minimalDuration_"+act.getType() );
 			if ( minimalDuration != null ) {
 				typeBuilder.setScoreAtAll( true );
-				typeBuilder.setMinimalDuration( minimalDuration );
+				typeBuilder.setMinimalDuration(minimalDuration);
 			}
 
 			final Double typicalDuration =
@@ -214,12 +216,12 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 						"typicalDuration_"+act.getType() );
 			if ( typicalDuration != null ) {
 				typeBuilder.setScoreAtAll( true );
-				typeBuilder.setTypicalDuration_s( typicalDuration );
+				typeBuilder.setTypicalDuration_s(typicalDuration);
 			}
 
 			builder.withActivityParameters(
 					act.getType(),
-					typeBuilder.create() );
+					typeBuilder.create());
 		}
 
 		final CharyparNagelScoringParameters params =
