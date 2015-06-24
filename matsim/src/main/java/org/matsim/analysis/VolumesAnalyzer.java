@@ -61,12 +61,12 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = (this.maxTime/this.timeBinSize) + 1;
-		this.links = new HashMap<Id<Link>, int[]>((int) (network.getLinks().size() * 1.1), 0.95f);
+		this.links = new HashMap<>((int) (network.getLinks().size() * 1.1), 0.95f);
 		
 		this.observeModes = observeModes;
 		if (this.observeModes) {
 			this.enRouteModes = new HashMap<>();
-			this.linksPerMode = new HashMap<Id<Link>, Map<String, int[]>>((int) (network.getLinks().size() * 1.1), 0.95f);
+			this.linksPerMode = new HashMap<>((int) (network.getLinks().size() * 1.1), 0.95f);
 		} else {
 			this.enRouteModes = null;
 			this.linksPerMode = null;
@@ -93,7 +93,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 		if (observeModes) {
 			Map<String, int[]> modeVolumes = this.linksPerMode.get(event.getLinkId());
 			if (modeVolumes == null) {
-				modeVolumes = new HashMap<String, int[]>();
+				modeVolumes = new HashMap<>();
 				this.linksPerMode.put(event.getLinkId(), modeVolumes);
 			}
 			String mode = enRouteModes.get(event.getPersonId());
@@ -134,6 +134,15 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 			if (modeVolumes != null) return modeVolumes.get(mode);
 		} 
 		return null;
+	}
+
+	/**
+	 *
+	 * @return The size of the arrays returned by calls to the {@link #getVolumesForLink(Id)} and the {@link #getVolumesForLink(Id, String)}
+	 * methods.
+	 */
+	public int getVolumesArraySize() {
+		return this.maxSlotIndex - 1;
 	}
 	
 	/*
@@ -207,7 +216,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 	 * @return Set of Strings containing all modes for which counting-values are available.
 	 */
 	public Set<String> getModes() {
-		Set<String> modes = new TreeSet<String>();
+		Set<String> modes = new TreeSet<>();
 		
 		for (Map<String, int[]> map : this.linksPerMode.values()) {
 			modes.addAll(map.keySet());
