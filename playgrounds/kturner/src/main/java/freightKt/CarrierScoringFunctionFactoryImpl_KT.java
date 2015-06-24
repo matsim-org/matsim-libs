@@ -1,7 +1,14 @@
 package freightKt;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -13,6 +20,9 @@ import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
+import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.jsprit.VehicleTypeDependentRoadPricingCalculator;
 import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.scoring.FreightActivity;
@@ -163,11 +173,13 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     static class ActivityScoring implements SumScoringFunction.ActivityScoring {
 
     	private static Logger log = Logger.getLogger(ActivityScoring.class);
+    	
 
 		private double score = 0. ;
 		private final double margUtlOfTime_s = 0.008 ;  //Wert aus Schröder/Liedtke 2014
     	
 		private Carrier carrier;
+		private List<ScheduledTour> correctedTours = new ArrayList<ScheduledTour>(); //TODO: Einbauen
 
 		ActivityScoring(Carrier carrier) {
 			super();
@@ -176,6 +188,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     	
     	//Added Activity Writer to log the Activities
 		WriteActivities activityWriter = new WriteActivities(new File(TEMP_DIR + "#ActivitiesForScoringInfor.txt")); //KT
+		WriteActivitiesInclScore activityWriterInclScore = new WriteActivitiesInclScore(new File(TEMP_DIR + "#ActivitiesForScoringInforInclScore.txt")); //KT
 		
 		@Override
 		public void finish() {
@@ -183,6 +196,11 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 			activityWriter.writeTextLineToFile("Activity Utils per s: " +"\t"+ margUtlOfTime_s +"\t"+ "Activity Utils per h: " +"\t"+ margUtlOfTime_s*3600);
 			activityWriter.writeActsToFile();
 			activityWriter.writeTextLineToFile(System.getProperty("line.separator"));
+			
+			activityWriterInclScore.writeCarrierLine(carrier);
+			activityWriterInclScore.writeTextLineToFile("Activity Utils per s: " +"\t"+ margUtlOfTime_s +"\t"+ "Activity Utils per h: " +"\t"+ margUtlOfTime_s*3600);
+			activityWriterInclScore.writeActsToFile();
+			activityWriterInclScore.writeTextLineToFile(System.getProperty("line.separator"));
 		}
 
 		@Override
@@ -193,6 +211,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 		@Override
 		public void handleFirstActivity(Activity act) {
 			activityWriter.addFirstActToWriter(act); 
+			activityWriterInclScore.addFirstActToWriter(act, 0.0);
 //			handleActivity(act);
 			//Am Start geschieht nichts; ggf kann man hier noch Bewertung für Beladung des Fzgs einfügen, KT 14.04.15
 			
@@ -200,43 +219,79 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 
 		@Override
 		public void handleActivity(Activity activity) {
-			activityWriter.addActToWriter(activity); 
-
-			// Entwurf von KN
+			double actCosts = 0;
 			if (activity instanceof FreightActivity) {
 				FreightActivity act = (FreightActivity) activity;
+				
+				actCosts = calcActCosts(act);		//costs for whole Activity, inkl waiting.
+				//Identify the first serviceActivity on tour and correct costs 
+				
+				//TODO: Sicherstellen, dass man richtigen Servie erwischt: Bisher nur grobe Zuordnung via Location, Zeitfenster und Act-Type.
+				//TODO: So umbauen, dass je ScheduledTour wirklich nur ein Element berücksichtigt wird. -> bisher nimmt er durch die Konstruktion jedes Element, da immer neue Abfrage :(
+				boolean isfirstAct = isFirstServiceAct(act);
+				if (isfirstAct){
+					actCosts -= correctFirstService(act);  //Ziehe die zuviel berechneten Kosten ab. 
+				}
+				
+				score += (-1) * actCosts;
+				activityWriter.addActToWriter(activity);
+				activityWriterInclScore.addActToWriter(activity, actCosts);
+			} else {
+				log.warn("Carrier activities which are not FreightActivities are not scored here: " + activity.toString()) ;
+			}			
+		}
+
+		private boolean isFirstServiceAct(FreightActivity act) {
+			boolean isfirstAct = false;
+			
+			for (ScheduledTour tour : carrier.getSelectedPlan().getScheduledTours() ){
+				if (!correctedTours.contains(tour)){
+					for (TourElement te : tour.getTour().getTourElements()) {
+						if (te instanceof  ServiceActivity){
+							ServiceActivity sa = (ServiceActivity) te;
+							if (sa.getLocation() == act.getLinkId()
+									&& sa.getTimeWindow() == act.getTimeWindow()
+									&& sa.getActivityType() == act.getType()){
+								isfirstAct = true;
+								correctedTours.add(tour);
+							}
+						}
+					}
+				}
+			}
+			return isfirstAct;
+		}
+
+		//Costs für Zeit von Begin bis Ende der Aktivität (enthält aktuell jun '15 auch Wartezeit bis Service beginnt)
+		private double calcActCosts(FreightActivity act) {
 				// deduct score for the time spent at the facility:
 				final double actStartTime = act.getStartTime();
 				final double actEndTime = act.getEndTime();
-				score -= (actEndTime - actStartTime) * this.margUtlOfTime_s ;
-
-				//From KN: Penalty for missing TimeWindow --> (KT) Überarbeiten, überlegen ob und wie es bewertet wird.
-				//KT: zu früh (Waiting-Costs) wird genauso bewertet (Lohnkosten des Fahrers) -> 0.008 EUR/s
-				final double windowStartTime = act.getTimeWindow().getStart();
-//				final double windowEndTime = act.getTimeWindow().getEnd();   //aktuell nicht verwendet, KT 14.04.15
-
-				final double penalty = this.margUtlOfTime_s; // per second!
-				if ( actStartTime < windowStartTime ) {
-					score -= penalty * ( windowStartTime - actStartTime ) ;
-					// mobsim could let them wait ... but this is also not implemented for regular activities. kai, nov'13
-					//aktuell warten Sie die Zeit "vor dem Tor" ab und beginnen Service dann pünktlich mit der Öffnung.
+				return (actEndTime - actStartTime) * this.margUtlOfTime_s ;
+		}
+		
+		//Korrigiert den Score bei der ersten Service-Aktivität (Wartezeit, da bereits zu Beginn der Depotöffnung losgefahren)
+		//indem diese Zeit wieder mit einem positiven Wert gegengerechnet wird
+		private double correctFirstService(FreightActivity act){
+			final double actStartTime = act.getStartTime();
+			final double windowStartTime = act.getTimeWindow().getStart();
+				if ( actStartTime < windowStartTime ) {	//Fahrzeug vor Öffnungszeit angekommen.
+					return ( windowStartTime - actStartTime ) * this.margUtlOfTime_s ;
 				}
-//				if ( windowEndTime < actEndTime ) { //Doppelbewertung der Zeit (weitere Strafe) zunächst raus, da bei Schroeder/Lietdke nicht vorgesehen. KT, 14.04.15
-//					score -= penalty * ( actEndTime - windowEndTime ) ;
-//				}
-				// (note: provide penalties that work with a gradient to help the evol algo. kai, nov'13)
-
-			} else {
-				log.warn("Carrier activities which are not FreightActivities are not scored here") ;
-			}
+				else {
+					return 0.0;
+			} 
 		}
 
 		@Override
 		public void handleLastActivity(Activity act) {
-			activityWriter.addLastActToWriter(act); 			
+			activityWriter.addLastActToWriter(act); 	
+			activityWriterInclScore.addLastActToWriter(act, null);
 			handleActivity(act);
 			// no penalty for everything that is after the last act (people don't work)		
 		}
+		
+		
     	
     }  //End Class ActivityScoring
     

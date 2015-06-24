@@ -63,6 +63,7 @@ import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import java.io.File;
@@ -94,58 +95,58 @@ public class KTFreight_v3 {
 
 	private static final Logger log = Logger.getLogger(KTFreight_v3.class) ;
 
-		//Beginn Namesdefinition KT Für Berlin-Szenario 
-		private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/" ;
-		private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Berlin/aldi/ucc_toll2/" ;
-		private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/";
-	
-		//Dateinamen ohne XML-Endung
-		private static final String NETFILE_NAME = "network" ;
-		private static final String VEHTYPES_NAME = "vehicleTypes" ;
-		private static final String CARRIERS_NAME = "carrierLEH_v2_withFleet" ;
-		private static final String ALGORITHM_NAME = "grid-algorithm" ;
-		private static final String TOLL_NAME = "toll_cordon";		//Zur Mautberechnung
-		private static final String LEZ_NAME = "toll_area";  //Zonendefinition (Links) für anhand eines Maut-Files
-		
-		
-		//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
-		private static final String uccC_prefix = "UCC_";	
-
-		//All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if Carrier should be used.
-		private static final ArrayList<String> retailerNames = 
-				new ArrayList<String>(Arrays.asList("aldi")); 
-		//Location of UCC
-		private static final ArrayList<String> uccDepotsLinkIdsString = 
-				new ArrayList<String>(Arrays.asList("6874", "3058", "5468")); 
-		//TODO: VehicleTypes die vom Maut betroffen seien sollen.
-		private static final ArrayList<String> tolledVehTypes = 
-				new ArrayList<String>(Arrays.asList("heavy40t", "heavy26t", "heavy26t_frozen", "medium18t", "light8t", "light8t_frozen")); 
-		//Ende  Namesdefinition Berlin
-
-
-//	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
-//	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-//	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/UCC_Test_Ucc2/" ;
-//	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
+//		//Beginn Namesdefinition KT Für Berlin-Szenario 
+//		private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/" ;
+//		private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Berlin/aldi/ucc_toll2/" ;
+//		private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/";
+//	
+//		//Dateinamen ohne XML-Endung
+//		private static final String NETFILE_NAME = "network" ;
+//		private static final String VEHTYPES_NAME = "vehicleTypes" ;
+//		private static final String CARRIERS_NAME = "carrierLEH_v2_withFleet" ;
+//		private static final String ALGORITHM_NAME = "grid-algorithm" ;
+//		private static final String TOLL_NAME = "toll_cordon";		//Zur Mautberechnung
+//		private static final String LEZ_NAME = "toll_area";  //Zonendefinition (Links) für anhand eines Maut-Files
+//		
+//		
+//		//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
+//		private static final String uccC_prefix = "UCC-";	
 //
-//	//Dateinamen ohne XML-Endung
-//	private static final String NETFILE_NAME = "grid-network" ;
-//	private static final String VEHTYPES_NAME = "grid-vehTypes_kt" ;
-//	private static final String CARRIERS_NAME = "grid-carrier_kt" ;
-//	private static final String ALGORITHM_NAME = "grid-algorithm" ;
-//	private static final String TOLL_NAME = "grid-tollCordon";
-//	private static final String LEZ_NAME = "grid-tollCordon"; 
-//	//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
-//	private static final String uccC_prefix = "UCC_";		
-//	// All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if Carrier should be used.
-//	private static final ArrayList<String> retailerNames 
-//		= new ArrayList<String>(Arrays.asList("gridCarrier1", "gridCarrier3")); 
-//	//Location of UCC
-//	private static final ArrayList<String> uccDepotsLinkIdsString =
-//		new ArrayList<String>(Arrays.asList("j(0,5)", "j(10,5)")); 
+//		//All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if Carrier should be used.
+//		private static final ArrayList<String> retailerNames = 
+//				new ArrayList<String>(Arrays.asList("aldi")); 
+//		//Location of UCC
+//		private static final ArrayList<String> uccDepotsLinkIdsString = 
+//				new ArrayList<String>(Arrays.asList("6874", "3058", "5468")); 
 //		//TODO: VehicleTypes die vom Maut betroffen seien sollen.
-//	private static final ArrayList<String> tolledVehTypes = 
-//		new ArrayList<String>(Arrays.asList("gridType01", "gridType05", "gridType10")); 
+//		private static final ArrayList<String> tolledVehTypes = 
+//				new ArrayList<String>(Arrays.asList("heavy40t", "heavy26t", "heavy26t_frozen", "medium18t", "light8t", "light8t_frozen")); 
+//		//Ende  Namesdefinition Berlin
+
+
+	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
+	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/UCC_Test_Ucc6/" ;
+	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
+
+	//Dateinamen ohne XML-Endung
+	private static final String NETFILE_NAME = "grid-network" ;
+	private static final String VEHTYPES_NAME = "grid-vehTypes_kt" ;
+	private static final String CARRIERS_NAME = "grid-carrier_kt" ;
+	private static final String ALGORITHM_NAME = "grid-algorithm" ;
+	private static final String TOLL_NAME = "grid-tollCordon";
+	private static final String LEZ_NAME = "grid-tollCordon"; 
+	//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
+	private static final String uccC_prefix = "UCC-";		
+	// All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if Carrier should be used.
+	private static final ArrayList<String> retailerNames 
+		= new ArrayList<String>(Arrays.asList("gridCarrier1", "gridCarrier3")); 
+	//Location of UCC
+	private static final ArrayList<String> uccDepotsLinkIdsString =
+		new ArrayList<String>(Arrays.asList("j(0,5)", "j(10,5)")); 
+		//TODO: VehicleTypes die vom Maut betroffen seien sollen.
+	private static final ArrayList<String> tolledVehTypes = 
+		new ArrayList<String>(Arrays.asList("gridType01", "gridType05", "gridType10")); 
 
 //	//Ende Namesdefinition Grid
 
@@ -194,7 +195,7 @@ public class KTFreight_v3 {
 
 	//### KT 03.12.2014 multiple run for testing the variety of the jsprit solutions (especially in terms of costs). 
 	private static void multipleRun (String[] args){	
-		System.out.println("#### Starting Run: " + runIndex + "of: "+ NU_OF_TOTAL_RUNS);
+		System.out.println("#### Starting Run: " + runIndex + " of: "+ NU_OF_TOTAL_RUNS);
 		createDir(new File(OUTPUT_DIR + RUN + runIndex));
 		createDir(new File(TEMP_DIR));	
 		
@@ -270,7 +271,8 @@ public class KTFreight_v3 {
 			new WriteCarrierScoreInfos(uccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_UCC.txt"), runIndex);
 
 			nonUccCarriers = uccCarrierCreator.createServicesToUCC(uccCarriers, nonUccCarriers); // Nachfrage den der UCCC ausliefert muss an die Umschlagpunkte geliefert werden. 
-
+			//TODO: DepotÖffnungszeiten der normalen Carrier anpassen, damit UCC rechtzeitig beliefert werden können.
+			
 			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_NonUCC_vor" + RUN + runIndex+".xml") ;
 			generateCarrierPlans(scenario.getNetwork(), nonUccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die NonUCC-Carriers
 			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_NonUCC" + RUN + runIndex+".xml") ;
@@ -472,7 +474,7 @@ public class KTFreight_v3 {
 		//Damit alle Carrier die Maut erfahren --> noch unsauber, da auf die einzelnen Vehicles genommen werden --> doppelte Einträge. KT 23.10.14
 		for(Carrier c : carriers.getCarriers().values()){
 			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
-				Id typeId = v.getVehicleId();
+				Id<Vehicle> typeId = v.getVehicleId();
 				if (tolledVehTypes.contains(typeId.toString())){
 					rpCalculator.addPricingScheme(typeId.toString(), scheme);
 				}
