@@ -41,7 +41,7 @@ public class VisualizationUtils {
 	private VisualizationUtils(){} // do not instantiate
 
 	
-	static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent, String workingDirectory) {
+	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent, String workingDirectory) {
 		// create Mapnik file that is needed to have OSM layer in QGis project
 		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
 
@@ -108,7 +108,7 @@ public class VisualizationUtils {
 	 * @param mode
 	 * @param osName
 	 */
-	static void createSnapshot(String workingDirectory, Modes4Accessibility mode, String osName) {
+	public static void createSnapshot(String workingDirectory, Modes4Accessibility mode, String osName) {
 
 		//TODO adapt this method so that maps for different modes are created.
 
