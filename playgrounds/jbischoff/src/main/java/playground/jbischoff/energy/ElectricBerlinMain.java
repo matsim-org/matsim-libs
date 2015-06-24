@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
@@ -126,7 +125,7 @@ public class ElectricBerlinMain {
 	
 	
 	public void run(){
-		c.addOverridingModule(new OTFVisModule());
+//		c.addOverridingModule(new OTFVisModule());
 
 		c.getConfig().controler().setOverwriteFileSetting(
 				true ?
