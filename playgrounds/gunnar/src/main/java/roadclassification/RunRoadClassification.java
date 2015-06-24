@@ -32,6 +32,7 @@ import java.util.Set;
 import opdytsintegration.MATSimDecisionVariableSetEvaluator;
 import optdyts.ObjectiveFunction;
 
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,6 +40,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
+import org.matsim.counts.Counts;
 
 public class RunRoadClassification {
 
@@ -71,13 +73,25 @@ public class RunRoadClassification {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+
+		// >>>>> TODO >>>>>
+		final Counts counts = null; // TODO can one somehow get this out of the scenario?
+		final VolumesAnalyzer volumesAnalyzer = new VolumesAnalyzer(3600,
+				24 * 3600, scenario.getNetwork());
+
+		// event.getControler().getVolumes()
+
+		// <<<<< TODO <<<<<
+
 		final Controler controler = new Controler(scenario);
-		final RoadClassificationStateFactory stateFactory = new RoadClassificationStateFactory();
-		final ObjectiveFunction<RoadClassificationState> objectiveFunction = new RoadClassificationObjectiveFunction();
-		final Set<AbstractRoadClassificationDecisionVariable> decisionVariables = new LinkedHashSet<>();
+		final RoadClassificationStateFactory<RoadClassificationDecisionVariable> stateFactory = new RoadClassificationStateFactory<RoadClassificationDecisionVariable>(
+				volumesAnalyzer, counts.getCounts().keySet());
+		final ObjectiveFunction<RoadClassificationState> objectiveFunction = new RoadClassificationObjectiveFunction(
+				counts);
+		final Set<RoadClassificationDecisionVariable> decisionVariables = new LinkedHashSet<>();
 
-		decisionVariables.add(new AbstractRoadClassificationDecisionVariable(
-				scenario.getNetwork()) {
+		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
+				.getNetwork()) {
 			@Override
 			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
 				// default capacities
@@ -109,8 +123,8 @@ public class RunRoadClassification {
 
 			}
 		});
-		decisionVariables.add(new AbstractRoadClassificationDecisionVariable(
-				scenario.getNetwork()) {
+		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
+				.getNetwork()) {
 			@Override
 			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
 				// Derived capacities (from triangular fundamental diagram)
@@ -142,8 +156,8 @@ public class RunRoadClassification {
 			}
 		});
 
-		decisionVariables.add(new AbstractRoadClassificationDecisionVariable(
-				scenario.getNetwork()) {
+		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
+				.getNetwork()) {
 			@Override
 			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
 				// default capacities
@@ -175,8 +189,8 @@ public class RunRoadClassification {
 
 			}
 		});
-		decisionVariables.add(new AbstractRoadClassificationDecisionVariable(
-				scenario.getNetwork()) {
+		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
+				.getNetwork()) {
 			@Override
 			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
 				// Derived capacities (from triangular fundamental diagram)
@@ -208,8 +222,8 @@ public class RunRoadClassification {
 			}
 		});
 
-		decisionVariables.add(new AbstractRoadClassificationDecisionVariable(
-				scenario.getNetwork()) {
+		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
+				.getNetwork()) {
 			@Override
 			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
 				// default capacities
@@ -241,8 +255,8 @@ public class RunRoadClassification {
 
 			}
 		});
-		decisionVariables.add(new AbstractRoadClassificationDecisionVariable(
-				scenario.getNetwork()) {
+		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
+				.getNetwork()) {
 			@Override
 			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
 				// Derived capacities (from triangular fundamental diagram)
@@ -274,8 +288,8 @@ public class RunRoadClassification {
 			}
 		});
 
-		decisionVariables.add(new AbstractRoadClassificationDecisionVariable(
-				scenario.getNetwork()) {
+		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
+				.getNetwork()) {
 			@Override
 			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
 				// default capacities
@@ -307,8 +321,8 @@ public class RunRoadClassification {
 
 			}
 		});
-		decisionVariables.add(new AbstractRoadClassificationDecisionVariable(
-				scenario.getNetwork()) {
+		decisionVariables.add(new RoadClassificationDecisionVariable(scenario
+				.getNetwork()) {
 			@Override
 			void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
 				// Derived capacities (from triangular fundamental diagram)
@@ -344,10 +358,10 @@ public class RunRoadClassification {
 
 		// final double convergenceNoiseVarianceScale = 0.01;
 		final double maximumRelativeGap = 0.05;
-		
-		final MATSimDecisionVariableSetEvaluator<RoadClassificationState, AbstractRoadClassificationDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadClassificationState, AbstractRoadClassificationDecisionVariable>(
+
+		final MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable>(
 				decisionVariables, objectiveFunction,
-				// convergenceNoiseVarianceScale, 
+				// convergenceNoiseVarianceScale,
 				stateFactory, 5, maximumRelativeGap);
 		predictor.setLogFileName("roadclassification-log.txt");
 		predictor.setMemory(1);

@@ -10,6 +10,7 @@ import optdyts.ObjectiveFunction;
 import optdyts.SimulatorState;
 import optdyts.algorithms.DecisionVariableSetEvaluator;
 
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -17,7 +18,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import floetteroed.utilities.DynamicData;
 import floetteroed.utilities.math.Vector;
 
 /**
@@ -47,9 +47,9 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 
 	// PARAMETERS
 
-	private int startTime_s = 0;
-
 	private int binSize_s = 3600;
+
+	private int startBin = 0;
 
 	private int binCnt = 24;
 
@@ -59,11 +59,11 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 
 	// RUNTIME VARIABLES
 
-	private LinkOutflowCollectingEventHandler handler = null;
+	private VolumesAnalyzer volumesAnalyzer;
 
 	private SortedSet<Id<Link>> sortedLinkIds = null;
 
-	private final LinkedList<DynamicData<Id<Link>>> dataList = new LinkedList<DynamicData<Id<Link>>>();
+	private final LinkedList<Vector> stateList = new LinkedList<Vector>();
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -126,23 +126,6 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 	}
 
 	/**
-	 * The earliest time (in seconds) at which the simulated conditions in
-	 * MATSim affect the evaluation of a decision variable. Setting this
-	 * parameter tightly may save a lot of computer memory.
-	 * <p>
-	 * The corresponding end time (exclusive, in seconds, also recommended to be
-	 * set tightly) is computed as
-	 * <code>getStartTime() + getBinSize_s() * getBinCnt()</code>.
-	 */
-	public void setStartTime_s(final int startTime_s) {
-		this.startTime_s = startTime_s;
-	}
-
-	public int getStartTime_s() {
-		return startTime_s;
-	}
-
-	/**
 	 * The time discretization (in seconds) according to which the simulated
 	 * conditions in MATSim affect the evaluation of a decision variable.
 	 * 
@@ -156,6 +139,20 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 		return binSize_s;
 	}
 
+
+	/**
+	 * The earliest time bin in which the simulated conditions in MATSim affect
+	 * the evaluation of a decision variable. Setting this parameter tightly may
+	 * save a lot of computer memory.
+	 */
+	public void setStartBin(final int startBin) {
+		this.startBin = startBin;
+	}
+
+	public int getStartBin() {
+		return this.startBin;
+	}
+	
 	/**
 	 * The number of time bins within which the simulated conditions in MATSim
 	 * affect the evaluation of a decision variable.
@@ -174,27 +171,17 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 
 	private boolean isInitialized = false;
 
-	private DynamicData<Id<Link>> newDynamicData() {
-		final DynamicData<Id<Link>> result = new DynamicData<Id<Link>>(
-				this.startTime_s, this.binSize_s, this.binCnt);
-		this.dataList.addFirst(result);
-		while (this.dataList.size() < this.memory) {
-			this.dataList.addFirst(result);
-		}
-		while (this.dataList.size() > this.memory) {
-			this.dataList.removeLast();
-		}
-		return result;
-	}
-
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		if (!this.isInitialized) {
 			this.sortedLinkIds = new TreeSet<Id<Link>>(event.getControler()
 					.getScenario().getNetwork().getLinks().keySet());
-			this.handler = new LinkOutflowCollectingEventHandler(
-					this.newDynamicData());
-			event.getControler().getEvents().addHandler(this.handler);
+
+			this.volumesAnalyzer = new VolumesAnalyzer(this.binSize_s,
+					this.binSize_s * (this.startBin + this.binCnt), event
+							.getControler().getScenario().getNetwork());
+			event.getControler().getEvents().addHandler(this.volumesAnalyzer);
+
 			this.evaluator.initialize();
 			this.isInitialized = true;
 		}
@@ -202,36 +189,48 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		final Vector newStateVector;
-		if (this.averageMemory) {
-			newStateVector = new Vector(this.sortedLinkIds.size()
-					* this.dataList.get(0).getBinCnt());
-			for (DynamicData<Id<Link>> data : this.dataList) {
-				int i = 0;
-				for (Id<Link> id : this.sortedLinkIds) {
-					for (int bin = 0; bin < data.getBinCnt(); bin++) {
-						newStateVector.add(i++, data.getBinValue(id, bin)
-								/ this.memory);
+		{
+			final Vector newInstantaneousState = new Vector(
+					this.sortedLinkIds.size() * this.binCnt);
+			int i = 0;
+			for (Id<Link> linkId : this.sortedLinkIds) {
+				final int[] volumes = this.volumesAnalyzer
+						.getVolumesForLink(linkId);
+				if (volumes == null) {
+					for (int j = this.startBin; j < (this.startBin + this.binCnt); j++) {
+						newInstantaneousState.set(i++, 0.0);
+					}
+				} else {
+					for (int j = this.startBin; j < (this.startBin + this.binCnt); j++) {
+						newInstantaneousState.set(i++, volumes[j]);
 					}
 				}
 			}
-		} else {
-			newStateVector = new Vector(this.sortedLinkIds.size()
-					* this.dataList.get(0).getBinCnt() * this.memory);
-			int i = 0;
-			for (DynamicData<Id<Link>> data : this.dataList) {
-				for (Id<Link> id : this.sortedLinkIds) {
-					for (int bin = 0; bin < data.getBinCnt(); bin++) {
-						newStateVector.add(i++, data.getBinValue(id, bin));
-					}
-				}
+			this.stateList.addFirst(newInstantaneousState);
+			while (this.stateList.size() < this.memory) {
+				this.stateList.addFirst(newInstantaneousState);
+			}
+			while (this.stateList.size() > this.memory) {
+				this.stateList.removeLast();
 			}
 		}
-		final X newState = this.stateFactory.newState(event.getControler()
-				.getScenario().getPopulation(), newStateVector,
-				this.evaluator.getCurrentDecisionVariable());
-		this.evaluator.afterIteration(newState);
 
-		this.handler.setDynamicData(this.newDynamicData());
+		{
+			final Vector newSummaryState;
+			if (this.averageMemory) {
+				newSummaryState = this.stateList.getFirst().copy();
+				for (int i = 1; i < this.memory; i++) {
+					newSummaryState.add(this.stateList.get(i));
+				}
+				newSummaryState.mult(1.0 / this.memory);
+			} else {
+				newSummaryState = Vector.concat(this.stateList);
+				System.out.println(newSummaryState);
+			}
+			final X newState = this.stateFactory.newState(event.getControler()
+					.getScenario().getPopulation(), newSummaryState,
+					this.evaluator.getCurrentDecisionVariable());
+			this.evaluator.afterIteration(newState);
+		}
 	}
 }

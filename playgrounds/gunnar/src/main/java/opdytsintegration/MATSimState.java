@@ -20,9 +20,6 @@ import floetteroed.utilities.math.Vector;
  * extent this state is given by the plan choice set of all agents, possibly
  * including scores and information about the selected plan.
  * 
- * TODO Switch from Person to that person's Id as a unique identifier? Need
- * something that is stable across iterations.
- * 
  * @author Gunnar Flötteröd
  * 
  * @see SimulatorState
@@ -80,7 +77,7 @@ public abstract class MATSimState implements SimulatorState {
 			final List<? extends Plan> fromPlanList) {
 		final List<Plan> toPlanList = new ArrayList<Plan>(fromPlanList.size());
 		for (Plan fromPlan : fromPlanList) {
-			// TODO Kai says that this is not ideal but the only existing way.
+			// Michael Z. says that this is the right way to do this.
 			final PlanImpl toPlan = new PlanImpl(fromPlan.getPerson());
 			toPlan.copyFrom(fromPlan);
 			toPlanList.add(toPlan);

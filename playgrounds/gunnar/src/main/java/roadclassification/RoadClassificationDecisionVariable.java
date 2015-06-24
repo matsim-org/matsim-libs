@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-abstract class AbstractRoadClassificationDecisionVariable implements DecisionVariable {
+class RoadClassificationDecisionVariable implements DecisionVariable {
 
 	private Network network;
 
-	public AbstractRoadClassificationDecisionVariable(Network network) {
+	public RoadClassificationDecisionVariable(final Network network) {
 		this.network = network;
 	}
 
@@ -25,7 +25,9 @@ abstract class AbstractRoadClassificationDecisionVariable implements DecisionVar
 	 * This is where concrete implementations configure the osmNetworkReader.
 	 *
 	 */
-	abstract void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader);
+	void doSetHighwayDefaults(OsmNetworkReader osmNetworkReader) {
+		throw new UnsupportedOperationException(); // TODO!
+	}
 
 	@Override
 	public final void implementInSimulation() {

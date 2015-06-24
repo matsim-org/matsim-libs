@@ -205,17 +205,17 @@ class RoadInvestmentMain {
 
 		// final double convergenceNoiseVarianceScale = 0.001;
 		final double maximumRelativeGap = 0.05;
-		
+
 		final MATSimDecisionVariableSetEvaluator<RoadInvestmentState, RoadInvestmentDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadInvestmentState, RoadInvestmentDecisionVariable>(
 				decisionVariables, objectiveFunction,
-				// convergenceNoiseVarianceScale, 
+				// convergenceNoiseVarianceScale,
 				stateFactory, 5, maximumRelativeGap);
 
 		predictor.setLogFileName("road-investment-equil.txt");
 		predictor.setMemory(1);
-		predictor.setStartTime_s(5 * 60 * 60);
-		predictor.setBinSize_s(15 * 60);
-		predictor.setBinCnt(4 * 4);
+		predictor.setBinSize_s(10 * 60);
+		predictor.setStartBin(6 * 5);
+		predictor.setBinCnt(6 * 20);
 		controler.addControlerListener(predictor);
 		controler.run();
 

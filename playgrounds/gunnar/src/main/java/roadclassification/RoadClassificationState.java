@@ -1,26 +1,39 @@
 package roadclassification;
 
+import java.util.Map;
+
+import opdytsintegration.MATSimState;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 
 import floetteroed.utilities.math.Vector;
-import opdytsintegration.MATSimState;
 
-public class RoadClassificationState extends
-		MATSimState {
+/**
+ * 
+ * @author Gunnar Flötteröd
+ *
+ */
+class RoadClassificationState extends MATSimState {
 
-	public RoadClassificationState(Population population,
-			Vector vectorRepresentation) {
+	// -------------------- MEMBERS --------------------
+	
+	private final Map<Id<Link>, int[]> linkId2simulatedCounts;
+
+	// -------------------- CONSTRUCTION --------------------
+	
+	RoadClassificationState(final Population population,
+			final Vector vectorRepresentation,
+			final Map<Id<Link>, int[]> linkId2simulatedCounts) {
 		super(population, vectorRepresentation);
+		this.linkId2simulatedCounts = linkId2simulatedCounts;
 	}
 
-	@Override
-	public Vector getReferenceToVectorRepresentation() {
-		return super.getReferenceToVectorRepresentation();
-	}
-
-	@Override
-	public void implementInSimulation() {
-		super.implementInSimulation();
+	// -------------------- GETTERS --------------------
+	
+	Map<Id<Link>, int[]> getLinkId2simulatedCounts() {
+		return this.linkId2simulatedCounts;
 	}
 
 }
