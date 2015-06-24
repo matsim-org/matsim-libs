@@ -30,8 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
-import playground.agarwalamit.analysis.congestion.CongestionPersonAnalyzer;
-import playground.agarwalamit.munich.analysis.LinkTollFromExternalCosts;
+import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -53,18 +52,20 @@ public class CongestionPricingComperator {
 		eventsFile = runDir+pricingScenario+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 	}
 
-	private int noOfTimeBins = 5;
+	private int noOfTimeBins = 30;
 	private String eventsFile ;
 	private double simulationEndTime;
 	private String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies/";
 	private Scenario scenario;
 	private String pricingScenario;
+	private final boolean isSortingForInsideMunich = true;
 	
 
 	private final PersonFilter pf = new PersonFilter();
 	
 	public static void main(String[] args) {
 		CongestionPricingComperator analyzer = new CongestionPricingComperator("implV3");
+//		analyzer.writeExperiecedAndCausingPersonDelay();
 		analyzer.writeAverageLinkTolls();
 		analyzer.writeHourlyCausedDelayForEachPerson();
 	}
@@ -130,7 +131,7 @@ public class CongestionPricingComperator {
 				/ (config.planCalcScore().getMarginalUtilityOfMoney());
 		
 		
-		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBins);
+		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBins,true); // only Munich city area
 		delayAnalyzer.run();
 		
 		SortedMap<Double, Map<Id<Link>, Double>> timeBin2LinkId2Delay = delayAnalyzer.getTimeBin2LinkId2Delay();
@@ -166,7 +167,7 @@ public class CongestionPricingComperator {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		CongestionPersonAnalyzer personAnalyzer = new CongestionPersonAnalyzer(eventsFile, noOfTimeBin);
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, noOfTimeBin,isSortingForInsideMunich);
 		personAnalyzer.init(scenario);
 		personAnalyzer.preProcessData();
 		personAnalyzer.postProcessData();
@@ -174,7 +175,7 @@ public class CongestionPricingComperator {
 	}
 	
 	private SortedMap<Double, Map<Id<Person>, Double>> getCausingPersonDelay(int noOfTimeBin){
-		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBin);
+		CausedDelayAnalyzer delayAnalyzer = new CausedDelayAnalyzer(eventsFile, scenario, noOfTimeBin,isSortingForInsideMunich);
 		delayAnalyzer.run();
 		return delayAnalyzer.getTimeBin2CausingPersonId2Delay();
 	}

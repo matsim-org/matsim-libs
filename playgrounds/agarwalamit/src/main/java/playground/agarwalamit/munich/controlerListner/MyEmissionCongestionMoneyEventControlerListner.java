@@ -33,7 +33,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.congestion.CongestionPerPersonHandler;
+import playground.agarwalamit.analysis.congestion.ExperiencedDelayHandler;
 import playground.benjamin.internalization.EmissionCostModule;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MoneyEventHandler;
 
@@ -58,7 +58,7 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 	private EmissionCostModule emissionCostModule;
 
 	private MoneyEventHandler moneyHandler;
-	private CongestionPerPersonHandler congestionCostHandler;
+	private ExperiencedDelayHandler congestionCostHandler;
 	private EmissionModule emissionModule;
 	private EmissionCostsCollector emissCostHandler;
 	private double vtts_car;
@@ -70,7 +70,7 @@ public class MyEmissionCongestionMoneyEventControlerListner implements StartupLi
 
 		this.emissCostHandler = new EmissionCostsCollector(emissionCostModule);
 		this.moneyHandler = new MoneyEventHandler();
-		this.congestionCostHandler = new CongestionPerPersonHandler(1, scenario);
+		this.congestionCostHandler = new ExperiencedDelayHandler(1, scenario);
 
 		event.getControler().getEvents().addHandler(congestionCostHandler);
 		event.getControler().getEvents().addHandler(moneyHandler);

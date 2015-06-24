@@ -33,7 +33,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.congestion.CongestionPersonAnalyzer;
+import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -91,7 +91,7 @@ public class ExperiencedDelaysUserGroup {
 		for(String runCase:runCases){
 			init(runCase);
 			String eventFile = this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz";//"/events.xml";//
-			CongestionPersonAnalyzer personAnalyzer = new CongestionPersonAnalyzer(eventFile, 1);
+			ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventFile, 1);
 			personAnalyzer.init(this.scenario);
 			personAnalyzer.preProcessData();
 			personAnalyzer.postProcessData();

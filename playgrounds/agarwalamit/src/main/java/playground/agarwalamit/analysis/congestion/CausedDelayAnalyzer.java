@@ -23,13 +23,16 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
+import playground.agarwalamit.munich.ExtendedPersonFilter;
 import playground.vsp.congestion.events.CongestionEvent;
 import playground.vsp.congestion.events.CongestionEventsReader;
 import playground.vsp.congestion.handlers.CongestionEventHandler;
@@ -47,11 +50,16 @@ public class CausedDelayAnalyzer {
 		this.eventsFile = eventsFile;
 		handler = new CausedDelayHandler(scenario, noOfTimeBin);
 	}
+	
+	public CausedDelayAnalyzer(String eventsFile, Scenario scenario, int noOfTimeBin,boolean sortingForInsideMunich) {
+		this.eventsFile = eventsFile;
+		handler = new CausedDelayHandler(scenario, noOfTimeBin, sortingForInsideMunich);
+	}
 
 	private CongestionEventsReader reader;
 	private CausedDelayHandler handler;
 	private String eventsFile;
-
+	
 	public void run(){
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -79,7 +87,21 @@ public class CausedDelayAnalyzer {
 		public CausedDelayHandler(Scenario scenario, int noOfTimeBin) {
 			double simulatioEndTime = scenario.getConfig().qsim().getEndTime();
 			this.timeBinSize = simulatioEndTime /noOfTimeBin;
+			this.network = scenario.getNetwork();
 
+			initialize(noOfTimeBin, scenario);
+		}
+		
+		public CausedDelayHandler(Scenario scenario, int noOfTimeBin, boolean sortingForInsideMunich) {
+			double simulatioEndTime = scenario.getConfig().qsim().getEndTime();
+			this.timeBinSize = simulatioEndTime /noOfTimeBin;
+			this.network = scenario.getNetwork();
+			this.isSortingForInsideMunich = sortingForInsideMunich;
+			
+			initialize(noOfTimeBin, scenario);
+		}
+		
+		private void initialize(int noOfTimeBin, Scenario scenario) {
 			for (int i=0;i<noOfTimeBin;i++){
 				this.timeBin2Link2DelayCaused.put(this.timeBinSize*(i+1), new HashMap<Id<Link>,Double>());
 				this.timeBin2Person2DelayCaused.put(this.timeBinSize*(i+1), new HashMap<Id<Person>,Double>());
@@ -87,7 +109,7 @@ public class CausedDelayAnalyzer {
 
 				Map<Id<Link>,Double> link2del = this.timeBin2Link2DelayCaused.get(this.timeBinSize*(i+1));
 				Map<Id<Link>, Integer> link2CausingPersonCount = this.timeBin2Link2PersonCount.get(this.timeBinSize*(i+1));
-				for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
+				for (Id<Link> linkId : this.network.getLinks().keySet()){
 					link2del.put(linkId, 0.);
 					link2CausingPersonCount.put(linkId, 0);
 				}
@@ -99,13 +121,15 @@ public class CausedDelayAnalyzer {
 			}
 		}
 
+		private boolean isSortingForInsideMunich = false;
 		private Map<Id<Person>, Double> personId2DelayCaused = new HashMap<>();
 		private Map<Id<Link>, Double> linkId2DelayCaused = new HashMap<>();
 		private final double timeBinSize;
 		private SortedMap<Double,Map<Id<Link>,Double>> timeBin2Link2DelayCaused = new TreeMap<Double, Map<Id<Link>,Double>>();
 		private SortedMap<Double,Map<Id<Link>,Integer>> timeBin2Link2PersonCount = new TreeMap<Double, Map<Id<Link>,Integer>>();
 		private SortedMap<Double,Map<Id<Person>,Double>> timeBin2Person2DelayCaused = new TreeMap<Double, Map<Id<Person>,Double>>();
-
+		private Network network;
+		
 		@Override
 		public void reset(int iteration) {
 			this.personId2DelayCaused.clear();
@@ -125,6 +149,12 @@ public class CausedDelayAnalyzer {
 			if(endOfTimeInterval<=0.0)endOfTimeInterval=this.timeBinSize;
 
 			Id<Link> linkId = event.getLinkId();
+			
+			Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
+			ExtendedPersonFilter pf = new ExtendedPersonFilter();
+			
+			if(isSortingForInsideMunich && (!pf.isCellInsideMunichCityArea(linkCoord))) return;
+			
 			Id<Person> causingAgentId = event.getCausingAgentId();
 
 			//person count

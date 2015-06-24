@@ -38,7 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.agarwalamit.analysis.congestion.CongestionPerLinkHandler;
+import playground.agarwalamit.analysis.congestion.ExperiencedDelayHandler;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
@@ -49,7 +49,7 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.old.SpatialAvera
  */
 public class SpatialAveragingCongestion {
 	private final Logger logger = Logger.getLogger(SpatialAveragingCongestion.class);
-	private CongestionPerLinkHandler congestionPerLinkHandler;
+	private ExperiencedDelayHandler congestionPerLinkHandler;
 	final double scalingFactor = 1.;
 	private final static String runDir = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
 	private final static String runBAU = runDir+"/baseCaseCtd";
@@ -314,7 +314,7 @@ public class SpatialAveragingCongestion {
 	private void processCongestions(String eventFile) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
-		this.congestionPerLinkHandler = new CongestionPerLinkHandler(noOfTimeBins, simulationEndTime, scenario);
+		this.congestionPerLinkHandler = new ExperiencedDelayHandler(noOfTimeBins, scenario);
 		eventsManager.addHandler(this.congestionPerLinkHandler);
 		eventsReader.readFile(eventFile);
 	}

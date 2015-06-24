@@ -80,13 +80,12 @@ public class AbsoluteDelays  {
 
 		String configFile = outputDir+runCase+"/output_config.xml";
 		String networkFile = outputDir+runCase+"/output_network.xml.gz";
-		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
 		int lastIt = LoadMyScenarios.getLastIteration(configFile);
 		String eventFile = outputDir+runCase+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";		
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 
-		CongestionLinkAnalyzer congestionHandler = new CongestionLinkAnalyzer(simEndTime, eventFile, 1);
+		ExperiencedDelayAnalyzer congestionHandler = new ExperiencedDelayAnalyzer(eventFile, 1);
 		congestionHandler.run(sc);
 
 		return congestionHandler.getTotalDelaysInHours();

@@ -30,7 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
-import playground.agarwalamit.analysis.congestion.CongestionPersonAnalyzer;
+import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.CrossMarginalCongestionEventsWriter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
@@ -172,7 +172,7 @@ public class BAUDelayAnalyzer {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		CongestionPersonAnalyzer personAnalyzer = new CongestionPersonAnalyzer(eventsFile, noOfTimeBin);
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, noOfTimeBin);
 		personAnalyzer.init(scenario);
 		personAnalyzer.preProcessData();
 		personAnalyzer.postProcessData();
