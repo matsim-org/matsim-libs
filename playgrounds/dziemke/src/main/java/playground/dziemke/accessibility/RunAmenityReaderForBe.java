@@ -54,13 +54,21 @@ public class RunAmenityReaderForBe {
 	 */
 	public static void main(String[] args) {
 		LOG.info("Parsing amenity facilities from OpenStreetMap.");
-		String osmFile = args[0];
-		String facilityFile = args[1];
-		String attributeFile = args[2];
-		String coordinateTransformation = "WGS84";
-		if(args.length > 3){
-			coordinateTransformation = args[3];
-		}
+//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/2015-05-26_berlin.osm";
+//		String facilityFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/facilities_amenities.xml";
+//		String attributeFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/facilitiy_attributes_amenities.xml";
+		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/2015-06-24_schlesische_str.osm";
+		String facilityFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/facilities_amenities.xml";
+		String attributeFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/facilitiy_attributes_amenities.xml";
+		String coordinateTransformation = "EPSG:31468";		
+		
+//		String osmFile = args[0];
+//		String facilityFile = args[1];
+//		String attributeFile = args[2];
+//		String coordinateTransformation = "WGS84";
+//		if(args.length > 3){
+//			coordinateTransformation = args[3];
+//		}
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", coordinateTransformation);
 		AmenityReader msr = new AmenityReader(osmFile, ct, buildOsmToMatsimTypeMap());

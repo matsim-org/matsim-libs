@@ -29,10 +29,11 @@ import org.matsim.contrib.accessibility.osm.LandUseReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.Facility;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class RunLandUseReaderForXY {
-	final private static Logger LOG = Logger.getLogger(RunLandUseReaderForXY.class);
+public class RunLandUseReaderForBe {
+	final private static Logger LOG = Logger.getLogger(RunLandUseReaderForBe.class);
 
 	/**
 	 * Implementing the {@link LandUseReader} class. 
@@ -51,13 +52,18 @@ public class RunLandUseReaderForXY {
 	 */
 	public static void main(String[] args) {
 		LOG.info("Parsing land use from OpenStreetMap.");
-		String osmFile = args[0];
-		String facilityFile = args[1];
-		String attributeFile = args[2];
-		String coordinateTransformation = "WGS84";
-		if(args.length > 3){
-			coordinateTransformation = args[3];
-		}
+		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/2015-06-24_schlesische_str.osm";
+		String facilityFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/facilities_landuse.xml";
+		String attributeFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/facilitiy_attributes_landuse.xml";
+		String coordinateTransformation = "EPSG:31468";
+		
+//		String osmFile = args[0];
+//		String facilityFile = args[1];
+//		String attributeFile = args[2];
+//		String coordinateTransformation = "WGS84";
+//		if(args.length > 3){
+//			coordinateTransformation = args[3];
+//		}
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", coordinateTransformation);
 		LandUseReader landUseReader = new LandUseReader(osmFile, ct, buildOsmToMatsimTypeMap());
