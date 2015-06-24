@@ -28,6 +28,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.DgPaths;
 import scenarios.braess.analysis.TtBraessControlerListener;
+import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes;
 import scenarios.braess.createInput.TtCreateBraessPopulation;
 
 /**
@@ -56,19 +57,6 @@ public class RunBraessSimulation {
 	// initial score for all initial plans
 	private final Double INIT_PLAN_SCORE = 110.;
 	
-	/* network parameter */
-	// capacity at all links that are not
-	private final long CAP_MAIN = 1800; // [veh/h]
-	// capacity at the links that all agents have to use
-	private final long CAP_FIRST_LAST = 3600; // [veh/h]
-	private final long LINK_LENGTH = 200; // [m]
-	// link length for the inflow links
-	private final double LINK_LENGTH_INFLOW = 7.5; // [m]
-	// if true, link 2_3 and 4_5 are divided into 2 links: a small one at the
-	// beginning that simulates an inflow capacity at the link and a longer one
-	// that preserves the other properties of the link
-	private final boolean SIMULATE_INFLOW_CAP = true;
-	
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
 	private final double SIGMA = 0.0;	
@@ -80,7 +68,7 @@ public class RunBraessSimulation {
 		// prepare config and scenario		
 		Config config = defineConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		adaptNetwork(scenario);
+		createNetwork(scenario);
 		createPopulation(scenario);
 		createRunNameAndOutputDir(scenario);
 		if (config.scenario().isUseSignalSystems()){
@@ -121,11 +109,8 @@ public class RunBraessSimulation {
 	private Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
 
-		// set network and lane properties
-		config.network().setInputFile(INPUT_DIR + "basicNetwork.xml");
-		config.scenario().setUseLanes( false );
-		config.network().setLaneDefinitionsFile(
-				INPUT_DIR + "lanes" + CAP_MAIN + "-" + CAP_FIRST_LAST + ".xml");
+		// choose whether lanes should be used or not
+		config.scenario().setUseLanes( true );
 
 		// set number of iterations
 		config.controler().setLastIteration( 100 );
@@ -218,113 +203,13 @@ public class RunBraessSimulation {
 		return config;
 	}
 
-	private void adaptNetwork(Scenario scenario) {	
-		Network net = scenario.getNetwork();
-
-		// adapt link capacity, link length and travel time		
-		for (Link l : net.getLinks().values()) {
-			double linkTT = 0.0;
-			
-			switch (l.getId().toString()){
-			case "0_1":
-			case "1_2":
-			case "5_6":
-				l.setCapacity(CAP_FIRST_LAST);
-				l.setLength(LINK_LENGTH);
-				linkTT = 1;
-				break;
-			case "2_3":
-			case "4_5":
-				l.setCapacity(CAP_MAIN);
-				l.setLength(LINK_LENGTH);
-				linkTT = 10;
-				break;
-			case "2_4":
-			case "3_5":
-				l.setCapacity(CAP_MAIN);
-				l.setLength(LINK_LENGTH);
-				linkTT = 20;
-				break;
-			case "3_4":
-				l.setCapacity(CAP_MAIN);
-				l.setLength(LINK_LENGTH);
-				linkTT = 1;
-			}
-			// set travel time by adapting free speed
-			l.setFreespeed(l.getLength() / linkTT);
-		}
-	
-		// extend network, if inflow capacity should be simulated
-		if (SIMULATE_INFLOW_CAP) {
-			NetworkFactory fac = net.getFactory();
-
-			// create new nodes
-			net.addNode(fac.createNode(Id.createNodeId(7),
-					scenario.createCoord(250, 250)));
-//			net.addNode(fac.createNode(Id.createNodeId(8),
-//					scenario.createCoord(250, 150)));
-			net.addNode(fac.createNode(Id.createNodeId(9), 
-					scenario.createCoord(450, 50)));
-
-			// remove former links
-			net.getLinks().get(Id.createLinkId("2_3")).setFreespeed(0.01);
-//			net.getLinks().get(Id.createLinkId("2_4")).setFreespeed(0.01);
-			net.getLinks().get(Id.createLinkId("4_5")).setFreespeed(0.01);
-
-			// create new links
-			Link l = fac.createLink(Id.createLinkId("2_7"),
-					net.getNodes().get(Id.createNodeId(2)),
-					net.getNodes().get(Id.createNodeId(7)));
-			l.setCapacity(CAP_MAIN);
-			l.setLength(LINK_LENGTH_INFLOW);
-			double linkTT = 1;
-			l.setFreespeed(l.getLength() / linkTT);
-			net.addLink(l);
-			
-			l = fac.createLink(Id.createLinkId("7_3"),
-					net.getNodes().get(Id.createNodeId(7)),
-					net.getNodes().get(Id.createNodeId(3)));
-			l.setCapacity(CAP_MAIN);
-			l.setLength(LINK_LENGTH);
-			linkTT = 9;
-			l.setFreespeed(l.getLength() / linkTT);
-			net.addLink(l);
-
-//			l = fac.createLink(Id.createLinkId("2_8"),
-//					net.getNodes().get(Id.createNodeId(2)),
-//					net.getNodes().get(Id.createNodeId(8)));
-//			l.setCapacity(CAP_MAIN);
-//			l.setLength(LINK_LENGTH_SHORT);
-//			linkTT = 1;
-//			l.setFreespeed(l.getLength() / linkTT);
-//			net.addLink(l);
-//			
-//			l = fac.createLink(Id.createLinkId("8_4"),
-//					net.getNodes().get(Id.createNodeId(8)),
-//					net.getNodes().get(Id.createNodeId(4)));
-//			l.setCapacity(CAP_MAIN);
-//			l.setLength(LINK_LENGTH);
-//			linkTT = 19;
-//			l.setFreespeed(l.getLength() / linkTT);
-//			net.addLink(l);
-			
-			l = fac.createLink(Id.createLinkId("4_9"),
-					net.getNodes().get(Id.createNodeId(4)),
-					net.getNodes().get(Id.createNodeId(9)));
-			l.setCapacity(CAP_MAIN);
-			l.setLength(LINK_LENGTH_INFLOW);
-			linkTT = 1;
-			l.setFreespeed(l.getLength() / linkTT);
-			net.addLink(l);
-			
-			l = fac.createLink(Id.createLinkId("9_5"),
-					net.getNodes().get(Id.createNodeId(9)),
-					net.getNodes().get(Id.createNodeId(5)));
-			l.setCapacity(CAP_MAIN);
-			l.setLength(LINK_LENGTH);
-			linkTT = 9;
-			l.setFreespeed(l.getLength() / linkTT);
-			net.addLink(l);
+	private void createNetwork(Scenario scenario) {	
+		
+		TtCreateBraessNetworkAndLanes netCreator = new TtCreateBraessNetworkAndLanes(scenario);
+		netCreator.createNetwork();
+		
+		if (scenario.getConfig().scenario().isUseLanes()){
+			netCreator.createLanes();
 		}
 	}
 
@@ -368,10 +253,10 @@ public class RunBraessSimulation {
 		runName += "_ttMid" + middleLink.getLength()
 				/ middleLink.getFreespeed() + "s";
 
-		if (LINK_LENGTH != 200)
-			runName += "_l" + LINK_LENGTH + "m";
+		if (middleLink.getLength() != 200)
+			runName += "_l" + middleLink.getLength() + "m";
 		
-		if (SIMULATE_INFLOW_CAP)
+		if (scenario.getNetwork().getNodes().containsKey(Id.createNodeId(7)))
 			runName += "_inflowCapZ";
 		
 		StrategySettings[] strategies = config.strategy().getStrategySettings()
@@ -393,10 +278,7 @@ public class RunBraessSimulation {
 					+ config.planCalcScore().getMonetaryDistanceCostRateCar();
 
 		if (config.scenario().isUseLanes()) {
-			String[] lanesInfoSplit = config.network().getLaneDefinitionsFile()
-					.split("\\.")[0].split("/");
-			String lanesFileName = lanesInfoSplit[lanesInfoSplit.length - 1];
-			runName += "_" + lanesFileName;
+			runName += "_lanes";
 		}
 
 		if (config.controler().isLinkToLinkRoutingEnabled())
