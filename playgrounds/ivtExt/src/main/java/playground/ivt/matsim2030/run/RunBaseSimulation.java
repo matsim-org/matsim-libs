@@ -59,9 +59,7 @@ public class RunBaseSimulation {
 
 		final Controler controler = new Controler( scenario );
 		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 		Matsim2030Utils.initializeLocationChoice( controler );
 		controler.setTripRouterFactory(
