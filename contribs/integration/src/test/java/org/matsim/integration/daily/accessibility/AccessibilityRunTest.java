@@ -16,7 +16,6 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -29,7 +28,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -51,13 +49,14 @@ public class AccessibilityRunTest {
 		System.out.println("class input directory = " + utils.getClassInputDirectory());
 		System.out.println("input directory = " + utils.getInputDirectory());
 
-		String folderStructure = "../../../"; // local
+		String folderStructure = "../../"; // local
+//		String folderStructure = "../../../"; // server
 			
 		String networkFile = folderStructure + "matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
-		String minibusPtTravelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
-		String minibusPtTravelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
-		String measuringPointsAsPtStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/measuringPointsAsStops/stops.csv.gz";
+//		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
+//		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
+//		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/measuringPointsAsStops/stops.csv.gz";
 
 //		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
@@ -89,10 +88,10 @@ public class AccessibilityRunTest {
 		
 //		scenario.getConfig().scenario().setUseTransit(true);
 		
-		mbpcg.setUsingTravelTimesAndDistances(true);
-		mbpcg.setPtStopsInputFile(measuringPointsAsPtStops);
-		mbpcg.setPtTravelTimesInputFile(minibusPtTravelTimeMatrix);
-		mbpcg.setPtTravelDistancesInputFile(minibusPtTravelDistanceMatrix);
+//		mbpcg.setUsingTravelTimesAndDistances(true);
+//		mbpcg.setPtStopsInputFile(ptStops);
+//		mbpcg.setPtTravelTimesInputFile(travelTimeMatrix);
+//		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrix);
 		
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
         
@@ -183,7 +182,7 @@ public class AccessibilityRunTest {
         // choose map view a bit bigger
         double[] mapViewExtent = {100000,-3720000,180000,-3675000};
 			
-		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
+//		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
 		// end new
 		
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
@@ -192,6 +191,7 @@ public class AccessibilityRunTest {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+//		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
@@ -217,15 +217,15 @@ public class AccessibilityRunTest {
 			activityFacilitiesMap.put(actType, opportunities);
 
 			GridBasedAccessibilityControlerListenerV3 listener = 
-//					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
-					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
+					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
+//					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
 				
 			// define the mode that will be considered
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+//			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 				
 			listener.addAdditionalFacilityData(homes) ;
 			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
@@ -237,59 +237,23 @@ public class AccessibilityRunTest {
 			controler.addControlerListener(listener);
 		}
 
-	controler.run();
+		controler.run();
 			
-	String workingDirectory =  config.controler().getOutputDirectory();
+		String workingDirectory =  config.controler().getOutputDirectory();
 	
-	Utils.createQGisOutput(activityTypes, mapViewExtent, workingDirectory);
-	}
-
+		String osName = System.getProperty("os.name");
 	
-	/**
-	 * This method creates a snapshot of the accessibility map that is held in the created QGis file.
-	 * The syntax within the method is different dependent on the operating system.
-	 * 
-	 * @param workingDirectory The directory where the QGisProjectFile (the data source of the to-be-created snapshot) is stored
-	 * @param mode
-	 * @param osName
-	 */
-	static void createSnapshot(String workingDirectory, Modes4Accessibility mode, String osName) {
+		for (String actType : activityTypes) {
+			String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
 		
-		//TODO adapt this method so that maps for different modes are created.
-		
-		// if OS is Windows
-		// example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
-		if ( osName.contains("Win") || osName.contains("win")) {
-			// On Windows, the PATH variables need to be set correctly to be able to call "qgis.bat" on the command line
-			// This needs to be done manually. It does not seem to be set automatically when installing QGis
-			String cmd = "qgis.bat " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
-					" --snapshot " + workingDirectory + "snapshot_" + mode + ".png";
-
-			String stdoutFileName = workingDirectory + "snapshot_" + mode + ".log";
-			int timeout = 99999;
-
-			ExeRunner.run(cmd, stdoutFileName, timeout);
-		
-		// if OS is Macintosh
-		// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
-		} else if ( osName.contains("Mac") || osName.contains("mac") ) {
-			String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
-					" --snapshot " + workingDirectory + "snapshot_" + mode + ".png";
-
-					String stdoutFileName = workingDirectory + "snapshot_" + mode + ".log";
-			
-			int timeout = 99999;
-
-			ExeRunner.run(cmd, stdoutFileName, timeout);
-		
-		// if OS is Linux
-		// example (benjamin) // os.arch=amd64 // os.name=Linux	// os.version=3.13.0-45-generic
-		//} else if ( osName.contains("Lin") || osName.contains("lin") ) {
-			// TODO for linux
-			
-		// if OS is other
-		} else {
-			log.warn("generating png files not implemented for os.arch=" + System.getProperty("os.arch") );
+			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
+				if ( !actType.equals("w") ) {
+					AccessibilityRunTest.log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+					continue ;
+				}
+				VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory);
+				VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+			}
 		}
 	}
 }
