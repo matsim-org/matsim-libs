@@ -31,7 +31,7 @@ import playground.dgrether.DgPaths;
  * 
  * Choose the number of persons you like to simulate, 
  * their starting times and their initial routes 
- * before running this class or calling the method createPersons(...)
+ * before calling the method createPersons(...)
  * 
  * @author tthunig
  */
@@ -39,6 +39,8 @@ public class TtCreateBraessPopulation {
 
 	private Population population;
 	private Network network;
+	
+	private int numberOfPersons;
 	
 	private boolean simulateInflowCap7 = false;
 	private boolean simulateInflowCap8 = false;
@@ -70,88 +72,42 @@ public class TtCreateBraessPopulation {
 		if (this.network.getNodes().containsKey(Id.createNodeId(9)))
 			this.simulateInflowCap9 = true;
 	}
-
-	/**
-	 * @param args
-	 *            not used
-	 */
-	public static void main(String[] args) {
-
-		int numberOfPersons = 60;
-		boolean sameStartTime = true;
-		boolean createAllRoutes = false;
-
-		String outputDir = DgPaths.SHAREDSVN
-				+ "projects/cottbus/data/scenarios/braess_scenario/";
-
-		String popOutputFile = outputDir + "plans" + numberOfPersons;
-		if (sameStartTime)
-			popOutputFile += "SameStartTime";
-		if (createAllRoutes) {
-			popOutputFile += "AllRoutes";
-		}
-		popOutputFile += ".xml";
-
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(outputDir + "basicNetwork.xml");
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Network network = scenario.getNetwork();
-		Population pop = PopulationUtils.createPopulation(config, network);
-
-		TtCreateBraessPopulation creator = new TtCreateBraessPopulation(pop,
-				network);
-		creator.createPersons(numberOfPersons, sameStartTime, createAllRoutes);
-		creator.writePersons(popOutputFile);
-	}
-
-	public void writePersons(String popOutputFile) {
-		new PopulationWriter(population, network).write(popOutputFile);
-	}
 	
 	/**
-	 * Calls createPersons(int, boolean, int, Double) with an initial plan
+	 * Calls createPersons(int, Double) with an initial plan
 	 * score of null.
 	 * 
-	 * @param numberOfPersons
-	 * @param sameStartTime
 	 * @param numberOfInitRoutes
 	 */
-	public void createPersons(int numberOfPersons, boolean sameStartTime,
-			int numberOfInitRoutes) {
+	public void createPersons(int numberOfInitRoutes) {
 		
-		createPersons(numberOfPersons, sameStartTime, numberOfInitRoutes, null);
+		createPersons(numberOfInitRoutes, null);
 	}
 	
 	/**
-	 * Calls createPersons(int, boolean, boolean, Double) with an initial plan
+	 * Calls createPersons(boolean, Double) with an initial plan
 	 * score of null.
 	 * 
-	 * @param numberOfPersons
-	 * @param sameStartTime
 	 * @param createAllRoutes
 	 */
-	public void createPersons(int numberOfPersons, boolean sameStartTime,
-			boolean createAllRoutes) {
+	public void createPersons(boolean createAllRoutes) {
 		
-		createPersons(numberOfPersons, sameStartTime, createAllRoutes, null);
+		createPersons(createAllRoutes, null);
 	}
 	
 	/**
-	 * Calls createPersons(int, boolean, int) with the correct number of initial
+	 * Calls createPersons(int, int) with the correct number of initial
 	 * routes.
 	 * 
-	 * @param numberOfPersons
-	 * @param sameStartTime
 	 * @param createAllRoutes
 	 * @param initPlanScore
 	 */
-	public void createPersons(int numberOfPersons, boolean sameStartTime,
-			boolean createAllRoutes, Double initPlanScore) {
+	public void createPersons(boolean createAllRoutes, Double initPlanScore) {
 		
 		if (createAllRoutes)
-			createPersons(numberOfPersons, sameStartTime, 3, initPlanScore);
+			createPersons(3, initPlanScore);
 		else
-			createPersons(numberOfPersons, sameStartTime, 0, initPlanScore);
+			createPersons(0, initPlanScore);
 	}
 
 	/**
@@ -159,8 +115,7 @@ public class TtCreateBraessPopulation {
 	 * persons travel from the left to the right through the network as in
 	 * Braess's original paradox.
 	 * 
-	 * If sameStartTime is true, all agents start their trip at 8 am. If not,
-	 * the agents start after each other in one second gaps, the first one at 8
+	 * All agents start after each other in one second gaps, the first one at 8
 	 * am.
 	 * 
 	 * If numberOfInitRoutes is zero, all agents are initialized with no initial
@@ -168,15 +123,12 @@ public class TtCreateBraessPopulation {
 	 * scenario, whereby every second agent gets the upper and every other agent
 	 * the lower route as initial selected route.
 	 * 
-	 * @param numberOfPersons
-	 * @param sameStartTime
 	 * @param numberOfInitRoutes
 	 *            number of routes that the agents get as initial plans
 	 * @param initPlanScore
 	 *            initial score for all plans the persons will get
 	 */
-	public void createPersons(int numberOfPersons, boolean sameStartTime,
-			int numberOfInitRoutes, Double initPlanScore) {
+	public void createPersons(int numberOfInitRoutes, Double initPlanScore) {
 		
 		for (int i = 0; i < numberOfPersons; i++) {
 
@@ -188,13 +140,10 @@ public class TtCreateBraessPopulation {
 			// add a start activity at link 0_1
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy", Id.createLinkId("0_1"));
-			if (sameStartTime) {
-				// 8:00 am.
-				startAct.setEndTime(8 * 3600);
-			} else {
-				// 8:00 am. plus i seconds
-				startAct.setEndTime(8 * 3600 + i);
-			}
+		
+			// 8:00 am. plus i seconds
+			startAct.setEndTime(8 * 3600 + i);
+		
 			plan.addActivity(startAct);
 
 			// add a leg
@@ -322,6 +271,10 @@ public class TtCreateBraessPopulation {
 				}
 			}
 		}
+	}
+
+	public void setNumberOfPersons(int numberOfPersons) {
+		this.numberOfPersons = numberOfPersons;
 	}
 
 }

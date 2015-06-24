@@ -47,10 +47,6 @@ public class RunBraessSimulation {
 			+ "projects/cottbus/data/scenarios/braess_scenario/";
 	
 	/* population parameter */
-	private final int NUMBER_OF_PERSONS = 3600;
-	// If true, all agents start their trip at 8 am. If not, the agents start
-	// after each other in one second gaps, the first one at 8 am.
-	private final boolean SAME_START_TIME = false;
 	// If false, agents are initialized without any routes. If true, with all
 	// three possible routes.
 	private final boolean INIT_WITH_ALL_ROUTES = true;
@@ -217,7 +213,8 @@ public class RunBraessSimulation {
 		
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
-		popCreator.createPersons(NUMBER_OF_PERSONS, SAME_START_TIME, INIT_WITH_ALL_ROUTES, INIT_PLAN_SCORE);
+		popCreator.setNumberOfPersons(3600);
+		popCreator.createPersons(INIT_WITH_ALL_ROUTES, INIT_PLAN_SCORE);
 	}
 
 	private void createRunNameAndOutputDir(Scenario scenario) {
@@ -236,9 +233,7 @@ public class RunBraessSimulation {
 		
 		String runName = date;
 
-		runName += "_" + NUMBER_OF_PERSONS + "p";
-		if (SAME_START_TIME)
-			runName += "_sameStart";
+		runName += "_" + scenario.getPopulation().getPersons().size() + "p";
 		if (INIT_WITH_ALL_ROUTES){
 			runName += "_initAllRoutes-sel1+3";
 			if (INIT_PLAN_SCORE != null)

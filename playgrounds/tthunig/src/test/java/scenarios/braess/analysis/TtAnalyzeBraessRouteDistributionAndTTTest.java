@@ -57,7 +57,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		outputdir = utils.getOutputDirectory() + "/Test_LinkTT" + TTperLink;
 		//TTperLink must not be 0;
 		if(TTperLink == 0) TTperLink = 1;
-		prepareRunAndAnalyse();
+		runSimulation();
 		this.events = EventsUtils.createEventsManager();
 		TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
 		events.addHandler(handler);
@@ -85,7 +85,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		
 	}
 	
-	private void prepareRunAndAnalyse() {
+	private void runSimulation() {
 		
 		// prepare config and scenario		
 		Config config = defineConfig();
@@ -142,7 +142,8 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 
 	private void createPopulation(Scenario scenario) {		
 		TtCreateBraessPopulation popCreator = new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
-		popCreator.createPersons(NUMBER_OF_PERSONS, false, INITROUTES );
+		popCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
+		popCreator.createPersons( INITROUTES );
 	}
 
 	
