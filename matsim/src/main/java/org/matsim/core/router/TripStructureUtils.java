@@ -286,8 +286,8 @@ public class TripStructureUtils {
 			// the trips are parsed in sequence, so it is not possible
 			// that a existing subtour contains elements later than the
 			// end of the new subtour.
-			assert existingSubtour.startIndex < newSubtour.endIndex;
-			assert existingSubtour.endIndex < newSubtour.endIndex;
+//			assert existingSubtour.startIndex < newSubtour.endIndex;
+//			assert existingSubtour.endIndex < newSubtour.endIndex;
 
 			existingSubtour.parent = newSubtour;
 			newSubtour.children.add( existingSubtour );
