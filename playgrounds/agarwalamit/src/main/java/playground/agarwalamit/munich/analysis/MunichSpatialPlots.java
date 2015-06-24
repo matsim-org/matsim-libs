@@ -36,7 +36,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
+import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
@@ -243,19 +243,17 @@ public class MunichSpatialPlots {
 
 		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");
 
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
-		double simEndTime = LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig);
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(inputs.initialCaseNetworkFile,inputs.initialCaseConfig);
 
-		CongestionLinkAnalyzer delayAnalyzer = new CongestionLinkAnalyzer(simEndTime, inputs.initialCaseEventsFile, noOfBins); 
+		ExperiencedDelayAnalyzer delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.initialCaseEventsFile, noOfBins); 
 		delayAnalyzer.init(sc);
 		delayAnalyzer.preProcessData();
 		delayAnalyzer.postProcessData();
 		linkDelaysBau = delayAnalyzer.getCongestionPerLinkTimeInterval();
 
 		if(inputs.isComparing){
-			simEndTime = LoadMyScenarios.getSimulationEndTime(inputs.compareToCaseConfig);
-			delayAnalyzer = new CongestionLinkAnalyzer(simEndTime, inputs.compareToCaseEventsFile, noOfBins);
-			delayAnalyzer.init(LoadMyScenarios.loadScenarioFromNetwork(inputs.compareToCaseNetwork));
+			delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.compareToCaseEventsFile, noOfBins);
+			delayAnalyzer.init(LoadMyScenarios.loadScenarioFromNetworkAndConfig(inputs.compareToCaseNetwork,inputs.compareToCaseConfig));
 			delayAnalyzer.preProcessData();
 			delayAnalyzer.postProcessData();
 			linkDelaysPolicy = delayAnalyzer.getCongestionPerLinkTimeInterval();

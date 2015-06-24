@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
+import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -54,10 +54,9 @@ public class PerLinkCongestionData {
 		
 		BufferedWriter writer1 = IOUtils.getBufferedWriter(this.outputDir+"/ITERS/it.100/100.timeLinkIdTotalCongestion.txt");//
 
-		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(this.networkFile);
+		Scenario scenario = LoadMyScenarios.loadScenarioFromNetworkAndConfig(this.networkFile,this.configFile);
 		this.network = scenario.getNetwork();
-		double simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
-		CongestionLinkAnalyzer linkAnalyzer = new CongestionLinkAnalyzer(simulationEndTime, this.eventFile,1);
+		ExperiencedDelayAnalyzer linkAnalyzer = new ExperiencedDelayAnalyzer(this.eventFile,1);
 		linkAnalyzer.init(scenario);
 		linkAnalyzer.preProcessData();
 		linkAnalyzer.postProcessData();

@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
+import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
@@ -55,7 +55,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 	private Network network;
 	private final int noOfTimeBins = 30;
 	private final double simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile) ;
-	private final Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(this.networkFile);
+	private final Scenario scenario = LoadMyScenarios.loadScenarioFromNetworkAndConfig(this.networkFile,this.configFile);
 	private final int lastIteration = LoadMyScenarios.getLastIteration(this.configFile);
 	private List<Double> allTimeBins = new ArrayList<Double>();
 
@@ -78,7 +78,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotal = eLinkAnalyzer.getLink2TotalEmissions();
 		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotalFilled = setNonCalculatedEmissions(time2EmissionsTotal);
 
-		CongestionLinkAnalyzer cLinkAnalyzer = new CongestionLinkAnalyzer(this.simulationEndTime, eventsFile, noOfTimeBins);
+		ExperiencedDelayAnalyzer cLinkAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, noOfTimeBins);
 		cLinkAnalyzer.init(this.scenario);
 		cLinkAnalyzer.preProcessData();
 		cLinkAnalyzer.postProcessData();
