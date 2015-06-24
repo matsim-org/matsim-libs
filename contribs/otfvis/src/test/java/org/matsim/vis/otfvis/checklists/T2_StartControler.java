@@ -23,30 +23,23 @@ package org.matsim.vis.otfvis.checklists;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
  * @author florian ostermann
  */
 public class T2_StartControler {
-	
-	private static String config = "./test/input/org/matsim/vis/otfvis/checklists/config.xml";
-	private static String config2 = "./test/input/org/matsim/vis/otfvis/checklists/config-qsim.xml";
+
+	private static final String config = "./test/input/org/matsim/vis/otfvis/checklists/config.xml";
+	private static final String config2 = "./test/input/org/matsim/vis/otfvis/checklists/config-qsim.xml";
 	
 	public static void main(String[] args) {
 		Controler con = new Controler(config);
-		con.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		con.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		con.addOverridingModule(new OTFVisModule());
 		con.run();
 		System.out.println("\n Queue-Sim is done. Output:" + con.getConfig().controler().getOutputDirectory());
 		con = new Controler(config2);
-		con.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		con.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		con.addOverridingModule(new OTFVisModule());
 		con.run();
 		System.out.println("\n QSim is done. Output:" + con.getConfig().controler().getOutputDirectory());
