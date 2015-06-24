@@ -55,17 +55,18 @@ public class CongestionPricingComperator {
 	private int noOfTimeBins = 30;
 	private String eventsFile ;
 	private double simulationEndTime;
-	private String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies/";
+	private String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/policies/";
 	private Scenario scenario;
 	private String pricingScenario;
 	private final boolean isSortingForInsideMunich = true;
+	private final String suffixForSoring = "_sorted";
 	
 
 	private final PersonFilter pf = new PersonFilter();
 	
 	public static void main(String[] args) {
 		CongestionPricingComperator analyzer = new CongestionPricingComperator("implV3");
-//		analyzer.writeExperiecedAndCausingPersonDelay();
+		analyzer.writeExperiecedAndCausingPersonDelay();
 		analyzer.writeAverageLinkTolls();
 		analyzer.writeHourlyCausedDelayForEachPerson();
 	}
@@ -75,7 +76,7 @@ public class CongestionPricingComperator {
 	 */
 	private void writeHourlyCausedDelayForEachPerson(){
 		SortedMap<Double, Map<Id<Person>, Double>> timeBin2CausingPerson2Delay = getCausingPersonDelay(noOfTimeBins);
-		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/timeBin2Person2UserGroup2CausedDelay_"+pricingScenario+".txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/timeBin2Person2UserGroup2CausedDelay_"+pricingScenario+suffixForSoring+".txt");
 		try {
 			writer.write("timeBin \t personId \t userGroup \t delayInHr \n");
 			for (double d : timeBin2CausingPerson2Delay.keySet()){
@@ -102,7 +103,7 @@ public class CongestionPricingComperator {
 		Map<Id<Person>, Double> affectedperson2Delay = timeBin2AffectedPerson2Delay.get(simulationEndTime);
 		Map<Id<Person>, Double> causedPerson2Delay = timeBin2CausingPerson2Delay.get(simulationEndTime);
 		
-		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/affectedAndCausedDelay_"+pricingScenario+".txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/affectedAndCausedDelay_"+pricingScenario+suffixForSoring+".txt");
 		
 		try {
 			writer.write("personId\tuserGroup\taffectedDelayInHr\tcausedDelayInHr\n");
@@ -137,7 +138,7 @@ public class CongestionPricingComperator {
 		SortedMap<Double, Map<Id<Link>, Double>> timeBin2LinkId2Delay = delayAnalyzer.getTimeBin2LinkId2Delay();
 		SortedMap<Double, Map<Id<Link>, Integer>> timeBin2LinkCount = delayAnalyzer.getTimeBin2Link2PersonCount();
 		
-		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/linkId2Toll"+pricingScenario+".txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/linkId2Toll"+pricingScenario+suffixForSoring+".txt");
 		
 		try {
 			writer.write("timeBin\tlinkId\tavgLinkTollEURO\n");
@@ -167,7 +168,7 @@ public class CongestionPricingComperator {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, noOfTimeBin,isSortingForInsideMunich);
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, noOfTimeBin, isSortingForInsideMunich);
 		personAnalyzer.init(scenario);
 		personAnalyzer.preProcessData();
 		personAnalyzer.postProcessData();

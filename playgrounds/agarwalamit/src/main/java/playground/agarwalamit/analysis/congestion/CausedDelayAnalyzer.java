@@ -129,6 +129,7 @@ public class CausedDelayAnalyzer {
 		private SortedMap<Double,Map<Id<Link>,Integer>> timeBin2Link2PersonCount = new TreeMap<Double, Map<Id<Link>,Integer>>();
 		private SortedMap<Double,Map<Id<Person>,Double>> timeBin2Person2DelayCaused = new TreeMap<Double, Map<Id<Person>,Double>>();
 		private Network network;
+		private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 		
 		@Override
 		public void reset(int iteration) {
@@ -151,8 +152,6 @@ public class CausedDelayAnalyzer {
 			Id<Link> linkId = event.getLinkId();
 			
 			Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-			ExtendedPersonFilter pf = new ExtendedPersonFilter();
-			
 			if(isSortingForInsideMunich && (!pf.isCellInsideMunichCityArea(linkCoord))) return;
 			
 			Id<Person> causingAgentId = event.getCausingAgentId();

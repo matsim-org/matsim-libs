@@ -58,24 +58,20 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	private double totalDelay;
 	private double warnCount=0;
 
-	private final double timeBinSize;
+	private double timeBinSize;
 	private Network network;
 	private boolean isSortingForInsideMunich = false;
+	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 
 	/**
 	 * @param noOfTimeBins
 	 * @param simulationEndTime
-	 * @param scenario must have minimally network and plans file.
-	 * @param isSortingForInsideMunich true if outside Munich city area links are not included in analsis
+	 * @param scenario must have minimally network, plans and config file.
+	 * @param isSortingForInsideMunich true if outside Munich city area links are not included in analysis
 	 */
 	public ExperiencedDelayHandler(int noOfTimeBins, Scenario scenario, boolean isSortingForInsideMunich){
-
-		this.timeBinSize = scenario.getConfig().qsim().getEndTime() / noOfTimeBins;
-		this.network = scenario.getNetwork();
 		this.isSortingForInsideMunich = isSortingForInsideMunich;
-		
-		logger.warn("Output data will only include links which falls inside the Munich city area");
-		
+		logger.warn("Output data will only include links which fall inside the Munich city area");
 		initialize(scenario, noOfTimeBins);
 	}
 
@@ -85,14 +81,14 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	 * @param scenario must have minimally network and plans file.
 	 */
 	public ExperiencedDelayHandler(int noOfTimeBins, Scenario scenario){
-
-		this.timeBinSize = scenario.getConfig().qsim().getEndTime() / noOfTimeBins;
-		this.network = scenario.getNetwork();
 		initialize(scenario, noOfTimeBins);
 	}
-
 	
 	private void initialize(Scenario scenario, int noOfTimeBins){
+		
+		this.timeBinSize = scenario.getConfig().qsim().getEndTime() / noOfTimeBins;
+		this.network = scenario.getNetwork();
+		
 		for (Link link : this.network.getLinks().values()) {
 			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id<Person>, Double>());
 			Double freeSpeedLinkTravelTime = Double.valueOf(Math.floor(link.getLength()/link.getFreespeed())+1);
@@ -165,7 +161,6 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		this.totalDelay+=currentDelay;
 		
 		Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
-		ExtendedPersonFilter pf = new ExtendedPersonFilter();
 		if(this.isSortingForInsideMunich && (!pf.isCellInsideMunichCityArea(linkCoord))) return;
 		
 		Map<Id<Person>, Double> delayForPerson = this.personId2DelaysPerTimeBin.get(endOfTimeInterval);

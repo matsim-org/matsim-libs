@@ -53,19 +53,19 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalyisModule {
 	private Map<Double, Map<Id<Link>, Double>> congestionPerLinkTimeInterval;
 	private EventsManager eventsManager;
 	private Scenario scenario;
+	private boolean isSortingForInsideMunich = false;
 
 	public ExperiencedDelayAnalyzer(String eventFile, int noOfTimeBins) {
 		super(ExperiencedDelayAnalyzer.class.getSimpleName());
 		this.eventsFile = eventFile;
 		this.noOfTimeBins = noOfTimeBins;
-		this.congestionPerPersonHandler = new ExperiencedDelayHandler(this.noOfTimeBins,  this.scenario);
 	}
 	
 	public ExperiencedDelayAnalyzer(String eventFile, int noOfTimeBins, boolean isSortingForInsideMunich) {
 		super(ExperiencedDelayAnalyzer.class.getSimpleName());
 		this.eventsFile = eventFile;
 		this.noOfTimeBins = noOfTimeBins;
-		this.congestionPerPersonHandler = new ExperiencedDelayHandler(this.noOfTimeBins,  this.scenario,isSortingForInsideMunich);
+		this.isSortingForInsideMunich = isSortingForInsideMunich;
 	}
 	
 	public void run(Scenario scenario){
@@ -77,6 +77,7 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalyisModule {
 	
 	public void init(Scenario scenario){
 		this.scenario = scenario;
+		this.congestionPerPersonHandler = new ExperiencedDelayHandler(this.noOfTimeBins,  this.scenario, isSortingForInsideMunich);
 	}
 	@Override
 	public List<EventHandler> getEventHandler() {
@@ -109,6 +110,10 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalyisModule {
 	
 	public SortedMap<Double, Map<Id<Person>, Double>> getCongestionPerPersonTimeInterval() {
 		return this.congestionPerPersonTimeInterval;
+	}
+	
+	public Map<Double, Map<Id<Link>, Double>> getCongestionPerLinkTimeInterval() {
+		return this.congestionPerLinkTimeInterval;
 	}
 	
 	public void checkTotalDelayUsingAlternativeMethod(){
