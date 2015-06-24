@@ -1,14 +1,18 @@
 package scenarios.braess.run;
 
+import java.util.Calendar;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.contrib.otfvis.OTFVisModule;
+//import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.contrib.signals.controler.SignalsModule;
+import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -21,8 +25,6 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.dgrether.DgPaths;
 import scenarios.braess.analysis.TtBraessControlerListener;
@@ -40,8 +42,6 @@ public class RunBraessSimulation {
 	private static final Logger log = Logger
 			.getLogger(RunBraessSimulation.class);
 	
-	private final String DATE = "2015-06-12";
-	
 	private final String INPUT_DIR = DgPaths.SHAREDSVN
 			+ "projects/cottbus/data/scenarios/braess_scenario/";
 	
@@ -54,7 +54,7 @@ public class RunBraessSimulation {
 	// three possible routes.
 	private final boolean INIT_WITH_ALL_ROUTES = true;
 	// initial score for all initial plans
-	private final Double INIT_PLAN_SCORE = null; //110.;
+	private final Double INIT_PLAN_SCORE = 110.;
 	
 	/* network parameter */
 	// capacity at all links that are not
@@ -90,11 +90,18 @@ public class RunBraessSimulation {
 		
 		// prepare the controller
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new OTFVisModule());
+//		controler.addOverridingModule(new OTFVisModule());
+		
 		if (config.scenario().isUseSignalSystems()){
 			// add the signals module if signal systems are used
 			controler.addOverridingModule(new SignalsModule());
 		}
+		
+		if (config.controler().isLinkToLinkRoutingEnabled()){
+			// add the module for link to link routing if enabled
+			controler.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
+		}
+		
 		// adapt sigma for randomized routing
 		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder();
 		builder.setSigma(SIGMA);
@@ -103,6 +110,7 @@ public class RunBraessSimulation {
 				bindTravelDisutilityFactory().toInstance(builder);
 			}
 		});
+		
 		// add a controller listener to analyze results
 		controler.addControlerListener(new TtBraessControlerListener(scenario));
 		
@@ -138,7 +146,7 @@ public class RunBraessSimulation {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 		
 		// set travelTimeBinSize
-		config.travelTimeCalculator().setTraveltimeBinSize( 10 );
+		config.travelTimeCalculator().setTraveltimeBinSize( 900 );
 		
 		config.travelTimeCalculator().setTravelTimeCalculatorType(
 				TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
@@ -178,12 +186,14 @@ public class RunBraessSimulation {
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.KeepLastSelected.toString() );
 			strat.setWeight( 0.9 ) ;
-//			strat.setDisableAfter( config.controler().getLastIteration() - 50 );
+			strat.setDisableAfter( config.controler().getLastIteration() );
 			config.strategy().addStrategySettings(strat);
 		}
 
 		// choose maximal number of plans per agent. 0 means unlimited
 		config.strategy().setMaxAgentPlanMemorySize( 0 );
+		
+		config.qsim().setStuckTime(3600 * 10.);
 		
 		// adapt monetary distance cost rate
 		// (should be negative. use -12.0 to balance time [h] and distance [m].
@@ -204,8 +214,6 @@ public class RunBraessSimulation {
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
-		
-		config.qsim().setStuckTime(3600 * 10.);
 		
 		return config;
 	}
@@ -240,7 +248,7 @@ public class RunBraessSimulation {
 			case "3_4":
 				l.setCapacity(CAP_MAIN);
 				l.setLength(LINK_LENGTH);
-				linkTT = 200;
+				linkTT = 1;
 			}
 			// set travel time by adapting free speed
 			l.setFreespeed(l.getLength() / linkTT);
@@ -256,7 +264,7 @@ public class RunBraessSimulation {
 //			net.addNode(fac.createNode(Id.createNodeId(8),
 //					scenario.createCoord(250, 150)));
 			net.addNode(fac.createNode(Id.createNodeId(9), 
-					scenario.createCoord(450, 150)));
+					scenario.createCoord(450, 50)));
 
 			// remove former links
 			net.getLinks().get(Id.createLinkId("2_3")).setFreespeed(0.01);
@@ -331,7 +339,17 @@ public class RunBraessSimulation {
 
 		Config config = scenario.getConfig();
 		
-		String runName = DATE;
+		// get the current date in format "yyyy-mm-dd"
+		Calendar cal = Calendar.getInstance ();
+		// this class counts months from 0, but days from 1
+		int month = cal.get(Calendar.MONTH) + 1;
+		String monthStr = month + "";
+		if (month < 10)
+			monthStr = "0" + month;
+		String date = cal.get(Calendar.YEAR) + "-" 
+				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);		
+		
+		String runName = date;
 
 		runName += "_" + NUMBER_OF_PERSONS + "p";
 		if (SAME_START_TIME)
