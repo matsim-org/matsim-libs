@@ -119,12 +119,12 @@ public class NetworkAngleUtilsTest {
         Link l60 = network.getLinks().get(Id.createLinkId(60));
         Link l8 = network.getLinks().get(Id.createLinkId(8));
         Assert.assertEquals(0.0, NetworkAngleUtils.getAngleBetweenLinks(l50, l1), MatsimTestUtils.EPSILON);
-        Assert.assertEquals(-135.0, NetworkAngleUtils.getAngleBetweenLinks(l20, l1), MatsimTestUtils.EPSILON); //sharp right
-        Assert.assertEquals(90.0, NetworkAngleUtils.getAngleBetweenLinks(l60, l1), MatsimTestUtils.EPSILON);
-        Assert.assertEquals(90.0, NetworkAngleUtils.getAngleBetweenLinks(l60, l50), MatsimTestUtils.EPSILON); //
-        Assert.assertEquals(45.0, NetworkAngleUtils.getAngleBetweenLinks(l50, l8), MatsimTestUtils.EPSILON);
-        Assert.assertEquals(-45.0, NetworkAngleUtils.getAngleBetweenLinks(l50, l2), MatsimTestUtils.EPSILON);
-        Assert.assertEquals(-90.0, NetworkAngleUtils.getAngleBetweenLinks(l50, l3), MatsimTestUtils.EPSILON);
+        Assert.assertEquals(Math.toRadians(-135.0), NetworkAngleUtils.getAngleBetweenLinks(l20, l1), MatsimTestUtils.EPSILON); //sharp right
+        Assert.assertEquals(Math.toRadians(90.0), NetworkAngleUtils.getAngleBetweenLinks(l60, l1), MatsimTestUtils.EPSILON);
+        Assert.assertEquals(Math.toRadians(90.0), NetworkAngleUtils.getAngleBetweenLinks(l60, l50), MatsimTestUtils.EPSILON); //
+        Assert.assertEquals(Math.toRadians(45.0), NetworkAngleUtils.getAngleBetweenLinks(l50, l8), MatsimTestUtils.EPSILON);
+        Assert.assertEquals(Math.toRadians(-45.0), NetworkAngleUtils.getAngleBetweenLinks(l50, l2), MatsimTestUtils.EPSILON);
+        Assert.assertEquals(Math.toRadians(-90.0), NetworkAngleUtils.getAngleBetweenLinks(l50, l3), MatsimTestUtils.EPSILON);
     }
 
     @Test
