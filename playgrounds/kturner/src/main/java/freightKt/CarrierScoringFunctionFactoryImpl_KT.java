@@ -227,7 +227,6 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 				//Identify the first serviceActivity on tour and correct costs 
 				
 				//TODO: Sicherstellen, dass man richtigen Servie erwischt: Bisher nur grobe Zuordnung via Location, Zeitfenster und Act-Type.
-				//TODO: So umbauen, dass je ScheduledTour wirklich nur ein Element berücksichtigt wird. -> bisher nimmt er durch die Konstruktion jedes Element, da immer neue Abfrage :(
 				boolean isfirstAct = isFirstServiceAct(act);
 				if (isfirstAct){
 					actCosts -= correctFirstService(act);  //Ziehe die zuviel berechneten Kosten ab. 
@@ -295,42 +294,42 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     	
     }  //End Class ActivityScoring
     
-    //TODO: Sollte TollScoring übernehmen, funktioniert jedoch nicht, da keine amounts generiert werden.
-    static class MoneyScoring implements SumScoringFunction.MoneyScoring {
-
-    	private double score = 0.;
-    	private Carrier carrier; 
-    	
-    	MoneyScoring (Carrier carrier){
-    		super();
-    		this.carrier = carrier;
-    	}
-    	
-     	WriteMoney moneyWriter = new WriteMoney(new File(TEMP_DIR + "#MoneyForScoringInfor.txt"), carrier); //KT
-     	
-		@Override
-		public void finish() {	
-			moneyWriter.writeCarrierLine(carrier);
-//			moneyWriter.writeAmountsToFile();
-			moneyWriter.writeTextLineToFile("finish aufgerufen");
-			moneyWriter.writeTextLineToFile(System.getProperty("line.separator"));
-		}
-
-		@Override
-		public double getScore() {
-			moneyWriter.writeTextLineToFile("get Score aufgerufen");
-			return this.score;
-		}
-
-		@Override
-		public void addMoney(double amount) {
-			moneyWriter.writeTextLineToFile("add-Money aufgerufen");
-			moneyWriter.writeMoneyToFile(amount);
-//			moneyWriter.addAmountToWriter(amount); 
-			score += (-1)* amount;			
-		}
-    	
-    } // End class MoneyScoring
+    //TODO: Sollte TollScoring übernehmen, funktioniert jedoch nicht, da keine amounts generiert werden. -> Wird nicht verwendet
+//    static class MoneyScoring implements SumScoringFunction.MoneyScoring {
+//
+//    	private double score = 0.;
+//    	private Carrier carrier; 
+//    	
+//    	MoneyScoring (Carrier carrier){
+//    		super();
+//    		this.carrier = carrier;
+//    	}
+//    	
+//     	WriteMoney moneyWriter = new WriteMoney(new File(TEMP_DIR + "#MoneyForScoringInfor.txt"), carrier); //KT
+//     	
+//		@Override
+//		public void finish() {	
+//			moneyWriter.writeCarrierLine(carrier);
+////			moneyWriter.writeAmountsToFile();
+//			moneyWriter.writeTextLineToFile("finish aufgerufen");
+//			moneyWriter.writeTextLineToFile(System.getProperty("line.separator"));
+//		}
+//
+//		@Override
+//		public double getScore() {
+//			moneyWriter.writeTextLineToFile("get Score aufgerufen");
+//			return this.score;
+//		}
+//
+//		@Override
+//		public void addMoney(double amount) {
+//			moneyWriter.writeTextLineToFile("add-Money aufgerufen");
+//			moneyWriter.writeMoneyToFile(amount);
+////			moneyWriter.addAmountToWriter(amount); 
+//			score += (-1)* amount;			
+//		}
+//    	
+//    } // End class MoneyScoring
     
     //Alternatives TollScoring von Schroeder {@see org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImp.TollScoring}
     static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {

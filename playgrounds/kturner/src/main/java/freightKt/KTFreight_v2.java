@@ -472,8 +472,9 @@ public class KTFreight_v2 {
 //			ActivityScoring actScoring = new ActivityScoring(carrier);
 //			sumSf.addScoringFunction(actScoring);
 			
-			MoneyScoring moneyScoring = new MoneyScoring(carrier);
-			sumSf.addScoringFunction(moneyScoring);
+			//Auskommentiert, da nicht funktionabel und von daher in CarrierScoringFunctionFactoryImpl_KT auskommentiert.
+//			MoneyScoring moneyScoring = new MoneyScoring(carrier);
+//			sumSf.addScoringFunction(moneyScoring);
 			
 			return sumSf;
 			}
