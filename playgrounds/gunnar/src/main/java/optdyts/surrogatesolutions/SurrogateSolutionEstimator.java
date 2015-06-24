@@ -49,6 +49,9 @@ class SurrogateSolutionEstimator {
 	// TODO current numerical precision checks are ad hoc
 	private static final double EPS = 1e-8;
 
+	// TODO make this configurable
+	private static final int maxIterations = 1000;
+	
 	// -------------------- NO CONSTRUCTION --------------------
 
 	private SurrogateSolutionEstimator() {
@@ -86,24 +89,25 @@ class SurrogateSolutionEstimator {
 		return result;
 	}
 
-	private static double constrainToQuadraticSolutionInterval(final double x,
-			final double p, final double q) {
-		final double sqrtArg = p * p / 4.0 - q;
-		// TODO a tighter check would have to be thought through better
-		// if (sqrtArg < -EPS) {
-		// throw new RuntimeException(
-		// "infeasible quadratic solution interval with square root argument "
-		// + sqrtArg + " < " + (-EPS));
-		// } else
-		if (sqrtArg < 0.0) {
-			return x;
-		} else {
-			final double sqrt = Math.sqrt(sqrtArg);
-			final double xMin = -p / 2.0 - sqrt;
-			final double xMax = -p / 2.0 + sqrt;
-			return Math.max(xMin, Math.min(x, xMax));
-		}
-	}
+	// private static double constrainToQuadraticSolutionInterval(final double
+	// x,
+	// final double p, final double q) {
+	// final double sqrtArg = p * p / 4.0 - q;
+	// // TODO a tighter check would have to be thought through better
+	// // if (sqrtArg < -EPS) {
+	// // throw new RuntimeException(
+	// // "infeasible quadratic solution interval with square root argument "
+	// // + sqrtArg + " < " + (-EPS));
+	// // } else
+	// if (sqrtArg < 0.0) {
+	// return x;
+	// } else {
+	// final double sqrt = Math.sqrt(sqrtArg);
+	// final double xMin = -p / 2.0 - sqrt;
+	// final double xMax = -p / 2.0 + sqrt;
+	// return Math.max(xMin, Math.min(x, xMax));
+	// }
+	// }
 
 	private static Vector computeAlphas(final Matrix stateCovariances,
 			final Vector initialAlphas, final double regularizationScale,
@@ -145,10 +149,13 @@ class SurrogateSolutionEstimator {
 		// double gap2 = squareGap(stateCovariances, alphas,
 		// regularizationScale);
 
-		while (!noMoreImprovement) {
+		System.out.print("solving for alpha ");
+		int iteration = 0;		
+		while (!noMoreImprovement && iteration < maxIterations) {
 
 			// >>>>>>>>>> TODO NEW >>>>>>>>>>
 			noMoreImprovement = true;
+			System.out.print(".");
 			// <<<<<<<<<< TODO NEW <<<<<<<<<<
 
 			for (int l = 1; l < alphas.size(); l++) {
@@ -166,9 +173,6 @@ class SurrogateSolutionEstimator {
 				newAlpha /= (stateCovariances.get(l, l) - 2.0
 						* stateCovariances.get(l, 0)
 						+ stateCovariances.get(0, 0) + regularizationScale);
-
-				// TODO COMPUTE UPPER AND LOWER BOUNDS BEFORE CONSTRAINING
-				// ALPHA!!!
 
 				// bound constraints
 				double lower = 0;
@@ -194,10 +198,6 @@ class SurrogateSolutionEstimator {
 				// q);
 				// <<<<<<<<<< TODO NEW <<<<<<<<<<
 
-				// check constraints
-				System.out.println("CONSTRAINING TO INTERVAL [" + lower + ", "
-						+ upper + "]");
-
 				// establish constraints
 				newAlpha = Math.max(newAlpha, lower);
 				newAlpha = Math.min(newAlpha, upper);
@@ -220,7 +220,8 @@ class SurrogateSolutionEstimator {
 			// noMoreImprovement = true;
 			// }
 		}
-
+		System.out.println();
+		
 		return alphas;
 	}
 
