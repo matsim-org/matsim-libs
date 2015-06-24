@@ -3,10 +3,10 @@ package roadclassification;
 import org.matsim.api.core.v01.population.Population;
 
 import floetteroed.utilities.math.Vector;
-import opdytsintegration.AbstractMATSimState;
+import opdytsintegration.MATSimState;
 
 public class RoadClassificationState extends
-		AbstractMATSimState {
+		MATSimState {
 
 	public RoadClassificationState(Population population,
 			Vector vectorRepresentation) {
