@@ -119,20 +119,20 @@ public class CausedDelayHandler implements CongestionEventHandler {
 		Id<Person> causingAgentId = event.getCausingAgentId();
 
 		//tolled trip count --> causing agent 
-		List<Id<Person>> tollPayers = this.getTimeBin2ListOfTollPayers().get(endOfTimeInterval);
-		tollPayers.add(event.getCausingAgentId());
+		List<Id<Person>> tollPayers = this.timeBin2ListOfTollPayers.get(endOfTimeInterval);
+		tollPayers.add(causingAgentId);
 		
 		//person count
 		Map<Id<Link>, Integer> link2PersonCount = this.timeBin2Link2PersonCount.get(endOfTimeInterval);
-		link2PersonCount.put(linkId,link2PersonCount.get(linkId)+1);
+		link2PersonCount.put(linkId, link2PersonCount.get(linkId)+1);
 		
 		//causing person delay
 		Map<Id<Person>,Double> causingPerson2delay = this.timeBin2Person2DelayCaused.get(endOfTimeInterval);
-		causingPerson2delay.put(causingAgentId, causingPerson2delay.get(causingAgentId)+event.getDelay());
+		causingPerson2delay.put(causingAgentId, causingPerson2delay.get(causingAgentId) + event.getDelay());
 		
 		//link delays
 		Map<Id<Link>,Double> link2delay = this.timeBin2Link2DelayCaused.get(endOfTimeInterval);
-		link2delay.put(linkId, link2delay.get(linkId)+event.getDelay());
+		link2delay.put(linkId, link2delay.get(linkId) + event.getDelay());
 	}
 
 	public SortedMap<Double, Map<Id<Link>, Double>> getTimeBin2Link2Delay() {
