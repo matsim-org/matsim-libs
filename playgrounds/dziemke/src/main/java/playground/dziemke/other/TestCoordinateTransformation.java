@@ -13,14 +13,20 @@ public class TestCoordinateTransformation {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SA_Albers, TransformationFactory.WGS84);
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.DHDN_GK4, TransformationFactory.WGS84);
 		
-		Coord lowerLeftCoordinateSAALbers = new CoordImpl(100000,-3720000);
-		Coord upperRightCoordinateSAALbers = new CoordImpl(180000,-3675000);
+		Coord coordinateMoabitDHDN_GK4 = new CoordImpl(4590918.313160132, 5822867.249212103);
+		
+		Coord lowerLeftCoordinateSAALbers = new CoordImpl(111583.944,-3714912.098);
+		Coord upperRightCoordinateSAALbers = new CoordImpl(171583.944,-3667912.098);
+		
+		Coord coordinateMoabitWGS84 = transformation.transform(coordinateMoabitDHDN_GK4);
+		
 		Coord lowerLeftCoordinateWGS84 = transformation.transform(lowerLeftCoordinateSAALbers);
 		Coord upperRightCoordinateWGS84 = transformation.transform(upperRightCoordinateSAALbers);
 		
 		System.out.println("###########################################################################");
+		System.out.println("coordinateMoabitWGS84: " + coordinateMoabitWGS84);
 		System.out.println("lowerLeftCoordinateWGS84: " + lowerLeftCoordinateWGS84);
 		System.out.println("upperRightCoordinateWGS84: " + upperRightCoordinateWGS84);
 		System.out.println("###########################################################################");
