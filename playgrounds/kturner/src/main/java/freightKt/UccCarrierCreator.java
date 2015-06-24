@@ -312,8 +312,7 @@ class UccCarrierCreator {
 		//Services aus den UCC für die Non-UCC erstellen -> Funktionmiert grundsätzlich, KT 02.05.15
 		for (Carrier uccC : uccCarriers.getCarriers().values()){
 			for (Carrier nonUccC : nonUccCarriers.getCarriers().values()){
-				//TODO: Sicherstellen, dass jeder Service auch erstellt wird--> Sicherheitsabfrage, ansonsten Fehler erzeugen!
-//				if (uccC.getId().toString().endsWith(nonUccC.getId().toString())){	//TODO: Besser, weil exakter: prefix + nonUccC-Id		
+				//TODO: Sicherstellen, dass jeder Service auch erstellt wird--> Sicherheitsabfrage, ansonsten Fehler erzeugen!	
 				if (uccC.getId().toString().equals(uccC_prefix+nonUccC.getId().toString())){
 					
 					//Zählt nachfrage an UCC-LinkID
