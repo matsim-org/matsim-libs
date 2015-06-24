@@ -209,7 +209,8 @@ public final class PtMatrix {
 				ptTravelTime = 0.;
 			}
 			else {
-				throw new RuntimeException("Trying to route matrix based pt through a pair of od stops that is not contained in the travel time od matrix");
+				throw new RuntimeException("Trying to route matrix based pt through a pair of od stops that is not contained in the"
+						+ "travel time od matrix. fromPtStop = " + fromPtStop.getId() + " -- toPtStop = " + toPtStop.getId());
 			}
 		}
 		return ptTravelTime;
