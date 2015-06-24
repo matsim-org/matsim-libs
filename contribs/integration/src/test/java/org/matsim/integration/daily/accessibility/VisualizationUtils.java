@@ -18,13 +18,10 @@
  * *********************************************************************** */
 package org.matsim.integration.daily.accessibility;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
-import org.matsim.contrib.analysis.vsp.qgis.QGisConstants.geometryType;
 import org.matsim.contrib.analysis.vsp.qgis.QGisMapnikFileCreator;
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
 import org.matsim.contrib.analysis.vsp.qgis.RasterLayer;
@@ -39,7 +36,7 @@ import org.matsim.core.utils.misc.ExeRunner;
  * @author nagel
  *
  */
-class VisualizationUtils {
+public class VisualizationUtils {
 	public static final Logger log = Logger.getLogger(VisualizationUtils.class);
 	private VisualizationUtils(){} // do not instantiate
 
