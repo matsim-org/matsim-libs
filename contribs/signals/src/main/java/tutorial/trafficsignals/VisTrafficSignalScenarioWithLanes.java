@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CreateSignalSystemScenario
+ * CreateTrafficSignalScenarioWithLanes
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,47 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.unsupported.example90TrafficLights;
+package tutorial.trafficsignals;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
-
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.contrib.signals.otfvis.OTFVisWithSignals;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import tutorial.trafficsignals.RunCreateTrafficSignalScenarioExample;
-
-
 
 /**
- * This class contains a simple example how to visualize a simple scenario
- * with signalized intersections.
+ * This class contains a simple example how to visualize a scenario with lanes and signalized intersections.
  * 
  * @author dgrether
- *
+ * 
  * @see org.matsim.signals
  * @see http://matsim.org/node/384
- *
  */
-public class VisSimpleTrafficSignalScenario {
+public class VisTrafficSignalScenarioWithLanes {
 
-	
 	private void run() {
-		String configFile = new RunCreateTrafficSignalScenarioExample().run();
+		String configFile = new RunCreateTrafficSignalScenarioWithLanesExample().run();
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
-		OTFVis.playScenario(scenario);
+		OTFVisWithSignals.playScenario(scenario);
 	}
-	
+
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		new VisSimpleTrafficSignalScenario().run();
+		new VisTrafficSignalScenarioWithLanes().run();
 	}
-
 
 }

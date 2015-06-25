@@ -23,9 +23,6 @@ package org.matsim.contrib.otfvis;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.signals.builder.FromDataBuilder;
-import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
-import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -45,11 +42,6 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.pt.otfvis.FacilityDrawer;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
-import org.matsim.signalsystems.otfvis.io.SignalGroupStateChangeTracker;
 import org.matsim.vis.otfvis.*;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 
@@ -181,12 +173,8 @@ public class OTFVis {
 	
 	public static void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
-		if (scenario.getConfig().scenario().isUseSignalSystems()){
-			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
-			qSim.addQueueSimulationListeners(engine);
-		}
-		
+		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
+
 		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qSim);
 		OTFClientLive.run(scenario.getConfig(), server);
 		
@@ -217,20 +205,10 @@ public class OTFVis {
 			server.addAdditionalElement(facilityWriter);
 		}
 
-		if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
+		if (config.scenario().isUseLanes()) {
 			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), scenario.getConfig());
 			server.addAdditionalElement(otfLaneWriter);
-		} else if (config.scenario().isUseSignalSystems()) {
-			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
-			SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
-			events.addHandler(signalTracker);
-			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-			LaneDefinitions20 laneDefs = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
-			SignalSystemsData systemsData = signalsData.getSignalSystemsData();
-			SignalGroupsData groupsData = signalsData.getSignalGroupsData();
-			OTFSignalWriter otfSignalWriter = new OTFSignalWriter(qSim.getVisNetwork(), laneDefs, scenario.getConfig(), systemsData, groupsData , signalTracker);
-			server.addAdditionalElement(otfSignalWriter);
 		}
 		server.pause();
 		return server;

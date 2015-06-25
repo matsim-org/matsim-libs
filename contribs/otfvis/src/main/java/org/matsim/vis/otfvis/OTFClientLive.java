@@ -30,8 +30,6 @@ import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
 import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.pt.otfvis.FacilityDrawer;
-import org.matsim.signalsystems.otfvis.io.OTFSignalReader;
-import org.matsim.signalsystems.otfvis.io.OTFSignalWriter;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -69,13 +67,9 @@ public class OTFClientLive {
 					connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
 				}
 				
-				if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
+				if (config.scenario().isUseLanes()) {
 					connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
 					connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
-					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
-				} else if (config.scenario().isUseSignalSystems()) {
-					connectionManager.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
-					connectionManager.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
 					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
 				}
 				OTFClient otfClient = new OTFClient();
