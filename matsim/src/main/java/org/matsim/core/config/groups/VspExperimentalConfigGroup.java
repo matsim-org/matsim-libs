@@ -60,7 +60,7 @@ public final class VspExperimentalConfigGroup extends ReflectiveConfigGroup {
 //	public static final String WARN = "warn" ;
 //	public static final String ABORT = "abort" ;
 	public static enum VspDefaultsCheckingLevel { ignore, info, warn, abort } ;
-	private VspDefaultsCheckingLevel vspDefaultsCheckingLevel = VspDefaultsCheckingLevel.warn ;
+	private VspDefaultsCheckingLevel vspDefaultsCheckingLevel = VspDefaultsCheckingLevel.ignore ;
 	@StringGetter(VSP_DEFAULTS_CHECKING_LEVEL)
 	public VspDefaultsCheckingLevel getVspDefaultsCheckingLevel() {
 		return vspDefaultsCheckingLevel;
