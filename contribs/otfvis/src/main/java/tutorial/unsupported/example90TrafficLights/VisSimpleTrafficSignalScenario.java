@@ -19,8 +19,14 @@
  * *********************************************************************** */
 package tutorial.unsupported.example90TrafficLights;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsScenarioLoader;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import tutorial.trafficsignals.RunCreateTrafficSignalScenarioExample;
 
 
@@ -40,7 +46,10 @@ public class VisSimpleTrafficSignalScenario {
 	
 	private void run() {
 		String configFile = new RunCreateTrafficSignalScenarioExample().run();
-		OTFVis.playConfig(configFile);
+		Config config = ConfigUtils.loadConfig(configFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+		OTFVis.playScenario(scenario);
 	}
 	
 	/**
