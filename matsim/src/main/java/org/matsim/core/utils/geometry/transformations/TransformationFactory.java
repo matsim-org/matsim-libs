@@ -58,7 +58,6 @@ public abstract class TransformationFactory {
 	 * @param fromSystem The source coordinate system.
 	 * @param toSystem The destination coordinate system.
 	 * @return Coordinate Transformation
-	 * @throws IllegalArgumentException if no matching coordinate transformation can be found.
 	 */
 	public static CoordinateTransformation getCoordinateTransformation(final String fromSystem, final String toSystem) {
 		if (fromSystem.equals(toSystem)) return new IdentityTransformation();
