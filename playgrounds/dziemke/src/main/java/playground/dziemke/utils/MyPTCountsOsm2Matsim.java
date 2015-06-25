@@ -19,19 +19,7 @@
 
 package playground.dziemke.utils;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.counts.Counts;
-import org.matsim.counts.CountsReaderMatsimV1;
-
 //import playground.andreas.fcd.Fcd;
-import playground.andreas.mzilske.osm.OsmPrepare;
-import playground.andreas.osmBB.OsmTransitMain;
-import playground.andreas.osmBB.PTCountsNetworkSimplifier;
-import playground.andreas.osmBB.osm2counts.Osm2Counts;
 
 // based on "package playground.andreas.osmBB.PTCountsOsm2Matsim"
 
@@ -62,39 +50,39 @@ public class MyPTCountsOsm2Matsim {
 //		String[] transitFilter = new String[]{"ferry", "subway", "light_rail", "tram", "train", "bus", "trolleybus"};
 		String[] transitFilter = new String[]{"fsfsfgsg"};
 		
-		OsmPrepare osmPrepare = new OsmPrepare(osmRepository + osmFile, filteredOsmFile, streetFilter, transitFilter);
-		osmPrepare.prepareOsm();
-		osmPrepare = null;
-		
-		Osm2Counts osm2Counts = new Osm2Counts(filteredOsmFile);
-		osm2Counts.prepareOsm();
-		HashMap<String, String> shortNameMap = osm2Counts.getShortNameMap();
-		osm2Counts = null;
-		
-		Counts counts = new Counts();
-		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
-		countsReader.parse(countsFile);
-				
-		OsmTransitMain osmTransitMain = new OsmTransitMain(filteredOsmFile, TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, outDir + outName + "_network.xml", outDir + outName + "_schedule.xml", outDir + outName + "_vehicles.xml");
-		osmTransitMain.convertOsm2Matsim(transitFilter);
-		osmTransitMain = null;
-
-//		ResizeLinksByCount4 r = new ResizeLinksByCount4(outDir + outName + "_network.xml", counts, shortNameMap, 1.0);
-//		r.run(outDir + outName + "_network_resized.xml");
-//		r = null;
-		counts = null;
-		
-//		Set<String> linksBlocked = Fcd.readFcdReturningLinkIdsUsed(fcdNetInFile, fcdEventsInFile, outDir, outDir + outName + "_network_resized.xml", 500.0);
-		Set<String> linksBlocked = new TreeSet<String>();
-		
-		//PTCountsNetworkSimplifier ptCountNetSimplifier = new PTCountsNetworkSimplifier(outDir + outName + "_network_resized.xml", outDir + outName + "_schedule.xml", outDir + outName + "_network_merged.xml", outDir + outName + "_schedule_merged.xml", shortNameMap, countsFile, countsOutFile, outDir + "transitVehicles.xml.gz", linksBlocked);
-		PTCountsNetworkSimplifier ptCountNetSimplifier = new PTCountsNetworkSimplifier(outDir + outName + "_network.xml", outDir + outName + "_schedule.xml", outDir + outName + "_network_merged.xml", outDir + outName + "_schedule_merged.xml", shortNameMap, countsFile, countsOutFile, outDir + "transitVehicles.xml.gz", linksBlocked);
-		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-		nodeTypesToMerge.add(new Integer(4));
-		nodeTypesToMerge.add(new Integer(5));
-		ptCountNetSimplifier.setNodesToMerge(nodeTypesToMerge);
-		ptCountNetSimplifier.setMergeLinkStats(false);
-		ptCountNetSimplifier.simplifyPTNetwork();		
+//		OsmPrepare osmPrepare = new OsmPrepare(osmRepository + osmFile, filteredOsmFile, streetFilter, transitFilter);
+//		osmPrepare.prepareOsm();
+//		osmPrepare = null;
+//		
+//		Osm2Counts osm2Counts = new Osm2Counts(filteredOsmFile);
+//		osm2Counts.prepareOsm();
+//		HashMap<String, String> shortNameMap = osm2Counts.getShortNameMap();
+//		osm2Counts = null;
+//		
+//		Counts counts = new Counts();
+//		CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(counts);
+//		countsReader.parse(countsFile);
+//				
+//		OsmTransitMain osmTransitMain = new OsmTransitMain(filteredOsmFile, TransformationFactory.WGS84, TransformationFactory.DHDN_GK4, outDir + outName + "_network.xml", outDir + outName + "_schedule.xml", outDir + outName + "_vehicles.xml");
+//		osmTransitMain.convertOsm2Matsim(transitFilter);
+//		osmTransitMain = null;
+//
+////		ResizeLinksByCount4 r = new ResizeLinksByCount4(outDir + outName + "_network.xml", counts, shortNameMap, 1.0);
+////		r.run(outDir + outName + "_network_resized.xml");
+////		r = null;
+//		counts = null;
+//		
+////		Set<String> linksBlocked = Fcd.readFcdReturningLinkIdsUsed(fcdNetInFile, fcdEventsInFile, outDir, outDir + outName + "_network_resized.xml", 500.0);
+//		Set<String> linksBlocked = new TreeSet<String>();
+//		
+//		//PTCountsNetworkSimplifier ptCountNetSimplifier = new PTCountsNetworkSimplifier(outDir + outName + "_network_resized.xml", outDir + outName + "_schedule.xml", outDir + outName + "_network_merged.xml", outDir + outName + "_schedule_merged.xml", shortNameMap, countsFile, countsOutFile, outDir + "transitVehicles.xml.gz", linksBlocked);
+//		PTCountsNetworkSimplifier ptCountNetSimplifier = new PTCountsNetworkSimplifier(outDir + outName + "_network.xml", outDir + outName + "_schedule.xml", outDir + outName + "_network_merged.xml", outDir + outName + "_schedule_merged.xml", shortNameMap, countsFile, countsOutFile, outDir + "transitVehicles.xml.gz", linksBlocked);
+//		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
+//		nodeTypesToMerge.add(new Integer(4));
+//		nodeTypesToMerge.add(new Integer(5));
+//		ptCountNetSimplifier.setNodesToMerge(nodeTypesToMerge);
+//		ptCountNetSimplifier.setMergeLinkStats(false);
+//		ptCountNetSimplifier.simplifyPTNetwork();		
 	}
 
 }

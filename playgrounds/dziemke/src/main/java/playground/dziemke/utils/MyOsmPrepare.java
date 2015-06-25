@@ -1,6 +1,5 @@
 package playground.dziemke.utils;
 
-import playground.andreas.mzilske.osm.OsmPrepare;
 
 public class MyOsmPrepare {
 
@@ -20,8 +19,8 @@ public class MyOsmPrepare {
 		String[] streetFilter = new String[]{"motorway","motorway_link","trunk","trunk_link","primary","primary_link","secondary","tertiary","minor","unclassified","residential","living_street"};
 		String[] transitFilter = new String[]{"ferry", "subway", "light_rail", "tram", "train", "bus", "trolleybus"};
 		
-		OsmPrepare osmPrepare = new OsmPrepare(inputFile, outputFile, streetFilter, transitFilter);
-		osmPrepare.prepareOsm();
+//		OsmPrepare osmPrepare = new OsmPrepare(inputFile, outputFile, streetFilter, transitFilter);
+//		osmPrepare.prepareOsm();
 	}
 
 }

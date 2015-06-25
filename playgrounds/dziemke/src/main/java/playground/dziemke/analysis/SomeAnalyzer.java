@@ -19,8 +19,6 @@
 
 package playground.dziemke.analysis;
 
-import playground.vsp.analysis.VspAnalyzer;
-import playground.vsp.analysis.modules.travelTime.TravelTimeAnalyzer;
 
 
 public class SomeAnalyzer {
@@ -29,16 +27,16 @@ public class SomeAnalyzer {
 		String outdir = "D:/Workspace/container/demand/output/run_31_cadyts/analysis/";
 		//String eventsFile = "D:/Workspace/container/demand/output/run_31_cadyts/ITERS/it.10/10.events.xml.gz";
 		
-//		VspAnalyzer analyzer = new VspAnalyzer(outdir, eventsFile);
-		VspAnalyzer analyzer = new VspAnalyzer(outdir);
-		
-//		CarDistanceAnalyzer carDistanceAnalyzer = new CarDistanceAnalyzer();
-//		analyzer.addAnalysisModule(carDistanceAnalyzer);
-		
-		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer();
-		analyzer.addAnalysisModule(travelTimeAnalyzer);
-		
-		analyzer.run();
+////		VspAnalyzer analyzer = new VspAnalyzer(outdir, eventsFile);
+//		VspAnalyzer analyzer = new VspAnalyzer(outdir);
+//		
+////		CarDistanceAnalyzer carDistanceAnalyzer = new CarDistanceAnalyzer();
+////		analyzer.addAnalysisModule(carDistanceAnalyzer);
+//		
+//		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer();
+//		analyzer.addAnalysisModule(travelTimeAnalyzer);
+//		
+//		analyzer.run();
 	}
 
 }
