@@ -35,14 +35,14 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final int NUMBER_OF_PERSONS = 5;
-
-	private final int INITROUTES = 1;
 	
-	private EventsManager events;
-
+	private int TTPERLink = 10;
+	
+	private boolean agentsToStuck = true;
+	
 	private String outputdir;
 	
-	private int TTperLink = 10;
+
 
 	
 	
@@ -54,11 +54,11 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	@Test
 	public void testGetTotalTT() {
-		outputdir = utils.getOutputDirectory() + "/Test_LinkTT" + TTperLink;
+		outputdir = utils.getOutputDirectory() + "/Test_LinkTT" + TTPERLink;
 		//TTperLink must not be 0;
-		if(TTperLink == 0) TTperLink = 1;
-		runSimulation();
-		this.events = EventsUtils.createEventsManager();
+		if(TTPERLink == 0) TTPERLink = 1;
+		runSimulation(agentsToStuck);
+		EventsManager events = EventsUtils.createEventsManager();
 		TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
 		events.addHandler(handler);
 		
@@ -73,7 +73,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		*LinkTraveltime on Link 5_6 is equivalent to TTperLink
 		*/
 		
-		Double expectedTravelTime = (double) (1+5*TTperLink+4)*NUMBER_OF_PERSONS;
+		Double expectedTravelTime = (double) (1+5*TTPERLink+4)*NUMBER_OF_PERSONS;
 		
 		Assert.assertEquals("iteration 0: TT stimmt nicht", expectedTravelTime , handler.getTotalTT(), MatsimTestUtils.EPSILON);
 		events.resetHandlers(0);
@@ -85,12 +85,13 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		
 	}
 	
-	private void runSimulation() {
+
+	private void runSimulation(boolean agentsToStuck) {
 		
 		// prepare config and scenario		
 		Config config = defineConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		adaptNetwork(scenario);
+		adaptNetwork(scenario, agentsToStuck);
 		createPopulation(scenario);
 		
 		// prepare the controller
@@ -108,10 +109,10 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		// set number of iterations
 		config.controler().setLastIteration( 2 );
 
-		// define strategies:
+		// make agents keep their initial plan selected
 		{
 			StrategySettings strat = new StrategySettings() ;
-			strat.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
+			strat.setStrategyName( DefaultSelector.KeepLastSelected.toString() );
 			strat.setWeight( 1) ;
 			strat.setDisableAfter( config.controler().getLastIteration() );
 			config.strategy().addStrategySettings(strat);
@@ -124,6 +125,9 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		config.controler().setWriteEventsInterval(1);
 		config.controler().setWritePlansInterval(1);
 		
+		//set StuckTime
+		config.qsim().setStuckTime(1800);
+		
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
 		config.planCalcScore().addActivityParams(dummyAct);
@@ -132,18 +136,28 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		return config;
 	}
 
-	private void adaptNetwork(Scenario scenario) {		
+	private void adaptNetwork(Scenario scenario , boolean agentsToStuck) {		
 		// set the links' travel times (by adapting free speed) and capacity (to unlimited)
+		
 		for(Link l : scenario.getNetwork().getLinks().values()){
+			if(l.getId().equals(Id.createLinkId("3_4"))){
+				if(agentsToStuck){
+						l.setLength(90000);
+						l.setFreespeed(1);
+						l.setCapacity(1);
+				}
+			}
+			else{
 			l.setCapacity(999999);
-			l.setFreespeed(200/TTperLink);
+			l.setFreespeed(200/TTPERLink);
+			}
 		}
 	}
-
+	
 	private void createPopulation(Scenario scenario) {		
 		TtCreateBraessPopulation popCreator = new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
-		popCreator.createPersons( INITROUTES );
+		popCreator.createPersons( 1 );
 	}
 
 	
