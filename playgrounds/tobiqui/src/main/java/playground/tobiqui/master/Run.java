@@ -5,10 +5,18 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.*;
 
@@ -68,8 +76,21 @@ public class Run {
 			}
 			i++;
 		}
-
-        List<Person> personsSorted = new ArrayList<Person>(scenario.getPopulation().getPersons().values()); //id's sorted by end_times of first activity of selectedPlans
+	
+		List<Person> personsSorted = new ArrayList<Person>(scenario.getPopulation().getPersons().values()); //id's sorted by end_times of first activity of selectedPlans
+		for (TransitLine transitLine : scenario.getTransitSchedule().getTransitLines().values()) {
+			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
+				for (Departure departure : transitRoute.getDepartures().values()) {
+					Id<Person> vehId = Id.createPersonId(departure.getVehicleId().toString());
+					Person person = scenario.getPopulation().getFactory().createPerson(vehId);
+					PlanImpl plan = new PlanImpl();
+					plan.createAndAddActivity("").setEndTime(departure.getDepartureTime());
+					person.addPlan(plan);
+					personsSorted.add(person);
+				}
+			}
+		}
+	
         Collections.sort(personsSorted, new Comparator<Person>() {
             @Override
             public int compare(Person o1, Person o2) {
@@ -77,10 +98,7 @@ public class Run {
             }
 
             private double firstActivityEndTime(Person o1) {
-            	if (((Leg) o1.getSelectedPlan().getPlanElements().get(1)).getMode().equals("car"))
-            		return ((Leg) o1.getSelectedPlan().getPlanElements().get(1)).getDepartureTime();
-            	else
-            		return ((Activity) o1.getSelectedPlan().getPlanElements().get(0)).getEndTime();
+            	return ((Activity) o1.getSelectedPlan().getPlanElements().get(0)).getEndTime();
             }
         });
 

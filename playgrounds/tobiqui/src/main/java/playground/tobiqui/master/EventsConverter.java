@@ -23,6 +23,7 @@
 package playground.tobiqui.master;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -32,13 +33,27 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.facilities.ActivityFacility;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -55,20 +70,42 @@ public class EventsConverter{
 	static LinkedHashMap<Id<Vehicle>, VehicleData> vehicles = new LinkedHashMap<>();
 	static LinkedHashMap<Id<Person>, PersonData> persons = new LinkedHashMap<>();
 	static List<Event> events = new ArrayList<>();
-	static Boolean parsePersonInfoOnly = false;
-	static Boolean parsePersonsOnly = false;
-	static Boolean parseVehiclesOnly = false;
-	public static void main(String[] args) {
-		EventsParser eventsParser = new EventsParser();
-		parsePersonInfoOnly = true;
-		eventsParser.parse("E:/MA/sumo-0.22.0/bin/tripInfo.xml");
-		parsePersonInfoOnly = false;
-		parseVehiclesOnly = true;
-		eventsParser.parse("E:/MA/sumo-0.22.0/bin/vehroute.xml");
-		parsePersonsOnly = true;
-		parseVehiclesOnly = false;
-		eventsParser.parse("E:/MA/sumo-0.22.0/bin/vehroute.xml");
+	static String option;
 
+	static String configFileName = "../../matsim/examples/siouxfalls-2014/config_renamed.xml";
+	static String populationInput = "../../matsim/output/siouxfalls-2014_renamed/output_plans.xml.gz";
+
+	static Config config = ConfigUtils.loadConfig(configFileName);
+	static Scenario scenario = ScenarioUtils.createScenario(config);
+	static {new MatsimPopulationReader(scenario).readFile(populationInput);}
+
+	public static void main(String[] args) {
+		Boolean runTest = false; //true -> run with normal files; false -> run with test-files
+		String inputTripInfo = "E:/MA/sumo-0.22.0/bin/tripInfo.xml";
+		String inputVehroute = "E:/MA/sumo-0.22.0/bin/vehroute.xml";
+		String inputTripInfoTest = "../../matsim/output/siouxfalls-2014/TestTripInfo.xml";
+		String inputVehrouteTest = "../../matsim/output/siouxfalls-2014/TestVehroute.xml";
+		String outputEvents = "../../matsim/output/siouxfalls-2014/events.xml";
+		String outputEventsTest = "../../matsim/output/siouxfalls-2014/TestEvents.xml";//
+		EventsParser eventsParser = new EventsParser();
+		option = "parsePersonInfoOnly";
+		if (runTest.equals(false)){
+			eventsParser.parse(inputTripInfo);
+			option = "parseVehiclesOnly";
+			eventsParser.parse(inputVehroute);
+			option = "parseBusStopsOnly";
+			eventsParser.parse(inputVehroute);
+			option = "parsePersonsOnly";
+			eventsParser.parse(inputVehroute);
+		}else{
+			eventsParser.parse(inputTripInfoTest);
+			option = "parseVehiclesOnly";
+			eventsParser.parse(inputVehrouteTest);
+			option = "parseBusStopsOnly";
+			eventsParser.parse(inputVehrouteTest);
+			option = "parsePersonsOnly";
+			eventsParser.parse(inputVehrouteTest);
+		}
 		for(VehicleData vd : vehicles.values()){
 			for(int it = 0; it < vd.getLinkTimes().size(); it++){
 				Id<Link> linkId = vd.getLinkTimes().get(it).getId();
@@ -82,10 +119,10 @@ public class EventsConverter{
 					personId = Id.createPersonId("pt_" + vehicleId + "_" + vd.getType().getId().toString());
 				if (linkEntered != null)
 					events.add(new LinkEnterEvent(linkEntered, personId, linkId, vd.getId()));
-				events.add(new LinkLeaveEvent(linkLeft, personId, linkId, vd.getId()));
+				if (it < vd.getLinkTimes().size() -1)
+					events.add(new LinkLeaveEvent(linkLeft, personId, linkId, vd.getId()));
 			}
 		}
-		
 		Collections.sort(events, new Comparator<Event>() {
 			@Override
 			public int compare(Event o1, Event o2) {
@@ -94,13 +131,16 @@ public class EventsConverter{
 		});
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EventWriterXML eventWriterXML = new EventWriterXML("../../matsim/output/siouxfalls-2014/events.xml");
+		EventWriterXML eventWriterXML;
+		if (runTest.equals(false))
+			eventWriterXML = new EventWriterXML(outputEvents);
+		else
+			eventWriterXML = new EventWriterXML(outputEventsTest);
 		eventsManager.addHandler(eventWriterXML);
 		for (Event event : events) {
 			eventsManager.processEvent(event);
 		}
 		eventWriterXML.closeFile();
-
 	}
 
 	static class EventsParser extends MatsimXmlParser{
@@ -112,6 +152,8 @@ public class EventsConverter{
 		Id<Person> personId;
 		Id<Vehicle> vehicleId;
 		ArrayList<LinkData> linkTimes = new ArrayList<>();
+		LinkedHashMap<Id<Link>, Double> busStopDepartures;
+		String[] lines;
 		ArrayList<TripData> tripInfo;
 		int tripIndex = 0;
 		Double actTime = 0.0;
@@ -121,9 +163,10 @@ public class EventsConverter{
 		Double duration;
 		Double departure;
 		String mode;
+		Boolean isFirstRide = true;
 		@Override
 		public void startTag(String name, Attributes atts, Stack<String> context) {
-			if (parsePersonInfoOnly){
+			if (option.equals("parsePersonInfoOnly")){
 				if ("personinfo".equals(name)){
 					personId = Id.create(atts.getValue("id"), Person.class);
 					personData = new PersonData(personId);
@@ -154,8 +197,8 @@ public class EventsConverter{
 					}
 				}
 			}
-			
-			if (parseVehiclesOnly){
+
+			if (option.equals("parseVehiclesOnly")){
 				if ("vehicle".equals(name)){
 					vehicleId = Id.create(atts.getValue("id"), Vehicle.class);
 					VehicleType type = new VehicleTypeImpl(Id.create(atts.getValue("type"), VehicleType.class));
@@ -190,66 +233,163 @@ public class EventsConverter{
 					}
 					vehicleData.setLinkTimes(linkTimes);
 					vehicles.put(vehicleId, vehicleData);
+					if (vehicleData.getType().getId().toString().startsWith("Bus")){
+						Id<Person> driverId = Id.createPersonId("pt_" + vehicleId + "_" + vehicleData.getType().getId().toString());
+						Id<TransitLine> transitLineId = Id.create(vehicleId.toString().substring(vehicleId.toString().indexOf("_") + 1, vehicleId.toString().lastIndexOf("_")), TransitLine.class);
+						Id<TransitRoute> transitRouteId = Id.create(edges[0] + "to" + edges[edges.length-1], TransitRoute.class);
+						Id<Departure> departureId = Id.create(vehicleId.toString().substring(vehicleId.toString().lastIndexOf("_") + 1, vehicleId.toString().length()), Departure.class);
+						//						System.out.println(departure + "\t" + vehicleId + "\t" + driverId + "\t" + transitLineId + "\t" + transitRouteId + "\t" + departureId);
+						events.add(new TransitDriverStartsEvent(vehicleData.getDeparture(), driverId, vehicleId, transitLineId, transitRouteId, departureId));
+						Id<Link> startLink = Id.createLinkId(edges[0]);
+						Id<Link> endLink = Id.createLinkId(edges[edges.length-1]);
+						Id<TransitStopFacility> to = Id.create(endLink, TransitStopFacility.class);
+						events.add(new PersonDepartureEvent(vehicleData.getDeparture(), driverId, startLink, "car"));
+						events.add(new PersonEntersVehicleEvent(vehicleData.getDeparture(), driverId, vehicleId));
+						events.add(new VehicleDepartsAtFacilityEvent(vehicleData.getArrival(), vehicleId, to, 0));
+						events.add(new PersonLeavesVehicleEvent(vehicleData.getArrival(), driverId, vehicleId));
+						events.add(new PersonArrivalEvent(vehicleData.getArrival(), driverId, endLink, "car"));
+					}
 				}
 			}
-			if (parsePersonsOnly){
+			if (option.equals("parseBusStopsOnly")){
+				//get busStop departures
+				if ("person".equals(name)){
+					personId = Id.create(atts.getValue("id"), Person.class);
+					busStopDepartures = new LinkedHashMap<>();
+					isFirstRide = true;
+					tripIndex = 1;
+				}
+				if (personId.toString().contains("pt")){
+					if ("ride".equals(name)){
+						Id<Link> stopId = Id.createLinkId(atts.getValue("from"));
+						Double departure = persons.get(personId).getTripInfo().get(tripIndex).getDeparture();
+						busStopDepartures.put(stopId, departure);
+						if (isFirstRide){
+							vehicleId = Id.create(atts.getValue("lines"), Vehicle.class);
+							isFirstRide = false;
+						}
+						tripIndex++;
+					}
+					if ("stop".equals(name)){
+						tripIndex++;
+					}
+				}
+			}
+			if (option.equals("parsePersonsOnly")){
 				if ("person".equals(name)){
 					tripIndex = 1;
 					personId = Id.create(atts.getValue("id"), Person.class);
 				}
 
 				if ("walk".equals(name)){
-					mode = "walk";
-					String edges = atts.getValue("edges");
-					if (edges.contains(" ")){ //walk has more than one edge?
-						firstLinkId = Id.createLinkId(edges.substring(0, edges.indexOf(" ")));
-						lastLinkId = Id.createLinkId(edges.substring(edges.lastIndexOf(" ") + 1, edges.length()));
-					}else{
-						firstLinkId = Id.createLinkId(edges); //walk has only one edge
-						lastLinkId = firstLinkId;
+					if (personId.toString().contains("pt") == false){
+						mode = "walk";
+						String edges = atts.getValue("edges");
+						if (edges.contains(" ")){ //walk has more than one edge?
+							firstLinkId = Id.createLinkId(edges.substring(0, edges.indexOf(" ")));
+							lastLinkId = Id.createLinkId(edges.substring(edges.lastIndexOf(" ") + 1, edges.length()));
+						}else{
+							firstLinkId = Id.createLinkId(edges); //walk has only one edge
+							lastLinkId = firstLinkId;
+						}
+						Double departure = persons.get(personId).getTripInfo().get(tripIndex-1).getArrival();
+						Double arrival = persons.get(personId).getTripInfo().get(tripIndex).getArrival();
+						Double duration = Double.valueOf(atts.getValue("duration"));
+						Id<ActivityFacility> actFacId = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex-1)).getFacilityId();
+						String actType = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex-1)).getType();
+						mode = ((Leg) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex)).getMode();
+						events.add(new ActivityEndEvent(departure, personId, firstLinkId, actFacId, actType));
+						events.add(new PersonDepartureEvent(departure, personId, firstLinkId, mode));
+						events.add(new PersonArrivalEvent(arrival, personId, lastLinkId, mode));
+						actFacId = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex+1)).getFacilityId();
+						actType = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex+1)).getType();
+						events.add(new ActivityStartEvent(arrival, personId, lastLinkId, actFacId, actType));
 					}
-					Double arrival = persons.get(personId).getTripInfo().get(tripIndex).getArrival();
-					Double duration = Double.valueOf(atts.getValue("duration"));
-					events.add(new ActivityEndEvent(arrival - duration, personId, firstLinkId, Id.create("unknown", ActivityFacility.class), "test"));
-					events.add(new PersonDepartureEvent(arrival - duration, personId, firstLinkId, mode));
-					events.add(new PersonArrivalEvent(arrival, personId, lastLinkId, mode));
-					if (persons.get(personId).getTripInfo().size() > tripIndex + 1)
-						events.add(new ActivityStartEvent(arrival, personId, lastLinkId, Id.create("unknown", ActivityFacility.class), "test"));
 					tripIndex++;
 				}
 				if ("ride".equals(name)){
-					if (atts.getValue("lines").contains("car"))
-						mode = "car";
-					if (atts.getValue("lines").contains("bus"))
-						mode = "pt";
+					if (personId.toString().contains("pt") == false){
+						if (atts.getValue("lines").contains("car"))
+							mode = "car";
+						if (atts.getValue("lines").contains("bus")){
+							mode = "pt";
+							lines = atts.getValue("lines").split(" ");
+						}
 
-					firstLinkId = Id.createLinkId(atts.getValue("from"));
-					lastLinkId = Id.createLinkId(atts.getValue("to"));
+						firstLinkId = Id.createLinkId(atts.getValue("from"));
+						lastLinkId = Id.createLinkId(atts.getValue("to"));
 
-					Double departure = persons.get(personId).getTripInfo().get(tripIndex).getDeparture();
-					Double arrival;
-					if (persons.get(personId).getTripInfo().get(tripIndex).getArrival() != null)
-						arrival = persons.get(personId).getTripInfo().get(tripIndex).getArrival();
-					else
-						arrival = null;
-					events.add(new ActivityEndEvent(departure, personId, lastLinkId, Id.create("unknown", ActivityFacility.class), "test"));
-					events.add(new PersonDepartureEvent(departure, personId, lastLinkId, mode));
-					if ("car".equals(mode))
-						events.add(new PersonEntersVehicleEvent(departure, personId, Id.create("car_" + personId.toString(), Vehicle.class)));
-					if (arrival != null){
-						if ("car".equals(mode))
-							events.add(new PersonLeavesVehicleEvent(arrival, personId, Id.create("car_" + personId.toString(), Vehicle.class)));
-						events.add(new PersonArrivalEvent(arrival, personId, lastLinkId, mode));
-						if (persons.get(personId).getTripInfo().size() > tripIndex + 1)
-							events.add(new ActivityStartEvent(arrival, personId, lastLinkId, Id.create("unknown", ActivityFacility.class), "test"));
+						Double departure = persons.get(personId).getTripInfo().get(tripIndex).getDeparture();
+						Double arrival;
+						Id<ActivityFacility> actFacId = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex-1)).getFacilityId();
+						String actType = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex-1)).getType();
+						if (persons.get(personId).getTripInfo().get(tripIndex).getArrival() != null)
+							arrival = persons.get(personId).getTripInfo().get(tripIndex).getArrival();
+						else
+							arrival = null;
+						//						events.add(new ActivityEndEvent(departure, personId, firstLinkId, actFacId, actType));
+						//						events.add(new PersonDepartureEvent(departure, personId, firstLinkId, mode));
+						if ("pt".equals(mode)){
+							Double ptDeparture = persons.get(personId).getTripInfo().get(tripIndex-1).getArrival();
+							Id<TransitStopFacility> from = Id.create(firstLinkId, TransitStopFacility.class);
+							Id<TransitStopFacility> to = Id.create(lastLinkId, TransitStopFacility.class);
+							events.add(new ActivityEndEvent(ptDeparture, personId, firstLinkId, actFacId, actType));
+							events.add(new PersonDepartureEvent(ptDeparture, personId, firstLinkId, mode));
+							events.add(new AgentWaitingForPtEvent(ptDeparture, personId, from, to));
+						}
+						if ("car".equals(mode)){
+							events.add(new ActivityEndEvent(departure, personId, firstLinkId, actFacId, actType));
+							events.add(new PersonDepartureEvent(departure, personId, firstLinkId, mode));
+							events.add(new PersonEntersVehicleEvent(departure, personId, Id.create("car_" + personId.toString(), Vehicle.class)));
+						}else
+							if ("pt".equals(mode))
+								for(int i = 0; i < lines.length; i++){
+									Id<Vehicle> busId = Id.create(lines[i], Vehicle.class);
+									Double busDeparture, busArrival;
+									if (vehicles.containsKey(busId)){
+										busDeparture = vehicles.get(busId).getDeparture();
+										busArrival = vehicles.get(busId).getArrival();
+									}
+									else{
+										System.out.println(busId.toString() + "not in vehicles");
+										continue;
+									}
+									//									System.out.println(lines[i] + " " + firstLinkId + ": " + vehicles.get(busId).getBusStopDepartures().get(firstLinkId) + " <-> " + departure);
+									if (vehicles.get(busId).getBusStopDepartures().get(firstLinkId) - departure == 0){
+										events.add(new PersonEntersVehicleEvent(departure, personId, busId));
+										events.add(new PersonLeavesVehicleEvent(arrival, personId, busId));
+										break;
+									}
+									if (i - lines.length + 1 == 0)
+										System.out.println("no PersonEnters- and PersonLeavesVehicleEvents created (personId: " + personId.toString());
+								}
+						if (arrival != null){
+							if ("car".equals(mode))
+								events.add(new PersonLeavesVehicleEvent(arrival, personId, Id.create("car_" + personId.toString(), Vehicle.class)));
+							events.add(new PersonArrivalEvent(arrival, personId, lastLinkId, mode));
+
+							actFacId = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex+1)).getFacilityId();
+							actType = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex+1)).getType();
+							events.add(new ActivityStartEvent(arrival, personId, lastLinkId, actFacId, actType));
+						}
+					}else{
+						vehicleId = Id.create(atts.getValue("lines"), Vehicle.class);
+						Double arrival = persons.get(personId).getTripInfo().get(tripIndex-1).getArrival();
+						Double departure = persons.get(personId).getTripInfo().get(tripIndex).getDeparture();
+						Id<TransitStopFacility> from = Id.create(atts.getValue("from").replace("-", "_"), TransitStopFacility.class);
+						events.add(new VehicleArrivesAtFacilityEvent(arrival, vehicleId, from, 0));
+						events.add(new VehicleDepartsAtFacilityEvent(departure, vehicleId, from, 0));
+						if (persons.get(personId).getTripInfo().size() - tripIndex == 1){
+							Id<TransitStopFacility> to = Id.create(atts.getValue("to").replace("-", "_"), TransitStopFacility.class);
+							arrival = persons.get(personId).getTripInfo().get(tripIndex).getArrival();
+							events.add(new VehicleArrivesAtFacilityEvent(arrival, vehicleId, to, 0));
+						}
 					}
-					
 					tripIndex++;
 				}
-			}
-
-			if ("stop".equals(name)){
-				tripIndex++;
+				if ("stop".equals(name)){
+					tripIndex++;
+				}
 			}
 		}
 
@@ -259,7 +399,12 @@ public class EventsConverter{
 				personData.setTripInfo(tripInfo);
 				persons.put(personId, personData);
 			}
-			// TODO Auto-generated method stub		
+			if (option.equals("parseBusStopsOnly"))
+				if ("person".equals(name))
+					if (personId.toString().contains("pt")){
+						vehicles.get(vehicleId).setBusStopDepartures(busStopDepartures);
+						//						System.out.println(vehicleId + ": " + vehicles.get(vehicleId).getBusStopDepartures().values().toString());
+					}
 		}
 	}
 
@@ -269,6 +414,7 @@ public class EventsConverter{
 		private Double departure;
 		private Double arrival;
 		private ArrayList<LinkData> linkTimes = new ArrayList<>();
+		private LinkedHashMap<Id<Link>, Double> busStopDepartures = new LinkedHashMap<>(); //for busses only
 
 		public VehicleData(Id<Vehicle> id, VehicleType type, Double departure,
 				Double arrival) {
@@ -280,6 +426,14 @@ public class EventsConverter{
 
 		public void setLinkTimes(ArrayList<LinkData> linkTimes) {
 			this.linkTimes = linkTimes;
+		}
+
+		public LinkedHashMap<Id<Link>, Double> getBusStopDepartures() {
+			return busStopDepartures;
+		}
+
+		public void setBusStopDepartures(LinkedHashMap<Id<Link>, Double> busStopDepartures) {
+			this.busStopDepartures = busStopDepartures;
 		}
 
 		@Override
@@ -358,16 +512,16 @@ public class EventsConverter{
 			return left;
 		}
 	}
-	
+
 	static class TripData{
 		private String type;	//stop, walk or ride
 		private Double arrival;
 		private Double departure;
-		
+
 		public TripData(String type){
 			this.type = type;
 		}
-		
+
 		public Double getArrival() {
 			return arrival;
 		}

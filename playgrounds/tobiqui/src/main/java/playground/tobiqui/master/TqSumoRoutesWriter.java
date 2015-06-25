@@ -47,22 +47,9 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 	public void writeFiles(){
 
 		try {
-			//write routesFile
-			FileOutputStream os = new FileOutputStream(outputRoute);
-			super.openOutputStream(os);
-			super.writeStartTag("routes", null);
-			//			writeVTypes();
-			//			System.out.println("writing vTypes completed");
-			//			writeVehicles();
-			//			System.out.println("writing Vehicles completed");
-			writePersons();
-			System.out.println("writing Persons completed");
-			super.writeEndTag("routes");
-			super.writer.close();
-
 			//write additionalFile
 			FileOutputStream add = new FileOutputStream(outputAdditional);
-			this.writer = new BufferedWriter(new OutputStreamWriter(add));
+			super.openOutputStream(add);
 			super.writeStartTag("additional", null);
 			writeVTypes();
 			System.out.println("writing vTypes completed");
@@ -71,6 +58,15 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			writeVehicles();
 			System.out.println("writing Vehicles completed");
 			super.writeEndTag("additional");
+			super.writer.close();
+			
+			//write routesFile
+			FileOutputStream os = new FileOutputStream(outputRoute);
+			this.writer = new BufferedWriter(new OutputStreamWriter(os));
+			super.writeStartTag("routes", null);
+			writePersons();
+			System.out.println("writing Persons completed");
+			super.writeEndTag("routes");
 			super.writer.close();
 
 		} catch (IOException e) {
@@ -117,75 +113,110 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 	void writePersons(){
 		for (Person p : persons) {
 			Id<Person> id = p.getId();
-			String departure = null;
-			PlanImpl pli = (PlanImpl) p.getSelectedPlan();
-			Activity act = pli.getFirstActivity();
-			Activity lastAct = pli.getLastActivity();
-			Leg leg = pli.getNextLeg(act);
-			Activity nextAct = pli.getNextActivity(leg);
-			if (leg.getMode().equals("car"))
-				departure = String.valueOf(leg.getDepartureTime());
-			else
-				departure = String.valueOf(pli.getFirstActivity().getEndTime());
+			if (id.toString().contains("bus") == false){
+				PlanImpl pli = (PlanImpl) p.getSelectedPlan();
+				Activity act = pli.getFirstActivity();
+				Activity lastAct = pli.getLastActivity();
+				Leg leg = pli.getNextLeg(act);
+				Activity nextAct = pli.getNextActivity(leg);
+				String departure = String.valueOf(pli.getFirstActivity().getEndTime());
 
-			list.clear();
-			list.add(new Tuple<String, String>("id", id.toString()));
-			list.add(new Tuple<String, String>("depart", departure));
-			super.writeStartTag("person", list);
-			list.clear();
-
-			while (act != lastAct){
-				list.add(new Tuple<String, String>("from", act.getLinkId().toString()));
-				list.add(new Tuple<String, String>("to", nextAct.getLinkId().toString()));
-				if (leg.getMode().equals("car")){
-					list.add(new Tuple<String, String>("lines", "car_" + id.toString()/* + "_" + nextAct.getType()*/));
-					super.writeStartTag("ride", list, true);
-				}else if (leg.getMode().contains("walk")){
-					list.add(new Tuple<String, String>("duration", String.valueOf((leg.getTravelTime()))));
-					super.writeStartTag("walk", list, true);
-				}else if (leg.getMode().equals("pt")){ //add pt
-					String routeInfo = ((GenericRouteImpl) leg.getRoute()).getRouteDescription();
-					String line = routeInfo.split("===")[2];
-					String route = routeInfo.split("===")[3];
-					Id<TransitLine> lineId = Id.create(line, TransitLine.class);
-					Id<TransitRoute> routeId = Id.create(route, TransitRoute.class);
-
-					String lines = "";
-					Collection<Departure> departures = transitSchedule.getTransitLines().get(lineId).getRoutes().get(routeId).getDepartures().values();
-					for (Departure dep : departures){
-						lines = lines.concat(dep.getVehicleId().toString() + " ");
-					}
-					if (lines.endsWith(" "))
-						lines = lines.substring(0, lines.length() - 1);
-
-					list.add(new Tuple<String, String>("lines", lines));
-					list.add(new Tuple<String, String>("arrivalPos", "-10"));
-					super.writeStartTag("ride", list, true); //muss noch angepasst werden
-				}
+				list.clear();
+				list.add(new Tuple<String, String>("id", id.toString()));
+				list.add(new Tuple<String, String>("depart", departure));
+				super.writeStartTag("person", list);
 				list.clear();
 
-				if (nextAct != lastAct){
-					list.add(new Tuple<String, String>("lane", nextAct.getLinkId().toString() + "_0"));
-					if (nextAct.getEndTime() > 0)
-						if (pli.getNextLeg(nextAct).getMode().toString().equals("car"))
-							list.add(new Tuple<String, String>("until", String.valueOf(pli.getNextLeg(nextAct).getDepartureTime())));
-						else
-							list.add(new Tuple<String, String>("until", String.valueOf(nextAct.getEndTime())));
-					else
-						list.add(new Tuple<String, String>("duration", "0"));
-					list.add(new Tuple<String, String>("actType", nextAct.getType()));
-					list.add(new Tuple<String, String>("startPos", "0"));
-					list.add(new Tuple<String, String>("endPos", "10"));
-					super.writeStartTag("stop", list, true);
+				while (act != lastAct){
+					list.add(new Tuple<String, String>("from", act.getLinkId().toString()));
+					list.add(new Tuple<String, String>("to", nextAct.getLinkId().toString()));
+					if (leg.getMode().equals("car")){
+						list.add(new Tuple<String, String>("lines", "car_" + id.toString()/* + "_" + nextAct.getType()*/));
+						super.writeStartTag("ride", list, true);
+					}else if (leg.getMode().contains("walk")){
+						list.add(new Tuple<String, String>("duration", String.valueOf((leg.getTravelTime()))));
+						super.writeStartTag("walk", list, true);
+					}else if (leg.getMode().equals("pt")){ //add pt
+						String routeInfo = ((GenericRouteImpl) leg.getRoute()).getRouteDescription();
+						String line = routeInfo.split("===")[2];
+						String route = routeInfo.split("===")[3];
+						Id<TransitLine> lineId = Id.create(line, TransitLine.class);
+						Id<TransitRoute> routeId = Id.create(route, TransitRoute.class);
+
+						String lines = "";
+						Collection<Departure> departures = transitSchedule.getTransitLines().get(lineId).getRoutes().get(routeId).getDepartures().values();
+						for (Departure dep : departures){
+							lines = lines.concat(dep.getVehicleId().toString() + " ");
+						}
+						if (lines.endsWith(" "))
+							lines = lines.substring(0, lines.length() - 1);
+
+						list.add(new Tuple<String, String>("lines", lines));
+						super.writeStartTag("ride", list, true); 
+					}
 					list.clear();
+
+					if (nextAct != lastAct){
+						list.add(new Tuple<String, String>("lane", nextAct.getLinkId().toString() + "_0"));
+						if (nextAct.getEndTime() > 0)
+							if (pli.getNextLeg(nextAct).getMode().toString().equals("car"))
+								list.add(new Tuple<String, String>("until", String.valueOf(pli.getNextLeg(nextAct).getDepartureTime())));
+							else
+								list.add(new Tuple<String, String>("until", String.valueOf(nextAct.getEndTime())));
+						else
+							list.add(new Tuple<String, String>("duration", "0"));
+						list.add(new Tuple<String, String>("actType", nextAct.getType()));
+						list.add(new Tuple<String, String>("startPos", "0"));
+						list.add(new Tuple<String, String>("endPos", "10"));
+						super.writeStartTag("stop", list, true);
+						list.clear();
+					}
+					act = nextAct;
+					if (act != lastAct){
+						leg = pli.getNextLeg(act);
+						nextAct = pli.getNextActivity(leg);
+					}
 				}
-				act = nextAct;
-				if (act != lastAct){
-					leg = pli.getNextLeg(act);
-					nextAct = pli.getNextActivity(leg);
+				super.writeEndTag("person");
+			}else{	//write bus drivers
+				Id<Vehicle> vehicleId = Id.create(id, Vehicle.class);
+				if (vehicles2BSorted.get(vehicleId).getType().getId().toString().contains("Bus")){
+					VehicleInformation vehicleInfo = vehicles2BSorted.get(vehicleId);
+					Id<Person> driverId = Id.createPersonId("pt_" + vehicleId.toString() + "_" + vehicleInfo.getType().getId().toString());;
+					Double departure = vehicleInfo.getDeparture();
+
+					list.clear();
+					list.add(new Tuple<String, String>("id", driverId.toString()));
+					list.add(new Tuple<String, String>("depart", departure.toString()));
+					super.writeStartTag("person", list);
+					list.clear();
+
+					String tempFromLink = "";
+					int index = 0;
+					for (String busStopFacility : vehicleInfo.getBusStopFacilities()){
+						if (index == 0){
+							tempFromLink = busStopFacility.replace("_", "-");
+							index++;
+							continue;
+						}else{
+							list.add(new Tuple<String, String>("from", tempFromLink));
+							list.add(new Tuple<String, String>("to", busStopFacility.replace("_", "-")));
+							list.add(new Tuple<String, String>("lines", vehicleId.toString()));
+							list.add(new Tuple<String, String>("arrivalPos", "-10"));
+							super.writeStartTag("ride", list, true);
+							list.clear();					
+							list.add(new Tuple<String, String>("busStop", busStopFacility));
+							list.add(new Tuple<String, String>("duration", "20"));
+							super.writeStartTag("stop", list, true);
+							list.clear();
+							
+							tempFromLink = busStopFacility.replace("_", "-");
+							index++;
+						}
+					}
+					super.writeEndTag("person");
 				}
 			}
-			super.writeEndTag("person");
 		}
 	}
 
@@ -250,6 +281,8 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 		int count = 0;
 		for (Person p : persons) {
 			Id<Person> id = p.getId();
+			if (id.toString().contains("bus"))
+				continue;
 			PlanImpl pli = (PlanImpl) p.getSelectedPlan();
 
 			Activity act = pli.getFirstActivity();
@@ -267,7 +300,7 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 				if (leg.getMode().equals("car")){
 					containsCar = true;
 					if (firstCarLeg)
-						carDeparture = leg.getDepartureTime(); /*act.getEndTime();*/
+						carDeparture = act.getEndTime();
 					firstCarLeg = false;
 					//					Id<Vehicle> idV = Id.create("car_" + id.toString()/* + "_" + nextAct.getType()*/, Vehicle.class);
 
