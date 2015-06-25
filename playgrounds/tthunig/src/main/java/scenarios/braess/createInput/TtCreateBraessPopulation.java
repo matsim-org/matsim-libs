@@ -130,7 +130,7 @@ public class TtCreateBraessPopulation {
 	 */
 	public void createPersons(int numberOfInitRoutes, Double initPlanScore) {
 		
-		for (int i = 0; i < numberOfPersons; i++) {
+		for (int i = 0; i < this.numberOfPersons; i++) {
 
 			// create a person and a plan container
 			Person person = population.getFactory().createPerson(
