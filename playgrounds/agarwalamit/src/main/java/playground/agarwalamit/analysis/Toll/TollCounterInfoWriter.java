@@ -19,9 +19,6 @@
 package playground.agarwalamit.analysis.Toll;
 
 import java.io.BufferedWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -33,8 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
-
-import com.vividsolutions.jts.shape.fractal.SierpinskiCarpetBuilder;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.munich.ExtendedPersonFilter;
@@ -65,8 +60,8 @@ public class TollCounterInfoWriter extends AbstractAnalyisModule {
 	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	private final String suffixForSoring = "_sorted";
 
-	private SortedMap<Double,Map<UserGroup, Integer>> userGroup2TollPayers = new TreeMap<Double, Map<UserGroup,Integer>>();
-	private SortedMap<Double,Map<UserGroup, Integer>> userGroup2TolledTrips = new TreeMap<Double, Map<UserGroup,Integer>>();
+	private SortedMap<Double, SortedMap<UserGroup, Integer>> userGroup2TollPayers = new TreeMap<Double, SortedMap<UserGroup,Integer>>();
+	private SortedMap<Double,SortedMap<UserGroup, Integer>> userGroup2TolledTrips = new TreeMap<Double, SortedMap<UserGroup,Integer>>();
 	private SortedMap<Double,Integer> timeBin2TolledLinks = new TreeMap<Double,Integer>();
 
 	public static void main(String[] args) {
@@ -100,8 +95,8 @@ public class TollCounterInfoWriter extends AbstractAnalyisModule {
 
 		// initialize
 		for(Double d : timeBin2PersonInfo.keySet()){
-			Map<UserGroup, Integer> usrGrp2Cnt = new HashMap<UserGroup, Integer>();
-			Map<UserGroup, Integer> usrGrp2Cnt2 = new HashMap<UserGroup, Integer>();
+			SortedMap<UserGroup, Integer> usrGrp2Cnt = new TreeMap<UserGroup, Integer>();
+			SortedMap<UserGroup, Integer> usrGrp2Cnt2 = new TreeMap<UserGroup, Integer>();
 			for(UserGroup ug:UserGroup.values()){
 				usrGrp2Cnt.put(ug, 0);
 				usrGrp2Cnt2.put(ug, 0);
@@ -113,23 +108,18 @@ public class TollCounterInfoWriter extends AbstractAnalyisModule {
 
 		//timeBin2UserGrp2TolledPerson
 		for(Double d : timeBin2PersonInfo.keySet()){
-			Map<UserGroup,Integer> usrGrp2Person = this.userGroup2TollPayers.get(d);
-			System.out.println("Size from delay "+timeBin2PersonInfo.get(d).size());
+			SortedMap<UserGroup,Integer> usrGrp2Person = this.userGroup2TollPayers.get(d);
 			for(Id<Person> personId : timeBin2PersonInfo.get(d).keySet()){
 				if(timeBin2PersonInfo.get(d).get(personId)==0.) continue;
 				UserGroup ug = this.pf.getUserGroupFromPersonId(personId);
 				usrGrp2Person.put(ug, usrGrp2Person.get(ug)+1);
-				System.out.println(usrGrp2Person.toString());
 			}
 		}
 
 		//timeBin2UserGrp2TolledTrips
 		SortedMap<Double,List<Id<Person>>> timeBin2TolledPersonsList = this.cda.getTimeBin2ListOfTollPayers();
 		for(Double d : timeBin2TolledPersonsList.keySet()){
-			Map<UserGroup,Integer> usrGrp2Trips = this.userGroup2TolledTrips.get(d);
-			
-			 int sizeoflist = timeBin2TolledPersonsList.get(d).size(); System.out.println("Size of list "+ sizeoflist);
-			 int sizeofset = (new HashSet<Id<Person>>(timeBin2TolledPersonsList.get(d))).size(); System.out.println("Size of set "+ sizeofset);
+			SortedMap<UserGroup,Integer> usrGrp2Trips = this.userGroup2TolledTrips.get(d);
 			
 			for(Id<Person> personId : timeBin2TolledPersonsList.get(d)){
 				UserGroup ug = this.pf.getUserGroupFromPersonId(personId);
