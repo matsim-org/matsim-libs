@@ -53,7 +53,7 @@ public class VisLinkWLanes implements Serializable{
 	private Point2D.Double linkStartCenterPoint = null;
 	private Point2D.Double linkEndCenterPoint = null;
 	private Map<String, VisSignal> signals = null;
-	private ArrayList<Id<Link>> toLinkIds;
+	private ArrayList<String> toLinkIds;
 	private transient List<VisLinkWLanes> toLinks = null;
 	private CoordImpl startCoord;
 	private CoordImpl endCoord;
@@ -190,13 +190,13 @@ public class VisLinkWLanes implements Serializable{
 		return this.toLinks ;
 	}
 	
-	public void addToLinkId(Id<Link> toLinkId){
+	public void addToLinkId(String toLinkId){
 		if (this.toLinkIds == null)
 			this.toLinkIds = new ArrayList<>();
 		this.toLinkIds.add(toLinkId);
 	}
 
-	public List<Id<Link>> getToLinkIds() {
+	public List<String> getToLinkIds() {
 		return toLinkIds ;
 	}
 

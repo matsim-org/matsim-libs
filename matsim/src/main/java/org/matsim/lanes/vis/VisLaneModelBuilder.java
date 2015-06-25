@@ -111,8 +111,8 @@ public class VisLaneModelBuilder {
 		for (VisLinkWLanes otfLink : otfNetwork.values()){
 			if (otfLink.getLaneData() == null || otfLink.getLaneData().isEmpty()){
 				if (otfLink.getToLinkIds() != null){
-					for (Id<Link> toLinkId : otfLink.getToLinkIds()){
-						VisLinkWLanes toLink = otfNetwork.get(toLinkId.toString());
+					for (String toLinkId : otfLink.getToLinkIds()){
+						VisLinkWLanes toLink = otfNetwork.get(toLinkId);
 						otfLink.addToLink(toLink);
 					}
 				}
@@ -120,8 +120,8 @@ public class VisLaneModelBuilder {
 			else {
 				for (VisLane otfLane : otfLink.getLaneData().values()){
 					if (otfLane.getToLinkIds() != null) {
-						for (Id<Link> toLinkId : otfLane.getToLinkIds()){
-							VisLinkWLanes toLink = otfNetwork.get(toLinkId.toString());
+						for (String toLinkId : otfLane.getToLinkIds()){
+							VisLinkWLanes toLink = otfNetwork.get(toLinkId);
 							otfLane.addToLink(toLink);
 						}
 					}
@@ -185,7 +185,7 @@ public class VisLaneModelBuilder {
 				VisLane otfLane = lanesLinkData.getLaneData().get(lane.getLaneData().getId().toString());
 				if (lane.getToLanes() == null ||  lane.getToLanes().isEmpty()){
 					for (Id<Link> id : lane.getLaneData().getToLinkIds()){
-						otfLane.addToLinkId(id);
+						otfLane.addToLinkId(id.toString());
 					}
 				}
 				else {
@@ -198,7 +198,7 @@ public class VisLaneModelBuilder {
 		}
 		else {
 			for (Id<Link> id : link.getLink().getToNode().getOutLinks().keySet()){
-				lanesLinkData.addToLinkId(id);
+				lanesLinkData.addToLinkId(id.toString());
 			}
 		}
 		

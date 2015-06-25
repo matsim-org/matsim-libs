@@ -51,7 +51,7 @@ public class VisLane implements Serializable {
 	private Point2D.Double startPoint = null;
 	private Point2D.Double endPoint = null;
 	private Map<String, VisSignal> signals = null;
-	private List<Id<Link>> toLinkIds;
+	private List<String> toLinkIds;
 	private transient List<VisLinkWLanes> toLinksData = null;
 	private double euklideanDistance;
 	private CoordImpl startCoord;
@@ -185,13 +185,13 @@ public class VisLane implements Serializable {
 		return toLinksData;
 	}
 	
-	public void addToLinkId(Id<Link> toLinkId){
+	public void addToLinkId(String toLinkId){
 		if (this.toLinkIds == null)
 			this.toLinkIds = new ArrayList<>();
 		this.toLinkIds.add(toLinkId);
 	}
 
-	public List<Id<Link>> getToLinkIds() {
+	public List<String> getToLinkIds() {
 		return toLinkIds ;
 	}
 	
