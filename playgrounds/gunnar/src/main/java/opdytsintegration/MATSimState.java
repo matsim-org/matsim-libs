@@ -16,9 +16,9 @@ import floetteroed.utilities.math.Vector;
 
 /**
  * Considering the "day-to-day" iterations of MATSim as the stages of a
- * discrete-time stochastic process, this class represents its state, to the
- * extent this state is given by the plan choice set of all agents, possibly
- * including scores and information about the selected plan.
+ * discrete-time stochastic process, this class represents the state of this
+ * process. This state consists of the plan choice sets of all agents, including
+ * scores and information about the selected plan.
  * 
  * @author Gunnar Flötteröd
  * 
@@ -29,17 +29,17 @@ public abstract class MATSimState implements SimulatorState {
 	// -------------------- MEMBERS --------------------
 
 	/**
-	 * A map of lists of (deep copies of) all plans of all persons. The plan
-	 * order in the lists matters. Contains an empty list for every person that
-	 * does not have any plans.
+	 * A map of persons on lists of (deep copies of) all plans of the respective
+	 * person. The plan order in the lists matters. Contains an empty list but
+	 * non-null list for every person that does not have any plans.
 	 */
-	private final Map<Person, List<Plan>> person2planList = new LinkedHashMap<Person, List<Plan>>();
+	private final Map<Person, List<? extends Plan>> person2planList = new LinkedHashMap<Person, List<? extends Plan>>();
 
 	/**
 	 * A map of indices pointing to the currently selected plan of every person.
 	 * Contains a null value for every person that does not have a selected
 	 * plan.
-	 * 
+	 * <p>
 	 * Uses an index instead of a reference because references do not survive
 	 * deep copies and we want to be robust here.
 	 */
@@ -49,6 +49,16 @@ public abstract class MATSimState implements SimulatorState {
 
 	// -------------------- CONSTRUCTION --------------------
 
+	/**
+	 * Takes over a <em>deep copy</em> of the population and a <em>reference</em> to
+	 * vectorRepresentation.
+	 * 
+	 * @param population
+	 *            the current MATSim population
+	 * @param vectorRepresentation
+	 *            a real-valued vector representation of the current MATSim
+	 *            state.
+	 */
 	public MATSimState(final Population population,
 			final Vector vectorRepresentation) {
 
@@ -68,16 +78,15 @@ public abstract class MATSimState implements SimulatorState {
 			this.person2planList.put(person, newDeepCopy(person.getPlans()));
 		}
 
-		this.vectorRepresentation = vectorRepresentation.copy();
+		this.vectorRepresentation = vectorRepresentation;
 	}
 
 	// -------------------- HELPERS AND INTERNALS --------------------
 
-	private static List<Plan> newDeepCopy(
+	private static List<? extends Plan> newDeepCopy(
 			final List<? extends Plan> fromPlanList) {
 		final List<Plan> toPlanList = new ArrayList<Plan>(fromPlanList.size());
 		for (Plan fromPlan : fromPlanList) {
-			// Michael Z. says that this is the right way to do this.
 			final PlanImpl toPlan = new PlanImpl(fromPlan.getPerson());
 			toPlan.copyFrom(fromPlan);
 			toPlanList.add(toPlan);
@@ -85,7 +94,7 @@ public abstract class MATSimState implements SimulatorState {
 		return toPlanList;
 	}
 
-	private static Plan getSelectedPlan(final List<Plan> plans,
+	private static Plan getSelectedPlan(final List<? extends Plan> plans,
 			final Integer index) {
 		if (index == null) {
 			return null;
@@ -105,7 +114,7 @@ public abstract class MATSimState implements SimulatorState {
 	public void implementInSimulation() {
 		for (Person person : this.person2planList.keySet()) {
 			person.getPlans().clear();
-			final List<Plan> copiedPlans = newDeepCopy(this.person2planList
+			final List<? extends Plan> copiedPlans = newDeepCopy(this.person2planList
 					.get(person));
 			for (Plan plan : copiedPlans) {
 				person.addPlan(plan);

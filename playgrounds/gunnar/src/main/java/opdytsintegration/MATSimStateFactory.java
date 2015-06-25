@@ -26,8 +26,10 @@ public interface MATSimStateFactory<X extends SimulatorState, U extends Decision
 	 * Creates a new object representation of the current MATSim simulation
 	 * state.
 	 * 
+	 * @see MATSimState
+	 * 
 	 * @param population
-	 *            the simulated MATSim population
+	 *            the current MATSim population
 	 * @param stateVector
 	 *            a vector representation of the state to be created
 	 * @param decisionVariable

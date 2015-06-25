@@ -52,6 +52,8 @@ public interface SimulatorState {
 
 }
 
+// ========================================================================
+//
 // /**
 // * Returns a copy of this simulator state. This copy must be "deep" for
 // (i)
