@@ -38,14 +38,9 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	private int TTPERLink = 10;
 	
-	private boolean agentsToStuck = true;
+	private boolean agentsToStuck = false;
 	
 	private String outputdir;
-	
-
-
-	
-	
 	
 	
 	/**
@@ -140,24 +135,30 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		// set the links' travel times (by adapting free speed) and capacity (to unlimited)
 		
 		for(Link l : scenario.getNetwork().getLinks().values()){
-			if(l.getId().equals(Id.createLinkId("3_4"))){
+			// modify the capacity and/or length of the middle link to let agents stuck
+			if(agentsToStuck && l.getId().equals(Id.createLinkId("3_4"))){
 				if(agentsToStuck){
 						l.setLength(90000);
 						l.setFreespeed(1);
 						l.setCapacity(1);
+						// TODO
 				}
 			}
 			else{
-			l.setCapacity(999999);
-			l.setFreespeed(200/TTPERLink);
+				l.setCapacity(999999);
+				l.setFreespeed(200/TTPERLink);
 			}
 		}
 	}
 	
-	private void createPopulation(Scenario scenario) {		
+	private void createPopulation(Scenario scenario) {	
+		
+		// initialize all agents with only one route (the middle route)
+		int numberOfInitialRoutes = 1;
+		
 		TtCreateBraessPopulation popCreator = new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
-		popCreator.createPersons( 1 );
+		popCreator.createPersons( numberOfInitialRoutes );
 	}
 
 	
