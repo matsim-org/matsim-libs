@@ -24,8 +24,10 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 
@@ -40,6 +42,14 @@ public class LineChangeScoringFunction implements ArbitraryEventScoring, Scoring
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
 	private boolean currentLegIsPtLeg = false;
 	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
+
+	public LineChangeScoringFunction(final CharyparNagelScoringParameters config) {
+		this( new LineChangeScoringParameters( config ) );
+	}
+
+	public LineChangeScoringFunction(final PlanCalcScoreConfigGroup config) {
+		this( new LineChangeScoringParameters( config ) );
+	}
 
 	public LineChangeScoringFunction(final LineChangeScoringParameters params) {
 		this.params = params;
@@ -101,6 +111,21 @@ public class LineChangeScoringFunction implements ArbitraryEventScoring, Scoring
 		private final double utilityOfLineSwitch;
 		private final double marginalUtilityOfWaiting_s;
 		private final double marginalUtilityOfTraveling_s;
+
+		public LineChangeScoringParameters(
+				final CharyparNagelScoringParameters config ) {
+			this( config.modeParams.get( TransportMode.pt ).constant,
+				config.utilityOfLineSwitch,
+				config.marginalUtilityOfWaitingPt_s,
+				config.modeParams.get( TransportMode.pt ).marginalUtilityOfTraveling_s );
+		}
+		public LineChangeScoringParameters(
+				final PlanCalcScoreConfigGroup config ) {
+			this( config.getModes().get( TransportMode.pt ).getConstant(),
+				config.getUtilityOfLineSwitch(),
+				config.getMarginalUtlOfWaitingPt_utils_hr() / 3600.,
+				config.getModes().get( TransportMode.pt ).getMarginalUtilityOfTraveling() / 3600. );
+		}
 
 		public LineChangeScoringParameters(
 				final double constant,

@@ -37,6 +37,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.BlackListedActivityScoringFunction;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
 import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
+import playground.ivt.scoring.LineChangeScoringFunction;
 
 /**
  * This factory creates "CharyparNagel" scoring functions, but with
@@ -115,14 +116,17 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 				new ElementalCharyparNagelLegScoringFunction(
 					TransportMode.bike,
 					LegScoringParameters.createForBike(
-						params ),
+							params),
 					scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
 					TransportMode.transit_walk,
 					LegScoringParameters.createForWalk(
-						params ),
+							params),
 					scenario.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(
+				new LineChangeScoringFunction(
+						params ) );
 
 		// other standard stuff
 		scoringFunctionAccumulator.addScoringFunction(
