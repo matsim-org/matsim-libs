@@ -31,6 +31,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.CrossMarginalCongestionEventsWriter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -54,6 +55,7 @@ public class CausedDelayUserGroup {
 	private SortedMap<UserGroup, Double> userGroupToDelays;
 	private Map<Id<Person>, Double> personId2CausingDelay;
 	private Scenario scenario;
+	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
 
 	public static void main(String[] args) {
 		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
@@ -96,7 +98,7 @@ public class CausedDelayUserGroup {
 		}
 
 		for(Id<Person> p : personId2CausingDelay.keySet()){
-			UserGroup ug = getUserGrpFromPersonId(p);
+			UserGroup ug = pf.getUserGroupFromPersonId(p);
 			double delaySoFar = this.userGroupToDelays.get(ug);
 			this.userGroupToDelays.put(ug, delaySoFar+this.personId2CausingDelay.get(p));
 		}
@@ -132,17 +134,5 @@ public class CausedDelayUserGroup {
 		this.marginal_Utl_traveling_car_sec = scenario.getConfig().planCalcScore().getTraveling_utils_hr()/3600;
 		this.marginalUtlOfTravelTime = this.marginal_Utl_traveling_car_sec + this.marginal_Utl_performing_sec;
 		this.vtts_car = this.marginalUtlOfTravelTime / this.marginal_Utl_money;
-	}
-
-	private UserGroup getUserGrpFromPersonId(Id<Person> personId){
-		PersonFilter pf = new PersonFilter();
-		UserGroup outUG = UserGroup.URBAN;
-		for(UserGroup ug : UserGroup.values()){
-			if(pf.isPersonIdFromUserGroup(personId, ug)) {
-				outUG =ug;
-				break;
-			}
-		}
-		return outUG;
 	}
 }

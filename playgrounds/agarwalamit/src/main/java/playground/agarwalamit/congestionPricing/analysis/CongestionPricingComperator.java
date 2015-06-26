@@ -31,7 +31,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
-import playground.agarwalamit.munich.ExtendedPersonFilter;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
@@ -58,7 +58,7 @@ public class CongestionPricingComperator {
 				/ (config.planCalcScore().getMarginalUtilityOfMoney());
 	}
 
-	private int noOfTimeBins = 30;
+	private int noOfTimeBins = 1;
 	private String eventsFile ;
 	private double simulationEndTime;
 	private String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/policies/";
@@ -69,12 +69,11 @@ public class CongestionPricingComperator {
 	private double vtts_car;
 	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
 
-
 	public static void main(String[] args) {
-		CongestionPricingComperator analyzer = new CongestionPricingComperator("implV6");
-		analyzer.writeExperiecedAndCausingPersonDelay();
+		CongestionPricingComperator analyzer = new CongestionPricingComperator("implV3");
+//		analyzer.writeExperiecedAndCausingPersonDelay();
 		analyzer.writeAverageLinkTolls();
-		analyzer.writeHourlyCausedDelayForEachPerson();
+//		analyzer.writeHourlyCausedDelayForEachPerson();
 	}
 
 	/**
@@ -136,7 +135,7 @@ public class CongestionPricingComperator {
 		SortedMap<Double, Map<Id<Link>, Double>> timeBin2LinkId2Delay = delayAnalyzer.getTimeBin2LinkId2Delay();//delays on each link for each time bin
 		SortedMap<Double, Map<Id<Link>, Integer>> timeBin2LinkCount = delayAnalyzer.getTimeBin2Link2PersonCount();//delays on each link for each time bin
 
-		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/linkId2Toll"+pricingScenario+suffixForSoring+".txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/linkId2Toll_"+noOfTimeBins+"Bins_"+pricingScenario+suffixForSoring+".txt");
 
 		try {
 			writer.write("timeBin \t linkId \t avgLinkTollEURO \n");

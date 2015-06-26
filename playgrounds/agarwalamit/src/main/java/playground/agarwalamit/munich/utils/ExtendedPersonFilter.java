@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich;
+package playground.agarwalamit.munich.utils;
 
 import java.util.Collection;
 

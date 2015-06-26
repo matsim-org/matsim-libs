@@ -51,15 +51,14 @@ public class UserGrpToTollData {
 	
 	private void run(String outputFolder){
 		BufferedReader reader = IOUtils.getBufferedReader(outputFolder+"/simpleAverageToll.txt");
-		Map<Id, Double> pId2Tolls= new HashMap<>();
+		Map<Id<Person>, Double> pId2Tolls= new HashMap<>();
 		try {
 			String line = reader.readLine();
 			
 			while (line!=null){
 				String args[] = line.split("\t");
 				String pId = args[0];
-				String toll = args[1];
-				
+//				String toll = args[1];
 				
 				if(!args[1].equalsIgnoreCase("averageToll")){
 					Id<Person> person = Id.createPersonId(pId);
@@ -84,7 +83,7 @@ public class UserGrpToTollData {
 		}
 
 		for(UserGroup ug : UserGroup.values()){
-			for(Id pId : pId2Tolls.keySet()){
+			for(Id<Person> pId : pId2Tolls.keySet()){
 				if(pf.isPersonIdFromUserGroup(pId, ug)){
 					double tollSoFar = userGrpToToll.get(ug);
 					userGrpToToll.put(ug, tollSoFar+pId2Tolls.get(pId));

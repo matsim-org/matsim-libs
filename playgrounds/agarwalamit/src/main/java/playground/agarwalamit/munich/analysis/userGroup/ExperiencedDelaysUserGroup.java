@@ -34,6 +34,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -61,6 +62,7 @@ public class ExperiencedDelaysUserGroup {
 	private SortedMap<UserGroup, Double> userGroupToDelays;
 	private Map<Double, Map<Id<Person>, Double>> time2linkIdDelays;
 	private Scenario scenario;
+	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
 
 	public static void main(String[] args) throws IOException {
 		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
@@ -117,22 +119,10 @@ public class ExperiencedDelaysUserGroup {
 		logger.info("Finished Writing data to file "+outputFile);
 	}
 
-	private UserGroup getUserGrpFromPersonId(Id<Person> personId){
-		PersonFilter pf = new PersonFilter();
-		UserGroup outUG = UserGroup.URBAN;
-		for(UserGroup ug : UserGroup.values()){
-			if(pf.isPersonIdFromUserGroup(personId, ug)) {
-				outUG =ug;
-				break;
-			}
-		}
-		return outUG;
-	}
-
 	private void getTotalDelayPerUserGroup(Map<Double, Map<Id<Person>, Double>> delaysPerPersonPerTimeBin){
 		for(double d:delaysPerPersonPerTimeBin.keySet()){
 			for(Id<Person> personId : delaysPerPersonPerTimeBin.get(d).keySet()){
-				UserGroup ug = getUserGrpFromPersonId(personId);
+				UserGroup ug = pf.getUserGroupFromPersonId(personId);
 				double delaySoFar = this.userGroupToDelays.get(ug);
 				double newDelays = delaySoFar+delaysPerPersonPerTimeBin.get(d).get(personId);
 				this.userGroupToDelays.put(ug, newDelays);

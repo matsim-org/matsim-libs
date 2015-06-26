@@ -38,8 +38,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
@@ -69,6 +69,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private Scenario scenario;
 	private int lastIteration;
 	private boolean considerAllPersonsInSumOfTolls;
+	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
 
 	private final WelfareMeasure wm = WelfareMeasure.SELECTED;
 
@@ -135,7 +136,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		}
 
 		for(Id<Person> id:inputMap.keySet()){
-			UserGroup ug = getUserGrpFromPersonId(id);
+			UserGroup ug = pf.getUserGroupFromPersonId(id);
 			double valueSoFar = outMap.get(ug);
 			double value2add = inputMap.get(id) ;
 			double newValue = value2add+valueSoFar;
@@ -152,7 +153,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		}
 
 		for(Id<Person> id:inputMap.keySet()){
-			UserGroup ug = getUserGrpFromPersonId(id);
+			UserGroup ug = pf.getUserGroupFromPersonId(id);
 			double valueSoFar = outMap.get(ug);
 			double value2add = inputMap.get(id) ;
 
@@ -200,18 +201,6 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		paymentsAnalyzer.postProcessData();
 		paymentsAnalyzer.writeResults(this.outputDir+runCase+"/analysis/");
 		this.personId2MonetaryPayments = paymentsAnalyzer.getPersonId2amount();
-	}
-
-	private UserGroup getUserGrpFromPersonId(Id<Person> personId){
-		PersonFilter pf = new PersonFilter();
-		UserGroup outUG = UserGroup.URBAN;
-		for(UserGroup ug : UserGroup.values()){
-			if(pf.isPersonIdFromUserGroup(personId, ug)) {
-				outUG =ug;
-				break;
-			}
-		}
-		return outUG;
 	}
 
 	private boolean isPersonIncluded(Id<Person> personId){

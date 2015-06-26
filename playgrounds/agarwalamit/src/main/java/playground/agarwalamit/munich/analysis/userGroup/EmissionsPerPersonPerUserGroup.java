@@ -35,8 +35,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
+import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
@@ -53,6 +53,7 @@ public class EmissionsPerPersonPerUserGroup {
 	private SortedMap<UserGroup, SortedMap<String, Double>> userGroupToEmissions;
 	private Scenario scenario;
 	private Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson;
+	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
 	
 	public EmissionsPerPersonPerUserGroup(String outputDir) {
 
@@ -60,8 +61,8 @@ public class EmissionsPerPersonPerUserGroup {
 	}
 
 	public static void main(String[] args) {
-		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";/*"./output/run2/";*/
-		String [] runCases = {"bau","ei","ci","eci","10ei"};
+		String outputDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/backcasting/";
+		String [] runCases =  {"5ei","10ei","15ei","20ei","25ei"};
 		
 		EmissionsPerPersonPerUserGroup eppa = new EmissionsPerPersonPerUserGroup(outputDir);
 		eppa.run(runCases);
@@ -120,7 +121,7 @@ public class EmissionsPerPersonPerUserGroup {
 					writer.write(ec+"\t");
 					totalEmissionCost += ec;
 				}
-				writer.write(+totalEmissionCost+"\n");
+				writer.write(totalEmissionCost+"\n");
 			}
 			writer.close();
 		} catch (Exception e){
@@ -155,7 +156,7 @@ public class EmissionsPerPersonPerUserGroup {
 	private void getTotalEmissionsPerUserGroup(
 			Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson) {
 		for(Id<Person> personId: scenario.getPopulation().getPersons().keySet()){
-			UserGroup ug = getUserGrpFromPersonId(personId);
+			UserGroup ug = pf.getUserGroupFromPersonId(personId);
 			SortedMap<String, Double> emissionsNewValue = new TreeMap<String, Double>();
 			for(String str: emissionsPerPerson.get(personId).keySet()){
 				double emissionSoFar = this.userGroupToEmissions.get(ug).get(str);
@@ -164,17 +165,5 @@ public class EmissionsPerPersonPerUserGroup {
 			}
 			this.userGroupToEmissions.put(ug, emissionsNewValue);
 		}
-	}
-
-	private UserGroup getUserGrpFromPersonId(Id<Person> personId){
-		PersonFilter pf = new PersonFilter();
-		UserGroup outUG = UserGroup.URBAN;
-		for(UserGroup ug : UserGroup.values()){
-			if(pf.isPersonIdFromUserGroup(personId, ug)) {
-				outUG =ug;
-				break;
-			}
-		}
-		return outUG;
 	}
 }
