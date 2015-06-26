@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.popsim;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,6 +29,7 @@ import java.util.Set;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
+import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.sim3.HamiltonianComposite;
 import playground.johannes.gsv.synPop.sim3.HamiltonianLogger;
@@ -44,13 +46,19 @@ public class Simulator {
 
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 		parser.parse("/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml");
 		
 		Set<ProxyPerson> persons = parser.getPersons();
+		
+		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
+		task.addTask(new AgeIncomeCorrelation());
+		
+		ProxyAnalyzer.analyze(persons, task, "/home/johannes/gsv/germany-scenario/sim/output/ref/");
 		
 		Random random = new XORShiftRandom();
 		
@@ -87,16 +95,14 @@ public class Simulator {
 		
 		
 		
-		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-		task.addTask(new AgeIncomeCorrelation());
 		
-		listener.addComponent(new SynchronizeUserData(map, 1000));
-		listener.addComponent(new AnalyzerListener(task, "/home/johannes/gsv/germany-scenario/sim/output/", 1000));
-		listener.addComponent(new HamiltonianLogger(h, 1000));
+		listener.addComponent(new SynchronizeUserData(map, 100000));
+		listener.addComponent(new AnalyzerListener(task, "/home/johannes/gsv/germany-scenario/sim/output/", 100000));
+		listener.addComponent(new HamiltonianLogger(h, 100000));
 		
 		sampler.setSamplerListener(listener);
 		
-		sampler.run(1000000, 1);
+		sampler.run(10000000, 1);
 	}
 
 }
