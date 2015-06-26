@@ -35,7 +35,7 @@ import org.matsim.core.population.PlanImpl;
 import playground.benjamin.utils.BkNumberUtils;
 
 /**
- * Generate Modal Share from population file and events file.
+ * Generate Modal Share from last iteration plans file and events file.
  * 
  * @author amit
  */
@@ -45,6 +45,7 @@ public class ModalShareGenerator {
 	
 	public void getModalShareFromEvents(){
 		// TODO [AA] should get modal share from events as well.
+		throw new RuntimeException("Not implemented yet.");
 	}
 	
 	public SortedMap<String, Double > getMode2PctShareFromPlans (Population population){
