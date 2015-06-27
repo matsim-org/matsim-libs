@@ -60,8 +60,10 @@ import org.matsim.vehicles.VehicleTypeImpl;
 import org.xml.sax.Attributes;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
@@ -71,6 +73,8 @@ public class EventsConverter{
 	static LinkedHashMap<Id<Person>, PersonData> persons = new LinkedHashMap<>();
 	static List<Event> events = new ArrayList<>();
 	static String option;
+	static HashSet<Id<Person>> handledPersons = new HashSet<>(); //persons with departureEvent
+	static HashSet<Id<Person>> personInfo = new HashSet<>(); //persons in tripInfo-file
 
 	static String configFileName = "../../matsim/examples/siouxfalls-2014/config_renamed.xml";
 	static String populationInput = "../../matsim/output/siouxfalls-2014_renamed/output_plans.xml.gz";
@@ -80,9 +84,9 @@ public class EventsConverter{
 	static {new MatsimPopulationReader(scenario).readFile(populationInput);}
 
 	public static void main(String[] args) {
-		Boolean runTest = false; //true -> run with normal files; false -> run with test-files
-		String inputTripInfo = "E:/MA/sumo-0.22.0/bin/tripInfo.xml";
-		String inputVehroute = "E:/MA/sumo-0.22.0/bin/vehroute.xml";
+		Boolean runTest = false; //false -> run with normal files; true -> run with test-files
+		String inputTripInfo = "../../matsim/output/siouxfalls-2014/tripInfo.xml";
+		String inputVehroute = "../../matsim/output/siouxfalls-2014/vehroute.xml";
 		String inputTripInfoTest = "../../matsim/output/siouxfalls-2014/TestTripInfo.xml";
 		String inputVehrouteTest = "../../matsim/output/siouxfalls-2014/TestVehroute.xml";
 		String outputEvents = "../../matsim/output/siouxfalls-2014/events.xml";
@@ -141,6 +145,8 @@ public class EventsConverter{
 			eventsManager.processEvent(event);
 		}
 		eventWriterXML.closeFile();
+
+		System.out.println("number of persons: " + personInfo.size() + "    number of persons with departureEvent (excl. bus driver): " + handledPersons.size());
 	}
 
 	static class EventsParser extends MatsimXmlParser{
@@ -169,6 +175,9 @@ public class EventsConverter{
 			if (option.equals("parsePersonInfoOnly")){
 				if ("personinfo".equals(name)){
 					personId = Id.create(atts.getValue("id"), Person.class);
+					if (personInfo.contains(personId))
+						System.out.println(personId);
+					personInfo.add(personId);
 					personData = new PersonData(personId);
 					tripInfo = new ArrayList<>();
 				}
@@ -245,9 +254,13 @@ public class EventsConverter{
 						Id<TransitStopFacility> to = Id.create(endLink, TransitStopFacility.class);
 						events.add(new PersonDepartureEvent(vehicleData.getDeparture(), driverId, startLink, "car"));
 						events.add(new PersonEntersVehicleEvent(vehicleData.getDeparture(), driverId, vehicleId));
-						events.add(new VehicleDepartsAtFacilityEvent(vehicleData.getArrival(), vehicleId, to, 0));
-						events.add(new PersonLeavesVehicleEvent(vehicleData.getArrival(), driverId, vehicleId));
-						events.add(new PersonArrivalEvent(vehicleData.getArrival(), driverId, endLink, "car"));
+						if (vehicleData.getArrival() != null){
+							events.add(new VehicleDepartsAtFacilityEvent(vehicleData.getArrival(), vehicleId, to, 0));
+							events.add(new PersonLeavesVehicleEvent(vehicleData.getArrival(), driverId, vehicleId));
+							events.add(new PersonArrivalEvent(vehicleData.getArrival(), driverId, endLink, "car"));
+						}else{
+							System.out.println("vehicle " + vehicleId + " did not arrive");
+						}
 					}
 				}
 			}
@@ -300,6 +313,7 @@ public class EventsConverter{
 						mode = ((Leg) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex)).getMode();
 						events.add(new ActivityEndEvent(departure, personId, firstLinkId, actFacId, actType));
 						events.add(new PersonDepartureEvent(departure, personId, firstLinkId, mode));
+						handledPersons.add(personId);
 						events.add(new PersonArrivalEvent(arrival, personId, lastLinkId, mode));
 						actFacId = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex+1)).getFacilityId();
 						actType = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex+1)).getType();
@@ -335,11 +349,13 @@ public class EventsConverter{
 							Id<TransitStopFacility> to = Id.create(lastLinkId, TransitStopFacility.class);
 							events.add(new ActivityEndEvent(ptDeparture, personId, firstLinkId, actFacId, actType));
 							events.add(new PersonDepartureEvent(ptDeparture, personId, firstLinkId, mode));
+							handledPersons.add(personId);
 							events.add(new AgentWaitingForPtEvent(ptDeparture, personId, from, to));
 						}
 						if ("car".equals(mode)){
 							events.add(new ActivityEndEvent(departure, personId, firstLinkId, actFacId, actType));
 							events.add(new PersonDepartureEvent(departure, personId, firstLinkId, mode));
+							handledPersons.add(personId);
 							events.add(new PersonEntersVehicleEvent(departure, personId, Id.create("car_" + personId.toString(), Vehicle.class)));
 						}else
 							if ("pt".equals(mode))
@@ -354,12 +370,15 @@ public class EventsConverter{
 										System.out.println(busId.toString() + "not in vehicles");
 										continue;
 									}
-									//									System.out.println(lines[i] + " " + firstLinkId + ": " + vehicles.get(busId).getBusStopDepartures().get(firstLinkId) + " <-> " + departure);
-									if (vehicles.get(busId).getBusStopDepartures().get(firstLinkId) - departure == 0){
-										events.add(new PersonEntersVehicleEvent(departure, personId, busId));
-										events.add(new PersonLeavesVehicleEvent(arrival, personId, busId));
-										break;
-									}
+									if (vehicles.get(busId).getBusStopDepartures() != null){
+										if (vehicles.get(busId).getBusStopDepartures().get(firstLinkId) - departure == 0){
+											events.add(new PersonEntersVehicleEvent(departure, personId, busId));
+											events.add(new PersonLeavesVehicleEvent(arrival, personId, busId));
+											break;
+										}
+									}else
+										System.out.println("vehicle " + busId + " has no busStopDepartures [person: " + personId + "; linkId: " + firstLinkId + ": "
+												+ vehicles.get(busId).getBusStopDepartures().get(firstLinkId) + " <-> " + departure);
 									if (i - lines.length + 1 == 0)
 										System.out.println("no PersonEnters- and PersonLeavesVehicleEvents created (personId: " + personId.toString());
 								}

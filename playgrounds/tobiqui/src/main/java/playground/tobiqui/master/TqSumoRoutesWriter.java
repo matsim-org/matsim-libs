@@ -226,10 +226,10 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 			VehicleInformation vehInfo = vehicles2BSorted.get(vehicleId);
 			if (vehicles2BSorted.get(vehicleId).getType().getId().toString().equals("car")){
 				list.add(new Tuple<String, String>("id", vehicleId.toString()));
-				list.add(new Tuple<String, String>("depart", Double.toString(vehInfo.getDeparture())));
 				list.add(new Tuple<String, String>("type", vehInfo.getType().getId().toString()));
+				list.add(new Tuple<String, String>("depart", Double.toString(vehInfo.getDeparture())));
 				list.add(new Tuple<String, String>("departLane", "best"));
-				//				list.add(new Tuple<String, String>("departPos", "free"));
+//				list.add(new Tuple<String, String>("arrivalPos", "10"));
 
 
 				super.writeStartTag("vehicle", list);
@@ -238,16 +238,15 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 				list.add(new Tuple<String, String>("edges", vehInfo.getRoute()));
 				super.writeStartTag("route", list, true);
 				list.clear();
-				int it = 0;
+				
 				for (String stop : vehInfo.getBusStopFacilities()){
-					//					if (it != 0){
+					
 					list.add(new Tuple<String, String>("lane", stop.concat("_0")));
 					list.add(new Tuple<String, String>("startPos", "0"));
 					list.add(new Tuple<String, String>("endPos", "10"));
+
 					super.writeStartTag("stop", list, true);
 					list.clear();
-					//					}
-					it++;
 				}
 
 				super.writeEndTag("vehicle");
@@ -255,6 +254,9 @@ public class TqSumoRoutesWriter extends MatsimXmlWriter{
 				list.add(new Tuple<String, String>("id", vehicleId.toString()));
 				list.add(new Tuple<String, String>("type", vehInfo.getType().getId().toString()));
 				list.add(new Tuple<String, String>("depart", Double.toString(vehInfo.getDeparture())));
+				list.add(new Tuple<String, String>("departLane", "best"));
+//				list.add(new Tuple<String, String>("arrivalPos", "-10"));
+
 				super.writeStartTag("vehicle", list);
 				list.clear();
 

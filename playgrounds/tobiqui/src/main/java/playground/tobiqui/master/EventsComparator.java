@@ -3,6 +3,7 @@ package playground.tobiqui.master;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -17,10 +18,14 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class EventsComparator {
 	static private int leaveCount = 0;
@@ -134,6 +139,21 @@ public class EventsComparator {
 		System.out.println("durchschnittlicher Reisezeitunterschied Car (MATSim - SUMO): " + avgTravelTimeDifCar);
 		System.out.println("durchschnittlicher Reisezeitunterschied Bus (MATSim - SUMO): " + avgTravelTimeDifBus);
 		System.out.println("durchschnittlicher Reisezeitunterschied Walk (MATSim - SUMO): " + avgTravelTimeDifWalk);
+		
+//		String configFileName = "../../matsim/examples/siouxfalls-2014/config_renamed.xml";
+//		String populationInput = "../../matsim/output/siouxfalls-2014_renamed/output_plans.xml.gz";
+//
+//		Config config = ConfigUtils.loadConfig(configFileName);
+//		Scenario scenario = ScenarioUtils.createScenario(config);
+//		{new MatsimPopulationReader(scenario).readFile(populationInput);}
+//		
+//		int count = 0;
+//		for (Id<Person> id : scenario.getPopulation().getPersons().keySet())
+//			if(travelTimeS.containsKey(id) == false){
+//				count++;
+////				System.out.println(id);
+//			}
+//		System.out.println(count + " / " +scenario.getPopulation().getPersons().size());
 	}
 
 	static class TravelTimeCalculator implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
