@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.freight.carrier.*;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
@@ -49,6 +50,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheck
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -112,7 +114,7 @@ public class KTFreight_v3 {
 //		//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
 //		private static final String uccC_prefix = "UCC-";	
 //
-//		//All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if Carrier should be used.
+//		//All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if all should be used.
 //		private static final ArrayList<String> retailerNames = 
 //				new ArrayList<String>(Arrays.asList("aldi")); 
 //		//Location of UCC
@@ -124,9 +126,9 @@ public class KTFreight_v3 {
 //		//Ende  Namesdefinition Berlin
 
 
-	//Beginn Namesdefinition KT Für Test-Szenario (Grid)
+//Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/UCC_Test_Ucc6/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/UCC_Test_Ucc8/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
@@ -135,21 +137,21 @@ public class KTFreight_v3 {
 	private static final String CARRIERS_NAME = "grid-carrier_kt" ;
 	private static final String ALGORITHM_NAME = "grid-algorithm" ;
 	private static final String TOLL_NAME = "grid-tollCordon";
-	private static final String LEZ_NAME = "grid-tollCordon"; 
+	private static final String LEZ_NAME = "grid-tollDistance"; 
 	//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
 	private static final String uccC_prefix = "UCC-";		
-	// All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if Carrier should be used.
+	// All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if all should be used.
 	private static final ArrayList<String> retailerNames 
-		= new ArrayList<String>(Arrays.asList("gridCarrier1", "gridCarrier3")); 
+		= new ArrayList<String>(Arrays.asList("gridCarrier3")); 
 	//Location of UCC
 	private static final ArrayList<String> uccDepotsLinkIdsString =
 		new ArrayList<String>(Arrays.asList("j(0,5)", "j(10,5)")); 
 		//TODO: VehicleTypes die vom Maut betroffen seien sollen.
 	private static final ArrayList<String> tolledVehTypes = 
 		new ArrayList<String>(Arrays.asList("gridType01", "gridType05", "gridType10")); 
-
 //	//Ende Namesdefinition Grid
 
+	
 	private static final String RUN = "Run_" ;
 	private static int runIndex = 0;
 
@@ -165,7 +167,7 @@ public class KTFreight_v3 {
 	private static final boolean addingCongestion = false ;  //doesn't work correctly, KT 10.12.2014
 	private static final boolean addingToll = true;  //added, kt. 07.08.2014
 	private static final boolean usingUCC = true;	 //Using Transshipment-Center, added kt 30.04.2015
-	private static final boolean runMatsim = true;	 //when false only jsprit run will be performed
+	private static final boolean runMatsim = false;	 //when false only jsprit run will be performed
 	private static final int LAST_MATSIM_ITERATION = 0;  //only one iteration for writing events.
 	private static final int MAX_JSPRIT_ITERATION = 1000;
 	private static final int NU_OF_TOTAL_RUNS = 1;	
@@ -203,6 +205,7 @@ public class KTFreight_v3 {
 		// ### config stuff: ###	
 		Config config = createConfig(args);
 				config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
+				config.controler().setOverwriteFileSetting(OverwriteFileSetting.failIfDirectoryExists);
 				ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "dump");
 		textInfofile = new WriteTextToFile(new File(TEMP_DIR + "#TextInformation.txt"), null);
 		
@@ -252,7 +255,7 @@ public class KTFreight_v3 {
 			}
 			
 //			UccCarrierCreator uccCarrierCreator = new UccCarrierCreator(carriers, vehicleTypes, ZONEFILE, uccC_prefix, retailerNames, uccDepotsLinkIds);
-			UccCarrierCreator uccCarrierCreator = new UccCarrierCreator(carriers, vehicleTypes, ZONEFILE, uccC_prefix, retailerNames, uccDepotsLinkIds, 0.0, 23.0*3600);
+			UccCarrierCreator uccCarrierCreator = new UccCarrierCreator(carriers, vehicleTypes, ZONEFILE, uccC_prefix, retailerNames, uccDepotsLinkIds, 0.0, (24.0*3600)-1 );
 			uccCarrierCreator.createSplittedUccCarrriers();
 			carriers = uccCarrierCreator.getSplittedCarriers();
 			new CarrierPlanXmlWriterV2(carriers).write( TEMP_DIR + "splittedCarriers_" + RUN + runIndex+".xml") ;
@@ -267,21 +270,22 @@ public class KTFreight_v3 {
 				};
 			}
 			generateCarrierPlans(scenario.getNetwork(), uccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die UCC-Carriers
-			new CarrierPlanXmlWriterV2(uccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_UCC_" + RUN + runIndex+".xml") ;
-			new WriteCarrierScoreInfos(uccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_UCC.txt"), runIndex);
+//			new CarrierPlanXmlWriterV2(uccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_UCC_" + RUN + runIndex+".xml") ;
+//			new WriteCarrierScoreInfos(uccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_UCC.txt"), runIndex);
 
 			nonUccCarriers = uccCarrierCreator.createServicesToUCC(uccCarriers, nonUccCarriers); // Nachfrage den der UCCC ausliefert muss an die Umschlagpunkte geliefert werden. 
 			//TODO: DepotÖffnungszeiten der normalen Carrier anpassen, damit UCC rechtzeitig beliefert werden können.
 			
-			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_NonUCC_vor" + RUN + runIndex+".xml") ;
 			generateCarrierPlans(scenario.getNetwork(), nonUccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die NonUCC-Carriers
-			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_NonUCC" + RUN + runIndex+".xml") ;
-			new WriteCarrierScoreInfos(nonUccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_NonUCC.txt"), runIndex);
+//			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_NonUCC" + RUN + runIndex+".xml") ;
+//			new WriteCarrierScoreInfos(nonUccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_NonUCC.txt"), runIndex);
 
 		} else {  // ohne UCCs 
 			generateCarrierPlans(scenario.getNetwork(), carriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs
 		}
 			
+		checkServiceAssignment(carriers);
+		
 		//### Output nach Jsprit Iteration
 		new CarrierPlanXmlWriterV2(carriers).write( TEMP_DIR + "jsprit_plannedCarriers_" + RUN + runIndex+".xml") ; //Muss in Temp, da OutputDir leer sein muss // setOverwriteFiles gibt es nicht mehr; kt 05.11.2014
 		//Plot der Jsprit-Lösung
@@ -296,12 +300,86 @@ public class KTFreight_v3 {
 		return carriers;
 	}
 
-	
+	/**
+	 * Prüft ob alle Services auch in den geplanten Touren vorkommen, d.h., ob sie auhc tatsächslcih geplant wurden.
+	 * Falls nicht: log.Error und Ausgabe einer Datei: "#UnassignedServices.txt" mit den Service-Ids.
+	 * @param carriers
+	 */
+	private static void checkServiceAssignment(Carriers carriers) {
+		for (Carrier c :carriers.getCarriers().values()){
+			ArrayList<CarrierService> assignedServices = new ArrayList<CarrierService>();
+			ArrayList<CarrierService> multiassignedServices = new ArrayList<CarrierService>();
+			ArrayList<CarrierService> unassignedServices = new ArrayList<CarrierService>();
+
+			System.out.println("### Carrier: " +c.getId());
+			//Erfasse alle einer Tour zugehörigen (-> stattfindenden) Services 
+			for (ScheduledTour tour : c.getSelectedPlan().getScheduledTours()){
+				for (TourElement te : tour.getTour().getTourElements()){
+					if (te instanceof  ServiceActivity){
+						CarrierService assigService = ((ServiceActivity) te).getService();
+						if (!assignedServices.contains(assigService)){
+							assignedServices.add(assigService);
+							System.out.println("Assigned Service: " +assignedServices.toString());
+						} else {
+							multiassignedServices.add(assigService);
+							log.error("Service wurde von dem Carrier " + c.getId().toString() + " bereits angefahren: " + assigService.getId().toString() );
+						}
+					}
+				}
+			}
+			
+			//Nun prüfe, ob alle definierten Service zugeordnet wurden
+			for (CarrierService service : c.getServices()){
+				System.out.println("Service to Check: " + service.toString());
+				if (!assignedServices.contains(service)){
+					System.out.println("Service not assigned: " +service.toString());
+					unassignedServices.add(service);
+					log.error("Service wird von Carrier " + c.getId().toString() + " NICHT bedient: " + service.getId().toString() );
+				} else {
+					System.out.println("Service was assigned: " +service.toString());
+				}
+			}
+			
+			//Schreibe die mehrfach eingeplanten Services in Datei
+			if (!multiassignedServices.isEmpty()){
+				try {
+					FileWriter writer = new FileWriter(new File(TEMP_DIR + "#MultiAssignedServices.txt"), true);
+					writer.write("#### Multi-assigned Services of Carrier: " + c.getId().toString() + System.getProperty("line.separator"));
+					for (CarrierService s : multiassignedServices){
+						writer.write(s.getId().toString() + System.getProperty("line.separator"));
+					}
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} 
+			}
+			
+			//Schreibe die nicht eingeplanten Services in Datei
+			if (!unassignedServices.isEmpty()){
+				try {
+					FileWriter writer = new FileWriter(new File(TEMP_DIR + "#UnassignedServices.txt"), true);
+					writer.write("#### Unassigned Services of Carrier: " + c.getId().toString() + System.getProperty("line.separator"));
+					for (CarrierService s : unassignedServices){
+						writer.write(s.getId().toString() + System.getProperty("line.separator"));
+					}
+					writer.flush();
+					writer.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} 
+			}
+			
+		}//for(carriers)
+
+	}
+
+
 	private static void matsimRun(Scenario scenario, Carriers carriers) {
-		final Controler ctrl = new Controler( scenario ) ;
+		final Controler controler = new Controler( scenario ) ;
 
 		if (addingToll){		 //Added RoadpricingScheme to MATSIM-Controler Added, KT, 02.12.2014
-			ctrl.setModules(new ControlerDefaultsWithRoadPricingModule(rpscheme));
+			controler.setModules(new ControlerDefaultsWithRoadPricingModule(rpscheme));
 		}
 
 		//		Bringt aktuell (18.nov.14) NullPointerExeption at org.matsim.core.controler.Controler.getLinkTravelTimes(Controler.java:551)
@@ -315,9 +393,9 @@ public class KTFreight_v3 {
 
 		CarrierModule listener = new CarrierModule(carriers, planStrategyManagerFactory, scoringFunctionFactory) ;
 		listener.setPhysicallyEnforceTimeWindowBeginnings(true);
-		ctrl.addOverridingModule(listener) ;
+		controler.addOverridingModule(listener) ;
 
-		ctrl.run();
+		controler.run();
 	}
 	
 
@@ -337,7 +415,7 @@ public class KTFreight_v3 {
 	//Ergänzung kt: 1.8.2014 Erstellt das OUTPUT-Verzeichnis. Falls es bereits exisitert, geschieht nichts
 	// Mit dem doppelten Eintrag für den Run: nicht schön, aber selten.
 	private static void createDir(File file) {
-		System.out.println("Verzeichnis " + file + "erstellt: "+ file.mkdirs());	
+		System.out.println("Verzeichnis " + file + " erstellt: "+ file.mkdirs());	
 	}
 
 	private static void moveTempFile (File sourceDir, File destDir) {
@@ -353,7 +431,7 @@ public class KTFreight_v3 {
 				}
 				else {
 					files[i].renameTo(destFile);
-					System.out.println("Dateiwurde verschoben: " + files[i].toString() + "nach: " + destFile);
+					System.out.println("Datei wurde verschoben: " + files[i].toString() + " nach: " + destFile);
 				}
 			}
 		}
@@ -470,8 +548,6 @@ public class KTFreight_v3 {
 			throw new RuntimeException(e);
 		}
 
-		//TODO
-		//Damit alle Carrier die Maut erfahren --> noch unsauber, da auf die einzelnen Vehicles genommen werden --> doppelte Einträge. KT 23.10.14
 		for(Carrier c : carriers.getCarriers().values()){
 			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
 				Id<Vehicle> typeId = v.getVehicleId();
@@ -480,10 +556,7 @@ public class KTFreight_v3 {
 				}
 			}
 		}
-		//alte "manuelle" Definiton
-//		rpCalculator.addPricingScheme("gridType01", scheme );  //bisher nur für die GridVehicles, KT
-//		rpCalculator.addPricingScheme("gridType05", scheme );  //bisher nur für die GridVehicles, KT
-//		rpCalculator.addPricingScheme("gridType10", scheme );  //bisher nur für die GridVehicles, KT
+
 		netBuilder.setRoadPricingCalculator(rpCalculator);
 		
 		rpscheme = scheme;
@@ -547,9 +620,8 @@ public class KTFreight_v3 {
 	
 	/*
 	 * Neue Variante der ScoringFunction KT, 17.04.15
-	 * //TODO: Test von  MoneyScoring, ActivityScoring
+	 * TODO:
 	 * Activity: Kostensatz mitgeben, damit klar ist, wo er herkommt... oder vlt geht es in dem Konstrukt doch aus den Veh-Eigenschaften?? (KT, 17.04.15)
-	 * TODO: Maut fuktoniert nicht (MoneyScoring). Ist jedoch in Events zu sehen.
 	 */
 	
 	private static CarrierScoringFunctionFactoryImpl_KT createMyScoringFunction2 (final Scenario scenario) {
@@ -567,10 +639,15 @@ public class KTFreight_v3 {
 			LegScoring legScoring = new LegScoring(carrier);
 			sumSf.addScoringFunction(legScoring);
 			
-			ActivityScoring actScoring = new ActivityScoring(carrier);
+			//Score Activity w/o Correction of WaitingTime @ 1st Service.
+//			ActivityScoring actScoring = new ActivityScoring(carrier);
+//			sumSf.addScoringFunction(actScoring);
+			
+			//Score Activity with Correction of WaitingTime @ 1st Service.
+			ActivityScoringWithCorrection actScoring = new ActivityScoringWithCorrection(carrier);
 			sumSf.addScoringFunction(actScoring);
 			
-			//TollScoring - liefert nur leider keine Amounts
+			//TollScoring - liefert nur leider keine Amounts und somit auch keine Kosten :( -> use tollScoring
 //			MoneyScoring moneyScoring = new MoneyScoring(carrier);
 //			sumSf.addScoringFunction(moneyScoring);
 			
