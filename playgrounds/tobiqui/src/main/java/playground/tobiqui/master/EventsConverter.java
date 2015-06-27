@@ -223,43 +223,51 @@ public class EventsConverter{
 					String[] edges = atts.getValue("edges").split(" ");
 					String[] exitTimes = atts.getValue("exitTimes").split(" ");
 					ArrayList<LinkData> linkTimes = new ArrayList<>();
+					Boolean skipVehicle = false;
 					int length = 0;
 					if (edges.length == exitTimes.length)
 						length = edges.length;
 					else
 						if (edges.length > exitTimes.length){
 							length = exitTimes.length;
-							System.out.println("more edges than exitTimes");
+							skipVehicle = true;
+							System.out.println("!!one or more exitTimes missing in vehroute.xml for vehicle: " + vehicleId);
 						}else{
 							length = edges.length;
-							System.out.println("more exitTimes than edges");
+							skipVehicle = true;
+							System.out.println("!!on or more edges missing in vehroute.xml for vehicle: " + vehicleId);
 						}
-					for (int it = 0; it < length; it++){
-						if (it == 0)
-							linkTimes.add(new LinkData(Id.createLinkId(edges[it]), null, Double.valueOf(exitTimes[it])));
-						else 
-							linkTimes.add(new LinkData(Id.createLinkId(edges[it]), Double.valueOf(exitTimes[it-1]), Double.valueOf(exitTimes[it])));
-					}
-					vehicleData.setLinkTimes(linkTimes);
-					vehicles.put(vehicleId, vehicleData);
-					if (vehicleData.getType().getId().toString().startsWith("Bus")){
-						Id<Person> driverId = Id.createPersonId("pt_" + vehicleId + "_" + vehicleData.getType().getId().toString());
-						Id<TransitLine> transitLineId = Id.create(vehicleId.toString().substring(vehicleId.toString().indexOf("_") + 1, vehicleId.toString().lastIndexOf("_")), TransitLine.class);
-						Id<TransitRoute> transitRouteId = Id.create(edges[0] + "to" + edges[edges.length-1], TransitRoute.class);
-						Id<Departure> departureId = Id.create(vehicleId.toString().substring(vehicleId.toString().lastIndexOf("_") + 1, vehicleId.toString().length()), Departure.class);
-						//						System.out.println(departure + "\t" + vehicleId + "\t" + driverId + "\t" + transitLineId + "\t" + transitRouteId + "\t" + departureId);
-						events.add(new TransitDriverStartsEvent(vehicleData.getDeparture(), driverId, vehicleId, transitLineId, transitRouteId, departureId));
-						Id<Link> startLink = Id.createLinkId(edges[0]);
-						Id<Link> endLink = Id.createLinkId(edges[edges.length-1]);
-						Id<TransitStopFacility> to = Id.create(endLink, TransitStopFacility.class);
-						events.add(new PersonDepartureEvent(vehicleData.getDeparture(), driverId, startLink, "car"));
-						events.add(new PersonEntersVehicleEvent(vehicleData.getDeparture(), driverId, vehicleId));
-						if (vehicleData.getArrival() != null){
-							events.add(new VehicleDepartsAtFacilityEvent(vehicleData.getArrival(), vehicleId, to, 0));
-							events.add(new PersonLeavesVehicleEvent(vehicleData.getArrival(), driverId, vehicleId));
-							events.add(new PersonArrivalEvent(vehicleData.getArrival(), driverId, endLink, "car"));
-						}else{
-							System.out.println("vehicle " + vehicleId + " did not arrive");
+					if (edges[0].equals("") || exitTimes[0].equals(""))
+						skipVehicle = true;
+					if (skipVehicle.equals(false)){
+						for (int it = 0; it < length; it++){
+							if (it == 0){
+								linkTimes.add(new LinkData(Id.createLinkId(edges[it]), null, Double.valueOf(exitTimes[it])));
+							}
+							else 
+								linkTimes.add(new LinkData(Id.createLinkId(edges[it]), Double.valueOf(exitTimes[it-1]), Double.valueOf(exitTimes[it])));
+						}
+						vehicleData.setLinkTimes(linkTimes);
+						vehicles.put(vehicleId, vehicleData);
+						if (vehicleData.getType().getId().toString().startsWith("Bus")){
+							Id<Person> driverId = Id.createPersonId("pt_" + vehicleId + "_" + vehicleData.getType().getId().toString());
+							Id<TransitLine> transitLineId = Id.create(vehicleId.toString().substring(vehicleId.toString().indexOf("_") + 1, vehicleId.toString().lastIndexOf("_")), TransitLine.class);
+							Id<TransitRoute> transitRouteId = Id.create(edges[0] + "to" + edges[edges.length-1], TransitRoute.class);
+							Id<Departure> departureId = Id.create(vehicleId.toString().substring(vehicleId.toString().lastIndexOf("_") + 1, vehicleId.toString().length()), Departure.class);
+							//						System.out.println(departure + "\t" + vehicleId + "\t" + driverId + "\t" + transitLineId + "\t" + transitRouteId + "\t" + departureId);
+							events.add(new TransitDriverStartsEvent(vehicleData.getDeparture(), driverId, vehicleId, transitLineId, transitRouteId, departureId));
+							Id<Link> startLink = Id.createLinkId(edges[0]);
+							Id<Link> endLink = Id.createLinkId(edges[edges.length-1]);
+							Id<TransitStopFacility> to = Id.create(endLink, TransitStopFacility.class);
+							events.add(new PersonDepartureEvent(vehicleData.getDeparture(), driverId, startLink, "car"));
+							events.add(new PersonEntersVehicleEvent(vehicleData.getDeparture(), driverId, vehicleId));
+							if (vehicleData.getArrival() != null){
+								events.add(new VehicleDepartsAtFacilityEvent(vehicleData.getArrival(), vehicleId, to, 0));
+								events.add(new PersonLeavesVehicleEvent(vehicleData.getArrival(), driverId, vehicleId));
+								events.add(new PersonArrivalEvent(vehicleData.getArrival(), driverId, endLink, "car"));
+							}else{
+								System.out.println("vehicle " + vehicleId + " did not arrive");
+							}
 						}
 					}
 				}
@@ -370,17 +378,16 @@ public class EventsConverter{
 										System.out.println(busId.toString() + "not in vehicles");
 										continue;
 									}
-									if (vehicles.get(busId).getBusStopDepartures() != null){
+									if (vehicles.get(busId).getBusStopDepartures().get(firstLinkId) != null){
 										if (vehicles.get(busId).getBusStopDepartures().get(firstLinkId) - departure == 0){
 											events.add(new PersonEntersVehicleEvent(departure, personId, busId));
 											events.add(new PersonLeavesVehicleEvent(arrival, personId, busId));
 											break;
 										}
 									}else
-										System.out.println("vehicle " + busId + " has no busStopDepartures [person: " + personId + "; linkId: " + firstLinkId + ": "
-												+ vehicles.get(busId).getBusStopDepartures().get(firstLinkId) + " <-> " + departure);
+										System.out.println("vehicle " + busId + " has no busStopDeparture for " + firstLinkId + " [person: " + personId + "]");
 									if (i - lines.length + 1 == 0)
-										System.out.println("no PersonEnters- and PersonLeavesVehicleEvents created (personId: " + personId.toString());
+										System.out.println("no PersonEnters- and PersonLeavesVehicleEvents created for person: " + personId.toString());
 								}
 						if (arrival != null){
 							if ("car".equals(mode))
