@@ -38,10 +38,23 @@ import org.matsim.vehicles.Vehicle;
  * @author Kt, based on stefan
  * from sschroeder: package org.matsim.contrib.freight.usecases.chessboard ;
  * 
- * TODO:  MoneyScoring, ActivityScoring anlegen 
- * 
  */
 public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunctionFactory{
+	
+	@Override
+	public ScoringFunction createScoringFunction(Carrier carrier) {
+		return null;
+	}
+
+	private static Scenario scenario;
+	private static String TEMP_DIR;
+	
+    public CarrierScoringFunctionFactoryImpl_KT(Scenario scenario, String tempDir) {
+        super();
+        CarrierScoringFunctionFactoryImpl_KT.scenario = scenario;
+        CarrierScoringFunctionFactoryImpl_KT.TEMP_DIR = tempDir;
+    }
+    
 
     static class VehicleFixCostScoring implements SumScoringFunction.BasicScoring {
     	
@@ -170,7 +183,93 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     	
     } // End Class LegScoring
     
+    //TODO: Verdoppeln und einmal mit und einmal ohne Korrektur anbieten. (Ohne, wenn MatsimStategy anpassungen erlaubt)
     static class ActivityScoring implements SumScoringFunction.ActivityScoring {
+
+    	private static Logger log = Logger.getLogger(ActivityScoring.class);
+    	
+		private double score = 0. ;
+		private final double margUtlOfTime_s = 0.008 ;  //Wert aus Schröder/Liedtke 2014
+    	
+		private Carrier carrier;
+		
+		ActivityScoring(Carrier carrier) {
+			super();
+			this.carrier = carrier;
+		}
+    	
+    	//Added Activity Writer to log the Activities
+		WriteActivitiesInclScore activityWriterInclScore = new WriteActivitiesInclScore(new File(TEMP_DIR + "#ActivitiesForScoringInforInclScore.txt")); //KT
+		
+		@Override
+		public void finish() {
+			activityWriterInclScore.writeTextLineToFile("Hinweis: Die Bewertung der ersten ServicesAktivität einer jeden Tour (jedes Fzgs) wird korrigert:" +
+					"Es wird die Wartezeit bis zum Beginn des Services nicht berücksichitg, um eine Verzerrung durch verschiedene Depot-Öffnugszeiten vorzubeugen" + System.getProperty("line.separator"));
+			activityWriterInclScore.writeCarrierLine(carrier);
+			activityWriterInclScore.writeTextLineToFile("Activity Utils per s: " +"\t"+ margUtlOfTime_s +"\t"+ "Activity Utils per h: " +"\t"+ margUtlOfTime_s*3600);
+			activityWriterInclScore.writeActsToFile();
+			activityWriterInclScore.writeTextLineToFile(System.getProperty("line.separator"));
+		}
+
+		@Override
+		public double getScore() {
+			return this.score;
+		}
+
+		@Override
+		public void handleFirstActivity(Activity act) { 
+			activityWriterInclScore.addFirstActToWriter(act, 0.0);
+			//Am Start geschieht nichts; ggf kann man hier noch Bewertung für Beladung des Fzgs einfügen, KT 14.04.15
+		}
+
+		@Override
+		public void handleActivity(Activity activity) {
+			double actCosts = 0;
+			if (activity instanceof FreightActivity) {
+				FreightActivity act = (FreightActivity) activity;
+				
+				actCosts = calcActCosts(act);		//costs for whole Activity, inkl waiting.
+				
+				score += (-1) * actCosts;
+				activityWriterInclScore.addActToWriter(activity, actCosts);
+			} else {
+				log.warn("Carrier activities which are not FreightActivities are not scored here: " + activity.toString()) ;
+			}			
+		}
+
+		//Costs für Zeit von Begin bis Ende der Aktivität (enthält aktuell jun '15 auch Wartezeit bis Service beginnt)
+		private double calcActCosts(FreightActivity act) {
+				// deduct score for the time spent at the facility:
+				final double actStartTime = act.getStartTime();
+				final double actEndTime = act.getEndTime();
+				return (actEndTime - actStartTime) * this.margUtlOfTime_s ;
+		}
+
+		@Override
+		public void handleLastActivity(Activity act) {	
+			activityWriterInclScore.addLastActToWriter(act, null);
+			handleActivity(act);
+			// no penalty for everything that is after the last act (people don't work)		
+		}
+		
+    }  //End Class ActivityScoring
+    
+    /**
+     * 
+     * Bestimmt die Kosten für die Aktivitäten des Carriers.
+     * 
+     * Korrektur erfolgt für die Wartezeit vor dem ersten Service. Diese wird aus den Kosten rausgerechnet
+     * Hintergrund: Fzg fahren in der Simulation mit Depotöffnung los und warten dann vor dem Service
+     * auf dessen Öffnung. Bewertet man diese Zeit nun negativ mit, so kann das Ergebnis (Kosten) alleine durch 
+     * eine veränderte Depotöffnugszeit stark verändert werden, ohne das tatsächlich eine Veränderung der 
+     * Tour stattgefunden hat. 
+     * Für den Fall, dass MAtSim mit mehrern Iterationen und der entsprechenden Strategy zum
+     * verändern der Abfahrtszeiten ausgestattet wird - würde sich dieser Fehler hoffentlich selbst 
+     * rausiterieren und die Korrektur sollte nicht angewendet werden.
+     * 
+     * @author kt (24.6.15)
+     */
+    static class ActivityScoringWithCorrection implements SumScoringFunction.ActivityScoring {
 
     	private static Logger log = Logger.getLogger(ActivityScoring.class);
     	
@@ -179,24 +278,21 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 		private final double margUtlOfTime_s = 0.008 ;  //Wert aus Schröder/Liedtke 2014
     	
 		private Carrier carrier;
-		private List<ScheduledTour> correctedTours = new ArrayList<ScheduledTour>(); //TODO: Einbauen
-
-		ActivityScoring(Carrier carrier) {
+		private List<ScheduledTour> correctedTours = new ArrayList<ScheduledTour>(); 
+		
+		ActivityScoringWithCorrection(Carrier carrier) {
 			super();
 			this.carrier = carrier;
 		}
     	
     	//Added Activity Writer to log the Activities
-		WriteActivities activityWriter = new WriteActivities(new File(TEMP_DIR + "#ActivitiesForScoringInfor.txt")); //KT
 		WriteActivitiesInclScore activityWriterInclScore = new WriteActivitiesInclScore(new File(TEMP_DIR + "#ActivitiesForScoringInforInclScore.txt")); //KT
 		
 		@Override
 		public void finish() {
-			activityWriter.writeCarrierLine(carrier);
-			activityWriter.writeTextLineToFile("Activity Utils per s: " +"\t"+ margUtlOfTime_s +"\t"+ "Activity Utils per h: " +"\t"+ margUtlOfTime_s*3600);
-			activityWriter.writeActsToFile();
-			activityWriter.writeTextLineToFile(System.getProperty("line.separator"));
-			
+	
+			activityWriterInclScore.writeTextLineToFile("Hinweis: Die Bewertung der ersten ServicesAktivität einer jeden Tour (jedes Fzgs) wird korrigert:" +
+					"Es wird die Wartezeit bis zum Beginn des Services nicht berücksichitg, um eine Verzerrung durch verschiedene Depot-Öffnugszeiten vorzubeugen" + System.getProperty("line.separator"));
 			activityWriterInclScore.writeCarrierLine(carrier);
 			activityWriterInclScore.writeTextLineToFile("Activity Utils per s: " +"\t"+ margUtlOfTime_s +"\t"+ "Activity Utils per h: " +"\t"+ margUtlOfTime_s*3600);
 			activityWriterInclScore.writeActsToFile();
@@ -210,11 +306,8 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 
 		@Override
 		public void handleFirstActivity(Activity act) {
-			activityWriter.addFirstActToWriter(act); 
 			activityWriterInclScore.addFirstActToWriter(act, 0.0);
-//			handleActivity(act);
 			//Am Start geschieht nichts; ggf kann man hier noch Bewertung für Beladung des Fzgs einfügen, KT 14.04.15
-			
 		}
 
 		@Override
@@ -233,13 +326,27 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 				}
 				
 				score += (-1) * actCosts;
-				activityWriter.addActToWriter(activity);
 				activityWriterInclScore.addActToWriter(activity, actCosts);
 			} else {
 				log.warn("Carrier activities which are not FreightActivities are not scored here: " + activity.toString()) ;
 			}			
 		}
+		
+		@Override
+		public void handleLastActivity(Activity act) {	
+			activityWriterInclScore.addLastActToWriter(act, null);
+			handleActivity(act);
+			// no penalty for everything that is after the last act (people don't work)		
+		}
 
+		//Costs für Zeit von Begin bis Ende der Aktivität (enthält aktuell jun '15 auch Wartezeit bis Service beginnt)
+		private double calcActCosts(FreightActivity act) {
+				// deduct score for the time spent at the facility:
+				final double actStartTime = act.getStartTime();
+				final double actEndTime = act.getEndTime();
+				return (actEndTime - actStartTime) * this.margUtlOfTime_s ;
+		}
+		
 		private boolean isFirstServiceAct(FreightActivity act) {
 			boolean isfirstAct = false;
 			
@@ -261,14 +368,6 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 			return isfirstAct;
 		}
 
-		//Costs für Zeit von Begin bis Ende der Aktivität (enthält aktuell jun '15 auch Wartezeit bis Service beginnt)
-		private double calcActCosts(FreightActivity act) {
-				// deduct score for the time spent at the facility:
-				final double actStartTime = act.getStartTime();
-				final double actEndTime = act.getEndTime();
-				return (actEndTime - actStartTime) * this.margUtlOfTime_s ;
-		}
-		
 		//Korrigiert den Score bei der ersten Service-Aktivität (Wartezeit, da bereits zu Beginn der Depotöffnung losgefahren)
 		//indem diese Zeit wieder mit einem positiven Wert gegengerechnet wird
 		private double correctFirstService(FreightActivity act){
@@ -282,16 +381,8 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 			} 
 		}
 
-		@Override
-		public void handleLastActivity(Activity act) {
-			activityWriter.addLastActToWriter(act); 	
-			activityWriterInclScore.addLastActToWriter(act, null);
-			handleActivity(act);
-			// no penalty for everything that is after the last act (people don't work)		
-		}
-		
-		
-    	
+
+
     }  //End Class ActivityScoring
     
     //TODO: Sollte TollScoring übernehmen, funktioniert jedoch nicht, da keine amounts generiert werden. -> Wird nicht verwendet
@@ -331,7 +422,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 //    	
 //    } // End class MoneyScoring
     
-    //Alternatives TollScoring von Schroeder {@see org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImp.TollScoring}
+    //Alternatives TollScoring von Stefan Schroeder {@see org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImp.TollScoring}
     static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
 
         private double score = 0.;
@@ -339,7 +430,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
         private Network network;
 
         private VehicleTypeDependentRoadPricingCalculator roadPricing;
-
+        
         public TollScoring(Carrier carrier, Network network, VehicleTypeDependentRoadPricingCalculator roadPricing) {
             this.carrier = carrier;
             this.roadPricing = roadPricing;
@@ -353,6 +444,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
                 if(carrierVehicle == null) throw new IllegalStateException("carrier vehicle missing");
                 double toll = roadPricing.getTollAmount(carrierVehicle.getVehicleType().getId(),network.getLinks().get(((LinkEnterEvent) event).getLinkId()),event.getTime());
                 if(toll > 0.) System.out.println("bing: vehicle " + carrierVehicle.getVehicleId() + " paid toll " + toll + "");
+
                 score += (-1) * toll;
             }
         }
@@ -368,7 +460,6 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 
         @Override
         public void finish() {
-
         }
 
         @Override
@@ -377,18 +468,5 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
         }
     }
     
-	@Override
-	public ScoringFunction createScoringFunction(Carrier carrier) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	private static Scenario scenario;
-	private static String TEMP_DIR;
-	
-    public CarrierScoringFunctionFactoryImpl_KT(Scenario scenario, String tempDir) {
-        super();
-        CarrierScoringFunctionFactoryImpl_KT.scenario = scenario;
-        CarrierScoringFunctionFactoryImpl_KT.TEMP_DIR = tempDir;
-    }
 }
