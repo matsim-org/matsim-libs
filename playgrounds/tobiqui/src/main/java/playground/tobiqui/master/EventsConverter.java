@@ -42,7 +42,6 @@ import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -50,6 +49,9 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -343,7 +345,7 @@ public class EventsConverter{
 
 						Double departure = persons.get(personId).getTripInfo().get(tripIndex).getDeparture();
 						Double arrival;
-						Id<ActivityFacility> actFacId = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex-1)).getFacilityId();
+						Id<org.matsim.facilities.ActivityFacility> actFacId = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex-1)).getFacilityId();
 						String actType = ((Activity) scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements().get(tripIndex-1)).getType();
 						if (persons.get(personId).getTripInfo().get(tripIndex).getArrival() != null)
 							arrival = persons.get(personId).getTripInfo().get(tripIndex).getArrival();
