@@ -183,7 +183,6 @@ public class CrowdednessTest
 	{
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
 		
 		config.controler().setLastIteration(1000);
 		config.controler().setWriteEventsInterval(50);
