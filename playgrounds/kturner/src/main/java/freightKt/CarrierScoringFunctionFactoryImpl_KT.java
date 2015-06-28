@@ -47,12 +47,12 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 	}
 
 	private static Scenario scenario;
-	private static String TEMP_DIR;
+	private static String outputDir;
 	
-    public CarrierScoringFunctionFactoryImpl_KT(Scenario scenario, String tempDir) {
+    public CarrierScoringFunctionFactoryImpl_KT(Scenario scenario, String outputDir) {
         super();
         CarrierScoringFunctionFactoryImpl_KT.scenario = scenario;
-        CarrierScoringFunctionFactoryImpl_KT.TEMP_DIR = tempDir;
+        CarrierScoringFunctionFactoryImpl_KT.outputDir = outputDir;
     }
     
 
@@ -66,7 +66,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
             this.carrier = carrier;
         }
 
-        WriteMoney fixCostWriter = new WriteMoney(new File(TEMP_DIR + "#FixCostsForScoringInfor.txt"), carrier);
+        WriteMoney fixCostWriter = new WriteMoney(new File(outputDir + "#FixCostsForScoringInfor.txt"), carrier);
         
         @Override
         public void finish() {
@@ -111,7 +111,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
              this.carrier = carrier;
          }
 		
-		WriteLegs legWriter = new WriteLegs(new File(TEMP_DIR + "#LegsForScoringInfor.txt"), carrier); //KT
+		WriteLegs legWriter = new WriteLegs(new File(outputDir + "#LegsForScoringInfor.txt"), carrier); //KT
 
 		private double getTimeParameter(CarrierVehicle vehicle) {
             return vehicle.getVehicleType().getVehicleCostInformation().perTimeUnit;
@@ -199,7 +199,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 		}
     	
     	//Added Activity Writer to log the Activities
-		WriteActivitiesInclScore activityWriterInclScore = new WriteActivitiesInclScore(new File(TEMP_DIR + "#ActivitiesForScoringInforInclScore.txt")); //KT
+		WriteActivitiesInclScore activityWriterInclScore = new WriteActivitiesInclScore(new File(outputDir + "#ActivitiesForScoringInforInclScore.txt")); //KT
 		
 		@Override
 		public void finish() {
@@ -286,7 +286,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 		}
     	
     	//Added Activity Writer to log the Activities
-		WriteActivitiesInclScore activityWriterInclScore = new WriteActivitiesInclScore(new File(TEMP_DIR + "#ActivitiesForScoringInforInclScore.txt")); //KT
+		WriteActivitiesInclScore activityWriterInclScore = new WriteActivitiesInclScore(new File(outputDir + "#ActivitiesForScoringInforInclScore.txt")); //KT
 		
 		@Override
 		public void finish() {
