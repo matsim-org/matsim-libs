@@ -93,7 +93,7 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 
 	@SuppressWarnings("static-method")
 	@Deprecated
-	public void setUseVehicles(final boolean b) {
+	public void setUseVehicles(@SuppressWarnings("unused") final boolean b) {
 		throw new RuntimeException( "The setUseVehicles switch is no longer operational.  The vehicles file is loaded if the file name"
 				+ " is different from null.  If you needed this for the creation of the vehicles container, use the ScenarioBuilder in "
 				+ "ScenarioUtils.  If this does not work for you, please let us know. kai, jun'15" ) ;
