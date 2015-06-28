@@ -28,11 +28,10 @@ class WriteActivitiesInclScore {
 
 	WriteActivitiesInclScore(File file) {
 		this.file = file;
-		writeHeadLine(file);
 	}
 
-
-	private void writeHeadLine (File file) {
+	
+	void writeHeadLine()  {
 		FileWriter writer;
 
 		try {

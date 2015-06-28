@@ -52,7 +52,11 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     public CarrierScoringFunctionFactoryImpl_KT(Scenario scenario, String outputDir) {
         super();
         CarrierScoringFunctionFactoryImpl_KT.scenario = scenario;
-        CarrierScoringFunctionFactoryImpl_KT.outputDir = outputDir;
+        if (outputDir.endsWith("/")){
+        	CarrierScoringFunctionFactoryImpl_KT.outputDir = outputDir;
+        } else {
+        	CarrierScoringFunctionFactoryImpl_KT.outputDir = outputDir + "/";
+        }
     }
     
 
@@ -292,7 +296,9 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 		public void finish() {
 	
 			activityWriterInclScore.writeTextLineToFile("Hinweis: Die Bewertung der ersten ServicesAktivität einer jeden Tour (jedes Fzgs) wird korrigert:" +
-					"Es wird die Wartezeit bis zum Beginn des Services nicht berücksichitg, um eine Verzerrung durch verschiedene Depot-Öffnugszeiten vorzubeugen" + System.getProperty("line.separator"));
+					"Es wird die Wartezeit bis zum Beginn des Services nicht berücksichtigt, um eine Verzerrung durch verschiedene Depot-Öffnugszeiten vorzubeugen" + 
+					System.getProperty("line.separator") +System.getProperty("line.separator"));
+			activityWriterInclScore.writeHeadLine();
 			activityWriterInclScore.writeCarrierLine(carrier);
 			activityWriterInclScore.writeTextLineToFile("Activity Utils per s: " +"\t"+ margUtlOfTime_s +"\t"+ "Activity Utils per h: " +"\t"+ margUtlOfTime_s*3600);
 			activityWriterInclScore.writeActsToFile();
