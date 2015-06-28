@@ -629,7 +629,6 @@ public class CadytsIntegrationTest {
 		config.plans().setInputFile(inputDir + "4plans.xml") ;
 		// ---
 		config.scenario().setUseTransit(true) ;
-		config.scenario().setUseVehicles(true);
 		// ---
 		config.controler().setFirstIteration(1) ;
 		config.controler().setLastIteration(10) ;
