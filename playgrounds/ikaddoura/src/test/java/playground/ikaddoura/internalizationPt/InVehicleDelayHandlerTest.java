@@ -72,7 +72,6 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		ScenarioImpl scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 		EventsManager events = EventsUtils.createEventsManager();
-		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
 		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.getClassInputDirectory() + "vehicles.xml");
 			
@@ -219,7 +218,6 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 			Config config = ConfigUtils.createConfig();;
 			ScenarioImpl scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 			EventsManager events = EventsUtils.createEventsManager();
-			config.scenario().setUseVehicles(true);
 			config.scenario().setUseTransit(true);
 			new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.getClassInputDirectory() + "vehicles.xml");
 				
