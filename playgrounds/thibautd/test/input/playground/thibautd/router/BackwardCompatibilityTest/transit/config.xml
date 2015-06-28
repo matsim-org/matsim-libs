@@ -19,7 +19,6 @@
 
 	<module name="scenario">
 		<param name="useTransit" value="true" />
-		<param name="useVehicles" value="true" />
 	</module>
 
 	<module name="controler">
