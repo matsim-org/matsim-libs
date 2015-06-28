@@ -199,7 +199,6 @@ public class NonAlternativingPlanElementsIntegrationTest {
 
 	private void addSimpleTransitServices(Scenario scenario) {
 		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();

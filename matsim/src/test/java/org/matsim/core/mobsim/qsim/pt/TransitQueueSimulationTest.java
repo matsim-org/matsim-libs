@@ -81,7 +81,6 @@ public class TransitQueueSimulationTest {
     public void testCreateAgents() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
         scenario.getConfig().qsim().setEndTime(8.0*3600);
 
@@ -212,7 +211,6 @@ public class TransitQueueSimulationTest {
     public void testAddAgentToStop() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
         
         // setup: network
@@ -289,7 +287,6 @@ public class TransitQueueSimulationTest {
     public void testAddAgentToStopWrongLink() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
    
         // setup: network
@@ -355,7 +352,6 @@ public class TransitQueueSimulationTest {
     public void testHandleStop() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
         scenario.getConfig().qsim().setEndTime(8.0*3600);
 
@@ -639,7 +635,6 @@ public class TransitQueueSimulationTest {
 
         // build simple schedule with a single line
         config.scenario().setUseTransit(true);
-        config.scenario().setUseVehicles(true);
         double depTime = 7.0*3600;
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory sb = schedule.getFactory();
@@ -729,7 +724,6 @@ public class TransitQueueSimulationTest {
 
         // build simple schedule with a single line
         config.scenario().setUseTransit(true);
-        config.scenario().setUseVehicles(true);
         double depTime = 7.0*3600;
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory sb = schedule.getFactory();

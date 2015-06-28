@@ -73,7 +73,6 @@ public class TransitDriverTest {
 	public void testInitializationNetworkRoute() {
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(eventsManager);
@@ -147,7 +146,6 @@ public class TransitDriverTest {
 	@Test
 	public void testInitializationDeparture() {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
