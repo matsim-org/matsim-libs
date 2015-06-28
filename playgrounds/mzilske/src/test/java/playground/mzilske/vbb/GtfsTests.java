@@ -23,7 +23,6 @@ public class GtfsTests extends MatsimTestCase {
 	
 	public void testGtfsStandardConversion(){
         Config config = ConfigUtils.createConfig();
-        config.scenario().setUseVehicles(true);
         config.scenario().setUseTransit(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), scenario, new IdentityTransformation());
@@ -42,7 +41,6 @@ public class GtfsTests extends MatsimTestCase {
 	
 	public void testGtfsShapedConversion(){
         Config config = ConfigUtils.createConfig();
-        config.scenario().setUseVehicles(true);
         config.scenario().setUseTransit(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), scenario, new IdentityTransformation());
