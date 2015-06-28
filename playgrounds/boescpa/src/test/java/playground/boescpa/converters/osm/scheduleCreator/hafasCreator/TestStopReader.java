@@ -50,7 +50,6 @@ public class TestStopReader {
 	public void prepareTests() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().scenario().setUseVehicles(true);
 		this.schedule = scenario.getTransitSchedule();
 		this.reader = new StopReader(TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus"));
 	}
