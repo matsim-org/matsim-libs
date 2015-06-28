@@ -141,7 +141,6 @@ public class PTCountsNetworkSimplifier {
 		Config osmConfig = osmScenario.getConfig();
 		if(this.usePT){
 			osmConfig.scenario().setUseTransit(true);
-			osmConfig.scenario().setUseVehicles(true);
 			osmConfig.transit().setTransitScheduleFile(this.scheduleInFile);
 			osmConfig.transit().setVehiclesFile(this.vehiclesInFile);
 		}
