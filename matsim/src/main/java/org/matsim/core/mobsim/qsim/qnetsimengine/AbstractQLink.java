@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -118,10 +119,17 @@ abstract class AbstractQLink extends QLinkInternalI {
 			this.active = true;
 		}
 	}
+	private static int wrnCnt = 0 ;
 	@Override
 	/*package*/ final void addParkedVehicle(MobsimVehicle vehicle) {
 		QVehicle qveh = (QVehicle) vehicle; // cast ok: when it gets here, it needs to be a qvehicle to work.
-		this.parkedVehicles.put(qveh.getId(), qveh);
+		if ( this.parkedVehicles.put(qveh.getId(), qveh) != null ) {
+			if ( wrnCnt < 1 ) {
+				wrnCnt++ ;
+				log.warn( "existing vehicle on link was just overwritten by other vehicle with same ID.  Not clear what this means.  Continuing anyways ...") ;
+				log.warn( Gbl.ONLYONCE ) ;
+			}
+		}
 		qveh.setCurrentLink(this.link);
 	}
 

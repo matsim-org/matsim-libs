@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -198,8 +199,15 @@ public class QNetsimEngine implements MobsimEngine {
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 
+	private static int wrnCnt = 0 ;
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
-		vehicles.put(veh.getId(), (QVehicle) veh);
+		if ( vehicles.put(veh.getId(), (QVehicle) veh) != null ) {
+			if ( wrnCnt < 1 ) {
+				wrnCnt++ ;
+				log.warn( "existing vehicle in mobsim was just overwritten by other vehicle with same ID.  Not clear what this means.  Continuing anyways ...") ;
+				log.warn( Gbl.ONLYONCE ) ;
+			}
+		}
 		QLinkInternalI qlink = network.getNetsimLinks().get(startLinkId);
 		if ( qlink==null ) {
 			throw new RuntimeException("requested link with id=" + startLinkId + " does not exist in network.  Possible vehicles "

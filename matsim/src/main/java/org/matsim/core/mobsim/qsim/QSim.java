@@ -98,7 +98,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private double infoTime = 0;
 
 	private static final int INFO_PERIOD = 3600;
-//	private static final int INFO_PERIOD = 10;
+	//	private static final int INFO_PERIOD = 10;
 
 	private final EventsManager events;
 
@@ -121,7 +121,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 	private final AgentCounter agentCounter;
-//	private final Collection<MobsimAgent> agents = new LinkedHashSet<>();
+	//	private final Collection<MobsimAgent> agents = new LinkedHashSet<>();
 	private final Map<Id<Person>,MobsimAgent> agents = new LinkedHashMap<>();
 	private final List<AgentSource> agentSources = new ArrayList<>();
 	private TransitQSimEngine transitEngine;
@@ -145,17 +145,17 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 		@Override
 		public synchronized void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-            if (QSim.this.netEngine != null) {
-                QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
-            }
+			if (QSim.this.netEngine != null) {
+				QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);
+			}
 		}
 
 		@Override
 		public synchronized MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
-            if (QSim.this.netEngine != null) {
-                return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
-            }
-            return null;
+			if (QSim.this.netEngine != null) {
+				return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
+			}
+			return null;
 		}
 
 		@Override
@@ -169,7 +169,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 
 	};
-	
+
 	@Override
 	public final void rescheduleActivityEnd( MobsimAgent agent ) {
 		this.activityEngine.rescheduleActivityEnd(agent);
@@ -184,12 +184,12 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 *
 	 */
 	public QSim(final Scenario sc, EventsManager events) {
-        this.scenario = sc;
-        if (sc.getConfig().qsim().getNumberOfThreads() > 1) {
-            this.events = EventsUtils.getParallelFeedableInstance(events);
-        } else {
-            this.events = events;
-        }
+		this.scenario = sc;
+		if (sc.getConfig().qsim().getNumberOfThreads() > 1) {
+			this.events = EventsUtils.getParallelFeedableInstance(events);
+		} else {
+			this.events = events;
+		}
 		this.listenerManager = new MobsimListenerManager(this);
 		this.agentCounter = new AgentCounter();
 		this.simTimer = new MobsimTimer(sc.getConfig().qsim().getTimeStepSize());
@@ -206,18 +206,18 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		addDepartureHandler(this.teleportationEngine);
 		prepareSim();
 		this.listenerManager.fireQueueSimulationInitializedEvent();
-		
+
 		// Put agents into the handler for their first ("overnight") action,
 		// probably the ActivityEngine. This is done before the first
 		// beforeSimStepEvent, because the expectation seems to be
 		// (e.g. in OTFVis), that agents are doing something
 		// (can be located somewhere) before you execute a sim step.
-        // Agents can abort in this loop already, so we iterate over
-        // a defensive copy of the agent collection.
+		// Agents can abort in this loop already, so we iterate over
+		// a defensive copy of the agent collection.
 		for (MobsimAgent agent : new ArrayList<>(this.agents.values())) {
 			arrangeNextAgentAction(agent);
 		}
-		
+
 		// do iterations
 		boolean doContinue = true;
 		while ( doContinue ) {
@@ -257,17 +257,33 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 	}
 
+	private static int wrnCnt = 0 ;
 	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
 		QVehicle veh = new QVehicle(vehicle);
-        if (netEngine != null) {
-            netEngine.addParkedVehicle(veh, linkId);
-        }
+		if (netEngine != null) {
+			netEngine.addParkedVehicle(veh, linkId);
+		} else {
+			if ( wrnCnt < 1 ) {
+				log.warn( "not able to add parked vehicle since there is no netsim engine.  continuing anyway, but it may "
+						+ "not be clear what this means ...") ;
+				log.warn( Gbl.ONLYONCE ) ;
+				wrnCnt++ ;
+			}
+		}
 	}
 
+	private static int wrnCnt2 = 0 ;
 	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
 		if (netEngine != null) {
-            netEngine.addParkedVehicle(veh, startLinkId);
-        }
+			netEngine.addParkedVehicle(veh, startLinkId);
+		} else {
+			if ( wrnCnt2 < 1 ) {
+				log.warn( "not able to add parked vehicle since there is no netsim engine.  continuing anyway, but it may "
+						+ "not be clear what this means ...") ;
+				log.warn( Gbl.ONLYONCE ) ;
+				wrnCnt2++ ;
+			}
+		}
 	}
 
 	void cleanupSim() {
@@ -284,7 +300,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 */
 	/*package*/ boolean doSimStep() {
 		final double time = this.getSimTimer().getTimeOfDay() ;
-		
+
 		this.listenerManager.fireQueueSimulationBeforeSimStepEvent(time);
 
 		/*
@@ -317,9 +333,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		if ( this.agents.containsKey( agent.getId() ) ) {
 			throw new RuntimeException( "agent with same ID already in mobsim; aborting ... ") ;
 		}
-//		if ( this.agents.contains(agent) ) {
-//			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
-//		}
+		//		if ( this.agents.contains(agent) ) {
+		//			throw new RuntimeException("agent is already in mobsim; aborting ...") ;
+		//		}
 		agents.put(agent.getId(),agent);
 		this.agentCounter.incLiving();
 	}
@@ -529,7 +545,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	public Collection<MobsimAgent> getAgents() {
 		return Collections.unmodifiableCollection(this.agents.values());
 	}
-	
+
 	public Map< Id<Person>, MobsimAgent> getAgentMap() {
 		return Collections.unmodifiableMap( this.agents ) ;
 	}
