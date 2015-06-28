@@ -144,7 +144,7 @@ public class ScenarioLoaderImpl {
 			this.loadTransit();
 			this.loadTransitVehicles();
 		}
-		if (this.config.scenario().isUseVehicles()) {
+		if (this.config.vehicles().getVehiclesFile()!=null ) {
 			this.loadVehicles() ;
 		}
 		if (this.config.scenario().isUseLanes()) {

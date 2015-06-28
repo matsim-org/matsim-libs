@@ -82,7 +82,7 @@ public class EventsToTravelDiaries implements
         // yy seems a bit overkill to generate a config just to obtain one scalar value. kai, may'15
 
         this.network = scenario.getNetwork();
-        isTransitScenario = scenario.getConfig().scenario().isUseTransit() && scenario.getConfig().scenario().isUseVehicles();
+        isTransitScenario = scenario.getConfig().scenario().isUseTransit() ;
         if (isTransitScenario) {
             this.transitSchedule = scenario.getTransitSchedule();
             this.walkSpeed = new TransitRouterConfig(scenario.getConfig()).getBeelineWalkSpeed();

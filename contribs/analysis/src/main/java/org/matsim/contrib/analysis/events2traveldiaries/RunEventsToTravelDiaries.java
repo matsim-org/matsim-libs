@@ -92,8 +92,7 @@ public class RunEventsToTravelDiaries {
 
         new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 
-        if (config.scenario().isUseTransit() &&
-                config.scenario().isUseVehicles()) {
+        if (config.scenario().isUseTransit() ) {
 
             new TransitScheduleReader(scenario)
                     .readFile(config.transit().getTransitScheduleFile());

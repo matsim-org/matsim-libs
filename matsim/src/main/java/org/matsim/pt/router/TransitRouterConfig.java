@@ -20,7 +20,6 @@
 
 package org.matsim.pt.router;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;

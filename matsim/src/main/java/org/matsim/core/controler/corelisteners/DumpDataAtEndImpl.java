@@ -89,7 +89,7 @@ public final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener 
 		if (this.scenarioData.getConfig().scenario().isUseTransit()) {
 			new VehicleWriterV1(this.scenarioData.getTransitVehicles()).writeFile(controlerIO.getOutputFilename("output_transitVehicles.xml.gz"));
 		}
-		if (this.scenarioData.getConfig().scenario().isUseVehicles()) {
+		if (this.scenarioData.getConfig().vehicles().getVehiclesFile() != null ) {
 			new VehicleWriterV1(this.scenarioData.getVehicles()).writeFile(controlerIO.getOutputFilename("output_vehicles.xml.gz"));
 		}
 		if (this.scenarioData.getConfig().scenario().isUseHouseholds()) {

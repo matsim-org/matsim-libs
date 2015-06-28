@@ -45,11 +45,11 @@ import org.matsim.vehicles.Vehicles;
  * @author dgrether
  * @author mrieser
  */
-public class ScenarioImpl implements Scenario {
+public final class ScenarioImpl implements Scenario {
 	// setting this to final lead to 97 compile errors (many of them IMO multiple error messages of the same problem). kai, feb'14
 
 	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
-	
+
 	private boolean locked = false ;
 
 	private final Map<String, Object> elements = new HashMap<String, Object>();
@@ -65,26 +65,24 @@ public class ScenarioImpl implements Scenario {
 
 	private Households households;
 	private Vehicles transitVehicles;
-	
+
 	private Vehicles vehicles ;
 
 	protected ScenarioImpl(Config config) {
 		this.config = config;
-        this.network = NetworkImpl.createNetwork();
-        this.population = PopulationUtils.createPopulation(this.config, this.network);
-        this.facilities = new ActivityFacilitiesImpl();
-        if (this.config.scenario().isUseHouseholds()){
-            this.createHouseholdsContainer();
-        }
-        if (this.config.scenario().isUseVehicles()){
-        }
-        if (this.config.scenario().isUseTransit()) {
-            this.createTransitSchedule();
-            this.createTransitVehicleContainer();
-        }
-    }
+		this.network = NetworkImpl.createNetwork();
+		this.population = PopulationUtils.createPopulation(this.config, this.network);
+		this.facilities = new ActivityFacilitiesImpl();
+		if (this.config.scenario().isUseHouseholds()){
+			this.createHouseholdsContainer();
+		}
+		if (this.config.scenario().isUseTransit()) {
+			this.createTransitSchedule();
+			this.createTransitVehicleContainer();
+		}
+	}
 
-    /**
+	/**
 	 * Creates a vehicle container and stores it, if it does not exist.
 	 * This is necessary only in very special use cases, when one needs
 	 * to create such a container <b>without</b> setting the useVehicles
@@ -92,7 +90,7 @@ public class ScenarioImpl implements Scenario {
 	 *
 	 * @return true if a new container was initialized, false otherwise
 	 */
-	 public final boolean createTransitVehicleContainer(){
+	public final boolean createTransitVehicleContainer(){
 		if ( this.transitVehicles != null ) return false;
 
 		if ( !this.config.scenario().isUseTransit() ) {
@@ -101,12 +99,8 @@ public class ScenarioImpl implements Scenario {
 		this.transitVehicles = VehicleUtils.createVehiclesContainer();
 		return true;
 	}
-	 public final boolean createVehicleContainer(){
+	public final boolean createVehicleContainer(){
 		if ( this.vehicles != null ) return false;
-
-		if ( !this.config.scenario().isUseVehicles() ) {
-			log.info( "creating vehicles container while switch in config set to false. File will not be loaded automatically." );
-		}
 		this.vehicles = VehicleUtils.createVehiclesContainer();
 		return true;
 	}
@@ -130,7 +124,7 @@ public class ScenarioImpl implements Scenario {
 		return true;
 	}
 
-    /**
+	/**
 	 * Creates a transit schedule and stores it, if it does not exist.
 	 * This is necessary only in very special use cases, when one needs
 	 * to create such a container <b>without</b> setting the useTransit
@@ -138,8 +132,8 @@ public class ScenarioImpl implements Scenario {
 	 *
 	 * @return true if a new container was initialized, false otherwise
 	 */
-	 public final boolean createTransitSchedule() {
-		 if ( this.transitSchedule != null ) return false;
+	public final boolean createTransitSchedule() {
+		if ( this.transitSchedule != null ) return false;
 
 		if ( !this.config.scenario().isUseTransit() ) {
 			log.info( "creating transit schedule while switch in config set to false. File will not be loaded automatically." );
@@ -148,7 +142,7 @@ public class ScenarioImpl implements Scenario {
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		return true;
 	}
-	
+
 	@Override
 	public final ActivityFacilities getActivityFacilities() {
 		return this.facilities;
@@ -195,7 +189,7 @@ public class ScenarioImpl implements Scenario {
 	// He rather wants to have this fail when it is called.
 	// I (kn) am a bit sceptic if it makes sense to establish such a convention when most other people use "if ... == null" use as the
 	// official dialect to check if something is there (since this would cause an exception with Thibaut's approach). kai, feb'15
-	
+
 	@Override
 	public final Households getHouseholds() {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
@@ -242,10 +236,6 @@ public class ScenarioImpl implements Scenario {
 	final public Vehicles getVehicles() {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.vehicles == null ) {
-			if ( this.config.scenario().isUseVehicles() ) {
-				this.createVehicleContainer();
-			}
-			else {
 				// throwing an exception should be the right approach,
 				// but it requires some testing (there may be places in the code
 				// which are happy with getting a null pointer, and would then
@@ -253,15 +243,14 @@ public class ScenarioImpl implements Scenario {
 				// throw new IllegalStateException(
 				log.info(
 						"no vehicles container, and vehicles not activated from config. You must first call the create method of ScenarioImpl." );
-			}
 		}
 
 		return this.vehicles;
 	}
 
 
-	
-    @Override
+
+	@Override
 	public final TransitSchedule getTransitSchedule() {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.transitSchedule == null ) {
@@ -273,7 +262,7 @@ public class ScenarioImpl implements Scenario {
 				// but it requires some testing (there may be places in the code
 				// which are happy with getting a null pointer, and would then
 				// not work anymore)
-//				 throw new IllegalStateException(
+				//				 throw new IllegalStateException(
 				log.info(
 						"no transit schedule, and transit not activated from config. You must first call the create method of ScenarioImpl." );
 				// yyyy Could we please avoid warnings in logfiles that one cannot get rid of?
@@ -310,11 +299,11 @@ public class ScenarioImpl implements Scenario {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		return elements.get( name );
 	}
-	
+
 	public final void setLocked() {
 		this.locked = true ;
 	}
-	
+
 	private void testForLocked() {
 		if ( locked ) {
 			throw new RuntimeException( "ScenarioImpl is locked; too late to do this.  See comments in code.") ;
@@ -329,7 +318,7 @@ public class ScenarioImpl implements Scenario {
 			 */
 		}
 	}
-	
+
 	// the following are there for ScenarioUtils.ScenarioBuilder.  They are deliberately package-private; please do not change. kai, nov'14
 	final void setActivityFacilities( ActivityFacilities facilities ) {
 		testForLocked() ;
