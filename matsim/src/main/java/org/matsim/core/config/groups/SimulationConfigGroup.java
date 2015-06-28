@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.utils.misc.Time;
 
 public final class SimulationConfigGroup extends ConfigGroup implements MobsimConfigGroupI {
@@ -49,7 +50,7 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 	private double endTime = Time.UNDEFINED_TIME;
 	private double timeStepSize = 1.0;
 	private double snapshotPeriod = 0; // off, no snapshots
-	private String snapshotStyle = "equiDist"; // currently supported: queue, equiDist
+	private SnapshotStyle snapshotStyle = SnapshotStyle.equiDist ; 
 	private double flowCapFactor = 1.0;
 	private double stroageCapFactor = 1.0;
 	private double stuckTime = 10;
@@ -73,7 +74,7 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
 			setSnapshotPeriod(Time.parseTime(value));
 		} else if (SNAPSHOT_STYLE.equals(key)) {
-			setSnapshotStyle(value);
+			setSnapshotStyle( SnapshotStyle.valueOf(value) );
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
 			setFlowCapFactor(Double.parseDouble(value));
 		} else if (STORAGE_CAPACITY_FACTOR.equals(key)) {
@@ -107,7 +108,7 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 		} else if (SNAPSHOT_PERIOD.equals(key)) {
 			return Time.writeTime(getSnapshotPeriod());
 		} else if (SNAPSHOT_STYLE.equals(key)) {
-			return getSnapshotStyle();
+			return getSnapshotStyle().toString() ;
 		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
 			return Double.toString(getFlowCapFactor());
 		} else if (STORAGE_CAPACITY_FACTOR.equals(key)) {
@@ -274,18 +275,15 @@ public final class SimulationConfigGroup extends ConfigGroup implements MobsimCo
 	}
 
 	/** See {@link #getComments()} for options. */
-	public void setSnapshotStyle(final String style) {
-		this.snapshotStyle = style.intern();
-		if (!"equiDist".equals(this.snapshotStyle) && !"queue".equals(this.snapshotStyle)) {
-			log.warn("The snapshotStyle \"" + style + "\" is not one of the known ones (queue, equiDist).");
-		}
+	public void setSnapshotStyle(final SnapshotStyle style) {
+		this.snapshotStyle = style ;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.matsim.core.config.groups.MobsimConfigGroupI#getSnapshotStyle()
 	 */
 	@Override
-	public String getSnapshotStyle() {
+	public SnapshotStyle getSnapshotStyle() {
 		return this.snapshotStyle;
 	}
 

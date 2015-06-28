@@ -39,6 +39,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -46,7 +48,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VehicularDepartureHandler.VehicleBehavior;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.vehicles.Vehicle;
@@ -131,12 +132,12 @@ public class QNetsimEngine implements MobsimEngine {
 		// configuring the car departure hander (including the vehicle behavior)
 		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
 		VehicleBehavior vehicleBehavior;
-		if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION)) {
-			vehicleBehavior = VehicleBehavior.EXCEPTION;
-		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT)) {
-			vehicleBehavior = VehicleBehavior.TELEPORT;
-		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT)) {
-			vehicleBehavior = VehicleBehavior.WAIT_UNTIL_IT_COMES_ALONG;
+		if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VehicleBehavior.exception)) {
+			vehicleBehavior = VehicleBehavior.exception;
+		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VehicleBehavior.teleport)) {
+			vehicleBehavior = VehicleBehavior.teleport;
+		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VehicleBehavior.wait)) {
+			vehicleBehavior = VehicleBehavior.wait ;
 		} else {
 			throw new RuntimeException("Unknown vehicle behavior option.");
 		}
@@ -150,7 +151,7 @@ public class QNetsimEngine implements MobsimEngine {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ qsimConfigGroup.getTrafficDynamics() ) ;
 		}
-		if ( QSimConfigGroup.SNAPSHOT_WITH_HOLES.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
+		if ( QSimConfigGroup.SnapshotStyle.withHoles.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
 			QueueWithBuffer.VIS_HOLES = true ;
 		}
 
@@ -174,7 +175,7 @@ public class QNetsimEngine implements MobsimEngine {
 											LaneDefinitions20.ELEMENT_NAME)));
 		} else if ( netsimNetworkFactory != null ){
 			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-		} else if (QSimConfigGroup.LinkDynamics.valueOf(qsimConfigGroup.getLinkDynamics()) == QSimConfigGroup.LinkDynamics.PassingQ) {
+		} else if ( qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ) {
 			network = new QNetwork(sim.getScenario().getNetwork(), new NetsimNetworkFactory<QNode, QLinkImpl>() {
 				@Override
 				public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
@@ -208,15 +209,15 @@ public class QNetsimEngine implements MobsimEngine {
 	}
 
 	private AbstractAgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario){
-		String  snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
-		if ("queue".equalsIgnoreCase(snapshotStyle)){
+		final SnapshotStyle snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
+		switch( snapshotStyle ) {
+		case queue:
 			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
-		}
-		else  if ("equiDist".equalsIgnoreCase(snapshotStyle) || "withHolesExperimental".equalsIgnoreCase(snapshotStyle) ){
+		case equiDist:
+		case withHoles:
 			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
 			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
-		}
-		else {
+		default:
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");
 			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		}

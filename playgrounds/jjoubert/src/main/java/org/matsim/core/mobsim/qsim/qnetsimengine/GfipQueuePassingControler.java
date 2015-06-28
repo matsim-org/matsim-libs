@@ -20,6 +20,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +41,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -67,6 +69,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.*;
+
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
@@ -156,7 +159,7 @@ public class GfipQueuePassingControler {
 				GfipMode.GFIP_C.toString()};
 		config.qsim().setMainModes( Arrays.asList(modes) );
 		config.qsim().setEndTime(Time.parseTime("30:00:00"));
-		config.qsim().setSnapshotStyle("queue");
+		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		config.qsim().setStuckTime(Time.parseTime("02:00:00"));
 		config.plansCalcRoute().setNetworkModes(Arrays.asList(modes));
 

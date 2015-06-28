@@ -22,6 +22,9 @@
 
 package org.matsim.vis.otfvis.checklists;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -33,6 +36,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -47,13 +51,16 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
-
-import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Simplified version of TwoLinesDemo.java by mrieser
@@ -66,7 +73,7 @@ public class T6_Transit {
 		Config config = this.scenario.getConfig();
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.qsim().setSnapshotStyle("queue");
+		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		config.qsim().setEndTime(24.0*3600);
 	}
 

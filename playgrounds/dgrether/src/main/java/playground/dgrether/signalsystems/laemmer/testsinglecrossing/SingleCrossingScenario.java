@@ -19,6 +19,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -346,7 +347,7 @@ public class SingleCrossingScenario {
 		config.scenario().setUseLanes(false);
 		config.scenario().setUseSignalSystems(true);
 		QSimConfigGroup qsim = config.qsim();
-		qsim.setSnapshotStyle("queue");
+		qsim.setSnapshotStyle( SnapshotStyle.queue ) ;;
 		qsim.setStuckTime(1000.0);
 		config.qsim().setNodeOffset(20.0);
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setShowTeleportedAgents(true);

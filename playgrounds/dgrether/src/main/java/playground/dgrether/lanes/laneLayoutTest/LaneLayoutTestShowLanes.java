@@ -24,6 +24,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -31,6 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
 import playground.dgrether.utils.LogOutputEventHandler;
 
 
@@ -52,7 +54,7 @@ public class LaneLayoutTestShowLanes {
 //		config.otfVis().setLinkWidth(150.0f);
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawLinkIds(true);
 		config.qsim().setNodeOffset(30);
-		config.qsim().setSnapshotStyle("queue");
+		config.qsim().setSnapshotStyle(SnapshotStyle.queue);
 
 		Scenario sc = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();

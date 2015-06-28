@@ -59,7 +59,7 @@ public class DefaultPlanbasedSignalControlTest {
 		QSimConfigGroup qsimConfig = config.qsim();
 		qsimConfig.setStartTime(0.0);
 		qsimConfig.setEndTime(400.0);
-		qsimConfig.setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
+		qsimConfig.setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 	
 		String inputDir = utils.getClassInputDirectory();
 		//scenario

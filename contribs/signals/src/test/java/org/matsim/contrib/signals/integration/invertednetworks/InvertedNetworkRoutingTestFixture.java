@@ -87,7 +87,7 @@ public class InvertedNetworkRoutingTestFixture {
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setStuckTime(10000.0);
 		config.qsim().setStartTime(0.0);
-		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
+		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.toString());
 		stratSets.setWeight(1.0);

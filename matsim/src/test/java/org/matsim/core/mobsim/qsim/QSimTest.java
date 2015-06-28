@@ -766,7 +766,7 @@ public class QSimTest {
 	@Test
 	public void testWaitingForCar() {
 		Fixture f = new Fixture();
-		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT);
+		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.wait);
 		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
 		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl plan = person.createAndAddPlan(true);
@@ -855,7 +855,7 @@ public class QSimTest {
 	@Test
 	public void testVehicleTeleportationFalse() {
 		Fixture f = new Fixture();
-		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION);
+		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
 		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());

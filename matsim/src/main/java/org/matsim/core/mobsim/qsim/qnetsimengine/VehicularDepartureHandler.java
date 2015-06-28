@@ -24,19 +24,13 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.vehicles.Vehicle;
 
 class VehicularDepartureHandler implements DepartureHandler {
-
-	/*
-	 * What to do when some agent wants to drive their vehicle but it isn't there.
-	 * Either teleport it to the agent's location (no matter what!), or have the agent wait
-	 * for the car to arrive, or throw an exception.
-	 */
-	public static enum VehicleBehavior { TELEPORT, WAIT_UNTIL_IT_COMES_ALONG, EXCEPTION }
 
     private static final Logger log = Logger.getLogger(VehicularDepartureHandler.class);
 
@@ -77,7 +71,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 		QLinkInternalI qlink = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
-			if (vehicleBehavior == VehicleBehavior.TELEPORT) {
+			if (vehicleBehavior == VehicleBehavior.teleport) {
 				vehicle = qNetsimEngine.getVehicles().get(vehicleId);
 				if ( vehicle==null ) {
 					// log a maximum of information, to help the user identifying the cause of the problem
@@ -95,7 +89,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 				qlink.letVehicleDepart(vehicle, now);
 				// (since the "teleportVehicle" does not physically move the vehicle, this is finally achieved in the departure
 				// logic.  kai, nov'11)
-			} else if (vehicleBehavior == VehicleBehavior.WAIT_UNTIL_IT_COMES_ALONG) {
+			} else if (vehicleBehavior == VehicleBehavior.wait ) {
 				// While we are waiting for our car
 				qlink.registerDriverAgentWaitingForCar(agent);
 			} else {

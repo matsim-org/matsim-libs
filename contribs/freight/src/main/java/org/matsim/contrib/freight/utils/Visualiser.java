@@ -86,7 +86,7 @@ public class Visualiser {
 
 		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
 
-		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
 		Mobsim mobsim = mobsimFactory.get();
 
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, (QSim) mobsim);

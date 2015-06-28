@@ -19,8 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsimusages.jointpseudosim.qsim;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
+import org.matsim.contrib.socnetsim.jointtrips.qsim.JointModesDepartureHandler;
+import org.matsim.contrib.socnetsim.jointtrips.qsim.PassengerUnboardingAgentFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -30,16 +36,10 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
+
 import playground.thibautd.pseudoqsim.ParkedVehicleProvider;
 import playground.thibautd.pseudoqsim.PopulationAgentSourceForTeleportedVehicles;
 import playground.thibautd.pseudoqsim.VehicularTeleportationEngine;
-import playground.thibautd.pseudoqsim.VehicularTeleportationEngine.VehicleBehavior;
-import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
-import org.matsim.contrib.socnetsim.jointtrips.qsim.JointModesDepartureHandler;
-import org.matsim.contrib.socnetsim.jointtrips.qsim.PassengerUnboardingAgentFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author thibautd
@@ -74,7 +74,7 @@ public class JointTeleportationSimFactory implements MobsimFactory {
 			new VehicularTeleportationEngine(
 					conf.getMainModes(),
 					vehicles,
-					VehicleBehavior.valueOf( conf.getVehicleBehavior() ) );
+					conf.getVehicleBehavior() );
 
 		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
 		qSim.addMobsimEngine( activityEngine );

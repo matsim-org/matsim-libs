@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -43,6 +44,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.IOException;
 
 /**
@@ -53,7 +55,7 @@ import java.io.IOException;
 public class ScenarioPlayer {
 
 	public static void play(final Scenario scenario, final EventsManager events) {
-		scenario.getConfig().qsim().setSnapshotStyle("queue");
+		scenario.getConfig().qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		final QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);

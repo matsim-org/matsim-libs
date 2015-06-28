@@ -158,7 +158,7 @@ public class RunSimulation {
 		// config.controler().setWriteSnapshotsInterval(5);
 		config.qsim().setStorageCapFactor(0.01);
 		config.qsim().setFlowCapFactor(0.01);
-		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setNumberOfThreads(2);
 		config.qsim().setEndTime(30*60*60);

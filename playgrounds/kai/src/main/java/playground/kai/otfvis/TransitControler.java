@@ -21,6 +21,7 @@
 package playground.kai.otfvis;
 
 import com.google.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.otfvis.OTFVisModule;
@@ -32,6 +33,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -61,16 +63,13 @@ public class TransitControler {
 //		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
 		}
 
-		config.qsim().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT ) ;
+		config.qsim().setVehicleBehavior( QSimConfigGroup.VehicleBehavior.teleport ) ;
 		
 //		config.otfVis().setShowTeleportedAgents(true) ;
 		
 
 		final Controler tc = new Controler(config) ;
-		tc.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		tc.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
 		tc.setDirtyShutdown(true);
 		
 //		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;

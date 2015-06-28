@@ -23,17 +23,18 @@
  */
 package org.matsim.contrib.otfvis;
 
+import java.io.File;
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestCase;
-
-import java.io.File;
-import java.util.Arrays;
 
 /**
  * Simple test case to ensure the converting from eventsfile to .mvi-file
@@ -67,7 +68,7 @@ public class OTFVisTest extends MatsimTestCase {
 		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setSnapshotPeriod(600);
-		qSimConfigGroup.setSnapshotStyle("equiDist");
+		qSimConfigGroup.setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
 		final Controler controler = new Controler(config);
 		controler.addOverridingModule(new OTFVisModule());

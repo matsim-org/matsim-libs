@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -64,7 +65,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	private final double capCorrectionFactor;
 	private final double storageCapFactor;
-	private final String snapshotStyle;
+	private final SnapshotStyle snapshotStyle;
 	private double skipUntil = 0.0;
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
   private final AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);

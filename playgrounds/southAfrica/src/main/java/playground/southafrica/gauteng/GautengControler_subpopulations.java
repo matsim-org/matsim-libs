@@ -180,7 +180,7 @@ public class GautengControler_subpopulations {
 			config.controler().setWriteSnapshotsInterval(100);
 			
 			config.qsim().setSnapshotPeriod(900);
-			config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_EQUI_DIST);
+			config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.withHoles);
 			
 //			config.global().setRandomSeed(4713);
 			

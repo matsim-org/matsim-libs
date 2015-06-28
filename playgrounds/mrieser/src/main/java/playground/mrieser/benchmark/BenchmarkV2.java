@@ -158,7 +158,7 @@ public class BenchmarkV2 {
 		c.controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 
 		if ("qsim".equals(mobsim)) {
-	//		c.getQSimConfigGroup().setSnapshotStyle("queue");
+	//		c.getQSimConfigGroup().setSnapshotStyle( SnapshotStyle.queue ) ;;
 			c.qsim().setEndTime(30.0*3600);
 			c.qsim().setFlowCapFactor(flowFactor);
 			if (nOfThreadsSim > 0) {

@@ -78,7 +78,7 @@ public class LangeStreckeSzenario{
 		
 		//Initializing scenario Config file
 		Config config = ConfigUtils.createConfig();
-		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue) ;
 		config.qsim().setMainModes(Arrays.asList(NAMES));
 		config.qsim().setStuckTime(100*3600.);//allows to overcome maximal density regime
 		config.qsim().setEndTime(END_TIME);

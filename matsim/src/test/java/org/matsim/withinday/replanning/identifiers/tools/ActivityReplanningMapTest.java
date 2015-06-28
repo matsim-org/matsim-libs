@@ -97,7 +97,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(0);
 		config.qsim().setStartTime(0.0);
-		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
+		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(new WithinDayModule());

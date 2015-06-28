@@ -20,6 +20,8 @@
 
 package org.matsim.core.config.groups;
 
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+
 /**Interface which is there so that some params that exist jointly in different mobsim config groups can
  * be passed as arguments via the same channel.  One could argue that this should be a "QueueMobsimConfigGroupI",
  * but in the interest of simplicity the 1-2 args that arguable only make sense for queue were included. 
@@ -43,6 +45,6 @@ public interface MobsimConfigGroupI {
 
 	public abstract boolean isRemoveStuckVehicles();
 
-	public abstract String getSnapshotStyle();
+	public abstract SnapshotStyle getSnapshotStyle();
 
 }

@@ -82,7 +82,7 @@ final class RunWithinDayExample implements StartupListener {
 		this.scenario = controler.getScenario();
 		this.withinDayControlerListener = new WithinDayControlerListener();
 		
-		this.scenario.getConfig().qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+		this.scenario.getConfig().qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
 
 		// only necessary for visualization, which does, however, not work that well (replanned plans cannot be visualized):
 //		this.withinDayControlerListener.setOriginalMobsimFactory( new MobsimFactory() {

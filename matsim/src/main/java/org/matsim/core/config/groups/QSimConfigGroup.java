@@ -51,20 +51,18 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics";
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
 	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
-    private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
-    private static final String USE_DEFAULT_VEHICLES = "useDefaultVehicles";
+	private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
+	private static final String USE_DEFAULT_VEHICLES = "useDefaultVehicles";
 
 	public static enum TrafficDynamics { queue, withHoles } ;
+	
+	public static enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime } ;
+	
+	public static enum VehicleBehavior { teleport, wait, exception } ;
 
-	public static final String MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END = "maxOfStarttimeAndEarliestActivityEnd";
-	public static final String ONLY_USE_STARTTIME = "onlyUseStarttime";
-
-	public static final String VEHICLE_BEHAVIOR_TELEPORT = "teleport";
-	public static final String VEHICLE_BEHAVIOR_WAIT = "wait";
-	public static final String VEHICLE_BEHAVIOR_EXCEPTION = "exception";
 	private static final String NODE_OFFSET = "nodeOffset";
 
-	
+
 	private double startTime = Time.UNDEFINED_TIME;
 	private double endTime = Time.UNDEFINED_TIME;
 	private double timeStepSize = 1.0;
@@ -73,29 +71,27 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private double storageCapFactor = 1.0;
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
-    private boolean usePersonIdForMissingVehicleId = true;
-    private int numberOfThreads = 1;
+	private boolean usePersonIdForMissingVehicleId = true;
+	private int numberOfThreads = 1;
 	private TrafficDynamics trafficDynamics = TrafficDynamics.queue ;
-	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END;
-	private String vehicleBehavior = VEHICLE_BEHAVIOR_TELEPORT;
-	
+	private StarttimeInterpretation simStarttimeInterpretation = StarttimeInterpretation.maxOfStarttimeAndEarliestActivityEnd;
+	private VehicleBehavior vehicleBehavior = VehicleBehavior.teleport ;
+
 	// ---
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
-	public static final String SNAPSHOT_EQUI_DIST = "equiDist";
-	public static final String SNAPSHOT_AS_QUEUE = "queue";
-	public static final String SNAPSHOT_WITH_HOLES = "withHoles" ;
-	private String snapshotStyle = SNAPSHOT_EQUI_DIST;
-	
+	public static enum SnapshotStyle { equiDist, queue, withHoles } ;
+	private SnapshotStyle snapshotStyle = SnapshotStyle.equiDist ;
+
 	// ---
 	private static final String MAIN_MODE = "mainMode";
 	private Collection<String> mainModes = Arrays.asList(TransportMode.car);
-	
+
 	// ---
 	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles";
 	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false;
 
 	// ---
-    public static enum LinkDynamics { FIFO, PassingQ }
+	public static enum LinkDynamics { FIFO, PassingQ }
 	private LinkDynamics linkDynamics = LinkDynamics.FIFO ;
 	private static final String LINK_DYNAMICS = "linkDynamics" ;
 
@@ -105,89 +101,92 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private boolean usingThreadpool = false ;
 
 	public static final String LINK_WIDTH = "linkWidth";
-	
+
 	// ---
 	private final static String FAST_CAPACITY_UPDATE = "usingFastCapacityUpdate";
 	private boolean usingFastCapacityUpdate = false ;
 
-	private VehiclesSource vehiclesSource = VehiclesSource.DefaultVehicle ;
+	private VehiclesSource vehiclesSource = VehiclesSource.defaultVehicle ;
 	// ---
 
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
 	}
 
-    @StringSetter(MAIN_MODE)
-    private void setMainModes(String value) {
-        setMainModes(Arrays.asList(value.split(",")));
-    }
+	@StringSetter(MAIN_MODE)
+	private void setMainModes(String value) {
+		setMainModes(Arrays.asList(value.split(",")));
+	}
 
-    @StringSetter(SNAPSHOT_PERIOD)
-    private void setSnapshotPeriod(String value) {
-        setSnapshotPeriod(Time.parseTime(value));
-    }
+	@StringSetter(SNAPSHOT_PERIOD)
+	private void setSnapshotPeriod(String value) {
+		setSnapshotPeriod(Time.parseTime(value));
+	}
 
-    @StringSetter(TIME_STEP_SIZE)
-    private void setTimeStepSize(String value) {
-        setTimeStepSize(Time.parseTime(value));
-    }
+	@StringSetter(TIME_STEP_SIZE)
+	private void setTimeStepSize(String value) {
+		setTimeStepSize(Time.parseTime(value));
+	}
 
-    @StringSetter(END_TIME)
-    private void setEndTime(String value) {
-        setEndTime(Time.parseTime(value));
-    }
+	@StringSetter(END_TIME)
+	private void setEndTime(String value) {
+		setEndTime(Time.parseTime(value));
+	}
 
-    @StringSetter(START_TIME)
-    private void setStartTime(String value) {
-        setStartTime(Time.parseTime(value));
-    }
+	@StringSetter(START_TIME)
+	private void setStartTime(String value) {
+		setStartTime(Time.parseTime(value));
+	}
 
-    @StringGetter(MAIN_MODE)
-    private String getMainModesAsString() {
-        return CollectionUtils.setToString(new HashSet<>(getMainModes()));
-    }
+	@StringGetter(MAIN_MODE)
+	private String getMainModesAsString() {
+		return CollectionUtils.setToString(new HashSet<>(getMainModes()));
+	}
 
-    @StringGetter(SNAPSHOT_PERIOD)
-    private String getSnapshotPeriodAsString() {
-        return Time.writeTime(getSnapshotPeriod());
-    }
+	@StringGetter(SNAPSHOT_PERIOD)
+	private String getSnapshotPeriodAsString() {
+		return Time.writeTime(getSnapshotPeriod());
+	}
 
-    @StringGetter(TIME_STEP_SIZE)
-    private String getTimeStepSizeAsString() {
-        return Time.writeTime(getTimeStepSize());
-    }
-
-
-    @StringGetter(END_TIME)
-    private String getEndTimeAsString() {
-        return Time.writeTime(getEndTime());
-    }
+	@StringGetter(TIME_STEP_SIZE)
+	private String getTimeStepSizeAsString() {
+		return Time.writeTime(getTimeStepSize());
+	}
 
 
-    @StringGetter(START_TIME)
-    private String getStartTimeAsString() {
-        return Time.writeTime(getStartTime());
-    }
+	@StringGetter(END_TIME)
+	private String getEndTimeAsString() {
+		return Time.writeTime(getEndTime());
+	}
 
-    // measure so that comments remain consistent between Simulation and QSim.  kai, aug'10
+
+	@StringGetter(START_TIME)
+	private String getStartTimeAsString() {
+		return Time.writeTime(getStartTime());
+	}
+
+	// measure so that comments remain consistent between Simulation and QSim.  kai, aug'10
 	/* package */ final static String REMOVE_STUCK_VEHICLES_STRING=
-		"Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice.";
+			"Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice.";
 	/* package */ final static String STUCK_TIME_STRING=
-		"time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move.";
+			"time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move.";
 
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(SNAPSHOT_STYLE,"snapshotStyle. One of: " 
-				+ SNAPSHOT_EQUI_DIST + " (vehicles equidistant on link) or " 
-				+ SNAPSHOT_AS_QUEUE + " (vehicles queued at end of link) or "
-				+ SNAPSHOT_WITH_HOLES + " (experimental!!)" );
+		{
+			String options = null ;
+			for ( SnapshotStyle style : SnapshotStyle.values() ) {
+				options += style.toString() + " " ;
+			}
+			map.put(SNAPSHOT_STYLE,"snapshotStyle. One of: " + options ) ; 
+		}
 		map.put(NUMBER_OF_THREADS, "Number of threads used for the QSim.  "
 				+ "Note that this setting is independent from the \"global\" threads setting.  "
 				+ "In contrast to earlier versions, the non-parallel special version is no longer there." ) ;
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING );
 		map.put(STUCK_TIME, STUCK_TIME_STRING );
-		
+
 		{
 			String options = null ;
 			for ( TrafficDynamics dyn : TrafficDynamics.values() ) {
@@ -195,11 +194,21 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 			}
 			map.put(TRAFFIC_DYNAMICS, "options: " + options ) ;
 		}
-		map.put(SIM_STARTTIME_INTERPRETATION, "`"
-				+ MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END + "' (default behavior) or `"
-				+ ONLY_USE_STARTTIME + "'" );
-		map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. " +
-				"One of: " + VEHICLE_BEHAVIOR_TELEPORT + ", " + VEHICLE_BEHAVIOR_WAIT + ", " + VEHICLE_BEHAVIOR_EXCEPTION);
+		{ 
+			String options = null ;
+			for ( StarttimeInterpretation ii : StarttimeInterpretation.values() ) {
+				options += ii + " " ;
+			}
+			map.put(SIM_STARTTIME_INTERPRETATION, "Options: " + options ) ;
+		}
+		{
+			String options = null ;
+			for ( VehicleBehavior behav : VehicleBehavior.values() ) {
+				options += behav + " " ;
+			}
+			map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. " +
+					"One of: " + options ) ;
+		}
 		map.put(MAIN_MODE, "[comma-separated list] Defines which modes are congested modes. Technically, these are the modes that " +
 				"the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity " +
 				"factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense.");
@@ -214,7 +223,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 			}
 			map.put(LINK_DYNAMICS, "default: FIFO; options:" + stb ) ;
 		}
-        map.put(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID, "If a route does not reference a vehicle, agents will use the vehicle with the same id as their own.");
+		map.put(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID, "If a route does not reference a vehicle, agents will use the vehicle with the same id as their own.");
 		map.put(USE_DEFAULT_VEHICLES, "[DEPRECATED, use" + VEHICLES_SOURCE + " instead]  If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties.");
 		map.put(USING_THREADPOOL, "if the qsim should use as many runners as there are threads (Christoph's dissertation version)"
 				+ " or more of them, together with a thread pool (seems to be faster in some situations, but is not tested).") ;
@@ -230,14 +239,14 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 			map.put( VEHICLES_SOURCE, "If vehicles should all be the same default vehicle, or come from the vehicles file, "
 					+ "or something else.  Possible values: " + stb );
 		}
-        return map;
+		return map;
 	}
-	
+
 	@StringSetter(FAST_CAPACITY_UPDATE)
 	public final void setUsingFastCapacityUpdate( boolean val ) {
 		this.usingFastCapacityUpdate = val ;
 	}
-	
+
 	@StringGetter(FAST_CAPACITY_UPDATE)
 	public final boolean isUsingFastCapacityUpdate() {
 		return this.usingFastCapacityUpdate ;
@@ -266,10 +275,10 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	 *
 	 * @param seconds
 	 */
-    public void setTimeStepSize(final double seconds) {
+	public void setTimeStepSize(final double seconds) {
 		if ( seconds != 1.0 ) {
 			Logger.getLogger(this.getClass()).warn("there are nearly no tests for time step size != 1.0.  Please write such tests and remove "
-				+ "this warning. ") ;
+					+ "this warning. ") ;
 		}
 		this.timeStepSize = seconds;
 	}
@@ -279,7 +288,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		return this.timeStepSize;
 	}
 
-    public void setSnapshotPeriod(final double snapshotPeriod) {
+	public void setSnapshotPeriod(final double snapshotPeriod) {
 		this.snapshotPeriod = snapshotPeriod;
 	}
 
@@ -288,82 +297,77 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		return this.snapshotPeriod;
 	}
 
-    @StringSetter(FLOW_CAPACITY_FACTOR)
+	@StringSetter(FLOW_CAPACITY_FACTOR)
 	public void setFlowCapFactor(final double flowCapFactor) {
 		this.flowCapFactor = flowCapFactor;
 	}
 
 	@Override
-    @StringGetter(FLOW_CAPACITY_FACTOR)
+	@StringGetter(FLOW_CAPACITY_FACTOR)
 	public double getFlowCapFactor() {
 		return this.flowCapFactor;
 	}
 
-    @StringSetter(STORAGE_CAPACITY_FACTOR)
+	@StringSetter(STORAGE_CAPACITY_FACTOR)
 	public void setStorageCapFactor(final double val) {
 		this.storageCapFactor = val;
 	}
 
 	@Override
-    @StringGetter(STORAGE_CAPACITY_FACTOR)
+	@StringGetter(STORAGE_CAPACITY_FACTOR)
 	public double getStorageCapFactor() {
 		return this.storageCapFactor;
 	}
 
-    @StringSetter(STUCK_TIME)
+	@StringSetter(STUCK_TIME)
 	public void setStuckTime(final double stuckTime) {
 		this.stuckTime = stuckTime;
 	}
 
 	@Override
-    @StringGetter(STUCK_TIME)
+	@StringGetter(STUCK_TIME)
 	public double getStuckTime() {
 		return this.stuckTime;
 	}
 
-    @StringSetter(REMOVE_STUCK_VEHICLES)
+	@StringSetter(REMOVE_STUCK_VEHICLES)
 	public void setRemoveStuckVehicles(final boolean removeStuckVehicles) {
 		this.removeStuckVehicles = removeStuckVehicles;
 	}
 
 	@Override
-    @StringGetter(REMOVE_STUCK_VEHICLES)
+	@StringGetter(REMOVE_STUCK_VEHICLES)
 	public boolean isRemoveStuckVehicles() {
 		return this.removeStuckVehicles;
 	}
 
 	@StringSetter(SNAPSHOT_STYLE)
-	public void setSnapshotStyle(final String style) {
-		this.snapshotStyle = style.intern();
-		if (!SNAPSHOT_EQUI_DIST.equals(this.snapshotStyle) && !SNAPSHOT_AS_QUEUE.equals(this.snapshotStyle)
-				&& !"withHolesExperimental".equals(this.snapshotStyle) ) {
-			log.warn("The snapshotStyle \"" + style + "\" is not one of the known ones. "
-					+ "See comment in config dump of log file for allowed styles.");
-		}
+	public void setSnapshotStyle(final SnapshotStyle style) {
+		this.snapshotStyle = style ;
 	}
 
 	@Override
-    @StringGetter(SNAPSHOT_STYLE)
-	public String getSnapshotStyle() {
+	@StringGetter(SNAPSHOT_STYLE)
+	public SnapshotStyle getSnapshotStyle() {
 		return this.snapshotStyle;
 	}
 
-    @StringSetter(TRAFFIC_DYNAMICS)
+	@StringSetter(TRAFFIC_DYNAMICS)
 	public void setTrafficDynamics(final TrafficDynamics str) {
 		this.trafficDynamics = str;
 	}
 
-    @StringGetter(TRAFFIC_DYNAMICS)
+	@StringGetter(TRAFFIC_DYNAMICS)
 	public TrafficDynamics getTrafficDynamics() {
 		return this.trafficDynamics;
 	}
 
-    @StringGetter(NUMBER_OF_THREADS)
+	@StringGetter(NUMBER_OF_THREADS)
 	public int getNumberOfThreads() {
 		return this.numberOfThreads;
 	}
 
-    @StringSetter(NUMBER_OF_THREADS)
+	@StringSetter(NUMBER_OF_THREADS)
 	public void setNumberOfThreads(final int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "Number of threads must be strictly positive, got "+numberOfThreads );
@@ -371,28 +375,23 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.numberOfThreads = numberOfThreads;
 	}
 
-    @StringGetter(SIM_STARTTIME_INTERPRETATION)
-	public String getSimStarttimeInterpretation() {
+	@StringGetter(SIM_STARTTIME_INTERPRETATION)
+	public StarttimeInterpretation getSimStarttimeInterpretation() {
 		return simStarttimeInterpretation;
 	}
 
-    @StringSetter(SIM_STARTTIME_INTERPRETATION)
-	public void setSimStarttimeInterpretation(String str) {
+	@StringSetter(SIM_STARTTIME_INTERPRETATION)
+	public void setSimStarttimeInterpretation(StarttimeInterpretation str) {
 		this.simStarttimeInterpretation = str;
-		if ( !MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(str)
-				&& !ONLY_USE_STARTTIME.equals(str) ) {
-			log.warn("The simStarttimeInterpretation '" + str + "' is not one of the known ones. "
-					+ "See comment in config dump in log file for allowed styles.");
-		}
 	}
 
-    @StringSetter(VEHICLE_BEHAVIOR)
-	public void setVehicleBehavior(String value) {
+	@StringSetter(VEHICLE_BEHAVIOR)
+	public void setVehicleBehavior(VehicleBehavior value) {
 		this.vehicleBehavior = value;
 	}
 
-    @StringGetter(VEHICLE_BEHAVIOR)
-	public String getVehicleBehavior() {
+	@StringGetter(VEHICLE_BEHAVIOR)
+	public VehicleBehavior getVehicleBehavior() {
 		return this.vehicleBehavior;
 	}
 
@@ -404,96 +403,96 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		return mainModes;
 	}
 
-    @StringGetter(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES)
+	@StringGetter(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES)
 	public boolean isInsertingWaitingVehiclesBeforeDrivingVehicles() {
 		return this.insertingWaitingVehiclesBeforeDrivingVehicles;
 	}
 
-    @StringSetter(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES)
+	@StringSetter(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES)
 	public void setInsertingWaitingVehiclesBeforeDrivingVehicles(boolean val) {
 		this.insertingWaitingVehiclesBeforeDrivingVehicles = val;
 	}
 
-    @StringGetter(NODE_OFFSET)
+	@StringGetter(NODE_OFFSET)
 	public double getNodeOffset() {
 		return nodeOffset;
 	}
-	
+
 	@StringSetter(NODE_OFFSET)
-    public void setNodeOffset(double nodeOffset) {
+	public void setNodeOffset(double nodeOffset) {
 		this.nodeOffset = nodeOffset;
 	}
 
-    @StringGetter(LINK_WIDTH)
+	@StringGetter(LINK_WIDTH)
 	public float getLinkWidth() {
 		return this.linkWidth;
 	}
 
-    @StringSetter(LINK_WIDTH)
+	@StringSetter(LINK_WIDTH)
 	public void setLinkWidth(final float linkWidth) {
 		this.linkWidth = linkWidth;
 	}
 
-    @StringGetter(LINK_DYNAMICS)
-	public String getLinkDynamics() {
-		return this.linkDynamics.toString() ;
+	@StringGetter(LINK_DYNAMICS)
+	public LinkDynamics getLinkDynamics() {
+		return this.linkDynamics ;
 	}
 
-    @StringSetter(LINK_DYNAMICS)
+	@StringSetter(LINK_DYNAMICS)
 	public void setLinkDynamics( String str ) {
 		this.linkDynamics = LinkDynamics.valueOf( str ) ;
 	}
 
-    @StringGetter(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID)
-    public boolean getUsePersonIdForMissingVehicleId() {
-        return usePersonIdForMissingVehicleId;
-    }
+	@StringGetter(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID)
+	public boolean getUsePersonIdForMissingVehicleId() {
+		return usePersonIdForMissingVehicleId;
+	}
 
-    @StringSetter(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID)
-    public void setUsePersonIdForMissingVehicleId(boolean value) {
-        this.usePersonIdForMissingVehicleId = value;
-    }
+	@StringSetter(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID)
+	public void setUsePersonIdForMissingVehicleId(boolean value) {
+		this.usePersonIdForMissingVehicleId = value;
+	}
 
-    public static enum VehiclesSource { DefaultVehicle, FromVehiclesFile } ;
-    @StringSetter( VEHICLES_SOURCE)
-    public final void setVehiclesSource( VehiclesSource source ) {
-	    this.vehiclesSource = source ;
-    }
-    @StringGetter( VEHICLES_SOURCE )
-    public final VehiclesSource getVehiclesSource() {
-	    return this.vehiclesSource ;
-    }
+	public static enum VehiclesSource { defaultVehicle, fromVehiclesFile } ;
+	@StringSetter( VEHICLES_SOURCE)
+	public final void setVehiclesSource( VehiclesSource source ) {
+		this.vehiclesSource = source ;
+	}
+	@StringGetter( VEHICLES_SOURCE )
+	public final VehiclesSource getVehiclesSource() {
+		return this.vehiclesSource ;
+	}
 
-    @StringGetter(USE_DEFAULT_VEHICLES)
-    @Deprecated // use getVehiclesSource instead. kai, jun'15
-     boolean getUseDefaultVehicles() {
-	    switch( this.vehiclesSource ) {
-	    case DefaultVehicle:
-		    return true ;
-	    case FromVehiclesFile:
-		    return false ;
-	    default:
-		    throw new RuntimeException( "not implemented") ;
-	    }
-    }
-    @StringSetter(USE_DEFAULT_VEHICLES)
-    @Deprecated // use setVehiclesSource instead. kai, jun'15
-    public void setUseDefaultVehicles(boolean useDefaultVehicles) {
-	    if ( useDefaultVehicles ) {
-		    this.vehiclesSource = VehiclesSource.DefaultVehicle ;
-	    } else {
-		    this.vehiclesSource = VehiclesSource.FromVehiclesFile ;
-	    }
-    }
-    
-    private static final String USING_THREADPOOL = "usingThreadpool" ;
-    @StringGetter(USING_THREADPOOL)
-    public boolean isUsingThreadpool() {
-    	return this.usingThreadpool ;
-    }
-    @StringSetter(USING_THREADPOOL)
-    public void setUsingThreadpool( boolean val ) {
-    	this.usingThreadpool = val ;
-    }
+	@StringGetter(USE_DEFAULT_VEHICLES)
+	@Deprecated // use getVehiclesSource instead. kai, jun'15
+	boolean getUseDefaultVehicles() {
+		switch( this.vehiclesSource ) {
+		case defaultVehicle:
+			return true ;
+		case fromVehiclesFile:
+			return false ;
+		default:
+			throw new RuntimeException( "not implemented") ;
+		}
+	}
+	@StringSetter(USE_DEFAULT_VEHICLES)
+	@Deprecated // use setVehiclesSource instead. kai, jun'15
+	public void setUseDefaultVehicles(boolean useDefaultVehicles) {
+		if ( useDefaultVehicles ) {
+			this.vehiclesSource = VehiclesSource.defaultVehicle ;
+		} else {
+			this.vehiclesSource = VehiclesSource.fromVehiclesFile ;
+		}
+	}
+
+	private static final String USING_THREADPOOL = "usingThreadpool" ;
+	@StringGetter(USING_THREADPOOL)
+	public boolean isUsingThreadpool() {
+		return this.usingThreadpool ;
+	}
+	@StringSetter(USING_THREADPOOL)
+	public void setUsingThreadpool( boolean val ) {
+		this.usingThreadpool = val ;
+	}
 
 }

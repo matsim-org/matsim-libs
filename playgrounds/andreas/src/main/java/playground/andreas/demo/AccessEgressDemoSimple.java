@@ -31,6 +31,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -51,6 +52,7 @@ import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.*;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
 import playground.andreas.bvgAna.mrieser.analysis.RouteTimeDiagram;
 import playground.andreas.bvgAna.mrieser.analysis.TransitRouteAccessEgressAnalysis;
 import playground.andreas.bvgAna.mrieser.analysis.VehicleTracker;
@@ -76,7 +78,7 @@ public class AccessEgressDemoSimple {
 		Config config = this.scenario.getConfig();
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
-		config.qsim().setSnapshotStyle("queue");
+		config.qsim().setSnapshotStyle( SnapshotStyle.queue );
 		config.qsim().setEndTime(24.0*3600);
 	}
 

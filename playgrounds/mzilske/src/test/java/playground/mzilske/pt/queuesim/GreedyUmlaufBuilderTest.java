@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -36,7 +37,7 @@ public class GreedyUmlaufBuilderTest {
 		Config config = this.scenario.getConfig();
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.qsim().setSnapshotStyle("queue");
+		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		config.qsim().setEndTime(24.0*3600);
 		createNetwork();
 		setupSchedule();

@@ -342,10 +342,10 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 
 		double simStartTime = 0;
-		if (QSimConfigGroup.MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
+		if (QSimConfigGroup.StarttimeInterpretation.maxOfStarttimeAndEarliestActivityEnd.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
 			double firstAgentStartTime = calculateFirstAgentStartTime();
 			simStartTime = Math.floor(Math.max(configuredStartTime, firstAgentStartTime));
-		} else if (QSimConfigGroup.ONLY_USE_STARTTIME.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
+		} else if (QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime.equals(qSimConfigGroup.getSimStarttimeInterpretation())) {
 			simStartTime = configuredStartTime;
 		} else {
 			throw new RuntimeException("unkonwn starttimeInterpretation; aborting ...");

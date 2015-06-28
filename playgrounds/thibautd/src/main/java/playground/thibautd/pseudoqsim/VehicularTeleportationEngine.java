@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -58,7 +59,6 @@ public class VehicularTeleportationEngine implements DepartureHandler, MobsimEng
 			30, new TeleportationArrivalTimeComparator());
 	private InternalInterface internalInterface;
 
-	public static enum VehicleBehavior { teleport, wait, exception }
 	private final Set<String> vehicularModes;
 	private final VehicleBehavior vehicleBehavior;
 

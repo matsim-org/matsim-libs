@@ -267,7 +267,7 @@ final class AAQueueWithBuffer extends QLaneI implements SignalizeableItem {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ qsimConfigGroup.getTrafficDynamics() ) ;
 		}
-		if ( QSimConfigGroup.SNAPSHOT_WITH_HOLES.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
+		if ( QSimConfigGroup.SnapshotStyle.withHoles.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
 			AAQueueWithBuffer.VIS_HOLES = true ;
 		}
 

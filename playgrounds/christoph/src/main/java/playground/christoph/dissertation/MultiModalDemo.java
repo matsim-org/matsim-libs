@@ -140,7 +140,7 @@ public class MultiModalDemo {
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setRemoveStuckVehicles(false);
 		qSimConfigGroup.setStorageCapFactor(1.0);
-		qSimConfigGroup.setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION);
+		qSimConfigGroup.setVehicleBehavior(QSimConfigGroup.VehicleBehavior.exception);
 		qSimConfigGroup.setStuckTime(25.0);
 		
 		config.travelTimeCalculator().setTraveltimeBinSize(300);

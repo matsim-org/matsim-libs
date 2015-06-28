@@ -79,7 +79,7 @@ public class VehicleWaitingTest {
 	private static void testVehicleWaitingDoesntFail(final int nLaps, final boolean insertActivities) {
 		final Config config = ConfigUtils.createConfig();
 		// test behavior when agents wait for the car
-		config.qsim().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT );
+		config.qsim().setVehicleBehavior( QSimConfigGroup.VehicleBehavior.wait );
 		// fail if the simualtion hangs forever (for instance, if some agents
 		// just vanish as in MATSIM-71)
 		config.qsim().setEndTime( 48 * 3600 );

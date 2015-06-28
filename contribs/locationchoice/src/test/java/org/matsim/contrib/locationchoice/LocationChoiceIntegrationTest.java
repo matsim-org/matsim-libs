@@ -386,7 +386,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1);
 		config.controler().setMobsim("qsim");
-		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue) ;
 
 		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setAlgorithm(Algotype.random);
 		((DestinationChoiceConfigGroup)config.getModule("locationchoice")).setFlexibleTypes("work");

@@ -8,6 +8,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -22,6 +23,7 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
+
 import playground.mzilske.ant2014.RunResource;
 import playground.mzilske.gtfs.GtfsConverter;
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterModule;
@@ -82,7 +84,7 @@ class UlmResource {
 		config.global().setCoordinateSystem(CRS);
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
-		config.qsim().setSnapshotStyle("queue");
+		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		config.qsim().setSnapshotPeriod(1);
 		config.qsim().setRemoveStuckVehicles(false);
 		config.qsim().setEndTime(35*60*60);

@@ -32,6 +32,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
@@ -49,6 +50,7 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
 import playground.dgrether.DgOTFVis;
 import playground.dgrether.lanes.LanesConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalControlDataConsistencyChecker;
@@ -559,9 +561,9 @@ public class PoznanNetwork
     {
         // general setup
         Config config = ConfigUtils.createConfig();
-        config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
+        config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
         config.qsim().setStartTime(0.0);
-        config.qsim().setSnapshotStyle("queue");
+        config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
         config.scenario().setUseLanes(true);
         config.scenario().setUseSignalSystems(true);
         OTFVisConfigGroup otfconfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);

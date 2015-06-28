@@ -60,7 +60,7 @@ public class RunWithinDayReplanningAgentExample {
 		config.network().setInputFile("../../../matsim/trunk/examples/siouxfalls/network-wo-dummy-node.xml") ;
 		config.controler().setLastIteration(0) ;
 		config.qsim().setEndTime(26.*3600) ;
-		config.qsim().setSnapshotStyle( QSimConfigGroup.SNAPSHOT_AS_QUEUE ) ;
+		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.queue ) ;
 
 		// base the controler on that:
 		Controler ctrl = new Controler( config ) ;

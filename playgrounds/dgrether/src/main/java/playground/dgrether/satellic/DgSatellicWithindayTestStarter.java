@@ -22,14 +22,16 @@ package playground.dgrether.satellic;
 import java.util.Arrays;
 
 import com.google.inject.Provider;
+
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-
 import org.matsim.core.mobsim.framework.Mobsim;
+
 import playground.dgrether.DgOTFVisConfigWriter;
 import playground.dgrether.DgPaths;
 
@@ -47,7 +49,7 @@ public class DgSatellicWithindayTestStarter {
 		config.controler().setLastIteration(0);
 		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		config.qsim().setSnapshotPeriod(10.0);
-		config.qsim().setSnapshotStyle("queue");
+		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		
 		
 		final Controler controler = new Controler(config);

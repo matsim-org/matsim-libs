@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -50,7 +51,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 import playground.sergioo.ptsim2013.QSim;
-import playground.sergioo.ptsim2013.qnetsimengine.PTVehicularDepartureHandler.VehicleBehavior;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTime;
 
 /**
@@ -138,13 +138,13 @@ public class PTQNetsimEngine extends NetElementActivator implements MobsimEngine
 
 		// configuring the car departure hander (including the vehicle behavior)
 		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
-		VehicleBehavior vehicleBehavior;
-		if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION)) {
-			vehicleBehavior = VehicleBehavior.EXCEPTION;
-		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT)) {
-			vehicleBehavior = VehicleBehavior.TELEPORT;
-		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT)) {
-			vehicleBehavior = VehicleBehavior.WAIT_UNTIL_IT_COMES_ALONG;
+		org.matsim.core.config.groups.QSimConfigGroup.VehicleBehavior vehicleBehavior;
+		if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VehicleBehavior.exception)) {
+			vehicleBehavior = VehicleBehavior.exception;
+		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VehicleBehavior.teleport)) {
+			vehicleBehavior = VehicleBehavior.teleport;
+		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VehicleBehavior.wait )) {
+			vehicleBehavior = VehicleBehavior.wait ;
 		} else {
 			throw new RuntimeException("Unknown vehicle behavior option.");
 		}

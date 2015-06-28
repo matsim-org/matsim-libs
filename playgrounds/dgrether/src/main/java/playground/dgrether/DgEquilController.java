@@ -25,6 +25,7 @@ import java.util.Arrays;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.SimulationConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
@@ -65,7 +66,7 @@ public class DgEquilController {
 		  controler.getConfig().controler().setSnapshotFormat(Arrays.asList("otfvis"));
 		  controler.getConfig().controler().setWriteSnapshotsInterval(0);
 		  controler.getConfig().qsim().setSnapshotPeriod(1.0);
-		  controler.getConfig().qsim().setSnapshotStyle("queue");
+		  controler.getConfig().qsim().setSnapshotStyle(SnapshotStyle.queue);
 		}
 		else {
 		  ((SimulationConfigGroup) controler.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(1.0);

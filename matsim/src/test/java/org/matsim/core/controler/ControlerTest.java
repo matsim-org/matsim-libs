@@ -21,6 +21,7 @@
 package org.matsim.core.controler;
 
 import com.google.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -37,6 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.PersonImpl;
@@ -872,7 +874,7 @@ public class ControlerTest {
 		config.controler().setMobsim("qsim");
 		config.controler().setSnapshotFormat(Arrays.asList("googleearth"));
 		config.qsim().setSnapshotPeriod(600);
-		config.qsim().setSnapshotStyle("equiDist");
+		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
@@ -891,7 +893,7 @@ public class ControlerTest {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.qsim().setSnapshotPeriod(10);
-		config.qsim().setSnapshotStyle("equiDist");
+		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);
@@ -910,7 +912,7 @@ public class ControlerTest {
 		config.controler().setMobsim("qsim");
 		config.controler().setSnapshotFormat(Arrays.asList("transims"));
 		config.qsim().setSnapshotPeriod(600);
-		config.qsim().setSnapshotStyle("equiDist");
+		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
 		final Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);

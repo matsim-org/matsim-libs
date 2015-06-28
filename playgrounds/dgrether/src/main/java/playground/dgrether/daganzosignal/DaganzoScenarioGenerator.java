@@ -398,7 +398,7 @@ public class DaganzoScenarioGenerator {
 		if (this.doOtfOutput){
 			config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
 			config.qsim().setSnapshotPeriod(10.0);
-//			config.getQSimConfigGroup().setSnapshotStyle("queue");
+//			config.getQSimConfigGroup().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		}
 
 		//    config.getQSimConfigGroup().setSnapshotFormat(null);

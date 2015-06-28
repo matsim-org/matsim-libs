@@ -25,6 +25,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -65,7 +66,7 @@ public class FourWaysVisMviTest {
     
     conf.controler().setSnapshotFormat(Arrays.asList("otfvis"));
     conf.qsim().setSnapshotPeriod(15.0);
-    conf.qsim().setSnapshotStyle("queue");
+    conf.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
     conf.qsim().setStuckTime(100.0);
     
     conf.network().setLaneDefinitionsFile(lanesFile);

@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,7 +39,7 @@ public class Convert {
 		// new NetworkCleaner().run(scenario.getNetwork());
 		System.out.println("Scenario has " + scenario.getNetwork().getLinks().size() + " links.");
 		scenario.getConfig().controler().setMobsim("qsim");
-		scenario.getConfig().qsim().setSnapshotStyle("queue");
+		scenario.getConfig().qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		scenario.getConfig().qsim().setSnapshotPeriod(1);
 		scenario.getConfig().qsim().setRemoveStuckVehicles(false);
 		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setColoringScheme(ColoringScheme.gtfs);
