@@ -745,7 +745,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private double monetaryDistanceCostRate = 0.0;
 		private double constant = 0.0;
 
-		ModeParams(final String mode) {
+		public ModeParams(final String mode) {
 			super( SET_TYPE );
 			setMode( mode );
 		}

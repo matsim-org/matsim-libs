@@ -52,9 +52,10 @@ public class ChangeLegMode extends AbstractMultithreadedModule {
 
 	private final static Logger log = Logger.getLogger(ChangeLegMode.class);
 
-	/*package*/ final static String CONFIG_MODULE = "changeLegMode";
-	/*package*/ final static String CONFIG_PARAM_MODES = "modes";
-	/*package*/ final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
+	public final static String CONFIG_MODULE = "changeLegMode";
+	public final static String CONFIG_PARAM_MODES = "modes";
+	public final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
+	// (I made the above static final variables public so they can be used in scripts-in-java. kai, jun'15)
 
 	private String[] availableModes = new String[] { TransportMode.car, TransportMode.pt };
 	private boolean ignoreCarAvailability = true;

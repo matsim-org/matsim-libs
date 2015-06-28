@@ -47,6 +47,7 @@ public final class PopulationAgentSource implements AgentSource {
 		this.modeVehicleTypes = new HashMap<>();
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
 		for (String mode : mainModes) {
+			// initialize each mode with default vehicle type:
 			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
 		}
 	}
@@ -86,14 +87,19 @@ public final class PopulationAgentSource implements AgentSource {
                                 throw new IllegalStateException("Found a network route without a vehicle id.");
                             }
                         }
-                        Vehicle vehicle;
-                        if (qsim.getScenario().getConfig().qsim().getUseDefaultVehicles()) {
-                            vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
-                        } else {
-                            vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
-                            if (vehicle == null) {
-                                throw new IllegalStateException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
-                            }
+                        Vehicle vehicle = null ;
+                        switch ( qsim.getScenario().getConfig().qsim().getVehiclesSource() ) {
+                        case DefaultVehicle:
+                              vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
+                        	break;
+                        case FromVehiclesFile:
+                              vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
+                              if (vehicle == null) {
+                                  throw new IllegalStateException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
+                              }
+                        	break;
+                        default:
+                        	throw new RuntimeException("not implemented") ;
                         }
                         Id<Link> vehicleLink = findVehicleLink(p);
                         qsim.createAndParkVehicleOnLink(vehicle, vehicleLink);

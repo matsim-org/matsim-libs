@@ -39,10 +39,7 @@ public class RunWithinDayReplanningFromPlansExample {
 
 	public static void main(String[] args){		
 		final Controler controler = new Controler("examples/tutorial/programming/example50VeryExperimentalWithinDayReplanning/withinday-config.xml");
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 		// define the travel time collector (/predictor) that you want to use for routing:
 		Set<String> analyzedModes = new HashSet<String>();

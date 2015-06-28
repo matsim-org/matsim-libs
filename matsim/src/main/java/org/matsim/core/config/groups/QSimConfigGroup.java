@@ -33,6 +33,8 @@ import java.util.Map;
 
 public final class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConfigGroupI {
 
+	private static final String VEHICLES_SOURCE = "vehiclesSource";
+
 	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
 
 	public static final String GROUP_NAME = "qsim";
@@ -72,7 +74,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
     private boolean usePersonIdForMissingVehicleId = true;
-    private boolean useDefaultVehicles = true;
     private int numberOfThreads = 1;
 	private TrafficDynamics trafficDynamics = TrafficDynamics.queue ;
 	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END;
@@ -108,6 +109,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	// ---
 	private final static String FAST_CAPACITY_UPDATE = "usingFastCapacityUpdate";
 	private boolean usingFastCapacityUpdate = false ;
+
+	private VehiclesSource vehiclesSource = VehiclesSource.DefaultVehicle ;
 	// ---
 
 	public QSimConfigGroup() {
@@ -212,12 +215,21 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 			map.put(LINK_DYNAMICS, "default: FIFO; options:" + stb ) ;
 		}
         map.put(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID, "If a route does not reference a vehicle, agents will use the vehicle with the same id as their own.");
-		map.put(USE_DEFAULT_VEHICLES, "If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties.");
+		map.put(USE_DEFAULT_VEHICLES, "[DEPRECATED, use" + VEHICLES_SOURCE + " instead]  If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties.");
 		map.put(USING_THREADPOOL, "if the qsim should use as many runners as there are threads (Christoph's dissertation version)"
 				+ " or more of them, together with a thread pool (seems to be faster in some situations, but is not tested).") ;
 		map.put(FAST_CAPACITY_UPDATE, "normally, the qsim accumulates fractional flows up to one flow unit.  This is impractical with "
 				+ " with smaller PCEs.  If this switch is set to true, cars can enter a link if the accumulated flow is >=0, and the accumulated flow can go "
 				+ "into negative.  Will probably become the default eventually.") ;
+
+		{	
+			StringBuilder stb = new StringBuilder() ;
+			for ( VehiclesSource src : VehiclesSource.values() ) {
+				stb.append(" ").append( src.toString() ) ;
+			}
+			map.put( VEHICLES_SOURCE, "If vehicles should all be the same default vehicle, or come from the vehicles file, "
+					+ "or something else.  Possible values: " + stb );
+		}
         return map;
 	}
 	
@@ -442,14 +454,36 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
         this.usePersonIdForMissingVehicleId = value;
     }
 
-    @StringGetter(USE_DEFAULT_VEHICLES)
-    public boolean getUseDefaultVehicles() {
-        return useDefaultVehicles;
+    public static enum VehiclesSource { DefaultVehicle, FromVehiclesFile } ;
+    @StringSetter( VEHICLES_SOURCE)
+    public final void setVehiclesSource( VehiclesSource source ) {
+	    this.vehiclesSource = source ;
+    }
+    @StringGetter( VEHICLES_SOURCE )
+    public final VehiclesSource getVehiclesSource() {
+	    return this.vehiclesSource ;
     }
 
+    @StringGetter(USE_DEFAULT_VEHICLES)
+    @Deprecated // use getVehiclesSource instead. kai, jun'15
+     boolean getUseDefaultVehicles() {
+	    switch( this.vehiclesSource ) {
+	    case DefaultVehicle:
+		    return true ;
+	    case FromVehiclesFile:
+		    return false ;
+	    default:
+		    throw new RuntimeException( "not implemented") ;
+	    }
+    }
     @StringSetter(USE_DEFAULT_VEHICLES)
+    @Deprecated // use setVehiclesSource instead. kai, jun'15
     public void setUseDefaultVehicles(boolean useDefaultVehicles) {
-        this.useDefaultVehicles = useDefaultVehicles;
+	    if ( useDefaultVehicles ) {
+		    this.vehiclesSource = VehiclesSource.DefaultVehicle ;
+	    } else {
+		    this.vehiclesSource = VehiclesSource.FromVehiclesFile ;
+	    }
     }
     
     private static final String USING_THREADPOOL = "usingThreadpool" ;
