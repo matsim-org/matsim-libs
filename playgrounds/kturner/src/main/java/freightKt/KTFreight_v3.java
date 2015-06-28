@@ -18,12 +18,14 @@
  * *********************************************************************** */
 package freightKt;
 
+import jsprit.analysis.toolbox.Plotter;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import jsprit.core.problem.VehicleRoutingProblem;
 import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import jsprit.core.util.Solutions;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -128,21 +130,21 @@ public class KTFreight_v3 {
 
 //Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Grid/UCC_Test_Ucc8/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Grid/Base/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
 	private static final String NETFILE_NAME = "grid-network" ;
 	private static final String VEHTYPES_NAME = "grid-vehTypes_kt" ;
 	private static final String CARRIERS_NAME = "grid-carrier_kt" ;
-	private static final String ALGORITHM_NAME = "grid-algorithm" ;
+	private static final String ALGORITHM_NAME = "mdvrp_algorithmConfig_2" ;
 	private static final String TOLL_NAME = "grid-tollCordon";
 	private static final String LEZ_NAME = "grid-tollDistance"; 
 	//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
 	private static final String uccC_prefix = "UCC-";		
 	// All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if all should be used.
-	private static final ArrayList<String> retailerNames 
-		= new ArrayList<String>(Arrays.asList("gridCarrier3")); 
+	private static final ArrayList<String> retailerNames = null ;
+//		= new ArrayList<String>("gridCarrier", "gridCarrier1", "gridCarrier2", "gridCarrier3"); 
 	//Location of UCC
 	private static final ArrayList<String> uccDepotsLinkIdsString =
 		new ArrayList<String>(Arrays.asList("j(0,5)", "j(10,5)")); 
@@ -165,12 +167,12 @@ public class KTFreight_v3 {
 
 	// Einstellungen für den Run	
 	private static final boolean addingCongestion = false ;  //doesn't work correctly, KT 10.12.2014
-	private static final boolean addingToll = true;  //added, kt. 07.08.2014
-	private static final boolean usingUCC = true;	 //Using Transshipment-Center, added kt 30.04.2015
-	private static final boolean runMatsim = false;	 //when false only jsprit run will be performed
+	private static final boolean addingToll = false;  //added, kt. 07.08.2014
+	private static final boolean usingUCC = false;	 //Using Transshipment-Center, added kt 30.04.2015
+	private static final boolean runMatsim = true;	 //when false only jsprit run will be performed
 	private static final int LAST_MATSIM_ITERATION = 0;  //only one iteration for writing events.
-	private static final int MAX_JSPRIT_ITERATION = 1000;
-	private static final int NU_OF_TOTAL_RUNS = 1;	
+	private static final int MAX_JSPRIT_ITERATION = 2000;
+	private static final int NU_OF_TOTAL_RUNS = 100;	
 
 	//temporär zum Programmieren als Ausgabe
 	private static WriteTextToFile textInfofile; 
@@ -191,6 +193,7 @@ public class KTFreight_v3 {
 			multipleRun(args);	
 		}
 		writeRunInfo();	
+		moveTempFile(new File(TEMP_DIR), new File(OUTPUT_DIR)); //move of temp-files
 		System.out.println("#### End of all runs --Y Finished ####");
 	}
 
@@ -199,7 +202,7 @@ public class KTFreight_v3 {
 	private static void multipleRun (String[] args){	
 		System.out.println("#### Starting Run: " + runIndex + " of: "+ NU_OF_TOTAL_RUNS);
 		createDir(new File(OUTPUT_DIR + RUN + runIndex));
-		createDir(new File(TEMP_DIR));	
+		createDir(new File(TEMP_DIR + RUN + runIndex));	
 		
 
 		// ### config stuff: ###	
@@ -229,7 +232,7 @@ public class KTFreight_v3 {
 			matsimRun(scenario, carriers);	//final MATSim configurations and start of the MATSim-Run
 		}
 		finalOutput(config, carriers);	//write some final Output
-		moveTempFile(new File(TEMP_DIR), new File(OUTPUT_DIR)); //move of temp-files
+//		moveTempFile(new File(TEMP_DIR), new File(OUTPUT_DIR)); //move of temp-files
 	} 
 
 	private static Carriers jspritRun(Config config, Scenario scenario) {
@@ -248,7 +251,8 @@ public class KTFreight_v3 {
 		* von den Depots, welcher ebenfalls von den bisherigen Carriern im Rahmen
 		* ihrer Tour mit übernommen wird.	
 		*/
-		if (usingUCC) {			
+		if (usingUCC) {		
+			//TODO: Tests ob uccDepotsLinkIdsString != null und ob LinkIds element des Netzwerkes.
 			ArrayList<Id<Link>> uccDepotsLinkIds = new ArrayList<Id<Link>>();	//Location of UCC
 			for (String linkId : uccDepotsLinkIdsString){
 				uccDepotsLinkIds.add(Id.createLinkId(linkId));
@@ -258,7 +262,7 @@ public class KTFreight_v3 {
 			UccCarrierCreator uccCarrierCreator = new UccCarrierCreator(carriers, vehicleTypes, ZONEFILE, uccC_prefix, retailerNames, uccDepotsLinkIds, 0.0, (24.0*3600)-1 );
 			uccCarrierCreator.createSplittedUccCarrriers();
 			carriers = uccCarrierCreator.getSplittedCarriers();
-			new CarrierPlanXmlWriterV2(carriers).write( TEMP_DIR + "splittedCarriers_" + RUN + runIndex+".xml") ;
+//			new CarrierPlanXmlWriterV2(carriers).write( TEMP_DIR + "splittedCarriers_" + RUN + runIndex+".xml") ;
 			
 			Carriers uccCarriers = new Carriers();
 			Carriers nonUccCarriers = new Carriers();
@@ -270,14 +274,14 @@ public class KTFreight_v3 {
 				};
 			}
 			generateCarrierPlans(scenario.getNetwork(), uccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die UCC-Carriers
-//			new CarrierPlanXmlWriterV2(uccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_UCC_" + RUN + runIndex+".xml") ;
+//			new CarrierPlanXmlWriterV2(uccCarriers).write( TEMP_DIR +  RUN + runIndex + "/jsprit_plannedCarriers_UCC_" + RUN + runIndex+".xml") ;
 //			new WriteCarrierScoreInfos(uccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_UCC.txt"), runIndex);
 
 			nonUccCarriers = uccCarrierCreator.createServicesToUCC(uccCarriers, nonUccCarriers); // Nachfrage den der UCCC ausliefert muss an die Umschlagpunkte geliefert werden. 
 			//TODO: DepotÖffnungszeiten der normalen Carrier anpassen, damit UCC rechtzeitig beliefert werden können.
 			
 			generateCarrierPlans(scenario.getNetwork(), nonUccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die NonUCC-Carriers
-//			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR + "jsprit_plannedCarriers_NonUCC" + RUN + runIndex+".xml") ;
+//			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR +  RUN + runIndex + "/jsprit_plannedCarriers_NonUCC" + RUN + runIndex+".xml") ;
 //			new WriteCarrierScoreInfos(nonUccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_NonUCC.txt"), runIndex);
 
 		} else {  // ohne UCCs 
@@ -287,15 +291,9 @@ public class KTFreight_v3 {
 		checkServiceAssignment(carriers);
 		
 		//### Output nach Jsprit Iteration
-		new CarrierPlanXmlWriterV2(carriers).write( TEMP_DIR + "jsprit_plannedCarriers_" + RUN + runIndex+".xml") ; //Muss in Temp, da OutputDir leer sein muss // setOverwriteFiles gibt es nicht mehr; kt 05.11.2014
-		//Plot der Jsprit-Lösung
-		//			Plotter plotter = new Plotter(vrp,solution);
-		//			plotter.plot(TEMP_DIR +"jsprit_solution_" +RUN + runIndex+".png", carrier.getId().toString());
+		new CarrierPlanXmlWriterV2(carriers).write( TEMP_DIR +  RUN + runIndex + "/jsprit_plannedCarriers.xml") ; //Muss in Temp, da OutputDir leer sein muss // setOverwriteFiles gibt es nicht mehr; kt 05.11.2014
 
-		//Ausgabe der Ergebnisse auf der Console
-		//			SolutionPrinter.print(vrp,solution,Print.VERBOSE);
-
-		new WriteCarrierScoreInfos(carriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation.txt"), runIndex);
+		new WriteCarrierScoreInfos(carriers, new File(TEMP_DIR +  "#JspritCarrierScoreInformation.txt"), runIndex);
 
 		return carriers;
 	}
@@ -305,6 +303,9 @@ public class KTFreight_v3 {
 	 * Falls nicht: log.Error und Ausgabe einer Datei: "#UnassignedServices.txt" mit den Service-Ids.
 	 * @param carriers
 	 */
+	
+	//TODO: Ausgabe der Anassigned Services in Run-Verzeichnis und dafürin der Übersicht nur eine Nennung der Anzahl unassignedServices je Run 
+	//TODO: multiassigned analog.
 	private static void checkServiceAssignment(Carriers carriers) {
 		for (Carrier c :carriers.getCarriers().values()){
 			ArrayList<CarrierService> assignedServices = new ArrayList<CarrierService>();
@@ -398,12 +399,13 @@ public class KTFreight_v3 {
 		controler.run();
 	}
 	
-
+	//TODO: Klarmachen, wann wlechen Output schreiben. Im Moment wird der ketzte immer in RUN-Verzeichnis geschrieben, 
+	//das ist mal jsprit und mal Matsim, je nachdem was durchgeführt zuletzt wurde... -> nicht einheitlich -> nicht gut :(
 	private static void finalOutput(Config config, Carriers carriers) {
 		// ### some final output: ###
 		if (runMatsim){		//makes only sence, when Matsun-Run was performed KT 06.04.15
 		new WriteCarrierScoreInfos(carriers, new File(OUTPUT_DIR + "#MatsimCarrierScoreInformation.txt"), runIndex);
-		new CarrierPlanXmlWriterV2(carriers).write( OUTPUT_DIR + "matsim_output_carriers.xml") ;
+//		new CarrierPlanXmlWriterV2(carriers).write( OUTPUT_DIR + "matsim_output_carriers.xml") ; //das letzte Ergebnis in oberstes AusgabeSit schreiben
 		}		
 		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml") ;
 		new CarrierPlanXmlWriterV2(carriers).write( config.controler().getOutputDirectory() + "/output_carriers.xml.gz") ;
@@ -427,7 +429,8 @@ public class KTFreight_v3 {
 			for (int i = 0; i < files.length; i++) {
 				destFile = new File(destDir.getAbsolutePath() + System.getProperty("file.separator") + files[i].getName());
 				if (files[i].isDirectory()) {
-					//copyDir(files[i], newFile);
+					FileUtils.copyDirectory(files[i], destFile);
+					FileUtils.deleteDirectory(files[i]);
 				}
 				else {
 					files[i].renameTo(destFile);
@@ -509,11 +512,18 @@ public class KTFreight_v3 {
 
 			carrier.setSelectedPlan(newPlan) ;
 
-			/*  JSprit Events. Neu: KT 07.12.2014 --> bringt in Version 1.4.3 noch Fehlermeldung: "gridVehicle_start" .. könnte an den gleichnamigen Vehicle-Ids liegen.. :-(
-			 * (AlgorithmEventsRecorder.java:360 und daraus :359, :374): return vehicle.getId() + "_start";
-			 */
-			//	AlgorithmEventsRecorder.writeSolution(vrp, solution, new File(TEMP_DIR + "jsprit_events_" + RUN + runIndex+".txt"));
-
+			//Plot der Jsprit-Lösung
+			Plotter plotter = new Plotter(vrp,solution);
+//			if (carrier.getId().toString().startsWith(uccC_prefix)){
+//				plotter.plot(TEMP_DIR +"jsprit_solution_" +RUN + runIndex+"_UccC.png", carrier.getId().toString());
+//			} else{
+//				plotter.plot(TEMP_DIR +"jsprit_solution_" +RUN + runIndex+".png", carrier.getId().toString());
+//			}
+			plotter.plot(TEMP_DIR + RUN + runIndex + "/jsprit_solution_" + carrier.getId().toString() +".png", carrier.getId().toString());
+			
+			//Ausgabe der Ergebnisse auf der Console
+			//SolutionPrinter.print(vrp,solution,Print.VERBOSE);
+			
 		}
 	}
 
@@ -628,7 +638,7 @@ public class KTFreight_v3 {
 
 		textInfofile.writeTextLineToFile("createMyScoringFunction2 aufgerufen");
 		
-		return new CarrierScoringFunctionFactoryImpl_KT(scenario, TEMP_DIR) {
+		return new CarrierScoringFunctionFactoryImpl_KT(scenario, scenario.getConfig().controler().getOutputDirectory()) {
 			
 			public ScoringFunction createScoringFunction(final Carrier carrier){
 			SumScoringFunction sumSf = new SumScoringFunction() ;
@@ -653,8 +663,6 @@ public class KTFreight_v3 {
 			
 			TollScoring tollScoring = new TollScoring(carrier, scenario.getNetwork(), rpCalculator) ;
 			sumSf.addScoringFunction(tollScoring);
-		
-		
 			
 			return sumSf;
 			}
@@ -671,11 +679,14 @@ public class KTFreight_v3 {
 			writer.write("Carrier:  \t" + CARRIERFILE +System.getProperty("line.separator"));
 			writer.write("VehType: \t" + VEHTYPEFILE +System.getProperty("line.separator"));
 			writer.write("Algorithm: \t" + ALGORITHMFILE +System.getProperty("line.separator"));
+			writer.write("Toll: \t" + TOLL_NAME +System.getProperty("line.separator"));
+			writer.write("LowEmissionZone: \t" + LEZ_NAME +System.getProperty("line.separator"));
 
 			writer.write(System.getProperty("line.separator"));
 			writer.write("##Run Settings:" +System.getProperty("line.separator"));
 			writer.write("addingCongestion: \t" + addingCongestion +System.getProperty("line.separator"));
 			writer.write("addingToll: \t \t" + addingToll +System.getProperty("line.separator"));
+			writer.write("usingUCC: \t \t" + usingUCC +System.getProperty("line.separator"));
 			writer.write("runMatsim: \t \t" + runMatsim +System.getProperty("line.separator"));
 			writer.write("Last Matsim Iteration: \t" + LAST_MATSIM_ITERATION +System.getProperty("line.separator"));
 			writer.write("Max Jsprit Iteration: \t" + MAX_JSPRIT_ITERATION +System.getProperty("line.separator"));
