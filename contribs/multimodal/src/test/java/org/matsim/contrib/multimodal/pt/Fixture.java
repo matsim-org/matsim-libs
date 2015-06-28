@@ -89,7 +89,6 @@ import java.util.List;
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		this.config = this.scenario.getConfig();
 		this.config.scenario().setUseTransit(true);
-		this.config.scenario().setUseVehicles(true);
 		this.network = this.scenario.getNetwork();
 		this.schedule = this.scenario.getTransitSchedule();
 		this.builder = this.schedule.getFactory();

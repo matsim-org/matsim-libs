@@ -47,7 +47,6 @@ public class WagonSimQSimFactoryTest {
 	public void test() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
-		sc.getConfig().scenario().setUseVehicles(true);
 		EventsManager manager = EventsUtils.createEventsManager(sc.getConfig());
 		
 		WagonSimQSimFactory factory = new WagonSimQSimFactory(new ObjectAttributes(), null);
