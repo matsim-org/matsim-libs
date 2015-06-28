@@ -1,5 +1,6 @@
 package playground.dziemke.ikea;
 
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -19,29 +20,18 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class CreateDemandIKEA {
+public class CreateDemand {
 private Scenario scenario;
-private String dataFile = "C:\\Users\\jeffw_000\\Desktop\\Masterarbeit\\data\\feathers0\\prdToAscii.csv";
-//"./input/feathers_output.txt";
-//
+private String dataFile = "./input/prdToAscii_IKEA.csv";
 
-private Double xMin=4.87;
-private Double xMax=5.56;
-private Double yMin=50.772;
-private Double yMax=51.014;
-
-private Double xIKEA = 662741.5;
-private Double yIKEA = 5643343.5366;
+private	ConvertTazToCoord coordTazManager = new ConvertTazToCoord();
 
 private Random random = new Random();
 private ObjectAttributes homeLocations = new ObjectAttributes();
 
 private String[] activityTypeStrings = {"home","work","n.a.","brinGet","dailyShopping","nonDailyShopping","services","socialVisit","leisure","touring","other"} ;
 private String[] modeStrings = {"n.a.","car","n.a.","walk","pt","n.a.","ride"};
-
-private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,  "EPSG:32631");
-
-
+//----------------------------------------------------------------------------"walk" -> "slow" etc.
 
 public void run(Scenario scenario, ObjectAttributes homeLocations){
 	this.scenario = scenario;
@@ -54,6 +44,7 @@ Population population = this.scenario.getPopulation();
 PopulationFactory populationFactory = population.getFactory();
 
 try{
+	coordTazManager.convertCoordinates();
 	// load data-file
 BufferedReader bufferedReader = new BufferedReader(new FileReader(this.dataFile));
 // skip header
@@ -73,29 +64,33 @@ int index_mode=19;
 
 Id previousPerson = null;
 double departureTimeBuffer = 0.0;
-int counter=0;
 
-	while((line=bufferedReader.readLine()) != null){
+ while((line=bufferedReader.readLine()) != null){
 		String parts[] = line.split(";");
-		counter++;
-		
-		Id personId = Id.createPersonId(parts[index_personId]);
-		Person person = population.getPersons().get(personId);
-		
-		if(person!=null){
-		Plan plan = person.getSelectedPlan();
 
+		Id personId;
+		personId=Id.createPersonId(parts[index_personId]);
+		Person person = population.getPersons().get(personId);
+	
+		Plan plan = person.getSelectedPlan();
 		
+		// Remove plans of persons with activity in TAZ "0", as apparently no TAZ with the Id "0" exists (-> nodeCoord2zone_mapping.csv)
+		if(Integer.parseInt(parts[index_activityLocation])==0 || person.getPlans().isEmpty()){
+			person.removePlan(plan);
+			population.getPersons().remove(person);
+			System.out.println("Person "+person+" removed from population.");
+			continue;
+		}
 		// activity start time in [s]:
 		double activityStartTime = (((Integer.parseInt(parts[index_beginningTime]))/100)*60
 										+Integer.parseInt(parts[index_beginningTime])%100)
 										*60;
 		// activity duration in [s]:
 		double activityDuration = (Double.parseDouble(parts[index_activityDuration]))*60;
-		
+
 		// journey duration in [s]:
 				double journeyDuration = (Double.parseDouble(parts[index_journeyDuration]))*60;
-		
+
 		//Set Coordinates for activity
 		Coord coordOrigin;
 
@@ -105,19 +100,16 @@ if(!personId.equals(previousPerson)){
 	if (parts[index_activityType].equals("0")){
 		coordOrigin = (Coord) homeLocations.getAttribute(String.valueOf(personId),"home");
 		Activity activity = populationFactory.createActivityFromCoord("home", coordOrigin);
-//		activity.setStartTime(activityStartTime);
-//		activity.setMaximumDuration(activityDuration);
+	//	activity.setStartTime(activityStartTime);
+	//	activity.setMaximumDuration(activityDuration);
 		activity.setEndTime(activityStartTime+activityDuration);
 		plan.addActivity(activity);
-			
+
 	}
 	// else -> add activity with random Coord
 	else {
-		coordOrigin = new CoordImpl(
-				// for now: Coord generated randomly
-				xMin + (double) random.nextFloat()*( xMax - xMin),
-				yMin + (double) random.nextFloat()*( yMax - yMin));
-		Activity activity = populationFactory.createActivityFromCoord(activityTypeStrings[Integer.parseInt(parts[index_activityType])], ct.transform(coordOrigin));
+		coordOrigin = coordTazManager.randomCoordinates(Integer.parseInt(parts[index_activityLocation]));
+		Activity activity = populationFactory.createActivityFromCoord(activityTypeStrings[Integer.parseInt(parts[index_activityType])], coordOrigin);
 //		activity.setStartTime(activityStartTime);
 //		activity.setMaximumDuration(activityDuration);
 		activity.setEndTime(activityStartTime+activityDuration);
@@ -126,56 +118,22 @@ if(!personId.equals(previousPerson)){
 	}
 departureTimeBuffer=activityStartTime+activityDuration;
 }
-//Add a leg to next activity 
+//Add a leg to next activity
 	else {
-		
+		String mode = parts[index_mode];
+		Leg leg = populationFactory.createLeg(modeStrings[Integer.parseInt(mode)]);
+		leg.setDepartureTime(departureTimeBuffer);
+		leg.setTravelTime(journeyDuration);
+		plan.addLeg(leg);
+
+		//Add (random) destination Coord
+
 		Coord coordDestination;
 
-		
 		if (parts[index_activityType].equals("0")){
-			String mode = parts[index_mode];
-			Leg leg = populationFactory.createLeg(modeStrings[Integer.parseInt(mode)]);
-	//		leg.setDepartureTime(departureTimeBuffer);
-	//		leg.setTravelTime(journeyDuration);
-			plan.addLeg(leg);	
-			//Add destination Coord
 			coordDestination = (Coord) homeLocations.getAttribute(String.valueOf(personId),"home");}
-		
-		// if activity = daily shopping: add leg to IKEA
-		else if(parts[index_activityType].equals("4"))
-			
-		{
-						
-			String mode = parts[index_mode];
-			Leg leg = populationFactory.createLeg(modeStrings[Integer.parseInt(mode)]);
-
-		
-	//	leg.setDepartureTime(departureTimeBuffer);
-	//	leg.setTravelTime(journeyDuration);
-		plan.addLeg(leg);
-		
-		
-			
-			coordDestination = new CoordImpl(xIKEA,yIKEA);
-		System.out.println("IKEA activity created, line: "+counter);
-		
-			;}
 		else{
-			
-			String mode = parts[index_mode];
-			Leg leg = populationFactory.createLeg(modeStrings[Integer.parseInt(mode)]);
-	//		leg.setDepartureTime(departureTimeBuffer);
-	//		leg.setTravelTime(journeyDuration);
-			plan.addLeg(leg);
-			
-			//Add (random) destination Coord
-			
-		
-		coordDestination = new CoordImpl(
-				// for now: Coord generated randomly
-				xMin + (double) random.nextFloat()*( xMax - xMin),
-				yMin + (double) random.nextFloat()*( yMax - yMin));
-		coordDestination = ct.transform(coordDestination);
+			coordDestination = coordTazManager.randomCoordinates(Integer.parseInt(parts[index_activityLocation]));
 		}
 		// Add activity
 		Activity activity = populationFactory.createActivityFromCoord(activityTypeStrings[Integer.parseInt(parts[index_activityType])], coordDestination);
@@ -188,7 +146,6 @@ departureTimeBuffer=activityStartTime+activityDuration;
 	}
 previousPerson = personId;
 	}
-		}
 	bufferedReader.close();
 
 } // end try
