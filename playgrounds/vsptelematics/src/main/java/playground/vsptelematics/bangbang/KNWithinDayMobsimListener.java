@@ -45,6 +45,7 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
@@ -191,6 +192,7 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		
 		// method 2:
 		final int idx = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
+
 		if ( oldRoute.getLinkIds().contains( this.returnId ) ) {
 			List<Id<Link>> copy = new ArrayList<>( oldRoute.getLinkIds() ) ;
 			while (  !copy.get( idx ).equals( this.returnId )  ) {
@@ -199,6 +201,9 @@ class KNWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 			copy.addAll( idx, this.alternativeLinks ) ;
 			final ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory();
 			NetworkRoute newRoute = (NetworkRoute) modeRouteFactory.createRoute( TransportMode.car, oldRoute.getStartLinkId(), oldRoute.getEndLinkId()) ;
+			
+//			RouteUtils.createNetworkRoute(routeLinkIds, network) ;
+			
 			newRoute.setLinkIds( oldRoute.getStartLinkId(), copy, oldRoute.getEndLinkId() );
 			leg.setRoute(newRoute);
 		}

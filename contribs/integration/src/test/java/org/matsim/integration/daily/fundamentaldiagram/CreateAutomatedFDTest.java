@@ -127,7 +127,8 @@ public class CreateAutomatedFDTest {
 		run(this.linkDynamics, this.trafficDynamics,false);
 	}
 
-	@Test public void Fds_carBike_fastCapacityUpdate(){
+	@Test 
+	public void Fds_carBike_fastCapacityUpdate(){
 		run(this.linkDynamics,this.trafficDynamics,true);
 	}
 
