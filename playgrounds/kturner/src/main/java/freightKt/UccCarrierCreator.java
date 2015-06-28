@@ -309,7 +309,7 @@ class UccCarrierCreator {
 	}
 
 	Carriers createServicesToUCC(Carriers uccCarriers,	Carriers nonUccCarriers) {
-		//Services aus den UCC für die Non-UCC erstellen -> Funktionmiert grundsätzlich, KT 02.05.15
+		//Services aus den UCC für die Non-UCC erstellen -> Funktioniert grundsätzlich, KT 02.05.15
 		for (Carrier uccC : uccCarriers.getCarriers().values()){
 			for (Carrier nonUccC : nonUccCarriers.getCarriers().values()){
 				//TODO: Sicherstellen, dass jeder Service auch erstellt wird--> Sicherheitsabfrage, ansonsten Fehler erzeugen!	
@@ -336,22 +336,27 @@ class UccCarrierCreator {
 						}
 					}
 					
+					
 					//TODO: Sicherstellen, dass bisher kein Service mit UCC_Prefix existiert, da sonst doppelte Einträge -> Fehler
+					//TODO: Abfharzeiten Fahrzeuige bisherige Flotte anpassen, da sonst to_UCC-Services nicht bedient werden!
+					//			Alternativ lediglich neue Fahrzeuge hinzufügen (die die Zulieferdienste übernehmen)
+					
 					//neue Services erstellen des nonUccC zum Depot des uccC.
 					for (Id<Link> linkId : demandAtUCC.keySet()){				//Nun erstelle die ganzen Services
 						for (int i = 1; i<=demandAtUCC.get(linkId); i++){
-							double earliestVehDep = calcEarliestDep(uccC ,linkId);	
+							double earliestVehDepUCC = calcEarliestDep(uccC ,linkId);	
 							CarrierService.Builder csBuilder = CarrierService.Builder
 								.newInstance(Id.create("to_"+uccC_prefix+linkId.toString()+"_"+i, CarrierService.class), linkId)
 							//Jeder Service nur Nachfrage = 1, damit Fzg Aufteilung frei erfolgen kann
 								.setCapacityDemand(1)		
 								.setServiceDuration(60)	//60sec = 1min
-							// zwischen 120 und 30 Minuten bevor das erste Fahrzeug das UCC verlässt. 
+							// zwischen 120 und 30 Minuten bevor das erste Fahrzeug das UCC verlässt, soll die Ware dort ankommen.
 								.setServiceStartTimeWindow(TimeWindow.newInstance(
-									Math.max(0, earliestVehDep -7200), Math.max(0, earliestVehDep -1800))); 
+									Math.max(0, earliestVehDepUCC -7200), Math.max(0, earliestVehDepUCC -1800))); 
 							nonUccC.getServices().add(csBuilder.build());
 						}	
 					}
+					
 				} //end if
 			}
 		}
@@ -369,6 +374,18 @@ class UccCarrierCreator {
 					 } 
 			  }
 		  }
+		return earliestDepTime;
+	}
+	
+	//Früheste Abfahrt eines Fahrzeuges des Carriers 
+//	TODO: Test gegen Null (Link und cv.getEarliestStartTime)
+	private double calcEarliestDep(Carrier carrier) {
+		double earliestDepTime = 24*3600.0; 	//24 Uhr 
+		for (CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()) {
+			if (cv.getEarliestStartTime() < earliestDepTime) {
+				earliestDepTime = cv.getEarliestStartTime();
+			}
+		}
 		return earliestDepTime;
 	}
 
