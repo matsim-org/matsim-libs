@@ -308,9 +308,6 @@
 
 		<!-- Set this parameter to true if transit should be simulated, false if not. -->
 		<param name="useTransit" value="true" />
-
-		<!-- Set this parameter to true if vehicles should be used, false if not. -->
-		<param name="useVehicles" value="true" />
 	</module>
 
 	
