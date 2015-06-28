@@ -29,8 +29,8 @@ public class KNTaxiLauncherTest
     {
         String file = "./src/main/resources/mielec-2-peaks_2014_02/params.in";
         TaxiLauncherParams params = TaxiLauncherParams.readParams(file);
-        KNTaxiLauncher.run(params, false, false);//equivalent to (file, false, true)        
-        KNTaxiLauncher.run(params, true, false);
-        KNTaxiLauncher.run(params, true, true);
+        KNTaxiLauncher.run(params, false, false, false);//equivalent to (file, false, true)        
+        KNTaxiLauncher.run(params, true, false, false);
+        KNTaxiLauncher.run(params, true, true, false);
     }
 }

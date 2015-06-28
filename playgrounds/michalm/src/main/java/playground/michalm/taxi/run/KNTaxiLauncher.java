@@ -32,16 +32,19 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 class KNTaxiLauncher
 {
     /**
-     * @param file path to the configuration file (e.g. param.in)
      * @param removeNonPassengers if {@code true}, only taxi traffic is simulated
-     * @param endActivitiesAtTimeZero if {@code true}, everybody calls taxi at time 0
+ * @param endActivitiesAtTimeZero if {@code true}, everybody calls taxi at time 0
+ * @param useOTFVis TODO
+ * @param file path to the configuration file (e.g. param.in)
      */
     public static void run(TaxiLauncherParams params, boolean removeNonPassengers,
-            boolean endActivitiesAtTimeZero)
+            boolean endActivitiesAtTimeZero, boolean useOTFVis)
     {
 
         SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(params);
-        //        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(TaxiLauncherParams.readParams(file));
+        
+//        String file = "/Users/nagel/shared-svn/projects/maciejewski/input/2014_02/mielec-2-peaks-new-40-25/kaiparams.in" ;
+//        SingleRunTaxiLauncher launcher = new SingleRunTaxiLauncher(TaxiLauncherParams.readParams(file));
 
         if (removeNonPassengers) {
             VrpPopulationUtils.removePersonsNotUsingMode(TaxiUtils.TAXI_MODE, launcher.scenario);
@@ -51,9 +54,11 @@ class KNTaxiLauncher
             }
         }
 
-        OTFVisConfigGroup otfConfig = new OTFVisConfigGroup();
-        launcher.scenario.getConfig().addModule(otfConfig);
-        otfConfig.setLinkWidth(2);
+        if ( useOTFVis ) {
+      	  OTFVisConfigGroup otfConfig = new OTFVisConfigGroup();
+      	  launcher.scenario.getConfig().addModule(otfConfig);
+      	  otfConfig.setLinkWidth(2);
+        }
 
         launcher.initVrpPathCalculator();
         launcher.simulateIteration();
@@ -71,7 +76,7 @@ class KNTaxiLauncher
         params.put("plansFile", "../mielec-2-peaks-new/output/ITERS/it.20/20.plans.xml.gz");
         params.put("eventsFile", "../mielec-2-peaks-new/output/ITERS/it.20/20.events.xml.gz");
 
-        params.put("taxisCustomersFile", "taxiCustomers_40_pc.txt");
+        params.put("taxiCustomersFile", "taxiCustomers_40_pc.txt");
         params.put("taxisFile", "taxis-25.xml");
         params.put("ranksFile", "taxi_ranks-0.xml");
 
@@ -121,6 +126,6 @@ class KNTaxiLauncher
 //        TaxiLauncherParams params = TaxiLauncherParams.readParams(file);
         
         TaxiLauncherParams params = createParams();
-        run(params, true, false);
+        run(params, true, false, true);
     }
 }
