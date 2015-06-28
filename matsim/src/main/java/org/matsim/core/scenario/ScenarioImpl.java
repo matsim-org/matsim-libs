@@ -68,7 +68,7 @@ public final class ScenarioImpl implements Scenario {
 
 	private Vehicles vehicles ;
 
-	protected ScenarioImpl(Config config) {
+	ScenarioImpl(Config config) {
 		this.config = config;
 		this.network = NetworkImpl.createNetwork();
 		this.population = PopulationUtils.createPopulation(this.config, this.network);

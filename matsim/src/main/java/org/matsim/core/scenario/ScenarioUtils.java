@@ -65,45 +65,62 @@ public class ScenarioUtils {
 		public ScenarioBuilder( Config config ) {
 			this.scenario = new ScenarioImpl( config ) ;
 		}
-		public void addScenarioElement(String name, Object o) {
+		public ScenarioBuilder addScenarioElement(String name, Object o) {
 			scenario.addScenarioElement(name, o); 
+			return this ;
 		}
+		// households:
 		/**
 		 * This is here if you want to instantiate the empty container
 		 */
-		public void createHouseholdsContainer() { 
+		public ScenarioBuilder createHouseholdsContainer() { 
 			scenario.createHouseholdsContainer() ;
+			return this ;
 		}
-		/**
-		 * This is here if you want to instantiate the empty container
-		 */
-		public void createTransitSchedule() {
-			scenario.createTransitSchedule() ;
-		}
-		/**
-		 * This is here if you want to instantiate the empty container
-		 */
-		public void createVehicleContainer() {
-			scenario.createTransitVehicleContainer() ;
-		}
-		public void setNetwork( Network network ) {
-			scenario.setNetwork(network);
-		}
-		public void setPopulation( Population population ) {
-			scenario.setPopulation(population);
-		}
-		public void setActivityFacilities( ActivityFacilities facilities ) {
-			scenario.setActivityFacilities(facilities);
-		}
-		public void setHouseholds( Households households ) {
+		public ScenarioBuilder setHouseholds( Households households ) {
 			scenario.setHouseholds(households);
+			return this ;
 		}
-		public void setVehicles( Vehicles vehicles ) {
-			scenario.setTransitVehicles(vehicles);
+		// transit schedule:
+		/**
+		 * This is here if you want to instantiate the empty container
+		 */
+		public ScenarioBuilder createTransitSchedule() {
+			scenario.createTransitSchedule() ;
+			return this ;
 		}
-		public void setTransitSchedule( TransitSchedule schedule ) {
+		public ScenarioBuilder setTransitSchedule( TransitSchedule schedule ) {
 			scenario.setTransitSchedule(schedule);
+			return this ;
 		}
+		// vehicles:
+		/**
+		 * This is here if you want to instantiate the empty container
+		 */
+		public ScenarioBuilder createVehiclesContainer() {
+			scenario.createTransitVehicleContainer() ;
+			return this ;
+		}
+		public ScenarioBuilder setVehicles( Vehicles vehicles ) {
+			scenario.setTransitVehicles(vehicles);
+			return this;
+		}
+		// network (always there):
+		public ScenarioBuilder setNetwork( Network network ) {
+			scenario.setNetwork(network);
+			return this ;
+		}
+		// population (always there):
+		public ScenarioBuilder setPopulation( Population population ) {
+			scenario.setPopulation(population);
+			return this ;
+		}
+		// facilities (always there, although that does not make a lot of sense):
+		public ScenarioBuilder setActivityFacilities( ActivityFacilities facilities ) {
+			scenario.setActivityFacilities(facilities);
+			return this ;
+		}
+		// final creational method:
 		public Scenario createScenario() {
 			this.scenario.setLocked(); // prevents that one can cast to ScenarioImpl and change the containers again. kai, nov'14
 			return this.scenario ;
