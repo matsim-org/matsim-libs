@@ -31,6 +31,10 @@ public class SpatialAveragingInputData {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingInputData.class);
 	
 //	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
+//	private static double xMin=4452550.25;
+//	private static double xMax=4479483.33;
+//	private static double yMin=5324955.00;
+//	private static double yMax=5345696.81;
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:32646");
 	private final double xMin = 458823.0;
 	private final double xMax = 544945.0;
