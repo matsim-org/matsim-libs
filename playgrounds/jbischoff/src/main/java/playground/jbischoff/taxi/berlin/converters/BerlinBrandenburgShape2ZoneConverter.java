@@ -76,7 +76,7 @@ public class BerlinBrandenburgShape2ZoneConverter
             Zone zone = new Zone(zoneId, zoneId.toString(), e.getValue());
             zoneMap.put(zoneId, zone);
         }
-        Zones.writeZones(zoneMap, TransformationFactory.WGS84_UTM33N,//actually, ETRS89_UTM33N
+        Zones.writeZones(zoneMap, "EPSG:25833",//ETRS89_UTM33N
                 "C:/local_jb/data/OD/shp_merged/zones.xml",
                 "C:/local_jb/data/OD/shp_merged/zones.shp");
     }
