@@ -178,19 +178,18 @@ public class TaxiStatusDataAnalyser
 
 //
         Matrices statusMatrices = MatrixUtils.readMatrices(statusMatricesFile);
-//
-//                dumpTaxisInSystem(statusMatrices, "20130415000000", "20130421235500", averagesFile,
-//                        taxisOverTimeFile);
-//
+
+//      dumpTaxisInSystem(statusMatrices, "20130415000000", "20130421235500", averagesFile, taxisOverTimeFile);
+
         String start = 	"20140407000000";
         String end = 	"20140414000000";
         
-//        writeStatusByZone(statusMatrices, zonalStatuses, start, end);
-//        Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);
-//        writeMatrices(hourlyMatrices, hourlyStatusMatricesXmlFile, hourlyStatusMatricesTxtFile);
-//
-//        writeMatrices(calculateAverages(hourlyMatrices, 1./24, Functions.constant("avg")),
-//                avgStatusMatricesXmlFile, avgStatusMatricesTxtFile);
+        writeStatusByZone(statusMatrices, zonalStatuses, start, end);
+        Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);
+        writeMatrices(hourlyMatrices, hourlyStatusMatricesXmlFile, hourlyStatusMatricesTxtFile);
+
+        writeMatrices(calculateAverages(hourlyMatrices, 1./24, Functions.constant("avg")),
+                avgStatusMatricesXmlFile, avgStatusMatricesTxtFile);
         writeIdleVehiclesByZoneAndStatus(statusMatrices, idleVehiclesPerZoneAndHour, start, end);
     }
 
@@ -275,7 +274,14 @@ public class TaxiStatusDataAnalyser
         while (!currentTime.equals(endTime)) {
         	Matrix  m = statusMatrices.getMatrix(STATUS_DATE_FORMAT.format(currentTime));   
         	System.out.println(STATUS_DATE_FORMAT.format(currentTime));
-                for (ArrayList<Entry> l : m.getFromLocations().values()){
+            if (m == null)
+            {
+            	System.err.println("time comes without status"+STATUS_DATE_FORMAT.format(currentTime));
+                currentTime = getNextTime(currentTime);
+
+            	continue;
+            }
+        	for (ArrayList<Entry> l : m.getFromLocations().values()){
                     
                     for (Entry e : l ){
                         if (!statuses.containsKey(e.getFromLocation())){
