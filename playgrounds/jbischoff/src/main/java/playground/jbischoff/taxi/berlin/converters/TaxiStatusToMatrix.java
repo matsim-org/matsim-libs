@@ -4,12 +4,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
+
+import playground.michalm.zone.Zone;
 
 
 public class TaxiStatusToMatrix
@@ -95,12 +98,12 @@ public class TaxiStatusToMatrix
         @Override
         public void startRow(String[] row)
         {
-            String lor = row[0];
+            Id<Zone> lor = LORUtil.createZoneId(row[0]);
 
             for (int i = 1; i < row.length; i += 2) {
                 String statusId = row[i];
                 double vehicles = Double.parseDouble(row[i + 1]);
-                this.matrix.createEntry(lor, statusId, vehicles);
+                this.matrix.createEntry(lor.toString(), statusId, vehicles);
             }
         }
     }

@@ -183,7 +183,7 @@ public class TaxiStatusDataAnalyser
 //                        taxisOverTimeFile);
 //
         String start = 	"20140407000000";
-        String end = 	"20140413235500";
+        String end = 	"20140414000000";
         
 //        writeStatusByZone(statusMatrices, zonalStatuses, start, end);
 //        Matrices hourlyMatrices = calculateAveragesByHour(statusMatrices, 7);

@@ -19,21 +19,30 @@
  * *********************************************************************** */
 package playground.jbischoff.taxi.berlin.converters;
 
+import org.apache.commons.lang3.StringUtils;
+import org.matsim.api.core.v01.Id;
+
+import playground.michalm.zone.Zone;
+
 
 /**
  * @author jbischoff
- *
  */
-public class LORUtil {
+public class LORUtil
+{
+    public static boolean isInBerlin(String zone)
+    {
+        if (zone.length() != 8) {
+            throw new IllegalStateException();
+        }
 
-		
-	static boolean isInBerlin(String zone){
-		
+        return !zone.startsWith("120");
+    }
 
-		if (zone.length()!=8) 
-			throw new IllegalStateException();
-		if (zone.startsWith("120"))
-		return false;
-		else return true;
-	}
+
+    public static Id<Zone> createZoneId(String id)
+    {
+        String _8digitZoneId = StringUtils.leftPad(id, 8, '0');//some ids lack leading 0's
+        return Id.create(_8digitZoneId, Zone.class);
+    }
 }
