@@ -54,24 +54,30 @@ public class SpatialAveragingWriter {
 
 	private static final Logger logger = Logger.getLogger(SpatialAveragingWriter.class);
 	
-	public SpatialAveragingWriter(double xMin, double xMax, double yMin, double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String munichShapeFile, CoordinateReferenceSystem targetCRS, boolean useVisBoundary){
+	public SpatialAveragingWriter(double xMin, double xMax, double yMin, double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, 
+//			String munichShapeFile, 
+			CoordinateReferenceSystem targetCRS, boolean useVisBoundary){
 		this.xMin = xMin;
 		this.xMax = xMax;
 		this.yMin = yMin;
 		this.yMax = yMax;
 		this.noOfXbins = noOfXbins;
 		this.noOfYbins = noOfYbins;
-		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(munichShapeFile);
+//		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(munichShapeFile);
 		this.targetCRS = targetCRS;
 		this.useVisBoundary=useVisBoundary;
 	}
 	
 	public SpatialAveragingWriter(SpatialAveragingInputData inputData, int noOfXbins, int noOfYbins, double smoothingRadius_m, boolean useVisBoundary) {
-		this(	inputData.getMinX(), inputData.getMaxX(), 
-									inputData.getMinY(), inputData.getMaxY(), 
-									noOfXbins, noOfYbins, 
-									smoothingRadius_m, 
-									inputData.getMunichShapeFile(), inputData.getTargetCRS(), useVisBoundary);
+		this(	inputData.getMinX(),
+				inputData.getMaxX(), 
+				inputData.getMinY(),
+				inputData.getMaxY(), 
+				noOfXbins, noOfYbins, 
+				smoothingRadius_m, 
+//				inputData.getMunichShapeFile(),
+				inputData.getTargetCRS(), 
+				useVisBoundary);
 	}
 
 	public SpatialAveragingWriter(SpatialAveragingInputData inputData,

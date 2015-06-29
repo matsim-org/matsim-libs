@@ -42,12 +42,12 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 	
 	double smoothinRadiusSquared_m;
 	double area_in_smoothing_circle_sqkm;
-	Collection<SimpleFeature> featuresInVisBoundary;
+//	Collection<SimpleFeature> featuresInVisBoundary;
 	CoordinateReferenceSystem targetCRS;
 
 	private double cellSizeSquareKm;
 	
-	public LinkPointWeightUtil(double xMin, double xMax, double yMin, double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String visBoundaryShapeFile, CoordinateReferenceSystem targetCRS) {
+	public LinkPointWeightUtil(double xMin, double xMax, double yMin, double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, CoordinateReferenceSystem targetCRS) {
 		this.xMin = xMin;
 		this.xMax = xMax;
 		this.yMin = yMin;
@@ -57,7 +57,7 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 		
 		this.smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 		this.area_in_smoothing_circle_sqkm = (Math.PI * smoothingRadius_m * smoothingRadius_m) / (1000. * 1000.);
-		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(visBoundaryShapeFile);
+//		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(visBoundaryShapeFile);
 		this.targetCRS = targetCRS;
 		this.cellSizeSquareKm = (xMax-xMin)/noOfXbins*(yMax-yMin)/noOfYbins / (1000.*1000.);
 		logger.info("Cell size in sqkm is " + this.cellSizeSquareKm);
@@ -65,11 +65,15 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 	
 
 	public LinkPointWeightUtil(SpatialAveragingInputData inputData, int noOfXbins2, int noOfYbins2, double smoothingRadius_m) {
-		this(inputData.getMinX(), inputData.getMaxX(), 
-								inputData.getMinY(), inputData.getMaxY(), 
-								noOfXbins2, noOfYbins2, 
-								smoothingRadius_m, 
-								inputData.getMunichShapeFile(), inputData.getTargetCRS());
+		this(inputData.getMinX(),
+			 inputData.getMaxX(), 
+			 inputData.getMinY(),
+			 inputData.getMaxY(), 
+			 noOfXbins2,
+			 noOfYbins2, 
+			 smoothingRadius_m, 
+//			 inputData.getMunichShapeFile(),
+			 inputData.getTargetCRS());
 	}
 
 

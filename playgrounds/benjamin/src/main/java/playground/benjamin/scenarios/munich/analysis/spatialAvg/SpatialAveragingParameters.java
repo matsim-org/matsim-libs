@@ -52,9 +52,9 @@ public class SpatialAveragingParameters {
 		return areaInSmoothingCirleSqkm;
 	}
 
-	public String getVisBoundaryShapeFile() {
-		return visBoundaryShapeFile;
-	}
+//	public String getVisBoundaryShapeFile() {
+//		return visBoundaryShapeFile;
+//	}
 
 	public CoordinateReferenceSystem getTargetCRS() {
 		return targetCRS;

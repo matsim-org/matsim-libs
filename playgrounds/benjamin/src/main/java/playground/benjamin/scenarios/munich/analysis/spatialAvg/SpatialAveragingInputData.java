@@ -30,15 +30,16 @@ public class SpatialAveragingInputData {
 	
 	private static final Logger logger = Logger.getLogger(SpatialAveragingInputData.class);
 	
-	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
-	private final double xMin = 4452550.25;
-	private final double xMax = 4479483.33;
-	private final double yMin = 5324955.00;
-	private final double yMax = 5345696.81;
+//	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
+	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:32646");
+	private final double xMin = 458823.0;
+	private final double xMax = 544945.0;
+	private final double yMin = 6190162.0;
+	private final double yMax = 6248014.0;
 	
 	double scalingFactor;
 	private String netFile;
-	private String munichShapeFile;
+//	private String munichShapeFile;
 	
 	private String runNumber1, runNumber2;
 	private String runDirectory1, runDirectory2;
@@ -58,7 +59,17 @@ public class SpatialAveragingInputData {
 	}
 	
 	private void setFieldsForBaseCase(String baseCase) {
-		munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+//		munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+		if(baseCase.equals("bau")){
+			scalingFactor = 10.;
+			runNumber1 = "baseCase";
+			runDirectory1 = "../../runs-svn/krasnojarsk/bau/";
+			netFile = runDirectory1 + "network.xml";
+			configFile1 = runDirectory1 + "output_config.xml";
+			lastIteration1 = getLastIteration(configFile1);
+			emissionFile1 = runDirectory1 + "emission.events.offline-10.xml.gz";
+			eventsFile1 = runDirectory1 + "run0.400.events.xml.gz";
+		}
 		if(baseCase.equals("exposureInternalization")){
 			scalingFactor = 100.;
 			runNumber1 = "baseCase";
@@ -210,9 +221,9 @@ public class SpatialAveragingInputData {
 		return yMax;
 	}
 
-	public String getMunichShapeFile() {
-		return this.munichShapeFile;
-	}
+//	public String getMunichShapeFile() {
+//		return this.munichShapeFile;
+//	}
 
 	public CoordinateReferenceSystem getTargetCRS() {
 		return this.targetCRS;
