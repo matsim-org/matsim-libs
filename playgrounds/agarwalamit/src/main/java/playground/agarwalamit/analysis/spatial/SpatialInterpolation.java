@@ -116,16 +116,19 @@ public class SpatialInterpolation {
 			double weightSoFar = this.cellWeights.get(p);
 			double weightNow;
 
-
-			if(inputs.linkWeigthMethod.equals("line")){
-
+			switch (inputs.linkWeigthMethod) {
+			
+			case line :
 				weightNow = intensityOnLink * calculateWeightFromLine(fromNodeCoord,toNodeCoord,pointCoord) * normalizationFactor;
-
-			} else if(inputs.linkWeigthMethod.equals("point")) {
-
+				break;
+			
+			case point : 
 				weightNow = intensityOnLink * calculateWeightFromPoint(linkCentroid, pointCoord) * normalizationFactor;
+				break;
 
-			} else throw new RuntimeException("Averaging method for weight is not recongnized. Use 'line' or 'point'.");
+			default:
+				throw new RuntimeException("Averaging method for weight is not recongnized. Use 'line' or 'point'.");
+			}
 
 			this.cellWeights.put(p, weightNow+weightSoFar);
 		}
@@ -153,11 +156,15 @@ public class SpatialInterpolation {
 			double weightNow;
 
 
-			if(inputs.linkWeigthMethod.equals("point")) {
+			switch(inputs.linkWeigthMethod){
 
+			case point :
 				weightNow = intensityOfPoint * calculateWeightFromPoint(actCoordinate, pointCoord) * normalizationFactor;
+				break;
 
-			} else throw new RuntimeException("Averaging method other than point method is not possible for a point intensity. Aborting ...");
+			default : 
+				throw new RuntimeException("Averaging method other than point method is not possible for a point intensity. Aborting ...");
+			}
 
 			this.cellWeights.put(p, weightNow+weightSoFar);
 		}

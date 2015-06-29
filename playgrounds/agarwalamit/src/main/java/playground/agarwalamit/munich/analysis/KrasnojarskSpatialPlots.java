@@ -40,10 +40,12 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
+import playground.agarwalamit.analysis.spatial.SpatialDataInputs.LinkWeightMethod;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
+import playground.benjamin.scenarios.munich.analysis.spatialAvg.LinkLineWeightUtil;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
@@ -60,7 +62,7 @@ public class KrasnojarskSpatialPlots {
 //	String policyName = "ei";
 //	String policyCase = runDir + policyName;
 	private final double countScaleFactor = 10;
-	private final double gridSize = 500;
+	private final double gridSize = 5000;
 	private boolean isWritingGGPLOTData = true;
 	private int noOfBins = 1;
 
@@ -239,7 +241,7 @@ public class KrasnojarskSpatialPlots {
 
 		// setting of input data
 //		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,policyCase);
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
+		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 //		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -315,7 +317,7 @@ public class KrasnojarskSpatialPlots {
 
 		// setting of input data
 //		SpatialDataInputs inputs = new SpatialDataInputs("line",bau, policyCase);
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau);
+		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 //		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 

@@ -40,6 +40,7 @@ import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
 import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
+import playground.agarwalamit.analysis.spatial.SpatialDataInputs.LinkWeightMethod;
 import playground.agarwalamit.analysis.spatial.SpatialInterpolation;
 import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -54,28 +55,28 @@ import com.vividsolutions.jts.geom.Point;
 
 public class MunichSpatialPlots {
 
-	String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run10/policies/";
+	String runDir = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run12/policies/";
 	String bau = runDir+"/bau";
-	String policyName = "ei";
+	String policyName = "implV6";
 	String policyCase = runDir+"/"+policyName;
 	private final double countScaleFactor = 100;
 	private final double gridSize = 500;
 	private boolean isWritingGGPLOTData = true;
-	private int noOfBins = 15;
+	private int noOfBins = 1;
 
 	public static void main(String[] args) {
 		MunichSpatialPlots plots = new MunichSpatialPlots();
-		plots.writeCongestionToCells();
+//		plots.writeCongestionToCells();
 		plots.writeEmissionToCells();
 		//		plots.writeUserWelfareToCells();
-		//				plots.writePopulationDensityCountToCells();
-		//		plots.writePersonTollToCells();
+		plots.writePopulationDensityCountToCells();
+		plots.writePersonTollToCells();
 		//		plots.writeLinkTollToCells();
 	}
 
 	public void writePopulationDensityCountToCells(){
 
-		SpatialDataInputs inputs = new SpatialDataInputs("point",bau);
+		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -93,8 +94,8 @@ public class MunichSpatialPlots {
 					break;
 				}
 			}
-			//			plot.processLocationForDensityCount(act,countScaleFactor);
-			plot.processHomeLocation(act, 1*countScaleFactor); // if want to interpolate
+			plot.processLocationForDensityCount(act,countScaleFactor);
+//			plot.processHomeLocation(act, 1*countScaleFactor); // if want to interpolate
 		}
 
 		plot.writeRData("popDensity_interpolate",isWritingGGPLOTData);
@@ -107,7 +108,7 @@ public class MunichSpatialPlots {
 		Map<Id<Person>, Double> person_userWElfare_money_policy = new HashMap<>();
 
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("point",bau,policyCase);
+		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau,policyCase);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -163,7 +164,7 @@ public class MunichSpatialPlots {
 	public void writePersonTollToCells(){
 		Map<Id<Person>, Double> personTollPolicy = new HashMap<>();
 
-		SpatialDataInputs inputs = new SpatialDataInputs("point",policyCase); //bau do not have toll
+		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,policyCase); //bau do not have toll
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -201,7 +202,7 @@ public class MunichSpatialPlots {
 		Map<Id<Link>, Double> linkTollPolicy = new HashMap<>();
 
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,policyCase);
+		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.line,bau,policyCase);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -237,7 +238,7 @@ public class MunichSpatialPlots {
 		Map<Double, Map<Id<Link>, Double>> linkDelaysPolicy = new HashMap<>();
 
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,policyCase);
+		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.line,bau,policyCase);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -312,13 +313,13 @@ public class MunichSpatialPlots {
 		Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissionsPolicy = new HashMap<>();
 
 		// setting of input data
-		SpatialDataInputs inputs = new SpatialDataInputs("line",bau, policyCase);
+		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.line,bau, policyCase);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
 		// set bounding box, smoothing radius and targetCRS if different.
 		//		inputs.setTargetCRS(MGC.getCRS("EPSG:20004"));
-		//		inputs.setBoundingBox(4452550.25, 4479483.33, 5324955.00, 5345696.81);
+				inputs.setBoundingBox(4452550.25, 4479483.33, 5324955.00, 5345696.81);
 		//		inputs.setSmoothingRadius(500.);
 
 		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"/analysis/spatialPlots/"+noOfBins+"timeBins/");

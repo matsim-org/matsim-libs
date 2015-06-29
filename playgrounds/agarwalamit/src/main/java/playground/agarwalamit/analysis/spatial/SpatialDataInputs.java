@@ -33,9 +33,11 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public class SpatialDataInputs {
 
+	public enum LinkWeightMethod {line, point};
+	
 	public SpatialDataInputs(){}
 	
-	public SpatialDataInputs(String linkWeightMethod, String initialCaseLocation) {
+	public SpatialDataInputs(LinkWeightMethod linkWeightMethod, String initialCaseLocation) {
 		this.linkWeigthMethod = linkWeightMethod;
 		this.initialCase = initialCaseLocation;
 		setInitialFiles();
@@ -44,7 +46,7 @@ public class SpatialDataInputs {
 	/**
 	 * If comparing two scenarios
 	 */
-	public SpatialDataInputs(String linkWeightMethod, String initialCaseLocation, String compareToCaseLocation) {
+	public SpatialDataInputs(LinkWeightMethod linkWeightMethod, String initialCaseLocation, String compareToCaseLocation) {
 		this.isComparing = true;
 		this.linkWeigthMethod = linkWeightMethod;
 		this.initialCase = initialCaseLocation;
@@ -62,7 +64,7 @@ public class SpatialDataInputs {
 
 	public final static Logger LOG = Logger.getLogger(SpatialDataInputs.class);
 	
-	public String linkWeigthMethod;
+	public LinkWeightMethod linkWeigthMethod;
 	
 	GridType gridType;
 	double cellWidth;
