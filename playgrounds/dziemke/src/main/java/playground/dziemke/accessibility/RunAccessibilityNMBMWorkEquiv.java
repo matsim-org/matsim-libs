@@ -102,8 +102,8 @@ public class RunAccessibilityNMBMWorkEquiv {
 			String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
 
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-				VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory);
-				VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory);
+				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}
 	}

@@ -27,9 +27,10 @@ public class RunAccessibilityBe {
 	private static final double cellSize = 1000.;
 
 	public static void main(String[] args) {
-		String networkFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.final.xml.gz";
+//		String networkFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.all.xml";
+		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 		String facilitiesFile = "../../shared-svn/projects/accessibility_berlin/osm/facilities_amenities_modified.xml";
-		String outputDirectory = "../../shared-svn/projects/accessibility_berlin/output/01/";
+		String outputDirectory = "../../shared-svn/projects/accessibility_berlin/output/02/";
 //		String travelTimeMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
@@ -151,11 +152,10 @@ public class RunAccessibilityBe {
 		}
 		
 //		BoundingBox boundingBox = BoundingBox.createBoundingBox(scenario.getNetwork());
+	
         
-        // extends of the network are (as they can looked up by using the bounding box):
-        // minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
-        // choose map view a bit bigger
-        double[] mapViewExtent = {100000,-3720000,180000,-3675000};
+        
+        double[] mapViewExtent = {4574000-1000, 5802000-1000, 4620000+1000, 5839000+1000};
 			
 //		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
 		// end new
@@ -169,7 +169,7 @@ public class RunAccessibilityBe {
 
 		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
-//			if ( !actType.equals("w") ) {
+//			if ( !actType.equals("s") ) {
 //				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 //				continue ;
 //			}
@@ -191,15 +191,16 @@ public class RunAccessibilityBe {
 				
 			// define the mode that will be considered
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-//			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-//			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-//			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 //			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 				
 			listener.addAdditionalFacilityData(homes) ;
 //			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 			// Boundaries of Berlin are approx.: 4570000, 4613000, 5836000, 5806000
-			listener.generateGridsAndMeasuringPointsByCustomBoundary(4570000, 5806000, 4613000, 5836000, cellSize);
+			
+			listener.generateGridsAndMeasuringPointsByCustomBoundary(4574000, 5802000, 4620000, 5839000, cellSize);
 //			listener.generateGridsAndMeasuringPointsByCustomBoundary(4590000, 5815000, 4595000, 5820000, cellSize);
 			
 				
@@ -220,12 +221,16 @@ public class RunAccessibilityBe {
 			String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
 		
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//				if ( !actType.equals("w") ) {
+//				if ( !actType.equals("s") ) {
 //					RunAccessibilityBe.log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 //					continue ;
 //				}
-				VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory);
-				VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+//				if ( !mode.equals(Modes4Accessibility.freeSpeed) ) {
+//					RunAccessibilityBe.log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//					continue ;
+//				}
+				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory);
+				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}
 	}

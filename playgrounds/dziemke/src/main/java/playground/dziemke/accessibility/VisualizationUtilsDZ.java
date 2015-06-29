@@ -36,9 +36,9 @@ import org.matsim.core.utils.misc.ExeRunner;
  * @author nagel
  *
  */
-public class VisualizationUtils {
-	public static final Logger log = Logger.getLogger(VisualizationUtils.class);
-	private VisualizationUtils(){} // do not instantiate
+public class VisualizationUtilsDZ {
+	public static final Logger log = Logger.getLogger(VisualizationUtilsDZ.class);
+	private VisualizationUtilsDZ(){} // do not instantiate
 
 	
 	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent, String workingDirectory) {
@@ -46,7 +46,8 @@ public class VisualizationUtils {
 		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
 
 		// Write QGis project file
-		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_SA_Albers, workingDirectory);
+//		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_SA_Albers, workingDirectory);
+		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
 		String qGisProjectFile = "QGisProjectFile_" + mode + ".qgs";
 		writer.setExtent(mapViewExtent);
 
@@ -64,13 +65,13 @@ public class VisualizationUtils {
 		writer.changeWorkingDirectory(actSpecificWorkingDirectory);
 
 		// density layer
-		VectorLayer densityLayer = new VectorLayer(
-				"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
-		densityLayer.setXField(Labels.X_COORDINATE);
-		densityLayer.setYField(Labels.Y_COORDINATE);
-		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
-		dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
-		writer.addLayer(densityLayer);
+//		VectorLayer densityLayer = new VectorLayer(
+//				"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
+//		densityLayer.setXField(Labels.X_COORDINATE);
+//		densityLayer.setYField(Labels.Y_COORDINATE);
+//		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
+//		dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
+//		writer.addLayer(densityLayer);
 
 		// accessibility layer
 		VectorLayer accessibilityLayer = new VectorLayer(
