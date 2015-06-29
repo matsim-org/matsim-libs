@@ -19,6 +19,7 @@
 package playground.agarwalamit.analysis.spatial;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
- * A class to interpolate effect of emissions on each link on other parts of study area.
+ * A class to interpolate effect of emissions (or ...) on each link on other parts of study area.
  * @author amit
  */
 
@@ -47,8 +48,11 @@ public class SpatialInterpolation {
 		this.inputs = inputs;
 		SpatialDataInputs.LOG.info("Creating grids inside polygon of bounding box.");
 		createGridFromBoundingBox();
-		this.grid.writeGrid(outputFolder, inputs.targetCRS.toString());
+		
 		this.outputFolder = outputFolder;
+		if(!new File(this.outputFolder).exists()) new File(this.outputFolder).mkdirs();
+		
+		this.grid.writeGrid(outputFolder, inputs.targetCRS.toString());
 		clear();
 	}
 

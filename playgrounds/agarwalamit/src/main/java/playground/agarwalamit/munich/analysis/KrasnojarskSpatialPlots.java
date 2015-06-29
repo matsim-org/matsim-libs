@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class KrasnojarskSpatialPlots {
 
-	String runDir = "../../runs-svn/krasnojarsk/";
+	String runDir = "./bk/";//"../../runs-svn/krasnojarsk/";
 	String bau = runDir + "bau";
 //	String policyName = "ei";
 //	String policyCase = runDir + policyName;
@@ -326,7 +326,10 @@ public class KrasnojarskSpatialPlots {
 
 		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"analysis/spatialPlots/"+noOfBins+"timeBins/");
 
-		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), inputs.initialCaseEmissionEventsFile, noOfBins);
+		String emissionEventsFile = bau+"/emission.events.offline-10.xml.gz";
+		String networkFile = bau+"/network.xml";
+		
+		EmissionLinkAnalyzer emsLnkAna = new EmissionLinkAnalyzer(LoadMyScenarios.getSimulationEndTime(inputs.initialCaseConfig), emissionEventsFile, noOfBins);
 		emsLnkAna.init();
 		emsLnkAna.preProcessData();
 		emsLnkAna.postProcessData();
@@ -341,7 +344,7 @@ public class KrasnojarskSpatialPlots {
 		}
 
 
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		double sumEmission =0;
 
 		for(double time :linkEmissionsBau.keySet()){
