@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class KrasnojarskSpatialPlots {
 
-	String runDir = "./bk/";//"../../runs-svn/krasnojarsk/";
+	String runDir = "../../runs-svn/krasnojarsk/";
 	String bau = runDir + "bau";
 //	String policyName = "ei";
 //	String policyCase = runDir + policyName;
