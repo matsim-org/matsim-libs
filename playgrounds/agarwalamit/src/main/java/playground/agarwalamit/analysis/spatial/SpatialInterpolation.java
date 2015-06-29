@@ -114,7 +114,7 @@ public class SpatialInterpolation {
 			double area_smoothingCircle = Math.PI * inputs.getSmoothingRadius() *inputs.getSmoothingRadius();
 			double normalizationFactor = cellArea/area_smoothingCircle;
 			double weightSoFar = this.cellWeights.get(p);
-			double weightNow;
+			double weightNow = 0;
 
 			switch (inputs.linkWeigthMethod) {
 			
@@ -129,7 +129,7 @@ public class SpatialInterpolation {
 			default:
 				throw new RuntimeException("Averaging method for weight is not recongnized. Use 'line' or 'point'.");
 			}
-
+			
 			this.cellWeights.put(p, weightNow+weightSoFar);
 		}
 	}
@@ -221,7 +221,7 @@ public class SpatialInterpolation {
 
 		if(weight<0.0) {
 			throw new RuntimeException("Weight is negative, eeight = "+weight+ ". Thus aborting.");
-		}
+		} else if (Double.isNaN(weight)) weight = 0;
 		return weight;
 	}
 
