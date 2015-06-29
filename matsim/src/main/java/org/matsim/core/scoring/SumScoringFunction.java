@@ -14,7 +14,7 @@ public final class SumScoringFunction implements ScoringFunction {
 		public void finish();
 		public double getScore();
 	}
-	
+
 	public interface ActivityScoring extends BasicScoring {
 		void handleFirstActivity(final Activity act);
 		void handleActivity(final Activity act);
@@ -24,7 +24,7 @@ public final class SumScoringFunction implements ScoringFunction {
 	public interface LegScoring extends BasicScoring {
 		void handleLeg(final Leg leg);
 	}
-	
+
 	public interface MoneyScoring extends BasicScoring {
 		void addMoney(final double amount);
 	}
@@ -32,7 +32,7 @@ public final class SumScoringFunction implements ScoringFunction {
 	public interface AgentStuckScoring extends BasicScoring {
 		void agentStuck(final double time);
 	}
-	
+
 	/**
 	 * NOTE: Despite its somewhat misleading name, only Events that at the same time implement HasPersonId are passed 
 	 * through this interface.  This excludes, in particular, LinkEnterEvent and LinkLeaveEvent.  This was done for performance reasons,
@@ -45,7 +45,7 @@ public final class SumScoringFunction implements ScoringFunction {
 	public interface ArbitraryEventScoring extends BasicScoring {
 		void handleEvent( final Event event ) ;
 	}
-	
+
 	private static Logger log = Logger.getLogger(SumScoringFunction.class);
 
 	private ArrayList<BasicScoring> basicScoringFunctions = new ArrayList<BasicScoring>();
@@ -54,35 +54,35 @@ public final class SumScoringFunction implements ScoringFunction {
 	private ArrayList<LegScoring> legScoringFunctions = new ArrayList<LegScoring>();
 	private ArrayList<AgentStuckScoring> agentStuckScoringFunctions = new ArrayList<AgentStuckScoring>();
 	private ArrayList<ArbitraryEventScoring> arbtraryEventScoringFunctions = new ArrayList<ArbitraryEventScoring>() ;
-	
+
 	@Override
 	public final void handleActivity(Activity activity) {
 		double startTime = activity.getStartTime();
 		double endTime = activity.getEndTime();
-        if (startTime == Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
-        	for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
-    			activityScoringFunction.handleFirstActivity(activity);
-    		}
-        } else if (startTime != Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
-        	for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
-    			activityScoringFunction.handleActivity(activity);
-    		}
-        } else if (startTime != Time.UNDEFINED_TIME && endTime == Time.UNDEFINED_TIME) {
-        	for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
-    			activityScoringFunction.handleLastActivity(activity);
-    		}
-        } else {
-        	throw new RuntimeException("Trying to score an activity without start or end time. Should not happen."); 	
-        }
-    }
+		if (startTime == Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
+			for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
+				activityScoringFunction.handleFirstActivity(activity);
+			}
+		} else if (startTime != Time.UNDEFINED_TIME && endTime != Time.UNDEFINED_TIME) {
+			for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
+				activityScoringFunction.handleActivity(activity);
+			}
+		} else if (startTime != Time.UNDEFINED_TIME && endTime == Time.UNDEFINED_TIME) {
+			for (ActivityScoring activityScoringFunction : activityScoringFunctions) {
+				activityScoringFunction.handleLastActivity(activity);
+			}
+		} else {
+			throw new RuntimeException("Trying to score an activity without start or end time. Should not happen."); 	
+		}
+	}
 
 	@Override
-    public final void handleLeg(Leg leg) {
+	public final void handleLeg(Leg leg) {
 		for (LegScoring legScoringFunction : legScoringFunctions) {
 			legScoringFunction.handleLeg(leg);
 		}
-    }
-	
+	}
+
 	@Override
 	public void addMoney(double amount) {
 		for (MoneyScoring moneyScoringFunction : moneyScoringFunctions) {
@@ -118,7 +118,7 @@ public final class SumScoringFunction implements ScoringFunction {
 	public double getScore() {
 		double score = 0.0;
 		for (BasicScoring basicScoringFunction : basicScoringFunctions) {
-            double contribution = basicScoringFunction.getScore();
+			double contribution = basicScoringFunction.getScore();
 			if (log.isTraceEnabled()) {
 				log.trace("Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is: " + contribution);
 			}
@@ -127,7 +127,7 @@ public final class SumScoringFunction implements ScoringFunction {
 				// one might change this to "log.error(...)". td june 15
 				throw new RuntimeException( "Contribution of scoring function: " + basicScoringFunction.getClass().getName() + " is NaN! Behavior with NaN scores is undefined." );
 			}
-            score += contribution;
+			score += contribution;
 		}
 		return score;
 	}
@@ -150,7 +150,7 @@ public final class SumScoringFunction implements ScoringFunction {
 		if (scoringFunction instanceof MoneyScoring) {
 			moneyScoringFunctions.add((MoneyScoring) scoringFunction);
 		}
-		
+
 		if (scoringFunction instanceof ArbitraryEventScoring ) {
 			this.arbtraryEventScoringFunctions.add((ArbitraryEventScoring) scoringFunction) ;
 		}

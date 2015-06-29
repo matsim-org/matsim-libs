@@ -92,7 +92,7 @@ public final class PopulationAgentSource implements AgentSource {
 						case defaultVehicle:
 							vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
 							break;
-						case fromVehiclesFile:
+						case fromVehiclesData:
 							vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
 							if (vehicle == null) {
 								throw new IllegalStateException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);

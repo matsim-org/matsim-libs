@@ -33,8 +33,8 @@ import java.util.Map;
 
 public final class QSimConfigGroup extends ReflectiveConfigGroup implements MobsimConfigGroupI {
 
-	private static final String VEHICLES_SOURCE = "vehiclesSource";
 
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
 
 	public static final String GROUP_NAME = "qsim";
@@ -50,15 +50,12 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics";
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
-	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
 	private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
 	private static final String USE_DEFAULT_VEHICLES = "useDefaultVehicles";
 
 	public static enum TrafficDynamics { queue, withHoles } ;
 	
 	public static enum StarttimeInterpretation { maxOfStarttimeAndEarliestActivityEnd, onlyUseStarttime } ;
-	
-	public static enum VehicleBehavior { teleport, wait, exception } ;
 
 	private static final String NODE_OFFSET = "nodeOffset";
 
@@ -75,8 +72,11 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	private int numberOfThreads = 1;
 	private TrafficDynamics trafficDynamics = TrafficDynamics.queue ;
 	private StarttimeInterpretation simStarttimeInterpretation = StarttimeInterpretation.maxOfStarttimeAndEarliestActivityEnd;
-	private VehicleBehavior vehicleBehavior = VehicleBehavior.teleport ;
 
+	// ---
+	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
+	public static enum VehicleBehavior { teleport, wait, exception } ;
+	private VehicleBehavior vehicleBehavior = VehicleBehavior.teleport ;
 	// ---
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	public static enum SnapshotStyle { equiDist, queue, withHoles } ;
@@ -105,7 +105,9 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	// ---
 	private final static String FAST_CAPACITY_UPDATE = "usingFastCapacityUpdate";
 	private boolean usingFastCapacityUpdate = false ;
-
+	// ---
+	private static final String VEHICLES_SOURCE = "vehiclesSource";
+	public static enum VehiclesSource { defaultVehicle, fromVehiclesData } ;
 	private VehiclesSource vehiclesSource = VehiclesSource.defaultVehicle ;
 	// ---
 
@@ -453,7 +455,6 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		this.usePersonIdForMissingVehicleId = value;
 	}
 
-	public static enum VehiclesSource { defaultVehicle, fromVehiclesFile } ;
 	@StringSetter( VEHICLES_SOURCE)
 	public final void setVehiclesSource( VehiclesSource source ) {
 		this.vehiclesSource = source ;
@@ -469,7 +470,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		switch( this.vehiclesSource ) {
 		case defaultVehicle:
 			return true ;
-		case fromVehiclesFile:
+		case fromVehiclesData:
 			return false ;
 		default:
 			throw new RuntimeException( "not implemented") ;
@@ -481,7 +482,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		if ( useDefaultVehicles ) {
 			this.vehiclesSource = VehiclesSource.defaultVehicle ;
 		} else {
-			this.vehiclesSource = VehiclesSource.fromVehiclesFile ;
+			this.vehiclesSource = VehiclesSource.fromVehiclesData ;
 		}
 	}
 
