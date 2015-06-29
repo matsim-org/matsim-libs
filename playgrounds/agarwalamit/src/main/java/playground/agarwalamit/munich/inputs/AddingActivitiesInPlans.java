@@ -65,7 +65,7 @@ public class AddingActivitiesInPlans {
 		String initialPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 		String initialConfig = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_usrGrp_subAct_baseCase.xml";
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndConfig(initialPlans,initialConfig);
-		String outPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_subActivities.xml.gz";
+		String outPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
 
 		AddingActivitiesInPlans newPlansInfo = new AddingActivitiesInPlans(sc);
 		newPlansInfo.run();
@@ -147,12 +147,14 @@ public class AddingActivitiesInPlans {
 							if(isFirstAndLastActSame){ // same first and last act
 
 								actType = firstAct.getType().substring(0,4).concat(homeTypDur/3600+"H");
+								
 								Activity hAct = popFactory.createActivityFromCoord(actType, firstAct.getCoord());
 
 								if(ii==0) hAct.setEndTime(firstAct.getEndTime()); // first act --> only end time (no need for any time shift for first act)
 								else hAct.setStartTime(lastAct.getStartTime() + timeShift); // last act --> only start time
 
 								planOut.addActivity(hAct);
+								typDur = homeTypDur;
 
 							} else { // different first and last act
 
@@ -214,7 +216,7 @@ public class AddingActivitiesInPlans {
 							planOut.addActivity(a1);
 						}
 
-						Tuple<Double, Double> typMinDur = new Tuple<Double, Double>(homeTypDur, homeTypDur/2);
+						Tuple<Double, Double> typMinDur = new Tuple<Double, Double>(typDur, typDur/2);
 						actType2TypDurMinDur.put(actType, typMinDur);
 					} 
 				}

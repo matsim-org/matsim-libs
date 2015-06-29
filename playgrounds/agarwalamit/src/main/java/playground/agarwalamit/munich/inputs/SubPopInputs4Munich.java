@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.calibration;
+package playground.agarwalamit.munich.inputs;
 
 import java.util.List;
 
@@ -58,9 +58,9 @@ public class SubPopInputs4Munich {
 	private void writePersonAttributes(){
 
 		// read plans with subActivities (basically these are inital plans from different sources + subActivities)
-		String initialPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_subActivities.xml.gz";
+		String initialPlans = "../../../repos/shared-svn/projects/detailedEval/pop/merged/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities.xml.gz";
 		String outPopAttributeFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/personsAttributes_1pct_usrGrp.xml.gz";
-		String outPlansFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_subActivities_subPop.xml.gz";
+		String outPlansFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4_wrappedSubActivities_subPop.xml.gz";
 		
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(initialPlans);
 		Population pop = sc.getPopulation();	
@@ -93,8 +93,8 @@ public class SubPopInputs4Munich {
 	private void modifyConfig(){
 
 		// I think, config with all sub activities info can be taken.
-		String existingConfig = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_subActivities_baseCase.xml"; 
-		String outConfigFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_usrGrp_subAct_baseCase.xml"; // need manual verification later
+		String existingConfig = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_wrappedSubActivities_baseCase_msa.xml"; 
+		String outConfigFile = "../../../repos/runs-svn/detEval/emissionCongestionInternalization/input/config_usrGrp_wrappedSubAct_baseCase_msa.xml"; // need manual verification later
 
 		Config config =  ConfigUtils.loadConfig(existingConfig);
 
@@ -146,10 +146,8 @@ public class SubPopInputs4Munich {
 	}
 
 	private String getUserGroupFromPersonId(Id<Person> personId){
-		if(pf.isPersonFromMID(personId)) return "OTHERS";
-		else if(pf.isPersonInnCommuter(personId)) return "COMMUTER_REV_COMMUTER";
+		if(pf.isPersonInnCommuter(personId)) return "COMMUTER_REV_COMMUTER";
 		else if(pf.isPersonOutCommuter(personId)) return "COMMUTER_REV_COMMUTER";
-		else if (pf.isPersonFreight(personId)) return "OTHERS";
-		else throw new RuntimeException("Person "+personId+" does not belong to any user group. Aborting ...");
+		else return "OTHERS";
 	}
 }
