@@ -53,14 +53,17 @@ public class NetworkMatsim2Shape {
 //	private static String networkName = "network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes";
 //	private static String networkName = "../policies/network-86-85-87-84_simplified---withLanes_zone30";
 	
-	private static String filePath = "../../runs-svn/run892/";
-	private static String networkName = "892.output_network";
+//	private static String filePath = "../../runs-svn/run892/";
+//	private static String networkName = "892.output_network";
 	
-//	private static String inFileType = ".xml";
-	private static String inFileType = ".xml.gz";
+	private static String filePath = "../../runs-svn/krasnojarsk/bau/";
+	private static String networkName = "network";
+	
+	private static String inFileType = ".xml";
+//	private static String inFileType = ".xml.gz";
 	private static String outFileType = ".shp";
 	
-	private static boolean filterLinks = true;
+	private static boolean filterLinks = false;
 	private static String linksToFilter = filePath + "zh_forRun891_distanceMorningToll_0630-0900_cityWOhighways_35rp_per_km.xml";
 
 	/**
@@ -82,6 +85,7 @@ public class NetworkMatsim2Shape {
 //		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.WGS84).write();
 //		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.CH1903_LV03_GT).write();
 		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.DHDN_GK4).write();
+		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.WGS84).write();
 //		new Links2ESRIShape(net, filePath + networkName + outFileType, "WGS84_UTM32T").write();
 	}
 
