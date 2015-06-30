@@ -11,6 +11,7 @@ import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
@@ -49,11 +50,14 @@ public class TtCreateBraessSignals {
 
 	private boolean simulateInflowCap7 = false;
 	private boolean simulateInflowCap9 = false;
+	private boolean lanesUsed;
 
 	public TtCreateBraessSignals(Scenario scenario) {
 		this.scenario = scenario;
 
 		checkInflowSimulation();
+		//check whether lanes are used or not
+		this.lanesUsed = this.scenario.getConfig().scenario().isUseLanes();
 	}
 
 	/**
@@ -78,8 +82,6 @@ public class TtCreateBraessSignals {
 
 	public void createSignals() {
 
-		// TODO handle the case, when no lanes are used!
-		
 		createSignalSystems();
 		createSignalGroups();
 		createAllGreenSignalControl();
@@ -91,6 +93,8 @@ public class TtCreateBraessSignals {
 
 	private void createSignalSystems() {
 
+		// TODO add turning move restrictions if lanesUsed false. change signalutils??
+		
 		SignalsData signalsData = (SignalsData) this.scenario
 				.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();

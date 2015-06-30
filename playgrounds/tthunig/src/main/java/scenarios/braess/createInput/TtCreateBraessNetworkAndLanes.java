@@ -3,8 +3,6 @@
  */
 package scenarios.braess.createInput;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -12,10 +10,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneData20;
-import org.matsim.lanes.data.v20.LaneData20Impl;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20Impl;
 
 /**
  * Class to create network and lanes for the breass scenario.
@@ -197,12 +194,13 @@ public class TtCreateBraessNetworkAndLanes {
 		
 		LaneDefinitions20 laneDef20 = (LaneDefinitions20) this.scenario
 				.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		LaneDefinitionsFactory20 fac = laneDef20.getFactory();
 
 		// create link assignment of link 1_2
-		LanesToLinkAssignment20 linkAssignment = new LanesToLinkAssignment20Impl(
+		LanesToLinkAssignment20 linkAssignment = fac.createLanesToLinkAssignment(
 				Id.createLinkId("1_2"));
 
-		LaneData20 lane = new LaneData20Impl(Id.create("1_2.ol", Lane.class));
+		LaneData20 lane = fac.createLane(Id.create("1_2.ol", Lane.class));
 		lane.addToLaneId(Id.create("1_2.1", Lane.class));
 		lane.addToLaneId(Id.create("1_2.2", Lane.class));
 		lane.setCapacityVehiclesPerHour(CAP_FIRST_LAST);
@@ -210,7 +208,7 @@ public class TtCreateBraessNetworkAndLanes {
 		lane.setAlignment(0);
 		linkAssignment.addLane(lane);
 		
-		lane = new LaneData20Impl(Id.create("1_2.1", Lane.class));
+		lane = fac.createLane(Id.create("1_2.1", Lane.class));
 		if (simulateInflowCap){
 			lane.addToLinkId(Id.createLinkId("2_7"));
 		}
@@ -222,7 +220,7 @@ public class TtCreateBraessNetworkAndLanes {
 		lane.setAlignment(-1);
 		linkAssignment.addLane(lane);
 		
-		lane = new LaneData20Impl(Id.create("1_2.2", Lane.class));
+		lane = fac.createLane(Id.create("1_2.2", Lane.class));
 		lane.addToLinkId(Id.createLinkId("2_4"));
 		lane.setCapacityVehiclesPerHour(CAP_FIRST_LAST);
 		lane.setStartsAtMeterFromLinkEnd(LINK_LENGTH / 2);
@@ -233,9 +231,9 @@ public class TtCreateBraessNetworkAndLanes {
 		
 		// create link assignment of link 2_3 (or 7_3 if inflow capacity is simulated)
 		if (simulateInflowCap){
-			linkAssignment = new LanesToLinkAssignment20Impl(Id.createLinkId("7_3"));
+			linkAssignment = fac.createLanesToLinkAssignment(Id.createLinkId("7_3"));
 
-			lane = new LaneData20Impl(Id.create("7_3.ol", Lane.class));
+			lane = fac.createLane(Id.create("7_3.ol", Lane.class));
 			lane.addToLaneId(Id.create("7_3.1", Lane.class));
 			lane.addToLaneId(Id.create("7_3.2", Lane.class));
 			lane.setCapacityVehiclesPerHour(CAP_MAIN);
@@ -243,14 +241,14 @@ public class TtCreateBraessNetworkAndLanes {
 			lane.setAlignment(0);
 			linkAssignment.addLane(lane);
 
-			lane = new LaneData20Impl(Id.create("7_3.1", Lane.class));
+			lane = fac.createLane(Id.create("7_3.1", Lane.class));
 			lane.addToLinkId(Id.createLinkId("3_5"));
 			lane.setCapacityVehiclesPerHour(CAP_MAIN);
 			lane.setStartsAtMeterFromLinkEnd(LINK_LENGTH / 2);
 			lane.setAlignment(0);
 			linkAssignment.addLane(lane);
 
-			lane = new LaneData20Impl(Id.create("7_3.2", Lane.class));
+			lane = fac.createLane(Id.create("7_3.2", Lane.class));
 			lane.addToLinkId(Id.createLinkId("3_4"));
 			lane.setCapacityVehiclesPerHour(CAP_MAIN);
 			lane.setStartsAtMeterFromLinkEnd(LINK_LENGTH / 2);
@@ -260,10 +258,10 @@ public class TtCreateBraessNetworkAndLanes {
 			laneDef20.addLanesToLinkAssignment(linkAssignment);
 		}
 		else{
-			linkAssignment = new LanesToLinkAssignment20Impl(
+			linkAssignment = fac.createLanesToLinkAssignment(
 					Id.createLinkId("2_3"));
 
-			lane = new LaneData20Impl(Id.create("2_3.ol", Lane.class));
+			lane = fac.createLane(Id.create("2_3.ol", Lane.class));
 			lane.addToLaneId(Id.create("2_3.1", Lane.class));
 			lane.addToLaneId(Id.create("2_3.2", Lane.class));
 			lane.setCapacityVehiclesPerHour(CAP_MAIN);
@@ -271,14 +269,14 @@ public class TtCreateBraessNetworkAndLanes {
 			lane.setAlignment(0);
 			linkAssignment.addLane(lane);
 
-			lane = new LaneData20Impl(Id.create("2_3.1", Lane.class));
+			lane = fac.createLane(Id.create("2_3.1", Lane.class));
 			lane.addToLinkId(Id.createLinkId("3_5"));
 			lane.setCapacityVehiclesPerHour(CAP_MAIN);
 			lane.setStartsAtMeterFromLinkEnd(LINK_LENGTH / 2);
 			lane.setAlignment(0);
 			linkAssignment.addLane(lane);
 
-			lane = new LaneData20Impl(Id.create("2_3.2", Lane.class));
+			lane = fac.createLane(Id.create("2_3.2", Lane.class));
 			lane.addToLinkId(Id.createLinkId("3_4"));
 			lane.setCapacityVehiclesPerHour(CAP_MAIN);
 			lane.setStartsAtMeterFromLinkEnd(LINK_LENGTH / 2);
