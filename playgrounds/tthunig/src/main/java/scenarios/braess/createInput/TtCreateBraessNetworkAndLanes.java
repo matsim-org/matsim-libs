@@ -31,10 +31,7 @@ public class TtCreateBraessNetworkAndLanes {
 
 	private Scenario scenario;
 	
-	// if true, link 2_3 and 4_5 are divided into 2 links: a small one at the
-	// beginning that simulates an inflow capacity at the link and a longer one
-	// that preserves the other properties of the link
-	private boolean SIMULATE_INFLOW_CAP = true;
+	private boolean simulateInflowCap = false;
 	
 	// capacity at the links that all agents have to use
 	private long CAP_FIRST_LAST = 3600; // [veh/h]
@@ -73,7 +70,7 @@ public class TtCreateBraessNetworkAndLanes {
 		net.addNode(fac.createNode(Id.createNodeId(6),
 				scenario.createCoord(800, 200)));
 		
-		if (SIMULATE_INFLOW_CAP){
+		if (simulateInflowCap){
 			net.addNode(fac.createNode(Id.createNodeId(7),
 					scenario.createCoord(250, 250)));
 			net.addNode(fac.createNode(Id.createNodeId(9), 
@@ -99,7 +96,7 @@ public class TtCreateBraessNetworkAndLanes {
 		l.setFreespeed(l.getLength() / linkTT);
 		net.addLink(l);
 		
-		if (SIMULATE_INFLOW_CAP){
+		if (simulateInflowCap){
 			l = fac.createLink(Id.createLinkId("2_7"),
 					net.getNodes().get(Id.createNodeId(2)),
 					net.getNodes().get(Id.createNodeId(7)));
@@ -156,7 +153,7 @@ public class TtCreateBraessNetworkAndLanes {
 		l.setFreespeed(l.getLength() / linkTT);
 		net.addLink(l);
 		
-		if (SIMULATE_INFLOW_CAP){
+		if (simulateInflowCap){
 			l = fac.createLink(Id.createLinkId("4_9"),
 					net.getNodes().get(Id.createNodeId(4)),
 					net.getNodes().get(Id.createNodeId(9)));
@@ -214,7 +211,7 @@ public class TtCreateBraessNetworkAndLanes {
 		linkAssignment.addLane(lane);
 		
 		lane = new LaneData20Impl(Id.create("1_2.1", Lane.class));
-		if (SIMULATE_INFLOW_CAP){
+		if (simulateInflowCap){
 			lane.addToLinkId(Id.createLinkId("2_7"));
 		}
 		else{
@@ -235,7 +232,7 @@ public class TtCreateBraessNetworkAndLanes {
 		laneDef20.addLanesToLinkAssignment(linkAssignment);
 		
 		// create link assignment of link 2_3 (or 7_3 if inflow capacity is simulated)
-		if (SIMULATE_INFLOW_CAP){
+		if (simulateInflowCap){
 			linkAssignment = new LanesToLinkAssignment20Impl(Id.createLinkId("7_3"));
 
 			lane = new LaneData20Impl(Id.create("7_3.ol", Lane.class));
@@ -290,6 +287,19 @@ public class TtCreateBraessNetworkAndLanes {
 
 			laneDef20.addLanesToLinkAssignment(linkAssignment);
 		}
+	}
+
+	/**
+	 * Sets the flag for simulating inflow capacity.
+	 * 
+	 * If true, link 2_3 and 4_5 are divided into 2 links: a small one at the
+	 * beginning that simulates an inflow capacity at the link and a longer one
+	 * that preserves the other properties of the link
+	 * 
+	 * @param simulateInflowCap
+	 */
+	public void setSimulateInflowCap(boolean simulateInflowCap) {
+		this.simulateInflowCap = simulateInflowCap;
 	}
 
 }
