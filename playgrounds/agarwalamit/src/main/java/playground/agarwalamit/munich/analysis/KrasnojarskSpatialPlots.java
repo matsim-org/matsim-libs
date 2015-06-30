@@ -62,8 +62,8 @@ public class KrasnojarskSpatialPlots {
 //	String policyName = "ei";
 //	String policyCase = runDir + policyName;
 	private final double countScaleFactor = 10;
-	private final double gridSize = 5000;
-	private boolean isWritingGGPLOTData = true;
+	private final double gridSize = 250;
+	private boolean isWritingGGPLOTData = false;
 	private int noOfBins = 1;
 
 	public static void main(String[] args) {
@@ -82,7 +82,7 @@ public class KrasnojarskSpatialPlots {
 //		inputs.setGridInfo(GridType.HEX, gridSize);
 //		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 //
-//		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"analysis/spatialPlots/");
+//		SpatialInterpolation plot = new SpatialInterpolation(inputs, bau + "/analysis/spatialPlots/");
 //
 //		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.initialCasePlansFile,inputs.initialCaseNetworkFile);
 //
@@ -114,7 +114,7 @@ public class KrasnojarskSpatialPlots {
 //		inputs.setGridInfo(GridType.HEX, gridSize);
 //		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 //
-//		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"analysis/spatialPlots/");
+//		SpatialInterpolation plot = new SpatialInterpolation(inputs, bau + "/analysis/spatialPlots/");
 //
 //		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(inputs.initialCasePlansFile,inputs.initialCaseNetworkFile);
 //
@@ -170,7 +170,7 @@ public class KrasnojarskSpatialPlots {
 //		inputs.setGridInfo(GridType.HEX, gridSize);
 //		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 //
-//		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"analysis/spatialPlots/");
+//		SpatialInterpolation plot = new SpatialInterpolation(inputs, bau + "/analysis/spatialPlots/");
 //
 //		Scenario scPolicy = LoadMyScenarios.loadScenarioFromOutputDir(policyCase);
 //
@@ -208,7 +208,7 @@ public class KrasnojarskSpatialPlots {
 //		inputs.setGridInfo(GridType.HEX, gridSize);
 //		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 //
-//		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"analysis/spatialPlots/");
+//		SpatialInterpolation plot = new SpatialInterpolation(inputs, bau + "/analysis/spatialPlots/");
 //
 //		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(inputs.initialCaseNetworkFile);
 //
@@ -241,11 +241,11 @@ public class KrasnojarskSpatialPlots {
 
 		// setting of input data
 //		SpatialDataInputs inputs = new SpatialDataInputs("line",bau,policyCase);
-		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau);
+		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point, bau);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 //		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
-		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"analysis/spatialPlots/"+noOfBins+"timeBins/");
+		SpatialInterpolation plot = new SpatialInterpolation(inputs, bau + "/analysis/spatialPlots/"+noOfBins+"timeBins");
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(inputs.initialCaseNetworkFile,inputs.initialCaseConfig);
 
@@ -317,16 +317,20 @@ public class KrasnojarskSpatialPlots {
 
 		// setting of input data
 //		SpatialDataInputs inputs = new SpatialDataInputs("line",bau, policyCase);
-		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau);
+//		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau);
+		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.line,bau);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 //		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
 		// set bounding box, smoothing radius and targetCRS if different.
 		inputs.setTargetCRS(MGC.getCRS("EPSG:32646"));
-		inputs.setBoundingBox(458823.0, 544945.0, 6190162.0, 6248014.0);
+//		inputs.setBoundingBox(458823.0, 544945.0, 6190162.0, 6248014.0);
+//		inputs.setBoundingBox(480236.0, 511199.0, 6197894.0, 6216748.0);
+//		inputs.setBoundingBox(483772.0, 504220.0, 6198650.0, 6213566.0);
+		inputs.setBoundingBox(483895.0, 502066.0, 6202213.0, 6212963.0);
 		//		inputs.setSmoothingRadius(500.);
 
-		SpatialInterpolation plot = new SpatialInterpolation(inputs,runDir+"analysis/spatialPlots/"+noOfBins+"timeBins/");
+		SpatialInterpolation plot = new SpatialInterpolation(inputs, bau + "/analysis/spatialPlots/"+noOfBins+"timeBins");
 
 		String emissionEventsFile = bau+"/emission.events.offline-10.xml.gz";
 		String networkFile = bau+"/network.xml";
@@ -344,7 +348,6 @@ public class KrasnojarskSpatialPlots {
 			emsLnkAna.postProcessData();
 			linkEmissionsPolicy = emsLnkAna.getLink2TotalEmissions();
 		}
-
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 		double sumEmission =0;
