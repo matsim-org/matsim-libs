@@ -216,6 +216,7 @@ public class RunBraessSimulation {
 	private void createSignals(Scenario scenario) {
 
 		TtCreateBraessSignals signalsCreator = new TtCreateBraessSignals(scenario);
+		signalsCreator.setRetardMiddleRoute( false );		
 		signalsCreator.createSignals();
 	}
 

@@ -3,6 +3,7 @@
  */
 package scenarios.braess.createInput;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -10,12 +11,9 @@ import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsDataFactory;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsDataFactoryImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
@@ -39,11 +37,15 @@ import org.matsim.lanes.data.v20.Lane;
  */
 public class TtCreateBraessSignals {
 
+	private static final Logger log = Logger
+			.getLogger(TtCreateBraessSignals.class);
+	
 	private static final Double START_TIME = 0.0;
 	private static final Double END_TIME = 0.0;
 	private static final Integer CYCLE_TIME = 60;
 
 	private Scenario scenario;
+	private boolean retardMiddleRoute = false;
 
 	private boolean simulateInflowCap7 = false;
 	private boolean simulateInflowCap9 = false;
@@ -76,20 +78,22 @@ public class TtCreateBraessSignals {
 
 	public void createSignals() {
 
-		SignalsData signalsData = (SignalsData) this.scenario
-				.getScenarioElement(SignalsData.ELEMENT_NAME);
-
-		createSignalSystems(signalsData);
-		createSignalControl(signalsData);
-		createSignalGroups(signalsData);
-
 		// TODO handle the case, when no lanes are used!
+		
+		createSignalSystems();
+		createSignalGroups();
+		createAllGreenSignalControl();
+		
+		if (retardMiddleRoute){
+			changeSignalControlTo1Z();
+		}
 	}
 
-	private void createSignalSystems(SignalsData signalsData) {
+	private void createSignalSystems() {
 
+		SignalsData signalsData = (SignalsData) this.scenario
+				.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
-
 		SignalSystemsDataFactory fac = new SignalSystemsDataFactoryImpl();
 
 		// create signal system at node 2
@@ -204,8 +208,10 @@ public class TtCreateBraessSignals {
 		signalSystems.addSignalSystemData(signalSystem);
 	}
 
-	private void createSignalGroups(SignalsData signalsData) {
+	private void createSignalGroups() {
 
+		SignalsData signalsData = (SignalsData) this.scenario
+				.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
 		
@@ -215,76 +221,45 @@ public class TtCreateBraessSignals {
 		}
 	}
 
-	private void createSignalControl(SignalsData signalsData) {
+	private void createAllGreenSignalControl() {
 
+		SignalsData signalsData = (SignalsData) this.scenario
+				.getScenarioElement(SignalsData.ELEMENT_NAME);		
+		SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
+		SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
 		SignalControlData signalControl = signalsData.getSignalControlData();
-
 		SignalControlDataFactory fac = new SignalControlDataFactoryImpl();
 
-		// create signal control for signal system 2
-		SignalSystemControllerData signalSystemController = fac
-				.createSignalSystemControllerData(Id.create("signalSystem2",
-						SignalSystem.class));
-		
-		SignalPlanData signalPlan = createDefaultSignalPlan(fac);
-		signalPlan.addSignalGroupSettings(createSetting4SignalGroup(fac,
-				Id.create("signal1_2.1", SignalGroup.class), 0, CYCLE_TIME));
-		signalPlan.addSignalGroupSettings(createSetting4SignalGroup(fac,
-				Id.create("signal1_2.2", SignalGroup.class), 0, CYCLE_TIME));
-
-		signalSystemController.addSignalPlanData(signalPlan);
-		signalSystemController
-				.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		signalControl.addSignalSystemControllerData(signalSystemController);
-		
-		// create signal control for signal system 3
-		signalSystemController = fac.createSignalSystemControllerData(Id
-				.create("signalSystem3", SignalSystem.class));
-
-		signalPlan = createDefaultSignalPlan(fac);
-		signalPlan.addSignalGroupSettings(createSetting4SignalGroup(fac,
-				Id.create("signal2_3.1", SignalGroup.class), 0, CYCLE_TIME));
-		signalPlan.addSignalGroupSettings(createSetting4SignalGroup(fac,
-				Id.create("signal2_3.2", SignalGroup.class), 0, CYCLE_TIME));
-
-		signalSystemController.addSignalPlanData(signalPlan);
-		signalSystemController
-				.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		signalControl.addSignalSystemControllerData(signalSystemController);
-		
-		// create signal control for signal system 4
-		signalSystemController = fac.createSignalSystemControllerData(Id
-				.create("signalSystem4", SignalSystem.class));
-
-		signalPlan = createDefaultSignalPlan(fac);
-		signalPlan.addSignalGroupSettings(createSetting4SignalGroup(fac,
-				Id.create("signal3_4.1", SignalGroup.class), 0, CYCLE_TIME));
-		signalPlan.addSignalGroupSettings(createSetting4SignalGroup(fac,
-				Id.create("signal2_4.2", SignalGroup.class), 0, CYCLE_TIME));
-
-		signalSystemController.addSignalPlanData(signalPlan);
-		signalSystemController
-				.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		signalControl.addSignalSystemControllerData(signalSystemController);
-		
-		// create signal control for signal system 5
-		signalSystemController = fac.createSignalSystemControllerData(Id
-				.create("signalSystem5", SignalSystem.class));
-
-		signalPlan = createDefaultSignalPlan(fac);
-		signalPlan.addSignalGroupSettings(createSetting4SignalGroup(fac,
-				Id.create("signal3_5.1", SignalGroup.class), 0, CYCLE_TIME));
-		signalPlan.addSignalGroupSettings(createSetting4SignalGroup(fac,
-				Id.create("signal4_5.2", SignalGroup.class), 0, CYCLE_TIME));
-
-		signalSystemController.addSignalPlanData(signalPlan);
-		signalSystemController
-				.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		signalControl.addSignalSystemControllerData(signalSystemController);
+		// creates a signal control for all signal systems
+		for (SignalSystemData signalSystem : signalSystems
+				.getSignalSystemData().values()) {
+			
+			SignalSystemControllerData signalSystemControl = fac
+					.createSignalSystemControllerData(signalSystem.getId());
+			
+			// creates a default plan for the signal system (with default cycle
+			// time, start end end time and offset 0)
+			SignalPlanData signalPlan = createDefaultSignalPlan(fac);
+			// specifies signal group settings for all signal groups of this
+			// signal system
+			for (SignalGroupData signalGroup : signalGroups
+					.getSignalGroupDataBySystemId(signalSystem.getId())
+					.values()) {
+				// uses all day green onset and dropping
+				signalPlan.addSignalGroupSettings(createSetting4SignalGroup(
+						fac, signalGroup.getId(), 0, CYCLE_TIME));
+			}
+			
+			signalSystemControl.addSignalPlanData(signalPlan);
+			signalSystemControl
+					.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+			signalControl.addSignalSystemControllerData(signalSystemControl);
+		}
 	}
 
 	/**
-	 * Creates a default signal plan with offset 0.
+	 * Creates a default signal plan with specific cycle time, start end end
+	 * time and with offset 0.
 	 * 
 	 * @param fac
 	 * @return the signalPlan
@@ -318,6 +293,47 @@ public class TtCreateBraessSignals {
 		signalGroupSettings.setOnset(onset);
 		signalGroupSettings.setDropping(dropping);
 		return signalGroupSettings;
+	}
+
+	/**
+	 * Sets the second signal at node 3 (which is for the middle edge) green for
+	 * only one second a cycle. (Green for no seconds is not possible.)
+	 */
+	private void changeSignalControlTo1Z() {
+		
+		SignalsData signalsData = (SignalsData) this.scenario
+				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		SignalControlData signalControl = signalsData.getSignalControlData();
+		
+		SignalSystemControllerData signalSystem3Control = signalControl.getSignalSystemControllerDataBySystemId().get(Id.create("signalSystem3", SignalSystem.class));
+		for (SignalPlanData signalPlan : signalSystem3Control.getSignalPlanData().values()){
+			// note: every signal system has only one signal plan here
+			
+			// pick the second signal (which is for the middle path) from the signal plan
+			SignalGroupSettingsData signalGroupZSetting;
+			if (simulateInflowCap7) {
+				signalGroupZSetting = signalPlan
+						.getSignalGroupSettingsDataByGroupId().get(
+								Id.create("signal7_3.2", SignalGroup.class));
+			} else {
+				signalGroupZSetting = signalPlan
+						.getSignalGroupSettingsDataByGroupId().get(
+								Id.create("signal2_3.2", SignalGroup.class));
+			}
+			
+			// set the signal green for only one second
+			signalGroupZSetting.setOnset(0);
+			signalGroupZSetting.setDropping(1);
+		}
+	}
+
+	/**
+	 * If true the middle route gets green only for one second a cycle at node 3.
+	 * 
+	 * @param retardMiddleRoute
+	 */
+	public void setRetardMiddleRoute(boolean retardMiddleRoute) {
+		this.retardMiddleRoute = retardMiddleRoute;
 	}
 
 }
