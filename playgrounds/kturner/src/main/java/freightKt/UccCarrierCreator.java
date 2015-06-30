@@ -338,7 +338,7 @@ class UccCarrierCreator {
 					
 					
 					//TODO: Sicherstellen, dass bisher kein Service mit UCC_Prefix existiert, da sonst doppelte Einträge -> Fehler
-					//TODO: Abfharzeiten Fahrzeuige bisherige Flotte anpassen, da sonst to_UCC-Services nicht bedient werden!
+					//TODO: Abfahrtzeiten Fahrzeuge der bisherigen Flotte anpassen, da sonst to_UCC-Services nicht bedient werden!
 					//			Alternativ lediglich neue Fahrzeuge hinzufügen (die die Zulieferdienste übernehmen)
 					
 					//neue Services erstellen des nonUccC zum Depot des uccC.
