@@ -18,30 +18,32 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-public class RoadClassificationStateFactory<U extends RoadClassificationDecisionVariable>
-		implements MATSimStateFactory<RoadClassificationState, U> {
+class RoadClassificationStateFactory
+		implements
+		MATSimStateFactory<RoadClassificationState, RoadClassificationDecisionVariable> {
 
 	// -------------------- MEMBERS --------------------
 
 	private final VolumesAnalyzer volumesAnalyzer;
 
-	private final Set<Id<Link>> linkIds;
+	private final Set<Id<Link>> relevantLinkIds;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public RoadClassificationStateFactory(
-			final VolumesAnalyzer volumesAnalyzer, final Set<Id<Link>> linkIds) {
+	RoadClassificationStateFactory(final VolumesAnalyzer volumesAnalyzer,
+			final Set<Id<Link>> relevantLinkIds) {
 		this.volumesAnalyzer = volumesAnalyzer;
-		this.linkIds = linkIds;
+		this.relevantLinkIds = relevantLinkIds;
 	}
 
 	// --------------- IMPLEMENTATION OF MATSimStateFactory ---------------
 
 	@Override
 	public RoadClassificationState newState(final Population population,
-			final Vector stateVector, final U decisionVariable) {
+			final Vector stateVector,
+			final RoadClassificationDecisionVariable decisionVariable) {
 		final Map<Id<Link>, int[]> linkId2simulatedCounts = new LinkedHashMap<Id<Link>, int[]>();
-		for (Id<Link> linkId : this.linkIds) {
+		for (Id<Link> linkId : this.relevantLinkIds) {
 			linkId2simulatedCounts.put(linkId,
 					this.volumesAnalyzer.getVolumesForLink(linkId));
 		}

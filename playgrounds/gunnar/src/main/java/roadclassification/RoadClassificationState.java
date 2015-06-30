@@ -18,22 +18,22 @@ import floetteroed.utilities.math.Vector;
 class RoadClassificationState extends MATSimState {
 
 	// -------------------- MEMBERS --------------------
-	
-	private final Map<Id<Link>, int[]> linkId2simulatedCounts;
+
+	private final Map<Id<Link>, int[]> linkId2simulatedVolumes;
 
 	// -------------------- CONSTRUCTION --------------------
-	
+
 	RoadClassificationState(final Population population,
 			final Vector vectorRepresentation,
-			final Map<Id<Link>, int[]> linkId2simulatedCounts) {
+			final Map<Id<Link>, int[]> linkId2simulatedVolumes) {
 		super(population, vectorRepresentation);
-		this.linkId2simulatedCounts = linkId2simulatedCounts;
+		this.linkId2simulatedVolumes = linkId2simulatedVolumes;
 	}
 
 	// -------------------- GETTERS --------------------
-	
-	Map<Id<Link>, int[]> getLinkId2simulatedCounts() {
-		return this.linkId2simulatedCounts;
+
+	Map<Id<Link>, int[]> getLinkId2simulatedVolumes() {
+		return this.linkId2simulatedVolumes;
 	}
 
 }

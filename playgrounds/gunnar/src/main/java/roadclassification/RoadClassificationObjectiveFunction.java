@@ -6,34 +6,43 @@ import optdyts.ObjectiveFunction;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
+import org.matsim.counts.Volume;
 
 /**
  * 
  * @author Gunnar Flötteröd
  *
  */
-public class RoadClassificationObjectiveFunction implements
+class RoadClassificationObjectiveFunction implements
 		ObjectiveFunction<RoadClassificationState> {
+
+	// -------------------- MEMBERS --------------------
 
 	private final Counts counts;
 
-	public RoadClassificationObjectiveFunction(final Counts counts) {
+	// -------------------- CONSTRUCTION --------------------
+
+	RoadClassificationObjectiveFunction(final Counts counts) {
 		this.counts = counts;
 	}
+
+	// --------------- IMPLEMENTATION of ObjectiveFunction ---------------
 
 	@Override
 	public double evaluateState(final RoadClassificationState state) {
 		double result = 0.0;
-		for (Map.Entry<Id<Link>, int[]> linkId2simulatedCountsEntry : state
-				.getLinkId2simulatedCounts().entrySet()) {
-			for (int h = 0; h < linkId2simulatedCountsEntry.getValue().length; h++) {
-				final double measuredCount = this.counts
-						.getCount(linkId2simulatedCountsEntry.getKey())
-						.getVolume(h).getValue();
-				final double simulatedCount = linkId2simulatedCountsEntry
-						.getValue()[h];
-				final double residual = measuredCount - simulatedCount;
+		for (Map.Entry<Id<Link>, Count> linkId2measuredVolumes : this.counts
+				.getCounts().entrySet()) {
+			final int[] simulatedVolumes = state.getLinkId2simulatedVolumes()
+					.get(linkId2measuredVolumes.getKey());
+			for (Map.Entry<Integer, Volume> hour2measuredVolume : linkId2measuredVolumes
+					.getValue().getVolumes().entrySet()) {
+				final int h = hour2measuredVolume.getKey();
+				final double measuredVolume = hour2measuredVolume.getValue()
+						.getValue();
+				final double residual = measuredVolume - simulatedVolumes[h];
 				result += residual * residual;
 			}
 		}

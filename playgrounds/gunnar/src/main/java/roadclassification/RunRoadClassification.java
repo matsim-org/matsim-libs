@@ -22,10 +22,8 @@
 
 package roadclassification;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -39,52 +37,83 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.counts.Counts;
+import org.matsim.counts.CountsReaderMatsimV1;
 
 public class RunRoadClassification {
 
 	static void justRun() {
-		System.out.println("STARTED ...");
-		Scenario scenario = ScenarioUtils.createScenario(createConfig());
-		try (InputStream is = new FileInputStream(
-				DownloadExampleData.SIOUX_FALLS)) {
-			OsmNetworkReader osmNetworkReader = new OsmNetworkReader(
-					scenario.getNetwork(),
-					DownloadExampleData.COORDINATE_TRANSFORMATION);
-			osmNetworkReader.parse(is);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		// System.out.println("STARTED ...");
+		// Scenario scenario = ScenarioUtils.createScenario(createConfig());
+		// try (InputStream is = new FileInputStream(
+		// DownloadExampleData.SIOUX_FALLS)) {
+		// OsmNetworkReader osmNetworkReader = new OsmNetworkReader(
+		// scenario.getNetwork(),
+		// DownloadExampleData.COORDINATE_TRANSFORMATION);
+		// osmNetworkReader.parse(is);
+		// } catch (IOException e) {
+		// throw new RuntimeException(e);
+		// }
+		// final Controler controler = new Controler(scenario);
+		// controler.run();
+		// System.out.println("... DONE.");
+
+		final String path = "./test/input/berlin_145f/";
+		final String configFileName = path + "run_145f.output_config.xml";
+
+		final Config config = ConfigUtils.loadConfig(configFileName);
+		final File out = new File(config.findParam("controler",
+				"outputDirectory"));
+		if (out.exists()) {
+			IOUtils.deleteDirectory(out);
 		}
-		final Controler controler = new Controler(scenario);
+
+		final Controler controler = new Controler(config);
 		controler.run();
-		System.out.println("... DONE.");
+
 	}
 
 	static void optimize() {
+
 		System.out.println("STARTED ...");
-		Scenario scenario = ScenarioUtils.createScenario(createConfig());
-		try (InputStream is = new FileInputStream(
-				DownloadExampleData.SIOUX_FALLS)) {
-			OsmNetworkReader osmNetworkReader = new OsmNetworkReader(
-					scenario.getNetwork(),
-					DownloadExampleData.COORDINATE_TRANSFORMATION);
-			osmNetworkReader.parse(is);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+
+		// Scenario scenario = ScenarioUtils.createScenario(createConfig());
+		// try (InputStream is = new FileInputStream(
+		// DownloadExampleData.SIOUX_FALLS)) {
+		// OsmNetworkReader osmNetworkReader = new OsmNetworkReader(
+		// scenario.getNetwork(),
+		// DownloadExampleData.COORDINATE_TRANSFORMATION);
+		// osmNetworkReader.parse(is);
+		// } catch (IOException e) {
+		// throw new RuntimeException(e);
+		// }
+
+		// using runs-svn/cemdapMatsimCadyts/run_145f from TUB repo
+		final String path = "./test/input/berlin_145f/";
+		final String configFileName = path + "run_145f.output_config.xml";
+		final String countsFileName = path + "vmz_di-do.xml";
+
+		final Config config = ConfigUtils.loadConfig(configFileName);
+
+		final File out = new File(config.findParam("controler",
+				"outputDirectory"));
+		if (out.exists()) {
+			IOUtils.deleteDirectory(out);
 		}
 
-		// >>>>> TODO >>>>>
-		final Counts counts = null; // TODO can one somehow get this out of the scenario?
+		final Counts counts = new Counts();
+		final CountsReaderMatsimV1 countsReader = new CountsReaderMatsimV1(
+				counts);
+		countsReader.parse(countsFileName);
+
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		final VolumesAnalyzer volumesAnalyzer = new VolumesAnalyzer(3600,
 				24 * 3600, scenario.getNetwork());
-
-		// event.getControler().getVolumes()
-
-		// <<<<< TODO <<<<<
-
 		final Controler controler = new Controler(scenario);
-		final RoadClassificationStateFactory<RoadClassificationDecisionVariable> stateFactory = new RoadClassificationStateFactory<RoadClassificationDecisionVariable>(
+
+		final RoadClassificationStateFactory stateFactory = new RoadClassificationStateFactory(
 				volumesAnalyzer, counts.getCounts().keySet());
 		final ObjectiveFunction<RoadClassificationState> objectiveFunction = new RoadClassificationObjectiveFunction(
 				counts);
@@ -356,9 +385,7 @@ public class RunRoadClassification {
 
 		// AND RUN THE ENTIRE THING
 
-		// final double convergenceNoiseVarianceScale = 0.01;
 		final double maximumRelativeGap = 0.05;
-
 		final MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable> predictor = new MATSimDecisionVariableSetEvaluator<RoadClassificationState, RoadClassificationDecisionVariable>(
 				decisionVariables, objectiveFunction,
 				// convergenceNoiseVarianceScale,

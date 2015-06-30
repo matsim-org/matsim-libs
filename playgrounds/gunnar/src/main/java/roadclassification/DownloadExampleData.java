@@ -32,6 +32,8 @@ import java.net.URLConnection;
 
 /**
  * @author michaz
+ * 
+ * @deprecated Don't assume that an osm network is used.
  */
 public class DownloadExampleData {
 
