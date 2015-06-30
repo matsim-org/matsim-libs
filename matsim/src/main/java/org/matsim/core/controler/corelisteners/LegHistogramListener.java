@@ -86,9 +86,6 @@ public final class LegHistogramListener implements IterationEndsListener, Iterat
 			}
 			if (nofModeLegs != 0) {
 				log.info("number of " + legMode + " legs:\t"  + nofModeLegs + "\t" + (nofModeLegs * 100.0 / nofLegs) + "%");
-				if ( TransportMode.car.equals(legMode) ) {
-					log.info("(car legs include legs by pt vehicles)") ;
-				}
 			}
 		}
 	}

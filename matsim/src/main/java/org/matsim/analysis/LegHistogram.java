@@ -26,8 +26,11 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.misc.Time;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -38,7 +41,7 @@ import java.util.TreeMap;
 /**
  * @author mrieser
  *
- * Counts the number of vehicles departed, arrived or got stuck per time bin
+ * Counts the number of persons departed, arrived or got stuck per time bin
  * based on events.
  *
  * The chart plotting was moved to its own class.
@@ -47,10 +50,18 @@ import java.util.TreeMap;
  */
 public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
-    private int iteration = 0;
+	private Population population;
+	private int iteration = 0;
 	private final int binSize;
 	private final int nofBins;
 	private final Map<String, DataFrame> data = new TreeMap<>();
+
+	@Inject
+	LegHistogram(Population population, EventsManager eventsManager) {
+		this(300);
+		this.population = population;
+		eventsManager.addHandler(this);
+	}
 
 	/**
 	 * Creates a new LegHistogram with the specified binSize and the specified number of bins.
@@ -79,7 +90,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
-		if (event.getLegMode() != null) {
+		if ((population == null || population.getPersons().keySet().contains(event.getPersonId()) && event.getLegMode() != null)) {
 			DataFrame dataFrame = getDataForMode(event.getLegMode());
 			dataFrame.countsDep[index]++;
 		}
@@ -88,7 +99,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
-		if (event.getLegMode() != null) {
+		if ((population == null || population.getPersons().keySet().contains(event.getPersonId()) && event.getLegMode() != null)) {
 			DataFrame dataFrame = getDataForMode(event.getLegMode());
 			dataFrame.countsArr[index]++;
 		}
@@ -97,7 +108,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(final PersonStuckEvent event) {
 		int index = getBinIndex(event.getTime());
-		if (event.getLegMode() != null) {
+		if ((population == null || population.getPersons().keySet().contains(event.getPersonId()) && event.getLegMode() != null)) {
 			DataFrame dataFrame = getDataForMode(event.getLegMode());
 			dataFrame.countsStuck[index]++;
 		}

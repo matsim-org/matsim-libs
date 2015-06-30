@@ -26,11 +26,9 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.core.controler.AbstractModule;
 
 public final class LegHistogramModule extends AbstractModule {
-    @Override
-    public void install() {
-        LegHistogram legHistogram = new LegHistogram(300);
-        addEventHandlerBinding().toInstance(legHistogram);
-        bind(LegHistogram.class).toInstance(legHistogram);
-        addControlerListenerBinding().to(LegHistogramListener.class);
-    }
+	@Override
+	public void install() {
+		bind(LegHistogram.class);
+		addControlerListenerBinding().to(LegHistogramListener.class);
+	}
 }

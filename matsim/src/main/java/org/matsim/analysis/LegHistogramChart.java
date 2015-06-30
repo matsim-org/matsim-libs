@@ -58,7 +58,7 @@ public class LegHistogramChart {
 
         final JFreeChart chart = ChartFactory.createXYStepChart(
                 "Leg Histogram, " + mode + ", it." + iteration,
-                "time", "# vehicles",
+                "time", "# persons",
                 xyData,
                 PlotOrientation.VERTICAL,
                 true,   // legend
