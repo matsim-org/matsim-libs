@@ -16,13 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.prepareforbiogeme;
+package playground.thibautd.maxess.prepareforbiogeme.framework;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.UncheckedIOException;
-import playground.thibautd.maxess.prepareforbiogeme.ChoiceDataSetWriter.ChoiceSetRecordFiller;
+import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
 
 import java.io.IOException;
 import java.util.List;

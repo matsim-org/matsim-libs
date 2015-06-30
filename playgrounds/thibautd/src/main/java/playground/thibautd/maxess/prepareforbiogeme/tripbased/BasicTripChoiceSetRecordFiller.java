@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.prepareforbiogeme;
+package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
@@ -25,7 +25,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
-import playground.thibautd.maxess.prepareforbiogeme.ChoiceDataSetWriter.ChoiceSetRecordFiller;
+import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
+import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSet;
 
 import java.util.ArrayList;
 import java.util.List;

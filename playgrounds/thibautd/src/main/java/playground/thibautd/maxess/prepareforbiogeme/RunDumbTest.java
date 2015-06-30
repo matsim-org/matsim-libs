@@ -27,7 +27,11 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.thibautd.maxess.prepareforbiogeme.Converter.ChoicesIdentifier;
+import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSet;
+import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
+import playground.thibautd.maxess.prepareforbiogeme.framework.Converter;
+import playground.thibautd.maxess.prepareforbiogeme.framework.Converter.ChoicesIdentifier;
+import playground.thibautd.maxess.prepareforbiogeme.tripbased.BasicTripChoiceSetRecordFiller;
 
 import java.util.Collections;
 import java.util.HashMap;

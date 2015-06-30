@@ -16,13 +16,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.prepareforbiogeme;
+package playground.thibautd.maxess.prepareforbiogeme.framework;
 
 import org.matsim.api.core.v01.population.Person;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author thibautd
  */
-public interface ChoiceSetSampler<T> {
-	ChoiceSet<T> sampleChoiceSet( Person decisionMaker , T choice );
+public class ChoiceSet<T> {
+	private final Person decisionMaker;
+	private final String chosen;
+	private final Map<String, T> namedAlternatives = new TreeMap<>();
+
+	public ChoiceSet(
+			final Person decisionMaker,
+			final String chosen,
+			final Map<String, T> namedAlternatives) {
+		this.chosen = chosen;
+		this.decisionMaker = decisionMaker;
+		this.namedAlternatives.putAll( namedAlternatives );
+	}
+
+	public Person getDecisionMaker() {
+		return decisionMaker;
+	}
+
+	public T getChosenAlternative() {
+		return namedAlternatives.get( chosen );
+	}
+
+	public String getChosenName() {
+		return chosen;
+	}
+
+	public Map<String, T> getNamedAlternatives() {
+		return namedAlternatives;
+	}
+
+	public T getAlternative(final String name) {
+		return namedAlternatives.get( name );
+	}
 }
