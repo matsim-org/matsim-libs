@@ -48,11 +48,13 @@ public class GenerateRandomNetworks {
 		ArrayList<Integer> toNodes = tupleEdgeList.getSecond();
 		
 		for(int i = 0; i<numberRandomNetworks; i++){
-			log.info("========================================");
-			log.info("              Network " + i);
-			log.info("========================================");
+//			log.info("========================================");
+			log.info("Generating random network " + i + ".");
+//			log.info("========================================");
 			ArrayList<Integer> randomToNodes = generateRandomNetworks(toNodes, fromNodes);
+			log.info("Checking for self loops.");
 			ArrayList<Tuple<Integer, Integer>> randomNetworkNoSelfEdges = checkNoSelfEdges(randomToNodes, fromNodes);
+			log.info("Checking for duplicate edges.");
 			ArrayList<Tuple<Integer, Integer>> randomNoDuplicates = checkNoDuplicates(randomNetworkNoSelfEdges);
 			writeRandomNetwork(outputFolder, randomNoDuplicates, i);
 		}
@@ -112,7 +114,7 @@ public class GenerateRandomNetworks {
 				if(i != j){
 					Tuple<Integer, Integer> nextEdge = newRandomNetwork.get(j);
 					if(nextEdge.equals(thisEdge)){
-						log.info("Duplicate edge found at index " + j + ": " + thisEdge.getFirst() + ", " + thisEdge.getSecond());
+//						log.info("Duplicate edge found at index " + j + ": " + thisEdge.getFirst() + ", " + thisEdge.getSecond());
 						Random random = new Random();
 						int min = 0;
 						int max = newRandomNetwork.size()-1;
@@ -211,7 +213,7 @@ public class GenerateRandomNetworks {
 			Integer thisDestination = thisEdge.getSecond();
 			
 			if(thisSource.equals(thisDestination)){
-				log.info("Self loop at index " + i + ": " + thisSource + " = " + thisDestination);
+//				log.info("Self loop at index " + i + ": " + thisSource + " = " + thisDestination);
 				Random random = new Random();
 				int min = 0;
 				int max = edgeArrayList.size()-1;
