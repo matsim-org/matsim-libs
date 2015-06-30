@@ -149,8 +149,8 @@ public class KTFreight_v3 {
 	private static final ArrayList<String> uccDepotsLinkIdsString =
 		new ArrayList<String>(Arrays.asList("j(0,5)", "j(10,5)")); 
 	// VehicleTypes die vom Maut betroffen seien sollen. null, wenn alle (ohne Einschränkung) bemautet werden sollen
-	private static final ArrayList<String> onlyTollVehTypes = null;
-//		new ArrayList<String>(Arrays.asList("gridType01", "gridType05", "gridType10")); 
+	private static final ArrayList<String> onlyTollVehTypes =  null;
+//		new ArrayList<String>(Arrays.asList("gridType01", "gridType03", "gridType05", "gridType10")); 
 //	//Ende Namesdefinition Grid
 
 	
@@ -484,15 +484,16 @@ public class KTFreight_v3 {
 	 * 
 	 */
 	private static void generateCarrierPlans(Network network, Carriers carriers, CarrierVehicleTypes vehicleTypes, Config config) {
-		final Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
+		Builder netBuilder = NetworkBasedTransportCosts.Builder.newInstance( network, vehicleTypes.getVehicleTypes().values() );
 		//		netBuilder.setBaseTravelTimeAndDisutility(travelTime, travelDisutility) ;
+		
 		netBuilder.setTimeSliceWidth(1800) ; // !!!!, otherwise it will not do anything.
-
 
 		if (addingToll){		 //Added, KT, 07.08.2014
 			generateRoadPricingCalculator(netBuilder, config, carriers);
 		}
-
+		
+		
 		final NetworkBasedTransportCosts netBasedCosts = netBuilder.build() ;
 
 		for ( Carrier carrier : carriers.getCarriers().values() ) {
@@ -536,18 +537,6 @@ public class KTFreight_v3 {
 
 		ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
 
-
-		//		VehicleTypeDependentRoadPricingCalculator rpCalculator = new VehicleTypeDependentRoadPricingCalculator();
-		//				RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
-		//				Id<Link> linkIdMaut = Id.createLinkId("i(6,0)");  //bisher nur für den einen Link
-		//				scheme.setType("distance");
-		//				scheme.addLinkCost(linkIdMaut, 0.0, 24.0*3600, 0.1); //Aktuell noch 0-24 Uhr und extrem hohe Maut!
-		//		
-		//				rpCalculator.addPricingScheme("gridType", scheme );  //bisher nur für die 26t
-		//				netBuilder.setRoadPricingCalculator(rpCalculator);
-
-
-
 		final RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
 		try {
@@ -562,13 +551,13 @@ public class KTFreight_v3 {
 		if (onlyTollVehTypes == null) {
 			for(Carrier c : carriers.getCarriers().values()){
 				for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
-					rpCalculator.addPricingScheme(v.getVehicleId().toString(), scheme);
+					rpCalculator.addPricingScheme(v.getVehicleType().getId().toString(), scheme);
 				}
 			}
 		} else {
 			for(Carrier c : carriers.getCarriers().values()){
 				for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
-					Id<Vehicle> typeId = v.getVehicleId();
+					Id<VehicleType> typeId = v.getVehicleType().getId();
 					if (onlyTollVehTypes.contains(typeId.toString())){
 						rpCalculator.addPricingScheme(typeId.toString(), scheme);
 					}
@@ -580,6 +569,7 @@ public class KTFreight_v3 {
 		
 		rpscheme = scheme;
 		
+		//Writing Info
 		for(Id<VehicleType> vehTypId: rpCalculator.getSchemes().keySet()){
 			textInfofile.writeTextLineToFile(vehTypId.toString());
 			textInfofile.writeTextLineToFile(rpCalculator.getPricingSchemes(vehTypId).toString());
