@@ -23,6 +23,7 @@ import java.io.*;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.matrices.Matrix;
 
 import playground.michalm.util.matrices.MatrixUtils;
@@ -56,6 +57,29 @@ public class VisumDemandDataReader
         }
 
         return hourlyShares;
+    }
+    
+    
+    public static Map<String, Tuple<String, String>> readActivityPairs(String activityFile)
+    {
+        Map<String, Tuple<String, String>> activityPairs = new LinkedHashMap<>();
+
+        try (Scanner scanner = new Scanner(new File(activityFile))) {
+            scanner.useLocale(Locale.US);
+
+            while (scanner.hasNext()) {
+                String key = scanner.next();
+                String fromActivity = scanner.next();
+                String toActivity = scanner.next();
+                
+                activityPairs.put(key, new Tuple<>(fromActivity, toActivity));
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        return activityPairs;
     }
 
 

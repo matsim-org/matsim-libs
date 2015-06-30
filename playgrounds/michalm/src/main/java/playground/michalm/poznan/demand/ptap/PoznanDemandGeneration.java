@@ -26,6 +26,7 @@ import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.contrib.util.random.RandomUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.matrices.Matrix;
 
 import playground.michalm.demand.ODDemandGenerator;
@@ -42,6 +43,7 @@ public class PoznanDemandGeneration
 
         String demandDir = inputDir + "Visum_2014/demand/";
         String hourlySharesFile = demandDir + "hourly_shares_KZ.txt";
+        String activityPairsFile = demandDir + "activity_pairs_KZ.txt";
         String bindingsFile = demandDir + "bindings_KZ.txt";
 
         int randomSeed = RandomUtils.DEFAULT_SEED;
@@ -55,6 +57,10 @@ public class PoznanDemandGeneration
 
         Map<String, double[]> hourlyShares = VisumDemandDataReader
                 .readHourlyShares(hourlySharesFile);
+
+        Map<String, Tuple<String, String>> activityPairs = VisumDemandDataReader
+                .readActivityPairs(activityPairsFile);
+
         Map<String, Matrix> odMatrices = VisumDemandDataReader.readODMatrices(bindingsFile,
                 demandDir, zones);
 
@@ -64,12 +70,13 @@ public class PoznanDemandGeneration
 
         for (String key : hourlyShares.keySet()) {
             double[] shares = hourlyShares.get(key);
+            Tuple<String, String> activityPair = activityPairs.get(key);
             Matrix odMatrix = odMatrices.get(key);
             int countBefore = scenario.getPopulation().getPersons().size();
 
             for (int i = 0; i < shares.length; i++) {
-                dg.generateSinglePeriod(odMatrix, key, key, transportMode, i * 3600, 3600,
-                        shares[i]);
+                dg.generateSinglePeriod(odMatrix, activityPair.getFirst(),
+                        activityPair.getSecond(), transportMode, i * 3600, 3600, shares[i]);
             }
 
             int countAfter = scenario.getPopulation().getPersons().size();
