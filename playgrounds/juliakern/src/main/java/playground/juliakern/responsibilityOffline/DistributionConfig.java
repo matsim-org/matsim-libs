@@ -31,7 +31,7 @@ import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -83,7 +83,7 @@ public class DistributionConfig implements DistributionConfiguration {
 	 */
 	public DistributionConfig() {
 		this.config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(this.config);
+		ConfigReader configReader = new ConfigReader(this.config);
 		configReader.readFile(configFile1);
 		simulationEndTime = config.qsim().getEndTime();
 		timeBinSize = simulationEndTime/noOfTimeBins;

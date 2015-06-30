@@ -2,7 +2,7 @@ package playground.andreas;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.Gbl;
@@ -78,7 +78,7 @@ public class TransitControler extends Controler {
 	public static void main(final String[] args) {
 		Config config = new Config();
 		config.addCoreModules();
-		new MatsimConfigReader(config).readFile(args[0]);
+		new ConfigReader(config).readFile(args[0]);
 		config.scenario().setUseTransit(true);
 				
 		TransitControler tc = new TransitControler(config);

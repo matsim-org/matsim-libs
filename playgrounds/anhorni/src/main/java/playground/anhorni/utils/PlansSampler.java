@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -42,8 +42,8 @@ public class PlansSampler {
 	
 	public void init(String configFile){
 		Config config = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
-    	matsimConfigReader.readFile(configFile);
+    	ConfigReader configReader = new ConfigReader(config);
+    	configReader.readFile(configFile);
 		this.scenario  = (ScenarioImpl) ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 	}
 	

@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -79,7 +79,7 @@ public class Accessibility {
 	public static void main(String[] args) throws IOException {
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader creader = new MatsimConfigReader(config);
+		ConfigReader creader = new ConfigReader(config);
 		creader.readFile(args[0]);
 		
 		String popfile = config.getParam("plans", "inputPlansFile");

@@ -47,7 +47,7 @@ public class ConfigTest {
 				"		<param name=\"b\" value=\"bbb\" />\n" +
 				"	</module>\n" +
 				"</config>";
-		new MatsimConfigReader(config).parse(new ByteArrayInputStream(str.getBytes()));
+		new ConfigReader(config).parse(new ByteArrayInputStream(str.getBytes()));
 
 		Assert.assertEquals("aaa", group.getA());
 		Assert.assertEquals("bbb", group.getB());
@@ -69,7 +69,7 @@ public class ConfigTest {
 				"		<param name=\"b\" value=\"bbb\" />\n" +
 				"	</module>\n" +
 				"</config>";
-		new MatsimConfigReader(config).parse(new ByteArrayInputStream(str.getBytes()));
+		new ConfigReader(config).parse(new ByteArrayInputStream(str.getBytes()));
 
 		Assert.assertEquals("aaa", config.getParam("ctg", "a"));
 		Assert.assertEquals("bbb", config.getParam("ctg", "b"));

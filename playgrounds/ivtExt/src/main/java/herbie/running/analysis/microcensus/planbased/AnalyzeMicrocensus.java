@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -75,8 +75,8 @@ public class AnalyzeMicrocensus {
 	{
 		String [] arguments = new String[5];
 		Config config = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
-    	matsimConfigReader.readFile(args);
+    	ConfigReader configReader = new ConfigReader(config);
+    	configReader.readFile(args);
 		
     	arguments[0] = config.findParam("analysis", "mode");
     	arguments[1] = config.findParam("analysis", "type");

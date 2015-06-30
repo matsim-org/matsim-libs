@@ -22,7 +22,7 @@ package playground.yu.tests;
 
 import java.io.IOException;
 
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -39,7 +39,7 @@ public class PtCheckTest {
 		final String ptcheckFilename = "./test/yu/test/output/ptCheck100.10pctZrhCarPt.txt";
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimConfigReader(scenario.getConfig()).readFile("./test/yu/test/configPtcheckTest.xml");
+		new ConfigReader(scenario.getConfig()).readFile("./test/yu/test/configPtcheckTest.xml");
 		
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 

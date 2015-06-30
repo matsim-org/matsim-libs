@@ -22,7 +22,7 @@ package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -164,7 +164,7 @@ public class SpatialAveragingInputData {
 
 	private static Integer getLastIteration(String configFile) {
 		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configFile);
 		Integer lastIteration = config.controler().getLastIteration();
 		return lastIteration;
@@ -173,7 +173,7 @@ public class SpatialAveragingInputData {
 
 	public double getEndTime() {
 		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configFile1);
 		Double endTime = config.qsim().getEndTime();
 		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PlanImpl;
@@ -153,7 +153,7 @@ public class ExternalModule implements PlanStrategyModule {
 			extConfig = new Config();
 		} else {
 			extConfig = new Config();
-			MatsimConfigReader reader = new MatsimConfigReader(extConfig);
+			ConfigReader reader = new ConfigReader(extConfig);
 			reader.readFile(configFileName);
 		}
 		// Change scenario config according to given output- and input-filenames: events, plans, network

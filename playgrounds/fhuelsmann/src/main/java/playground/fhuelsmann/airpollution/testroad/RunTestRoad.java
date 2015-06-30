@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
@@ -69,7 +69,7 @@ public class RunTestRoad {
 		for(int day : days){
 			Config config = new Config();
 			config.addCoreModules();
-			MatsimConfigReader confReader = new MatsimConfigReader(config);
+			ConfigReader confReader = new ConfigReader(config);
 			confReader.readFile(inputPath + configName);
 			Controler controler = new Controler(config);
 

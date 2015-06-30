@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -250,7 +250,7 @@ public class SpatialAveragingWelfare {
 
 	private static Integer getLastIteration(String configFile) {
 		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configFile);
 		Integer lastIteration = config.controler().getLastIteration();
 		return lastIteration;

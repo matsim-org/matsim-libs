@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -105,8 +105,8 @@ public class CreateFreightTraffic {
 	
 	private void init(String file) {
 		Config config = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
-    	matsimConfigReader.readFile(file);   	
+    	ConfigReader configReader = new ConfigReader(config);
+    	configReader.readFile(file);
 		long seed = Long.parseLong(config.findParam("freight", "randomSeed"));
 		this.randomNumberGenerator = new Random(seed);
 		this.freightOffset = Integer.parseInt(config.findParam("freight", "offset"));

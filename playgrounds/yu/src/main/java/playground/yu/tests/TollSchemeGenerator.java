@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -1261,7 +1261,7 @@ public class TollSchemeGenerator {
 		// read the config
 		config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader confReader = new MatsimConfigReader(config);
+		ConfigReader confReader = new ConfigReader(config);
 		System.out.println("this.usedConf : " + usedConf);
 		confReader.readFile(usedConf);
 		usedCoords = parseGoogleEarthCoord(config);

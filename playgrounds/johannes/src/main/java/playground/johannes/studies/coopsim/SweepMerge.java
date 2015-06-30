@@ -29,7 +29,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 
 /**
  * @author illenberger
@@ -77,7 +77,7 @@ public class SweepMerge {
 						 */
 						Config config = new Config();
 						config.addCoreModules();
-						MatsimConfigReader creader = new MatsimConfigReader(config);
+						ConfigReader creader = new ConfigReader(config);
 						creader.readFile(String.format("%1$s/config.xml", file.getAbsolutePath()));
 						String paramValue = config.getParam("socialnets", parameterKey);
 						/*

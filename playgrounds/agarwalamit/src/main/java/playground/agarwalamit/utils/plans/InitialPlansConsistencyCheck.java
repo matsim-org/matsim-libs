@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
@@ -213,7 +213,7 @@ public class InitialPlansConsistencyCheck {
 	private SortedMap<String, Double> getZeroUtilDuration(){
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader reader = new MatsimConfigReader(config);
+		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(configFile);
 
 		PlanCalcScoreConfigGroup params = config.planCalcScore();

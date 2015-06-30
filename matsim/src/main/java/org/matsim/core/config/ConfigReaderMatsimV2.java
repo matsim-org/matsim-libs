@@ -36,12 +36,12 @@ import org.xml.sax.Attributes;
 /**
  * @author thibautd
  */
- public class ConfigReaderMatsimV2 extends MatsimXmlParser {
+ class ConfigReaderMatsimV2 extends MatsimXmlParser {
 	private final Config config;
 
 	private final Deque<ConfigGroup> moduleStack = new ArrayDeque<ConfigGroup>();
 
-	public ConfigReaderMatsimV2(
+	ConfigReaderMatsimV2(
 			final Config config) {
 		this.config = config;
 	}

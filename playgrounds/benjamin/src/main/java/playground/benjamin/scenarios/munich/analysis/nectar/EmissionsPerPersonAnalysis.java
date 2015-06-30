@@ -29,7 +29,7 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -97,7 +97,7 @@ public class EmissionsPerPersonAnalysis {
 	private static Integer getLastIteration(String configFile) {
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configFile);
 		Integer lastIt = config.controler().getLastIteration();
 		return lastIt;

@@ -29,7 +29,7 @@ import java.util.Comparator;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 
 import playground.johannes.studies.mcmc.KeyMatrix;
 
@@ -74,7 +74,7 @@ public class SweepMerge2D {
 					 * get parameter value
 					 */
 					Config config = new Config();
-					MatsimConfigReader creader = new MatsimConfigReader(config);
+					ConfigReader creader = new ConfigReader(config);
 					creader.readFile(String.format("%1$s/config.xml", file.getAbsolutePath()));
 					double paramValue1 = Double.parseDouble(config.findParam("planCalcScore", parameterKey1));
 					double paramValue2 = Double.parseDouble(config.findParam("planCalcScore", parameterKey2));

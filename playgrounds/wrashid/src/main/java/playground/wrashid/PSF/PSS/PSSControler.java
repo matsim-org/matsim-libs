@@ -9,7 +9,7 @@ import java.io.PrintWriter;
 
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.Controler;
 
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -174,7 +174,7 @@ public class PSSControler {
 
 		// use the right Controler (read parameter
 		Config config = new Config();
-		MatsimConfigReader reader = new MatsimConfigReader(config);
+		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(configFilePath);
 		String tempStringValue = config.findParam(ParametersPSF.getPSFModule(), "main.inputEventsForSimulationPath");
 		if (tempStringValue != null) {

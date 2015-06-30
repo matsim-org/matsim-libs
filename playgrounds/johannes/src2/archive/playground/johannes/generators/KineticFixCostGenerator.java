@@ -39,7 +39,7 @@ import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraphBuilder;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseVertex;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLWriter;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.xml.sax.SAXException;
@@ -75,7 +75,7 @@ public class KineticFixCostGenerator<G extends SpatialSparseGraph, V extends Spa
 	 */
 	public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException {
 		Config config = new Config();
-		MatsimConfigReader creader = new MatsimConfigReader(config);
+		ConfigReader creader = new ConfigReader(config);
 		creader.parse(args[0]);
 		
 		SpatialSparseGraph graph = null;

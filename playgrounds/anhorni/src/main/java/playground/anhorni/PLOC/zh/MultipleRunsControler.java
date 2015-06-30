@@ -25,7 +25,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 
 import playground.anhorni.LEGO.miniscenario.create.AdaptZHScenario;
 import playground.anhorni.PLOC.SingleRunControler;
@@ -46,8 +46,8 @@ public class MultipleRunsControler {
 	
 	private void init(String createConfigFile) {
 		Config createConfig = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(createConfig);
-    	matsimConfigReader.readFile(createConfigFile);
+    	ConfigReader configReader = new ConfigReader(createConfig);
+    	configReader.readFile(createConfigFile);
     	
     	this.numberOfRuns = Integer.parseInt(createConfig.findParam("PLOC", "numberOfRuns"));
     	log.info("number of Runs: " + numberOfRuns);
@@ -66,9 +66,9 @@ public class MultipleRunsControler {
 	
 	private void createPlansAndConfigs(Config createConfig) {
 		Config runConfig = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(runConfig);
+    	ConfigReader configReader = new ConfigReader(runConfig);
     	String runConfigFile = createConfig.findParam("PLOC", "runConfig");
-    	matsimConfigReader.readFile(runConfigFile);
+    	configReader.readFile(runConfigFile);
     	
     	for (int runIndex = 0; runIndex < numberOfRuns; runIndex++) {
     		

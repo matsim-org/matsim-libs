@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
@@ -54,7 +54,7 @@ public class DgEquilController {
 		
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader confReader = new MatsimConfigReader(config);
+		ConfigReader confReader = new ConfigReader(config);
 		confReader.readFile(configfile);
 		
 		

@@ -25,7 +25,7 @@ import com.google.inject.Provider;
 
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -43,7 +43,7 @@ public class DgSatellicWithindayTestStarter {
 		final String configfile = DgPaths.EXAMPLEBASE + "equil/configPlans100.xml";
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader confReader = new MatsimConfigReader(config);
+		ConfigReader confReader = new ConfigReader(config);
 		confReader.readFile(configfile);
 
 		config.controler().setLastIteration(0);

@@ -37,12 +37,12 @@ import org.matsim.core.utils.io.UncheckedIOException;
 /**
  * @author thibautd
  */
-public class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
+class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 
 	private String newline = "\n";
 
 
-	public void writeModule(
+	private void writeModule(
 			final BufferedWriter writer,
 			final String indent,
 			final String moduleTag,

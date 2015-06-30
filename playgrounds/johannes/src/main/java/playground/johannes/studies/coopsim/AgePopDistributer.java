@@ -24,8 +24,6 @@ import java.io.IOException;
 import gnu.trove.TObjectDoubleHashMap;
 
 import org.apache.commons.math.stat.StatUtils;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;

@@ -1,6 +1,5 @@
 package org.matsim.core.config.groups;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 
@@ -12,7 +11,7 @@ import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
@@ -47,7 +46,7 @@ public class PlanCalcScoreConfigGroupTest {
 		new ConfigWriter( configV1 ).writeFileV1( v1path );
 
 		final Config configV1In = ConfigUtils.createConfig();
-		new MatsimConfigReader( configV1In ).readFile( v1path );
+		new ConfigReader( configV1In ).readFile( v1path );
 
 		assertIdentical("re-read v1", initialGroup, configV1In.planCalcScore());
 
@@ -56,7 +55,7 @@ public class PlanCalcScoreConfigGroupTest {
 		new ConfigWriter( configV1In ).writeFileV2( v2path );
 
 		final Config configV2 = ConfigUtils.createConfig();
-		new MatsimConfigReader( configV2 ).readFile( v2path );
+		new ConfigReader( configV2 ).readFile( v2path );
 
 		assertIdentical("re-read v2", initialGroup, configV2.planCalcScore());
 	}

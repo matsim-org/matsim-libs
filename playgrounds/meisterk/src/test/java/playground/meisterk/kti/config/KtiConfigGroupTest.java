@@ -21,7 +21,7 @@
 package playground.meisterk.kti.config;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.testcases.MatsimTestCase;
 
 public class KtiConfigGroupTest extends MatsimTestCase {
@@ -59,7 +59,7 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 		Config config = new Config();
 		KtiConfigGroup testee = new KtiConfigGroup();
 		config.addModule(testee);
-		new MatsimConfigReader(config).readFile(this.getInputDirectory() + "config.xml", null);
+		new ConfigReader(config).readFile(this.getInputDirectory() + "config.xml", null);
 
 		assertEquals(999.9, testee.getConstBike());
 		assertEquals(-888.8, testee.getConstCar());

@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -66,7 +66,7 @@ public class WardropTest {
 		config = new Config();
 		config.addCoreModules();
 
-		new MatsimConfigReader(config).readFile(configFileName);
+		new ConfigReader(config).readFile(configFileName);
 
 /*
 		try {

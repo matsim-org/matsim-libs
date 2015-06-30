@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.events.EventsReaderTXTv1;
@@ -270,7 +270,7 @@ public class PlanScoreForecasterTravPerf {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Config cf = sc.getConfig();
-		new MatsimConfigReader(cf).readFile(configFilename);
+		new ConfigReader(cf).readFile(configFilename);
 		PlanCalcScoreConfigGroup scoring = cf.planCalcScore();
 
 		NetworkImpl net = (NetworkImpl) sc.getNetwork();

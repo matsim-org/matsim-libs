@@ -23,7 +23,7 @@ import java.util.SortedMap;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
@@ -62,7 +62,7 @@ public class ReadAndAddSubActivities {
 	private void readConfig(){
 		config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader reader = new MatsimConfigReader(config);
+		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(inputConfig);
 	}
 	

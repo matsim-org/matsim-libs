@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -55,7 +55,7 @@ public class Create3TownsScenario {
 	private double [] sigma = {	0.0,	0.0};
 
 	private ExpenditureAssigner expenditureAssigner = null;
-	private ConfigReader configReader = new ConfigReader();
+	private playground.anhorni.PLOC.ConfigReader configReader = new playground.anhorni.PLOC.ConfigReader();
 	
 	// ====================================================================================
 	public static void main(final String[] args) {
@@ -103,14 +103,14 @@ public class Create3TownsScenario {
 	// ====================================================================================
 	private void createConfigs() {
     	Config config = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
-    	matsimConfigReader.readFile(path + "/input/PLOC/3towns/config.xml");   	
+    	ConfigReader configReader = new ConfigReader(config);
+    	configReader.readFile(path + "/input/PLOC/3towns/config.xml");
     	config.setParam("network", "inputNetworkFile", path + "input/PLOC/3towns/networks/" + 
     			this.configReader.getPopulationSize() + "_network.xml");
     	
     	String outputPath = "";
     	ConfigWriter configWriter = new ConfigWriter(config);
-    	for (int i = 0; i < configReader.getNumberOfRandomRuns(); i++) {
+    	for (int i = 0; i < this.configReader.getNumberOfRandomRuns(); i++) {
 
     		for (int j = 0; j < 5; j++) {
     			config.setParam("plans", "inputPlansFile", path + "input/PLOC/3towns/runs/run" + i + "/day" + j + "/plans.xml");

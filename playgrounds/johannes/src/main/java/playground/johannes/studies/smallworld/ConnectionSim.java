@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
@@ -139,7 +139,7 @@ public class ConnectionSim {
 	public static Config loadConfig(String file) {
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader reader = new MatsimConfigReader(config);
+		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(file);
 		return config;
 	}

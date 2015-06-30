@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -84,7 +84,7 @@ public class ErgmSimulator {
 		 * read config file
 		 */
 		Config config = new Config();
-		MatsimConfigReader creader = new MatsimConfigReader(config);
+		ConfigReader creader = new ConfigReader(config);
 		creader.parse(args[0]);
 		/*
 		 * load population

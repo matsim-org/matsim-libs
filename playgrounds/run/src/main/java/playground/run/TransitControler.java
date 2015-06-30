@@ -25,7 +25,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -45,7 +45,7 @@ public class TransitControler {
 //		args[0] = "/Users/nagel/kw/rotterdam/config.xml" ;
 		Config config = new Config();
 		config.addCoreModules();
-		new MatsimConfigReader(config).readFile(args[0]);
+		new ConfigReader(config).readFile(args[0]);
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setColoringScheme( OTFVisConfigGroup.ColoringScheme.bvg ) ;

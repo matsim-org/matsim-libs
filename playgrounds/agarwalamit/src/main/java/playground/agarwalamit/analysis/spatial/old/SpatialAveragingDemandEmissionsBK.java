@@ -39,7 +39,7 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -413,7 +413,7 @@ public class SpatialAveragingDemandEmissionsBK {
 
 	private Double getEndTime(String configfile) {
 		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configfile);
 		Double endTime = config.qsim().getEndTime();
 		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");

@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.experimental.ReflectiveConfigGroup;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -201,7 +201,7 @@ public class RunArentzeModel {
 		final Config config = new Config();
 		for ( ConfigGroup group : groups ) config.addModule( group );
 
-		new MatsimConfigReader( config ).readFile( file );
+		new ConfigReader( config ).readFile( file );
 	}
 
 	private static void logGroups( final ConfigGroup... groups ) {

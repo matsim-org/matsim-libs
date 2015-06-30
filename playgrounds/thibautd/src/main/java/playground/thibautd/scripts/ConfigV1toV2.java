@@ -22,7 +22,7 @@ package playground.thibautd.scripts;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 
 /**
  * @author thibautd
@@ -33,7 +33,7 @@ public class ConfigV1toV2 {
 		final String out = args[ 1 ];
 
 		final Config config = ConfigUtils.createConfig();
-		new MatsimConfigReader( config ).readFile( in );
+		new ConfigReader( config ).readFile( in );
 		new ConfigWriter( config ).write( out );
 	}
 }

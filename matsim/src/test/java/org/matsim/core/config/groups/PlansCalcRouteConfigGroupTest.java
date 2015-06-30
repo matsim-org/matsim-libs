@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup.ModeRoutingParams;
 import org.matsim.testcases.MatsimTestUtils;
@@ -98,7 +98,7 @@ public class PlansCalcRouteConfigGroupTest {
 		final Config configV1In = ConfigUtils.createConfig();
 		log.info( "... done creating new config.");
 		log.info( "read file into new config ...");
-		new MatsimConfigReader( configV1In ).readFile( v1path );
+		new ConfigReader( configV1In ).readFile( v1path );
 		log.info("... done reading file into new config.") ;
 
 		log.info( "asserting ...");
@@ -110,7 +110,7 @@ public class PlansCalcRouteConfigGroupTest {
 		new ConfigWriter( configV1In ).writeFileV2( v2path );
 
 		final Config configV2 = ConfigUtils.createConfig();
-		new MatsimConfigReader( configV2 ).readFile( v2path );
+		new ConfigReader( configV2 ).readFile( v2path );
 
 		assertIdentical("re-read v2", initialGroup, configV2.plansCalcRoute());
 	}

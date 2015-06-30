@@ -20,12 +20,6 @@
 package org.matsim.contrib.socnetsim.usage;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReaderMatsimV2;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.cliques.config.CliquesConfigGroup;
 import org.matsim.contrib.socnetsim.framework.cliques.config.JointTimeModeChooserConfigGroup;
@@ -41,6 +35,12 @@ import org.matsim.contrib.socnetsim.jointtrips.population.DriverRouteFactory;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
 import org.matsim.contrib.socnetsim.jointtrips.population.PassengerRouteFactory;
 import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigReader;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  *
@@ -118,7 +118,7 @@ public class JointScenarioUtils {
 
 	public static Config loadConfig(final String configFile) {
 		final Config config = createConfig();
-		new ConfigReaderMatsimV2( config ).parse( configFile );
+		new ConfigReader( config ).parse( configFile );
 		return config;
 	}
 }

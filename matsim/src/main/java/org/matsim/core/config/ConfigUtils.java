@@ -56,7 +56,7 @@ public abstract class ConfigUtils {
             config.addModule(customModule);
         }
 
-		new MatsimConfigReader(config).parse(filename);
+		new ConfigReader(config).parse(filename);
 
 		return config;
 	}
@@ -75,7 +75,7 @@ public abstract class ConfigUtils {
 		if (config.global() == null) {
 			config.addCoreModules();
 		}
-		new MatsimConfigReader(config).parse(filename);
+		new ConfigReader(config).parse(filename);
 	}
 
 	/**

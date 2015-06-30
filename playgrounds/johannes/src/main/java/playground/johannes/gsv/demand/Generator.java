@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationUtils;
@@ -66,7 +66,7 @@ public class Generator {
 	 */
 	public static void main(String[] args) throws IOException {
 		Config config = ConfigUtils.createConfig();
-		new MatsimConfigReader(config).readFile(args[0]);
+		new ConfigReader(config).readFile(args[0]);
 		
 		Random random = new XORShiftRandom(4711);
 		String year = "2009";

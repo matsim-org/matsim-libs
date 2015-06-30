@@ -28,12 +28,11 @@ import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityCostModule;
 import playground.benjamin.scenarios.munich.exposure.EmissionResponsibilityTravelDisutilityCalculatorFactory;
@@ -78,7 +77,7 @@ public class RunExposureInternalizationMunich {
 		
 		Config config = ConfigUtils.createConfig();
 		config.addCoreModules(); // TODO remove?
-		MatsimConfigReader confReader = new MatsimConfigReader(config);
+		ConfigReader confReader = new ConfigReader(config);
 		confReader.readFile(configFile);
 
 		Controler controler = new Controler(config);

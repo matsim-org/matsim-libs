@@ -24,19 +24,19 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.socnetsim.framework.scoring.GroupSizePreferencesConfigGroup;
+import org.matsim.contrib.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
+import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
+import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
+import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReaderMatsimV2;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
-import org.matsim.contrib.socnetsim.framework.scoring.GroupSizePreferencesConfigGroup;
-import org.matsim.contrib.socnetsim.usage.replanning.GroupReplanningConfigGroup;
-import org.matsim.contrib.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
-import org.matsim.contrib.socnetsim.sharedvehicles.VehicleRessources;
-import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 
 /**
  * Groups methods too specific to go in the "frameworky" part of the code,
@@ -154,7 +154,7 @@ public class RunUtils {
 	public static Config loadConfig(final String configFile) {
 		final Config config = JointScenarioUtils.createConfig();
 		addConfigGroups( config );
-		new ConfigReaderMatsimV2( config ).parse( configFile );
+		new ConfigReader( config ).parse( configFile );
 		return config;
 	}
 

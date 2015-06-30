@@ -6,7 +6,7 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
@@ -83,7 +83,7 @@ public class BkVisLiveFromLastIteration {
 		this.handleNoLongerSupportedParameters(configfile, newConfigFile);
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(newConfigFile);
 		OutputDirectoryHierarchy oldConfControlerIO;
 		if (config.controler().getRunId() != null) {

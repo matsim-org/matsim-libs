@@ -35,7 +35,7 @@ import org.matsim.contrib.sna.gis.CRSUtils;
 import org.matsim.contrib.sna.graph.spatial.SpatialSparseGraph;
 import org.matsim.contrib.sna.graph.spatial.io.SpatialGraphMLReader;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.xml.sax.SAXException;
 
 import playground.johannes.socialnetworks.graph.mcmc.Ergm;
@@ -59,7 +59,7 @@ public class MCMCRandomGraphGenerator {
 	
 	public static void main(String[] args) throws FileNotFoundException, IOException, SAXException, ParserConfigurationException {
 		Config config = new Config();
-		MatsimConfigReader creader = new MatsimConfigReader(config);
+		ConfigReader creader = new ConfigReader(config);
 		creader.parse(args[0]);
 		
 		SpatialSparseGraph graph = null;

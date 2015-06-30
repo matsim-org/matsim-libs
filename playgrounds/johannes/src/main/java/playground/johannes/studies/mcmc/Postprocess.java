@@ -27,7 +27,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 
 import playground.johannes.sna.util.TXTWriter;
 
@@ -52,7 +52,7 @@ public class Postprocess {
 		TDoubleDoubleHashMap values = new TDoubleDoubleHashMap();
 		
 		Config config = new Config();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		
 		File root = new File(rootDir + "/output/");
 		for(String runDir : root.list()) {

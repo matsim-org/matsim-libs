@@ -28,18 +28,16 @@ import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
@@ -56,7 +54,7 @@ public class TransitControler {
 		
 		Config config = new Config();
 		config.addCoreModules();
-		new MatsimConfigReader(config).readFile(args[0]);
+		new ConfigReader(config).readFile(args[0]);
 		if ( useTransit ) {
 			config.scenario().setUseTransit(true);
 			config.scenario().setUseVehicles(true);

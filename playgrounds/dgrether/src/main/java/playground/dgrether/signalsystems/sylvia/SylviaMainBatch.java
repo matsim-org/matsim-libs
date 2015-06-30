@@ -22,7 +22,7 @@ package playground.dgrether.signalsystems.sylvia;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
@@ -67,7 +67,7 @@ public class SylviaMainBatch {
 		String footballPlansBaseFilename = reposBaseDirectory + "shared-svn/studies/dgrether/cottbus/Cottbus-BA/planswithfb/output_plans_";
 		//read the config
 		Config baseConfig = ConfigUtils.createConfig();
-		MatsimConfigReader confReader = new MatsimConfigReader(baseConfig);
+		ConfigReader confReader = new ConfigReader(baseConfig);
 		confReader.readFile(configFilename);
 
 		String outputDirBase = baseConfig.controler().getOutputDirectory();

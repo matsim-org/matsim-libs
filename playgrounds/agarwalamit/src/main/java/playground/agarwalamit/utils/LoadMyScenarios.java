@@ -21,7 +21,7 @@ package playground.agarwalamit.utils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -37,7 +37,7 @@ public class LoadMyScenarios {
 	public static Scenario loadScenarioFromPlansNetworkAndConfig(String populationFile, String networkFile, String configFile) {
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configFile);
 		config.plans().setInputFile(populationFile);
 		config.plans().setInputPersonAttributeFile(null);
@@ -76,7 +76,7 @@ public class LoadMyScenarios {
 	public static Scenario loadScenarioFromNetworkAndConfig(String networkFile, String configFile) {
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configFile);
 		config.network().setInputFile(networkFile);
 		config.plans().setInputFile(null);
@@ -92,7 +92,7 @@ public class LoadMyScenarios {
 	public static int getLastIteration(String configFile) {
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configFile);
 		return config.controler().getLastIteration();
 	}
@@ -125,7 +125,7 @@ public class LoadMyScenarios {
 	public static Scenario loadScenarioFromPlansAndConfig(String plansFile, String configFile) {
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configFile);
 		config.plans().setInputFile(plansFile);
 		config.plans().setInputPersonAttributeFile(null);
@@ -140,7 +140,7 @@ public class LoadMyScenarios {
 	public static Double getSimulationEndTime(String configfile) {
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configfile);
 		Double endTime = config.qsim().getEndTime();
 		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
@@ -153,7 +153,7 @@ public class LoadMyScenarios {
 	public static Config getConfigFromPlansNetworkAndConfigFiles(String populationFile, String networkFile, String configFile) {
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
+		ConfigReader configReader = new ConfigReader(config);
 		configReader.readFile(configFile);
 		config.plans().setInputFile(populationFile);
 		config.plans().setInputPersonAttributeFile(null);

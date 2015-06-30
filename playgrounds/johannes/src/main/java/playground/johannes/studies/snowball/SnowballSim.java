@@ -25,15 +25,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 
-import playground.johannes.coopsim.Profiler;
 import playground.johannes.sna.graph.Edge;
 import playground.johannes.sna.graph.Graph;
 import playground.johannes.sna.graph.Vertex;
 import playground.johannes.sna.graph.analysis.AnalyzerTask;
 import playground.johannes.sna.graph.analysis.DegreeTask;
-import playground.johannes.sna.graph.analysis.FixedSizeRandomPartition;
 import playground.johannes.sna.graph.analysis.GraphSizeTask;
 import playground.johannes.sna.graph.analysis.PropDegreeFixedSizePartition;
 import playground.johannes.sna.graph.analysis.RandomPartition;
@@ -60,7 +58,6 @@ import playground.johannes.socialnetworks.snowball2.analysis.WSMStatsFactory;
 import playground.johannes.socialnetworks.snowball2.analysis.WaveSizeTask;
 import playground.johannes.socialnetworks.snowball2.sim.EstimatorTask;
 import playground.johannes.socialnetworks.snowball2.sim.RDSEstimator;
-import playground.johannes.studies.coopsim.TimeSampler;
 
 /**
  * @author illenberger
@@ -163,7 +160,7 @@ public class SnowballSim {
 	public static Config loadConfig(String file) {
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader reader = new MatsimConfigReader(config);
+		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(file);
 		return config;
 	}

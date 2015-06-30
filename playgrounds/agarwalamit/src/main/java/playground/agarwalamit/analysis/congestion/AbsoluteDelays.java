@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
@@ -67,7 +67,7 @@ public class AbsoluteDelays  {
 		String configFile = outputDir+runCase+"/output_config.xml";
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader reader = new MatsimConfigReader(config);
+		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(configFile);
 
 		double vtts_car = ((config.planCalcScore().getTraveling_utils_hr()/3600) + 

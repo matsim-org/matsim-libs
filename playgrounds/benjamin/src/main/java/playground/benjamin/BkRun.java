@@ -20,7 +20,7 @@
 package playground.benjamin;
 
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -55,7 +55,7 @@ public class BkRun {
 		
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader confReader = new MatsimConfigReader(config);
+		ConfigReader confReader = new ConfigReader(config);
 		confReader.readFile(configFile);
 		Controler kontrolle = new Controler(config);
 		

@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -65,7 +65,7 @@ public class CottbusFootballBatch {
 		String configFilename = args[1];
 		//read the config & the scenario
 		Config baseConfig = ConfigUtils.createConfig();
-		MatsimConfigReader confReader = new MatsimConfigReader(baseConfig);
+		ConfigReader confReader = new ConfigReader(baseConfig);
 		confReader.readFile(configFilename);
 		Scenario baseScenario = ScenarioUtils.loadScenario(baseConfig);
 		//create the output directoy

@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
@@ -45,7 +45,7 @@ public class PersonArrivalAnalyzer {
 
 		Config config = new Config();
 		config.addCoreModules();
-		new MatsimConfigReader(config).readFile(configFile);
+		new ConfigReader(config).readFile(configFile);
 
 		Collection<String> mainModes = config.qsim().getMainModes();
 		double endTime = config.qsim().getEndTime();

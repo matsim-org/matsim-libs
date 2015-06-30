@@ -29,14 +29,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
 /**

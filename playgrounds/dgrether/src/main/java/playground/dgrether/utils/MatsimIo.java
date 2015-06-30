@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
@@ -44,7 +44,7 @@ public class MatsimIo {
 	private static final Logger log = Logger.getLogger(MatsimIo.class);
 
 	public static Config loadConfig(final Config conf, final String filename) {
-		MatsimConfigReader reader = new MatsimConfigReader(conf);
+		ConfigReader reader = new ConfigReader(conf);
 		reader.parse(filename);
 		return conf;
 	}

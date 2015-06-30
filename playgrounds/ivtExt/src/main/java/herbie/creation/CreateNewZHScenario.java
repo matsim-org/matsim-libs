@@ -27,7 +27,7 @@ import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.*;
 import org.matsim.core.population.PopulationWriter;
@@ -102,8 +102,8 @@ public class CreateNewZHScenario {
 	private void readConfig(String configFile) {
 		log.info("\tReading the config .........................");
 		Config config = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
-    	matsimConfigReader.readFile(configFile);   	
+    	ConfigReader configReader = new ConfigReader(config);
+    	configReader.readFile(configFile);
 		
 		this.outputFolder = config.findParam("demandcreation", "outputFolder");
 		

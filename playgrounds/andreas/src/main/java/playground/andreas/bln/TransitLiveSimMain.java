@@ -3,7 +3,7 @@ package playground.andreas.bln;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -32,7 +32,7 @@ public class TransitLiveSimMain {
 		String configFilename = inputDir + "config.xml";
 		Config config = new Config();
 		config.addCoreModules();
-		new MatsimConfigReader(config).readFile(configFilename);
+		new ConfigReader(config).readFile(configFilename);
 		config.scenario().setUseTransit(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();

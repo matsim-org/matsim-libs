@@ -22,7 +22,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -151,7 +151,7 @@ public class MyTollSchemeGenerator {
 		//read the config
 		this.config = new Config();
 		this.config.addCoreModules();
-		MatsimConfigReader confReader = new MatsimConfigReader(this.config);
+		ConfigReader confReader = new ConfigReader(this.config);
 		confReader.readFile(this.usedConf);
 
 		// TODO change used data here:

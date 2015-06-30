@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -95,8 +95,8 @@ public class PtScenarioAdaption {
 		log.info("InitConfig ...");
 		
 		Config config = new Config();
-    	MatsimConfigReader matsimConfigReader = new MatsimConfigReader(config);
-    	matsimConfigReader.readFile(file);
+    	ConfigReader configReader = new ConfigReader(config);
+    	configReader.readFile(file);
     	
 		this.networkfilePath = config.findParam("ptScenarioAdaption", "networkfilePath");
 		this.outpath = config.findParam("ptScenarioAdaption", "output");

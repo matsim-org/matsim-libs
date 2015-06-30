@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -40,7 +40,7 @@ public class Analyzer {
 
 	public static void main(String[] args) throws IOException {
 		Config config = ConfigUtils.createConfig();
-		new MatsimConfigReader(config).parse(args[0]);
+		new ConfigReader(config).parse(args[0]);
 		
 		String eventsFile = args[1];
 		String outputDir = args[2];

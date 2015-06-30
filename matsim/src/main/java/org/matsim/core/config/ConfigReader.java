@@ -37,9 +37,9 @@ import org.xml.sax.InputSource;
  *
  * @author mrieser
  */
-public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeReader {
+public class ConfigReader extends MatsimXmlParser implements MatsimSomeReader {
 
-	private final static Logger log = Logger.getLogger(MatsimConfigReader.class);
+	private final static Logger log = Logger.getLogger(ConfigReader.class);
 
 	private final static String CONFIG_V1 = "config_v1.dtd";
 	private final static String CONFIG_V2 = "config_v2.dtd";
@@ -58,7 +58,7 @@ public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeRea
 	 * except if they are explicitly overwritten by entries in the config file.  The MATSim4UrbanSim initialization sequence depends on this
 	 * behavior.  kn, mar'13 
 	 */
-	public MatsimConfigReader(final Config config) {
+	public ConfigReader(final Config config) {
 		this.config = config;
 	}
 

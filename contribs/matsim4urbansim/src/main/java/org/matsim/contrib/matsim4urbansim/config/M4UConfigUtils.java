@@ -389,7 +389,7 @@ public class M4UConfigUtils {
 
 			log.info("Loading settings from external MATSim config: " + externalMATSimConfigFileName);
 			log.warn("NOTE: MATSim4UrbanSim settings will be overwritten by settings in the external config! Make sure that this is what you intended!");
-			new MatsimConfigReader(config).parse(externalMATSimConfigFileName);
+			new ConfigReader(config).parse(externalMATSimConfigFileName);
 			log.info("... loading settings done!");
 		}
 	}

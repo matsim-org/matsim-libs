@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -146,7 +146,7 @@ public class MyRuns {
 		Config config = scenario.getConfig();
 		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
 		config.addModule(ktiConfigGroup);
-		MatsimConfigReader reader = new MatsimConfigReader(config);
+		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(args[0]);
 
 		Network network = scenario.getNetwork();
@@ -201,7 +201,7 @@ public class MyRuns {
 		Config config = scenario.getConfig();
 		MeisterkConfigGroup meisterkConfigGroup = new MeisterkConfigGroup();
 		config.addModule(meisterkConfigGroup);
-		MatsimConfigReader reader = new MatsimConfigReader(config);
+		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(args[0]);
 		MatsimRandom.reset(config.global().getRandomSeed());
 

@@ -2,7 +2,7 @@ package playground.mzilske.cdr;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -21,7 +21,7 @@ public class BerlinRunCongested implements Runnable {
 	public void run() {
 		Config config = new Config();
 		config.addCoreModules();
-		new MatsimConfigReader(config).parse(this.getClass().getResourceAsStream("2kW.15.xml"));
+		new ConfigReader(config).parse(this.getClass().getResourceAsStream("2kW.15.xml"));
 		config.plans().setInputFile(BERLIN_PATH + "plans/baseplan_car_only.xml.gz");  // 18377 persons
 		config.network().setInputFile(BERLIN_PATH + "network/bb_5_v_scaled_simple.xml.gz"); // only till secondary roads (4), dumped from OSM 20090603, contains 35336 nodes and 61920 links
 		config.counts().setCountsFileName(BERLIN_PATH + "counts/counts4bb_5_v_notscaled_simple.xml");

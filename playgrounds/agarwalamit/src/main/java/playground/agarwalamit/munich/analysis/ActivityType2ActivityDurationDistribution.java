@@ -28,7 +28,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.activity.ActivityType2ActDurationsAnalyzer;
@@ -112,7 +112,7 @@ public class ActivityType2ActivityDurationDistribution {
 
 		Config config = new Config();
 		config.addCoreModules();
-		MatsimConfigReader reader = new MatsimConfigReader(config);
+		ConfigReader reader = new ConfigReader(config);
 		reader.readFile(configFile);
 
 		SortedMap<String, Double> act2TypDur = new TreeMap<>();

@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.analysis.filters.population.RouteLinkFilter;
 import org.matsim.contrib.analysis.filters.population.SelectedPlanFilter;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -75,7 +75,7 @@ public class KmlPlansVisualizer {
 
 	public KmlPlansVisualizer(final String config, final List<Tuple<String, String>> linkTuples) {
 		Config conf = new Config();
-		MatsimConfigReader reader = new MatsimConfigReader(conf);
+		ConfigReader reader = new ConfigReader(conf);
 		reader.readFile(config);
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
 		new ScenarioLoaderImpl(conf).loadScenario();
