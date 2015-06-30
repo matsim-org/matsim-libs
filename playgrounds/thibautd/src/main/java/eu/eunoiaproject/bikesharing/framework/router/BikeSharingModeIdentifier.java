@@ -39,7 +39,7 @@ public class BikeSharingModeIdentifier implements MainModeIdentifier {
 
 	@Override
 	public String identifyMainMode(
-			final List<PlanElement> tripElements) {
+			final List<? extends PlanElement> tripElements) {
 		boolean hadBikeSharing = false;
 		for ( PlanElement pe : tripElements ) {
 			if ( pe instanceof Leg ) {

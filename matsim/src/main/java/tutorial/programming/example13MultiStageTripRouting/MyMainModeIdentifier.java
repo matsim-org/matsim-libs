@@ -36,8 +36,7 @@ public class MyMainModeIdentifier implements MainModeIdentifier {
 	}
 
 	@Override
-	public String identifyMainMode(
-			final List<PlanElement> tripElements) {
+	public String identifyMainMode(List<? extends PlanElement> tripElements) {
 		for ( PlanElement pe : tripElements ) {
 			if ( pe instanceof Leg && ((Leg) pe).getMode().equals( MyRoutingModule.TELEPORTATION_LEG_MODE ) ) {
 				return MyTripRouterFactory.TELEPORTATION_MAIN_MODE;

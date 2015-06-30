@@ -1,11 +1,8 @@
 package playground.balac.allcsmodestest.controler;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-
-import com.google.inject.Provider;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -15,7 +12,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.RoutingContext;
@@ -141,7 +137,7 @@ public class CarsharingWithTaxiControler extends Controler{
                             new MainModeIdentifier() {
                                 @Override
                                 public String identifyMainMode(
-                                        final List<PlanElement> tripElements) {
+                                        final List<? extends PlanElement> tripElements) {
                                     for ( PlanElement pe : tripElements ) {
                                         if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
                                             return "twowaycarsharing";

@@ -66,7 +66,7 @@ public class MovingPathwaysTripRouterFactory implements TripRouterFactory{
 				new MainModeIdentifier() {
 					@Override
 					public String identifyMainMode(
-							final List<PlanElement> tripElements) {
+							final List<? extends PlanElement> tripElements) {
 						boolean hadMovingPathway = false;
 						for ( PlanElement pe : tripElements ) {
 							if ( pe instanceof Leg ) {

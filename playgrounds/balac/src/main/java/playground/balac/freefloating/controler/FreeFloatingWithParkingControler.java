@@ -121,7 +121,7 @@ public class FreeFloatingWithParkingControler {
 								new MainModeIdentifier() {
 									@Override
 									public String identifyMainMode(
-											final List<PlanElement> tripElements) {
+											final List<? extends PlanElement> tripElements) {
 										for ( PlanElement pe : tripElements ) {
 											if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "freefloating" ) ) {
 												return "freefloating";

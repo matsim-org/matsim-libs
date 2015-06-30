@@ -92,7 +92,7 @@ public class ExtractTripModeSharesAroundBellevue {
 								new MainModeIdentifierImpl() ) ) );
 
 			@Override
-			public String identifyMainMode(final List<PlanElement> tripElements) {
+			public String identifyMainMode(final List<? extends PlanElement> tripElements) {
 				if ( tripElements.size() == 1 &&
 						((Leg) tripElements.get( 0 )).getMode().equals( TransportMode.transit_walk ) ) {
 					return TransportMode.walk;

@@ -40,7 +40,7 @@ public class MainModeIdentifierForMultiModalAccessPt implements MainModeIdentifi
 	}
 
 	@Override
-	public String identifyMainMode(final List<PlanElement> tripElements) {
+	public String identifyMainMode(final List<? extends PlanElement> tripElements) {
 		for ( Activity act : TripStructureUtils.getActivities( tripElements , EmptyStageActivityTypes.INSTANCE ) ) {
 			if ( act.getType().equals( TransitMultiModalAccessRoutingModule.DEPARTURE_ACTIVITY_TYPE ) ) {
 				return TransportMode.pt;

@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.google.inject.Provider;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -20,7 +18,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.MainModeIdentifier;
@@ -158,7 +155,7 @@ public class CarsharingMATSimLControler {
                                     new MainModeIdentifier() {
                                         @Override
                                         public String identifyMainMode(
-                                                final List<PlanElement> tripElements) {
+                                                final List<? extends PlanElement> tripElements) {
                                             for ( PlanElement pe : tripElements ) {
                                                 if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
                                                     return "twowaycarsharing";

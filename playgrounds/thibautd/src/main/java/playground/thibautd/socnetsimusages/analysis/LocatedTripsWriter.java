@@ -67,7 +67,7 @@ public class LocatedTripsWriter {
 				final MainModeIdentifier identifier = new MainModeIdentifierImpl();
 				@Override
 				public String identifyMainMode(
-						final List<PlanElement> tripElements) {
+						final List<? extends PlanElement> tripElements) {
 					for ( PlanElement pe : tripElements ) {
 						if ( pe instanceof Leg && JointActingTypes.JOINT_MODES.contains( ((Leg) pe).getMode() ) ) {
 							return ((Leg) pe).getMode();

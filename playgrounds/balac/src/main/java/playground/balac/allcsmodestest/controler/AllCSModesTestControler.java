@@ -24,7 +24,6 @@ import playground.balac.allcsmodestest.config.AllCSModesConfigGroup;
 import playground.balac.allcsmodestest.controler.listener.AllCSModesTestListener;
 import playground.balac.allcsmodestest.qsim.AllCSModesQsimFactory;
 import playground.balac.allcsmodestest.scoring.AllCSModesScoringFunctionFactory;
-import playground.balac.allcsmodestest.scoring.modechoiceshopping.SpecialScoringFunctionFactory;
 import playground.balac.analysis.TripsAnalyzer;
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.router.FreeFloatingRoutingModule;
@@ -97,7 +96,7 @@ public class AllCSModesTestControler {
                                 new MainModeIdentifier() {
                                     @Override
                                     public String identifyMainMode(
-                                            final List<PlanElement> tripElements) {
+                                            final List<? extends PlanElement> tripElements) {
                                         for ( PlanElement pe : tripElements ) {
                                             if ( pe instanceof Leg && ((Leg) pe).getMode().equals( "twowaycarsharing" ) ) {
                                                 return "twowaycarsharing";
