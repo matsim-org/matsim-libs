@@ -29,7 +29,7 @@ import playground.michalm.taxi.optimizer.mip.MIPProblem.MIPSolution;
 import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
 
 
-public class MIPGurobiSolver
+class MIPGurobiSolver
 {
     private static enum Mode
     {
@@ -50,8 +50,8 @@ public class MIPGurobiSolver
 
     private static final double W_MAX = 30 * 60 * 60;//30 hours
 
-    private static final double TW_MAX = 1.5 * 60 * 60;// 1.5 hours 
-    private static final double TP_MAX = 20 * 60;// 20 minutes
+    private static final double TW_MAX = 1.5 * 60 * 60;// 1.5 hours (Mielec) 
+    private static final double TP_MAX = 20 * 60;// 20 minutes (Mielec)
 
     private final TaxiOptimizerConfiguration optimConfig;
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;

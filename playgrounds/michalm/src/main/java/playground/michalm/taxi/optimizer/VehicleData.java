@@ -49,7 +49,6 @@ public class VehicleData
 
 
     public final List<Entry> entries = new ArrayList<>();
-
     public final int idleCount;
     public final int dimension;
 

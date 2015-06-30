@@ -32,7 +32,7 @@ import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
 
 public class AssignmentProblem
 {
-    private final double NULL_PATH_COST = 24 * 60 * 60; //1 day
+    private final double NULL_PATH_COST = 48 * 60 * 60; //2 days
 
     private final TaxiOptimizerConfiguration optimConfig;
 
@@ -87,7 +87,7 @@ public class AssignmentProblem
             rMin = Math.min(rData.dimension, vData.dimension);
         }
 
-        Max maxArrivalTimeForRMinRequests = new Max();
+        Max maxArrivalTimeForRMinRequests = new Max();//heuristics
 
         for (int r = 0; r < rMin; r++) {
             TaxiRequest req = rData.requests[r];
@@ -104,9 +104,8 @@ public class AssignmentProblem
 
         for (int r = rMin; r < rData.dimension; r++) {
             TaxiRequest req = rData.requests[r];
-
             if (req.getT0() > maxArrivalTimeForRMinRequests.getResult()) {
-                return paths;
+                break;
             }
 
             paths.add(createVrpPathsForRequest(req));
