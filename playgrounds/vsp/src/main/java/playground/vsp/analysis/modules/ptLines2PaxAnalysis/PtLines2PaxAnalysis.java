@@ -155,7 +155,6 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 		VspAnalyzer analyzer = new VspAnalyzer(dir, dir + "tut_10min_0.0.events.xml.gz");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
-		sc.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule.xml.gz");
 //		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule_1.xml");	//for testing
 		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles()).readFile(dir + "tut_10min_0.0.vehicles.xml.gz");

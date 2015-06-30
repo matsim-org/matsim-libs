@@ -299,7 +299,6 @@ public class TransitScheduleAnalyserToCSVandTEX {
 	public static void main(String[] args) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
-		sc.getConfig().scenario().setUseVehicles(true);
 		(new NetworkReaderMatsimV1(sc)).parse("F:/temp/network.final.xml.gz");
 		(new TransitScheduleReaderV1(sc)).parse("F:/temp/transitSchedule_basecase.xml.gz");
 		
