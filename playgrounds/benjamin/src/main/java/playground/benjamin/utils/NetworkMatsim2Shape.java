@@ -84,8 +84,8 @@ public class NetworkMatsim2Shape {
 		}
 //		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.WGS84).write();
 //		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.CH1903_LV03_GT).write();
-		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.DHDN_GK4).write();
-		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.WGS84).write();
+//		new Links2ESRIShape(net, filePath + networkName + outFileType, TransformationFactory.DHDN_GK4).write();
+		new Links2ESRIShape(net, filePath + networkName + outFileType, "EPSG:32646").write();
 //		new Links2ESRIShape(net, filePath + networkName + outFileType, "WGS84_UTM32T").write();
 	}
 
