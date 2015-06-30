@@ -89,7 +89,6 @@ public final class TransitControler extends Controler {
 			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
 		}
 		this.getConfig().scenario().setUseTransit(true);
-		this.getConfig().scenario().setUseVehicles(true);
 		Set<EventsFileFormat> formats = EnumSet.copyOf(this.getConfig().controler().getEventsFileFormats());
 		formats.add(EventsFileFormat.xml);
 		this.getConfig().controler().setEventsFileFormats(formats);

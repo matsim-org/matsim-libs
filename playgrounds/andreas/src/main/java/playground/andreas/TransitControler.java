@@ -80,8 +80,6 @@ public class TransitControler extends Controler {
 		config.addCoreModules();
 		new MatsimConfigReader(config).readFile(args[0]);
 		config.scenario().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
-		
 				
 		TransitControler tc = new TransitControler(config);
 		if(args.length > 1 && args[1].equalsIgnoreCase("true")){

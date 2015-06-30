@@ -129,7 +129,6 @@ public class TransitScheduleAreaCut2 {
 		TransitLine line;
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
-		sc.getConfig().scenario().setUseVehicles(true);
 		this.newSchedule = sc.getTransitSchedule();
 		this.newVehicles = ((ScenarioImpl) sc).getTransitVehicles();
 		TransitScheduleFactory factory = this.newSchedule.getFactory();
@@ -419,7 +418,6 @@ public class TransitScheduleAreaCut2 {
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
-		sc.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(sc).readFile(dir + "remainingSchedule.xml.gz");
 		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles() ).readFile(dir + "transitVehicles100.final.xml.gz");
 		

@@ -34,7 +34,6 @@ public class TransitLiveSimMain {
 		config.addCoreModules();
 		new MatsimConfigReader(config).readFile(configFilename);
 		config.scenario().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
 

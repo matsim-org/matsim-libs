@@ -97,7 +97,6 @@ public class AnalysisRunner {
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
-		sc.getConfig().scenario().setUseVehicles(true);
 		
 //		String targetCoordinateSystem = TransformationFactory.WGS84_UTM35S; // Gauteng
 //		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin
