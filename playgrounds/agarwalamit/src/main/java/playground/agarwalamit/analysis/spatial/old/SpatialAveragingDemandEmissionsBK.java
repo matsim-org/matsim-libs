@@ -45,7 +45,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
@@ -66,7 +65,7 @@ public class SpatialAveragingDemandEmissionsBK {
 	private final static String runNumber = runDir+"/ci";
 	private final String netFile1 = runBAU+"/output_network.xml.gz";//"../../siouxFallsJava/output/run4/output_network.xml.gz" ;//runDirectory1 + runNumber1 + ".output_network.xml.gz";
 
-	private final String munichShapeFile = SpatialDataInputs.shapeFile;
+	private final String munichShapeFile = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
 	private static String configFile1 =runBAU+"/output_config.xml";; //"../../siouxFallsJava/output/run4/output_config.xml";//runDirectory1 + runNumber1 + ".output_config.xml.gz";
 	private final String emissionFileBAU = runBAU+"/ITERS/it.1500/1500.emission.events.xml.gz";

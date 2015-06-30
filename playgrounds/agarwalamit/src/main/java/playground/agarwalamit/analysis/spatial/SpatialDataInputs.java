@@ -19,7 +19,6 @@
 package playground.agarwalamit.analysis.spatial;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.agarwalamit.analysis.spatial.GeneralGrid.GridType;
@@ -35,8 +34,9 @@ public class SpatialDataInputs {
 
 	public enum LinkWeightMethod {line, point};
 	
-	public SpatialDataInputs(){}
-	
+	/**
+	 * If analyzing only one scenario. By default, events file from last iteration and other output files (network, plans, config) are taken.
+	 */
 	public SpatialDataInputs(LinkWeightMethod linkWeightMethod, String initialCaseLocation) {
 		this.linkWeigthMethod = linkWeightMethod;
 		this.initialCase = initialCaseLocation;
@@ -44,7 +44,7 @@ public class SpatialDataInputs {
 	}
 	
 	/**
-	 * If comparing two scenarios
+	 * If comparing two scenarios. By default, events file from last iteration and other output files (network, plans, config) are taken.
 	 */
 	public SpatialDataInputs(LinkWeightMethod linkWeightMethod, String initialCaseLocation, String compareToCaseLocation) {
 		this.isComparing = true;
@@ -64,12 +64,12 @@ public class SpatialDataInputs {
 
 	public final static Logger LOG = Logger.getLogger(SpatialDataInputs.class);
 	
-	public LinkWeightMethod linkWeigthMethod;
+	private LinkWeightMethod linkWeigthMethod;
 	
 	GridType gridType;
 	double cellWidth;
 	
-	public  String initialCase;
+	String initialCase;
 	
 	/**
 	 * Config extension is taken .xml (not .xml.gz) because .xml have possible changes due to core changes.
@@ -96,15 +96,15 @@ public class SpatialDataInputs {
 	public String compareToCaseEventsFile;
 	public String compareToCasePlans; 
 	
-	public static String shapeFile = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-	public CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
+	public String shapeFile ;
+	public CoordinateReferenceSystem targetCRS ;
 	
-	public static double xMin=4452550.25;
-	public static double xMax=4479483.33;
-	public static double yMin=5324955.00;
-	public static double yMax=5345696.81;
+	double xMin;
+	double xMax;
+	double yMin;
+	double yMax;
 	
-	public final  double boundingBoxArea = (yMax-yMin)*(xMax-xMin);
+	final  double boundingBoxArea = (yMax-yMin)*(xMax-xMin);
 	private double smoothingRadius = 500.;
 	
 	/**
@@ -150,5 +150,9 @@ public class SpatialDataInputs {
 		initialCaseEmissionEventsFile = initialCase+"/ITERS/it."+initialCaseLastIteration+"/"+initialCaseLastIteration+".emission.events.xml.gz";
 		initialCaseEventsFile = initialCase+"/ITERS/it."+initialCaseLastIteration+"/"+initialCaseLastIteration+".events.xml.gz";
 		initialCasePlansFile = initialCase+"/output_plans.xml.gz";
+	}
+
+	LinkWeightMethod getLinkWeigthMethod() {
+		return linkWeigthMethod;
 	}
 }

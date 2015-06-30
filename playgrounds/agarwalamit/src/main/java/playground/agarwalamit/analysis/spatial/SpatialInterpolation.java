@@ -111,12 +111,12 @@ public class SpatialInterpolation {
 			Coordinate pointCoord = p.getCoordinate();
 
 			double cellArea = this.grid.getCellGeometry(p).getArea();
-			double area_smoothingCircle = Math.PI * inputs.getSmoothingRadius() *inputs.getSmoothingRadius();
+			double area_smoothingCircle = Math.PI * inputs.getSmoothingRadius() * inputs.getSmoothingRadius();
 			double normalizationFactor = cellArea/area_smoothingCircle;
 			double weightSoFar = this.cellWeights.get(p);
 			double weightNow = 0;
 
-			switch (inputs.linkWeigthMethod) {
+			switch (inputs.getLinkWeigthMethod()) {
 			
 			case line :
 				weightNow = intensityOnLink * calculateWeightFromLine(fromNodeCoord,toNodeCoord,pointCoord) * normalizationFactor;
@@ -156,7 +156,7 @@ public class SpatialInterpolation {
 			double weightNow;
 
 
-			switch(inputs.linkWeigthMethod){
+			switch(inputs.getLinkWeigthMethod()){
 
 			case point :
 				weightNow = intensityOfPoint * calculateWeightFromPoint(actCoordinate, pointCoord) * normalizationFactor;
@@ -260,10 +260,10 @@ public class SpatialInterpolation {
 		String fileName;
 		if(inputs.isComparing){
 			String scenarioCase = inputs.compareToCase.split("/") [inputs.compareToCase.split("/").length-1];
-			fileName = outputFolder+"/rData"+"_"+fileNamePrefix+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+"_"+"diff"+".txt";
+			fileName = outputFolder+"/rData"+"_"+fileNamePrefix+"_"+type+"_"+inputs.cellWidth+"_"+inputs.getLinkWeigthMethod()+"_"+scenarioCase+"_"+"diff"+".txt";
 		} else {
 			String scenarioCase = inputs.initialCase.split("/") [inputs.initialCase.split("/").length-1];
-			fileName= outputFolder+"/rData"+"_"+fileNamePrefix+"_"+type+"_"+inputs.cellWidth+"_"+inputs.linkWeigthMethod+"_"+scenarioCase+".txt";	
+			fileName= outputFolder+"/rData"+"_"+fileNamePrefix+"_"+type+"_"+inputs.cellWidth+"_"+inputs.getLinkWeigthMethod()+"_"+scenarioCase+".txt";	
 		}
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);

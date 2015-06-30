@@ -39,7 +39,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayHandler;
-import playground.agarwalamit.analysis.spatial.SpatialDataInputs;
 import playground.benjamin.scenarios.munich.analysis.filter.LocationFilter;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
 import playground.benjamin.scenarios.munich.analysis.spatialAvg.old.SpatialAveragingUtilsExtended;
@@ -56,7 +55,7 @@ public class SpatialAveragingCongestion {
 	private final static String runNumber = runDir+"/ei";
 	private final String netFile1 = runBAU+"/output_network.xml.gz";
 
-	private final String munichShapeFile = SpatialDataInputs.shapeFile;
+	private final String munichShapeFile = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
 	private static String configFileBAU =runBAU+"/output_config.xml"; 
 	private final String eventsFileBAU = runBAU+"/ITERS/it.1500/1500.events.xml.gz";

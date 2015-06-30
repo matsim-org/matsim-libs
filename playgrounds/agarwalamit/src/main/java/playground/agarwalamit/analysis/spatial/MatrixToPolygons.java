@@ -43,8 +43,15 @@ public class MatrixToPolygons {
 	
 	private int xBins = 160;
 	private int yBins = 120;
-	private double xWidth = (SpatialDataInputs.xMax - SpatialDataInputs.xMin)/xBins;
-	private double yWidth = (SpatialDataInputs.yMax - SpatialDataInputs.yMin)/yBins;
+	
+	private final double xMin=4452550.25;
+	private final double xMax=4479483.33;
+	private final double yMin=5324955.00;
+	private final double yMax=5345696.81;
+	
+	
+	private double xWidth = (xMax - xMin)/xBins;
+	private double yWidth = (yMax - yMin)/yBins;
 	
 	private String outFile =  "/Users/amit/Downloads/bk/poly_centroid_toll_weight.txt";
 	private String inputFile_toll = "/Users/amit/Downloads/bk/pricing.1500-baseCase.1500.absoluteDelta.Routput.AvgUserBenefitsDifferencesNoRefund.txt";

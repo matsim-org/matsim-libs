@@ -35,6 +35,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.agarwalamit.analysis.congestion.ExperiencedDelayAnalyzer;
 import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
@@ -63,7 +65,16 @@ public class MunichSpatialPlots {
 	private final double gridSize = 500;
 	private boolean isWritingGGPLOTData = true;
 	private int noOfBins = 1;
+	
+	private final double xMin=4452550.25;
+	private final double xMax=4479483.33;
+	private final double yMin=5324955.00;
+	private final double yMax=5345696.81;
+	
+	private final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 
+	private final String shapeFile = "/Users/amit/Documents/repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	
 	public static void main(String[] args) {
 		MunichSpatialPlots plots = new MunichSpatialPlots();
 //		plots.writeCongestionToCells();
@@ -77,6 +88,8 @@ public class MunichSpatialPlots {
 	public void writePopulationDensityCountToCells(){
 
 		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau);
+		inputs.setBoundingBox(xMin, xMax, yMin, yMax);
+		inputs.setTargetCRS(targetCRS);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -109,6 +122,8 @@ public class MunichSpatialPlots {
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,bau,policyCase);
+		inputs.setBoundingBox(xMin, xMax, yMin, yMax);
+		inputs.setTargetCRS(targetCRS);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -165,6 +180,8 @@ public class MunichSpatialPlots {
 		Map<Id<Person>, Double> personTollPolicy = new HashMap<>();
 
 		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.point,policyCase); //bau do not have toll
+		inputs.setBoundingBox(xMin, xMax, yMin, yMax);
+		inputs.setTargetCRS(targetCRS);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -203,6 +220,8 @@ public class MunichSpatialPlots {
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.line,bau,policyCase);
+		inputs.setBoundingBox(xMin, xMax, yMin, yMax);
+		inputs.setTargetCRS(targetCRS);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -239,6 +258,8 @@ public class MunichSpatialPlots {
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.line,bau,policyCase);
+		inputs.setBoundingBox(xMin, xMax, yMin, yMax);
+		inputs.setTargetCRS(targetCRS);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
@@ -314,6 +335,8 @@ public class MunichSpatialPlots {
 
 		// setting of input data
 		SpatialDataInputs inputs = new SpatialDataInputs(LinkWeightMethod.line,bau, policyCase);
+		inputs.setBoundingBox(xMin, xMax, yMin, yMax);
+		inputs.setTargetCRS(targetCRS);
 		inputs.setGridInfo(GridType.HEX, gridSize);
 		inputs.setShapeFile("../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp");
 
