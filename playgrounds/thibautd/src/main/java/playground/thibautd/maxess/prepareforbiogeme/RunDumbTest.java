@@ -25,18 +25,12 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSet;
-import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
-import playground.thibautd.maxess.prepareforbiogeme.framework.Converter;
-import playground.thibautd.maxess.prepareforbiogeme.framework.Converter.ChoicesIdentifier;
+import playground.thibautd.maxess.prepareforbiogeme.framework.*;
 import playground.thibautd.maxess.prepareforbiogeme.tripbased.BasicTripChoiceSetRecordFiller;
+import playground.thibautd.maxess.prepareforbiogeme.tripbased.Trip;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author thibautd
@@ -49,13 +43,13 @@ public class RunDumbTest {
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimPopulationReader( sc ).parse(inputChains);
 
-		Converter.<Trip>builder()
+		Converter.<Trip,ChoiceSituation<Trip>>builder()
 				.withChoiceSetSampler(
-						new ChoiceSetSampler<Trip>() {
+						new ChoiceSetSampler<Trip,ChoiceSituation<Trip>>() {
 							@Override
-							public ChoiceSet<Trip> sampleChoiceSet(final Person decisionMaker, final Trip choice) {
+							public ChoiceSet<Trip> sampleChoiceSet(final Person decisionMaker, final ChoiceSituation<Trip> choice) {
 								final Map<String, Trip> alts = new HashMap<String, Trip>();
-								alts.put( "TRIP" , choice );
+								alts.put( "TRIP" , choice.getChoice() );
 								return new ChoiceSet<Trip>(
 										decisionMaker,
 										"TRIP",
@@ -63,13 +57,17 @@ public class RunDumbTest {
 							}
 						})
 				.withChoicesIdentifier(
-						new ChoicesIdentifier<Trip>() {
+						new ChoicesIdentifier<ChoiceSituation<Trip>>() {
 							@Override
-							public List<Trip> indentifyChoices(final Plan p) {
-								return TripStructureUtils.getTrips( p , EmptyStageActivityTypes.INSTANCE );
+							public List<ChoiceSituation<Trip>> identifyChoices(final Plan p) {
+								final List<ChoiceSituation<Trip>> choices = new ArrayList<>();
+								for ( TripStructureUtils.Trip t : TripStructureUtils.getTrips(p, EmptyStageActivityTypes.INSTANCE) ) {
+									choices.add( new ChoiceSituationImpl<Trip>( new Trip( null , null , null ) ) );
+								}
+								return choices;
 							}
 						})
-				.withRecordFiller( new BasicTripChoiceSetRecordFiller( Collections.singletonList( "TRIP" ) ) )
+				.withRecordFiller(new BasicTripChoiceSetRecordFiller(Collections.singletonList("TRIP")))
 				.create()
 				.convert(
 						sc.getPopulation(),

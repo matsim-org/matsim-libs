@@ -16,13 +16,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.prepareforbiogeme.framework;
+package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.facilities.ActivityFacility;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author thibautd
  */
-public interface ChoiceSetSampler<T,C extends ChoiceSituation<T>> {
-	ChoiceSet<T> sampleChoiceSet( Person decisionMaker , C choice );
+public class Trip {
+	private final ActivityFacility origin;
+	private final ActivityFacility destination;
+	private final List<? extends PlanElement> trip;
+
+	public Trip(
+			final ActivityFacility origin,
+			final List<? extends PlanElement> trip,
+			final ActivityFacility destination ) {
+		this.origin = origin;
+		this.destination = destination;
+		this.trip = trip;
+	}
+
+	public ActivityFacility getOrigin() {
+		return origin;
+	}
+
+	public ActivityFacility getDestination() {
+		return destination;
+	}
+
+	public List<? extends PlanElement> getTrip() {
+		return Collections.unmodifiableList( trip );
+	}
+
+	public List<Leg> getLegsOnly() {
+		final List<Leg> legs= new ArrayList<>();
+		for ( PlanElement pe : trip ) {
+			if ( pe instanceof Leg ) legs.add( (Leg) pe );
+		}
+		return legs;
+	}
 }

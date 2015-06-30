@@ -18,11 +18,14 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.prepareforbiogeme.framework;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+
+import java.util.List;
 
 /**
  * @author thibautd
  */
-public interface ChoiceSetSampler<T,C extends ChoiceSituation<T>> {
-	ChoiceSet<T> sampleChoiceSet( Person decisionMaker , C choice );
+public interface ChoicesIdentifier<T> {
+	List<T> identifyChoices(final Plan p);
+
 }

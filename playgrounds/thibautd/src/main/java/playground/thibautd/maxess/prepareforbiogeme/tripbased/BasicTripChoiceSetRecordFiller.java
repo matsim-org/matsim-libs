@@ -22,8 +22,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.utils.misc.Time;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSet;
@@ -34,7 +32,7 @@ import java.util.List;
 /**
  * @author thibautd
  */
-public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<TripStructureUtils.Trip> {
+public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<Trip> {
 	private static final Logger log = Logger.getLogger( BasicTripChoiceSetRecordFiller.class );
 
 	private final List<String> alternativeNames;

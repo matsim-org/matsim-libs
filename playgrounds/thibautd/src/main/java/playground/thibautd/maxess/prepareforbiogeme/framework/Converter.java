@@ -19,39 +19,37 @@
 package playground.thibautd.maxess.prepareforbiogeme.framework;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author thibautd
  */
-public class Converter<T> {
-	private final ChoiceSetSampler<T> choiceSetSampler;
+public class Converter<T,C extends ChoiceSituation<T>> {
+	private final ChoiceSetSampler<T,C> choiceSetSampler;
 	private final ChoiceSetRecordFiller<T> recordFiller;
-	private final ChoicesIdentifier<T> choicesIdentifier;
+	private final ChoicesIdentifier<C> choicesIdentifier;
 
 	private Converter(
-			final ChoiceSetSampler<T> choiceSetSampler,
+			final ChoiceSetSampler<T,C> choiceSetSampler,
 			final ChoiceSetRecordFiller<T> recordFiller,
-			final ChoicesIdentifier<T> choicesIdentifier) {
+			final ChoicesIdentifier<C> choicesIdentifier) {
 		this.choiceSetSampler = choiceSetSampler;
 		this.recordFiller = recordFiller;
 		this.choicesIdentifier = choicesIdentifier;
 	}
 
-	public static <T> ConverterBuilder<T> builder() {
+	public static <T,C extends ChoiceSituation<T>> ConverterBuilder<T,C> builder() {
 		return new ConverterBuilder<>();
 	}
 
 	public void convert( final Population chains , final String dataset ) {
 		try ( final ChoiceDataSetWriter<T> writer = new ChoiceDataSetWriter<>( recordFiller , dataset ) ) {
 			for (Person p : chains.getPersons().values() ) {
-				for ( T choice : choicesIdentifier.indentifyChoices( p.getSelectedPlan() ) ) {
+				for ( C choice : choicesIdentifier.identifyChoices(p.getSelectedPlan()) ) {
 					writer.write( choiceSetSampler.sampleChoiceSet( p , choice ) );
 				}
 			}
@@ -61,31 +59,27 @@ public class Converter<T> {
 		}
 	}
 
-	public interface ChoicesIdentifier<T> {
-		List<T> indentifyChoices( final Plan p );
-	}
-
-	public static class ConverterBuilder<T> {
-		private ChoiceSetSampler<T> choiceSetSampler;
+	public static class ConverterBuilder<T,C extends ChoiceSituation<T>> {
+		private ChoiceSetSampler<T,C> choiceSetSampler;
 		private ChoiceSetRecordFiller<T> recordFiller;
-		private ChoicesIdentifier<T> choicesIdentifier;
+		private ChoicesIdentifier<C> choicesIdentifier;
 
-		public ConverterBuilder<T> withChoiceSetSampler(final ChoiceSetSampler<T> choiceSetSampler) {
+		public ConverterBuilder<T,C> withChoiceSetSampler(final ChoiceSetSampler<T,C> choiceSetSampler) {
 			this.choiceSetSampler = choiceSetSampler;
 			return this;
 		}
 
-		public ConverterBuilder<T> withRecordFiller(final ChoiceSetRecordFiller<T> recordFiller) {
+		public ConverterBuilder<T,C> withRecordFiller(final ChoiceSetRecordFiller<T> recordFiller) {
 			this.recordFiller = recordFiller;
 			return this;
 		}
 
-		public ConverterBuilder<T> withChoicesIdentifier(final ChoicesIdentifier<T> choicesIdentifier) {
+		public ConverterBuilder<T,C> withChoicesIdentifier(final ChoicesIdentifier<C> choicesIdentifier) {
 			this.choicesIdentifier = choicesIdentifier;
 			return this;
 		}
 
-		public Converter<T> create() {
+		public Converter<T,C> create() {
 			return new Converter(choiceSetSampler, recordFiller, choicesIdentifier);
 		}
 	}

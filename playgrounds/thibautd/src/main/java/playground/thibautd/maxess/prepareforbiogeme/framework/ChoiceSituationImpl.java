@@ -18,11 +18,18 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.prepareforbiogeme.framework;
 
-import org.matsim.api.core.v01.population.Person;
-
 /**
  * @author thibautd
  */
-public interface ChoiceSetSampler<T,C extends ChoiceSituation<T>> {
-	ChoiceSet<T> sampleChoiceSet( Person decisionMaker , C choice );
+public class ChoiceSituationImpl<T> implements ChoiceSituation<T> {
+	private final T choice;
+
+	public ChoiceSituationImpl(final T choice) {
+		this.choice = choice;
+	}
+
+	@Override
+	public T getChoice() {
+		return choice;
+	}
 }

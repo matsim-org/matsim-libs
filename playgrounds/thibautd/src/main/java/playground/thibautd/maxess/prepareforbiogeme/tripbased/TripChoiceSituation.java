@@ -16,13 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.maxess.prepareforbiogeme.framework;
+package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.TripStructureUtils;
+import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSituation;
+
+import java.util.List;
 
 /**
  * @author thibautd
  */
-public interface ChoiceSetSampler<T,C extends ChoiceSituation<T>> {
-	ChoiceSet<T> sampleChoiceSet( Person decisionMaker , C choice );
+public class TripChoiceSituation implements ChoiceSituation<Trip> {
+	private final Trip trip;
+	private final List<TripStructureUtils.Trip> tripSequence;
+	private final int positionInTripSequence;
+
+	public TripChoiceSituation(
+			final Trip trip,
+			final List<TripStructureUtils.Trip> tripSequence,
+			final int positionInTripSequence) {
+		this.trip = trip;
+		this.tripSequence = tripSequence;
+		this.positionInTripSequence = positionInTripSequence;
+	}
+
+	@Override
+	public Trip getChoice() {
+		return trip;
+	}
+
+	public List<TripStructureUtils.Trip> getTripSequence() {
+		return tripSequence;
+	}
+
+	public int getPositionInTripSequence() {
+		return positionInTripSequence;
+	}
 }

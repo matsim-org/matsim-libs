@@ -18,11 +18,12 @@
  * *********************************************************************** */
 package playground.thibautd.maxess.prepareforbiogeme.framework;
 
-import org.matsim.api.core.v01.population.Person;
-
 /**
- * @author thibautd
+ * Allows to complement choice with context information if needed (for instance, next trip if trip-level choice,
+ * allowing to use space-time prisms to sample destinations).
+ *
+ * @param <T>
  */
-public interface ChoiceSetSampler<T,C extends ChoiceSituation<T>> {
-	ChoiceSet<T> sampleChoiceSet( Person decisionMaker , C choice );
+public interface ChoiceSituation<T> {
+	T getChoice();
 }
