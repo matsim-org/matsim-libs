@@ -122,7 +122,7 @@ public class KTFreight_v3 {
 //		//Location of UCC
 //		private static final ArrayList<String> uccDepotsLinkIdsString = 
 //				new ArrayList<String>(Arrays.asList("6874", "3058", "5468")); 
-//		//TODO: VehicleTypes die vom Maut betroffen seien sollen.
+//		// VehicleTypes die vom Maut betroffen seien sollen. null, wenn alle (ohne Einschränkung) bemautet werden sollen
 //		private static final ArrayList<String> tolledVehTypes = 
 //				new ArrayList<String>(Arrays.asList("heavy40t", "heavy26t", "heavy26t_frozen", "medium18t", "light8t", "light8t_frozen")); 
 //		//Ende  Namesdefinition Berlin
@@ -130,7 +130,7 @@ public class KTFreight_v3 {
 
 //Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Grid/Base/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Grid/CordonToll/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
@@ -148,9 +148,9 @@ public class KTFreight_v3 {
 	//Location of UCC
 	private static final ArrayList<String> uccDepotsLinkIdsString =
 		new ArrayList<String>(Arrays.asList("j(0,5)", "j(10,5)")); 
-		//TODO: VehicleTypes die vom Maut betroffen seien sollen.
-	private static final ArrayList<String> tolledVehTypes = 
-		new ArrayList<String>(Arrays.asList("gridType01", "gridType05", "gridType10")); 
+	// VehicleTypes die vom Maut betroffen seien sollen. null, wenn alle (ohne Einschränkung) bemautet werden sollen
+	private static final ArrayList<String> onlyTollVehTypes = null;
+//		new ArrayList<String>(Arrays.asList("gridType01", "gridType05", "gridType10")); 
 //	//Ende Namesdefinition Grid
 
 	
@@ -167,7 +167,7 @@ public class KTFreight_v3 {
 
 	// Einstellungen für den Run	
 	private static final boolean addingCongestion = false ;  //doesn't work correctly, KT 10.12.2014
-	private static final boolean addingToll = false;  //added, kt. 07.08.2014
+	private static final boolean addingToll = true;  //added, kt. 07.08.2014
 	private static final boolean usingUCC = false;	 //Using Transshipment-Center, added kt 30.04.2015
 	private static final boolean runMatsim = true;	 //when false only jsprit run will be performed
 	private static final int LAST_MATSIM_ITERATION = 0;  //only one iteration for writing events.
@@ -558,11 +558,20 @@ public class KTFreight_v3 {
 			throw new RuntimeException(e);
 		}
 
-		for(Carrier c : carriers.getCarriers().values()){
-			for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
-				Id<Vehicle> typeId = v.getVehicleId();
-				if (tolledVehTypes.contains(typeId.toString())){
-					rpCalculator.addPricingScheme(typeId.toString(), scheme);
+		//keine Einschränkung eingegeben -> alle bemauten
+		if (onlyTollVehTypes == null) {
+			for(Carrier c : carriers.getCarriers().values()){
+				for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
+					rpCalculator.addPricingScheme(v.getVehicleId().toString(), scheme);
+				}
+			}
+		} else {
+			for(Carrier c : carriers.getCarriers().values()){
+				for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
+					Id<Vehicle> typeId = v.getVehicleId();
+					if (onlyTollVehTypes.contains(typeId.toString())){
+						rpCalculator.addPricingScheme(typeId.toString(), scheme);
+					}
 				}
 			}
 		}
