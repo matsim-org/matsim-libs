@@ -76,7 +76,7 @@ public class TripStructureUtils {
 	}
 
 	public static List<Activity> getActivities(
-			final List<PlanElement> planElements,
+			final List<? extends PlanElement> planElements,
 			final StageActivityTypes stageActivities) {
 		final List<Activity> activities = new ArrayList<>();
 
@@ -102,7 +102,7 @@ public class TripStructureUtils {
 	}
 
 	public static List<Trip> getTrips(
-			final List<PlanElement> planElements,
+			final List<? extends PlanElement> planElements,
 			final StageActivityTypes stageActivities) {
 		final List<Trip> trips = new ArrayList<>();
 
@@ -145,7 +145,7 @@ public class TripStructureUtils {
 	}
 
 	public static Collection<Subtour> getSubtours(
-			final List<PlanElement> plan,
+			final List<? extends PlanElement> plan,
 			final StageActivityTypes stageActivityTypes) {
 		return getSubtours(
 				plan,
@@ -192,7 +192,7 @@ public class TripStructureUtils {
 	 * sequence
 	 */
 	public static Collection<Subtour> getSubtours(
-			final List<PlanElement> planElements,
+			final List<? extends PlanElement> planElements,
 			final StageActivityTypes stageActivityTypes,
 			final boolean useFacilitiesInsteadOfLinks) {
 		final List<Subtour> subtours = new ArrayList<>();
