@@ -26,8 +26,8 @@ import org.matsim.core.utils.misc.Time;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
 import playground.thibautd.maxess.prepareforbiogeme.framework.ChoiceSet;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -35,44 +35,20 @@ import java.util.List;
 public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<Trip> {
 	private static final Logger log = Logger.getLogger( BasicTripChoiceSetRecordFiller.class );
 
-	private final List<String> alternativeNames;
-
-	public BasicTripChoiceSetRecordFiller(final List<String> alternativeNames) {
-		this.alternativeNames = alternativeNames;
-	}
-
 	@Override
-	public List<String> getFieldNames() {
-		final List<String> fieldNames = new ArrayList<String>();
-
-		fieldNames.add( "P_ID" );
-		fieldNames.add( "P_AGE" );
-		fieldNames.add( "P_GENDER" );
-		fieldNames.add( "P_CARAVAIL" );
-
-		fieldNames.add( "C_CHOICE" );
-
-		for ( String alt : alternativeNames ) {
-			fieldNames.add( "A_"+alt+"_TT" );
-		}
-
-		return fieldNames;
-	}
-
-	@Override
-	public List<Number> getFieldValues(final ChoiceSet<Trip> cs) {
-		final List<Number> values = new ArrayList<>( 5 + alternativeNames.size() );
+	public Map<String,Number> getFieldValues(final ChoiceSet<Trip> cs) {
+		final Map<String,Number> values = new LinkedHashMap<>();
 
 		// This is awful, but BIOGEME does not understand anything else than numbers...
-		values.add( Long.getLong(cs.getDecisionMaker().getId().toString()) );
-		values.add( getAge(cs.getDecisionMaker()) );
-		values.add( getGender(cs.getDecisionMaker()) );
-		values.add( getCarAvailability(cs.getDecisionMaker()) );
+		values.put("P_ID", Long.getLong(cs.getDecisionMaker().getId().toString()));
+		values.put("P_AGE", getAge(cs.getDecisionMaker()));
+		values.put("P_GENDER", getGender(cs.getDecisionMaker()));
+		values.put("P_CARAVAIL", getCarAvailability(cs.getDecisionMaker()));
 
-		values.add( getChoice( cs ) );
+		values.put("C_CHOICE", getChoice(cs));
 
-		for ( String name : alternativeNames ) {
-			values.add( getTravelTime( cs.getAlternative( name ) ) );
+		for ( Map.Entry<String,Trip> alt : cs.getNamedAlternatives().entrySet() ) {
+			values.put("A_" + alt.getKey() + "_TT", getTravelTime( alt.getValue() ));
 		}
 
 		return values;
@@ -82,9 +58,12 @@ public class BasicTripChoiceSetRecordFiller implements ChoiceSetRecordFiller<Tri
 		// Assuming the chosen destination is the first listed one, the choice index will always be between
 		// 0 and n_modes. So linear search sould actually not be that bad for large number of alternatives,
 		// and actually scale BETTER than "smart" methods such as binary search...
-		final int index = alternativeNames.indexOf( cs.getChosenName() );
-		if ( index < 0 ) throw new RuntimeException( cs.getChosenName()+" not found in "+alternativeNames );
-		return index;
+		int index = 0;
+		for ( String alt : cs.getNamedAlternatives().keySet() ) {
+			if ( alt.equals( cs.getChosenName() ) ) return index;
+			index++;
+		}
+		throw new RuntimeException( cs.getChosenName()+" not found in "+cs.getNamedAlternatives() );
 	}
 
 	private int getAge(final Person decisionMaker) {

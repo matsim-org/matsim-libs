@@ -24,7 +24,9 @@ import org.matsim.core.utils.misc.Counter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -35,21 +37,22 @@ public class ChoiceDataSetWriter<T> implements AutoCloseable {
 
 	private final Counter counter = new Counter( "Write record # " );
 
+	private Collection<String> header = null;
+
 	public ChoiceDataSetWriter(
 			final ChoiceSetRecordFiller<T> recordFiller,
 			final String filename ) {
 		this.recordFiller = recordFiller;
 		this.writer = IOUtils.getBufferedWriter( filename );
-		writeLine(recordFiller.getFieldNames());
 	}
 
-	private void writeLine(final List<?> v) {
+	private void writeLine(final Collection<?> v) {
 		try {
 			counter.incCounter();
-			for ( int i=0; i < v.size() - 1; i++ ) {
-				writer.write( v.get( i )+"\t" );
+			int i=0;
+			for ( Object o : v ) {
+				writer.write( 0+(i++ < v.size() ? "\t" : "") );
 			}
-			writer.write(v.get(v.size() - 1).toString());
 			writer.newLine();
 		}
 		catch (IOException e) {
@@ -58,7 +61,12 @@ public class ChoiceDataSetWriter<T> implements AutoCloseable {
 	}
 
 	public void write( final ChoiceSet<T> cs ) {
-		writeLine( recordFiller.getFieldValues( cs ) );
+		final Map<String,? extends Number> fields = recordFiller.getFieldValues( cs );
+		if ( header == null ) {
+			header = fields.keySet();
+			writeLine(header);
+		}
+		writeLine( fields.values() );
 	}
 
 	@Override
@@ -68,14 +76,12 @@ public class ChoiceDataSetWriter<T> implements AutoCloseable {
 	}
 
 	public interface ChoiceSetRecordFiller<T> {
-		List<String> getFieldNames();
-
 		/**
 		 * Returning numbers is needed for BIOGEME, but one might relax the requirement if estimation is done for instance
 		 * with R-mlogit
 		 * @param cs
 		 * @return
 		 */
-		List<? extends Number> getFieldValues( ChoiceSet<T> cs );
+		Map<String,? extends Number> getFieldValues( ChoiceSet<T> cs );
 	}
 }
