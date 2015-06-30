@@ -51,7 +51,7 @@ class SurrogateSolutionEstimator {
 
 	// TODO make this configurable
 	private static final int maxIterations = 1000;
-	
+
 	// -------------------- NO CONSTRUCTION --------------------
 
 	private SurrogateSolutionEstimator() {
@@ -150,7 +150,7 @@ class SurrogateSolutionEstimator {
 		// regularizationScale);
 
 		System.out.print("solving for alpha ");
-		int iteration = 0;		
+		int iteration = 0;
 		while (!noMoreImprovement && iteration < maxIterations) {
 
 			// >>>>>>>>>> TODO NEW >>>>>>>>>>
@@ -221,7 +221,7 @@ class SurrogateSolutionEstimator {
 			// }
 		}
 		System.out.println();
-		
+
 		return alphas;
 	}
 
@@ -292,8 +292,10 @@ class SurrogateSolutionEstimator {
 		final double equivalentAveragingIterations = 1.0 / alphas
 				.innerProd(alphas);
 		// TODO only one function call
-		final double absoluteConvergenceGap = Math.sqrt(squareGap(
-				stateCovariances, alphas, 0.0));
+		final double squareConvergenceGap = squareGap(stateCovariances, alphas,
+				0.0);
+		// TODO because tiny negative numbers may come out
+		final double absoluteConvergenceGap = Math.sqrt(Math.max(0.0, squareConvergenceGap));
 
 		// Create and return a properties object representing these results.
 		return new SurrogateSolutionProperties(decisionVariable2alphaSum,
