@@ -29,14 +29,14 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
- * @author droeder
+ * @author aneumann, droeder
  */
 public class TransitSchedule2Shp extends AbstractAnalyisModule{
 	
@@ -84,15 +84,15 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 	public void writeResults(String outputFolder) {
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		// write a shape per line
-		for(TransitLine l: this.schedule.getTransitLines().values()){
-			if(l.getRoutes().isEmpty()){
-				log.warn("can not create a shapefile for transitline " + l.getId() + ", because the line contains no routes...");
+		for(TransitLine transitLine: this.schedule.getTransitLines().values()){
+			if(transitLine.getRoutes().isEmpty()){
+				log.warn("can not create a shapefile for transitline " + transitLine.getId() + ", because the line contains no routes...");
 				continue;
 			}
-			Collection<SimpleFeature> temp = getTransitLineFeatures(l, this.targetCoordinateSystem);
+			Collection<SimpleFeature> temp = getTransitLineFeatures(transitLine, this.targetCoordinateSystem);
 			features.addAll(temp);
 			try{
-				ShapeFileWriter.writeGeometries(temp, outputFolder + l.getId().toString() + ".shp");
+				ShapeFileWriter.writeGeometries(temp, outputFolder + transitLine.getId().toString() + ".shp");
 			}catch(ServiceConfigurationError e){
 				e.printStackTrace();
 			}
@@ -109,90 +109,88 @@ public class TransitSchedule2Shp extends AbstractAnalyisModule{
 		}
 	}
 	
-	private Collection<SimpleFeature> getTransitLineFeatures(TransitLine l, String targetCoordinateSystem) {
-		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
-		b.setCRS(MGC.getCRS(targetCoordinateSystem));
-		b.setName("transitLineFeature");
-		b.add("LineString", LineString.class);
-		b.add("line", String.class);
-		b.add("route", String.class);
-		b.add("mode", String.class);
-		b.add("tourLength", Double.class);
-		b.add("tourTime", Double.class);
-		b.add("nrVeh", Double.class);
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
+	private Collection<SimpleFeature> getTransitLineFeatures(TransitLine transitLine, String targetCoordinateSystem) {
+		SimpleFeatureTypeBuilder simpleFeatureBuilder = new SimpleFeatureTypeBuilder();
+		simpleFeatureBuilder.setCRS(MGC.getCRS(targetCoordinateSystem));
+		simpleFeatureBuilder.setName("transitLineFeature");
+		simpleFeatureBuilder.add("the_geom", LineString.class);
+		simpleFeatureBuilder.add("line", String.class);
+		simpleFeatureBuilder.add("route", String.class);
+		simpleFeatureBuilder.add("from", String.class);
+		simpleFeatureBuilder.add("via", String.class);
+		simpleFeatureBuilder.add("to", String.class);
+		simpleFeatureBuilder.add("mode", String.class);
+		simpleFeatureBuilder.add("tourLength", Double.class);
+		simpleFeatureBuilder.add("tourTime", String.class);
+		simpleFeatureBuilder.add("nVeh", Integer.class);
+		simpleFeatureBuilder.add("headway", String.class);
+		simpleFeatureBuilder.add("nDeparture", Integer.class);
+		simpleFeatureBuilder.add("avgSpeed", Double.class);
+		simpleFeatureBuilder.add("fsFactor", Double.class);
+		simpleFeatureBuilder.add("firstDep", String.class);
+		simpleFeatureBuilder.add("lastDep", String.class);
+		simpleFeatureBuilder.add("timeOper", String.class);
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(simpleFeatureBuilder.buildFeatureType());
 		
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		Object[] featureAttribs;
-		for(TransitRoute r: l.getRoutes().values()){
-			featureAttribs = getRouteFeatureAttribs(r,l.getId(),  new Object[7]);
+		Object[] routeFeatureAttributes;
+		for(TransitRoute transitRoute: transitLine.getRoutes().values()){
+			routeFeatureAttributes = getRouteFeatureAttribs(transitRoute, transitLine.getId(), new Object[17]);
 			try {
-				features.add(builder.buildFeature(r.getId().toString(), featureAttribs));
-			} catch (IllegalArgumentException e1) {
-				e1.printStackTrace();
+				features.add(builder.buildFeature(transitRoute.getId().toString(), routeFeatureAttributes));
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
 			}
 		}
 		 return features;
 	}
 
-	private Object[] getRouteFeatureAttribs(TransitRoute r, Id lineId, Object[] o ) {
+	private Object[] getRouteFeatureAttribs(TransitRoute transitRoute, Id<TransitLine> lineId, Object[] routeFeatureAttributes ) {
+		
 		List<Coordinate> coords = new ArrayList<Coordinate>();
 
-		// #### create the lineString
+		// Create the polyline (lineString)
+		
 		// add the startLink
-		Coord toNode = this.network.getLinks().get(r.getRoute().getStartLinkId()).getToNode().getCoord();
+		Coord toNode = this.network.getLinks().get(transitRoute.getRoute().getStartLinkId()).getToNode().getCoord();
 		coords.add(new Coordinate(toNode.getX(), toNode.getY(), 0.));
+		
 		// add the routeLinks
-		for(Id linkId : r.getRoute().getLinkIds()){
+		for(Id<Link> linkId : transitRoute.getRoute().getLinkIds()){
 			toNode = this.network.getLinks().get(linkId).getToNode().getCoord();
 			coords.add(new Coordinate(toNode.getX(), toNode.getY(), 0.));
 		}
+		
 		//add the endlink
-		toNode = this.network.getLinks().get(r.getRoute().getEndLinkId()).getToNode().getCoord();
+		toNode = this.network.getLinks().get(transitRoute.getRoute().getEndLinkId()).getToNode().getCoord();
 		coords.add(new Coordinate(toNode.getX(), toNode.getY(), 0.));
+		
 		// create an array
 		Coordinate[] coord = new Coordinate[coords.size()];
 		coord = coords.toArray(coord);
-		LineString ls = new GeometryFactory().createLineString(new CoordinateArraySequence(coord));
-		o[0] = ls;
-		o[1] = lineId.toString();
-		o[2] = r.getId();
-		o[3] = r.getTransportMode();
-		o[4] = getTourLength(r);
-		o[5] = getTourTime(r);
-		o[6] = getNrVeh(r);
-		return o;
-	}
+		LineString lineString = new GeometryFactory().createLineString(new CoordinateArraySequence(coord));
 
-	private Double getTourLength(TransitRoute r) {
-		Double l = 0.;
-		l += this.network.getLinks().get(r.getRoute().getStartLinkId()).getLength();
-		for(Id id: r.getRoute().getLinkIds()){
-			l += this.network.getLinks().get(id).getLength();
-		}
-		l += this.network.getLinks().get(r.getRoute().getEndLinkId()).getLength();
-		return l;
+		// get the content
+		TransitRouteData transitRouteData = new TransitRouteData(this.network, transitRoute);
+		
+		routeFeatureAttributes[0] = lineString;
+		routeFeatureAttributes[1] = lineId.toString();
+		routeFeatureAttributes[2] = transitRoute.getId();
+		routeFeatureAttributes[3] = transitRouteData.getFirstStopName();
+		routeFeatureAttributes[4] = transitRouteData.getViaStopName();
+		routeFeatureAttributes[5] = transitRouteData.getLastStopName();
+		routeFeatureAttributes[6] = transitRoute.getTransportMode();
+		routeFeatureAttributes[7] = transitRouteData.getDistance();
+		routeFeatureAttributes[8] = Time.writeTime(transitRouteData.getTravelTime(), Time.TIMEFORMAT_HHMMSS);
+		routeFeatureAttributes[9] = transitRouteData.getNVehicles();
+		routeFeatureAttributes[10] = Time.writeTime(transitRouteData.getHeadway(), Time.TIMEFORMAT_HHMMSS);
+		routeFeatureAttributes[11] = transitRouteData.getNDepartures();
+		routeFeatureAttributes[12] = transitRouteData.getAvgSpeed() * 3.6;
+		routeFeatureAttributes[13] = transitRouteData.getFreeSpeedFactor();
+		routeFeatureAttributes[14] = Time.writeTime(transitRouteData.getFirstDeparture(), Time.TIMEFORMAT_HHMMSS);
+		routeFeatureAttributes[15] = Time.writeTime(transitRouteData.getLastDeparture(), Time.TIMEFORMAT_HHMMSS);
+		routeFeatureAttributes[16] = Time.writeTime(transitRouteData.getOperatingDuration(), Time.TIMEFORMAT_HHMMSS);
+		return routeFeatureAttributes;
 	}
-
-	private Double getTourTime(TransitRoute r) {
-		Double t = - Double.MAX_VALUE;
-		for(TransitRouteStop s: r.getStops()){
-			if(s.getDepartureOffset() > t){
-				t = s.getDepartureOffset();
-			}
-		}
-		return t;
-	}
-
-	private Double getNrVeh(TransitRoute r) {
-		List<Id> ids = new ArrayList<Id>();
-		for(Departure d: r.getDepartures().values()){
-			if(!ids.contains(d.getVehicleId())){
-				ids.add(d.getVehicleId());
-			}
-		}
-		return (double) ids.size();
-	}
-	
 }
