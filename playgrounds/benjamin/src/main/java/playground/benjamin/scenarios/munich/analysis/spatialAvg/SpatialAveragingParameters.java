@@ -25,7 +25,7 @@ public class SpatialAveragingParameters {
 
 	private int numberOfXBins = 160;
 	private int numberOfYBins = 120;
-	private double smoothingRadius_m = 1000.;
+	private double smoothingRadius_m = 250.;
 	private double smoothingRadiusSquared_m;
 	private double areaInSmoothingCirleSqkm;
 	private String visBoundaryShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";

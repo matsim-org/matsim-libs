@@ -65,8 +65,8 @@ public class LinkLineWeightUtil implements LinkWeightUtil {
 		}
 		double  weight = constantC *(integrationUpperLimit-integrationLowerLimit);
 		if(weight<0.0) {
-			logger.warn("Weight is negative, please check. Weight = "+weight);
-		}
+			throw new RuntimeException("Weight is negative: weight = " + weight + ". Aborting...");
+		} else if (Double.isNaN(weight)) weight = 0.0;
 		return weight;
 	}
 	private double getConstantA(Coord fromNodeCoord, double cellCentroidX, double cellCentroidY){

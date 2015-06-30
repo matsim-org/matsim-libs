@@ -36,10 +36,14 @@ public class SpatialAveragingInputData {
 //	private static double yMin=5324955.00;
 //	private static double yMax=5345696.81;
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:32646");
-	private final double xMin = 458823.0;
-	private final double xMax = 544945.0;
-	private final double yMin = 6190162.0;
-	private final double yMax = 6248014.0;
+//	private final double xMin = 458823.0;
+//	private final double xMax = 544945.0;
+//	private final double yMin = 6190162.0;
+//	private final double yMax = 6248014.0;
+	private final double xMin = 483895.0;
+	private final double xMax = 502066.0;
+	private final double yMin = 6202213.0;
+	private final double yMax = 6212963.0;
 	
 	double scalingFactor;
 	private String netFile;
