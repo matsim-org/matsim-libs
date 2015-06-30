@@ -55,7 +55,8 @@ public class TripChoicesIdentifier implements ChoicesIdentifier<TripChoiceSituat
 							facilities.getFacilities().get( t.getOriginActivity().getFacilityId() ),
 							t.getTripElements(),
 							facilities.getFacilities().get( t.getDestinationActivity().getFacilityId() ) );
-			choices.add( new TripChoiceSituation( choice , trips , i++ ) );
+			choices.add( new TripChoiceSituation( choice , trips , i ) );
+			i++;
 		}
 
 		return choices;
