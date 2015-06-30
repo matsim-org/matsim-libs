@@ -109,7 +109,7 @@ public class RunBraessSimulation {
 		config.controler().setLastIteration( 100 );
 
 		// able or enable signals and lanes
-		config.scenario().setUseLanes( false );
+		config.scenario().setUseLanes( true );
 		config.scenario().setUseSignalSystems( false );
 		
 		// set brain exp beta
