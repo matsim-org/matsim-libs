@@ -30,48 +30,56 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactor
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 
-
 /**
  * @author dgrether
- *
+ * 
  */
 public class SignalUtils {
 
-	
-	private SignalUtils(){}
+	private SignalUtils() {
+	}
 
 	/**
 	 * Creates a SignalGroupData instance for each SignalData instance of the
-	 * SignalSystemData instance given as parameter and adds it to the SignalGroupsData
-	 * container given as parameter. The SignalGroupData instance
-	 * has the same Id as the SignalData instance.
-	 * @param groups The container to that the SignalGroupData instances are added.
-	 * @param system The SignalSystemData instance  whose SignalData Ids serve
-	 * as template for the SignalGroupData
+	 * SignalSystemData instance given as parameter and adds it to the
+	 * SignalGroupsData container given as parameter. The SignalGroupData
+	 * instance has the same Id as the SignalData instance.
+	 * 
+	 * @param groups
+	 *            The container to that the SignalGroupData instances are added.
+	 * @param system
+	 *            The SignalSystemData instance whose SignalData Ids serve as
+	 *            template for the SignalGroupData
 	 */
-	public static void createAndAddSignalGroups4Signals(SignalGroupsData groups, SignalSystemData system) {
-		for (SignalData signal : system.getSignalData().values()){
-			SignalGroupData group4signal = groups.getFactory().createSignalGroupData(system.getId(), Id.create(signal.getId(), SignalGroup.class));
+	public static void createAndAddSignalGroups4Signals(
+			SignalGroupsData groups, SignalSystemData system) {
+		
+		for (SignalData signal : system.getSignalData().values()) {
+			SignalGroupData group4signal = groups.getFactory()
+					.createSignalGroupData(system.getId(),
+							Id.create(signal.getId(), SignalGroup.class));
 			group4signal.addSignalId(signal.getId());
 			groups.addSignalGroupData(group4signal);
 		}
 	}
-	
+
 	/**
-	 * Convenience method to create a signal with the given Id on the link with the given Id on the lanes
-	 * with the given Ids. The signal is added to the SignalSystemData. 
+	 * Convenience method to create a signal with the given Id on the link with
+	 * the given Id on the lanes with the given Ids. The signal is added to the
+	 * SignalSystemData.
 	 */
-	public static void createAndAddSignal(SignalSystemData sys, SignalSystemsDataFactory factory, 
-			Id<Signal> signalId, Id<Link> linkId, Id<Lane>... laneIds){
+	public static void createAndAddSignal(SignalSystemData sys,
+			SignalSystemsDataFactory factory, Id<Signal> signalId,
+			Id<Link> linkId, Id<Lane>... laneIds) {
+		
 		SignalData signal = factory.createSignalData(signalId);
 		sys.addSignalData(signal);
 		signal.setLinkId(linkId);
-		if (laneIds != null){
-			for (Id<Lane> laneId : laneIds){
+		if (laneIds != null) {
+			for (Id<Lane> laneId : laneIds) {
 				signal.addLaneId(laneId);
 			}
 		}
 	}
-	
-	
+
 }
