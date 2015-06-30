@@ -36,7 +36,7 @@ public abstract class AbstractTaxiOptimizer
     protected final TaxiOptimizerConfiguration optimConfig;
     protected final Collection<TaxiRequest> unplannedRequests;
 
-    private final boolean doUnscheduleAwaitingRequests;
+    private final boolean doUnscheduleAwaitingRequests;//PLANNED or TAXI_DISPATCHED
     private final boolean destinationKnown;
     private final boolean vehicleDiversion;
 

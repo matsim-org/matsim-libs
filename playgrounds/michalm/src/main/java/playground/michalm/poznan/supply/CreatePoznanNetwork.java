@@ -16,8 +16,11 @@ public class CreatePoznanNetwork
 {
     public static void main(String[] args)
     {
-        String osmFile = "d:/GoogleDrive/Poznan/Osm_2015_02/Source/Poznan_2015_02_05_all.osm";
-        String networkFile = "d:/PP-rad/poznan/test/Poznan_2015_02_05_all.xml";
+//        String osmFile = "d:/GoogleDrive/Poznan/Osm_2015_02/Source/Poznan_2015_02_05_all.osm";
+//        String networkFile = "d:/PP-rad/poznan/test/Poznan_2015_02_05_all.xml";
+
+        String osmFile = "d:/GoogleDrive/Poznan/Osm_2015_02/Source/Poznan_2015_02_05_down2tertiary.osm";
+        String networkFile = "d:/PP-rad/poznan/test/Poznan_2015_02_05_down2tertiary.xml";
 
         Config config = ConfigUtils.createConfig();
         Scenario scenario = ScenarioUtils.createScenario(config);
