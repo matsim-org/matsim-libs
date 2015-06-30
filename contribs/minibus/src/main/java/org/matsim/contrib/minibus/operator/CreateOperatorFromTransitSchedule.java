@@ -175,7 +175,6 @@ public final class CreateOperatorFromTransitSchedule implements PStrategy {
 	private TransitSchedule readTransitSchedule(String transitScheduleToStartWith) {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
-		sc.getConfig().scenario().setUseVehicles(true);
 		log.info("Reading " + transitScheduleToStartWith);
 		new TransitScheduleReaderV1(sc).readFile(transitScheduleToStartWith);
 		return sc.getTransitSchedule();
