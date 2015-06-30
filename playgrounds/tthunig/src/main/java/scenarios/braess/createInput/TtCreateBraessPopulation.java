@@ -43,32 +43,29 @@ public class TtCreateBraessPopulation {
 	private int numberOfPersons;
 	
 	private boolean simulateInflowCap7 = false;
-	private boolean simulateInflowCap8 = false;
 	private boolean simulateInflowCap9 = false;
 	
 	public TtCreateBraessPopulation(Population pop, Network net) {
 		this.population = pop;
 		this.network = net;
 		
-		prepareFields();
+		checkInflowSimulation();
 	}
 
 	/**
-	 * Checks whether the network simulates inflow capacity at links 2_3, 2_4
-	 * and 4_5 or not.
+	 * Checks whether the network simulates inflow capacity at links 2_3 and 4_5
+	 * or not.
 	 * 
-	 * If the network contains nodes 7, 8 or 9, it simulates inflow capacity;
+	 * If the network contains nodes 7 or 9, it simulates inflow capacity;
 	 * otherwise it doesn't.
 	 * 
 	 * The boolean simulateInflowCap is necessary for creating initial plans in
 	 * createPersons(...)
 	 */
-	private void prepareFields() {
+	private void checkInflowSimulation() {
 		
 		if (this.network.getNodes().containsKey(Id.createNodeId(7)))
 			this.simulateInflowCap7 = true;
-		if (this.network.getNodes().containsKey(Id.createNodeId(8)))
-			this.simulateInflowCap8 = true;
 		if (this.network.getNodes().containsKey(Id.createNodeId(9)))
 			this.simulateInflowCap9 = true;
 	}
@@ -236,13 +233,7 @@ public class TtCreateBraessPopulation {
 							TransportMode.car);
 					List<Id<Link>> pathDown = new ArrayList<>();
 					pathDown.add(Id.createLinkId("1_2"));
-					if (!this.simulateInflowCap8){
-						pathDown.add(Id.createLinkId("2_4"));
-					}
-					else{
-						pathDown.add(Id.createLinkId("2_8"));
-						pathDown.add(Id.createLinkId("8_4"));
-					}
+					pathDown.add(Id.createLinkId("2_4"));
 					if (!this.simulateInflowCap9){
 						pathDown.add(Id.createLinkId("4_5"));
 					}

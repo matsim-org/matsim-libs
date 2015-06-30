@@ -6,9 +6,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-//import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
@@ -30,6 +27,7 @@ import playground.dgrether.DgPaths;
 import scenarios.braess.analysis.TtBraessControlerListener;
 import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes;
 import scenarios.braess.createInput.TtCreateBraessPopulation;
+import scenarios.braess.createInput.TtCreateBraessSignals;
 
 /**
  * Class to run a simulation of the braess scenario without signals. It also
@@ -43,9 +41,6 @@ public class RunBraessSimulation {
 	private static final Logger log = Logger
 			.getLogger(RunBraessSimulation.class);
 	
-	private final String INPUT_DIR = DgPaths.SHAREDSVN
-			+ "projects/cottbus/data/scenarios/braess_scenario/";
-	
 	/* population parameter */
 	// If false, agents are initialized without any routes. If true, with all
 	// three possible routes.
@@ -58,8 +53,11 @@ public class RunBraessSimulation {
 	private final double SIGMA = 0.0;	
 		
 
-	private void prepareRunAndAnalyse() {
-		log.info("Starts running the simulation from input directory " + INPUT_DIR);
+	/**
+	 * prepare, run and analyze the Braess simulation
+	 */
+	private void prepareRunAndAnalyze() {
+		log.info("Starts running the simulation.");
 		
 		// prepare config and scenario		
 		Config config = defineConfig();
@@ -67,14 +65,16 @@ public class RunBraessSimulation {
 		createNetwork(scenario);
 		createPopulation(scenario);
 		createRunNameAndOutputDir(scenario);
+		
 		if (config.scenario().isUseSignalSystems()){
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, 
 					new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+			
+			createSignals(scenario);
 		}
 		
 		// prepare the controller
 		Controler controler = new Controler(scenario);
-//		controler.addOverridingModule(new OTFVisModule());
 		
 		if (config.scenario().isUseSignalSystems()){
 			// add the signals module if signal systems are used
@@ -105,17 +105,12 @@ public class RunBraessSimulation {
 	private Config defineConfig() {
 		Config config = ConfigUtils.createConfig();
 
-		// choose whether lanes should be used or not
-		config.scenario().setUseLanes( true );
-
 		// set number of iterations
 		config.controler().setLastIteration( 100 );
 
-		// set signal files
+		// able or enable signals and lanes
+		config.scenario().setUseLanes( false );
 		config.scenario().setUseSignalSystems( false );
-		config.signalSystems().setSignalControlFile(INPUT_DIR + "signalControl_Green.xml");
-		config.signalSystems().setSignalGroupsFile(INPUT_DIR + "signalGroups.xml");
-		config.signalSystems().setSignalSystemFile(INPUT_DIR + "signalSystems.xml");
 		
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta( 20 );
@@ -202,6 +197,7 @@ public class RunBraessSimulation {
 	private void createNetwork(Scenario scenario) {	
 		
 		TtCreateBraessNetworkAndLanes netCreator = new TtCreateBraessNetworkAndLanes(scenario);
+		netCreator.setSimulateInflowCap( true );
 		netCreator.createNetwork();
 		
 		if (scenario.getConfig().scenario().isUseLanes()){
@@ -215,6 +211,12 @@ public class RunBraessSimulation {
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(3600);
 		popCreator.createPersons(INIT_WITH_ALL_ROUTES, INIT_PLAN_SCORE);
+	}
+
+	private void createSignals(Scenario scenario) {
+
+		TtCreateBraessSignals signalsCreator = new TtCreateBraessSignals(scenario);
+		signalsCreator.createSignals();
 	}
 
 	private void createRunNameAndOutputDir(Scenario scenario) {
@@ -282,10 +284,7 @@ public class RunBraessSimulation {
 			runName += "_node2node";
 		
 		if (config.scenario().isUseSignalSystems()){
-			String[] signalsInfoSplit = config.signalSystems().getSignalControlFile()
-					.split("\\.")[0].split("_");
-			String signalsInfo = signalsInfoSplit[signalsInfoSplit.length - 1];
-			runName += "_signals" + signalsInfo;
+			runName += "_signals";
 		}
 
 		String outputDir = DgPaths.RUNSSVN + "braess/" + runName + "/";
@@ -296,6 +295,6 @@ public class RunBraessSimulation {
 	}
 
 	public static void main(String[] args) {
-		new RunBraessSimulation().prepareRunAndAnalyse();
+		new RunBraessSimulation().prepareRunAndAnalyze();
 	}
 }
