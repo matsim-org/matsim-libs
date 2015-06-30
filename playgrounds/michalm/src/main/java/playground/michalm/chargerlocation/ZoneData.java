@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,70 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+package playground.michalm.chargerlocation;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.utils.geometry.geotools.MGC;
+import java.util.*;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
+import org.matsim.api.core.v01.Id;
+
+import playground.michalm.zone.Zone;
 
 
-public class Zone
-    implements BasicLocation<Zone>
+public class ZoneData
 {
-    private final Id<Zone> id;
-    private final String type;
-
-    private MultiPolygon multiPolygon;
-    private Coord centroid;
-
-
-    public Zone(Id<Zone> id, String type)
+    public static class Entry
     {
-        this.id = id;
-        this.type = type;
+        public final Zone zone;
+        public final double potential;
+
+
+        public Entry(Zone zone, double potential)
+        {
+            this.zone = zone;
+            this.potential = potential;
+        }
     }
 
 
-    public Zone(Id<Zone> id, String type, MultiPolygon multiPolygon)
+    public final List<Entry> entries = new ArrayList<>();
+    public final double totalPotential;
+    public final double potentialToEnergy;
+
+
+    public ZoneData(Map<Id<Zone>, Zone> zones, Map<Id<Zone>, Double> zonePotentials,
+            double potentialToEnergy)
     {
-        this.id = id;
-        this.type = type;
+        this.potentialToEnergy = potentialToEnergy;
 
-        this.multiPolygon = multiPolygon;
-        centroid = MGC.point2Coord(multiPolygon.getCentroid());
-    }
-
-
-    @Override
-    public Id<Zone> getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public Coord getCoord()
-    {
-        return centroid;
-    }
-
-
-    public String getType()
-    {
-        return type;
-    }
-
-
-    public MultiPolygon getMultiPolygon()
-    {
-        return multiPolygon;
-    }
-
-
-    public void setMultiPolygon(MultiPolygon multiPolygon)
-    {
-        this.multiPolygon = multiPolygon;
-        centroid = MGC.point2Coord(multiPolygon.getCentroid());
+        double potentialSum = 0;
+        for (Zone z : zones.values()) {
+            double p = zonePotentials.get(z.getId());
+            entries.add(new Entry(z, p));
+            potentialSum += p;
+        }
+        totalPotential = potentialSum;
     }
 }

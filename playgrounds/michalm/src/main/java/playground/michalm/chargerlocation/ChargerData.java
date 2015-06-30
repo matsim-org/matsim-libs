@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,70 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+package playground.michalm.chargerlocation;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.core.utils.geometry.geotools.MGC;
-
-import com.vividsolutions.jts.geom.MultiPolygon;
+import java.util.List;
 
 
-public class Zone
-    implements BasicLocation<Zone>
+public class ChargerData
 {
-    private final Id<Zone> id;
-    private final String type;
-
-    private MultiPolygon multiPolygon;
-    private Coord centroid;
+    public final List<ChargingStation> stations;
+    public final double totalPower;
+    public final double powerToEnergy;
 
 
-    public Zone(Id<Zone> id, String type)
+    public ChargerData(List<ChargingStation> stations, double powerToEnergy)
     {
-        this.id = id;
-        this.type = type;
-    }
+        this.stations = stations;
+        this.powerToEnergy = powerToEnergy;
 
-
-    public Zone(Id<Zone> id, String type, MultiPolygon multiPolygon)
-    {
-        this.id = id;
-        this.type = type;
-
-        this.multiPolygon = multiPolygon;
-        centroid = MGC.point2Coord(multiPolygon.getCentroid());
-    }
-
-
-    @Override
-    public Id<Zone> getId()
-    {
-        return id;
-    }
-
-
-    @Override
-    public Coord getCoord()
-    {
-        return centroid;
-    }
-
-
-    public String getType()
-    {
-        return type;
-    }
-
-
-    public MultiPolygon getMultiPolygon()
-    {
-        return multiPolygon;
-    }
-
-
-    public void setMultiPolygon(MultiPolygon multiPolygon)
-    {
-        this.multiPolygon = multiPolygon;
-        centroid = MGC.point2Coord(multiPolygon.getCentroid());
+        double powerSum = 0;
+        for (ChargingStation s : stations) {
+            powerSum += s.getPower();
+        }
+        totalPower = powerSum;
     }
 }

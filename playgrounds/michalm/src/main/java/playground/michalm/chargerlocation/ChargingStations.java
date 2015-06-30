@@ -17,43 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.zone;
+package playground.michalm.chargerlocation;
 
-import org.matsim.api.core.v01.*;
+import java.util.*;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.geometry.CoordImpl;
+
+import playground.michalm.zone.Zone;
 
 
-public class Centroid
-    implements BasicLocation<Centroid>
+public class ChargingStations
 {
-    private final Zone zone;
-    private final Id<Centroid> id;
-    private final Coord coord;
-
-
-    public Centroid(Zone zone)
+    public static ChargingStation createStation(long id, double x, double y, double power)
     {
-        this.zone = zone;
-        id = Id.create(zone.getId(), Centroid.class);
-        coord = Zones.getCentroidCoord(zone);
+        return new ChargingStation(Id.create(id, ChargingStation.class), new CoordImpl(x, y), power);
     }
 
 
-    @Override
-    public Id<Centroid> getId()
+    public static List<ChargingStation> createStationsInZones(Iterable<Zone> zones, double power)
     {
-        return id;
+        List<ChargingStation> stations = new ArrayList<>();
+        for (Zone z : zones) {
+            stations.add(new ChargingStation(Id.create(z.getId(), ChargingStation.class), z
+                    .getCoord(), power));
+        }
+
+        return stations;
     }
 
-
-    @Override
-    public Coord getCoord()
-    {
-        return coord;
-    }
-
-
-    public Zone getZone()
-    {
-        return zone;
-    }
 }
