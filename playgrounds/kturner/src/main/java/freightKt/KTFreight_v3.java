@@ -75,6 +75,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,7 +132,7 @@ public class KTFreight_v3 {
 
 //Beginn Namesdefinition KT Für Test-Szenario (Grid)
 	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Grid/CordonToll/" ;
+	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Grid/CordonToll3/" ;
 	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 
 	//Dateinamen ohne XML-Endung
@@ -140,15 +142,19 @@ public class KTFreight_v3 {
 	private static final String ALGORITHM_NAME = "mdvrp_algorithmConfig_2" ;
 	private static final String TOLL_NAME = "grid-tollCordon";
 	private static final String LEZ_NAME = "grid-tollDistance"; 
-	//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
+	//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId). Vermeide "_", 
+	//um die Analyse der MATSIMEvents einfacher zu gestalten (Dort ist "_" als Trennzeichen verwendet.
 	private static final String uccC_prefix = "UCC-";		
 	// All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if all should be used.
+	//TODO: add Warning, if Name does not exists in carrier-File
 	private static final ArrayList<String> retailerNames = null ;
+//			new ArrayList<String>(Arrays.asList("gridCarrier3"));
 //		= new ArrayList<String>("gridCarrier", "gridCarrier1", "gridCarrier2", "gridCarrier3"); 
 	//Location of UCC
 	private static final ArrayList<String> uccDepotsLinkIdsString =
 		new ArrayList<String>(Arrays.asList("j(0,5)", "j(10,5)")); 
 	// VehicleTypes die vom Maut betroffen seien sollen. null, wenn alle (ohne Einschränkung) bemautet werden sollen
+	//TODO: add Warning, if Name does not exists in carrier-File and /or vehType-File (oder andere klare Restriktion)
 	private static final ArrayList<String> onlyTollVehTypes =  null;
 //		new ArrayList<String>(Arrays.asList("gridType01", "gridType03", "gridType05", "gridType10")); 
 //	//Ende Namesdefinition Grid
@@ -547,19 +553,26 @@ public class KTFreight_v3 {
 			throw new RuntimeException(e);
 		}
 
+		
+		Collection<Id<VehicleType>> vehTypesAddedToRPS = new ArrayList<Id<VehicleType>>();
 		//keine Einschränkung eingegeben -> alle bemauten
 		if (onlyTollVehTypes == null) {
 			for(Carrier c : carriers.getCarriers().values()){
 				for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
-					rpCalculator.addPricingScheme(v.getVehicleType().getId().toString(), scheme);
+					Id<VehicleType> typeId = v.getVehicleType().getId();
+					if (!vehTypesAddedToRPS.contains(typeId)) {
+						vehTypesAddedToRPS.add(typeId);
+						rpCalculator.addPricingScheme(typeId, scheme);
+					}
 				}
 			}
 		} else {
 			for(Carrier c : carriers.getCarriers().values()){
 				for(CarrierVehicle v : c.getCarrierCapabilities().getCarrierVehicles()){
 					Id<VehicleType> typeId = v.getVehicleType().getId();
-					if (onlyTollVehTypes.contains(typeId.toString())){
-						rpCalculator.addPricingScheme(typeId.toString(), scheme);
+					if (onlyTollVehTypes.contains(typeId.toString()) & !vehTypesAddedToRPS.contains(typeId)){
+						vehTypesAddedToRPS.add(typeId);
+						rpCalculator.addPricingScheme(typeId, scheme);
 					}
 				}
 			}
