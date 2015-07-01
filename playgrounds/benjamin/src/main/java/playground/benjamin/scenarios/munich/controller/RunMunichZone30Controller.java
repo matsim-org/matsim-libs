@@ -133,9 +133,9 @@ public class RunMunichZone30Controller extends AbstractController {
 		final StrategyManager strategyManager = buildStrategyManager() ;
 		this.addCoreControlerListener(new PlansReplanningImpl( strategyManager, this.population ));
 
-		final PlansDumping plansDumping = new PlansDumpingImpl( this.scenario, this.config.controler().getFirstIteration(), 
-				this.config.controler().getWritePlansInterval(), stopwatch, getControlerIO() );
-		this.addCoreControlerListener(plansDumping);
+//		final PlansDumping plansDumping = new PlansDumpingImpl( this.scenario, this.config.controler().getFirstIteration(),
+//				this.config.controler().getWritePlansInterval(), stopwatch, getControlerIO() );
+//		this.addCoreControlerListener(plansDumping);
 
 		this.addCoreControlerListener(new LegTimesControlerListener(legTimes, getControlerIO()));
 		final EventsHandling eventsHandling = new EventsHandlingImpl((EventsManagerImpl) eventsManager,

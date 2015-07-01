@@ -17,8 +17,9 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.controler;
+package org.matsim.core.controler.corelisteners;
 
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.DumpDataAtEndImpl;
 import org.matsim.core.controler.corelisteners.EventsHandling;

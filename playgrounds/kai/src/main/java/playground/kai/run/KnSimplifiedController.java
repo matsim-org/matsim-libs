@@ -121,9 +121,9 @@ public class KnSimplifiedController extends AbstractController {
 		final StrategyManager strategyManager = createStrategyManager() ;
 		this.addCoreControlerListener(new PlansReplanningImpl( strategyManager, this.population ));
 
-		final PlansDumping plansDumping = new PlansDumpingImpl( this.scenario, this.config.controler().getFirstIteration(), 
-				this.config.controler().getWritePlansInterval(), stopwatch, getControlerIO() );
-		this.addCoreControlerListener(plansDumping);
+//		final PlansDumping plansDumping = new PlansDumpingImpl( this.scenario, this.config.controler().getFirstIteration(),
+//				this.config.controler().getWritePlansInterval(), stopwatch, getControlerIO() );
+//		this.addCoreControlerListener(plansDumping);
 
 		this.addCoreControlerListener(new LegTimesControlerListener(legTimes, getControlerIO()));
 		

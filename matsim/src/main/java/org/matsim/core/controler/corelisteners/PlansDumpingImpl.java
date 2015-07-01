@@ -42,7 +42,7 @@ import com.google.inject.Singleton;
  * @author mrieser
  */
 @Singleton
-public final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
+final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListener {
 
 	static final private Logger log = Logger.getLogger(PlansDumpingImpl.class);
 	private Scenario sc ;
@@ -53,7 +53,7 @@ public final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListene
 	boolean calledViaOldConstructor = false ;
 
 	@Inject
-	public PlansDumpingImpl(
+	PlansDumpingImpl(
 			final Scenario sc,
 			final IterationStopWatch stopwatch,
 			final OutputDirectoryHierarchy controlerIO ) {
@@ -62,20 +62,6 @@ public final class PlansDumpingImpl implements PlansDumping, BeforeMobsimListene
 		this.writePlansInterval = sc.getConfig().controler().getWritePlansInterval();
 		this.stopwatch = stopwatch ;
 		this.controlerIO = controlerIO ;
-	}
-
-	public PlansDumpingImpl(Scenario sc, int firstIteration, int writePlansInterval, IterationStopWatch stopwatch,
-			OutputDirectoryHierarchy controlerIO ) {
-		this.sc = sc ;
-		this.firstIteration = firstIteration ;
-		this.writePlansInterval = writePlansInterval ;
-		this.stopwatch = stopwatch ;
-		this.controlerIO = controlerIO ;
-	}
-
-	@Deprecated // use other contructor; do not assume that Controler object is accessible from here.  kai, jun'12
-	public PlansDumpingImpl() {
-		calledViaOldConstructor = true ;
 	}
 
 	@Override
