@@ -68,13 +68,13 @@ public class ChargerLocationSolver
             addChargerCountConstraint();
             model.update();
 
-            //model.write("D:\\model.lp");
+            //model.write("D:/model.lp");
 
             applyInitialSolution(initialSolution);
 
             model.optimize();
 
-            //model.write(optimConfig.workingDirectory + "gurobi_solution.sol");
+            //model.write("D:/gurobi_solution.sol");
 
             ChargerLocationSolution solution = extractSolution();
 
@@ -108,7 +108,7 @@ public class ChargerLocationSolver
 
             for (int j = 0; j < problem.J; j++) {
                 double maxFlow_ij = problem.distances[i][j] > problem.maxDistance ? 0 : //
-                        potential_i;//TODO also limit by charger capacity * no of chargers
+                        potential_i * problem.zoneData.potentialToEnergy;
                 fVar[i][j] = model.addVar(0, maxFlow_ij, 0, GRB.CONTINUOUS, "f_" + i + "," + j);
             }
         }
@@ -144,7 +144,7 @@ public class ChargerLocationSolver
             double demand_i = problem.zoneData.entries.get(i).potential
                     * problem.zoneData.potentialToEnergy;
 
-            model.addConstr(expr, GRB.EQUAL, demand_i, "demand_i");
+            model.addConstr(expr, GRB.EQUAL, demand_i, "demand_" + i);
         }
     }
 
@@ -161,8 +161,9 @@ public class ChargerLocationSolver
 
             double supply_j = problem.chargerData.stations.get(j).getPower()
                     * problem.chargerData.powerToEnergy;
+            expr.addTerm(-supply_j, xVar[j]);
 
-            model.addConstr(expr, GRB.LESS_EQUAL, supply_j, "supply_j");
+            model.addConstr(expr, GRB.LESS_EQUAL, 0, "supply_" + j);
         }
     }
 

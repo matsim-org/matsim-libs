@@ -47,7 +47,7 @@ public class RunChargerLocationOptimization
     {
         //from TST paper (depends on scenario)
         double chargerPower = 50;//kW
-        double timeHorizon = 16;//16 hours (for converring: kW ==> kWh)
+        int timeHorizon = 16;//16 hours (for converring: kW ==> kWh)
 
         //from TST paper (depends on scenario)
         double energyConsumptionPerVehicle = 70;//kWh
@@ -57,10 +57,9 @@ public class RunChargerLocationOptimization
         //LP constraints
         double maxDistance = 10_000;//m
         int maxChargersInZone = 10;
-        int maxChargers = 700;
+        int maxChargers = 450;
 
         String dir = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
-
         String networkFile = dir + "scenarios/2015_02_basic_scenario_v6/berlin_brb.xml";
         String zonesXmlFile = dir + "shp_merged/berlin_zones.xml";
         String zonesShpFile = dir + "shp_merged/berlin_zones.shp";
@@ -70,13 +69,12 @@ public class RunChargerLocationOptimization
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
 
-        System.out.println("TTCalculations - begin");
-        DistanceCalculator calculator = DistanceCalculators
-                .crateFreespeedDistanceCalculator(scenario.getNetwork());
-        System.out.println("TTCalculations - end");
-        
+        //        DistanceCalculator calculator = DistanceCalculators
+        //                .crateFreespeedDistanceCalculator(scenario.getNetwork());
+        DistanceCalculator calculator = DistanceCalculators.BEELINE_DISTANCE_CALCULATOR;
+
         Map<Id<Zone>, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
-        readPotentials(zones, potentialFile);
+        readPotentials(zones, potentialFile, timeHorizon);
 
         double totalEnergyConsumed = Math.max(energyConsumptionPerVehicle - deltaSOC, 0)
                 * vehicleCount;
@@ -94,9 +92,10 @@ public class RunChargerLocationOptimization
 
         double maxEnergyProduced = Math.min(maxChargersInZone * stations.size(), maxChargers)
                 * chargerPower * timeHorizon;
-        
+
         if (maxEnergyProduced < totalEnergyConsumed) {
-            throw new RuntimeException("demand > supply");
+            throw new RuntimeException("demand > supply: " + totalEnergyConsumed + " > "
+                    + maxEnergyProduced);
         }
 
         problem = new ChargerLocationProblem(zoneData, chargerData, calculator, maxDistance,
@@ -104,16 +103,28 @@ public class RunChargerLocationOptimization
     }
 
 
-    private void readPotentials(Map<Id<Zone>, Zone> zones, String potentialFile)
+    private void readPotentials(Map<Id<Zone>, Zone> zones, String potentialFile, int timeHorizon)
     {
         //from: 20140407000000
-        //to: 20140413230000
+        //to: 20140413230000 (incl.)
 
         int fromDay = 1;//monday
         int toDay = 4;//thursday (incl.)
 
-        int fromHour = 7;//7am
-        int toHour = 7 + 15;//16h from 7am (incl.)
+        int fromHour;
+        switch (timeHorizon) {
+            case 16:
+                fromHour = 7;//7am
+                break;
+
+            case 24:
+                fromHour = 0;//0am
+
+            default:
+                throw new RuntimeException();
+        }
+
+        int toHour = fromHour + timeHorizon - 1;// 16h from 7am / 24h from 0am
 
         try (Scanner s = new Scanner(new File(potentialFile))) {
             while (s.hasNext()) {
@@ -149,13 +160,61 @@ public class RunChargerLocationOptimization
     }
 
 
+    private void writeSolution(ChargerLocationSolution solution)
+    {
+        String dir = "d:/PP-rad/berlin/chargingLocation/";
+
+        writeChargers(solution.x, dir + "chargers.csv");
+        writeFlows(solution.f, dir + "flows.csv");
+    }
+
+
+    private void writeChargers(int[] x, String file)
+    {
+        List<ChargingStation> stations = problem.chargerData.stations;
+
+        try (PrintWriter writer = new PrintWriter(file)) {
+            for (int j = 0; j < problem.J; j++) {
+                if (x[j] > 0) {
+                    Id<ChargingStation> stationId = stations.get(j).getId();
+                    writer.printf("%s,%d\n", stationId, x[j]);
+                }
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private void writeFlows(double[][] f, String file)
+    {
+        List<ZoneData.Entry> zoneEntries = problem.zoneData.entries;
+        List<ChargingStation> stations = problem.chargerData.stations;
+
+        try (PrintWriter writer = new PrintWriter(file)) {
+            for (int i = 0; i < problem.I; i++) {
+                for (int j = 0; j < problem.J; j++) {
+                    if (f[i][j] > 1e-2) {
+                        Id<Zone> zoneId = zoneEntries.get(i).zone.getId();
+                        Id<ChargingStation> stationId = stations.get(j).getId();
+                        writer.printf("%s,%s,%.2f\n", zoneId, stationId, f[i][j]);
+                    }
+                }
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
     private void solveProblem()
     {
-        ChargerLocationFinder finder = new ChargerLocationFinder(problem);
-        initSolution = finder.findInitialSolution();
+        initSolution = new ChargerLocationFinder(problem).findInitialSolution();
+        finalSolution = new ChargerLocationSolver(problem).solve(initSolution);
 
-        ChargerLocationSolver solver = new ChargerLocationSolver(problem);
-        finalSolution = solver.solve(initSolution);
+        writeSolution(finalSolution);
     }
 
 
