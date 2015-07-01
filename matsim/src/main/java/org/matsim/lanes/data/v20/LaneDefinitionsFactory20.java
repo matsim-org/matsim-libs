@@ -41,5 +41,5 @@ public interface LaneDefinitionsFactory20 extends MatsimFactory {
 	 * @param laneId
 	 * @return
 	 */
-	public LaneData20 createLane(Id<Lane> laneId);
+	public Lane createLane(Id<Lane> laneId);
 }

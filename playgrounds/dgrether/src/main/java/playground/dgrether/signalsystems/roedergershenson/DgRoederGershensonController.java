@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
@@ -140,7 +140,7 @@ public class DgRoederGershensonController implements SignalController {
 					else { // there are lanes
 						LanesToLinkAssignment20 lanes4link = lanedefs.getLanesToLinkAssignments().get(signalData.getLinkId());
 						for (Id  laneId : signalData.getLaneIds()){
-							LaneData20 lane = lanes4link.getLanes().get(laneId);
+							Lane lane = lanes4link.getLanes().get(laneId);
 							if (lane.getToLinkIds() == null || lane.getToLinkIds().isEmpty()){
 								this.addOutLinksWithoutBackLinkToMetadata(inLink, metadata);
 							}

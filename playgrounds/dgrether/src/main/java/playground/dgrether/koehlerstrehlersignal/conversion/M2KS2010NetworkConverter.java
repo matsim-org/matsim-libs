@@ -38,7 +38,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -584,7 +583,7 @@ public class M2KS2010NetworkConverter {
 				}
 			} else { // link with lanes
 				for (Id<Lane> laneId : signal.getLaneIds()) {
-					LaneData20 lane = l2l.getLanes().get(laneId);
+					Lane lane = l2l.getLanes().get(laneId);
 					if (signal.getTurningMoveRestrictions() == null
 							|| signal.getTurningMoveRestrictions().isEmpty()) { 
 						// no turning move restrictions for signal -> outlinks come from lane
@@ -671,7 +670,7 @@ public class M2KS2010NetworkConverter {
 				// }
 			}
 		} else {
-			for (LaneData20 lane : l2l.getLanes().values()) {
+			for (Lane lane : l2l.getLanes().values()) {
 				// check for outlanes (create only lights for lanes without
 				// outlanes, i.e. "last lanes" of a link)
 				if (lane.getToLaneIds() == null

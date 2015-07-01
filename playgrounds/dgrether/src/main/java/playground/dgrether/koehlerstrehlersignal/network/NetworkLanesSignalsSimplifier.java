@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -160,7 +160,7 @@ public class NetworkLanesSignalsSimplifier {
 										LanesToLinkAssignment20 newL2l = lanes.getFactory().createLanesToLinkAssignment(newLink.getId());
 										newL2l.getLanes().putAll(l2l.getLanes());
 										//correct first lane of newLink which starts at the beginning of inLink
-										for (LaneData20 lane : newL2l.getLanes().values()){
+										for (Lane lane : newL2l.getLanes().values()){
 											if (lane.getStartsAtMeterFromLinkEnd() == outLink.getLength()){
 												lane.setStartsAtMeterFromLinkEnd(inLink.getLength() + outLink.getLength());
 											}
@@ -170,7 +170,7 @@ public class NetworkLanesSignalsSimplifier {
 									
 									//correct lanes with toLink = inLink
 									for (LanesToLinkAssignment20  l2l : lanes.getLanesToLinkAssignments().values()){
-										for (LaneData20 lane : l2l.getLanes().values()){
+										for (Lane lane : l2l.getLanes().values()){
 											if (lane.getToLinkIds() != null && lane.getToLinkIds().contains(inLink.getId())) {
 												lane.getToLinkIds().remove(inLink.getId());
 												lane.getToLinkIds().add(newLink.getId());

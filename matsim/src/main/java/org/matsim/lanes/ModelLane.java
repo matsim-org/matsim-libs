@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.Lane;
 
 
 /**
@@ -38,17 +38,17 @@ import org.matsim.lanes.data.v20.LaneData20;
  */
 public final class ModelLane {
 
-	private final LaneData20 laneData;
+	private final Lane laneData;
 	private double length;
 	private double endsAtMetersFromLinkEnd;
 	private final List<Id<Link>> destinationLinkIds = new ArrayList<>();
 	private final List<ModelLane> toLanes = new ArrayList<ModelLane>();
 
-	public ModelLane(LaneData20 data) {
+	public ModelLane(Lane data) {
 		this.laneData = data;
 	}
 	
-	public LaneData20 getLaneData(){
+	public Lane getLaneData(){
 		return this.laneData;
 	}
 	

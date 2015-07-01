@@ -29,12 +29,12 @@ import org.matsim.core.api.internal.MatsimComparator;
  * attribute.
  * @author dgrether
  */
-public class LaneData20MeterFromLinkEndComparator implements Comparator<LaneData20>, Serializable, MatsimComparator {
+public class LaneData20MeterFromLinkEndComparator implements Comparator<Lane>, Serializable, MatsimComparator {
 
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public int compare(LaneData20 o1, LaneData20 o2) {
+	public int compare(Lane o1, Lane o2) {
     if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
       return -1;
     } else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {

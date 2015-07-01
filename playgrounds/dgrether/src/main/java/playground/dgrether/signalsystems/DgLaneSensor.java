@@ -22,7 +22,7 @@ package playground.dgrether.signalsystems;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.Lane;
 
 
 /**
@@ -32,10 +32,10 @@ import org.matsim.lanes.data.v20.LaneData20;
 public class DgLaneSensor {
 
 	private Link link;
-	private LaneData20 lane;
+	private Lane lane;
 	private int agentsOnLink = 0;
 
-	public DgLaneSensor(Link link, LaneData20 lane) {
+	public DgLaneSensor(Link link, Lane lane) {
 		this.link = link;
 		this.lane = lane;
 	}

@@ -34,7 +34,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
@@ -67,7 +67,7 @@ public class LanesConsistencyChecker {
 			//check length
 			else {
 				Link link = this.network.getLinks().get(l2l.getLinkId());
-				for (LaneData20 l : l2l.getLanes().values()){
+				for (Lane l : l2l.getLanes().values()){
 					if (link.getLength() < l.getStartsAtMeterFromLinkEnd()) {
 						log.error("Link Id " + link.getId() + " is shorter than an assigned lane with id " + l.getId());
 						malformedLinkIds.add(l2l.getLinkId());
@@ -76,7 +76,7 @@ public class LanesConsistencyChecker {
 			}
 			
 			//check toLinks or toLanes specified in the lanes 
-			for (LaneData20 lane : l2l.getLanes().values()) {
+			for (Lane lane : l2l.getLanes().values()) {
 				if (lane.getToLaneIds() != null) {
 					for (Id toLaneId : lane.getToLaneIds()){
 						if (! l2l.getLanes().containsKey(toLaneId)){
@@ -102,7 +102,7 @@ public class LanesConsistencyChecker {
 			log.info("Link id: " + l2l.getLinkId());
 			Map<Id<Link>, ? extends Link> outLinksMap = link.getToNode().getOutLinks();
 			Set<Id> linkLanes2LinkIdSet = new HashSet<Id>();
-			for (LaneData20 lane : l2l.getLanes().values()){
+			for (Lane lane : l2l.getLanes().values()){
 				if (lane.getToLinkIds() != null){
 					linkLanes2LinkIdSet.addAll(lane.getToLinkIds());
 				}
@@ -115,7 +115,7 @@ public class LanesConsistencyChecker {
 					log.error("Error: Lane Outlink: ");
 					log.error("\t\tThe lanes of link " + link.getId() + " do not lead to all of the outlinks of the links toNode " + link.getToNode().getId() + " . The outlink " + outLink.getId()
 					+ " is not reachable from the lanes of this link. ");
-					for (LaneData20 lane : l2l.getLanes().values()){
+					for (Lane lane : l2l.getLanes().values()){
 						log.error("\t\tLane id: " + lane.getId());
 						if (lane.getToLinkIds() != null){
 							for (Id id : lane.getToLinkIds()){

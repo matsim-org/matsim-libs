@@ -67,14 +67,14 @@ public class QLaneTest extends MatsimTestCase {
 		LaneDefinitionsFactory20 builder = lanes.getFactory();
 		//lanes for link 1
 		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(Id.create(1, Link.class));
-		LaneData20 link1FirstLane = builder.createLane(Id.create("1.ol", Lane.class));
+		Lane link1FirstLane = builder.createLane(Id.create("1.ol", Lane.class));
 		link1FirstLane.addToLaneId(Id.create(1, Lane.class));
 		link1FirstLane.setNumberOfRepresentedLanes(2.0);
 		link1FirstLane.setStartsAtMeterFromLinkEnd(1005.0);
 		link1FirstLane.setCapacityVehiclesPerHour(1800.0);
 		lanesForLink1.addLane(link1FirstLane);
 		
-		LaneData20 link1lane1 = builder.createLane(Id.create(1, Lane.class));
+		Lane link1lane1 = builder.createLane(Id.create(1, Lane.class));
 		link1lane1.addToLinkId(Id.create(2, Link.class));
 		link1lane1.setStartsAtMeterFromLinkEnd(105.0);
 		link1lane1.setNumberOfRepresentedLanes(numberOfRepresentedLanes);
@@ -92,7 +92,7 @@ public class QLaneTest extends MatsimTestCase {
 		//lanes for link 1
 		LanesToLinkAssignment20 lanesForLink1 = builder.createLanesToLinkAssignment(Id.create(1, Link.class));
 		
-		LaneData20 link1FirstLane = builder.createLane(Id.create("1.ol", Lane.class));
+		Lane link1FirstLane = builder.createLane(Id.create("1.ol", Lane.class));
 		link1FirstLane.addToLaneId(Id.create(1, Lane.class));
 		link1FirstLane.addToLaneId(Id.create(2, Lane.class));
 		link1FirstLane.addToLaneId(Id.create(3, Lane.class));
@@ -101,20 +101,20 @@ public class QLaneTest extends MatsimTestCase {
 		link1FirstLane.setCapacityVehiclesPerHour(1800.0);
 		lanesForLink1.addLane(link1FirstLane);
 		
-		LaneData20 link1lane1 = builder.createLane(Id.create(1, Lane.class));
+		Lane link1lane1 = builder.createLane(Id.create(1, Lane.class));
 		link1lane1.addToLinkId(Id.create(2, Link.class));
 		link1lane1.setStartsAtMeterFromLinkEnd(105.0);
 		link1lane1.setCapacityVehiclesPerHour(900.0);
 		lanesForLink1.addLane(link1lane1);
 		
-		LaneData20 link1lane2 = builder.createLane(Id.create(2, Lane.class));
+		Lane link1lane2 = builder.createLane(Id.create(2, Lane.class));
 		link1lane2.addToLinkId(Id.create(2, Link.class));
 		link1lane2.setNumberOfRepresentedLanes(2);
 		link1lane2.setStartsAtMeterFromLinkEnd(105.0);
 		link1lane2.setCapacityVehiclesPerHour(1800.0);
 		lanesForLink1.addLane(link1lane2);
 
-		LaneData20 link1lane3 = builder.createLane(Id.create(3, Lane.class));
+		Lane link1lane3 = builder.createLane(Id.create(3, Lane.class));
 		link1lane3.addToLinkId(Id.create(2, Link.class));
 		link1lane3.setCapacityVehiclesPerHour(900.0);
 		link1lane3.setStartsAtMeterFromLinkEnd(105.0);

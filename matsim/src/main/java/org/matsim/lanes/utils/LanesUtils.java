@@ -32,7 +32,6 @@ import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -94,7 +93,7 @@ public final class LanesUtils {
 			double startsAtMeterFromLinkEnd, int alignment,
 			int numberOfRepresentedLanes, List<Id<Link>> toLinkIds, List<Id<Lane>> toLaneIds) {
 		
-		LaneData20 lane = factory.createLane(laneId);
+		Lane lane = factory.createLane(laneId);
 		if (toLinkIds != null){
 			for (Id<Link> toLinkId : toLinkIds) {
 				lane.addToLinkId(toLinkId);
@@ -120,12 +119,12 @@ public final class LanesUtils {
 	 */
 	public static List<ModelLane> createLanes(Link link, LanesToLinkAssignment20 lanesToLinkAssignment) {
 		List<ModelLane> queueLanes = new ArrayList<ModelLane>();
-		List<LaneData20> sortedLanes =  new ArrayList<LaneData20>(lanesToLinkAssignment.getLanes().values());
+		List<Lane> sortedLanes =  new ArrayList<Lane>(lanesToLinkAssignment.getLanes().values());
 		Collections.sort(sortedLanes, new LaneData20MeterFromLinkEndComparator());
 		Collections.reverse(sortedLanes);
 
 		List<ModelLane> laneList = new LinkedList<ModelLane>();
-		LaneData20 firstLane = sortedLanes.remove(0);
+		Lane firstLane = sortedLanes.remove(0);
 		if (firstLane.getStartsAtMeterFromLinkEnd() != link.getLength()) {
 			throw new IllegalStateException("First Lane Id " + firstLane.getId() + " on Link Id " + link.getId() +
 			"isn't starting at the beginning of the link!");
@@ -145,7 +144,7 @@ public final class LanesUtils {
 			double laneLength = 0.0;
 			if (toLaneIds != null 	&& (!toLaneIds.isEmpty())) {
 				for (Id<Lane> toLaneId : toLaneIds){
-					LaneData20 currentLane = lanesToLinkAssignment.getLanes().get(toLaneId);
+					Lane currentLane = lanesToLinkAssignment.getLanes().get(toLaneId);
 					nextMetersFromLinkEnd = currentLane.getStartsAtMeterFromLinkEnd();
 					ModelLane currentQLane = new ModelLane(currentLane);
 					laneList.add(currentQLane);

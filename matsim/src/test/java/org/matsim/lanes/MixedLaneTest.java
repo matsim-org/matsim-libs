@@ -35,7 +35,7 @@ import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
@@ -62,14 +62,14 @@ public class MixedLaneTest {
 		LanesToLinkAssignment20 lanesLink1 = lanes.getLanesToLinkAssignments().get(fixture.id1);
 		Assert.assertNotNull(lanesLink1);
 		Assert.assertEquals(2, lanesLink1.getLanes().size());
-		LaneData20 lane1ol = lanesLink1.getLanes().get(fixture.link1FirstLaneId);
+		Lane lane1ol = lanesLink1.getLanes().get(fixture.link1FirstLaneId);
 		Assert.assertNotNull(lane1ol);
 		Assert.assertEquals(100.1, lane1ol.getStartsAtMeterFromLinkEnd());
 		Assert.assertEquals(7200.0, lane1ol.getCapacityVehiclesPerHour());
 		Assert.assertEquals(2.0 , lane1ol.getNumberOfRepresentedLanes() );
 		Assert.assertEquals(fixture.laneId1 , lane1ol.getToLaneIds().get(0));
 		Assert.assertNull(lane1ol.getToLinkIds());
-		LaneData20 lane1 = lanesLink1.getLanes().get(fixture.laneId1);
+		Lane lane1 = lanesLink1.getLanes().get(fixture.laneId1);
 		Assert.assertNotNull(lane1);
 		Assert.assertEquals(50.0, lane1.getStartsAtMeterFromLinkEnd());
 		Assert.assertEquals(7200.0, lane1.getCapacityVehiclesPerHour());
@@ -123,9 +123,9 @@ public class MixedLaneTest {
 		fixture.sc.getConfig().qsim().setStartTime(3500.0);
 		fixture.sc.getConfig().qsim().setEndTime(7200.0);
 		LaneDefinitions20 lanes = (LaneDefinitions20) fixture.sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
-		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
+		Lane lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
 		lane1.setCapacityVehiclesPerHour(1800.0);
-		LaneData20 lane1ol = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.link1FirstLaneId);
+		Lane lane1ol = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.link1FirstLaneId);
 		lane1ol.setCapacityVehiclesPerHour(1800.0);
 		
 		
@@ -250,7 +250,7 @@ public class MixedLaneTest {
 	public void testMixedLane2AgentsDrivingCapacityRestriction() {
 		fixture.create2PersonPopulation();
 		LaneDefinitions20 lanes = (LaneDefinitions20) fixture.sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
-		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
+		Lane lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
 		lane1.setCapacityVehiclesPerHour(1800.0);
 		
 		EventsManager events = EventsUtils.createEventsManager();

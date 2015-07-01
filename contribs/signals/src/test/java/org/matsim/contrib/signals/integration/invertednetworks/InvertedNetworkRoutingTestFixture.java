@@ -43,7 +43,6 @@ import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
@@ -117,7 +116,7 @@ public class InvertedNetworkRoutingTestFixture {
 		LaneDefinitionsFactory20 f = ld.getFactory();
 		LanesToLinkAssignment20 l2l = f.createLanesToLinkAssignment(Id.create(12, Link.class));
 		ld.addLanesToLinkAssignment(l2l);
-		LaneData20 l = f.createLane(Id.create(121, Lane.class));
+		Lane l = f.createLane(Id.create(121, Lane.class));
 		l.setStartsAtMeterFromLinkEnd(300);
 		l.addToLaneId(Id.create(122, Lane.class));
 		l2l.addLane(l);

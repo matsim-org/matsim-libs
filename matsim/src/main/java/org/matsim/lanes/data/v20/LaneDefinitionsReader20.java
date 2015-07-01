@@ -95,7 +95,7 @@ public class LaneDefinitionsReader20 extends MatsimJaxbXmlParser implements Mats
 			
 			//convert the parsed xml-instances to basic instances
 			LanesToLinkAssignment20 l2lAssignment;
-			LaneData20 lane = null;
+			Lane lane = null;
 			for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions
 					.getLanesToLinkAssignment()) {
 				l2lAssignment = builder.createLanesToLinkAssignment(Id.create(lldef

@@ -26,7 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
@@ -45,7 +45,7 @@ public class LanesCapacityCalculator {
 	 * A Lane may represent one or more lanes in reality. This is given by the attribute numberOfRepresentedLanes of
 	 * the Lane definition. The flow of a lane is scaled by this number.
 	 */
-	public void calculateAndSetCapacity(LaneData20 lane, boolean isLaneAtLinkEnd, Link link, Network network){
+	public void calculateAndSetCapacity(Lane lane, boolean isLaneAtLinkEnd, Link link, Network network){
 		if (isLaneAtLinkEnd){
 			double noLanesLink = link.getNumberOfLanes();
 			double linkFlowCapPerSecondPerLane = link.getCapacity() / network.getCapacityPeriod()
@@ -73,7 +73,7 @@ public class LanesCapacityCalculator {
 		LaneDefinitions20 lanes = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 		for (LanesToLinkAssignment20 l2l : lanes.getLanesToLinkAssignments().values()){
 			Link link = network.getLinks().get(l2l.getLinkId());
-			for (LaneData20 lane : l2l.getLanes().values()){
+			for (Lane lane : l2l.getLanes().values()){
 				if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){
 					calc.calculateAndSetCapacity(lane, true, link, network);
 				}

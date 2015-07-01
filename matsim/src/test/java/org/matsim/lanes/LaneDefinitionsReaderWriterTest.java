@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package org.matsim.lanes;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +36,6 @@ import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.testcases.MatsimTestCase;
@@ -144,9 +142,9 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		l2la = assignments.get(0);
 		assertNotNull(l2la);
 		assertEquals(linkId23, l2la.getLinkId());
-		List<LaneData20> lanes = new ArrayList<LaneData20>();
+		List<Lane> lanes = new ArrayList<Lane>();
 		lanes.addAll(l2la.getLanes().values());
-		LaneData20 lane = lanes.get(0);
+		Lane lane = lanes.get(0);
 		assertEquals(laneId3, lane.getId());
 		assertEquals(linkId1, lane.getToLinkIds().get(0));
 		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);

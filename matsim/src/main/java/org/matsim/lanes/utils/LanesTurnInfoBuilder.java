@@ -29,7 +29,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
-import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
@@ -46,7 +46,7 @@ public class LanesTurnInfoBuilder {
 		Set<Id<Link>> toLinkIds = new HashSet<>();
 		for (LanesToLinkAssignment20 l2l : laneDefs.getLanesToLinkAssignments().values()) {
 			toLinkIds.clear();
-			for (LaneData20 lane : l2l.getLanes().values()) {
+			for (Lane lane : l2l.getLanes().values()) {
 				if (lane.getToLinkIds() != null
 						&& (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty())) { // make sure that it is a lane at the
 																																									// end of a link

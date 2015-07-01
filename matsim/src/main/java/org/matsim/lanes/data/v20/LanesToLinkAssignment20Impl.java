@@ -32,14 +32,14 @@ public class LanesToLinkAssignment20Impl implements LanesToLinkAssignment20 {
 
 	private final Id<Link> linkId;
 
-	private final SortedMap<Id<Lane>, LaneData20> lanes = new TreeMap<>();
+	private final SortedMap<Id<Lane>, Lane> lanes = new TreeMap<>();
 
 	public LanesToLinkAssignment20Impl(Id<Link> linkId) {
 		this.linkId = linkId;
 	}
 
 	@Override
-	public void addLane(LaneData20 lane) {
+	public void addLane(Lane lane) {
 		this.lanes.put(lane.getId(), lane);
 	}
 
@@ -49,7 +49,7 @@ public class LanesToLinkAssignment20Impl implements LanesToLinkAssignment20 {
 	}
 
 	@Override
-	public SortedMap<Id<Lane>, LaneData20> getLanes() {
+	public SortedMap<Id<Lane>, Lane> getLanes() {
 		return this.lanes;
 	}
 

@@ -39,7 +39,7 @@ import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 
 
@@ -109,7 +109,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 			this.linkIdLaneIdSensorMap.put(linkId, new HashMap<Id, DgLaneSensor>());
 		}
 		if (! this.linkIdLaneIdSensorMap.get(linkId).containsKey(laneId)){
-			LaneData20 lane = this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId);
+			Lane lane = this.laneDefinitions.getLanesToLinkAssignments().get(linkId).getLanes().get(laneId);
 			this.linkIdLaneIdSensorMap.get(linkId).put(laneId, new DgLaneSensor(link, lane));
 		}
 	

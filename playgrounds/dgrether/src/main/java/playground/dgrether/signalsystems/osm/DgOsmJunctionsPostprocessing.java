@@ -38,7 +38,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
@@ -82,7 +82,7 @@ public class DgOsmJunctionsPostprocessing {
 			if (removedLinkIdToLinkIdsMap.containsKey(l2l.getLinkId())){
 				throw new IllegalStateException("Link Id " + l2l.getLinkId() + " was removed but has lanes attached, can't handle this automatically!");
 			}
-			for (LaneData20 lane : l2l.getLanes().values()){
+			for (Lane lane : l2l.getLanes().values()){
 				Set<Id<Link>> toLinkIds2Remove = new HashSet<>();
 				if (lane.getToLinkIds() != null && !lane.getToLinkIds().isEmpty()){
 					for (Id<Link> toLinkId : lane.getToLinkIds()){

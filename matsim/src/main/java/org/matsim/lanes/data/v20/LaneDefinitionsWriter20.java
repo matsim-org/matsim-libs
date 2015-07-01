@@ -100,7 +100,7 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 			XMLLanesToLinkAssignmentType xmlltla = fac.createXMLLanesToLinkAssignmentType();
 			xmlltla.setLinkIdRef(ltla.getLinkId().toString());
 
-			for (LaneData20 bl : ltla.getLanes().values()) {
+			for (Lane bl : ltla.getLanes().values()) {
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
 
