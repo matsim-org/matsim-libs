@@ -147,8 +147,9 @@ public class RunMunichZone30Controller extends AbstractController {
 	}
 	private PlansScoring buildPlansScoring() {
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
-		final PlansScoring plansScoring = new PlansScoringImpl( this.scenario, this.eventsManager, getControlerIO(), scoringFunctionFactory );
-		return plansScoring;
+//		final PlansScoring plansScoring = new PlansScoringImpl( this.scenario, this.eventsManager, getControlerIO(), scoringFunctionFactory );
+		return null;
+
 	}
 
 	private StrategyManager buildStrategyManager() {

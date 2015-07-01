@@ -23,11 +23,10 @@
 package playground.kai.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.corelisteners.PlansScoringImpl;
+import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -36,8 +35,6 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.vis.otfvis.OTFFileWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
@@ -53,12 +50,13 @@ public class SimplifiedControlerUtils {
 	 * Convenience method to have a default implementation of the scoring.  It is deliberately non-configurable.  It makes
 	 * no promises about what it does, nor about stability over time.  May be used as a starting point for own variants.
 	 */
-	static PlansScoringImpl createPlansScoringDefault( Scenario sc, EventsManager ev, OutputDirectoryHierarchy controlerIO ) {
-		Config config = sc.getConfig();
-		Network network = sc.getNetwork() ;
-		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( config.planCalcScore(), network );
-		final PlansScoringImpl plansScoring = new PlansScoringImpl( sc, ev, controlerIO, scoringFunctionFactory );
-		return plansScoring;
+	static PlansScoring createPlansScoringDefault( Scenario sc, EventsManager ev, OutputDirectoryHierarchy controlerIO ) {
+//		Config config = sc.getConfig();
+//		Network network = sc.getNetwork() ;
+//		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( config.planCalcScore(), network );
+//		final PlansScoringImpl plansScoring = new PlansScoringImpl( sc, ev, controlerIO, scoringFunctionFactory );
+//		return plansScoring;
+		throw new RuntimeException("Should use dependency injection.");
 	}
 
 	/**

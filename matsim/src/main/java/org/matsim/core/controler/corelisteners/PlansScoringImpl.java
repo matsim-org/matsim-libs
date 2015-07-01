@@ -53,7 +53,7 @@ import com.google.inject.Singleton;
  * @author mrieser, michaz
  */
 @Singleton
-public final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+final class PlansScoringImpl implements PlansScoring, ScoringListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
 	private EventsToScore eventsToScore;
 
@@ -68,7 +68,7 @@ public final class PlansScoringImpl implements PlansScoring, ScoringListener, It
 	private TravelDistanceStats travelDistanceStats; 
 
 	@Inject
-	public PlansScoringImpl( Scenario sc, EventsManager events, OutputDirectoryHierarchy controlerIO, ScoringFunctionFactory scoringFunctionFactory ) {
+	PlansScoringImpl( Scenario sc, EventsManager events, OutputDirectoryHierarchy controlerIO, ScoringFunctionFactory scoringFunctionFactory ) {
 		this.sc = sc ;
 		this.events = events ;
 		this.scoringFunctionFactory = scoringFunctionFactory ;
@@ -112,16 +112,6 @@ public final class PlansScoringImpl implements PlansScoring, ScoringListener, It
 	@Override
 	public void notifyShutdown(ShutdownEvent controlerShudownEvent) {
 		travelDistanceStats.close();
-	}
-
-	/** 
-	 * 
-	 * @deprecated It is not a good idea to allow ScoringFunctions to be plucked out of this module in the middle of the scoring process.
-	 * Let's try and get rid of it. michaz '2012
-	 */
-	@Deprecated
-	public ScoringFunction getScoringFunctionForAgent(Id<Person> agentId) {
-		return this.eventsToScore.getScoringFunctionForAgent(agentId);
 	}
 
 }
