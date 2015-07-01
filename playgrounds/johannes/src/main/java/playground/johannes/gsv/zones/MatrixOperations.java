@@ -296,4 +296,31 @@ public class MatrixOperations {
 			}
 		}
 	}
+	
+	public static double weightedCellAverage(KeyMatrix m, KeyMatrix weights) {
+		double sum = 0;
+		double wsum = 0;
+		
+		Set<String> keys = m.keys();
+		for(String i : keys) {
+			for(String j : keys) {
+				Double val = m.get(i, j);
+				if(val != null) {
+					Double w = weights.get(i, j);
+					if(w == null) w = 1.0;
+					sum += val * w;
+					wsum += w;
+				}
+			}
+		}
+		
+		return sum/wsum;
+	}
+	
+	public static void removeDiagonal(KeyMatrix m) {
+		Set<String> keys = m.keys();
+		for(String i : keys) {
+			m.set(i, i, null);
+		}
+	}
 }

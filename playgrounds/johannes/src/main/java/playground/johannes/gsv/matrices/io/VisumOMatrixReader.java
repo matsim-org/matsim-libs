@@ -17,31 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.matrices.io;
 
-import java.util.Random;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import playground.johannes.gsv.zones.KeyMatrix;
 
 /**
  * @author johannes
  *
  */
-public class AgeMutatorFactory implements MutatorFactory {
+public class VisumOMatrixReader {
 
-	private final Random random;
-	
-	private final HistogramSync1D histSync;
-	
-	public AgeMutatorFactory(Random random, HistogramSync1D histSync) {
-		this.random = random;
-		this.histSync = histSync;
+	public static KeyMatrix read(String filename) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(filename));
+		
+//		int startLine = 8;
+		int startLine = 29;
+		for(int i = 0; i < startLine; i++) reader.readLine();
+		
+		KeyMatrix m = new KeyMatrix();
+		
+		String line;
+		while((line = reader.readLine()) != null) {
+			if(line.startsWith("*")) {
+				break;
+			}
+			else {
+				line = line.trim();
+				String[] tokens = line.split("\\s+");
+				String i = tokens[0];
+				String j = tokens[1];
+				Double val = new Double(tokens[2]);
+				
+				m.set(i, j, val);
+			}
+		}
+		
+		
+		reader.close();
+		
+		return m;
 	}
 	
-	@Override
-	public Mutator newInstance() {
-		return new AgeMutator(random, histSync);
+	public static void main(String[] args) throws IOException {
+		VisumOMatrixReader.read("/home/johannes/gsv/prognose-update/iv-2030.txt");
 	}
-
 }

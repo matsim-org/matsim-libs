@@ -43,10 +43,13 @@ public abstract class AttributeMutator implements Mutator {
 	
 	private final Object objKey;
 	
-	public AttributeMutator(Random random, String strKey, Object objKey) {
+	private final HistogramSync1D histSync;
+	
+	public AttributeMutator(Random random, String strKey, Object objKey, HistogramSync1D histSync) {
 		this.random = random;
 		this.strKey = strKey;
 		this.objKey = objKey;
+		this.histSync = histSync;
 		
 		mutations = new ArrayList<>(1);
 		mutations.add(null);
@@ -65,12 +68,20 @@ public abstract class AttributeMutator implements Mutator {
 		double newValue = newValue(person);
 		person.setUserData(objKey, newValue);
 		
+		histSync.notifyChange(strKey, prevValue, newValue);
+		
 		return true;
 	}
 
 	@Override
 	public void revert(List<ProxyPerson> persons) {
-		persons.get(0).setUserData(objKey, prevValue);
+		ProxyPerson person = persons.get(0);
+		
+		double val = getAttribute(person, strKey, objKey);
+		person.setUserData(objKey, prevValue);
+		
+		histSync.notifyChange(strKey, val, prevValue);
+		
 		prevValue = null;
 	}
 

@@ -49,12 +49,12 @@ public class Visum2KeyMatrix {
 	public static void main(String[] args) {
 		Matrix visumMatrix = new Matrix("1", null);
 		VisumMatrixReader reader = new VisumMatrixReader(visumMatrix);
-		reader.readFile("/home/johannes/gsv/matrices/raw/TomTom/TTgrob_Winter .txt");
+		reader.readFile("/home/johannes/gsv/prognose-update/iv-2030.txt");
 		
 		KeyMatrix keyMatrix = convert(visumMatrix);
 		
 		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
-		writer.write(keyMatrix, "/home/johannes/gsv/matrices/raw/TomTom/TTgrob_Winter.xml");
+		writer.write(keyMatrix, "/home/johannes/gsv/prognose-update/iv-2030.xml");
 	}
 
 }

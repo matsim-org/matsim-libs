@@ -32,8 +32,8 @@ public class AgeMutator extends AttributeMutator {
 
 	private final Random random;
 	
-	public AgeMutator(Random random) {
-		super(random, CommonKeys.PERSON_AGE, DistanceVector.AGE_KEY);
+	public AgeMutator(Random random, HistogramSync1D histSync) {
+		super(random, CommonKeys.PERSON_AGE, DistanceVector.AGE_KEY, histSync);
 		this.random = random;
 	}
 

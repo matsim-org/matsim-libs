@@ -17,31 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.matrices.misc;
 
-import java.util.Random;
+import java.io.IOException;
+import java.util.Set;
 
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.Zone;
+import playground.johannes.gsv.zones.ZoneCollection;
 
 /**
  * @author johannes
- *
+ * 
  */
-public class AgeMutatorFactory implements MutatorFactory {
+public class ExtractDE {
 
-	private final Random random;
-	
-	private final HistogramSync1D histSync;
-	
-	public AgeMutatorFactory(Random random, HistogramSync1D histSync) {
-		this.random = random;
-		this.histSync = histSync;
-	}
-	
-	@Override
-	public Mutator newInstance() {
-		return new AgeMutator(random, histSync);
+	public static KeyMatrix extract(KeyMatrix m, String zonefile, String key) throws IOException {
+		ZoneCollection zones = ZoneCollection.readFromGeoJSON(zonefile, key);
+
+		KeyMatrix newM = new KeyMatrix();
+		Set<String> keys = m.keys();
+
+		for (String i : keys) {
+			Zone zi = zones.get(i);
+			if (zi != null) {
+				for (String j : keys) {
+					Zone zj = zones.get(j);
+					if (zj != null) {
+						newM.set(i, j, m.get(i, j));
+					}
+				}
+			}
+		}
+		
+		return newM;
 	}
 
 }

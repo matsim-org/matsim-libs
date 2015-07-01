@@ -19,29 +19,22 @@
 
 package playground.johannes.gsv.popsim;
 
-import java.util.Random;
-
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 
 /**
  * @author johannes
  *
  */
-public class AgeMutatorFactory implements MutatorFactory {
+public class HistEvaluator implements Hamiltonian {
 
-	private final Random random;
-	
-	private final HistogramSync1D histSync;
-	
-	public AgeMutatorFactory(Random random, HistogramSync1D histSync) {
-		this.random = random;
-		this.histSync = histSync;
-	}
-	
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.sim3.Hamiltonian#evaluate(playground.johannes.gsv.synPop.ProxyPerson)
+	 */
 	@Override
-	public Mutator newInstance() {
-		return new AgeMutator(random, histSync);
+	public double evaluate(ProxyPerson person) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

@@ -31,6 +31,8 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
+import playground.johannes.sna.math.DummyDiscretizer;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
@@ -68,7 +70,8 @@ public class AgeIncomeCorrelation extends AnalyzerTask {
 		}
 		
 		try {
-			TDoubleDoubleHashMap hist = Histogram.createHistogram(ages.toNativeArray(), new LinearDiscretizer(10), false);
+//			TDoubleDoubleHashMap hist = Histogram.createHistogram(ages.toNativeArray(), new LinearDiscretizer(5), false);
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(ages.toNativeArray(), new DummyDiscretizer(), false);
 			TXTWriter.writeMap(hist, "age", "n", getOutputDirectory() + "/age.txt");
 			
 			hist = Histogram.createHistogram(incomes.toNativeArray(), new LinearDiscretizer(1000), false);

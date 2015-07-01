@@ -36,6 +36,8 @@ import playground.johannes.gsv.synPop.sim3.HamiltonianLogger;
 import playground.johannes.gsv.synPop.sim3.MutatorCompositeFactory;
 import playground.johannes.gsv.synPop.sim3.Sampler;
 import playground.johannes.gsv.synPop.sim3.SamplerListenerComposite;
+import playground.johannes.sna.math.DummyDiscretizer;
+import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
@@ -65,7 +67,7 @@ public class Simulator {
 //		persons = PersonCloner.weightedClones(persons, 100000, random);
 
 		HamiltonianComposite h = new HamiltonianComposite();
-		h.addComponent(new DistanceVector(persons, random), 100);
+//		h.addComponent(new DistanceVector(persons, random), 100);
 //		Hamiltonian h = new DistanceVector(persons);
 		
 		Set<ProxyPerson> simPersons = new HashSet<>(100000);
@@ -82,8 +84,10 @@ public class Simulator {
 		}
 		
 		MutatorCompositeFactory factory = new MutatorCompositeFactory(random);
-		factory.addFactory(new IncomeMutatorFactory(random));
-		factory.addFactory(new AgeMutatorFactory(random));
+//		factory.addFactory(new IncomeMutatorFactory(random));
+		HistogramSync1D histSync = new HistogramSync1D(persons, simPersons, CommonKeys.PERSON_AGE, new DummyDiscretizer());
+		factory.addFactory(new AgeMutatorFactory(random, histSync));
+		h.addComponent(histSync, 100000);
 		
 		Sampler sampler = new Sampler(simPersons, h, factory, random);
 		
@@ -102,7 +106,7 @@ public class Simulator {
 		
 		sampler.setSamplerListener(listener);
 		
-		sampler.run(10000000, 1);
+		sampler.run(1000001, 1);
 	}
 
 }

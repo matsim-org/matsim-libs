@@ -33,7 +33,7 @@ public class IncomeMutator extends AttributeMutator {
 	private final Random random;
 	
 	public IncomeMutator(Random random) {
-		super(random, CommonKeys.HH_INCOME, DistanceVector.INCOME_KEY);
+		super(random, CommonKeys.HH_INCOME, DistanceVector.INCOME_KEY, null);
 		this.random = random;
 	}
 
