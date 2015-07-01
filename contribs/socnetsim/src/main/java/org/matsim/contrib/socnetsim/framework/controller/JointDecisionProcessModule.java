@@ -20,13 +20,6 @@
 package org.matsim.contrib.socnetsim.framework.controller;
 
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouter;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.contrib.socnetsim.framework.PlanRoutingAlgorithmFactory;
 import org.matsim.contrib.socnetsim.framework.controller.listeners.DumpJointDataAtEnd;
 import org.matsim.contrib.socnetsim.framework.controller.listeners.GroupReplanningListenner;
@@ -43,6 +36,12 @@ import org.matsim.contrib.socnetsim.framework.replanning.selectors.IncompatibleP
 import org.matsim.contrib.socnetsim.framework.scoring.InternalizingPlansScoring;
 import org.matsim.contrib.socnetsim.framework.scoring.InternalizingPlansScoring.ConfigBasedInternalizationSettings;
 import org.matsim.contrib.socnetsim.framework.scoring.InternalizingPlansScoring.InternalizationSettings;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.corelisteners.PlansReplanning;
+import org.matsim.core.controler.corelisteners.PlansScoring;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.population.algorithms.PlanAlgorithm;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -63,7 +62,7 @@ public class JointDecisionProcessModule extends AbstractModule {
 		// process as such
 		bind(PlansReplanning.class).to( GroupReplanningListenner.class );
 		bind(PlansScoring.class).to( InternalizingPlansScoring.class );
-		bind(DumpDataAtEnd.class).to( DumpJointDataAtEnd.class );
+		addControlerListenerBinding().to( DumpJointDataAtEnd.class );
 
 		bind( InternalizationSettings.class ).to( ConfigBasedInternalizationSettings.class );
 

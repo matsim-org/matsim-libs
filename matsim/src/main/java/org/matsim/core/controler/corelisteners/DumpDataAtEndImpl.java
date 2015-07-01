@@ -48,14 +48,14 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
+final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private final Scenario scenarioData;
 
 	private final OutputDirectoryHierarchy controlerIO;
 
 	@Inject
-	public DumpDataAtEndImpl(Scenario scenarioData, OutputDirectoryHierarchy controlerIO) {
+	DumpDataAtEndImpl(Scenario scenarioData, OutputDirectoryHierarchy controlerIO) {
 		this.scenarioData = scenarioData;
 		this.controlerIO = controlerIO;
 	}

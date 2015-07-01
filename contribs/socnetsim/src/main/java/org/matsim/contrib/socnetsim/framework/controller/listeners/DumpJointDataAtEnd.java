@@ -19,25 +19,20 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.controller.listeners;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
-import org.matsim.core.controler.corelisteners.DumpDataAtEndImpl;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.ShutdownListener;
-
-import org.matsim.contrib.socnetsim.framework.population.JointPlans;
-import org.matsim.contrib.socnetsim.framework.population.JointPlansXmlWriter;
-
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.socnetsim.framework.population.JointPlans;
+import org.matsim.contrib.socnetsim.framework.population.JointPlansXmlWriter;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 
 /**
  * @author thibautd
  */
 @Singleton
-public class DumpJointDataAtEnd implements DumpDataAtEnd, ShutdownListener {
-	private final DumpDataAtEndImpl individualDumper;
+public class DumpJointDataAtEnd implements ShutdownListener {
 	private final Scenario scenario;
 	private final JointPlans jointPlans;
 	private final OutputDirectoryHierarchy controlerIO;
@@ -47,7 +42,6 @@ public class DumpJointDataAtEnd implements DumpDataAtEnd, ShutdownListener {
 			final Scenario scenarioData,
 			final JointPlans jointPlans,
 			final OutputDirectoryHierarchy controlerIO) {
-		this.individualDumper = new DumpDataAtEndImpl( scenarioData , controlerIO );
 		this.scenario = scenarioData;
 		this.jointPlans = jointPlans;
 		this.controlerIO = controlerIO;
@@ -55,7 +49,6 @@ public class DumpJointDataAtEnd implements DumpDataAtEnd, ShutdownListener {
 
 	@Override
 	public void notifyShutdown(final ShutdownEvent event) {
-		individualDumper.notifyShutdown( event );
 		dumpJointPlans();
 	}
 

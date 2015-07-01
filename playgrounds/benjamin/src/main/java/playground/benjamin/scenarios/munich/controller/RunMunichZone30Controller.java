@@ -124,8 +124,8 @@ public class RunMunichZone30Controller extends AbstractController {
 	@Override
 	protected void loadCoreListeners() {
 
-		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEndImpl(scenario, getControlerIO());
-		this.addControlerListener(dumpDataAtEnd);
+//		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEndImpl(scenario, getControlerIO());
+//		this.addControlerListener(dumpDataAtEnd);
 		
 		final PlansScoring plansScoring = buildPlansScoring();
 		this.addControlerListener(plansScoring);

@@ -112,8 +112,8 @@ public class KnSimplifiedController extends AbstractController {
 	@Override
 	protected void loadCoreListeners() {
 
-		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEndImpl(scenario, getControlerIO());
-		this.addControlerListener(dumpDataAtEnd);
+//		final DumpDataAtEnd dumpDataAtEnd = new DumpDataAtEndImpl(scenario, getControlerIO());
+//		this.addControlerListener(dumpDataAtEnd);
 		
 		final PlansScoring plansScoring = createPlansScoring();
 		this.addControlerListener(plansScoring);
