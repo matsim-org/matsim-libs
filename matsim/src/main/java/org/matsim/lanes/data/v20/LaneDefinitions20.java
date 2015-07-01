@@ -31,24 +31,23 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  *
  */
 public interface LaneDefinitions20 extends MatsimToplevelContainer {
-	public static final String ELEMENT_NAME = "laneDefinition20";
+	String ELEMENT_NAME = "laneDefinition20";
 
 	/**
 	 *
 	 * @return Map with Link Ids as keys and assignments as values
 	 */
-	public SortedMap<Id<Link>, LanesToLinkAssignment20> getLanesToLinkAssignments();
+	SortedMap<Id<Link>, LanesToLinkAssignment20> getLanesToLinkAssignments();
 
 	/**
 	 * Adds a LanesToLinkAssignment to the container.
 	 * @param assignment
 	 */
-	public void addLanesToLinkAssignment(LanesToLinkAssignment20 assignment);
+	void addLanesToLinkAssignment(LanesToLinkAssignment20 assignment);
 	/**
 	 * Get the factory to create container content.
 	 */
 	@Override
-	public LaneDefinitionsFactory20 getFactory();
+	LaneDefinitionsFactory20 getFactory();
 
-	public void setFactory(LaneDefinitionsFactory20 factory);
 }

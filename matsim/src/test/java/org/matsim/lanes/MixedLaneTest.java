@@ -56,7 +56,7 @@ public class MixedLaneTest {
 	 */
 	@Test
 	public void testFixture(){
-		LaneDefinitions20 lanes = (LaneDefinitions20) this.fixture.sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		LaneDefinitions20 lanes = this.fixture.sc.getLanes();
 		Assert.assertNotNull(lanes);
 		Assert.assertNotNull(lanes.getLanesToLinkAssignments());
 		LanesToLinkAssignment20 lanesLink1 = lanes.getLanesToLinkAssignments().get(fixture.id1);
@@ -90,7 +90,7 @@ public class MixedLaneTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
-		QSim qsim = (QSim) QSimUtils.createDefaultQSim(this.fixture.sc, events);
+		QSim qsim = QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 		Assert.assertNotNull(handler.agentDepartureEvent);
 		Assert.assertEquals(3600.0, handler.agentDepartureEvent.getTime());
@@ -122,7 +122,7 @@ public class MixedLaneTest {
 		fixture.create1PersonFromLink1Population();
 		fixture.sc.getConfig().qsim().setStartTime(3500.0);
 		fixture.sc.getConfig().qsim().setEndTime(7200.0);
-		LaneDefinitions20 lanes = (LaneDefinitions20) fixture.sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		LaneDefinitions20 lanes = fixture.sc.getLanes();
 		Lane lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
 		lane1.setCapacityVehiclesPerHour(1800.0);
 		Lane lane1ol = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.link1FirstLaneId);
@@ -249,7 +249,7 @@ public class MixedLaneTest {
 	@Test
 	public void testMixedLane2AgentsDrivingCapacityRestriction() {
 		fixture.create2PersonPopulation();
-		LaneDefinitions20 lanes = (LaneDefinitions20) fixture.sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		LaneDefinitions20 lanes = fixture.sc.getLanes();
 		Lane lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
 		lane1.setCapacityVehiclesPerHour(1800.0);
 		

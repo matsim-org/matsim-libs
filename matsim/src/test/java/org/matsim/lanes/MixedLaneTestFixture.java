@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,7 +41,7 @@ import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
+import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
@@ -56,7 +57,7 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
  */
 public class MixedLaneTestFixture {
 
-	public final ScenarioImpl sc;
+	public final Scenario sc;
 	public final Id<Node> nid0;
 	public final Id<Node> nid1;
 	public final Id<Node> nid2;
@@ -76,7 +77,7 @@ public class MixedLaneTestFixture {
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseLanes(true);
 
-		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		sc = ScenarioUtils.createScenario(config);
 		id0 = Id.create("0", Link.class);
 		id1 = Id.create("1", Link.class);
 		laneId1 = Id.create("1", Lane.class);
@@ -103,7 +104,7 @@ public class MixedLaneTestFixture {
 
 		config.qsim().setTimeStepSize(timeStepSize);
 
-		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		sc = ScenarioUtils.createScenario(config);
 		
 		nid0 = Id.create("0", Node.class);
 		nid1 = Id.create("1", Node.class);
@@ -187,8 +188,7 @@ public class MixedLaneTestFixture {
 		LanesToLinkAssignment11 l2l = lb.createLanesToLinkAssignment(id1);
 		l2l.addLane(lane);
 		lanes.addLanesToLinkAssignment(l2l);
-		LaneDefinitions20 lanesV2 = LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, this.sc.getNetwork());
-		this.sc.addScenarioElement( LaneDefinitions20.ELEMENT_NAME , lanesV2);
+		LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, this.sc.getLanes(), this.sc.getNetwork());
 	}
 	
 	public void create2PersonPopulation(){

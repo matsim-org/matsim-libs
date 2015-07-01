@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 /**
  * @author dgrether
  */
-public class LaneData20Impl implements Lane {
+class LaneData20Impl implements Lane {
 
 	private Id<Lane> id;
 	/**

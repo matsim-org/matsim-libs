@@ -31,10 +31,10 @@ import org.matsim.api.core.v01.network.Link;
  */
 public interface LanesToLinkAssignment20 {
 
-	public SortedMap<Id<Lane>, Lane> getLanes();
+	SortedMap<Id<Lane>, Lane> getLanes();
 
-	public void addLane(Lane lane);
+	void addLane(Lane lane);
 
-	public Id<Link> getLinkId();
+	Id<Link> getLinkId();
 
 }

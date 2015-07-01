@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 /**
  * @author dgrether
  */
-public class LanesToLinkAssignment20Impl implements LanesToLinkAssignment20 {
+class LanesToLinkAssignment20Impl implements LanesToLinkAssignment20 {
 
 	private final Id<Link> linkId;
 

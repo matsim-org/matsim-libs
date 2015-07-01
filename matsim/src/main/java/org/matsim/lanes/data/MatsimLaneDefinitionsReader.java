@@ -52,18 +52,11 @@ public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
 
 	private LaneDefinitions11 laneDefinitionsV1;
 
-	private Scenario scenario;
-	
 	public MatsimLaneDefinitionsReader(Scenario scenario) {
 		this.laneDefinitionsV1 = new LaneDefinitions11Impl();
-		this.scenario = scenario;
-		this.laneDefinitions = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		this.laneDefinitions = scenario.getLanes();
 	}
 
-	
-	public LaneDefinitions11 getLaneDefinitionsV1() {
-		return laneDefinitionsV1;
-	}
 
 	/**
 	 * Reads both file formats, 1.1 and 2.0.
@@ -72,7 +65,7 @@ public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
 		try {
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
 			String sid = fileTypeGuesser.getSystemId();
-			MatsimJaxbXmlParser reader = null;
+			MatsimJaxbXmlParser reader;
 			if (sid != null) {
 				log.debug("creating parser for system id: " + sid);
 				if (sid.compareTo(SCHEMALOCATIONV11) == 0) {
@@ -97,14 +90,8 @@ public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
 			}
 			log.info("reading file " + filename);
 			reader.readFile(filename);
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (SAXException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (JAXBException | SAXException | ParserConfigurationException | IOException e) {
+			throw new RuntimeException(e);
 		}
 
 	}

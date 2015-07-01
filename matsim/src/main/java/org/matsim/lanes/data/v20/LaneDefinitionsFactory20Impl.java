@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author dgrether
  * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory20
  */
-public class LaneDefinitionsFactory20Impl implements LaneDefinitionsFactory20 {
+class LaneDefinitionsFactory20Impl implements LaneDefinitionsFactory20 {
 	/**
 	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory20#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
 	 */

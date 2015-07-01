@@ -19,22 +19,14 @@
  * *********************************************************************** */
 package org.matsim.lanes.utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Stack;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.lanes.ModelLane;
-import org.matsim.lanes.data.v11.LaneData11;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+
+import java.util.*;
 
 /**
  * @author dgrether
@@ -43,32 +35,6 @@ import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
  */
 public final class LanesUtils {
 
-	private static final LaneFromLinkEndComparator fromLinkEndComparator = new LaneFromLinkEndComparator();
-	
-	/**
-	 * Convenience method to create a format 11 lane with the given Id, the
-	 * given length, the given number of represented lanes and the given Ids of
-	 * the downstream links the lane leads to. The Lane is added to the
-	 * LanesToLinkAssignment given as parameter.
-	 * 
-	 * @param l2l
-	 * @param factory
-	 * @param laneId
-	 * @param length
-	 * @param noLanes
-	 * @param toLinkIds
-	 */
-	public static void createAndAddLane11(LanesToLinkAssignment11 l2l, LaneDefinitionsFactory11 factory, Id<Lane> laneId, 
-			double length, 	double noLanes, Id<Link>... toLinkIds) {
-		LaneData11 lane = factory.createLane(laneId);
-		for (Id<Link> toLinkId : toLinkIds) {
-			lane.addToLinkId(toLinkId);
-		}
-		lane.setStartsAtMeterFromLinkEnd(length);
-		lane.setNumberOfRepresentedLanes(noLanes);
-		l2l.addLane(lane);
-	}
-	
 	/**
 	 * Convenience method to create a format 20 lane with the given Id, the given length,
 	 * the given capacity, the given number of represented lanes, the given
@@ -120,7 +86,18 @@ public final class LanesUtils {
 	public static List<ModelLane> createLanes(Link link, LanesToLinkAssignment20 lanesToLinkAssignment) {
 		List<ModelLane> queueLanes = new ArrayList<ModelLane>();
 		List<Lane> sortedLanes =  new ArrayList<Lane>(lanesToLinkAssignment.getLanes().values());
-		Collections.sort(sortedLanes, new LaneData20MeterFromLinkEndComparator());
+		Collections.sort(sortedLanes, new Comparator<Lane>() {
+			@Override
+			public int compare(Lane o1, Lane o2) {
+				if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
+					return -1;
+				} else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {
+					return 1;
+				} else {
+					return 0;
+				}
+			}
+		});
 		Collections.reverse(sortedLanes);
 
 		List<ModelLane> laneList = new LinkedList<ModelLane>();
@@ -178,7 +155,18 @@ public final class LanesUtils {
 			}
 		}
 
-		Collections.sort(queueLanes, fromLinkEndComparator);
+		Collections.sort(queueLanes, new Comparator<ModelLane>() {
+			@Override
+			public int compare(ModelLane o1, ModelLane o2) {
+				if (o1.getEndsAtMeterFromLinkEnd() < o2.getEndsAtMeterFromLinkEnd()) {
+					return -1;
+				} else if (o1.getEndsAtMeterFromLinkEnd() > o2.getEndsAtMeterFromLinkEnd()) {
+					return 1;
+				} else {
+					return 0;
+				}
+			}
+		});
 		return queueLanes;
 	}
 

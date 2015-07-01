@@ -17,27 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
+package org.matsim.lanes.data.v11;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.lanes.data.v11.LaneData11;
-import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.core.api.internal.MatsimComparator;
+import org.matsim.lanes.data.CalculateAngle;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.utils.LanesCapacityCalculator;
+
+import java.io.Serializable;
+import java.util.*;
 
 
 /**
@@ -183,5 +177,20 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 		}
 	}
 
+	static class LaneData20MeterFromLinkEndComparator implements Comparator<Lane>, Serializable, MatsimComparator {
+
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public int compare(Lane o1, Lane o2) {
+			if (o1.getStartsAtMeterFromLinkEnd() < o2.getStartsAtMeterFromLinkEnd()) {
+				return -1;
+			} else if (o1.getStartsAtMeterFromLinkEnd() > o2.getStartsAtMeterFromLinkEnd()) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
 	
 }

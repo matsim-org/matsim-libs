@@ -38,14 +38,10 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
+import org.matsim.lanes.data.v11.*;
+import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
-import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
-import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.utils.LanesUtils;
 
 import java.io.File;
 import java.util.Arrays;
@@ -265,20 +261,20 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		//lanes for link 12
 		LanesToLinkAssignment11 lanesForLink12 = factory.createLanesToLinkAssignment(Id.create("12", Link.class));
 		lanes.addLanesToLinkAssignment(lanesForLink12);
-		LanesUtils.createAndAddLane11(lanesForLink12, factory, Id.create("1", Lane.class), 
+		LanesUtils11.createAndAddLane11(lanesForLink12, factory, Id.create("1", Lane.class),
 				laneLenght, 1, Id.create("23", Link.class));
 
-		LanesUtils.createAndAddLane11(lanesForLink12, factory, Id.create("2", Lane.class), 
+		LanesUtils11.createAndAddLane11(lanesForLink12, factory, Id.create("2", Lane.class),
 				laneLenght, 1, Id.create("27", Link.class));
 
 		//lanes for link 65
 		LanesToLinkAssignment11 lanesForLink65 = factory.createLanesToLinkAssignment(Id.create("65", Link.class));
 		lanes.addLanesToLinkAssignment(lanesForLink65);
 
-		LanesUtils.createAndAddLane11(lanesForLink65, factory, Id.create("1", Lane.class), 
+		LanesUtils11.createAndAddLane11(lanesForLink65, factory, Id.create("1", Lane.class),
 				laneLenght, 1, Id.create("54", Link.class));
 
-		LanesUtils.createAndAddLane11(lanesForLink65, factory, Id.create("2", Lane.class),
+		LanesUtils11.createAndAddLane11(lanesForLink65, factory, Id.create("2", Lane.class),
 				laneLenght, 1, Id.create("58", Link.class));
 		
 		LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, scenario.getLanes(), scenario.getNetwork());

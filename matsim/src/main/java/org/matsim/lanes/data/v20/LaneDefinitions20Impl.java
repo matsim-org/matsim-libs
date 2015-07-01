@@ -50,9 +50,4 @@ public class LaneDefinitions20Impl implements LaneDefinitions20 {
 		return this.builder;
 	}
 
-	@Override
-	public void setFactory(LaneDefinitionsFactory20 factory) {
-		this.builder = factory;
-	}
-
 }

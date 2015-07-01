@@ -53,8 +53,6 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 
 	private LaneDefinitions20 laneDefinitions;
 
-	private XMLLaneDefinitions xmlLaneDefinitions;
-
 	/**
 	 * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
 	 * file format.
@@ -74,21 +72,15 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 		log.info("writing to file: " + filename);
   	JAXBContext jc;
 		try {
-			this.xmlLaneDefinitions = convertDataToXml();
+			XMLLaneDefinitions xmlLaneDefinitions = convertDataToXml();
 			jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
 			super.setMarshallerProperties(MatsimLaneDefinitionsReader.SCHEMALOCATIONV20, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
-			m.marshal(this.xmlLaneDefinitions, bufout);
+			m.marshal(xmlLaneDefinitions, bufout);
 			bufout.close();
-		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (MarshalException e) {
-			e.printStackTrace();
+		} catch (JAXBException | IOException | MarshalException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -133,11 +125,11 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 				xmllane.setCapacity(capacity);
 
 				XMLLaneType.XMLRepresentedLanes lanes = new XMLLaneType.XMLRepresentedLanes();
-				lanes.setNumber(Double.valueOf(bl.getNumberOfRepresentedLanes()));
+				lanes.setNumber(bl.getNumberOfRepresentedLanes());
 				xmllane.setRepresentedLanes(lanes);
 
 				XMLLaneType.XMLStartsAt startsAt = new XMLLaneType.XMLStartsAt();
-				startsAt.setMeterFromLinkEnd(Double.valueOf(bl.getStartsAtMeterFromLinkEnd()));
+				startsAt.setMeterFromLinkEnd(bl.getStartsAtMeterFromLinkEnd());
 				xmllane.setStartsAt(startsAt);
 
 				xmllane.setAlignment(bl.getAlignment());

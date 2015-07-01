@@ -19,15 +19,12 @@
  * *********************************************************************** */
 package org.matsim.lanes;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
@@ -39,6 +36,9 @@ import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Tests the reader and writer for the different lane formats
@@ -65,13 +65,13 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 	private Id<Link> linkId42 = Id.create("42", Link.class);
 
 	private static final class Fixture{
-		ScenarioImpl scenario;
+		Scenario scenario;
 
 		Fixture(){
 			Config config = ConfigUtils.createConfig();
 			config.scenario().setUseLanes(true);
 			// need to LOAD the scenario in order for the lanes container to be created.
-			this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+			this.scenario = ScenarioUtils.loadScenario(config);
 		}
 	}
 	
@@ -87,7 +87,7 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		Fixture f = new Fixture();
 		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(f.scenario);
 		reader.readFile(this.getClassInputDirectory() + TESTXMLV20);
-		checkContent((LaneDefinitions20) f.scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+		checkContent(f.scenario.getLanes());
 	}
 	
 	public void testWriter20() {
@@ -102,14 +102,14 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		// write the test file
 		log.debug("write the test file...");
 		MatsimLaneDefinitionsWriter writer = new MatsimLaneDefinitionsWriter();
-		writer.writeFile20(testoutput, (LaneDefinitions20) f.scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+		writer.writeFile20(testoutput, f.scenario.getLanes());
 
 		f = new Fixture();
 		log.debug("and read it again");
 		reader = new MatsimLaneDefinitionsReader(
 				f.scenario);
 		reader.readFile(testoutput);
-		checkContent((LaneDefinitions20) f.scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+		checkContent(f.scenario.getLanes());
 	}
 	
 

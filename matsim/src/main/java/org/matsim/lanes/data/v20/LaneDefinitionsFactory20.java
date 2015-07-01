@@ -35,11 +35,11 @@ public interface LaneDefinitionsFactory20 extends MatsimFactory {
 	 * @param linkIdReference id of the links the lanes of the created object belong to
 	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
 	 */
-	public LanesToLinkAssignment20 createLanesToLinkAssignment(Id<Link> linkIdReference);
+	LanesToLinkAssignment20 createLanesToLinkAssignment(Id<Link> linkIdReference);
 	/**
 	 * Creates an instance of BasicLane with the id given as parameter.
 	 * @param laneId
 	 * @return
 	 */
-	public Lane createLane(Id<Lane> laneId);
+	Lane createLane(Id<Lane> laneId);
 }
