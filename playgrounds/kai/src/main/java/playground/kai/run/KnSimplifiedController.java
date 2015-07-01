@@ -119,7 +119,7 @@ public class KnSimplifiedController extends AbstractController {
 		this.addControlerListener(plansScoring);
 
 		final StrategyManager strategyManager = createStrategyManager() ;
-		this.addCoreControlerListener(new PlansReplanningImpl( strategyManager, this.population ));
+//		this.addCoreControlerListener(new PlansReplanningImpl( strategyManager, this.population ));
 
 //		final PlansDumping plansDumping = new PlansDumpingImpl( this.scenario, this.config.controler().getFirstIteration(),
 //				this.config.controler().getWritePlansInterval(), stopwatch, getControlerIO() );
@@ -132,6 +132,8 @@ public class KnSimplifiedController extends AbstractController {
 				getControlerIO() );
 		this.addCoreControlerListener(eventsHandling); 
 		// must be last being added (=first being executed)
+		throw new RuntimeException("This doesn't work anymore. Come to MZ, who will gladly help you repair it.");
+
 	}
 
 	/**

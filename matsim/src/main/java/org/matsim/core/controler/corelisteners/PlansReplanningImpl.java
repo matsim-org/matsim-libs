@@ -37,13 +37,13 @@ import com.google.inject.Singleton;
  * @author mrieser
  */
 @Singleton
-public final class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
+final class PlansReplanningImpl implements PlansReplanning, ReplanningListener {
 	
 	private Population population ;
 	private StrategyManager strategyManager ;
 	
 	@Inject
-	public PlansReplanningImpl( StrategyManager strategyManager, Population pop ) {
+	PlansReplanningImpl( StrategyManager strategyManager, Population pop ) {
 		this.population = pop ;
 		this.strategyManager = strategyManager ;
 	}

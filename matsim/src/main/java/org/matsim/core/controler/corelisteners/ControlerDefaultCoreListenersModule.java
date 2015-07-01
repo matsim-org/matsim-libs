@@ -20,16 +20,6 @@
 package org.matsim.core.controler.corelisteners;
 
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
-import org.matsim.core.controler.corelisteners.DumpDataAtEndImpl;
-import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.EventsHandlingImpl;
-import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansDumpingImpl;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
-import org.matsim.core.controler.corelisteners.PlansReplanningImpl;
-import org.matsim.core.controler.corelisteners.PlansScoring;
-import org.matsim.core.controler.corelisteners.PlansScoringImpl;
 
 /**
  * Defines the default core listeners.

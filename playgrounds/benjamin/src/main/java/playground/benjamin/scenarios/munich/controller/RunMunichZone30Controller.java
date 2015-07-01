@@ -131,7 +131,7 @@ public class RunMunichZone30Controller extends AbstractController {
 		this.addControlerListener(plansScoring);
 
 		final StrategyManager strategyManager = buildStrategyManager() ;
-		this.addCoreControlerListener(new PlansReplanningImpl( strategyManager, this.population ));
+//		this.addCoreControlerListener(new PlansReplanningImpl( strategyManager, this.population ));
 
 //		final PlansDumping plansDumping = new PlansDumpingImpl( this.scenario, this.config.controler().getFirstIteration(),
 //				this.config.controler().getWritePlansInterval(), stopwatch, getControlerIO() );
@@ -143,6 +143,7 @@ public class RunMunichZone30Controller extends AbstractController {
 				getControlerIO() );
 		this.addCoreControlerListener(eventsHandling); 
 		// must be last being added (=first being executed)
+		throw new RuntimeException("This doesn't work anymore. Come to MZ, who will gladly help you repair it.");
 	}
 	private PlansScoring buildPlansScoring() {
 		ScoringFunctionFactory scoringFunctionFactory = new CharyparNagelScoringFunctionFactory( this.config.planCalcScore(), this.network );
