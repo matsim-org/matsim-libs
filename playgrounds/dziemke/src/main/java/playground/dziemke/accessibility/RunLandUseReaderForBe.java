@@ -66,7 +66,7 @@ public class RunLandUseReaderForBe {
 //		}
 		
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", coordinateTransformation);
-		LandUseReader landUseReader = new LandUseReader(osmFile, ct, buildOsmToMatsimTypeMap());
+		LandUseReader landUseReader = new LandUseReader(ct, buildOsmToMatsimTypeMap());
 		try {
 			landUseReader.parseLandUse(osmFile);
 			landUseReader.writeFacilities(facilityFile);
