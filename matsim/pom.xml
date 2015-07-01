@@ -138,35 +138,35 @@
 						<groups>
 							<group>
 								<title>api</title>
-								<packages>org.matsim.api.*</packages>
+								<packages>org.matsim.api:org.matsim.api.*</packages>
 							</group>
 							<group>
 								<title>run</title>
-								<packages>org.matsim.run.*</packages>
+								<packages>org.matsim.run:org.matsim.run.*</packages>
 							</group>
 							<group>
 								<title>core</title>
-								<packages>org.matsim.core.*</packages>
+								<packages>org.matsim.core:org.matsim.core.*</packages>
 							</group>
 							<group>
 								<title>pt</title>
-								<packages>org.matsim.pt.*</packages>
+								<packages>org.matsim.pt:org.matsim.pt.*</packages>
 							</group>
 							<group>
 								<title>utils</title>
-								<packages>org.matsim.utils.*</packages>
+								<packages>org.matsim.utils:org.matsim.utils.*</packages>
 							</group>
 							<group>
 								<title>withinday</title>
-								<packages>org.matsim.withinday.*</packages>
+								<packages>org.matsim.withinday:org.matsim.withinday.*</packages>
 							</group>
 							<group>
 								<title>vis</title>
-								<packages>org.matsim.vis.*</packages>
+								<packages>org.matsim.vis:org.matsim.vis.*</packages>
 							</group>
 							<group>
 								<title>tutorial</title>
-								<packages>tutorial.*</packages>
+								<packages>tutorial:tutorial.*</packages>
 							</group>
 						</groups>
 					</configuration>
