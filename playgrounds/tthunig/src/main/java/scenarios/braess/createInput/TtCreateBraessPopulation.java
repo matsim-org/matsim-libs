@@ -69,43 +69,6 @@ public class TtCreateBraessPopulation {
 		if (this.network.getNodes().containsKey(Id.createNodeId(9)))
 			this.simulateInflowCap9 = true;
 	}
-	
-	/**
-	 * Calls createPersons(int, Double) with an initial plan
-	 * score of null.
-	 * 
-	 * @param numberOfInitRoutes
-	 */
-	public void createPersons(int numberOfInitRoutes) {
-		
-		createPersons(numberOfInitRoutes, null);
-	}
-	
-	/**
-	 * Calls createPersons(boolean, Double) with an initial plan
-	 * score of null.
-	 * 
-	 * @param createAllRoutes
-	 */
-	public void createPersons(boolean createAllRoutes) {
-		
-		createPersons(createAllRoutes, null);
-	}
-	
-	/**
-	 * Calls createPersons(int, int) with the correct number of initial
-	 * routes.
-	 * 
-	 * @param createAllRoutes
-	 * @param initPlanScore
-	 */
-	public void createPersons(boolean createAllRoutes, Double initPlanScore) {
-		
-		if (createAllRoutes)
-			createPersons(3, initPlanScore);
-		else
-			createPersons(0, initPlanScore);
-	}
 
 	/**
 	 * Fills a population container with the given number of persons. All
@@ -123,7 +86,8 @@ public class TtCreateBraessPopulation {
 	 * @param numberOfInitRoutes
 	 *            number of routes that the agents get as initial plans
 	 * @param initPlanScore
-	 *            initial score for all plans the persons will get
+	 *            initial score for all plans the persons will get. Use null for
+	 *            no scores.
 	 */
 	public void createPersons(int numberOfInitRoutes, Double initPlanScore) {
 		

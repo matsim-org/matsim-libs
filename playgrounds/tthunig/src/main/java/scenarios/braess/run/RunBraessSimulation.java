@@ -210,7 +210,15 @@ public class RunBraessSimulation {
 		TtCreateBraessPopulation popCreator = 
 				new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(3600);
-		popCreator.createPersons(INIT_WITH_ALL_ROUTES, INIT_PLAN_SCORE);
+		
+		// determine the number of initial routes: it is zero if the agents
+		// should be initialized without routes. it is three if they should be
+		// initialized with all three routes of the braess network
+		int numberOfInitialRoutes = 0;
+		if (INIT_WITH_ALL_ROUTES)
+			numberOfInitialRoutes = 3;
+		
+		popCreator.createPersons(numberOfInitialRoutes, INIT_PLAN_SCORE);
 	}
 
 	private void createSignals(Scenario scenario) {

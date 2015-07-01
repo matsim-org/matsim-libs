@@ -7,14 +7,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
@@ -41,7 +44,10 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class TtAnalyzeBraessRouteDistributionAndTT implements PersonArrivalEventHandler,
 		PersonDepartureEventHandler, LinkEnterEventHandler,
-		Wait2LinkEventHandler {
+		Wait2LinkEventHandler, PersonStuckEventHandler {
+	
+	private static final Logger log = Logger
+			.getLogger(TtAnalyzeBraessRouteDistributionAndTT.class);
 
 	private double totalTT;
 	private double[] totalRouteTTs;
@@ -229,6 +235,15 @@ public class TtAnalyzeBraessRouteDistributionAndTT implements PersonArrivalEvent
 		this.personDepartureTimes.remove(event.getPersonId());
 		this.personRouteChoice.remove(event.getPersonId());
 		this.personRouteStartTime.remove(event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(PersonStuckEvent event) {
+//		// TODO check consistency
+//		log.warn("Agent " + event.getPersonId() + " stucked on link " + event.getLinkId() + "."
+//				+ " This handler doesn't consider stucked agents for the calculation of travel times.");
+//		this.personDepartureTimes.remove(event.getPersonId());
+//		this.personRouteStartTime.remove(event.getPersonId());
 	}
 
 	/**
