@@ -3,11 +3,7 @@ package playground.sergioo.eventAnalysisTools2013.excessWaitingTime;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Toolkit;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +30,11 @@ import playground.sergioo.visualizer2D2012.LayersWindow;
 import playground.sergioo.visualizer2D2012.networkVisualizer.networkPainters.NetworkPainter;
 
 public class EWTWindow extends LayersWindow {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	private enum PanelIds implements LayersWindow.PanelIds {
 		ONE;
@@ -67,16 +68,17 @@ public class EWTWindow extends LayersWindow {
 		final StationsPainter stationsPainter = new StationsPainter(new Color[]{new Color(255,255,0,100),new Color(0,0,255,100),new Color(255,0,0,100)}, scale);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		EventsManager events = EventsUtils.createEventsManager();
-		ObjectInputStream ois = new ObjectInputStream(new FileInputStream(args[5]));
-		final ExcessWaitingTimeCalculator eWTCalculator = (ExcessWaitingTimeCalculator) ois.readObject();/*new ExcessWaitingTimeCalculator();
+		//ObjectInputStream ois = new ObjectInputStream(new FileInputStream(args[5]));
+		final ExcessWaitingTimeCalculator eWTCalculator = /*(ExcessWaitingTimeCalculator) ois.readObject();*/new ExcessWaitingTimeCalculator();
 		events.addHandler(eWTCalculator);
 		new EventsReaderXMLv1(events).parse(args[2]);
-		ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(args[5]));
+		/*ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(args[5]));
 		oos.writeObject(eWTCalculator);
-		oos.close();*/
-		ois.close();
+		oos.close();
+		ois.close();*/
 		final TransitRoute route = scenario.getTransitSchedule().getTransitLines().get(Id.create(args[3], TransitLine.class)).getRoutes().get(Id.create(args[4], TransitRoute.class));
 		final PrintWriter writer = new PrintWriter(args[6]+args[4]+".csv");
+		writer.println("stopId,EWT_headway,EWT_numPeople,EWT_byPerson");
 		final Id<TransitLine> lineId = Id.create(args[3], TransitLine.class);
 		LayersPanel panel = new LayersPanel() {
 			{
