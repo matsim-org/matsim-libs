@@ -109,12 +109,10 @@ public class RunRoadClassification {
 		countsReader.parse(countsFileName);
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		final VolumesAnalyzer volumesAnalyzer = new VolumesAnalyzer(3600,
-				24 * 3600, scenario.getNetwork());
 		final Controler controler = new Controler(scenario);
 
 		final RoadClassificationStateFactory stateFactory = new RoadClassificationStateFactory(
-				volumesAnalyzer, counts.getCounts().keySet());
+				controler.getInjector().getProvider(VolumesAnalyzer.class), counts.getCounts().keySet());
 		final ObjectiveFunction<RoadClassificationState> objectiveFunction = new RoadClassificationObjectiveFunction(
 				counts);
 		final Set<RoadClassificationDecisionVariable> decisionVariables = new LinkedHashSet<>();

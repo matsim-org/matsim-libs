@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.inject.Provider;
 import opdytsintegration.MATSimStateFactory;
 
 import org.matsim.analysis.VolumesAnalyzer;
@@ -24,13 +25,13 @@ class RoadClassificationStateFactory
 
 	// -------------------- MEMBERS --------------------
 
-	private final VolumesAnalyzer volumesAnalyzer;
+	private final Provider<VolumesAnalyzer> volumesAnalyzer;
 
 	private final Set<Id<Link>> relevantLinkIds;
 
 	// -------------------- CONSTRUCTION --------------------
 
-	RoadClassificationStateFactory(final VolumesAnalyzer volumesAnalyzer,
+	RoadClassificationStateFactory(final Provider<VolumesAnalyzer> volumesAnalyzer,
 			final Set<Id<Link>> relevantLinkIds) {
 		this.volumesAnalyzer = volumesAnalyzer;
 		this.relevantLinkIds = relevantLinkIds;
@@ -45,7 +46,7 @@ class RoadClassificationStateFactory
 		final Map<Id<Link>, int[]> linkId2simulatedCounts = new LinkedHashMap<Id<Link>, int[]>();
 		for (Id<Link> linkId : this.relevantLinkIds) {
 			linkId2simulatedCounts.put(linkId,
-					this.volumesAnalyzer.getVolumesForLink(linkId));
+					this.volumesAnalyzer.get().getVolumesForLink(linkId));
 		}
 		return new RoadClassificationState(population, stateVector,
 				linkId2simulatedCounts);
