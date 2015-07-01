@@ -17,32 +17,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
-
-import java.io.IOException;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
+package org.matsim.lanes.data.v20;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
-import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
-import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitionsReader20;
 import org.xml.sax.SAXException;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
 /**
  * @author dgrether
  */
-public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
+public class LaneDefinitionsReader implements MatsimSomeReader {
 	
 	private static final Logger log = Logger
-			.getLogger(MatsimLaneDefinitionsReader.class);
+			.getLogger(LaneDefinitionsReader.class);
 	
 	public static final String SCHEMALOCATIONV11 = "http://www.matsim.org/files/dtd/laneDefinitions_v1.1.xsd";
 
@@ -50,10 +44,7 @@ public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
 	
 	private LaneDefinitions20 laneDefinitions;
 
-	private LaneDefinitions11 laneDefinitionsV1;
-
-	public MatsimLaneDefinitionsReader(Scenario scenario) {
-		this.laneDefinitionsV1 = new LaneDefinitions11Impl();
+	public LaneDefinitionsReader(Scenario scenario) {
 		this.laneDefinitions = scenario.getLanes();
 	}
 
@@ -70,11 +61,10 @@ public class MatsimLaneDefinitionsReader implements MatsimSomeReader {
 				log.debug("creating parser for system id: " + sid);
 				if (sid.compareTo(SCHEMALOCATIONV11) == 0) {
 					log.info("Using LaneDefinitionReader11...");
-					log.warn("The laneDefinitions_v1.1.xsd file format is used. For the use within the mobility simulation it is strongly recommended to" +
+					throw new RuntimeException("The laneDefinitions_v1.1.xsd file format is used. For the use within the mobility simulation it is strongly recommended to" +
 							"convert the read data to the v2.0.xsd format using the LaneDefinitionsV11ToV20Conversion class. " +
 							"With the 0.5 release of MATSim the automatic conversion is switched off. Simulation will not run if the 1.1 file format" +
 							"is given as input. Please convert manually.");
-					reader = new LaneDefinitionsReader11(this.laneDefinitionsV1, sid);
 				}
 				else if (sid.compareTo(SCHEMALOCATIONV20) == 0){
 					reader = new LaneDefinitionsReader20(this.laneDefinitions, sid);

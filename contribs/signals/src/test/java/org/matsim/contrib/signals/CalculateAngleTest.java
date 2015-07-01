@@ -16,10 +16,10 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.CalculateAngle;
 import org.matsim.testcases.MatsimTestUtils;
 
 
@@ -44,22 +44,22 @@ public class CalculateAngleTest {
 		loader.loadNetwork();
 
 		Assert.assertEquals("Has to be 'null', since there is no other way back but Link 11.",
-				null, CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("1", Link.class))));
+				null, NetworkUtils.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("1", Link.class))));
 
 		Assert.assertEquals(
-				scenario.getNetwork().getLinks().get(Id.create("2", Link.class)), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("11", Link.class))));
+				scenario.getNetwork().getLinks().get(Id.create("2", Link.class)), NetworkUtils.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("11", Link.class))));
 
 		Assert.assertEquals(
-				scenario.getNetwork().getLinks().get(Id.create("3", Link.class)), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("22", Link.class))));
+				scenario.getNetwork().getLinks().get(Id.create("3", Link.class)), NetworkUtils.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("22", Link.class))));
 		
 		Assert.assertEquals(
-				scenario.getNetwork().getLinks().get(Id.create("4", Link.class)), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("33", Link.class))));
+				scenario.getNetwork().getLinks().get(Id.create("4", Link.class)), NetworkUtils.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("33", Link.class))));
 		
 		Assert.assertEquals(
-				scenario.getNetwork().getLinks().get(Id.create("1", Link.class)), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("44", Link.class))));
+				scenario.getNetwork().getLinks().get(Id.create("1", Link.class)), NetworkUtils.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("44", Link.class))));
 		
 		Assert.assertEquals(
-				scenario.getNetwork().getLinks().get(Id.create("5", Link.class)), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("3", Link.class))));
+				scenario.getNetwork().getLinks().get(Id.create("5", Link.class)), NetworkUtils.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("3", Link.class))));
 				
 	}
 	
@@ -75,7 +75,7 @@ public class CalculateAngleTest {
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			createNetwork(scenario, angle);
 			Network net = scenario.getNetwork();
-			TreeMap<Double, Link> m = CalculateAngle.getOutLinksSortedByAngle(net.getLinks().get(Id.create(1, Link.class)));
+			TreeMap<Double, Link> m = NetworkUtils.getOutLinksSortedByAngle(net.getLinks().get(Id.create(1, Link.class)));
 			Entry<Double, Link> entry = m.firstEntry();
 			Assert.assertEquals("For angle " + angle + "CalculateAngle returns not the correct order of outlinks", Id.create(2, Link.class), entry.getValue().getId());
 			entry = m.higherEntry(entry.getKey());
@@ -83,7 +83,7 @@ public class CalculateAngleTest {
 			entry = m.higherEntry(entry.getKey());
 			Assert.assertEquals("For angle " + angle + "CalculateAngle returns not the correct order of outlinks", Id.create(4, Link.class), entry.getValue().getId());
 			
-			Link leftLane = CalculateAngle.getLeftLane(net.getLinks().get(Id.create(1, Link.class)));
+			Link leftLane = NetworkUtils.getLeftLane(net.getLinks().get(Id.create(1, Link.class)));
 			Assert.assertEquals(Id.create(2, Link.class), leftLane.getId());
 			
 		}

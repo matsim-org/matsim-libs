@@ -40,8 +40,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.*;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.data.v20.Lane;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 import java.io.File;
 import java.util.Arrays;
@@ -327,7 +327,8 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		String signalGroupsFile = "../../matsim/output/example90TrafficLights/signal_groups.xml";
 		String signalControlFile = "../../matsim/output/example90TrafficLights/signal_control.xml";
 
-		new MatsimLaneDefinitionsWriter().writeFile20(lanesFile, scenario.getLanes());
+		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(scenario.getLanes());
+		writerDelegate.write(lanesFile);
 
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
 		signalsWriter.setSignalSystemsOutputFilename(signalSystemsFile);

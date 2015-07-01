@@ -19,22 +19,16 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
-import org.matsim.lanes.utils.LanesTurnInfoBuilder;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
+
+import java.util.*;
 
 
 /**
@@ -45,7 +39,7 @@ import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
  */
 public class SignalsTurnInfoBuilder {
 	
-	private static final Logger log = Logger.getLogger(LanesTurnInfoBuilder.class);
+	private static final Logger log = Logger.getLogger(SignalsTurnInfoBuilder.class);
 
 	private static int warnCount = 0;
 

@@ -44,13 +44,11 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.utils.LanesTurnInfoBuilder;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This leg router takes travel times needed for turning moves into account. This is done by a routing on an inverted
@@ -99,6 +97,30 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		return new LegRouterWrapper( mode, popFact, toWrap ) ;
 	}
 
+	static Map<Id<Link>, List<TurnInfo>> createTurnInfos(LaneDefinitions20 laneDefs) {
+		Map<Id<Link>, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<>();
+		Set<Id<Link>> toLinkIds = new HashSet<>();
+		for (LanesToLinkAssignment20 l2l : laneDefs.getLanesToLinkAssignments().values()) {
+			toLinkIds.clear();
+			for (Lane lane : l2l.getLanes().values()) {
+				if (lane.getToLinkIds() != null
+						&& (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty())) { // make sure that it is a lane at the
+																																									// end of a link
+					toLinkIds.addAll(lane.getToLinkIds());
+				}
+			}
+			if (!toLinkIds.isEmpty()) {
+				List<TurnInfo> turnInfoList = new ArrayList<TurnInfo>();
+				for (Id<Link> toLinkId : toLinkIds) {
+					turnInfoList.add(new TurnInfo(l2l.getLinkId(), toLinkId));
+				}
+				inLinkIdTurnInfoMap.put(l2l.getLinkId(), turnInfoList);
+			}
+		}
+
+		return inLinkIdTurnInfoMap;
+	}
+
 	private Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos(Scenario sc){
 		Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = new HashMap<>();
 
@@ -107,7 +129,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 
 		if (sc.getConfig().scenario().isUseLanes()) {
 			LaneDefinitions20 ld = (LaneDefinitions20) sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
-			Map<Id<Link>, List<TurnInfo>> lanesTurnInfoMap = new LanesTurnInfoBuilder().createTurnInfos(ld);
+			Map<Id<Link>, List<TurnInfo>> lanesTurnInfoMap = createTurnInfos(ld);
 			netTurnInfoBuilder.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, lanesTurnInfoMap);
 		}
 		if (sc.getConfig().scenario().isUseSignalSystems()) {

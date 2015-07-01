@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.lanes.ModelLane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.lanes.utils.LanesUtils;
+import org.matsim.lanes.LanesUtils;
 
 import java.util.List;
 

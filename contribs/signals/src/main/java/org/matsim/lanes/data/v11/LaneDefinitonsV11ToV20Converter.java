@@ -27,7 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
-import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
+import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
@@ -49,7 +49,7 @@ public class LaneDefinitonsV11ToV20Converter {
 		fileTypeGuesser = new MatsimFileTypeGuesser(laneDefs11Filename);
 		String sid11 = fileTypeGuesser.getSystemId();
 
-		if (!(sid11.compareTo(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11) == 0)){
+		if (!(sid11.compareTo(LaneDefinitionsReader.SCHEMALOCATIONV11) == 0)){
 			throw new IllegalArgumentException("File " + laneDefs11Filename + " is no laneDefinitions_v1.1.xsd format");
 		}
 	}
@@ -63,7 +63,7 @@ public class LaneDefinitonsV11ToV20Converter {
 		netReader.readFile(networkFilename);
 		Network net = sc.getNetwork();
 		LaneDefinitions11 lanedefs11 = new LaneDefinitions11Impl();
-		LaneDefinitionsReader11 reader11 = new LaneDefinitionsReader11(lanedefs11, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
+		LaneDefinitionsReader11 reader11 = new LaneDefinitionsReader11(lanedefs11, LaneDefinitionsReader.SCHEMALOCATIONV11);
 		reader11.readFile(laneDefs11Filename);
 		LaneDefinitions20 lanedefs20 = LaneDefinitionsV11ToV20Conversion.convertTo20(lanedefs11, net);
 		LaneDefinitionsWriter20 writer20 = new LaneDefinitionsWriter20(lanedefs20);

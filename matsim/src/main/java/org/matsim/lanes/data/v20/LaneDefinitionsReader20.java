@@ -47,7 +47,7 @@ import org.xml.sax.SAXException;
  * @author dgrether
  *
  */
-public class LaneDefinitionsReader20 extends MatsimJaxbXmlParser implements MatsimSomeReader {
+class LaneDefinitionsReader20 extends MatsimJaxbXmlParser implements MatsimSomeReader {
 
 	private static final Logger log = Logger
 			.getLogger(LaneDefinitionsReader20.class);

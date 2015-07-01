@@ -33,7 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
+import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -164,7 +164,7 @@ public class LanesConsistencyChecker {
 		new MatsimNetworkReader(scenario).readFile(netFile);
 	  log.info("read network");
 	  
-		MatsimLaneDefinitionsReader laneReader = new MatsimLaneDefinitionsReader(scenario);
+		LaneDefinitionsReader laneReader = new LaneDefinitionsReader(scenario);
 	  laneReader.readFile(lanesFile);
 	  
 	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));

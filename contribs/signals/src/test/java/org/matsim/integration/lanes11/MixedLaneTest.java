@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
+package org.matsim.integration.lanes11;
 
 import junit.framework.Assert;
 import org.jfree.util.Log;

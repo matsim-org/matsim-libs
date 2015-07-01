@@ -38,7 +38,7 @@ import org.matsim.jaxb.lanedefinitions11.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions11.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions11.XMLLanesToLinkAssignmentType;
-import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
+import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.Lane;
 import org.xml.sax.SAXException;
 
@@ -68,7 +68,7 @@ public class LaneDefinitionsReader11 extends MatsimJaxbXmlParser implements Mats
 	}
 	
 	public LaneDefinitionsReader11(LaneDefinitions11 laneDefs) {
-		super(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
+		super(LaneDefinitionsReader.SCHEMALOCATIONV11);
 		this.laneDefinitions = laneDefs;
 		builder = this.laneDefinitions.getFactory();
 	}

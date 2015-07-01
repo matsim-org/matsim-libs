@@ -20,7 +20,6 @@
 package org.matsim.lanes.data.v20;
 
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.xml.bind.JAXBContext;
@@ -39,7 +38,7 @@ import org.matsim.jaxb.lanedefinitions20.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions20.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions20.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
-import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
+
 /**
  * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
  * file format.
@@ -75,7 +74,7 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 			XMLLaneDefinitions xmlLaneDefinitions = convertDataToXml();
 			jc = JAXBContext.newInstance(org.matsim.jaxb.lanedefinitions20.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(MatsimLaneDefinitionsReader.SCHEMALOCATIONV20, m);
+			super.setMarshallerProperties(LaneDefinitionsReader.SCHEMALOCATIONV20, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 			m.marshal(xmlLaneDefinitions, bufout);
 			bufout.close();

@@ -17,14 +17,16 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.utils;
+package org.matsim.lanes;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.lanes.ModelLane;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.v20.*;
 
 import java.util.*;
 
@@ -135,7 +137,7 @@ public final class LanesUtils {
 				laneLength = lastQLane.getLaneData().getStartsAtMeterFromLinkEnd();
 				lastQLane.setEndsAtMetersFromLinkEnd(0.0);
 			}
-			lastQLane.changeLength(laneLength);
+			lastQLane.setLength(laneLength);
 		}
 
 		//fill toLinks
@@ -170,4 +172,49 @@ public final class LanesUtils {
 		return queueLanes;
 	}
 
+	/**
+	 * Calculate capacity by formular from Neumann2008DA:
+	 *
+	 * Flow of a Lane is given by the flow of the link divided by the number of lanes represented by the link.
+	 *
+	 * A Lane may represent one or more lanes in reality. This is given by the attribute numberOfRepresentedLanes of
+	 * the Lane definition. The flow of a lane is scaled by this number.
+	 */
+	public static void calculateAndSetCapacity(Lane lane, boolean isLaneAtLinkEnd, Link link, Network network){
+		if (isLaneAtLinkEnd){
+			double noLanesLink = link.getNumberOfLanes();
+			double linkFlowCapPerSecondPerLane = link.getCapacity() / network.getCapacityPeriod()
+					/ noLanesLink;
+			double laneFlowCapPerHour = lane.getNumberOfRepresentedLanes()
+					* linkFlowCapPerSecondPerLane * 3600.0;
+			lane.setCapacityVehiclesPerHour(laneFlowCapPerHour);
+		}
+		else {
+			double capacity = link.getCapacity() / network.getCapacityPeriod() * 3600.0;
+			lane.setCapacityVehiclesPerHour(capacity);
+		}
+	}
+
+	public static void calculateMissingCapacitiesForLanes20(String networkInputFilename, String lanes20InputFilename, String lanes20OutputFilename){
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(networkInputFilename);
+		config.scenario().setUseLanes(true);
+		config.network().setLaneDefinitionsFile(lanes20InputFilename);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = scenario.getNetwork();
+		LaneDefinitions20 lanes = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		for (LanesToLinkAssignment20 l2l : lanes.getLanesToLinkAssignments().values()){
+			Link link = network.getLinks().get(l2l.getLinkId());
+			for (Lane lane : l2l.getLanes().values()){
+				if (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty()){
+					calculateAndSetCapacity(lane, true, link, network);
+				}
+				else {
+					calculateAndSetCapacity(lane, false, link, network);
+				}
+			}
+		}
+		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(lanes);
+		writerDelegate.write(lanes20OutputFilename);
+	}
 }

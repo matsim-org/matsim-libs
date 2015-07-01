@@ -1,28 +1,27 @@
 package playground.andreas.intersection.zuerich;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.signals.data.SignalsData;
+import org.matsim.contrib.signals.data.SignalsScenarioWriter;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
-
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import playground.andreas.intersection.zuerich.lanes.LanesConsistencyChecker;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GenerateZuerrichOutput {
 
@@ -86,8 +85,8 @@ public class GenerateZuerrichOutput {
 			new LanesConsistencyChecker(net, lanes20).checkConsistency();
 			
 			//write data
-			MatsimLaneDefinitionsWriter laneWriter = new MatsimLaneDefinitionsWriter();
-			laneWriter.writeFile20(lanesOutputFile, lanes20);
+			LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(lanes20);
+			writerDelegate.write(lanesOutputFile);
 		}
 
 		if (generateSignalSystems){

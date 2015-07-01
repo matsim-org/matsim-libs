@@ -44,7 +44,7 @@ public final class ModelLane {
 	private final List<Id<Link>> destinationLinkIds = new ArrayList<>();
 	private final List<ModelLane> toLanes = new ArrayList<ModelLane>();
 
-	public ModelLane(Lane data) {
+	ModelLane(Lane data) {
 		this.laneData = data;
 	}
 	
@@ -56,11 +56,11 @@ public final class ModelLane {
 		return toLanes;
 	}
 
-	public void addAToLane(ModelLane toLane) {
+	void addAToLane(ModelLane toLane) {
 		this.toLanes.add(toLane);
 	}
 
-	public void changeLength(double lengthMeter) {
+	void setLength(double lengthMeter) {
 		this.length = lengthMeter;
 	}
 
@@ -69,19 +69,19 @@ public final class ModelLane {
 	}
 
 	
-	public double getEndsAtMeterFromLinkEnd(){
+	double getEndsAtMeterFromLinkEnd(){
 		return this.endsAtMetersFromLinkEnd;
 	}
 
-	public void setEndsAtMetersFromLinkEnd(double endsAtMetersFromLinkEnd) {
+	void setEndsAtMetersFromLinkEnd(double endsAtMetersFromLinkEnd) {
 		this.endsAtMetersFromLinkEnd = endsAtMetersFromLinkEnd;
 	}
 
-	public void addDestinationLink(Id<Link> toLinkId) {
+	void addDestinationLink(Id<Link> toLinkId) {
 		this.destinationLinkIds.add(toLinkId);
 	}
 
-	public List<Id<Link>> getDestinationLinkIds() {
+	List<Id<Link>> getDestinationLinkIds() {
 		return this.destinationLinkIds;
 	}
 

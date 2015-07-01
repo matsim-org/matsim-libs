@@ -36,7 +36,6 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
-import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.data.v11.*;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -49,6 +48,7 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.dgrether.DgOTFVis;
@@ -623,7 +623,8 @@ public class PoznanNetwork
 
         String lanes20OutputFile = baseDir + "lanes20.xml";
         // String lanes20OutputFile = "d:\\PP-dyplomy\\2010_11-inz\\MATSim\\lanes20.xml";
-        new MatsimLaneDefinitionsWriter().writeFile20(lanes20OutputFile, lanes20);
+        LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(lanes20);
+        writerDelegate.write(lanes20OutputFile);
         config.network().setLaneDefinitionsFile(lanes20OutputFile);
 
         String popFilename = baseDir + "population.xml";

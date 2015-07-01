@@ -36,9 +36,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.CalculateAngle;
 
 /**
  * based on {@code org.matsim.signalsystems.CalculateAngle}
@@ -110,7 +110,7 @@ public class LeftTurnIdentifier {
 			return true;
 		}
 
-		TreeMap<Double, Link> outLinksSortedByAngle = CalculateAngle
+		TreeMap<Double, Link> outLinksSortedByAngle = NetworkUtils
 				.getOutLinksSortedByAngle(inLink);
 		int realOutLinksSize = outLinksSortedByAngle.size();
 		if (realOutLinksSize == 1) {

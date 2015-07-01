@@ -32,7 +32,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
+import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
@@ -128,7 +128,7 @@ public class RunResultsLoader {
 		Config c = ConfigUtils.createConfig();
 		c.scenario().setUseLanes(true);
 		Scenario sc = ScenarioUtils.createScenario(c);
-		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(sc);
+		LaneDefinitionsReader reader = new LaneDefinitionsReader(sc);
 		reader.readFile(path);
 		return (LaneDefinitions20) sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
 	}

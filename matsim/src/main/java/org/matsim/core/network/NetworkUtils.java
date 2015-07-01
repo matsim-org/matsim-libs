@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 import java.util.*;
 
@@ -455,4 +456,67 @@ public class NetworkUtils {
         }
         return nearestLink;
     }
+
+	/**
+	 * Calculates the most 'left' outLink for a given inLink (oriented from north to south).
+	 * That's the link a driver would refer to when turning left (no u-turn),
+	 * even if there is only one link going to the right.
+	 *
+	 * @param inLink The inLink given
+	 * @return outLink, or null if there is only one outLink back to the inLinks fromNode.
+	 */
+	public static Link getLeftLane(Link inLink){
+
+		TreeMap<Double, Link> result = getOutLinksSortedByAngle(inLink);
+
+		if (result.size() == 0){
+			return null;
+		}
+		return result.get(result.firstKey());
+	}
+
+	/**
+	 * Calculates the orientation of the outLinks for a given inLink
+	 * beginning from the right if the inLink goes north to south.
+	 * The most 'left' outLink comes last.
+	 * backLink is ignored
+	 *
+	 * @param inLink The inLink given
+	 * @return Collection of outLinks, or an empty collection, if there is only
+	 * one outLink back to the inLinks fromNode.
+	 */
+	public static TreeMap<Double, Link> getOutLinksSortedByAngle(Link inLink){
+		Coord coordInLink = getVector(inLink);
+		double thetaInLink = Math.atan2(coordInLink.getY(), coordInLink.getX());
+
+		TreeMap<Double, Link> leftLane = new TreeMap<Double, Link>();
+
+		for (Link outLink : inLink.getToNode().getOutLinks().values()) {
+
+			if (!(outLink.getToNode().equals(inLink.getFromNode()))){
+
+				Coord coordOutLink = getVector(outLink);
+				double thetaOutLink = Math.atan2(coordOutLink.getY(), coordOutLink.getX());
+
+				double thetaDiff = thetaOutLink - thetaInLink;
+
+				if (thetaDiff < -Math.PI){
+					thetaDiff += 2 * Math.PI;
+				} else if (thetaDiff > Math.PI){
+					thetaDiff -= 2 * Math.PI;
+				}
+
+				leftLane.put(Double.valueOf(-thetaDiff), outLink);
+
+			}
+		}
+
+		return leftLane;
+	}
+
+	private static Coord getVector(Link link){
+		double x = link.getToNode().getCoord().getX() - link.getFromNode().getCoord().getX();
+		double y = link.getToNode().getCoord().getY() - link.getFromNode().getCoord().getY();
+		return new CoordImpl(x, y);
+	}
 }

@@ -37,9 +37,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.openstreetmap.osmosis.core.domain.v0_6.Tag;
 import org.openstreetmap.osmosis.tagfilter.v0_6.TagFilter;
@@ -73,7 +73,8 @@ public class DgOsmJunctionsPostprocessing {
 		LaneDefinitions20 lanes = this.handleLanes((LaneDefinitions20)scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), removedLinkIdToLinkIdsMap);
 		
 		new NetworkWriter(network).write(networkOutFile);
-		new MatsimLaneDefinitionsWriter().writeFile20(lanesOutFile, lanes);
+		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(lanes);
+		writerDelegate.write(lanesOutFile);
 		log.info("done!");
 	}
 	

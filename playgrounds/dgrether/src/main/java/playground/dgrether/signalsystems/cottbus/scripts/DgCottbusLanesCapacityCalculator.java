@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.cottbus.scripts;
 
-import org.matsim.lanes.utils.LanesCapacityCalculator;
+import org.matsim.lanes.LanesUtils;
 
 import playground.dgrether.DgPaths;
 
@@ -38,7 +38,7 @@ public class DgCottbusLanesCapacityCalculator {
 		String networkInputFilename = inputDir + "network_wgs84_utm33n.xml.gz";
 		String lanesInputFilename = inputDir + "lanes_without_capacities.xml";
 		String lanesOutputFilename = inputDir + "lanes.xml";
-		LanesCapacityCalculator.calculateMissingCapacitiesForLanes20(networkInputFilename, 
+		LanesUtils.calculateMissingCapacitiesForLanes20(networkInputFilename,
 				lanesInputFilename, lanesOutputFilename);
 	}
 

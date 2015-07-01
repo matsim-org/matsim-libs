@@ -29,7 +29,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
+import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 
 /**
  * @author mrieser
@@ -109,7 +109,7 @@ public class MatsimFileTypeGuesserTest {
 		assertEquals(MatsimFileTypeGuesser.FileType.LaneDefinitions, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNotNull(g.getSystemId());
-		assertEquals(MatsimLaneDefinitionsReader.SCHEMALOCATIONV11, g.getSystemId());
+		assertEquals(LaneDefinitionsReader.SCHEMALOCATIONV11, g.getSystemId());
 	}
 
 	@Test

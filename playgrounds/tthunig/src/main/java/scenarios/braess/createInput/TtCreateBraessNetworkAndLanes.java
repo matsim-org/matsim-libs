@@ -14,7 +14,7 @@ import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.lanes.utils.LanesUtils;
+import org.matsim.lanes.LanesUtils;
 
 /**
  * Class to create network and lanes for the breass scenario.

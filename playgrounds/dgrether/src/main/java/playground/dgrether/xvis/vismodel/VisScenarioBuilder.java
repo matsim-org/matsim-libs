@@ -34,7 +34,7 @@ import org.matsim.lanes.ModelLane;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
-import org.matsim.lanes.utils.LanesUtils;
+import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;

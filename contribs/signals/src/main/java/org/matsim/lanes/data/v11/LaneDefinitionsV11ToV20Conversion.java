@@ -23,12 +23,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.lanes.data.CalculateAngle;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.lanes.LanesUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
-import org.matsim.lanes.utils.LanesCapacityCalculator;
 
 import java.io.Serializable;
 import java.util.*;
@@ -64,7 +64,6 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 		org.matsim.lanes.data.v20.LanesToLinkAssignment20 l2lnew;
 		Lane lanev20;
 		Link link;
-		LanesCapacityCalculator capacityCalculator = new LanesCapacityCalculator();
 		for (LanesToLinkAssignment11 l2lv11 : in.getLanesToLinkAssignments().values()){
 			//create the lane2linkassignment
 			l2lnew = lanedefs20fac.createLanesToLinkAssignment(l2lv11.getLinkId());
@@ -80,7 +79,7 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 				for (Id<Link> toLinkId : lanev11.getToLinkIds()){
 					lanev20.addToLinkId(toLinkId);
 				}
-				capacityCalculator.calculateAndSetCapacity(lanev20, true, link, network);
+				LanesUtils.calculateAndSetCapacity(lanev20, true, link, network);
 			}
 			//further processing of not defined lanes in 1.1 format
 			//add original lane
@@ -93,7 +92,7 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 			originalLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
 			originalLane.setStartsAtMeterFromLinkEnd(link.getLength());
 			originalLane.addToLaneId(longestLane.getId());
-			capacityCalculator.calculateAndSetCapacity(originalLane, false, link, network);
+			LanesUtils.calculateAndSetCapacity(originalLane, false, link, network);
 			l2lnew.addLane(originalLane);
 
 			//add other lanes
@@ -113,7 +112,7 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 					intermediateLane.setStartsAtMeterFromLinkEnd(longestLane.getStartsAtMeterFromLinkEnd());
 					intermediateLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
 					intermediateLane.addToLaneId(secondLongestLane.getId());
-					capacityCalculator.calculateAndSetCapacity(intermediateLane, false, link, network);
+					LanesUtils.calculateAndSetCapacity(intermediateLane, false, link, network);
 					l2lnew.addLane(intermediateLane);
 					lastLane.addToLaneId(intermediateLaneId);
 					lastLane = intermediateLane;
@@ -131,7 +130,7 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 
 			//calculate the alignment and uturn
 			int mostRight = l2lv11.getLanes().size() / 2;
-			SortedMap<Double, Link> outLinksByAngle = CalculateAngle.getOutLinksSortedByAngle(link);
+			SortedMap<Double, Link> outLinksByAngle = NetworkUtils.getOutLinksSortedByAngle(link);
 			Lane newLane;
 			Set<LaneData11> assignedLanes = new HashSet<LaneData11>();
 			for (Link outlink : outLinksByAngle.values()){

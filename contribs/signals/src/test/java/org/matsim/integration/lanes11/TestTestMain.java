@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MatsimLaneDefinitionWriter
+ * TestTestMain
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,45 +17,29 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.data;
+package org.matsim.integration.lanes11;
 
-import org.matsim.core.api.internal.MatsimSomeWriter;
-import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LaneDefinitionsWriter11;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 
 /**
- * Writes the lane definitions according to
- * the http://www.matsim.org/files/dtd/laneDefinitions_v*.xsd
- * grammar.
  * @author dgrether
  *
  */
-public class MatsimLaneDefinitionsWriter implements MatsimSomeWriter {
-	
-	
-	 
-	/**
-	 * Writes the file with the default format for 
-	 * LaneDefinitions within MATSim.
-	 * @param lanedefs
-	 */
-	public MatsimLaneDefinitionsWriter(){
+public class TestTestMain {
+
+	public static void main(String[] args) {
+		MixedLaneTestFixture fixture = new MixedLaneTestFixture();
+		fixture.create2PersonPopulation();
+		Scenario scenario = fixture.sc;
+		ConfigUtils.addOrGetModule(scenario.getConfig(), OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
+		scenario.getConfig().qsim().setNodeOffset(10.0);
+		scenario.getConfig().qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
+		OTFVis.playScenario(scenario);
 	}
-	
-	
-	public void writeFile20(String filename, LaneDefinitions20 lanedefs){
-		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriter20(lanedefs);
-		writerDelegate.write(filename);
-	}
-	
-	public void writeFile11(String filename, LaneDefinitions11 lanedefs){
-		MatsimJaxbXmlWriter writerDelegate = new LaneDefinitionsWriter11(lanedefs);
-		writerDelegate.write(filename);
-	}
-	
-	
+
 }
