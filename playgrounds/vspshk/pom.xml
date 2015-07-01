@@ -8,4 +8,11 @@
   <groupId>playground</groupId>
   <artifactId>vspshk</artifactId>
   <name>vspshk</name>
+  <dependencies>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>mzilske</artifactId>
+  		<version>0.7.0-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>
