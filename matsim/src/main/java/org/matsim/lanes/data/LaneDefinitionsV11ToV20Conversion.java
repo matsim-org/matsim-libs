@@ -62,22 +62,21 @@ import org.matsim.lanes.utils.LanesCapacityCalculator;
  * 
  * @author dgrether
  */
-public class LaneDefinitionsV11ToV20Conversion {
+public abstract class LaneDefinitionsV11ToV20Conversion {
 	
 //	private static final Logger log = Logger.getLogger(LaneDefinitionsV11ToV20Conversion.class);
-	
-	public LaneDefinitions20 convertTo20(LaneDefinitions11 lanedefs11, Network network) {
-		LaneDefinitions20 lanedefs20 = new LaneDefinitions20Impl();
-		LaneDefinitionsFactory20 lanedefs20fac = lanedefs20.getFactory();
+
+	public static void convertTo20(LaneDefinitions11 in, LaneDefinitions20 out, Network network) {
+		LaneDefinitionsFactory20 lanedefs20fac = out.getFactory();
 		org.matsim.lanes.data.v20.LanesToLinkAssignment20 l2lnew;
 		LaneData20 lanev20;
 		Link link;
 		LanesCapacityCalculator capacityCalculator = new LanesCapacityCalculator();
-		for (LanesToLinkAssignment11 l2lv11 : lanedefs11.getLanesToLinkAssignments().values()){
+		for (LanesToLinkAssignment11 l2lv11 : in.getLanesToLinkAssignments().values()){
 			//create the lane2linkassignment
 			l2lnew = lanedefs20fac.createLanesToLinkAssignment(l2lv11.getLinkId());
 			link = network.getLinks().get(l2lv11.getLinkId());
-			lanedefs20.addLanesToLinkAssignment(l2lnew);
+			out.addLanesToLinkAssignment(l2lnew);
 			//create the already in 1.1 defined lanes and add them to the 2.0 format objects
 			for (LaneData11 lanev11 : l2lv11.getLanes().values()){
 				lanev20 = lanedefs20fac.createLane(lanev11.getId());
@@ -103,7 +102,7 @@ public class LaneDefinitionsV11ToV20Conversion {
 			originalLane.addToLaneId(longestLane.getId());
 			capacityCalculator.calculateAndSetCapacity(originalLane, false, link, network);
 			l2lnew.addLane(originalLane);
-			
+
 			//add other lanes
 			LaneData20 lastLane = originalLane;
 			LaneData20 secondLongestLane;
@@ -134,9 +133,9 @@ public class LaneDefinitionsV11ToV20Conversion {
 				else {
 					throw new RuntimeException("Illegal sort order");
 				}
-			}	
-			
-			
+			}
+
+
 			//calculate the alignment and uturn
 			int mostRight = l2lv11.getLanes().size() / 2;
 			SortedMap<Double, Link> outLinksByAngle = CalculateAngle.getOutLinksSortedByAngle(link);
@@ -150,12 +149,12 @@ public class LaneDefinitionsV11ToV20Conversion {
 						continue;
 					}
 					newLane = l2lnew.getLanes().get(oldLane.getId());
-					
+
 					//add uturn functionality if the first lane is processed, i.e. the most left lane that is indicated by an empty set of assignedLanes
 					if (assignedLanes.isEmpty()){
-						this.addUTurn(link, newLane);
+						addUTurn(link, newLane);
 					}
-					
+
 					if (newLane.getToLinkIds().contains(outlink.getId())){
 //						log.info("lane " + newLane.getId() + "  alignment: " + mostRight);
 						newLane.setAlignment(mostRight);
@@ -168,11 +167,15 @@ public class LaneDefinitionsV11ToV20Conversion {
 					}
 				}
 			}
-		}//end outer for
+		}
+	}
+
+	public static LaneDefinitions20 convertTo20(LaneDefinitions11 lanedefs11, Network network) {
+		LaneDefinitions20 lanedefs20 = new LaneDefinitions20Impl();
 		return lanedefs20;
 	}
 	
-	private void addUTurn(Link link, LaneData20 newLane) {
+	private static void addUTurn(Link link, LaneData20 newLane) {
 		for (Link outLink : link.getToNode().getOutLinks().values()) {
 			if ((outLink.getToNode().equals(link.getFromNode()))) {
 //				log.info("Added uturn, i.e. turning move from link " + link.getId() + " lane " + newLane.getId() + " to link " + outLink.getId());

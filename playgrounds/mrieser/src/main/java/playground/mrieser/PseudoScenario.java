@@ -27,6 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -99,6 +100,12 @@ public class PseudoScenario implements Scenario {
 
 	@Override
 	public Households getHouseholds() {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+	@Override
+	public LaneDefinitions20 getLanes() {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("not implemented") ;
 	}

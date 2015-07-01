@@ -385,7 +385,7 @@ public class DgCalculateSignalGroupsTest {
 		lane = fac.createLane(Id.create(2, Lane.class));
 		l2l.addLane(lane);
 		lane.addToLinkId(Id.create(32, Link.class));
-		sc.addScenarioElement(LaneDefinitions20.ELEMENT_NAME, new LaneDefinitionsV11ToV20Conversion().convertTo20(lanes, sc.getNetwork()));
+		sc.addScenarioElement(LaneDefinitions20.ELEMENT_NAME, LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, sc.getNetwork()));
 	}
 	
 	/**

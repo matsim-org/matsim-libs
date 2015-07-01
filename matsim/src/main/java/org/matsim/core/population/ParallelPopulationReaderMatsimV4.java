@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicles;
@@ -248,6 +249,11 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		@Override
 		public Households getHouseholds() {
 			return this.delegate.getHouseholds();
+		}
+
+		@Override
+		public LaneDefinitions20 getLanes() {
+			return this.delegate.getLanes();
 		}
 
 		@Override

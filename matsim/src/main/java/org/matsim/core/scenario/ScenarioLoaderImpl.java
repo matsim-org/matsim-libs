@@ -37,8 +37,6 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleReaderV1;
@@ -150,8 +148,13 @@ public class ScenarioLoaderImpl {
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
 		}
-		if (this.config.scenario().isUseSignalSystems()){
-			this.loadSignalSystems();
+		if (this.config.scenario().isUseSignalSystems()) {
+			log.error("SignalsData is no longer loaded by this method. \n "
+					+ "If you do not use the default signals initialization code that is provided in the contrib, "
+					+ "make sure you add the following line after you have loaded the scenario: \n "
+					+ "  scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData()); \n "
+					+ "Additionally, you have to add the signals module to the simulation: \n "
+					+ "  controler.addOverridingModule(new SignalsModule()); \n");
 		}
 		return this.scenario;
 	}
@@ -289,8 +292,6 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadLanes() {
-		LaneDefinitions20 laneDefinitions = new LaneDefinitions20Impl();
-		this.scenario.addScenarioElement(LaneDefinitions20.ELEMENT_NAME, laneDefinitions);
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);
@@ -304,22 +305,13 @@ public class ScenarioLoaderImpl {
 				throw new UncheckedIOException("Wrong lane file format: " + fileTypeGuesser.getSystemId());
 			}
 		}
-		if ((laneDefinitions != null) && (filename != null)) {
+		if ((filename != null)) {
 			MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(this.scenario);
 			reader.readFile(filename);
 		}
 		else {
 			log.info("no lane definition file set in config or feature disabled, not able to load anything");
 		}
-	}
-
-	private void loadSignalSystems() {
-		log.error("SignalsData is no longer loaded by this method. \n "
-				+ "If you do not use the default signals initialization code that is provided in the contrib, "
-				+ "make sure you add the following line after you have loaded the scenario: \n "
-		        + "  scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData()); \n "
-				+ "Additionally, you have to add the signals module to the simulation: \n "
-		        + "  controler.addOverridingModule(new SignalsModule()); \n");
 	}
 
 }

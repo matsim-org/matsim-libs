@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package tutorial.trafficsignals;
 
-import java.io.File;
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,21 +26,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
+import org.matsim.contrib.signals.data.signalgroups.v20.*;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
-import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
-import org.matsim.contrib.signals.model.Signal;
-import org.matsim.contrib.signals.model.SignalGroup;
-import org.matsim.contrib.signals.model.SignalPlan;
-import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.model.*;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -58,8 +45,10 @@ import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.utils.LanesUtils;
+
+import java.io.File;
+import java.util.Arrays;
 
 /**
  * This class contains some examples how to set up a scenario with lanes and
@@ -68,8 +57,7 @@ import org.matsim.lanes.utils.LanesUtils;
  * @author dgrether
  * 
  * @see org.matsim.signalsystems
- * @see http://matsim.org/node/384
- * 
+ *
  */
 public class RunCreateTrafficSignalScenarioWithLanesExample {
 
@@ -270,7 +258,7 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		settings4.setDropping(this.dropping2);
 	}
 
-	private LaneDefinitions20 createLanes(ScenarioImpl scenario) {
+	private void createLanes(ScenarioImpl scenario) {
 		double laneLenght = 150.0;
 		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		LaneDefinitionsFactory11 factory = lanes.getFactory();
@@ -290,16 +278,10 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		LanesUtils.createAndAddLane11(lanesForLink65, factory, Id.create("1", Lane.class), 
 				laneLenght, 1, Id.create("54", Link.class));
 
-		LanesUtils.createAndAddLane11(lanesForLink65, factory, Id.create("2", Lane.class), 
+		LanesUtils.createAndAddLane11(lanesForLink65, factory, Id.create("2", Lane.class),
 				laneLenght, 1, Id.create("58", Link.class));
 		
-		//convert to 2.0 format and return
-		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-		LaneDefinitions20 l2 = conversion.convertTo20(lanes, scenario.getNetwork());
-		// TODO this doesn't work here because the scenario was loaded with ScenarioUtils.loadScenario(config)
-		// which automatically sets a LaneDefinition20 ScenarioElement, Theresa July 2015
-		scenario.addScenarioElement( LaneDefinitions20.ELEMENT_NAME , l2);
-		return l2;
+		LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, scenario.getLanes(), scenario.getNetwork());
 	}
 
 	public String run() {
@@ -349,9 +331,7 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		String signalGroupsFile = "../../matsim/output/example90TrafficLights/signal_groups.xml";
 		String signalControlFile = "../../matsim/output/example90TrafficLights/signal_control.xml";
 
-		new MatsimLaneDefinitionsWriter().writeFile20(lanesFile,
-				(LaneDefinitions20) scenario
-						.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+		new MatsimLaneDefinitionsWriter().writeFile20(lanesFile, scenario.getLanes());
 
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
 		signalsWriter.setSignalSystemsOutputFilename(signalSystemsFile);

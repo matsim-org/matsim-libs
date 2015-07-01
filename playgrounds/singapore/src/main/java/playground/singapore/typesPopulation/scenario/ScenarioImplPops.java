@@ -27,6 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -101,6 +102,11 @@ public class ScenarioImplPops implements Scenario {
 	@Override
 	public Households getHouseholds() {
 		return delegate.getHouseholds();
+	}
+
+	@Override
+	public LaneDefinitions20 getLanes() {
+		return delegate.getLanes();
 	}
 
 }

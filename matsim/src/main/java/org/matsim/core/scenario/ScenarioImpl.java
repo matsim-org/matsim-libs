@@ -35,6 +35,8 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleUtils;
@@ -62,7 +64,7 @@ public final class ScenarioImpl implements Scenario {
 
 	//non-mandatory attributes
 	private TransitSchedule transitSchedule = null;
-
+	private LaneDefinitions20 lanes = null;
 	private Households households;
 	private Vehicles transitVehicles;
 
@@ -75,6 +77,9 @@ public final class ScenarioImpl implements Scenario {
 		this.facilities = new ActivityFacilitiesImpl();
 		if (this.config.scenario().isUseHouseholds()){
 			this.createHouseholdsContainer();
+		}
+		if (this.config.scenario().isUseLanes()) {
+			createLanesContainer();
 		}
 		if (this.config.scenario().isUseTransit()) {
 			this.createTransitSchedule();
@@ -94,7 +99,7 @@ public final class ScenarioImpl implements Scenario {
 		if ( this.transitVehicles != null ) return false;
 
 		if ( !this.config.scenario().isUseTransit() ) {
-			log.info( "creating transit vehicles container while transit switch in config set to false. File will not be loaded automatically." );
+			log.info("creating transit vehicles container while transit switch in config set to false. File will not be loaded automatically.");
 		}
 		this.transitVehicles = VehicleUtils.createVehiclesContainer();
 		return true;
@@ -122,6 +127,10 @@ public final class ScenarioImpl implements Scenario {
 
 		this.households = new HouseholdsImpl();
 		return true;
+	}
+
+	private void createLanesContainer() {
+		this.lanes = new LaneDefinitions20Impl();
 	}
 
 	/**
@@ -209,6 +218,14 @@ public final class ScenarioImpl implements Scenario {
 		}
 
 		return this.households;
+	}
+
+	@Override
+	public LaneDefinitions20 getLanes() {
+		if (this.lanes == null) {
+			throw new RuntimeException("Lanes not activated.");
+		}
+		return this.lanes;
 	}
 
 	@Override

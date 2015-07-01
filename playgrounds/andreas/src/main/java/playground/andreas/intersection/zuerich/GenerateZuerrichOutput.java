@@ -79,8 +79,8 @@ public class GenerateZuerrichOutput {
 			laneGeneratior.setNetwork(net);
 			laneDefs = laneGeneratior.processLaneDefinitions(knotenVonSpurNachSpurMap, knotenSpurLinkMap);
 			
-      lanes20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(
-          laneDefs, scenario.getNetwork());
+      lanes20 = LaneDefinitionsV11ToV20Conversion.convertTo20(
+			  laneDefs, scenario.getNetwork());
 
 			
 			new LanesConsistencyChecker(net, lanes20).checkConsistency();

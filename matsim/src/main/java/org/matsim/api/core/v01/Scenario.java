@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -41,15 +42,15 @@ import org.matsim.vehicles.Vehicles;
  */
 public interface Scenario {
 
-	public Network getNetwork();
+	Network getNetwork();
 
-	public Population getPopulation();
+	Population getPopulation();
 
-	public TransitSchedule getTransitSchedule();
+	TransitSchedule getTransitSchedule();
 	
-	public Config getConfig();
+	Config getConfig();
 
-	public Coord createCoord(double x, double y);
+	Coord createCoord(double x, double y);
 
 	/**
 	 * Adds the given object to the scenario, such it can be
@@ -63,7 +64,7 @@ public interface Scenario {
 	 * @throws {@link IllegalStateException} if there is already an object
 	 * associated to this name.
 	 */
-	public void addScenarioElement(String name, Object o);
+	void addScenarioElement(String name, Object o);
 
 	/**
 	 * Removes the object from the scenario, such it can no
@@ -72,22 +73,23 @@ public interface Scenario {
 	 * @param name the name of the element
 	 * @return the object which was associated with this name, or null if there was none
 	 */
-	public Object removeScenarioElement(String name);
+	Object removeScenarioElement(String name);
 
 	/**
 	 *
 	 * @param name the name of the element to get
 	 * @return the object associated with that name, or null if none is associated
 	 */
-	public Object getScenarioElement(String name);
+	Object getScenarioElement(String name);
 
-	public ActivityFacilities getActivityFacilities();
+	ActivityFacilities getActivityFacilities();
 
 	Vehicles getTransitVehicles();
-	// maybe they should only be there via scenario element, but since transit schedule is already in the api, this does not seem so bad. kai, feb'15
 
 	Vehicles getVehicles();
 
 	Households getHouseholds();
+
+	LaneDefinitions20 getLanes();
 
 }

@@ -392,8 +392,7 @@ public class DgFigure9ScenarioGenerator {
 		link65lane2.setStartsAtMeterFromLinkEnd(laneLenght);
 		
 		//convert to 2.0 format and return
-		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
-		LaneDefinitions20 lanesv2 = conversion.convertTo20(lanes, scenario.getNetwork());
+		LaneDefinitions20 lanesv2 = LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, scenario.getNetwork());
 		return lanesv2;
 	}
 

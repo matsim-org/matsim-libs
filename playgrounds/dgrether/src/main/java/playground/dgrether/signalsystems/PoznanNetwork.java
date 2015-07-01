@@ -576,7 +576,7 @@ public class PoznanNetwork
 
         // create network lanes and signals
         createPhysics();
-        LaneDefinitions20 lanes20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(
+        LaneDefinitions20 lanes20 = LaneDefinitionsV11ToV20Conversion.convertTo20(
                 lanes, scenario.getNetwork());
         LanesConsistencyChecker lcc = new LanesConsistencyChecker(scenario.getNetwork(), lanes20);
         lcc.checkConsistency();

@@ -69,7 +69,7 @@ public class LaneDefinitonsV11ToV20Converter {
 		LaneDefinitions11 lanedefs11 = new LaneDefinitions11Impl();
 		LaneDefinitionsReader11 reader11 = new LaneDefinitionsReader11(lanedefs11, MatsimLaneDefinitionsReader.SCHEMALOCATIONV11);
 		reader11.readFile(laneDefs11Filename);
-		LaneDefinitions20 lanedefs20 = new LaneDefinitionsV11ToV20Conversion().convertTo20(lanedefs11, net);
+		LaneDefinitions20 lanedefs20 = LaneDefinitionsV11ToV20Conversion.convertTo20(lanedefs11, net);
 		LaneDefinitionsWriter20 writer20 = new LaneDefinitionsWriter20(lanedefs20);
 		writer20.write(laneDefs20Filename);
 	}
