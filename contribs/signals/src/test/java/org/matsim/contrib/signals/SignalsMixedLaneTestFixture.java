@@ -20,6 +20,7 @@
 package org.matsim.contrib.signals;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataImpl;
@@ -41,7 +42,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
  */
 public class SignalsMixedLaneTestFixture {
 
-	public final ScenarioImpl sc;
+	public final Scenario sc;
 	public final Id<Link> id1, id2, id3;
 	public final Id<Person> pid1, pid2;
 	private MixedLaneTestFixture delegate;
