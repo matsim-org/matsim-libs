@@ -121,17 +121,17 @@ public class AmenitySink implements Sink {
 		/*TODO Report the final counts of different amenity types. */
 	}
 
-	private Coord getCoord(Entity entity){
-		if(entity instanceof Node){
-			return getNodeCoord((Node)entity);
-		} else if(entity instanceof Way){
-			return getWayCentroid((Way)entity);
-		} else if(entity instanceof Relation){
-			return getRelationCentroid((Relation)entity);
-		}
-		
-		return null;
-	}
+//	private Coord getCoord(Entity entity){
+//		if(entity instanceof Node){
+//			return getNodeCoord((Node)entity);
+//		} else if(entity instanceof Way){
+//			return getWayCentroid((Way)entity);
+//		} else if(entity instanceof Relation){
+//			return getRelationCentroid((Relation)entity);
+//		}
+//		
+//		return null;
+//	}
 
 	private void processFacilities(ActivityFacilitiesFactory aff,
 			Map<Long,? extends EntityContainer> nodeMap) {
@@ -157,7 +157,8 @@ public class AmenitySink implements Sink {
 				}
 
 				/* Facility identified. Now get the centroid of all members. */ 
-				Coord coord = getCoord(entity);
+				//Coord coord = getCoord(entity);
+				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
@@ -181,7 +182,8 @@ public class AmenitySink implements Sink {
 				}
 
 				/* Facility identified. Now get the centroid of all members. */ 
-				Coord coord = getCoord(entity);
+//				Coord coord = getCoord(entity);
+				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
@@ -220,154 +222,154 @@ public class AmenitySink implements Sink {
 	}
 	
 	
-	/**
-	 * Determine the bounding box of a closed way.
-	 * @param way
-	 * @return the {@link List} of {@link Coord}s: the first is the bottom-left
-	 * 		of the bounding box, and the second is the upper-right. 
-	 */
-	private List<Coord> getWayBox(Way way){
-		List<Coord> list = new ArrayList<Coord>();
-		Double xmin = Double.POSITIVE_INFINITY;
-		Double ymin = Double.POSITIVE_INFINITY;
-		Double xmax = Double.NEGATIVE_INFINITY;
-		Double ymax = Double.NEGATIVE_INFINITY;
-		for(WayNode n : way.getWayNodes()){
-			double xNode = nodeMap.get(n.getNodeId()).getEntity().getLongitude();
-			double yNode = nodeMap.get(n.getNodeId()).getEntity().getLatitude();
-			if(xNode < xmin){ xmin = xNode; }
-			if(yNode < ymin){ ymin = yNode; }
-			if(xNode > xmax){ xmax = xNode; }
-			if(yNode > ymax){ ymax = yNode; }
-		}
-
-		/* Create the bounding coordinates, and add them to the result list. */
-		Coord bottomLeft = new CoordImpl(xmin, ymin);
-		Coord topRight = new CoordImpl(xmax, ymax);
-		list.add(bottomLeft);
-		list.add(topRight);
-		
-		return list;
-	}
+//	/**
+//	 * Determine the bounding box of a closed way.
+//	 * @param way
+//	 * @return the {@link List} of {@link Coord}s: the first is the bottom-left
+//	 * 		of the bounding box, and the second is the upper-right. 
+//	 */
+//	private List<Coord> getWayBox(Way way){
+//		List<Coord> list = new ArrayList<Coord>();
+//		Double xmin = Double.POSITIVE_INFINITY;
+//		Double ymin = Double.POSITIVE_INFINITY;
+//		Double xmax = Double.NEGATIVE_INFINITY;
+//		Double ymax = Double.NEGATIVE_INFINITY;
+//		for(WayNode n : way.getWayNodes()){
+//			double xNode = nodeMap.get(n.getNodeId()).getEntity().getLongitude();
+//			double yNode = nodeMap.get(n.getNodeId()).getEntity().getLatitude();
+//			if(xNode < xmin){ xmin = xNode; }
+//			if(yNode < ymin){ ymin = yNode; }
+//			if(xNode > xmax){ xmax = xNode; }
+//			if(yNode > ymax){ ymax = yNode; }
+//		}
+//
+//		/* Create the bounding coordinates, and add them to the result list. */
+//		Coord bottomLeft = new CoordImpl(xmin, ymin);
+//		Coord topRight = new CoordImpl(xmax, ymax);
+//		list.add(bottomLeft);
+//		list.add(topRight);
+//		
+//		return list;
+//	}
 	
 	
-	/**
-	 * Determine the bounding box of a relation.
-	 * @param relation
-	 * @return the {@link List} of {@link Coord}s: the first is the bottom-left
-	 * 		of the bounding box, and the second is the upper-right. 
-	 */
-	private List<Coord> getRelationBox(Relation relation){
-		List<Coord> list = new ArrayList<Coord>(); 
-		Double xmin = Double.POSITIVE_INFINITY;
-		Double ymin = Double.POSITIVE_INFINITY;
-		Double xmax = Double.NEGATIVE_INFINITY;
-		Double ymax = Double.NEGATIVE_INFINITY;
-
-		for(RelationMember rm : relation.getMembers()){
-			if(rm.getMemberType() == EntityType.Node){
-				if(nodeMap.containsKey(rm.getMemberId())){
-					double xNode = nodeMap.get(rm.getMemberId()).getEntity().getLongitude();
-					double yNode = nodeMap.get(rm.getMemberId()).getEntity().getLatitude();
-					if(xNode < xmin){ xmin = xNode; }
-					if(yNode < ymin){ ymin = yNode; }
-					if(xNode > xmax){ xmax = xNode; }
-					if(yNode > ymax){ ymax = yNode; }					
-				} else{
-					log.warn("Node " + rm.getMemberId() + " was not found in nodeMap, and will be ignored.");
-				}
-			} else if(rm.getMemberType() == EntityType.Way){
-				if(wayMap.containsKey(rm.getMemberId())){
-					Way way = wayMap.get(rm.getMemberId()).getEntity();
-					List<Coord> box = this.getWayBox(way);
-					if(box.get(0).getX() < xmin){ xmin = box.get(0).getX(); }
-					if(box.get(0).getY() < ymin){ ymin = box.get(0).getY(); }
-					if(box.get(1).getX() > xmax){ xmax = box.get(1).getX(); }
-					if(box.get(1).getY() > ymax){ ymax = box.get(1).getY(); }									
-				} else{
-					log.warn("Way " + rm.getMemberId() + " was not found in wayMap, and will be ignored.");
-				}
-			} else if(rm.getMemberType() == EntityType.Relation){
-//				log.info("                                                                              ----> " + rm.getMemberId());
-				try{
-					if(relationMap.containsKey(rm.getMemberId())){
-						Relation r = relationMap.get(rm.getMemberId()).getEntity();
-						List<Coord> box = this.getRelationBox(r);
-						if(box.get(0).getX() < xmin){ xmin = box.get(0).getX(); }
-						if(box.get(0).getY() < ymin){ ymin = box.get(0).getY(); }
-						if(box.get(1).getX() > xmax){ xmax = box.get(1).getX(); }
-						if(box.get(1).getY() > ymax){ ymax = box.get(1).getY(); }									
-					} else{
-						log.warn("Relation " + rm.getMemberId() + " was not found in relationMap, and will be ignored.");
-					}					
-				} catch(StackOverflowError e){
-					log.error("Circular reference: Relation " + rm.getMemberId());
-					errorCounter++;
-				}
-			} else{
-				log.warn("Could not get the bounding box for EntityType " + rm.getMemberType().toString());
-			}
-		}
-
-		/* Create the bounding coordinates, and add them to the result list. */
-		Coord bottomLeft = new CoordImpl(xmin, ymin);
-		Coord topRight = new CoordImpl(xmax, ymax);
-		list.add(bottomLeft);
-		list.add(topRight);
-		
-		return list;
-	}
+//	/**
+//	 * Determine the bounding box of a relation.
+//	 * @param relation
+//	 * @return the {@link List} of {@link Coord}s: the first is the bottom-left
+//	 * 		of the bounding box, and the second is the upper-right. 
+//	 */
+//	private List<Coord> getRelationBox(Relation relation){
+//		List<Coord> list = new ArrayList<Coord>(); 
+//		Double xmin = Double.POSITIVE_INFINITY;
+//		Double ymin = Double.POSITIVE_INFINITY;
+//		Double xmax = Double.NEGATIVE_INFINITY;
+//		Double ymax = Double.NEGATIVE_INFINITY;
+//
+//		for(RelationMember rm : relation.getMembers()){
+//			if(rm.getMemberType() == EntityType.Node){
+//				if(nodeMap.containsKey(rm.getMemberId())){
+//					double xNode = nodeMap.get(rm.getMemberId()).getEntity().getLongitude();
+//					double yNode = nodeMap.get(rm.getMemberId()).getEntity().getLatitude();
+//					if(xNode < xmin){ xmin = xNode; }
+//					if(yNode < ymin){ ymin = yNode; }
+//					if(xNode > xmax){ xmax = xNode; }
+//					if(yNode > ymax){ ymax = yNode; }					
+//				} else{
+//					log.warn("Node " + rm.getMemberId() + " was not found in nodeMap, and will be ignored.");
+//				}
+//			} else if(rm.getMemberType() == EntityType.Way){
+//				if(wayMap.containsKey(rm.getMemberId())){
+//					Way way = wayMap.get(rm.getMemberId()).getEntity();
+//					List<Coord> box = this.getWayBox(way);
+//					if(box.get(0).getX() < xmin){ xmin = box.get(0).getX(); }
+//					if(box.get(0).getY() < ymin){ ymin = box.get(0).getY(); }
+//					if(box.get(1).getX() > xmax){ xmax = box.get(1).getX(); }
+//					if(box.get(1).getY() > ymax){ ymax = box.get(1).getY(); }									
+//				} else{
+//					log.warn("Way " + rm.getMemberId() + " was not found in wayMap, and will be ignored.");
+//				}
+//			} else if(rm.getMemberType() == EntityType.Relation){
+////				log.info("                                                                              ----> " + rm.getMemberId());
+//				try{
+//					if(relationMap.containsKey(rm.getMemberId())){
+//						Relation r = relationMap.get(rm.getMemberId()).getEntity();
+//						List<Coord> box = this.getRelationBox(r);
+//						if(box.get(0).getX() < xmin){ xmin = box.get(0).getX(); }
+//						if(box.get(0).getY() < ymin){ ymin = box.get(0).getY(); }
+//						if(box.get(1).getX() > xmax){ xmax = box.get(1).getX(); }
+//						if(box.get(1).getY() > ymax){ ymax = box.get(1).getY(); }									
+//					} else{
+//						log.warn("Relation " + rm.getMemberId() + " was not found in relationMap, and will be ignored.");
+//					}					
+//				} catch(StackOverflowError e){
+//					log.error("Circular reference: Relation " + rm.getMemberId());
+//					errorCounter++;
+//				}
+//			} else{
+//				log.warn("Could not get the bounding box for EntityType " + rm.getMemberType().toString());
+//			}
+//		}
+//
+//		/* Create the bounding coordinates, and add them to the result list. */
+//		Coord bottomLeft = new CoordImpl(xmin, ymin);
+//		Coord topRight = new CoordImpl(xmax, ymax);
+//		list.add(bottomLeft);
+//		list.add(topRight);
+//		
+//		return list;
+//	}
 	
-	private Coord getNodeCoord(Node node){
-		return ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
-	}
+//	private Coord getNodeCoord(Node node){
+//		return ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
+//	}
 	
 		
-	/**
-	 * Calculate the centre of the way as the centroid of the bounding box
-	 * of the facility;
-	 * @param way
-	 * @return
-	 */
-	private Coord getWayCentroid(Way way){
-		List<Coord> box = getWayBox(way);
-		double xmin = box.get(0).getX();
-		double ymin = box.get(0).getY();
-		double xmax = box.get(1).getX();
-		double ymax = box.get(1).getY();
-		
-		Double x = xmin + (xmax - xmin)/2;
-		Double y = ymin + (ymax - ymin)/2;
-		
-		/* This should be in WGS84. */
-		Coord c = new CoordImpl(x, y);
-		
-		/* This should be returned in the transformed CRS. */
-		return ct.transform(c);
-	}
+//	/**
+//	 * Calculate the centre of the way as the centroid of the bounding box
+//	 * of the facility;
+//	 * @param way
+//	 * @return
+//	 */
+//	private Coord getWayCentroid(Way way){
+//		List<Coord> box = getWayBox(way);
+//		double xmin = box.get(0).getX();
+//		double ymin = box.get(0).getY();
+//		double xmax = box.get(1).getX();
+//		double ymax = box.get(1).getY();
+//		
+//		Double x = xmin + (xmax - xmin)/2;
+//		Double y = ymin + (ymax - ymin)/2;
+//		
+//		/* This should be in WGS84. */
+//		Coord c = new CoordImpl(x, y);
+//		
+//		/* This should be returned in the transformed CRS. */
+//		return ct.transform(c);
+//	}
 	
-	/**
-	 * Calculate the centre of the relation as the centroid of the bounding box
-	 * of the facility;
-	 * @param relation
-	 * @return
-	 */	
-	private Coord getRelationCentroid(Relation relation){
-		List<Coord> box = getRelationBox(relation);
-		double xmin = box.get(0).getX();
-		double ymin = box.get(0).getY();
-		double xmax = box.get(1).getX();
-		double ymax = box.get(1).getY();
-
-		Double x = xmin + (xmax - xmin)/2;
-		Double y = ymin + (ymax - ymin)/2;
-		
-		/* This should be in WGS84. */
-		Coord c = new CoordImpl(x, y);
-		
-		/* This should be in the transformed CRS. */
-		return ct.transform(c);
-	}
+//	/**
+//	 * Calculate the centre of the relation as the centroid of the bounding box
+//	 * of the facility;
+//	 * @param relation
+//	 * @return
+//	 */	
+//	private Coord getRelationCentroid(Relation relation){
+//		List<Coord> box = getRelationBox(relation);
+//		double xmin = box.get(0).getX();
+//		double ymin = box.get(0).getY();
+//		double xmax = box.get(1).getX();
+//		double ymax = box.get(1).getY();
+//
+//		Double x = xmin + (xmax - xmin)/2;
+//		Double y = ymin + (ymax - ymin)/2;
+//		
+//		/* This should be in WGS84. */
+//		Coord c = new CoordImpl(x, y);
+//		
+//		/* This should be in the transformed CRS. */
+//		return ct.transform(c);
+//	}
 	
 
 	@Override

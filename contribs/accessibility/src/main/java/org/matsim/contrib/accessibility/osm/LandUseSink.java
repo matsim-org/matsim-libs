@@ -109,8 +109,17 @@ public class LandUseSink implements Sink {
 		
 		ActivityFacilitiesFactory aff = new ActivityFacilitiesFactoryImpl();
 
-		/* First check all the point features. */
-		processFacilities(aff, nodeMap);
+//		/* First check all the point features. */
+//		processFacilities(aff, nodeMap);
+//		
+//		/* Second, check for way features. */
+//		processFacilities(aff, wayMap);
+//
+//		/* Thirdly, check for relation. */
+//		processFacilities(aff, relationMap);
+		
+		/* First check all the relations for land use. */
+		processFacilities(aff, relationMap);
 		
 		/* Second, check for way features. */
 		processFacilities(aff, wayMap);
@@ -121,28 +130,29 @@ public class LandUseSink implements Sink {
 		/*TODO Report the final counts of different amenity types. */
 	}
 
-	private Coord getCoord(Entity entity){
-		if(entity instanceof Node){
-			return getNodeCoord((Node)entity);
-		} else if(entity instanceof Way){
-			return getWayCentroid((Way)entity);
-		} else if(entity instanceof Relation){
-			return getRelationCentroid((Relation)entity);
-		}
-		
-		return null;
-	}
+//	private Coord getCoord(Entity entity){
+//		if(entity instanceof Node){
+//			return getNodeCoord((Node)entity);
+//		} else if(entity instanceof Way){
+//			return getWayCentroid((Way)entity);
+//		} else if(entity instanceof Relation){
+//			return getRelationCentroid((Relation)entity);
+//		}
+//		
+//		return null;
+//	}
 
 	private void processFacilities(ActivityFacilitiesFactory aff,
-			Map<Long,? extends EntityContainer> nodeMap) {
-		for(long n : nodeMap.keySet()){
-			Entity entity = nodeMap.get(n).getEntity();
+			Map<Long,? extends EntityContainer> entityMap) {
+		for(long entityKey : entityMap.keySet()){
+			Entity entity = entityMap.get(entityKey).getEntity();
 			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
 			/* Check land use */
-			String landuse = tags.get("landuse");
+			//System.out.println("tags.get(landuse) = " + tags.get("landuse"));
+			String landuseType = tags.get("landuse");
 			String activityType = null;
-			if(landuse != null) {
-				activityType = getActivityType(landuse);
+			if(landuseType != null) {
+				activityType = getActivityType(landuseType);
 			}
 			if(activityType != null){
 				String name = tags.get("name");
@@ -151,13 +161,13 @@ public class LandUseSink implements Sink {
 //					if(activityType.equalsIgnoreCase("e")){
 //						getEducationLevel(name);
 //					}
-					log.warn("      ---> Land use " + n + " has name " + name + ".");
+					log.warn("      ---> Land use " + entityKey + " has name " + name + ".");
 				} else{
-					log.warn("      ---> Land use " + n + " does not have a name.");
+					log.warn("      ---> Land use " + entityKey + " does not have a name.");
 				}
 
 				/* Facility identified. Now get the centroid of all members. */ 
-				Coord coord = getCoord(entity);
+				Coord coord = CoordUtils.getCoord(entity, this.ct, this.nodeMap, this.wayMap, this.relationMap);
 				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
 				ActivityFacility af;
 				if(!facilities.getFacilities().containsKey(newId)){
@@ -201,6 +211,51 @@ public class LandUseSink implements Sink {
 		}
 	}
 	
+	private void processFacilities2(ActivityFacilitiesFactory aff,
+			Map<Long,? extends EntityContainer> entityMap) {
+		for(long entityKey : entityMap.keySet()){
+			Entity entity = entityMap.get(entityKey).getEntity();
+			Map<String, String> tags = new TagCollectionImpl(entity.getTags()).buildMap();
+			/* Check land use */
+			//System.out.println("tags.get(landuse) = " + tags.get("landuse"));
+			String landuseType = tags.get("landuse");
+			String activityType = null;
+			if(landuseType != null) {
+				activityType = getActivityType(landuseType);
+			}
+			if(activityType != null){
+				String name = tags.get("name");
+				if(name != null){
+					/* Check education level. */
+//					if(activityType.equalsIgnoreCase("e")){
+//						getEducationLevel(name);
+//					}
+					log.warn("      ---> Land use " + entityKey + " has name " + name + ".");
+				} else{
+					log.warn("      ---> Land use " + entityKey + " does not have a name.");
+				}
+
+				/* Facility identified. Now get the centroid of all members. */ 
+				Coord coord = CoordUtils.getCoord(entity, ct, nodeMap, wayMap, relationMap);
+				Id<ActivityFacility> newId = Id.create(entity.getId(), ActivityFacility.class);
+				ActivityFacility af;
+				if(!facilities.getFacilities().containsKey(newId)){
+					af = aff.createActivityFacility(newId, coord);
+					((ActivityFacilityImpl)af).setDesc(name);
+					facilities.addActivityFacility(af);
+				} else{
+					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
+				}
+				ActivityOption ao = aff.createActivityOption(activityType);
+				
+				af.addActivityOption(ao);
+//				setFacilityDetails(ao);
+//				nodeFacilities++;
+			}
+
+		}
+	}
+	
 	
 	
 	/**
@@ -221,154 +276,154 @@ public class LandUseSink implements Sink {
 	}
 	
 	
-	/**
-	 * Determine the bounding box of a closed way.
-	 * @param way
-	 * @return the {@link List} of {@link Coord}s: the first is the bottom-left
-	 * 		of the bounding box, and the second is the upper-right. 
-	 */
-	private List<Coord> getWayBox(Way way){
-		List<Coord> list = new ArrayList<Coord>();
-		Double xmin = Double.POSITIVE_INFINITY;
-		Double ymin = Double.POSITIVE_INFINITY;
-		Double xmax = Double.NEGATIVE_INFINITY;
-		Double ymax = Double.NEGATIVE_INFINITY;
-		for(WayNode n : way.getWayNodes()){
-			double xNode = nodeMap.get(n.getNodeId()).getEntity().getLongitude();
-			double yNode = nodeMap.get(n.getNodeId()).getEntity().getLatitude();
-			if(xNode < xmin){ xmin = xNode; }
-			if(yNode < ymin){ ymin = yNode; }
-			if(xNode > xmax){ xmax = xNode; }
-			if(yNode > ymax){ ymax = yNode; }
-		}
-
-		/* Create the bounding coordinates, and add them to the result list. */
-		Coord bottomLeft = new CoordImpl(xmin, ymin);
-		Coord topRight = new CoordImpl(xmax, ymax);
-		list.add(bottomLeft);
-		list.add(topRight);
-		
-		return list;
-	}
+//	/**
+//	 * Determine the bounding box of a closed way.
+//	 * @param way
+//	 * @return the {@link List} of {@link Coord}s: the first is the bottom-left
+//	 * 		of the bounding box, and the second is the upper-right. 
+//	 */
+//	private List<Coord> getWayBox(Way way){
+//		List<Coord> list = new ArrayList<Coord>();
+//		Double xmin = Double.POSITIVE_INFINITY;
+//		Double ymin = Double.POSITIVE_INFINITY;
+//		Double xmax = Double.NEGATIVE_INFINITY;
+//		Double ymax = Double.NEGATIVE_INFINITY;
+//		for(WayNode n : way.getWayNodes()){
+//			double xNode = nodeMap.get(n.getNodeId()).getEntity().getLongitude();
+//			double yNode = nodeMap.get(n.getNodeId()).getEntity().getLatitude();
+//			if(xNode < xmin){ xmin = xNode; }
+//			if(yNode < ymin){ ymin = yNode; }
+//			if(xNode > xmax){ xmax = xNode; }
+//			if(yNode > ymax){ ymax = yNode; }
+//		}
+//
+//		/* Create the bounding coordinates, and add them to the result list. */
+//		Coord bottomLeft = new CoordImpl(xmin, ymin);
+//		Coord topRight = new CoordImpl(xmax, ymax);
+//		list.add(bottomLeft);
+//		list.add(topRight);
+//		
+//		return list;
+//	}
 	
 	
-	/**
-	 * Determine the bounding box of a relation.
-	 * @param relation
-	 * @return the {@link List} of {@link Coord}s: the first is the bottom-left
-	 * 		of the bounding box, and the second is the upper-right. 
-	 */
-	private List<Coord> getRelationBox(Relation relation){
-		List<Coord> list = new ArrayList<Coord>(); 
-		Double xmin = Double.POSITIVE_INFINITY;
-		Double ymin = Double.POSITIVE_INFINITY;
-		Double xmax = Double.NEGATIVE_INFINITY;
-		Double ymax = Double.NEGATIVE_INFINITY;
-
-		for(RelationMember rm : relation.getMembers()){
-			if(rm.getMemberType() == EntityType.Node){
-				if(nodeMap.containsKey(rm.getMemberId())){
-					double xNode = nodeMap.get(rm.getMemberId()).getEntity().getLongitude();
-					double yNode = nodeMap.get(rm.getMemberId()).getEntity().getLatitude();
-					if(xNode < xmin){ xmin = xNode; }
-					if(yNode < ymin){ ymin = yNode; }
-					if(xNode > xmax){ xmax = xNode; }
-					if(yNode > ymax){ ymax = yNode; }					
-				} else{
-					log.warn("Node " + rm.getMemberId() + " was not found in nodeMap, and will be ignored.");
-				}
-			} else if(rm.getMemberType() == EntityType.Way){
-				if(wayMap.containsKey(rm.getMemberId())){
-					Way way = wayMap.get(rm.getMemberId()).getEntity();
-					List<Coord> box = this.getWayBox(way);
-					if(box.get(0).getX() < xmin){ xmin = box.get(0).getX(); }
-					if(box.get(0).getY() < ymin){ ymin = box.get(0).getY(); }
-					if(box.get(1).getX() > xmax){ xmax = box.get(1).getX(); }
-					if(box.get(1).getY() > ymax){ ymax = box.get(1).getY(); }									
-				} else{
-					log.warn("Way " + rm.getMemberId() + " was not found in wayMap, and will be ignored.");
-				}
-			} else if(rm.getMemberType() == EntityType.Relation){
-//				log.info("                                                                              ----> " + rm.getMemberId());
-				try{
-					if(relationMap.containsKey(rm.getMemberId())){
-						Relation r = relationMap.get(rm.getMemberId()).getEntity();
-						List<Coord> box = this.getRelationBox(r);
-						if(box.get(0).getX() < xmin){ xmin = box.get(0).getX(); }
-						if(box.get(0).getY() < ymin){ ymin = box.get(0).getY(); }
-						if(box.get(1).getX() > xmax){ xmax = box.get(1).getX(); }
-						if(box.get(1).getY() > ymax){ ymax = box.get(1).getY(); }									
-					} else{
-						log.warn("Relation " + rm.getMemberId() + " was not found in relationMap, and will be ignored.");
-					}					
-				} catch(StackOverflowError e){
-					log.error("Circular reference: Relation " + rm.getMemberId());
-					errorCounter++;
-				}
-			} else{
-				log.warn("Could not get the bounding box for EntityType " + rm.getMemberType().toString());
-			}
-		}
-
-		/* Create the bounding coordinates, and add them to the result list. */
-		Coord bottomLeft = new CoordImpl(xmin, ymin);
-		Coord topRight = new CoordImpl(xmax, ymax);
-		list.add(bottomLeft);
-		list.add(topRight);
-		
-		return list;
-	}
+//	/**
+//	 * Determine the bounding box of a relation.
+//	 * @param relation
+//	 * @return the {@link List} of {@link Coord}s: the first is the bottom-left
+//	 * 		of the bounding box, and the second is the upper-right. 
+//	 */
+//	private List<Coord> getRelationBox(Relation relation){
+//		List<Coord> list = new ArrayList<Coord>(); 
+//		Double xmin = Double.POSITIVE_INFINITY;
+//		Double ymin = Double.POSITIVE_INFINITY;
+//		Double xmax = Double.NEGATIVE_INFINITY;
+//		Double ymax = Double.NEGATIVE_INFINITY;
+//
+//		for(RelationMember rm : relation.getMembers()){
+//			if(rm.getMemberType() == EntityType.Node){
+//				if(nodeMap.containsKey(rm.getMemberId())){
+//					double xNode = nodeMap.get(rm.getMemberId()).getEntity().getLongitude();
+//					double yNode = nodeMap.get(rm.getMemberId()).getEntity().getLatitude();
+//					if(xNode < xmin){ xmin = xNode; }
+//					if(yNode < ymin){ ymin = yNode; }
+//					if(xNode > xmax){ xmax = xNode; }
+//					if(yNode > ymax){ ymax = yNode; }					
+//				} else{
+//					log.warn("Node " + rm.getMemberId() + " was not found in nodeMap, and will be ignored.");
+//				}
+//			} else if(rm.getMemberType() == EntityType.Way){
+//				if(wayMap.containsKey(rm.getMemberId())){
+//					Way way = wayMap.get(rm.getMemberId()).getEntity();
+//					List<Coord> box = this.getWayBox(way);
+//					if(box.get(0).getX() < xmin){ xmin = box.get(0).getX(); }
+//					if(box.get(0).getY() < ymin){ ymin = box.get(0).getY(); }
+//					if(box.get(1).getX() > xmax){ xmax = box.get(1).getX(); }
+//					if(box.get(1).getY() > ymax){ ymax = box.get(1).getY(); }									
+//				} else{
+//					log.warn("Way " + rm.getMemberId() + " was not found in wayMap, and will be ignored.");
+//				}
+//			} else if(rm.getMemberType() == EntityType.Relation){
+////				log.info("                                                                              ----> " + rm.getMemberId());
+//				try{
+//					if(relationMap.containsKey(rm.getMemberId())){
+//						Relation r = relationMap.get(rm.getMemberId()).getEntity();
+//						List<Coord> box = this.getRelationBox(r);
+//						if(box.get(0).getX() < xmin){ xmin = box.get(0).getX(); }
+//						if(box.get(0).getY() < ymin){ ymin = box.get(0).getY(); }
+//						if(box.get(1).getX() > xmax){ xmax = box.get(1).getX(); }
+//						if(box.get(1).getY() > ymax){ ymax = box.get(1).getY(); }									
+//					} else{
+//						log.warn("Relation " + rm.getMemberId() + " was not found in relationMap, and will be ignored.");
+//					}					
+//				} catch(StackOverflowError e){
+//					log.error("Circular reference: Relation " + rm.getMemberId());
+//					errorCounter++;
+//				}
+//			} else{
+//				log.warn("Could not get the bounding box for EntityType " + rm.getMemberType().toString());
+//			}
+//		}
+//
+//		/* Create the bounding coordinates, and add them to the result list. */
+//		Coord bottomLeft = new CoordImpl(xmin, ymin);
+//		Coord topRight = new CoordImpl(xmax, ymax);
+//		list.add(bottomLeft);
+//		list.add(topRight);
+//		
+//		return list;
+//	}
 	
-	private Coord getNodeCoord(Node node){
-		return ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
-	}
-	
-		
-	/**
-	 * Calculate the centre of the way as the centroid of the bounding box
-	 * of the facility;
-	 * @param way
-	 * @return
-	 */
-	private Coord getWayCentroid(Way way){
-		List<Coord> box = getWayBox(way);
-		double xmin = box.get(0).getX();
-		double ymin = box.get(0).getY();
-		double xmax = box.get(1).getX();
-		double ymax = box.get(1).getY();
-		
-		Double x = xmin + (xmax - xmin)/2;
-		Double y = ymin + (ymax - ymin)/2;
-		
-		/* This should be in WGS84. */
-		Coord c = new CoordImpl(x, y);
-		
-		/* This should be returned in the transformed CRS. */
-		return ct.transform(c);
-	}
-	
-	/**
-	 * Calculate the centre of the relation as the centroid of the bounding box
-	 * of the facility;
-	 * @param relation
-	 * @return
-	 */	
-	private Coord getRelationCentroid(Relation relation){
-		List<Coord> box = getRelationBox(relation);
-		double xmin = box.get(0).getX();
-		double ymin = box.get(0).getY();
-		double xmax = box.get(1).getX();
-		double ymax = box.get(1).getY();
-
-		Double x = xmin + (xmax - xmin)/2;
-		Double y = ymin + (ymax - ymin)/2;
-		
-		/* This should be in WGS84. */
-		Coord c = new CoordImpl(x, y);
-		
-		/* This should be in the transformed CRS. */
-		return ct.transform(c);
-	}
+//	private Coord getNodeCoord(Node node){
+//		return ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
+//	}
+//	
+//		
+//	/**
+//	 * Calculate the centre of the way as the centroid of the bounding box
+//	 * of the facility;
+//	 * @param way
+//	 * @return
+//	 */
+//	private Coord getWayCentroid(Way way){
+//		List<Coord> box = getWayBox(way);
+//		double xmin = box.get(0).getX();
+//		double ymin = box.get(0).getY();
+//		double xmax = box.get(1).getX();
+//		double ymax = box.get(1).getY();
+//		
+//		Double x = xmin + (xmax - xmin)/2;
+//		Double y = ymin + (ymax - ymin)/2;
+//		
+//		/* This should be in WGS84. */
+//		Coord c = new CoordImpl(x, y);
+//		
+//		/* This should be returned in the transformed CRS. */
+//		return ct.transform(c);
+//	}
+//	
+//	/**
+//	 * Calculate the centre of the relation as the centroid of the bounding box
+//	 * of the facility;
+//	 * @param relation
+//	 * @return
+//	 */	
+//	private Coord getRelationCentroid(Relation relation){
+//		List<Coord> box = getRelationBox(relation);
+//		double xmin = box.get(0).getX();
+//		double ymin = box.get(0).getY();
+//		double xmax = box.get(1).getX();
+//		double ymax = box.get(1).getY();
+//
+//		Double x = xmin + (xmax - xmin)/2;
+//		Double y = ymin + (ymax - ymin)/2;
+//		
+//		/* This should be in WGS84. */
+//		Coord c = new CoordImpl(x, y);
+//		
+//		/* This should be in the transformed CRS. */
+//		return ct.transform(c);
+//	}
 	
 
 	@Override
@@ -410,10 +465,10 @@ public class LandUseSink implements Sink {
 		});
 	}
 	
-	private String getActivityType(String landuse){
-		String type = typeMap.get(landuse);
+	private String getActivityType(String landuseType){
+		String type = typeMap.get(landuseType);
 		if(type == null){
-			log.warn("Do not have an activity type mapping for " + landuse + "! Returning NULL.");
+			log.warn("Do not have an activity type mapping for " + landuseType + "! Returning NULL.");
 		} else{
 		}
 		MapUtils.addToInteger(type, typeCount, 0, 1);
