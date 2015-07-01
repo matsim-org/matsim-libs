@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * This module calculates the transfer payments for each agent and the sum of all transfer payments.
@@ -44,7 +44,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author ikaddoura
  *
  */
-public class MonetaryPaymentsAnalyzer extends AbstractAnalyisModule{
+public class MonetaryPaymentsAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(MonetaryPaymentsAnalyzer.class);
 	private ScenarioImpl scenario;
 

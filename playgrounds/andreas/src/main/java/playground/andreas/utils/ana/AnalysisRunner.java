@@ -45,7 +45,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import playground.andreas.dh.TransitScheduleSimplifier;
 import playground.vsp.analysis.VspAnalyzer;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
 import playground.vsp.analysis.modules.boardingAlightingCount.BoardingAlightingCountAnalyzer;
 import playground.vsp.analysis.modules.ptAccessibility.PtAccessibility;
@@ -199,7 +199,7 @@ public class AnalysisRunner {
 	}
 }
 
-class MyPtCount extends AbstractAnalyisModule{
+class MyPtCount extends AbstractAnalysisModule{
 
 	PtPaxVolumesHandler handler;
 	private ArrayList<Id<Link>> links;

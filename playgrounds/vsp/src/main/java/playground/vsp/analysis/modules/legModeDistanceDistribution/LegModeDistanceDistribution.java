@@ -48,7 +48,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * This tool calculates modal split over predefined distance classes.
@@ -60,7 +60,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author aneumann, benjamin, ihab
  *
  */
-public class LegModeDistanceDistribution extends AbstractAnalyisModule{
+public class LegModeDistanceDistribution extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(LegModeDistanceDistribution.class);
 
 	private Scenario scenario;

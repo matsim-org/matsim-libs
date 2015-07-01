@@ -33,7 +33,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * This class takes list of eventsFile as input and then returns set of all stuck (1) events and (2) persons. 
@@ -41,7 +41,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author amit
  */
 
-public class StuckAgentsFilter extends AbstractAnalyisModule {
+public class StuckAgentsFilter extends AbstractAnalysisModule {
 
 	private final Logger log = Logger.getLogger(StuckAgentsFilter.class);
 	

@@ -35,7 +35,7 @@ import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * writeResultsPlanCoords() added by gleich
  *
  */
-public class ActivityToModeAnalysis extends AbstractAnalyisModule {
+public class ActivityToModeAnalysis extends AbstractAnalysisModule {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger

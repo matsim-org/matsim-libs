@@ -40,7 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -50,7 +50,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 /**
  * @author aneumann, droeder
  */
-public class TransitSchedule2Shp extends AbstractAnalyisModule{
+public class TransitSchedule2Shp extends AbstractAnalysisModule{
 	
 	private static final Logger log = Logger.getLogger(TransitSchedule2Shp.class);
 	

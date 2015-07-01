@@ -35,18 +35,18 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
 /**
  * @author ikaddoura
  *
  */
-public class StopId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModule{
+public class StopId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(StopId2PersonEnterLeaveVehicleAnalyzer.class);
 	private ScenarioImpl scenario;
 	
-	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
+	private List<AbstractAnalysisModule> anaModules = new LinkedList<AbstractAnalysisModule>();
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
 	private StopId2PersonEnterLeaveVehicleHandler handler;
@@ -73,7 +73,7 @@ public class StopId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModul
 		List<EventHandler> allEventHandler = new LinkedList<EventHandler>();
 
 		// from (sub-)modules
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			for (EventHandler handler : module.getEventHandler()) {
 				allEventHandler.add(handler);
 			}
@@ -88,7 +88,7 @@ public class StopId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModul
 	@Override
 	public void preProcessData() {
 		log.info("Preprocessing all (sub-)modules...");
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			module.preProcessData();
 		}
 		log.info("Preprocessing all (sub-)modules... done.");
@@ -97,7 +97,7 @@ public class StopId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModul
 	@Override
 	public void postProcessData() {
 		log.info("Postprocessing all (sub-)modules...");
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			module.postProcessData();
 		}
 		log.info("Postprocessing all (sub-)modules... done.");

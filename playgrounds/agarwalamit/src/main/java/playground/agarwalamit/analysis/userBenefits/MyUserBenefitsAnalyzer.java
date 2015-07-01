@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsAnalyzer;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
@@ -45,7 +45,7 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
  * @author amit after ikaddoura, benjamin
  *
  */
-public class MyUserBenefitsAnalyzer extends AbstractAnalyisModule{
+public class MyUserBenefitsAnalyzer extends AbstractAnalysisModule{
 	
 	private final Logger log = Logger.getLogger(UserBenefitsAnalyzer.class);
 	private ScenarioImpl scenario;

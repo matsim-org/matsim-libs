@@ -28,7 +28,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author aneumann, droeder
@@ -38,7 +38,7 @@ public class VspAnalyzer {
 
 	private static final Logger log = Logger.getLogger(VspAnalyzer.class);
 	private String outdir;
-	private LinkedList<AbstractAnalyisModule> modules;
+	private LinkedList<AbstractAnalysisModule> modules;
 	private String eventsFile;
 
 	/**
@@ -53,7 +53,7 @@ public class VspAnalyzer {
 	 */
 	public VspAnalyzer(String outdir, String eventsFile) {
 		this.outdir = outdir;
-		this.modules = new LinkedList<AbstractAnalyisModule>();
+		this.modules = new LinkedList<AbstractAnalysisModule>();
 		this.eventsFile = eventsFile;
 	}
 	
@@ -69,11 +69,11 @@ public class VspAnalyzer {
 	 */
 	public VspAnalyzer(String outdir) {
 		this.outdir = outdir;
-		this.modules = new LinkedList<AbstractAnalyisModule>();
+		this.modules = new LinkedList<AbstractAnalysisModule>();
 		this.eventsFile = null;
 	}
 	
-	public void addAnalysisModule(AbstractAnalyisModule module){
+	public void addAnalysisModule(AbstractAnalysisModule module){
 		this.modules.add(module);
 	}
 	
@@ -102,7 +102,7 @@ public class VspAnalyzer {
 	 */
 	private void preProcess() {
 		log.info("preprocessing all modules...");
-		for(AbstractAnalyisModule module: this.modules){
+		for(AbstractAnalysisModule module: this.modules){
 			try {
 				log.info("preprocessing " + module.getName());
 				module.preProcessData();
@@ -120,7 +120,7 @@ public class VspAnalyzer {
 	private void handleEvents() {
 		log.info("handling events for all modules...");
 		EventsManager manager = EventsUtils.createEventsManager();
-		for(AbstractAnalyisModule module: this.modules){
+		for(AbstractAnalysisModule module: this.modules){
 			log.info("adding eventHandler from " + module.getName());
 			for(EventHandler handler: module.getEventHandler()){
 				manager.addHandler(handler);
@@ -135,7 +135,7 @@ public class VspAnalyzer {
 	 */
 	private void postProcess() {
 		log.info("post-processing all modules...");
-		for(AbstractAnalyisModule module: this.modules){
+		for(AbstractAnalysisModule module: this.modules){
 			log.info("postprocessing " + module.getName());
 			module.postProcessData();
 			Gbl.printElapsedTime(); Gbl.printMemoryUsage();
@@ -149,7 +149,7 @@ public class VspAnalyzer {
 	 */
 	private void writeResults() {
 		log.info("writing data for all modules...");
-		for(AbstractAnalyisModule module: this.modules){
+		for(AbstractAnalysisModule module: this.modules){
 			String outputDir = this.outdir + "/" + module.getName() + "/";
 			log.info("writing output for " + module.getName() + " to " + outputDir);
 			if(!new File(outputDir).exists()){
@@ -165,7 +165,7 @@ public class VspAnalyzer {
 		log.info("combinedPostProcessAndWriteResults for all modules...");
 		
 		while (!this.modules.isEmpty()) {
-			AbstractAnalyisModule module = this.modules.removeFirst();
+			AbstractAnalysisModule module = this.modules.removeFirst();
 			
 			try {
 				log.info("postprocessing " + module.getName());

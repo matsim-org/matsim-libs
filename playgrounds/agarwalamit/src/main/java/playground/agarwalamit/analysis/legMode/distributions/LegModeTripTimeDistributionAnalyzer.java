@@ -36,12 +36,12 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
-public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalyisModule {
+public class LegModeTripTimeDistributionAnalyzer extends AbstractAnalysisModule {
 
 	private final List<Integer> timeClasses;
 	private SortedSet<String> usedModes;

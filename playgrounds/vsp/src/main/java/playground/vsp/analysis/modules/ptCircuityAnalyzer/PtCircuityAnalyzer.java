@@ -40,7 +40,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicles;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * 
@@ -51,7 +51,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author gleich
  *
  */
-public class PtCircuityAnalyzer extends AbstractAnalyisModule {
+public class PtCircuityAnalyzer extends AbstractAnalysisModule {
 	
 	private Scenario scenario;
 	private Vehicles vehicles;

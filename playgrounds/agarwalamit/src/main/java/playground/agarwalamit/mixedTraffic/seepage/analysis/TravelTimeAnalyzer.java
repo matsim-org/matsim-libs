@@ -43,12 +43,12 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.mixedTraffic.seepage.TestSetUp.SeepageControler;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
-public class TravelTimeAnalyzer extends AbstractAnalyisModule {
+public class TravelTimeAnalyzer extends AbstractAnalysisModule {
 
 	public TravelTimeAnalyzer(String eventsFile, String outputDir) {
 		super(TravelTimeAnalyzer.class.getSimpleName());

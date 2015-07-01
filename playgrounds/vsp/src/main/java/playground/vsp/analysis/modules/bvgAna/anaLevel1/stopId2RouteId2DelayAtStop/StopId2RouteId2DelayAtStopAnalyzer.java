@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2RouteId2DelayAtStop.StopId2RouteId2DelayAtStopHandler;
 
 /**
@@ -41,7 +41,7 @@ import playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2RouteId2DelayAtSt
  * @author ikaddoura, aneumann
  *
  */
-public class StopId2RouteId2DelayAtStopAnalyzer extends AbstractAnalyisModule{
+public class StopId2RouteId2DelayAtStopAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(StopId2RouteId2DelayAtStopAnalyzer.class);
 	private ScenarioImpl scenario;
 	private StopId2RouteId2DelayAtStopHandler delayHandler;

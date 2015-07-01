@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTripSet;
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractPlan2TripsFilter;
 import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * This class analyzes the trip-dependent traveltime per mode 
  *
  */
-public class TTtripAnalysis extends AbstractAnalyisModule{
+public class TTtripAnalysis extends AbstractAnalysisModule{
 	private static final Logger log = Logger.getLogger(TTtripAnalysis.class);
 	private TTtripEventsHandler eventsHandler;
 	private String unProcessedAgents;

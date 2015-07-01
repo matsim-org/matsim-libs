@@ -34,7 +34,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.waitingTimes.WaitingTimesAnalyzer;
 import playground.vsp.analysis.modules.welfareAnalyzer.WelfareAnalyzer;
 
@@ -51,7 +51,7 @@ public class DefaultAnalysis_ik {
 	private final String eventsFile;
 	private final ScenarioImpl scenario;
 	
-	private final List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
+	private final List<AbstractAnalysisModule> anaModules = new LinkedList<AbstractAnalysisModule>();
 
 	public DefaultAnalysis_ik(ScenarioImpl scenario, String iterationOutputDir, String eventsFile) {
 		this.outputDir = iterationOutputDir + "defaultAnalysis" + "/";
@@ -118,7 +118,7 @@ public class DefaultAnalysis_ik {
 
 	public void preProcess(){
 		log.info("Preprocessing all modules...");
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			module.preProcessData();
 		}
 		log.info("Preprocessing all modules... done.");
@@ -126,7 +126,7 @@ public class DefaultAnalysis_ik {
 	
 	public void run(){
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			for (EventHandler handler : module.getEventHandler()) {
 				eventsManager.addHandler(handler);
 			}
@@ -142,7 +142,7 @@ public class DefaultAnalysis_ik {
 	
 	public void postProcess(){
 		log.info("Postprocessing all modules...");
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			module.postProcessData();
 		}
 		log.info("Postprocessing all modules... done.");
@@ -153,7 +153,7 @@ public class DefaultAnalysis_ik {
 		log.info("Generating output directory " + this.outputDir);
 		new File(this.outputDir).mkdir();
 		
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			String moduleOutputDir = this.outputDir + module.getName() + "/";
 			log.info("Writing results of module " + module.getName() + " to " + moduleOutputDir + "...");
 			new File(moduleOutputDir).mkdir();

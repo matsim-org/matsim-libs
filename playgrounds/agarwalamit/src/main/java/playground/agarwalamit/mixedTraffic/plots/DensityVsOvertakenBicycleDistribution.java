@@ -31,12 +31,12 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
-public class DensityVsOvertakenBicycleDistribution extends AbstractAnalyisModule {
+public class DensityVsOvertakenBicycleDistribution extends AbstractAnalysisModule {
 
 	private DensityVsPassingDistributionHandler dpd;
 	private DensityVsFractionOfStoppedVehiclesHandler dfsv;

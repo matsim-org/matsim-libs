@@ -42,13 +42,13 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
 
-public class AverageTollAnalyzer extends AbstractAnalyisModule {
+public class AverageTollAnalyzer extends AbstractAnalysisModule {
 
 	public static void main(String[] args) {
 		String congestionImpl = "implV6";

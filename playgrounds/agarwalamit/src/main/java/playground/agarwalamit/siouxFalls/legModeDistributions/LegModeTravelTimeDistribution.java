@@ -36,12 +36,12 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.legMode.distributions.LegModeTravelTimeHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
-public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
+public class LegModeTravelTimeDistribution extends AbstractAnalysisModule {
 
 	private final Logger logger = Logger.getLogger(LegModeTravelTimeDistribution.class);
 	private LegModeTravelTimeHandler lmth;

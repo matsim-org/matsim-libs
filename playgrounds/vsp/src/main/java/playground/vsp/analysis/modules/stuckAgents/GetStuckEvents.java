@@ -29,13 +29,13 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author droeder
  *
  */
-public class GetStuckEvents extends AbstractAnalyisModule implements PersonStuckEventHandler{
+public class GetStuckEvents extends AbstractAnalysisModule implements PersonStuckEventHandler{
 	
 	private Collection<PersonStuckEvent> stuckEvents;
 

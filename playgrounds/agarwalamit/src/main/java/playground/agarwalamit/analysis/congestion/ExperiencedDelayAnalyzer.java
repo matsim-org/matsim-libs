@@ -34,7 +34,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
 
 /**
@@ -43,7 +43,7 @@ import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
  * 
  * @author amit
  */
-public class ExperiencedDelayAnalyzer extends AbstractAnalyisModule {
+public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
 	
 	private final Logger logger = Logger.getLogger(ExperiencedDelayAnalyzer.class);
 	private final String eventsFile;

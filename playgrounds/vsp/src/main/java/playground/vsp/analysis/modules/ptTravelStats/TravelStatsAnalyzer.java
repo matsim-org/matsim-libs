@@ -37,7 +37,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * Writes counts data for pax, paxMeter, transit vehicle capacity, capacityMeter, and number of transit vehicles each per link and mode.
@@ -46,7 +46,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * 
  * @author aneumann, sfuerbas
  */
-public class TravelStatsAnalyzer extends AbstractAnalyisModule {
+public class TravelStatsAnalyzer extends AbstractAnalysisModule {
 
 	public final static String CAPACITY = "capacity";
 	public final static String CAPACITY_METER = "capacityMeter";

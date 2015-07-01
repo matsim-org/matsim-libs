@@ -33,13 +33,13 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.legMode.distributions.LegModeTravelTimeHandler;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
 
-public class PatnaTravelTimeAnalyzer extends AbstractAnalyisModule {
+public class PatnaTravelTimeAnalyzer extends AbstractAnalysisModule {
 
 
 	public PatnaTravelTimeAnalyzer(String inputEventsFile) {

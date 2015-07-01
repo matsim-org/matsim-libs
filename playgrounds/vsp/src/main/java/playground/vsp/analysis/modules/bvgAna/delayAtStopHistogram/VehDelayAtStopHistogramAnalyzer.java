@@ -43,7 +43,7 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * Evaluates the delay a vehicle reports at a stop when arriving or departing. Writes a histogram to file. A negative delay is counted as no delay (0s).
@@ -51,7 +51,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author ikaddoura, aneumann
  *
  */
-public class VehDelayAtStopHistogramAnalyzer extends AbstractAnalyisModule{
+public class VehDelayAtStopHistogramAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(VehDelayAtStopHistogramAnalyzer.class);
 	private ScenarioImpl scenario;
 	private VehDelayAtStopHistogramEventHandler delayHandler;

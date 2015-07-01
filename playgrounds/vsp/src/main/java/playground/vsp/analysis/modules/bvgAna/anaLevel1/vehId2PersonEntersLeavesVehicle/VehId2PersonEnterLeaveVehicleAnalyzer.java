@@ -37,13 +37,13 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author ikaddoura
  *
  */
-public class VehId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalyisModule{
+public class VehId2PersonEnterLeaveVehicleAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(VehId2PersonEnterLeaveVehicleAnalyzer.class);
 	private ScenarioImpl scenario;
 	

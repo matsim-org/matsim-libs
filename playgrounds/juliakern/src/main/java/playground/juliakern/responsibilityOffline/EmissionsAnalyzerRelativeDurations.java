@@ -47,7 +47,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicle;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * This module requires an emissions events file.
@@ -61,7 +61,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author ikaddoura, benjamin
  *
  */
-public class EmissionsAnalyzerRelativeDurations extends AbstractAnalyisModule{
+public class EmissionsAnalyzerRelativeDurations extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(EmissionsAnalyzerRelativeDurations.class);
 //	private ScenarioImpl scenario;
 	private final String emissionEventsFile;

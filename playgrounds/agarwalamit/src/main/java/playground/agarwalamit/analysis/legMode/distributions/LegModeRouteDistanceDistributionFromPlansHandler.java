@@ -46,7 +46,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * Provides leg mode distance distribution, distances are calculated from routes of selected plans 
@@ -55,7 +55,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * Also returns mode2PersonId2RouteDistances.
  * @author amit
  */
-public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAnalyisModule{
+public class LegModeRouteDistanceDistributionFromPlansHandler extends AbstractAnalysisModule{
 	private final Logger log = Logger.getLogger(LegModeRouteDistanceDistributionFromPlansHandler.class);
 
 	private Scenario scenario;

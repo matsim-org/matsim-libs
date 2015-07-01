@@ -33,7 +33,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 /**
@@ -51,7 +51,7 @@ public class DefaultAnalysis {
 	private final Scenario scenario;
 	private final Set<SimpleFeature> shapeFile;
 	
-	private final List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
+	private final List<AbstractAnalysisModule> anaModules = new LinkedList<AbstractAnalysisModule>();
 
 	public DefaultAnalysis(Scenario scenario, String baseFolder, String iterationOutputDir, String eventsFile, Set<SimpleFeature> shapeFile) {
 		this.baseFolder = baseFolder;
@@ -75,14 +75,14 @@ public class DefaultAnalysis {
 	}
 
 	public void preProcess(){
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			module.preProcessData();
 		}
 	}
 	
 	public void run(){
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			for (EventHandler handler : module.getEventHandler()) {
 				eventsManager.addHandler(handler);
 			}
@@ -99,7 +99,7 @@ public class DefaultAnalysis {
 	}
 	
 	public void postProcess(){
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			module.postProcessData();
 		}
 	}
@@ -109,7 +109,7 @@ public class DefaultAnalysis {
 		log.info("Generating output directory " + outputDir);
 		new File(outputDir).mkdir();
 		
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			String moduleOutputDir = outputDir + module.getName() + "/";
 			log.info("Writing results of module " + module.getName() + " to " + moduleOutputDir + "...");
 			new File(moduleOutputDir).mkdir();
@@ -122,7 +122,7 @@ public class DefaultAnalysis {
 		Gbl.printMemoryUsage();
 	}
 
-	public List<AbstractAnalyisModule> getAnaModules() {
+	public List<AbstractAnalysisModule> getAnaModules() {
 		return this.anaModules;
 	}
 }

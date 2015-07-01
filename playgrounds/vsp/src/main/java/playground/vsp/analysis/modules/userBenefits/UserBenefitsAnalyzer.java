@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * This module calculates the logsum for each user and the sum of all user logsums in monetary units.
@@ -47,7 +47,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author ikaddoura, benjamin
  *
  */
-public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
+public class UserBenefitsAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(UserBenefitsAnalyzer.class);
 	private ScenarioImpl scenario;
 	private UserBenefitsCalculator userWelfareCalculator;

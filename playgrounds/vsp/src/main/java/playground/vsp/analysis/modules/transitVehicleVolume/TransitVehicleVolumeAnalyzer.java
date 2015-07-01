@@ -41,7 +41,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * @author droeder
  *
  */
-public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
+public class TransitVehicleVolumeAnalyzer extends AbstractAnalysisModule {
 
 	private static final Logger log = Logger.getLogger(TransitVehicleVolumeAnalyzer.class);
 	private Scenario sc;

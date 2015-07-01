@@ -36,13 +36,13 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 
 /**
  * @author amit
  */
-public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModule {
+public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalysisModule {
 
 	private final Logger logger = Logger.getLogger(LegModeDepartureArrivalTimeDistribution.class);
 	private LegModeDepartureArrivalTimeHandler lmdah;

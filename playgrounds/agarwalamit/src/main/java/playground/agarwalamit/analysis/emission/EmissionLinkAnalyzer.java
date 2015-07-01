@@ -38,13 +38,13 @@ import org.matsim.core.events.handler.EventHandler;
 
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  *
  */
-public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
+public class EmissionLinkAnalyzer extends AbstractAnalysisModule {
 	private final Logger logger = Logger.getLogger(EmissionLinkAnalyzer.class);
 	private final String emissionEventsFile;
 	private EmissionUtils emissionUtils;

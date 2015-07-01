@@ -40,14 +40,14 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.utils.heatMap.HeatMap;
 
 /**
  * @author droeder
  *
  */
-public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
+public class BoardingAlightingCountAnalyzer extends AbstractAnalysisModule{
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger

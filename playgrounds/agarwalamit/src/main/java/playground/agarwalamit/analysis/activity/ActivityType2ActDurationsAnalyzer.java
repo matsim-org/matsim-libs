@@ -32,7 +32,7 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * A class to analyze activity type to activity durations, activity start times
@@ -40,7 +40,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * same activity as different leg. 
  * @author amit
  */
-public class ActivityType2ActDurationsAnalyzer extends AbstractAnalyisModule {
+public class ActivityType2ActDurationsAnalyzer extends AbstractAnalysisModule {
 
 	public ActivityType2ActDurationsAnalyzer(String outputDir) {
 		super(ActivityType2ActDurationsAnalyzer.class.getSimpleName());

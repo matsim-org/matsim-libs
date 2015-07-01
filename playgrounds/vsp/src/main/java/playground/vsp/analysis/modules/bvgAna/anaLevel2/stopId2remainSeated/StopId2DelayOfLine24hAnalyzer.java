@@ -33,14 +33,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * 
  * @author ikaddoura
  *
  */
-public class StopId2DelayOfLine24hAnalyzer extends AbstractAnalyisModule{
+public class StopId2DelayOfLine24hAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(StopId2DelayOfLine24hAnalyzer.class);
 	private ScenarioImpl scenario;
 	private StopId2RemainSeatedHandler remainSeatedHandler;

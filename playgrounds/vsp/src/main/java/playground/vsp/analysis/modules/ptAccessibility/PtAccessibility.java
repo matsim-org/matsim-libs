@@ -38,7 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.ptAccessibility.activity.ActivityLocation;
 import playground.vsp.analysis.modules.ptAccessibility.activity.LocationMap;
 import playground.vsp.analysis.modules.ptAccessibility.stops.Circle;
@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * @author droeder
  *
  */
-public class PtAccessibility extends AbstractAnalyisModule {
+public class PtAccessibility extends AbstractAnalysisModule {
 	
 	public static final String MODULENAME = "ptAccessibility";
 

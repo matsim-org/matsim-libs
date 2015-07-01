@@ -37,12 +37,12 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LinkVolumeHandler;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
-public class CountData extends AbstractAnalyisModule {
+public class CountData extends AbstractAnalysisModule {
 
 	private LinkVolumeHandler lvh;
 	private SortedMap<Id<Link>, Double> linkId2Vol;

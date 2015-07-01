@@ -32,14 +32,14 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * 
  * @author ikaddoura
  *
  */
-public class PtDriverIdAnalyzer extends AbstractAnalyisModule{
+public class PtDriverIdAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(PtDriverIdAnalyzer.class);
 	private ScenarioImpl scenario;
 	

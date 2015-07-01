@@ -44,7 +44,7 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 
 import playground.vsp.analysis.VspAnalyzer;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.PtRoutes2PaxAnalysisHandler;
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.TransitLineContainer;
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.TransitRouteContainer;
@@ -53,7 +53,7 @@ import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.TransitRouteContaine
  * @author droeder
  *
  */
-public class PtRoutes2PaxAnalysis extends AbstractAnalyisModule {
+public class PtRoutes2PaxAnalysis extends AbstractAnalysisModule {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger

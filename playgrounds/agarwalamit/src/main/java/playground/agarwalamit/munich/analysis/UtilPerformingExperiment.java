@@ -38,12 +38,12 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.legMode.distributions.LegModeActivityEndTimeAndActDurationHandler;
 import playground.agarwalamit.utils.LoadMyScenarios;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
-public class UtilPerformingExperiment extends AbstractAnalyisModule {
+public class UtilPerformingExperiment extends AbstractAnalysisModule {
 
 	private LegModeActivityEndTimeAndActDurationHandler actDurationUtilHandler;
 	private String eventsFile;

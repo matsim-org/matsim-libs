@@ -34,7 +34,7 @@ import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.act2mode.ActivityToMode;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -46,7 +46,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * adjustment to use Plan Coordinates by gleich
  *
  */
-public class Act2ModeWithPlanCoordAnalysis extends AbstractAnalyisModule {
+public class Act2ModeWithPlanCoordAnalysis extends AbstractAnalysisModule {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger

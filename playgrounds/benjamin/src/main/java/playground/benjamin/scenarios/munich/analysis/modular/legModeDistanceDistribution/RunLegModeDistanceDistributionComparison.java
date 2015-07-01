@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 /**
@@ -68,8 +68,8 @@ public class RunLegModeDistanceDistributionComparison {
 		SortedMap<String, Double> mode2ShareDifference = calculateLegModeShareDifference(initialLegMode2Share, finalLegMode2Share);
 	
 		// begin ugly code...
-		List<AbstractAnalyisModule> anaModules = rlmdd1.getAnalysis().getAnaModules();
-		for(AbstractAnalyisModule anaModule : anaModules){
+		List<AbstractAnalysisModule> anaModules = rlmdd1.getAnalysis().getAnaModules();
+		for(AbstractAnalysisModule anaModule : anaModules){
 			if(anaModule instanceof LegModeDistanceDistribution){
 				((LegModeDistanceDistribution) anaModule).setMode2DistanceClass2LegCount(modeDifference2DistanceClassLegCount);
 				((LegModeDistanceDistribution) anaModule).setMode2Share(mode2ShareDifference);
@@ -83,8 +83,8 @@ public class RunLegModeDistanceDistributionComparison {
 	
 	private static SortedMap<String, Double> getMode2Share(RunLegModeDistanceDistribution rlmdd) {
 		SortedMap<String, Double> mode2Share = null;
-		List<AbstractAnalyisModule> anaModules = rlmdd.getAnalysis().getAnaModules();
-		for(AbstractAnalyisModule anaModule : anaModules){
+		List<AbstractAnalysisModule> anaModules = rlmdd.getAnalysis().getAnaModules();
+		for(AbstractAnalysisModule anaModule : anaModules){
 			if(anaModule instanceof LegModeDistanceDistribution){
 				mode2Share = ((LegModeDistanceDistribution) anaModule).getMode2Share();
 			}
@@ -94,8 +94,8 @@ public class RunLegModeDistanceDistributionComparison {
 
 	private static SortedMap<String, Map<Integer, Integer>> getMode2DistanceClassLegCount(RunLegModeDistanceDistribution rlmdd) {
 		SortedMap<String, Map<Integer, Integer>> mode2DistanceClassLegCount = null;
-		List<AbstractAnalyisModule> anaModules = rlmdd.getAnalysis().getAnaModules();
-		for(AbstractAnalyisModule anaModule : anaModules){
+		List<AbstractAnalysisModule> anaModules = rlmdd.getAnalysis().getAnaModules();
+		for(AbstractAnalysisModule anaModule : anaModules){
 			if(anaModule instanceof LegModeDistanceDistribution){
 				mode2DistanceClassLegCount = ((LegModeDistanceDistribution) anaModule).getMode2DistanceClass2LegCount();
 			}

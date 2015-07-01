@@ -32,13 +32,13 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author droeder
  *
  */
-public class GetPlansSubset extends AbstractAnalyisModule{
+public class GetPlansSubset extends AbstractAnalysisModule{
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(GetPlansSubset.class);

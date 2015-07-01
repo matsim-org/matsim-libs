@@ -42,12 +42,12 @@ import playground.agarwalamit.munich.utils.UserGroupUtilsExtended;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
-public class TravelTimePerUserGroup extends AbstractAnalyisModule {
+public class TravelTimePerUserGroup extends AbstractAnalysisModule {
 
 	public TravelTimePerUserGroup() {
 		super(TravelTimePerUserGroup.class.getSimpleName());

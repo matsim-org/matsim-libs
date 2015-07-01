@@ -39,14 +39,14 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * To get desired part of utility for each person.
  * @author amit
  */
 
-public class UtilityByPartsAnalyzer extends AbstractAnalyisModule {
+public class UtilityByPartsAnalyzer extends AbstractAnalysisModule {
 
 
 	public UtilityByPartsAnalyzer(boolean includeActivitScoring, boolean includeLegScoring, 

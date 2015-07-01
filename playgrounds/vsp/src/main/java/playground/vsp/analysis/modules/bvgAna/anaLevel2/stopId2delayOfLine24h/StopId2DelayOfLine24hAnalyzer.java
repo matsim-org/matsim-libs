@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2RouteId2DelayAtStop.StopId2RouteId2DelayAtStopAnalyzer;
 import playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2RouteId2DelayAtStop.StopId2RouteId2DelayAtStopData;
 
@@ -44,11 +44,11 @@ import playground.vsp.analysis.modules.bvgAna.anaLevel1.stopId2RouteId2DelayAtSt
  * @author ikaddoura, andreas
  *
  */
-public class StopId2DelayOfLine24hAnalyzer extends AbstractAnalyisModule{
+public class StopId2DelayOfLine24hAnalyzer extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(StopId2DelayOfLine24hAnalyzer.class);
 	private ScenarioImpl scenario;
 
-	private List<AbstractAnalyisModule> anaModules = new LinkedList<AbstractAnalyisModule>();
+	private List<AbstractAnalysisModule> anaModules = new LinkedList<AbstractAnalysisModule>();
 	private StopId2RouteId2DelayAtStopAnalyzer stopId2RouteId2DelayAtStopAnalyzer;
 	
 	private TreeMap<Id, StopId2DelayOfLine24hData> stopId2DelayOfLine24hMap;
@@ -68,7 +68,7 @@ public class StopId2DelayOfLine24hAnalyzer extends AbstractAnalyisModule{
 	@Override
 	public List<EventHandler> getEventHandler() {
 		List<EventHandler> allEventHandler = new LinkedList<EventHandler>();
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			for (EventHandler handler : module.getEventHandler()) {
 				allEventHandler.add(handler);
 			}
@@ -79,7 +79,7 @@ public class StopId2DelayOfLine24hAnalyzer extends AbstractAnalyisModule{
 	@Override
 	public void preProcessData() {
 		log.info("Preprocessing all (sub-)modules...");
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			module.preProcessData();
 		}
 		log.info("Preprocessing all (sub-)modules... done.");
@@ -88,7 +88,7 @@ public class StopId2DelayOfLine24hAnalyzer extends AbstractAnalyisModule{
 	@Override
 	public void postProcessData() {
 		log.info("Postprocessing all (sub-)modules...");
-		for (AbstractAnalyisModule module : this.anaModules) {
+		for (AbstractAnalysisModule module : this.anaModules) {
 			module.postProcessData();
 		}
 		log.info("Postprocessing all (sub-)modules... done.");

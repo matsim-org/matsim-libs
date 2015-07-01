@@ -39,12 +39,12 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * @author amit
  */
-public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalyisModule {
+public class LegModeRouteDistanceDistributionAnalyzer extends AbstractAnalysisModule {
 
 	private Scenario scenario;
 	private final List<Integer> distanceClasses;

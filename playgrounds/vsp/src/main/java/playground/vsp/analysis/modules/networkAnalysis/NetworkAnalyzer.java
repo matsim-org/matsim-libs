@@ -38,7 +38,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.networkAnalysis.utils.AccessibilityCalc;
 import playground.vsp.analysis.modules.networkAnalysis.utils.BoundingPolygon;
 import playground.vsp.analysis.modules.networkAnalysis.utils.QGisProjectFileWriter;
@@ -64,7 +64,7 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  * 
  */
 
-public class NetworkAnalyzer extends AbstractAnalyisModule{
+public class NetworkAnalyzer extends AbstractAnalysisModule{
 
 	private Logger log = Logger.getLogger(NetworkAnalyzer.class);
 	

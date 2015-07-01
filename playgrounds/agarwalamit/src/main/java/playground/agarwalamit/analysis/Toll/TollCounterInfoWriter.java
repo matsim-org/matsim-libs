@@ -35,14 +35,14 @@ import playground.agarwalamit.analysis.congestion.CausedDelayAnalyzer;
 import playground.agarwalamit.munich.utils.ExtendedPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * Idea is to write (1) total tolled persons (2) total tolled trips (3) total tolled links for each time bin and for each user group (if applicable).
  * @author amit
  */
 
-public class TollCounterInfoWriter extends AbstractAnalyisModule {
+public class TollCounterInfoWriter extends AbstractAnalysisModule {
 
 	public TollCounterInfoWriter(String eventsFile, Scenario sc, int noOfTimeBins, boolean isSortingForMunich) {
 		super(TollCounterInfoWriter.class.getSimpleName());

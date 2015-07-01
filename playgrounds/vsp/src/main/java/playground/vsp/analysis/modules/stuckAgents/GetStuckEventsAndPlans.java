@@ -28,14 +28,14 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.events.handler.EventHandler;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 import playground.vsp.analysis.modules.plansSubset.GetPlansSubset;
 
 /**
  * @author droeder
  *
  */
-public class GetStuckEventsAndPlans extends AbstractAnalyisModule{
+public class GetStuckEventsAndPlans extends AbstractAnalysisModule{
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger

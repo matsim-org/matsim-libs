@@ -30,7 +30,7 @@ import org.matsim.core.events.handler.EventHandler;
  * @author aneumann
  *
  */
-public abstract class AbstractAnalyisModule {
+public abstract class AbstractAnalysisModule {
 	
 	private final String name;
 	
@@ -38,7 +38,7 @@ public abstract class AbstractAnalyisModule {
 	 * 
 	 * @param name The name of the module.
 	 */
-	public AbstractAnalyisModule(String name){
+	public AbstractAnalysisModule(String name){
 		this.name = name;
 	}
 	

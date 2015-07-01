@@ -36,7 +36,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * This module requires a scenario with emission specific informations set in the VspExperimentalConfigGroup.
@@ -45,7 +45,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author ikaddoura, benjamin
  *
  */
-public class EmissionEventsWriter extends AbstractAnalyisModule{
+public class EmissionEventsWriter extends AbstractAnalysisModule{
 	private final static Logger log = Logger.getLogger(EmissionEventsWriter.class);
 	private ScenarioImpl scenario;
 	private EmissionModule emissionModule;

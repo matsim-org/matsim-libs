@@ -38,7 +38,7 @@ import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
  * A simple analysis-class for a very basic MATSim-Scenario, i.e it should be used 
@@ -48,7 +48,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author droeder
  *
  */
-public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
+public class SimpleTripAnalyzerModule extends AbstractAnalysisModule{
 
 	private SimpleTripAnalyzer analyzer;
 	private Population p;

@@ -38,7 +38,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.LineString;
 /**
  * @author droeder
  */
-public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
+public class PtPaxVolumesAnalyzer extends AbstractAnalysisModule{
 
 	private PtPaxVolumesHandler handler;
 	private Scenario sc;
