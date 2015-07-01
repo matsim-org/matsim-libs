@@ -71,6 +71,7 @@ final class PBox implements Operators {
 	private final PStrategyManager strategyManager = new PStrategyManager();
 	
 	private final WelfareAnalyzer welfareAnalyzer;
+	private final WelfareStatsContainer welfareStats;
 
 	private final TicketMachine ticketMachine;
 
@@ -89,6 +90,9 @@ final class PBox implements Operators {
 			log.info("Objective Function: Operator Profit");
 			this.welfareAnalyzer = null;
 		}
+		
+		this.welfareStats = new WelfareStatsContainer(pConfig, this.welfareAnalyzer);
+		
 	}
 
 	void notifyStartup(StartupEvent event) {
@@ -180,6 +184,8 @@ final class PBox implements Operators {
 		for (Operator operator : this.operators) {
 			operator.score(driverId2ScoreMap);
 		}
+		
+		this.welfareStats.run(event, this.operators);
 		
 		// why is the following done twice (see notifyIterationstarts)?
 		this.pTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
