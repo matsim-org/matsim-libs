@@ -37,7 +37,7 @@ import javax.inject.Inject;
  *
  * @author mrieser
  */
-public final class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
+final class LegHistogramListener implements IterationEndsListener, IterationStartsListener {
 
 	private final LegHistogram histogram;
 	private final boolean outputGraph;

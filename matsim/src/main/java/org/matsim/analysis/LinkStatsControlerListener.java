@@ -19,8 +19,6 @@
 
 package org.matsim.analysis;
 
-import org.matsim.analysis.CalcLinkStats;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -37,7 +35,7 @@ import javax.inject.Provider;
 /**
  * @author mrieser
  */
-public final class LinkStatsControlerListener implements IterationEndsListener, IterationStartsListener {
+final class LinkStatsControlerListener implements IterationEndsListener, IterationStartsListener {
 
 	private final LinkStatsConfigGroup linkStatsConfigGroup;
     private final Config config;
@@ -49,7 +47,7 @@ public final class LinkStatsControlerListener implements IterationEndsListener, 
 	private boolean doReset = false;
 
     @Inject
-    public LinkStatsControlerListener(Config config, OutputDirectoryHierarchy controlerIO, CalcLinkStats linkStats, VolumesAnalyzer volumes, Provider<TravelTime> travelTime) {
+    LinkStatsControlerListener(Config config, OutputDirectoryHierarchy controlerIO, CalcLinkStats linkStats, VolumesAnalyzer volumes, Provider<TravelTime> travelTime) {
         this.config = config;
         this.controlerIO = controlerIO;
         this.linkStats = linkStats;

@@ -28,7 +28,7 @@ import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;
 
-public class LegTimesControlerListener implements AfterMobsimListener {
+class LegTimesControlerListener implements AfterMobsimListener {
 
 	private static Logger log = Logger.getLogger(LegTimesControlerListener.class);
 	
@@ -37,7 +37,7 @@ public class LegTimesControlerListener implements AfterMobsimListener {
 	private OutputDirectoryHierarchy controlerIO;
 	
 	@Inject
-    public LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO) {
+    LegTimesControlerListener(CalcLegTimes legTimes, OutputDirectoryHierarchy controlerIO) {
 		this.legTimes = legTimes;
 		this.controlerIO = controlerIO;
 	}
