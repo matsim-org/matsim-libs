@@ -17,12 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.controler.corelisteners;
+package org.matsim.analysis;
 
 import com.google.inject.Provider;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.analysis.LinkStatsControlerListener;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -36,7 +37,6 @@ import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;

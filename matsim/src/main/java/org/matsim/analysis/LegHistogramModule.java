@@ -20,9 +20,8 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.core.controler.corelisteners;
+package org.matsim.analysis;
 
-import org.matsim.analysis.LegHistogram;
 import org.matsim.core.controler.AbstractModule;
 
 public final class LegHistogramModule extends AbstractModule {

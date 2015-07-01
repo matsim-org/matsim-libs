@@ -20,10 +20,9 @@
  *  * ***********************************************************************
  */
 
-package org.matsim.core.controler.corelisteners;
+package org.matsim.analysis;
 
 import com.google.inject.Singleton;
-import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;

@@ -46,7 +46,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton
-public final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener, 
+final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 	AfterMobsimListener, IterationEndsListener, ShutdownListener {
 
 	final static private Logger log = Logger.getLogger(EventsHandlingImpl.class);
@@ -61,21 +61,13 @@ public final class EventsHandlingImpl implements EventsHandling, BeforeMobsimLis
 	private OutputDirectoryHierarchy controlerIO ;
 
 	@Inject
-	public EventsHandlingImpl(
+	EventsHandlingImpl(
 			final EventsManager eventsManager,
 			final Config config,
 			final OutputDirectoryHierarchy controlerIO ) {
 		this.eventsManager = eventsManager ;
 		this.writeEventsInterval = config.controler().getWriteEventsInterval();
 		this.eventsFileFormats = config.controler().getEventsFileFormats();
-		this.controlerIO = controlerIO ;
-	}
-
-	public EventsHandlingImpl(EventsManager eventsManager, int writeEventsInterval, Set<EventsFileFormat> eventsFileFormats,
-			OutputDirectoryHierarchy controlerIO ) {
-		this.eventsManager = eventsManager ;
-		this.writeEventsInterval = writeEventsInterval ;
-		this.eventsFileFormats = eventsFileFormats ;
 		this.controlerIO = controlerIO ;
 	}
 

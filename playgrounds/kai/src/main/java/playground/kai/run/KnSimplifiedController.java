@@ -127,10 +127,10 @@ public class KnSimplifiedController extends AbstractController {
 
 		this.addCoreControlerListener(new LegTimesControlerListener(legTimes, getControlerIO()));
 		
-		final EventsHandling eventsHandling = new EventsHandlingImpl(events,
-				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
-				getControlerIO() );
-		this.addCoreControlerListener(eventsHandling); 
+//		final EventsHandling eventsHandling = new EventsHandlingImpl(events,
+//				this.config.controler().getWriteEventsInterval(), this.config.controler().getEventsFileFormats(),
+//				getControlerIO() );
+//		this.addCoreControlerListener(eventsHandling);
 		// must be last being added (=first being executed)
 		throw new RuntimeException("This doesn't work anymore. Come to MZ, who will gladly help you repair it.");
 

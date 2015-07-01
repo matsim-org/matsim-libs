@@ -18,12 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.controler.corelisteners;
+package org.matsim.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.LegHistogram;
-import org.matsim.analysis.LegHistogramChart;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
