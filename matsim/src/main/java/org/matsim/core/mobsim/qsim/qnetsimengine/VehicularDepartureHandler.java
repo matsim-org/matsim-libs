@@ -120,7 +120,12 @@ class VehicularDepartureHandler implements DepartureHandler {
 				}
 			}
 			QLinkInternalI qlinkOld = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(vehicle.getCurrentLink().getId());
-			qlinkOld.removeParkedVehicle(vehicle.getId());
+			QVehicle result = qlinkOld.removeParkedVehicle(vehicle.getId());
+			if ( result==null ) {
+				throw new RuntimeException( "could not remove parked vehicle.  Maybe it is currently used by someone else?"
+						+ " (In which case ignoring this exception would lead to duplication of this vehicle.) "
+						+ "Maybe was never placed onto a link?" );
+			}
 		}
 	}
 

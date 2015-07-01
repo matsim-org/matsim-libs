@@ -132,26 +132,30 @@ public class QNetsimEngine implements MobsimEngine {
 
 		// configuring the car departure hander (including the vehicle behavior)
 		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
-		VehicleBehavior vehicleBehavior;
-		if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VehicleBehavior.exception)) {
-			vehicleBehavior = VehicleBehavior.exception;
-		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VehicleBehavior.teleport)) {
-			vehicleBehavior = VehicleBehavior.teleport;
-		} else if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VehicleBehavior.wait)) {
-			vehicleBehavior = VehicleBehavior.wait ;
-		} else {
-			throw new RuntimeException("Unknown vehicle behavior option.");
+
+		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior() ;
+		switch( vehicleBehavior ) {
+		case exception:
+		case teleport:
+		case wait:
+			break;
+		default:
+			throw new RuntimeException("Unknown vehicle behavior option.");			
 		}
 		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior);
-
-		if ( QSimConfigGroup.TrafficDynamics.queue.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+		
+		switch( qsimConfigGroup.getTrafficDynamics() ) {
+		case queue:
 			QueueWithBuffer.HOLES=false ;
-		} else if ( QSimConfigGroup.TrafficDynamics.withHoles.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
+			break;
+		case withHoles:
 			QueueWithBuffer.HOLES = true ;
-		} else {
+			break;
+		default:
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ qsimConfigGroup.getTrafficDynamics() ) ;
 		}
+
 		if ( QSimConfigGroup.SnapshotStyle.withHoles.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
 			QueueWithBuffer.VIS_HOLES = true ;
 		}
@@ -179,12 +183,12 @@ public class QNetsimEngine implements MobsimEngine {
 		} else if ( qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ) {
 			network = new QNetwork(sim.getScenario().getNetwork(), new NetsimNetworkFactory<QNode, QLinkImpl>() {
 				@Override
-				public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
-					return new QLinkImpl(link, network, toQueueNode, new PassingVehicleQ());
+				public QLinkImpl createNetsimLink(final Link link, final QNetwork network2, final QNode toQueueNode) {
+					return new QLinkImpl(link, network2, toQueueNode, new PassingVehicleQ());
 				}
 				@Override
-				public QNode createNetsimNode(final Node node, QNetwork network) {
-					return new QNode(node, network);
+				public QNode createNetsimNode(final Node node, QNetwork network2) {
+					return new QNode(node, network2);
 				}
 			});
 		} else {
