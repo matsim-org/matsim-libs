@@ -13,6 +13,7 @@ import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
@@ -104,8 +105,6 @@ public class TtCreateBraessSignals {
 	 * lanes and links, the signals are located on or lead to, depend.
 	 */
 	private void createSignalSystems() {
-
-		// TODO add turning move restrictions if lanesUsed false. change signalutils??
 		
 		SignalsData signalsData = (SignalsData) this.scenario
 				.getScenarioElement(SignalsData.ELEMENT_NAME);
@@ -116,13 +115,29 @@ public class TtCreateBraessSignals {
 		SignalSystemData signalSystem = fac.createSignalSystemData(Id.create(
 				"signalSystem2", SignalSystem.class));
 
-		SignalUtils.createAndAddSignal(signalSystem, fac,
-				Id.create("signal1_2.1", Signal.class), Id.createLinkId("1_2"),
-				Arrays.asList(Id.create("1_2.1", Lane.class)));
+		SignalData signal = fac.createSignalData(Id.create("signal1_2.1",
+				Signal.class));
+		signal.setLinkId(Id.createLinkId("1_2"));
+		if (this.lanesUsed) {
+			signal.addLaneId(Id.create("1_2.1", Lane.class));
+		} else { // no lanes used. turning move restrictions necessary
+			if (this.simulateInflowCap7) {
+				signal.addTurningMoveRestriction(Id.createLinkId("2_7"));
+			} else {
+				signal.addTurningMoveRestriction(Id.createLinkId("2_3"));
+			}
+		}
+		signalSystem.addSignalData(signal);
 
-		SignalUtils.createAndAddSignal(signalSystem, fac,
-				Id.create("signal1_2.2", Signal.class), Id.createLinkId("1_2"),
-				Arrays.asList(Id.create("1_2.2", Lane.class)));
+		signal = fac.createSignalData(Id.create("signal1_2.2",
+				Signal.class));
+		signal.setLinkId(Id.createLinkId("1_2"));
+		if (this.lanesUsed) {
+			signal.addLaneId(Id.create("1_2.2", Lane.class));
+		} else { // no lanes used. turning move restrictions necessary
+			signal.addTurningMoveRestriction(Id.createLinkId("2_4"));
+		}
+		signalSystem.addSignalData(signal);
 
 		signalSystems.addSignalSystemData(signalSystem);
 
@@ -131,21 +146,45 @@ public class TtCreateBraessSignals {
 				SignalSystem.class));
 
 		if (simulateInflowCap7) {
-			SignalUtils.createAndAddSignal(signalSystem, fac,
-					Id.create("signal7_3.1", Signal.class), Id.createLinkId("7_3"),
-					Arrays.asList(Id.create("7_3.1", Lane.class)));
+			signal = fac.createSignalData(Id.create("signal7_3.1",
+					Signal.class));
+			signal.setLinkId(Id.createLinkId("7_3"));
+			if (this.lanesUsed) {
+				signal.addLaneId(Id.create("7_3.1", Lane.class));
+			} else { // no lanes used. turning move restrictions necessary
+				signal.addTurningMoveRestriction(Id.createLinkId("3_5"));
+			}
+			signalSystem.addSignalData(signal);
 
-			SignalUtils.createAndAddSignal(signalSystem, fac,
-					Id.create("signal7_3.2", Signal.class), Id.createLinkId("7_3"),
-					Arrays.asList(Id.create("7_3.2", Lane.class)));
-		} else {
-			SignalUtils.createAndAddSignal(signalSystem, fac,
-					Id.create("signal2_3.1", Signal.class), Id.createLinkId("2_3"),
-					Arrays.asList(Id.create("2_3.1", Lane.class)));
+			signal = fac.createSignalData(Id.create("signal7_3.2",
+					Signal.class));
+			signal.setLinkId(Id.createLinkId("7_3"));
+			if (this.lanesUsed) {
+				signal.addLaneId(Id.create("7_3.2", Lane.class));
+			} else { // no lanes used. turning move restrictions necessary
+				signal.addTurningMoveRestriction(Id.createLinkId("3_4"));
+			}
+			signalSystem.addSignalData(signal);
+		} else { // no inflow capacity simulated at link 2_3
+			signal = fac.createSignalData(Id.create("signal2_3.1",
+					Signal.class));
+			signal.setLinkId(Id.createLinkId("2_3"));
+			if (this.lanesUsed) {
+				signal.addLaneId(Id.create("2_3.1", Lane.class));
+			} else { // no lanes used. turning move restrictions necessary
+				signal.addTurningMoveRestriction(Id.createLinkId("3_5"));
+			}
+			signalSystem.addSignalData(signal);
 
-			SignalUtils.createAndAddSignal(signalSystem, fac,
-					Id.create("signal2_3.2", Signal.class), Id.createLinkId("2_3"),
-					Arrays.asList(Id.create("2_3.2", Lane.class)));
+			signal = fac.createSignalData(Id.create("signal2_3.2",
+					Signal.class));
+			signal.setLinkId(Id.createLinkId("2_3"));
+			if (this.lanesUsed) {
+				signal.addLaneId(Id.create("2_3.2", Lane.class));
+			} else { // no lanes used. turning move restrictions necessary
+				signal.addTurningMoveRestriction(Id.createLinkId("3_4"));
+			}
+			signalSystem.addSignalData(signal);
 		}
 
 		signalSystems.addSignalSystemData(signalSystem);
