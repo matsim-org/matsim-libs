@@ -19,25 +19,24 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.utils;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.lanes.data.v20.Lane;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.lanes.data.v20.Lane;
 
 /**
  * @author dgrether
  * 
  */
 public class SignalUtils {
-
-	private SignalUtils() {
-	}
 
 	/**
 	 * Creates a SignalGroupData instance for each SignalData instance of the
@@ -70,7 +69,7 @@ public class SignalUtils {
 	 */
 	public static void createAndAddSignal(SignalSystemData sys,
 			SignalSystemsDataFactory factory, Id<Signal> signalId,
-			Id<Link> linkId, Id<Lane>... laneIds) {
+			Id<Link> linkId, List<Id<Lane>> laneIds) {
 		
 		SignalData signal = factory.createSignalData(signalId);
 		sys.addSignalData(signal);

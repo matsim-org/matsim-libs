@@ -3,6 +3,8 @@
  */
 package scenarios.braess.createInput;
 
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -11,7 +13,6 @@ import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataFactoryImpl;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
-import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
@@ -106,20 +107,11 @@ public class TtCreateBraessSignals {
 
 		SignalUtils.createAndAddSignal(signalSystem, fac,
 				Id.create("signal1_2.1", Signal.class), Id.createLinkId("1_2"),
-				Id.create("1_2.1", Lane.class));
-//		SignalData signal = fac.createSignalData(Id.create("signal1_2.1",
-//				Signal.class));
-//		signal.setLinkId(Id.createLinkId("1_2"));
-//		signal.addLaneId(Id.create("1_2.1", Lane.class));
-//		signalSystem.addSignalData(signal);
+				Arrays.asList(Id.create("1_2.1", Lane.class)));
 
 		SignalUtils.createAndAddSignal(signalSystem, fac,
 				Id.create("signal1_2.2", Signal.class), Id.createLinkId("1_2"),
-				Id.create("1_2.2", Lane.class));
-//		signal = fac.createSignalData(Id.create("signal1_2.2", Signal.class));
-//		signal.setLinkId(Id.createLinkId("1_2"));
-//		signal.addLaneId(Id.create("1_2.2", Lane.class));
-//		signalSystem.addSignalData(signal);
+				Arrays.asList(Id.create("1_2.2", Lane.class)));
 
 		signalSystems.addSignalSystemData(signalSystem);
 
@@ -130,39 +122,19 @@ public class TtCreateBraessSignals {
 		if (simulateInflowCap7) {
 			SignalUtils.createAndAddSignal(signalSystem, fac,
 					Id.create("signal7_3.1", Signal.class), Id.createLinkId("7_3"),
-					Id.create("7_3.1", Lane.class));
-//			signal = fac.createSignalData(Id
-//					.create("signal7_3.1", Signal.class));
-//			signal.setLinkId(Id.createLinkId("7_3"));
-//			signal.addLaneId(Id.create("7_3.1", Lane.class));
-//			signalSystem.addSignalData(signal);
+					Arrays.asList(Id.create("7_3.1", Lane.class)));
 
 			SignalUtils.createAndAddSignal(signalSystem, fac,
 					Id.create("signal7_3.2", Signal.class), Id.createLinkId("7_3"),
-					Id.create("7_3.2", Lane.class));
-//			signal = fac.createSignalData(Id
-//					.create("signal7_3.2", Signal.class));
-//			signal.setLinkId(Id.createLinkId("7_3"));
-//			signal.addLaneId(Id.create("7_3.2", Lane.class));
-//			signalSystem.addSignalData(signal);
+					Arrays.asList(Id.create("7_3.2", Lane.class)));
 		} else {
 			SignalUtils.createAndAddSignal(signalSystem, fac,
 					Id.create("signal2_3.1", Signal.class), Id.createLinkId("2_3"),
-					Id.create("2_3.1", Lane.class));
-//			signal = fac.createSignalData(Id
-//					.create("signal2_3.1", Signal.class));
-//			signal.setLinkId(Id.createLinkId("2_3"));
-//			signal.addLaneId(Id.create("2_3.1", Lane.class));
-//			signalSystem.addSignalData(signal);
+					Arrays.asList(Id.create("2_3.1", Lane.class)));
 
 			SignalUtils.createAndAddSignal(signalSystem, fac,
 					Id.create("signal2_3.2", Signal.class), Id.createLinkId("2_3"),
-					Id.create("2_3.2", Lane.class));
-//			signal = fac.createSignalData(Id
-//					.create("signal2_3.2", Signal.class));
-//			signal.setLinkId(Id.createLinkId("2_3"));
-//			signal.addLaneId(Id.create("2_3.2", Lane.class));
-//			signalSystem.addSignalData(signal);			
+					Arrays.asList(Id.create("2_3.2", Lane.class)));
 		}
 
 		signalSystems.addSignalSystemData(signalSystem);
@@ -172,16 +144,10 @@ public class TtCreateBraessSignals {
 				SignalSystem.class));
 
 		SignalUtils.createAndAddSignal(signalSystem, fac,
-				Id.create("signal2_4", Signal.class), Id.createLinkId("2_4"));
-//		signal = fac.createSignalData(Id.create("signal2_4", Signal.class));
-//		signal.setLinkId(Id.createLinkId("2_4"));
-//		signalSystem.addSignalData(signal);
+				Id.create("signal2_4", Signal.class), Id.createLinkId("2_4"), null);
 
 		SignalUtils.createAndAddSignal(signalSystem, fac,
-				Id.create("signal3_4", Signal.class), Id.createLinkId("3_4"));
-//		signal = fac.createSignalData(Id.create("signal3_4", Signal.class));
-//		signal.setLinkId(Id.createLinkId("3_4"));
-//		signalSystem.addSignalData(signal);
+				Id.create("signal3_4", Signal.class), Id.createLinkId("3_4"), null);
 
 		signalSystems.addSignalSystemData(signalSystem);
 
@@ -190,23 +156,16 @@ public class TtCreateBraessSignals {
 				SignalSystem.class));
 
 		SignalUtils.createAndAddSignal(signalSystem, fac,
-				Id.create("signal3_5", Signal.class), Id.createLinkId("3_5"));
-//		signal = fac.createSignalData(Id.create("signal3_5", Signal.class));
-//		signal.setLinkId(Id.createLinkId("3_5"));
-//		signalSystem.addSignalData(signal);
+				Id.create("signal3_5", Signal.class), Id.createLinkId("3_5"), null);
 
 		if (this.simulateInflowCap9) {
 			SignalUtils.createAndAddSignal(signalSystem, fac,
-					Id.create("signal9_5", Signal.class), Id.createLinkId("9_5"));
-//			signal = fac.createSignalData(Id.create("signal9_5", Signal.class));
-//			signal.setLinkId(Id.createLinkId("9_5"));
-//			signalSystem.addSignalData(signal);
+					Id.create("signal9_5", Signal.class),
+					Id.createLinkId("9_5"), null);
 		} else {
 			SignalUtils.createAndAddSignal(signalSystem, fac,
-					Id.create("signal4_5", Signal.class), Id.createLinkId("4_5"));
-//			signal = fac.createSignalData(Id.create("signal4_5", Signal.class));
-//			signal.setLinkId(Id.createLinkId("4_5"));
-//			signalSystem.addSignalData(signal);
+					Id.create("signal4_5", Signal.class),
+					Id.createLinkId("4_5"), null);
 		}
 
 		signalSystems.addSignalSystemData(signalSystem);
