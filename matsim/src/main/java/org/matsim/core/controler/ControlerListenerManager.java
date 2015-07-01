@@ -33,7 +33,7 @@ import javax.swing.event.EventListenerList;
  *
  * @author dgrether
  */
-public final class ControlerListenerManager implements MatsimManager {
+final class ControlerListenerManager implements MatsimManager {
 
 	private final static Logger log = Logger.getLogger(ControlerListenerManager.class);
 

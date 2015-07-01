@@ -2,7 +2,6 @@ package playground.wrashid.tryouts.performance;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.matsim.core.events.ConcurrentListSPSC;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 
 
