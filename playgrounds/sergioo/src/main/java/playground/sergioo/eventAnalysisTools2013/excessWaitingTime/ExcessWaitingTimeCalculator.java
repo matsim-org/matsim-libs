@@ -1,5 +1,7 @@
 package playground.sergioo.eventAnalysisTools2013.excessWaitingTime;
 
+/*import java.io.FileNotFoundException;
+import java.io.PrintWriter;*/
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,13 +67,15 @@ public class ExcessWaitingTimeCalculator implements Serializable, PersonDepartur
 	}
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Double startWaitingTime = agentsWaitingData.get(event.getPersonId());
-		if(startWaitingTime!=null) {
-			double waitTime = event.getTime()-startWaitingTime;
-			Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>> keyStopLineRoute = new Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>(stopOfVehicle.get(event.getVehicleId()), linesRoutesNumVehicle.get(event.getVehicleId()));
-			List<Collection<Double>> waitTimesCollections = waitTimes.get(keyStopLineRoute);
-			waitTimesCollections.get(waitTimesCollections.size()-1).add(waitTime);
-			agentsWaitingData.remove(event.getPersonId());
+		if(event.getTime()<26*3600) {
+			Double startWaitingTime = agentsWaitingData.get(event.getPersonId());
+			if(startWaitingTime!=null) {
+				double waitTime = event.getTime()-startWaitingTime;
+				Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>> keyStopLineRoute = new Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>(stopOfVehicle.get(event.getVehicleId()), linesRoutesNumVehicle.get(event.getVehicleId()));
+				List<Collection<Double>> waitTimesCollections = waitTimes.get(keyStopLineRoute);
+				waitTimesCollections.get(waitTimesCollections.size()-1).add(waitTime);
+				agentsWaitingData.remove(event.getPersonId());
+			}
 		}
 	}
 	@Override
@@ -81,26 +85,28 @@ public class ExcessWaitingTimeCalculator implements Serializable, PersonDepartur
 	}
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		Tuple<Id<TransitLine>, Id<TransitRoute>> linesRoute = linesRoutesNumVehicle.get(event.getVehicleId());
-		if(linesRoute!=null) {
-			stopOfVehicle.put(event.getVehicleId(), event.getFacilityId());
-			Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>> keyStopLineRoute = new Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>(event.getFacilityId(), linesRoute);
-			Double previousTime = timeOfStopLineRoute.get(keyStopLineRoute);
-			if(previousTime!=null) {
-				List<Double> headwaysList = headways.get(keyStopLineRoute);
-				if(headwaysList==null) {
-					headwaysList = new ArrayList<Double>();
-					headways.put(keyStopLineRoute, headwaysList);
+		if(event.getTime()<26*3600) {
+			Tuple<Id<TransitLine>, Id<TransitRoute>> linesRoute = linesRoutesNumVehicle.get(event.getVehicleId());
+			if(linesRoute!=null) {
+				stopOfVehicle.put(event.getVehicleId(), event.getFacilityId());
+				Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>> keyStopLineRoute = new Tuple<Id<TransitStopFacility>, Tuple<Id<TransitLine>, Id<TransitRoute>>>(event.getFacilityId(), linesRoute);
+				Double previousTime = timeOfStopLineRoute.get(keyStopLineRoute);
+				if(previousTime!=null) {
+					List<Double> headwaysList = headways.get(keyStopLineRoute);
+					if(headwaysList==null) {
+						headwaysList = new ArrayList<Double>();
+						headways.put(keyStopLineRoute, headwaysList);
+					}
+					headwaysList.add(event.getTime()-previousTime);
 				}
-				headwaysList.add(event.getTime()-previousTime);
+				timeOfStopLineRoute.put(keyStopLineRoute, event.getTime());
+				List<Collection<Double>> waitTimesCollections = waitTimes.get(keyStopLineRoute);
+				if(waitTimesCollections==null) {
+					waitTimesCollections = new ArrayList<Collection<Double>>();
+					waitTimes.put(keyStopLineRoute, waitTimesCollections);
+				}
+				waitTimesCollections.add(new ArrayList<Double>());
 			}
-			timeOfStopLineRoute.put(keyStopLineRoute, event.getTime());
-			List<Collection<Double>> waitTimesCollections = waitTimes.get(keyStopLineRoute);
-			if(waitTimesCollections==null) {
-				waitTimesCollections = new ArrayList<Collection<Double>>();
-				waitTimes.put(keyStopLineRoute, waitTimesCollections);
-			}
-			waitTimesCollections.add(new ArrayList<Double>());
 		}
 	}
 	public double getAverageWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, Mode mode) {
@@ -145,7 +151,8 @@ public class ExcessWaitingTimeCalculator implements Serializable, PersonDepartur
 			throw new RuntimeException("Stop doesn't belong to the given line-route");
 		SortedMap<Double, Departure> sortedDepartures = new TreeMap<Double, Departure>();
 		for(Departure departure:route.getDepartures().values())
-			sortedDepartures.put(departure.getDepartureTime(), departure);
+			if(departure.getDepartureTime()<26*3600)
+				sortedDepartures.put(departure.getDepartureTime(), departure);
 		Iterator<Departure> it;
 		double pDeparture, cDeparture;
 		switch(mode) {
@@ -158,6 +165,43 @@ public class ExcessWaitingTimeCalculator implements Serializable, PersonDepartur
 				pDeparture = cDeparture;
 				sum += headway;
 			}
+			/*if(Integer.parseInt(stopId.toString())==1229) {
+				try {
+					average=0; sum=0;
+					PrintWriter writer = new PrintWriter("./data/testWhy1.csv");
+					it = sortedDepartures.values().iterator();
+					pDeparture = it.next().getDepartureTime();
+					for(double headway:headways.get(key)) {
+						cDeparture = it.next().getDepartureTime();
+						writer.println(pDeparture+","+cDeparture+","+headway+","+(cDeparture-pDeparture)+","+(headway*(headway/2-(cDeparture-pDeparture)/2))+","+average+","+sum);
+						average += headway*(headway/2-(cDeparture-pDeparture)/2);
+						pDeparture = cDeparture;
+						sum += headway;
+					}
+					writer.close();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			else if(Integer.parseInt(stopId.toString())==1329) {
+				try {
+					PrintWriter writer = new PrintWriter("./data/testWhy2.csv");
+					it = sortedDepartures.values().iterator();
+					pDeparture = it.next().getDepartureTime();
+					for(double headway:headways.get(key)) {
+						cDeparture = it.next().getDepartureTime();
+						writer.println(pDeparture+","+cDeparture+","+headway+","+(cDeparture-pDeparture)+","+(headway*(headway/2-(cDeparture-pDeparture)/2))+","+average+","+sum);
+						average += headway*(headway/2-(cDeparture-pDeparture)/2);
+						pDeparture = cDeparture;
+						sum += headway;
+					}
+					writer.close();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}*/
 			return average/sum;
 		case NUM_PEOPLE_WEIGHT:
 			List<Collection<Double>> waitTimeCollections = waitTimes.get(key);
