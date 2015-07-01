@@ -158,7 +158,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		
 		TtCreateBraessPopulation popCreator = new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
-		popCreator.createPersons( numberOfInitialRoutes );
+		popCreator.createPersons( numberOfInitialRoutes , null);
 	}
 
 	
