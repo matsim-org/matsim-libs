@@ -156,6 +156,7 @@ class SurrogateSolutionEstimator {
 			// >>>>>>>>>> TODO NEW >>>>>>>>>>
 			noMoreImprovement = true;
 			System.out.print(".");
+			if (alphas.isNaN()) { System.out.println(alphas); }
 			// <<<<<<<<<< TODO NEW <<<<<<<<<<
 
 			for (int l = 1; l < alphas.size(); l++) {

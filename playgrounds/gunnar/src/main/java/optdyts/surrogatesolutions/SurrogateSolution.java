@@ -49,7 +49,7 @@ public class SurrogateSolution<X extends SimulatorState, U extends DecisionVaria
 
 	// CONSTANTS
 
-	private final double zeroRegularizationScale = 0.0;
+	private final double regularizationScale = 1e-3;
 
 	// PARAMETERS
 
@@ -303,7 +303,7 @@ public class SurrogateSolution<X extends SimulatorState, U extends DecisionVaria
 			// }
 
 			this.properties = SurrogateSolutionEstimator.computeProperties(
-					transitionList, this.zeroRegularizationScale,
+					transitionList, this.regularizationScale,
 					this.minimumAverageIterations);
 		}
 

@@ -10,18 +10,16 @@ import optdyts.ObjectiveFunction;
 class TwoRoutesObjectiveFunction implements
 		ObjectiveFunction<TwoRoutesSimulatorState> {
 
-	private final double vot = 1.0;
-	
-	private final double damage1;
+	private final double eta;
 
-	TwoRoutesObjectiveFunction(final double damage1) {
-		this.damage1 = damage1;
+	TwoRoutesObjectiveFunction(final double eta) {
+		this.eta = eta;
 	}
 
 	@Override
 	public double evaluateState(final TwoRoutesSimulatorState state) {
-		return -(this.vot * state.getTotalTT() + (this.damage1 + state
-				.getToll1()) * state.getFlow1());
+		return state.getFlow1() * state.getTT1() + state.getFlow2()
+				* state.getTT2() + state.getFlow1() * this.eta;
 	}
 
 }

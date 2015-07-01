@@ -11,21 +11,21 @@ class TwoRoutesDecisionVariable implements DecisionVariable {
 
 	private final TwoRoutes twoRoutes;
 
-	private final double toll1;
+	private final double theta;
 
-	TwoRoutesDecisionVariable(final TwoRoutes twoRoutes, final double toll1) {
+	TwoRoutesDecisionVariable(final TwoRoutes twoRoutes, final double theta) {
 		this.twoRoutes = twoRoutes;
-		this.toll1 = toll1;
+		this.theta = theta;
 	}
 
 	@Override
 	public void implementInSimulation() {
-		this.twoRoutes.setToll(this.toll1);
+		this.twoRoutes.setToll(this.theta);
 	}
-	
+
 	@Override
 	public String toString() {
-		return "toll=" + this.toll1;
+		return "toll=" + this.theta;
 	}
 
 }
