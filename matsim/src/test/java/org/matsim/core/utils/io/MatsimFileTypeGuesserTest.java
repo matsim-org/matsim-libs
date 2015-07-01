@@ -105,7 +105,7 @@ public class MatsimFileTypeGuesserTest {
 
 	@Test
 	public void testLaneDefinitionsV11XML() throws IOException {
-		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/lanes/LaneDefinitionsReaderWriterTest/testLaneDefinitions_v1.1.xml");
+		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/input/org/matsim/lanes/data/v20/LaneDefinitionsReaderWriterTest/testLaneDefinitions_v1.1.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.LaneDefinitions, g.getGuessedFileType());
 		assertNull(g.getPublicId());
 		assertNotNull(g.getSystemId());
