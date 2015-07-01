@@ -34,10 +34,12 @@ import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
+import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 /**
  * @author dgrether
+ * @author tthunig
  * 
  */
 public final class LanesUtils {
@@ -45,11 +47,19 @@ public final class LanesUtils {
 	private static final LaneFromLinkEndComparator fromLinkEndComparator = new LaneFromLinkEndComparator();
 	
 	/**
-	 * Convenience method to create a Lane with the given Id, the given length, the given number of represented
-	 * lanes and the given Ids of the downstream links the lane leads to. The Lane is added to the LanesToLinkAssignment
-	 * given as parameter.
+	 * Convenience method to create a format 11 lane with the given Id, the
+	 * given length, the given number of represented lanes and the given Ids of
+	 * the downstream links the lane leads to. The Lane is added to the
+	 * LanesToLinkAssignment given as parameter.
+	 * 
+	 * @param l2l
+	 * @param factory
+	 * @param laneId
+	 * @param length
+	 * @param noLanes
+	 * @param toLinkIds
 	 */
-	public static void createAndAddLane(LanesToLinkAssignment11 l2l, LaneDefinitionsFactory11 factory, Id<Lane> laneId, 
+	public static void createAndAddLane11(LanesToLinkAssignment11 l2l, LaneDefinitionsFactory11 factory, Id<Lane> laneId, 
 			double length, 	double noLanes, Id<Link>... toLinkIds) {
 		LaneData11 lane = factory.createLane(laneId);
 		for (Id<Link> toLinkId : toLinkIds) {
@@ -57,6 +67,48 @@ public final class LanesUtils {
 		}
 		lane.setStartsAtMeterFromLinkEnd(length);
 		lane.setNumberOfRepresentedLanes(noLanes);
+		l2l.addLane(lane);
+	}
+	
+	/**
+	 * Convenience method to create a format 20 lane with the given Id, the given length,
+	 * the given capacity, the given number of represented lanes, the given
+	 * alignment and the given Ids of the downstream links or lanes, respectively,
+	 * the lane leads to. The lane is added to the LanesToLinkAssignment given
+	 * as parameter.
+	 * 
+	 * @param l2l
+	 *            the LanesToLinkAssignment to that the created lane is added
+	 * @param factory
+	 *            a LaneDefinitionsFactory20 to create the lane
+	 * @param laneId
+	 * @param capacity
+	 * @param startsAtMeterFromLinkEnd
+	 * @param alignment
+	 * @param numberOfRepresentedLanes
+	 * @param toLinkIds
+	 * @param toLaneIds
+	 */
+	public static void createAndAddLane20(LanesToLinkAssignment20 l2l,
+			LaneDefinitionsFactory20 factory, Id<Lane> laneId, double capacity,
+			double startsAtMeterFromLinkEnd, int alignment,
+			int numberOfRepresentedLanes, List<Id<Link>> toLinkIds, List<Id<Lane>> toLaneIds) {
+		
+		LaneData20 lane = factory.createLane(laneId);
+		if (toLinkIds != null){
+			for (Id<Link> toLinkId : toLinkIds) {
+				lane.addToLinkId(toLinkId);
+			}
+		}
+		if (toLaneIds != null){
+			for (Id<Lane> toLaneId : toLaneIds) {
+				lane.addToLaneId(toLaneId);
+			}
+		}
+		lane.setCapacityVehiclesPerHour(capacity);
+		lane.setStartsAtMeterFromLinkEnd(startsAtMeterFromLinkEnd);
+		lane.setNumberOfRepresentedLanes(numberOfRepresentedLanes);
+		lane.setAlignment(alignment); 
 		l2l.addLane(lane);
 	}
 	
