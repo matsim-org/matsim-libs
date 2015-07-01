@@ -34,10 +34,13 @@ import java.util.List;
 public class TripChoicesIdentifier implements ChoicesIdentifier<TripChoiceSituation> {
 	private final ActivityFacilities facilities;
 	private final StageActivityTypes stages;
+	private final String destinationType;
 
 	public TripChoicesIdentifier(
+			final String destinationType,
 			final ActivityFacilities facilities,
 			final StageActivityTypes stages) {
+		this.destinationType = destinationType;
 		this.facilities = facilities;
 		this.stages = stages;
 	}
@@ -50,12 +53,14 @@ public class TripChoicesIdentifier implements ChoicesIdentifier<TripChoiceSituat
 
 		int i=0;
 		for ( TripStructureUtils.Trip t : trips ) {
-			final Trip choice =
-					new Trip(
-							facilities.getFacilities().get( t.getOriginActivity().getFacilityId() ),
-							t.getTripElements(),
-							facilities.getFacilities().get( t.getDestinationActivity().getFacilityId() ) );
-			choices.add( new TripChoiceSituation( choice , trips , i ) );
+			if ( t.getDestinationActivity().getType().equals( destinationType ) ) {
+				final Trip choice =
+						new Trip(
+								facilities.getFacilities().get(t.getOriginActivity().getFacilityId()),
+								t.getTripElements(),
+								facilities.getFacilities().get(t.getDestinationActivity().getFacilityId()));
+				choices.add(new TripChoiceSituation(choice, trips, i));
+			}
 			i++;
 		}
 

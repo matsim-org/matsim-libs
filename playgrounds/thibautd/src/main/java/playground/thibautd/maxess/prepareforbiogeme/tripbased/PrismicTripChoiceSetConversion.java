@@ -81,11 +81,12 @@ public class PrismicTripChoiceSetConversion {
 										group.getBudget_m() ) ) )
 				.withChoicesIdentifier(
 						new TripChoicesIdentifier(
+								group.getActivityType(),
 								sc.getActivityFacilities(),
 								tripRouter.getStageActivityTypes() ) )
 				.create()
 				.convert(
 						sc.getPopulation(),
-						group.getOutputPath()+"data.dat" );
+						group.getOutputPath()+"/data.dat" );
 	}
 }

@@ -51,7 +51,7 @@ public class ChoiceDataSetWriter<T> implements AutoCloseable {
 			counter.incCounter();
 			int i=0;
 			for ( Object o : v ) {
-				writer.write( 0+(i++ < v.size() ? "\t" : "") );
+				writer.write( o+(i++ < v.size() ? "\t" : "") );
 			}
 			writer.newLine();
 		}

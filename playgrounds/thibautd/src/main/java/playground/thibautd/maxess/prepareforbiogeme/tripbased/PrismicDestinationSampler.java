@@ -75,6 +75,9 @@ public class PrismicDestinationSampler implements DestinationSampler {
 	}
 
 	private List<ActivityFacility> getPrism(final TripChoiceSituation choice) {
+		if ( choice.getPositionInTripSequence() >= choice.getTripSequence().size() - 1 ) {
+			throw new IllegalArgumentException( "Trip "+choice.getChoice()+" is last in "+choice.getTripSequence()+". This forbidds prism calculation." );
+		}
 		final Coord f1 = choice.getChoice().getOrigin().getCoord();
 		final Coord f2 = choice.getTripSequence().get(choice.getPositionInTripSequence() + 1).getDestinationActivity().getCoord();
 

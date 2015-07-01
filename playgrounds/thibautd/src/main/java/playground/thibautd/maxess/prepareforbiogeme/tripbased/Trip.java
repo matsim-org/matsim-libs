@@ -62,4 +62,13 @@ public class Trip {
 		}
 		return legs;
 	}
+
+	@Override
+	public String toString() {
+		return "Trip{" +
+				"origin=" + origin +
+				", destination=" + destination +
+				", trip=" + trip +
+				'}';
+	}
 }
