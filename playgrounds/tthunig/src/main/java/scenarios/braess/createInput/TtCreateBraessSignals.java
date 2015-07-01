@@ -91,7 +91,18 @@ public class TtCreateBraessSignals {
 			changeSignalControlTo1Z();
 		}
 	}
-
+	
+	/**
+	 * Creates signal systems depending on the network situation.
+	 * 
+	 * If lanes are used they already give the turning move restrictions such
+	 * that no further turning move restrictions are necessary for the signal
+	 * definitions. If no lanes are used this method defines the turning move
+	 * restrictions for the signals.
+	 * 
+	 * Depending on the existence of inflow simulating nodes 7 and 9, the ids of
+	 * lanes and links, the signals are located on or lead to, depend.
+	 */
 	private void createSignalSystems() {
 
 		// TODO add turning move restrictions if lanesUsed false. change signalutils??
