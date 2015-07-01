@@ -70,8 +70,9 @@ public class LandUseReader {
 	 * 		  <a href="http://wiki.openstreetmap.org/wiki/Key:landuse">Land Use</a>
 	 * 		  to MATSim activity types.
 	 */
-	public LandUseReader(String file, CoordinateTransformation ct, 
-			Map<String, String> osmToMatsimTypeMap) {
+//	public LandUseReader(String file, CoordinateTransformation ct, 
+//			Map<String, String> osmToMatsimTypeMap) {
+	public LandUseReader(CoordinateTransformation ct, Map<String, String> osmToMatsimTypeMap) {
 		log.info("Creating landuse ??? reader");
 		
 		this.ct = ct;

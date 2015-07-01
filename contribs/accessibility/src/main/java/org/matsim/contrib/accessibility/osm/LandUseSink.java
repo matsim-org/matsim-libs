@@ -168,6 +168,7 @@ public class LandUseSink implements Sink {
 					af = (ActivityFacilityImpl) facilities.getFacilities().get(newId);
 				}
 				ActivityOption ao = aff.createActivityOption(activityType);
+				
 				af.addActivityOption(ao);
 //				setFacilityDetails(ao);
 //				nodeFacilities++;
