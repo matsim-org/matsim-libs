@@ -1,7 +1,6 @@
 package org.matsim.contrib.accessibility.osm;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +8,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.NodeContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.RelationContainer;
 import org.openstreetmap.osmosis.core.container.v0_6.WayContainer;
@@ -21,6 +19,9 @@ import org.openstreetmap.osmosis.core.domain.v0_6.RelationMember;
 import org.openstreetmap.osmosis.core.domain.v0_6.Way;
 import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 
+/**
+ * @author dziemke
+ */
 class CoordUtils {
 	private final static Logger log = Logger.getLogger(CoordUtils.class);
 
@@ -126,6 +127,27 @@ class CoordUtils {
 		return list;
 	}
 	
+	
+	static Coord[] getWayCoords(Way way, CoordinateTransformation ct, Map<Long, NodeContainer> nodeMap){
+		List<Coord> list = new ArrayList<Coord>(); 
+		
+		for(WayNode wayNode : way.getWayNodes()){
+			double xNode = nodeMap.get(wayNode.getNodeId()).getEntity().getLongitude();
+			double yNode = nodeMap.get(wayNode.getNodeId()).getEntity().getLatitude();
+
+			Coord coord = new CoordImpl(xNode, yNode);
+			
+			list.add(ct.transform(coord));
+		}		
+				
+		Coord[] coords = new Coord[list.size()];
+		for (int i=0; i < list.size(); i++) {
+			coords[i] = list.get(i);
+		}
+		
+		return coords;
+	}
+		
 	
 	/**
 	 * Determine the bounding box of a relation.

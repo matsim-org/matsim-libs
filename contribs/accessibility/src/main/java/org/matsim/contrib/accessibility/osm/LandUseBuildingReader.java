@@ -51,8 +51,8 @@ import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
  * @author dziemke
  * @see <a href="http://wiki.openstreetmap.org/wiki/Key:landuse">OpenStreetMap: Land Use</a>
  */
-public class LandUseReader {
-	private final static Logger log = Logger.getLogger(LandUseReader.class);
+public class LandUseBuildingReader {
+	private final static Logger log = Logger.getLogger(LandUseBuildingReader.class);
 	private QuadTree<Id<ActivityFacility>> linkQT;
 	private ActivityFacilities landuse;
 	private ObjectAttributes amenityAttributes;
@@ -72,7 +72,7 @@ public class LandUseReader {
 	 */
 //	public LandUseReader(String file, CoordinateTransformation ct, 
 //			Map<String, String> osmToMatsimTypeMap) {
-	public LandUseReader(CoordinateTransformation ct, Map<String, String> osmToMatsimTypeMap) {
+	public LandUseBuildingReader(CoordinateTransformation ct, Map<String, String> osmToMatsimTypeMap) {
 		log.info("Creating landuse ??? reader");
 		
 		this.ct = ct;
@@ -97,7 +97,7 @@ public class LandUseReader {
 		if(!f.exists()){
 			throw new FileNotFoundException("Could not find " + file);
 		}
-		LandUseSink landUseSink = new LandUseSink(this.ct, this.osmToMatsimTypeMap);
+		LandUseBuildingSink landUseSink = new LandUseBuildingSink(this.ct, this.osmToMatsimTypeMap);
 		XmlReader xmlReader = new XmlReader(f, false, CompressionMethod.None);
 		xmlReader.setSink(landUseSink);
 		xmlReader.run();		
