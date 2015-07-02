@@ -32,12 +32,11 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.core.utils.collections.MapUtils;
 
 import java.util.*;
 
@@ -259,7 +258,17 @@ class ArrivalQueue {
 	private final Queue<Tuple<Double, MobsimAgent>> teleportationList =
 		new PriorityQueue<Tuple<Double, MobsimAgent>>(
 				30,
-				new TeleportationArrivalTimeComparator());
+				new Comparator<Tuple<Double, MobsimAgent>>() {
+
+					@Override
+					public int compare(Tuple<Double, MobsimAgent> o1, Tuple<Double, MobsimAgent> o2) {
+						int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
+						if (ret == 0) {
+							ret = o2.getSecond().getId().compareTo(o1.getSecond().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
+						}
+						return ret;
+					}
+				});
 
 	public void addAgent( final double arrivalTime , final MobsimAgent agent ) {
 		teleportationList.add( new Tuple<Double, MobsimAgent>( arrivalTime , agent ) );

@@ -31,13 +31,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.tools.PersonAgentComparator;
 
 public class InsecureLegPerformingIdentifier extends DuringLegAgentSelector {
 	
@@ -65,7 +65,7 @@ public class InsecureLegPerformingIdentifier extends DuringLegAgentSelector {
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(legPerformingAgents, time);
 		
-		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());		
+		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 		for (Id<Person> id : legPerformingAgents) {
 			
 			MobsimAgent agent = mapping.get(id);

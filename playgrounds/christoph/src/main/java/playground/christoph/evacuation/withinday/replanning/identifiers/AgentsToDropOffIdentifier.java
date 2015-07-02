@@ -20,26 +20,26 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegAgentSelector;
 import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
+import playground.christoph.tools.PersonAgentComparator;
+
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Identifies agents that are passengers in a vehicle which has as different

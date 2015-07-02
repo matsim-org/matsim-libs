@@ -32,13 +32,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgentSelector;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.tools.PersonAgentComparator;
 
 public class InsecureActivityPerformingIdentifier extends DuringActivityAgentSelector {
 

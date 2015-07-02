@@ -1,7 +1,6 @@
 package org.matsim.core.mobsim.qsim;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -11,7 +10,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
@@ -20,10 +18,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public final class TeleportationEngine implements DepartureHandler, MobsimEngine,
 VisData {
@@ -32,7 +27,17 @@ VisData {
 	 * QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
 	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<>(
-			30, new TeleportationArrivalTimeComparator());
+			30, new Comparator<Tuple<Double, MobsimAgent>>() {
+
+		@Override
+		public int compare(Tuple<Double, MobsimAgent> o1, Tuple<Double, MobsimAgent> o2) {
+			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
+			if (ret == 0) {
+				ret = o2.getSecond().getId().compareTo(o1.getSecond().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
+			}
+			return ret;
+		}
+	});
 	private final LinkedHashMap<Id<Person>, TeleportationVisData> teleportationData = new LinkedHashMap<>();
 	private InternalInterface internalInterface;
 	private Scenario scenario;

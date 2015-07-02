@@ -13,7 +13,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
@@ -27,7 +26,17 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 	 * Includes all agents that have transportation modes unknown to the
 	 * QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
-	private Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TeleportationArrivalTimeComparator());
+	private Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new Comparator<Tuple<Double, MobsimAgent>>() {
+
+		@Override
+		public int compare(Tuple<Double, MobsimAgent> o1, Tuple<Double, MobsimAgent> o2) {
+			int ret = o1.getFirst().compareTo(o2.getFirst()); // first compare time information
+			if (ret == 0) {
+				ret = o2.getSecond().getId().compareTo(o1.getSecond().getId()); // if they're equal, compare the Ids: the one with the larger Id should be first
+			}
+			return ret;
+		}
+	});
 	private final LinkedHashMap<Id, TeleportationVisData> teleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 	private InternalInterface internalInterface;
 	private final Set<Id> trackedAgents = new HashSet<Id>();

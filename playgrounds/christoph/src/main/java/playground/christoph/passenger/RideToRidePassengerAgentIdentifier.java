@@ -47,7 +47,6 @@ import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -58,6 +57,7 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 
 import playground.christoph.passenger.RideToRidePassengerContextProvider.RideToRidePassengerContext;
+import playground.christoph.tools.PersonAgentComparator;
 
 /**
  * This class replaces agent's ride trips with ride_passenger trips.

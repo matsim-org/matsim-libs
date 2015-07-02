@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.comparators;
+package org.matsim.withinday.replanning.identifiers;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -31,7 +31,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
  *
  * @author cdobler
  */
-public class PersonAgentComparator implements Comparator<MobsimAgent>, Serializable, MatsimComparator {
+class ById implements Comparator<MobsimAgent>, Serializable, MatsimComparator {
 
 	private static final long serialVersionUID = 1L;
 

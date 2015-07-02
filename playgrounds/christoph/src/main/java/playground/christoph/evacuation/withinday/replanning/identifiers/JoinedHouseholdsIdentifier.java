@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -52,6 +51,7 @@ import playground.christoph.evacuation.mobsim.HouseholdDepartureManager.JoinedHo
 import playground.christoph.evacuation.withinday.replanning.utils.HouseholdModeAssignment;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
+import playground.christoph.tools.PersonAgentComparator;
 
 /**
  *  Define which households will relocate to another (secure!) location

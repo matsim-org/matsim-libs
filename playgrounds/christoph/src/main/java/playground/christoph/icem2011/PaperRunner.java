@@ -33,7 +33,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.RoutingContext;
@@ -48,6 +47,7 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+import playground.christoph.tools.PersonAgentComparator;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;

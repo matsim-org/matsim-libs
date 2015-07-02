@@ -38,7 +38,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
@@ -54,6 +53,7 @@ import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.PickupModel.PickupDecision;
+import playground.christoph.tools.PersonAgentComparator;
 
 /**
  * Identifies agents that perform a walk leg in the insecure area. They might be
