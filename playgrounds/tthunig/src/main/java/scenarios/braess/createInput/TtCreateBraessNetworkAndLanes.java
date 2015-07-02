@@ -194,8 +194,7 @@ public class TtCreateBraessNetworkAndLanes {
 
 	public void createLanes() {
 		
-		LaneDefinitions20 laneDef20 = (LaneDefinitions20) this.scenario
-				.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		LaneDefinitions20 laneDef20 = this.scenario.getLanes();
 		LaneDefinitionsFactory20 fac = laneDef20.getFactory();
 
 		// create link assignment of link 1_2

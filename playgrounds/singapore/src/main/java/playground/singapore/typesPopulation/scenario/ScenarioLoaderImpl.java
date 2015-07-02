@@ -272,8 +272,7 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadLanes() {
-		LaneDefinitions20 laneDefinitions = new LaneDefinitions20Impl();
-		this.scenario.addScenarioElement(LaneDefinitions20.ELEMENT_NAME, laneDefinitions);
+		LaneDefinitions20 laneDefinitions = scenario.getLanes();
 		String filename = this.config.network().getLaneDefinitionsFile();
 		if (filename != null){
 			MatsimFileTypeGuesser fileTypeGuesser = new MatsimFileTypeGuesser(filename);

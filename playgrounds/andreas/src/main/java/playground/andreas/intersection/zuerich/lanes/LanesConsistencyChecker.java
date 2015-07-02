@@ -167,7 +167,7 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 		LaneDefinitionsReader laneReader = new LaneDefinitionsReader(scenario);
 	  laneReader.readFile(lanesFile);
 	  
-	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+	  LanesConsistencyChecker lcc = new LanesConsistencyChecker(net, scenario.getLanes());
 		lcc.setRemoveMalformed(false);
 		lcc.checkConsistency();
 		

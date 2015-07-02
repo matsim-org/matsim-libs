@@ -202,7 +202,7 @@ public final class LanesUtils {
 		config.network().setLaneDefinitionsFile(lanes20InputFilename);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
-		LaneDefinitions20 lanes = (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
+		LaneDefinitions20 lanes = scenario.getLanes();
 		for (LanesToLinkAssignment20 l2l : lanes.getLanesToLinkAssignments().values()){
 			Link link = network.getLinks().get(l2l.getLinkId());
 			for (Lane lane : l2l.getLanes().values()){

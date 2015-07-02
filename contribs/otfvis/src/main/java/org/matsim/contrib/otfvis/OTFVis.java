@@ -207,7 +207,7 @@ public class OTFVis {
 
 		if (config.scenario().isUseLanes()) {
 			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
-			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), scenario.getConfig());
+			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), scenario.getLanes(), scenario.getConfig());
 			server.addAdditionalElement(otfLaneWriter);
 		}
 		server.pause();

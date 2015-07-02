@@ -86,9 +86,9 @@ public class MixedLaneTestFixture {
 		init();
 	}
 
-	public MixedLaneTestFixture(boolean useLanes, double timeStepSize){
+	public MixedLaneTestFixture(double timeStepSize){
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseLanes(useLanes);
+		config.scenario().setUseLanes(true);
 
 		config.qsim().setTimeStepSize(timeStepSize);
 

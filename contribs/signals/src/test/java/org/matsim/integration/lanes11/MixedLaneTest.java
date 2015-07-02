@@ -208,7 +208,7 @@ public class MixedLaneTest {
 		Log.info("starting testLink2PersonsDriving()");
 		
 		@SuppressWarnings("hiding")
-		MixedLaneTestFixture fixture = new MixedLaneTestFixture(false, 1.0);
+		MixedLaneTestFixture fixture = new MixedLaneTestFixture(1.0);
 		
 		fixture.create2PersonPopulation();
 		EventsManager events = EventsUtils.createEventsManager();

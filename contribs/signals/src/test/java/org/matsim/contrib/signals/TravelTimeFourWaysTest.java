@@ -109,7 +109,7 @@ public class TravelTimeFourWaysTest {
 		
 		SignalEngine signalEngine = this.initSignalEngine(scenario, events);
 
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
+		QSim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
 		eventsXmlWriter.closeFile();
@@ -130,7 +130,7 @@ public class TravelTimeFourWaysTest {
 		
 		SignalEngine signalEngine = this.initSignalEngine(scenario, events);
 
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
+		QSim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.addQueueSimulationListeners(signalEngine);
 		sim.run();
 		eventsXmlWriter.closeFile();

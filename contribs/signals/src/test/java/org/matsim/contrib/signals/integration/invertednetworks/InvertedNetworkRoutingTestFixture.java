@@ -111,8 +111,7 @@ public class InvertedNetworkRoutingTestFixture {
 	}
 
 	private void createLanes() {
-		LaneDefinitions20 ld = new LaneDefinitions20Impl();
-		scenario.addScenarioElement(LaneDefinitions20.ELEMENT_NAME, ld);
+		LaneDefinitions20 ld = scenario.getLanes();
 		LaneDefinitionsFactory20 f = ld.getFactory();
 		LanesToLinkAssignment20 l2l = f.createLanesToLinkAssignment(Id.create(12, Link.class));
 		ld.addLanesToLinkAssignment(l2l);

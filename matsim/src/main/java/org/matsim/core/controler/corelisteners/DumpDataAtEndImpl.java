@@ -19,8 +19,8 @@
  * *********************************************************************** */
 package org.matsim.core.controler.corelisteners;
 
-import java.io.File;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -37,15 +37,13 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.households.HouseholdsWriterV10;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.VehicleWriterV1;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.io.File;
 
 @Singleton
 final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
@@ -97,7 +95,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		}
 		if (this.scenarioData.getConfig().scenario().isUseLanes()) {
 			new LaneDefinitionsWriter20(
-					(LaneDefinitions20) scenarioData.getScenarioElement(LaneDefinitions20.ELEMENT_NAME)).write(
+					scenarioData.getLanes()).write(
 							controlerIO.getOutputFilename(Controler.FILENAME_LANES));
 		}
 		if (!event.isUnexpected() && scenarioData.getConfig().vspExperimental().isWritingOutputEvents()) {

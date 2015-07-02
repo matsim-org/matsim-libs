@@ -164,6 +164,7 @@ public abstract class LaneDefinitionsV11ToV20Conversion {
 
 	public static LaneDefinitions20 convertTo20(LaneDefinitions11 lanedefs11, Network network) {
 		LaneDefinitions20 lanedefs20 = new LaneDefinitions20Impl();
+		convertTo20(lanedefs11, lanedefs20, network);
 		return lanedefs20;
 	}
 	
