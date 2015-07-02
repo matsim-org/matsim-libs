@@ -134,7 +134,7 @@
 					<configuration>
 						<quiet>true</quiet>
 						<header>MATSim API</header>
-						<excludePackageNames>org.matsim.jaxb.*</excludePackageNames>
+						<excludePackageNames>org.matsim.jaxb:org.matsim.jaxb.*</excludePackageNames>
 						<groups>
 							<group>
 								<title>api</title>
