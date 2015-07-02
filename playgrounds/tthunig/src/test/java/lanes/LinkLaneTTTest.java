@@ -38,8 +38,11 @@ import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * this class tests the TravelTime of one agent on different configuration of a 200m link.
- * see method createNetwork for details
+ * 
+ * this class tests the TravelTime of one agent on different configuration of a 200m link. currently, the following phenomenon occurs:
+ * the TravelTime on a 200m link is reduced if lanes are enabled
+ * 
+ * see method createNetwork for details on links configuration 
  * 
  * the network.xml and the Lanedefintions.xml files are written to the testOutputDirectory
  * 
