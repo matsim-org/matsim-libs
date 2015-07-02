@@ -19,15 +19,16 @@
 package playground.agarwalamit.mixedTraffic;
 
 import java.io.BufferedWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -39,7 +40,6 @@ import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -55,8 +55,6 @@ import org.matsim.vehicles.VehicleUtils;
 
 public class ComputationTimeCalculator {
 	
-	
-
 	public ComputationTimeCalculator(String outDir) {
 		this.outDir = outDir;
 	}
@@ -94,7 +92,7 @@ public class ComputationTimeCalculator {
 			Scenario sc = createBasicSceanrio();
 			sc.getConfig().qsim().setLinkDynamics(ld);
 			EventsManager events = EventsUtils.createEventsManager();
-
+//			events.addHandler(new EventWriterXML(outDir+"/events.xml.gz"));
 			processSceanarios(sc, events);
 
 		} else {
@@ -117,52 +115,80 @@ public class ComputationTimeCalculator {
 		sc.getConfig().qsim().setTrafficDynamics(TrafficDynamics.queue);
 		sc.getConfig().qsim().setUsingFastCapacityUpdate(false);
 
-		openFile(outDir+sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+".txt");
+		openFile(outDir+"test.txt");
+		printLine(sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+"\t");
+		double sumTimeTaken = 0.;
+		int countSum = 0;
 		for (int i=0;i<26;i++){
 			double startTime = System.currentTimeMillis();
 			QSimUtils.createDefaultQSim(sc, events).run();
 			double endTime = System.currentTimeMillis();
-			printLine(i+"\t"+(endTime - startTime) /1000+"\n");	
+			if(i>5) {
+				sumTimeTaken += ((endTime -startTime)/1000);
+				countSum ++;
+			}
 		}
-		closeFile();
+		printLine(countSum+"\t"+sumTimeTaken+"\n");
+//		closeFile();
 
 		//-- w/ holes -- old (slow) capacity update
 		sc.getConfig().qsim().setUsingFastCapacityUpdate(false);
 		sc.getConfig().qsim().setTrafficDynamics(TrafficDynamics.withHoles);
-
-		openFile(outDir+sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+".txt");
+		
+		printLine(sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+"\t");
+//		openFile(outDir+sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+".txt");
+		sumTimeTaken = 0.;
+		countSum=0;
 		for (int i=0;i<26;i++){
 			double startTime = System.currentTimeMillis();
 			QSimUtils.createDefaultQSim(sc, events).run();
 			double endTime = System.currentTimeMillis();
-			printLine(i+"\t"+(endTime - startTime)/1000 +"\n");
+			if(i>5) {
+				sumTimeTaken += ((endTime -startTime)/1000);
+				countSum ++;
+			}
 		}
-		closeFile();
+		printLine(countSum+"\t"+sumTimeTaken+"\n");
+//		closeFile();
 		
 		//-- w/o holes -- fast capacity update
 		sc.getConfig().qsim().setTrafficDynamics(TrafficDynamics.queue);
 		sc.getConfig().qsim().setUsingFastCapacityUpdate(true);
-
-		openFile(outDir+sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+".txt");
+		
+		printLine(sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+"\t");
+//		openFile(outDir+sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+".txt");
+		sumTimeTaken = 0.;
+		countSum=0;
 		for (int i=0;i<26;i++){
 			double startTime = System.currentTimeMillis();
 			QSimUtils.createDefaultQSim(sc, events).run();
 			double endTime = System.currentTimeMillis();
-			printLine(i+"\t"+(endTime - startTime)/1000 +"\n");
+			if(i>5) {
+				sumTimeTaken += ((endTime -startTime)/1000);
+				countSum ++;
+			}
 		}
-		closeFile();
+		printLine(countSum+"\t"+sumTimeTaken+"\n");
+//		closeFile();
 		
 		//-- w/ holes -- fast capacity update
 		sc.getConfig().qsim().setTrafficDynamics(TrafficDynamics.withHoles);
 		sc.getConfig().qsim().setUsingFastCapacityUpdate(true);
 		
-		openFile(outDir+sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+".txt");
+		printLine(sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+"\t");
+		//		openFile(outDir+sc.getConfig().qsim().getLinkDynamics()+"_"+sc.getConfig().qsim().getTrafficDynamics()+"_"+sc.getConfig().qsim().isUsingFastCapacityUpdate()+".txt");
+		sumTimeTaken = 0.;
+		countSum=0;
 		for (int i=0;i<26;i++){
 			double startTime = System.currentTimeMillis();
 			QSimUtils.createDefaultQSim(sc, events).run();
 			double endTime = System.currentTimeMillis();
-			printLine(i+"\t"+(endTime - startTime)/1000 +"\n");
+			if(i>5) {
+				sumTimeTaken += ((endTime -startTime)/1000);
+				countSum ++;
+			}
 		}
+		printLine(countSum+"\t"+sumTimeTaken+"\n");
 		closeFile();
 	}
 
@@ -177,32 +203,34 @@ public class ComputationTimeCalculator {
 	private Scenario createBasicSceanrio(){
 
 		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile("../../matsim/examples/equil/network.xml");
 
-		config.qsim().setEndTime(30*3600);
+		config.qsim().setEndTime(36*3600);
 		config.qsim().setMainModes(Arrays.asList("car","bike"));
 		config.qsim().setUseDefaultVehicles(false);
-		config.qsim().setStorageCapFactor(3.0);
+		config.qsim().setFlowCapFactor(0.01);
+		config.qsim().setStorageCapFactor(0.01);
 
 		Scenario sc = ScenarioUtils.loadScenario(config);
 		((ScenarioImpl)sc).createVehicleContainer();
 		
-		NetworkImpl net = (NetworkImpl) sc.getNetwork();
-		
-		Node n1 =  net.createAndAddNode(Id.createNodeId(1), sc.createCoord(0, 0));
-		Node n2 =  net.createAndAddNode(Id.createNodeId(2), sc.createCoord(0, 100));
-		Node n3 =  net.createAndAddNode(Id.createNodeId(3), sc.createCoord(10000, 100));
-		Node n4 =  net.createAndAddNode(Id.createNodeId(4), sc.createCoord(15000, 50));
-		Node n5 =  net.createAndAddNode(Id.createNodeId(5), sc.createCoord(15000, 0));
-		Node n6 =  net.createAndAddNode(Id.createNodeId(6), sc.createCoord(14000, 0));
-		Node n7 =  net.createAndAddNode(Id.createNodeId(7), sc.createCoord(5000, 0));
-		
-		Link l1 = net.createAndAddLink(Id.createLinkId(1), n1, n2, 100, 20, 1500, 1);
-		Link l2 = net.createAndAddLink(Id.createLinkId(2), n2, n3, 10000, 20, 1800, 1);
-		Link l3 = net.createAndAddLink(Id.createLinkId(3), n3, n4, 5000, 20, 1000, 1);
-		Link l4 = net.createAndAddLink(Id.createLinkId(4), n4, n5, 50, 20, 1000, 1);
-		Link l5 = net.createAndAddLink(Id.createLinkId(5), n5, n6, 500, 20, 500, 1);
-		Link l6 = net.createAndAddLink(Id.createLinkId(6), n6, n7, 5000, 20, 1800, 1);
-		Link l7 = net.createAndAddLink(Id.createLinkId(7), n7, n1, 5000, 20, 1800, 1);
+//		NetworkImpl net = (NetworkImpl) sc.getNetwork();
+//		
+//		Node n1 =  net.createAndAddNode(Id.createNodeId(1), sc.createCoord(0, 0));
+//		Node n2 =  net.createAndAddNode(Id.createNodeId(2), sc.createCoord(0, 100));
+//		Node n3 =  net.createAndAddNode(Id.createNodeId(3), sc.createCoord(10000, 100));
+//		Node n4 =  net.createAndAddNode(Id.createNodeId(4), sc.createCoord(15000, 50));
+//		Node n5 =  net.createAndAddNode(Id.createNodeId(5), sc.createCoord(15000, 0));
+//		Node n6 =  net.createAndAddNode(Id.createNodeId(6), sc.createCoord(14000, 0));
+//		Node n7 =  net.createAndAddNode(Id.createNodeId(7), sc.createCoord(5000, 0));
+//		
+//		Link l1 = net.createAndAddLink(Id.createLinkId(1), n1, n2, 1000, 20, 1500, 1);
+//		Link l2 = net.createAndAddLink(Id.createLinkId(2), n2, n3, 10000, 20, 2800, 1);
+//		Link l3 = net.createAndAddLink(Id.createLinkId(3), n3, n4, 5000, 20, 2000, 1);
+//		Link l4 = net.createAndAddLink(Id.createLinkId(4), n4, n5, 1000, 20, 2000, 1);
+//		Link l5 = net.createAndAddLink(Id.createLinkId(5), n5, n6, 1000, 20, 1500, 1);
+//		Link l6 = net.createAndAddLink(Id.createLinkId(6), n6, n7, 5000, 20, 2800, 1);
+//		Link l7 = net.createAndAddLink(Id.createLinkId(7), n7, n1, 5000, 20, 2800, 1);
 		
 		Map<String, VehicleType> mode2VehicleType = new HashMap<>();
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car,VehicleType.class));
@@ -217,20 +245,22 @@ public class ComputationTimeCalculator {
 		sc.getVehicles().addVehicleType(bike);
 		mode2VehicleType.put(TransportMode.bike, bike);
 
-		for (int i =0;i<10000;i++){
+		int noOfPerson = 10000;
+		
+		for (int i =0; i< noOfPerson; i++){
 
 			String mode;
 			double endTime = 0;
 			double dur = 0;
 			if(i%2==0) {
 				mode = TransportMode.bike;
-				endTime = 5*3600;
-				dur = 4*3600;
+				endTime = 0*3600+i; 
+				dur = 3*3600;
 			}
 			else {
 				mode = TransportMode.car;
-				endTime = 6*3600;
-				dur = 7*3600;
+				endTime = 0*3600+1.2*i;
+				dur = 4*3600;
 			}
 
 			Id<Person> personId = Id.createPersonId(i+"_"+mode);
@@ -238,8 +268,8 @@ public class ComputationTimeCalculator {
 			Plan plan = sc.getPopulation().getFactory().createPlan();
 			p.addPlan(plan);
 
-			Id<Link> startLinkId = l1.getId();
-			Id<Link> endLinkId = l4.getId();
+			Id<Link> startLinkId = Id.createLinkId(1);//l1.getId();
+			Id<Link> endLinkId = Id.createLinkId(20);//l4.getId();
 
 			Activity home = sc.getPopulation().getFactory().createActivityFromLinkId("home", startLinkId);
 			home.setEndTime(endTime);
@@ -249,7 +279,20 @@ public class ComputationTimeCalculator {
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 
 			NetworkRoute route = (NetworkRoute) factory.createRoute(startLinkId, endLinkId);
-			route.setLinkIds(startLinkId, Arrays.asList(l2.getId(), l3.getId()), endLinkId);
+			
+			List<Id<Link>> routesList = new ArrayList<Id<Link>>();
+			
+			if(i<noOfPerson/9) routesList = Arrays.asList(Id.createLinkId(2),Id.createLinkId(11));
+			else if(i< 2*noOfPerson/9) routesList = Arrays.asList(Id.createLinkId(3),Id.createLinkId(12));
+			else if(i< 3*noOfPerson/9) routesList = Arrays.asList(Id.createLinkId(4),Id.createLinkId(13));
+			else if(i< 4*noOfPerson/9) routesList = Arrays.asList(Id.createLinkId(5),Id.createLinkId(14));
+			else if(i< 5*noOfPerson/9) routesList = Arrays.asList(Id.createLinkId(6),Id.createLinkId(15));
+			else if(i< 6*noOfPerson/9) routesList = Arrays.asList(Id.createLinkId(7),Id.createLinkId(16));
+			else if(i< 7*noOfPerson/9) routesList = Arrays.asList(Id.createLinkId(8),Id.createLinkId(17));
+			else if(i< 8*noOfPerson/9) routesList = Arrays.asList(Id.createLinkId(9),Id.createLinkId(18));
+			else 					   routesList = Arrays.asList(Id.createLinkId(10),Id.createLinkId(19));
+			
+			route.setLinkIds(startLinkId, routesList, endLinkId);
 			leg.setRoute(route);
 			plan.addLeg(leg);
 
@@ -259,7 +302,7 @@ public class ComputationTimeCalculator {
 
 			leg = sc.getPopulation().getFactory().createLeg(mode);
 			route = (NetworkRoute) factory.createRoute(endLinkId, startLinkId);
-			route.setLinkIds(endLinkId, Arrays.asList(l5.getId(), l6.getId(), l7.getId()), startLinkId);
+			route.setLinkIds(endLinkId, Arrays.asList(Id.createLinkId(21), Id.createLinkId(22), Id.createLinkId(23)), startLinkId);
 			leg.setRoute(route);
 			plan.addLeg(leg);
 
