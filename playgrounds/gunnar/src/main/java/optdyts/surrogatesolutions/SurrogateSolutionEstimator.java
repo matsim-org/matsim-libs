@@ -59,20 +59,6 @@ class SurrogateSolutionEstimator {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	// private static Matrix newStateCovariances(
-	// final List<Transition<?>> transitions) {
-	// final Matrix result = new Matrix(transitions.size(), transitions.size());
-	// for (int i = 0; i < transitions.size(); i++) {
-	// for (int j = 0; j <= i; j++) {
-	// final double val = transitions.get(i).getDelta()
-	// .innerProd(transitions.get(j).getDelta());
-	// result.getRow(i).set(j, val);
-	// result.getRow(j).set(i, val);
-	// }
-	// }
-	// return result;
-	// }
-
 	// TODO only used as absolute gap
 	private static double squareGap(final Matrix stateCovariances,
 			final Vector alphas, final double regularizationScale) {
@@ -89,29 +75,9 @@ class SurrogateSolutionEstimator {
 		return result;
 	}
 
-	// private static double constrainToQuadraticSolutionInterval(final double
-	// x,
-	// final double p, final double q) {
-	// final double sqrtArg = p * p / 4.0 - q;
-	// // TODO a tighter check would have to be thought through better
-	// // if (sqrtArg < -EPS) {
-	// // throw new RuntimeException(
-	// // "infeasible quadratic solution interval with square root argument "
-	// // + sqrtArg + " < " + (-EPS));
-	// // } else
-	// if (sqrtArg < 0.0) {
-	// return x;
-	// } else {
-	// final double sqrt = Math.sqrt(sqrtArg);
-	// final double xMin = -p / 2.0 - sqrt;
-	// final double xMax = -p / 2.0 + sqrt;
-	// return Math.max(xMin, Math.min(x, xMax));
-	// }
-	// }
-
 	private static Vector computeAlphas(final Matrix stateCovariances,
-			final Vector initialAlphas, final double regularizationScale,
-			final double minimumAverageIterations) {
+			final Vector initialAlphas, final double minimumAverageIterations,
+			final double regularizationWeight) {
 
 		// Check parameters.
 
@@ -156,7 +122,6 @@ class SurrogateSolutionEstimator {
 			// >>>>>>>>>> TODO NEW >>>>>>>>>>
 			noMoreImprovement = true;
 			System.out.print(".");
-			if (alphas.isNaN()) { System.out.println(alphas); }
 			// <<<<<<<<<< TODO NEW <<<<<<<<<<
 
 			for (int l = 1; l < alphas.size(); l++) {
@@ -171,9 +136,14 @@ class SurrogateSolutionEstimator {
 											.get(0, 0));
 					}
 				}
-				newAlpha /= (stateCovariances.get(l, l) - 2.0
-						* stateCovariances.get(l, 0)
-						+ stateCovariances.get(0, 0) + regularizationScale);
+				// newAlpha /= (stateCovariances.get(l, l) - 2.0
+				// * stateCovariances.get(l, 0)
+				// + stateCovariances.get(0, 0) + regularizationScale);
+				newAlpha /= Math.max(
+						stateCovariances.get(l, l) - 2.0
+								* stateCovariances.get(l, 0)
+								+ stateCovariances.get(0, 0), 0)
+						+ regularizationWeight;
 
 				// bound constraints
 				double lower = 0;
@@ -243,7 +213,8 @@ class SurrogateSolutionEstimator {
 	 */
 	private static <U extends DecisionVariable> SurrogateSolutionProperties computeProperties(
 			final List<Transition<U>> transitions, final Vector initialAlphas,
-			final double regularizationScale, final int minimumAverageIterations) {
+			final int minimumAverageIterations,
+			final double regularizationWeight) {
 
 		// Check if enough iterations have been performed.
 		if (transitions.size() < minimumAverageIterations) {
@@ -268,7 +239,7 @@ class SurrogateSolutionEstimator {
 			alphas = initialAlphas.copy();
 		} else {
 			alphas = computeAlphas(stateCovariances, initialAlphas,
-					regularizationScale, minimumAverageIterations);
+					minimumAverageIterations, regularizationWeight);
 		}
 
 		// Compute summary statistics.
@@ -294,20 +265,16 @@ class SurrogateSolutionEstimator {
 				.innerProd(alphas);
 		// TODO only one function call
 		final double squareConvergenceGap = squareGap(stateCovariances, alphas,
-				0.0);
+				regularizationWeight);
 		// TODO because tiny negative numbers may come out
-		final double absoluteConvergenceGap = Math.sqrt(Math.max(0.0, squareConvergenceGap));
+		final double absoluteConvergenceGap = Math.sqrt(Math.max(0.0,
+				squareConvergenceGap));
 
 		// Create and return a properties object representing these results.
 		return new SurrogateSolutionProperties(decisionVariable2alphaSum,
 				interpolatedObjectiveFunctionValue,
 				interpolatedFromStateEuclideanNorm,
 				equivalentAveragingIterations, absoluteConvergenceGap);
-
-		// return new SurrogateSolutionProperties<U>(transitions, alphas, gap2(
-		// stateCovariances, alphas, 0.0), regularizationScale,
-		// 1.0 / alphas.innerProd(alphas), Math.sqrt(gap2(
-		// stateCovariances, alphas, 0.0)));
 	}
 
 	/**
@@ -319,10 +286,11 @@ class SurrogateSolutionEstimator {
 	 */
 	static <U extends DecisionVariable> SurrogateSolutionProperties computeProperties(
 			final List<Transition<U>> transitions,
-			final double regularizationScale, final int minimumAverageIterations) {
+			final int minimumAverageIterations,
+			final double regularizationWeight) {
 		final Vector initialAlphas = new Vector(transitions.size());
 		initialAlphas.fill(1.0 / transitions.size());
 		return computeProperties(transitions, initialAlphas,
-				regularizationScale, minimumAverageIterations);
+				minimumAverageIterations, regularizationWeight);
 	}
 }

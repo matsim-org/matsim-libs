@@ -70,7 +70,8 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 	public MATSimDecisionVariableSetEvaluator(final Set<U> decisionVariables,
 			final ObjectiveFunction<X> objectiveFunction,
 			final MATSimStateFactory<X, U> stateFactory,
-			final int minimumAverageIterations, final double maximumRelativeGap) {
+			final int minimumAverageIterations,
+			final double maximumRelativeGap) {
 		this.evaluator = new DecisionVariableSetEvaluator<X, U>(
 				decisionVariables, objectiveFunction, minimumAverageIterations,
 				maximumRelativeGap);

@@ -89,11 +89,19 @@ class TransitionSequence<X extends SimulatorState, U extends DecisionVariable> {
 				.copy();
 		delta.add(fromState.getReferenceToVectorRepresentation(), -1.0);
 
+		// important: new transitions are added at the end
 		this.transitions.add(new Transition<U>(decisionVariable, delta,
 				objectiveFunctionValue, fromState
 						.getReferenceToVectorRepresentation().euclNorm(),
 				toState.getReferenceToVectorRepresentation().euclNorm()));
 		this.lastState = toState;
+	}
+
+	void shrinkToMaximumLength(final int maximumLength) {
+		while (this.transitions.size() > maximumLength) {
+			// important: old transitions are removed from the front
+			this.transitions.removeFirst();
+		}
 	}
 
 	// -------------------- GETTERS --------------------

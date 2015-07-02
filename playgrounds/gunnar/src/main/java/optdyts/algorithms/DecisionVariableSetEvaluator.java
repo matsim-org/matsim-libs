@@ -65,19 +65,22 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState, U extends De
 	 * @param objectiveFunction
 	 *            represents the objective function that is to be minimized
 	 * @param minimumAverageIterations
-	 *            the number of iterations over which the simulation output
-	 *            should be averaged to be considered "sufficiently noise free"
+	 *            the minimum number of iterations over which the simulation
+	 *            output should be averaged to be considered
+	 *            "sufficiently noise free"
 	 * @param maximumRelativeGap
 	 *            the relative gap below which two subsequent and averaged
 	 *            simulation iterations are considered to be converged
 	 */
 	public DecisionVariableSetEvaluator(final Set<U> decisionVariables,
 			final ObjectiveFunction<X> objectiveFunction,
-			final int minimumAverageIterations, final double maximumRelativeGap) {
+			final int minimumAverageIterations,
+			final double maximumRelativeGap) {
 		this.decisionVariablesToBeTriedOut = new LinkedHashSet<U>(
 				decisionVariables);
 		this.surrogateSolution = new SurrogateSolution<X, U>(objectiveFunction,
-				minimumAverageIterations, maximumRelativeGap);
+				minimumAverageIterations, Integer.MAX_VALUE,
+				maximumRelativeGap);
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
