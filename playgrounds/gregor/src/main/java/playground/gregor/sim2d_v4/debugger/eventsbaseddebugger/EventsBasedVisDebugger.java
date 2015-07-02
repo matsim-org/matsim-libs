@@ -360,16 +360,21 @@ public class EventsBasedVisDebugger extends PApplet {
 			return;
 		}
 		if (c.fill) {
-			fill(c.r, c.g, c.b, c.a);
-			// fill(c.r,c.g,c.b,0);
+//			fill(c.r, c.g, c.b, c.a);
+			 fill(c.r,c.g,c.b,255);
 		} else {
 			fill(255, 0);
 		}
+		float r = c.rr;
 		// stroke(c.r,c.g,c.b,c.a);
 		// stroke(0,0,0,128);;
+		if (this.zoomer.getZoomScale() < 25) {
+			float incr = (float) (1/this.zoomer.getZoomScale());
+			r += incr;
+		} 
 		stroke(0, (float) (255 * this.zoomer.getZoomScale() / 100) + 32);
 		ellipseMode(RADIUS);
-		ellipse(c.x, c.y, c.rr, c.rr);
+		ellipse(c.x, c.y, r, r);
 		// filter(BLUR, 4);
 	}
 

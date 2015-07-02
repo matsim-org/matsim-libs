@@ -37,5 +37,7 @@ public interface CANetworkEntity {
 	public double getX();
 
 	public double getY();
+
+	public int getNrLanes();
 	
 }

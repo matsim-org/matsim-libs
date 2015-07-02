@@ -87,7 +87,7 @@
 			<artifactId>gt-epsg-hsql</artifactId>
 			<version>13.0</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.google.protobuf</groupId>
 			<artifactId>protobuf-java</artifactId>
@@ -209,11 +209,16 @@
 			<version>0.7.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>cadytsIntegration</artifactId>
+			<version>0.7.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
 			<groupId>com.vividsolutions</groupId>
 			<artifactId>jts</artifactId>
 			<version>1.11</version>
 		</dependency>
-				<dependency>
+		<dependency>
 			<groupId>org.jvnet.ogc</groupId>
 			<artifactId>iso-19139-d_2007_04_17-schema</artifactId>
 			<version>1.0.3</version>
@@ -222,6 +227,11 @@
 			<groupId>org.jvnet.ogc</groupId>
 			<artifactId>wfs-v_1_1_0-schema</artifactId>
 			<version>1.0.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.5.4</version>
 		</dependency>
 	</dependencies>
 </project>

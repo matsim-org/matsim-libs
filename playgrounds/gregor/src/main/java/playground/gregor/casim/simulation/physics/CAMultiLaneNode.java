@@ -240,6 +240,15 @@ public class CAMultiLaneNode implements CANode {
 		Id<Link> nextLinkId = a.getNextLinkId();
 		CAMultiLaneLink nextLink = (CAMultiLaneLink) this.net
 				.getCALink(nextLinkId);
+		if (nextLink.isSignalized()) {
+			double timeToWait = nextLink.timeToWait(time);
+			if (timeToWait > 0) {
+				CAEvent e = new CAEvent(time+timeToWait, a, this, CAEventType.TTA);
+				this.net.pushEvent(e);
+				return;
+			}
+		}
+		
 		a.setRho(nextLink.getDensityEstimator().estRho(a));
 		if (nextLink.getDownstreamCANode() == this) {
 			handleTTAEnterNextLinkFromDownstreamEnd(nextLink, a, time);
@@ -262,8 +271,8 @@ public class CAMultiLaneNode implements CANode {
 		int newLane = nextLink.getParticles(intendedLane)[0] == null && nextLink.getLastLeftDsTimes(intendedLane)[0] < time -z ? intendedLane : -1;
 		if (newLane > -1 && a.getRho() >= CAMultiLaneLink.LANESWITCH_TS_TTA && MatsimRandom.getRandom().nextDouble() < CAMultiLaneLink.LANESWITCH_PROB) {
 			
-			double bestLaneScore = nextLink.getLaneScore(a, a.getLane());
-			for (int i = 0; i < this.lanes; i++) {
+			double bestLaneScore = nextLink.getLaneScore(a, intendedLane);
+			for (int i = 0; i < nextLink.getNrLanes(); i++) {
 				double laneScore = nextLink.getLaneScore(a, i);
 				if (nextLink.getParticles(i)[0] == null && nextLink.getLastLeftDsTimes(i)[0] < time -z) {
 					if (laneScore > bestLaneScore) {
@@ -336,7 +345,7 @@ public class CAMultiLaneNode implements CANode {
 
 	private void handleTTAEnterNextLinkFromDownstreamEnd(
 			CAMultiLaneLink nextLink, CAMoveableEntity a, double time) {
-
+		
 		int idxLastCell = nextLink.getNumOfCells() - 1;
 
 		// check pre-condition
@@ -348,8 +357,8 @@ public class CAMultiLaneNode implements CANode {
 		int newLane = nextLink.getParticles(intendedLane)[idxLastCell] == null && nextLink.getLastLeftUsTimes(intendedLane)[idxLastCell] < time -z ? intendedLane : -1;
 
 		if (newLane > -1 && a.getRho() >= CAMultiLaneLink.LANESWITCH_TS_TTA && MatsimRandom.getRandom().nextDouble() < CAMultiLaneLink.LANESWITCH_PROB) {
-			double bestLaneScore = nextLink.getLaneScore(a, a.getLane());
-			for (int i = 0; i < this.lanes; i++) {
+			double bestLaneScore = nextLink.getLaneScore(a, intendedLane);
+			for (int i = 0; i < nextLink.getNrLanes(); i++) {
 				double laneScore = nextLink.getLaneScore(a, i);
 				if (nextLink.getParticles(i)[idxLastCell] == null && nextLink.getLastLeftDsTimes(i)[idxLastCell] < time -z) {
 					if (laneScore > bestLaneScore) {
@@ -527,15 +536,15 @@ public class CAMultiLaneNode implements CANode {
 		for (int lane = 0; lane < nextLink.getNrLanes(); lane++) {
 			CAMoveableEntity cand = nextLink.getParticles(lane)[0];
 			if (cand != null && cand.getDir() == -1) {
-				int intendedLane = CAMultiLaneLink.getIntendedLane(lane, nextLink.getNrLanes(), this.getNRLanes());
+				int intendedLane = CAMultiLaneLink.getIntendedLane(lane, nextLink.getNrLanes(), this.getNrLanes());
 				if (intendedLane == a.getLane()) {
 					cands.add(lane);
 				}
 			}
 		}
 		if (cands.size() == 0) {
-			log.info("situation at link's upstream end for agent: " + a
-					+ " has changed, dropping event.");
+//			log.info("situation at link's upstream end for agent: " + a
+//					+ " has changed, dropping event.");
 			return;
 		}
 		int lane = cands.get(MatsimRandom.getRandom().nextInt(cands.size()));
@@ -589,7 +598,7 @@ public class CAMultiLaneNode implements CANode {
 			CAMoveableEntity swapA, CAMultiLaneLink nextLink, double time) {
 
 		int cellIdx = 0;
-		int intendedLane = CAMultiLaneLink.getIntendedLane(swapA.getLane(), this.getNRLanes(), nextLink.getNrLanes());
+		int intendedLane = CAMultiLaneLink.getIntendedLane(swapA.getLane(), this.getNrLanes(), nextLink.getNrLanes());
 		if (nextLink.getParticles(intendedLane)[cellIdx] == null) {
 			triggerTTA(swapA, this, time + this.tFree);
 		} else if (nextLink.getParticles(intendedLane)[cellIdx].getDir() == -1){
@@ -636,7 +645,7 @@ public class CAMultiLaneNode implements CANode {
 
 		int cellIdx = nextLink.getNumOfCells() - 1;
 
-		int intendedLane = CAMultiLaneLink.getIntendedLane(swapA.getLane(), this.getNRLanes(), nextLink.getNrLanes());
+		int intendedLane = CAMultiLaneLink.getIntendedLane(swapA.getLane(), this.getNrLanes(), nextLink.getNrLanes());
 		if (nextLink.getParticles(intendedLane)[cellIdx] == null) {
 			triggerTTA(swapA, this, time + this.tFree);
 		} else if (nextLink.getParticles(intendedLane)[cellIdx].getDir() == 1){
@@ -688,15 +697,15 @@ public class CAMultiLaneNode implements CANode {
 		for (int lane = 0; lane < nextLink.getNrLanes(); lane++) {
 			CAMoveableEntity cand = nextLink.getParticles(lane)[cellIdx];
 			if (cand != null && cand.getDir() == 1) {
-				int intendedLane = CAMultiLaneLink.getIntendedLane(lane, nextLink.getNrLanes(), this.getNRLanes());
+				int intendedLane = CAMultiLaneLink.getIntendedLane(lane, nextLink.getNrLanes(), this.getNrLanes());
 				if (intendedLane == a.getLane()) {
 					cands.add(lane);
 				}
 			}
 		}
 		if (cands.size() == 0) {
-			log.info("situation at link's downstream end for agent: " + a
-					+ " has changed, dropping event.");
+//			log.info("situation at link's downstream end for agent: " + a
+//					+ " has changed, dropping event.");
 			return;
 		}
 
@@ -803,7 +812,8 @@ public class CAMultiLaneNode implements CANode {
 		return this.tFree;
 	}
 
-	public final int getNRLanes() {
+	@Override
+	public int getNrLanes() {
 		return this.lanes;
 	}
 
@@ -831,5 +841,7 @@ public class CAMultiLaneNode implements CANode {
 		this.net.unregisterAgent(a);
 		triggerPrevAgent(time,a.getLane());
 	}
+
+
 
 }

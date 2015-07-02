@@ -20,6 +20,9 @@
 
 package playground.gregor.casim.simulation.physics;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
@@ -36,8 +39,9 @@ public abstract class CAMoveableEntity {
 	private double lastMovementTime = 0;
 	private double spd = AbstractCANetwork.V_HAT;
 	
-	private final double [] laneSpds = new double[8];
-	private final double [] updates = new double[8];
+//	private final double [] laneSpds = new double[8];
+//	private final double [] updates = new double[8];
+	private final Map<Integer,Double> laneSpds = new HashMap<>();
 	private int nextLane = 0;
 	
 	public void proceed() {
@@ -61,19 +65,26 @@ public abstract class CAMoveableEntity {
 //		double oldW = (this.updates[lane]/(this.updates[lane]+1));
 //		double newW = (1/(this.updates[lane]+1));
 		
-		double oldW = 0;
-		double newW = 1;
+//		double oldW = 0;
+//		double newW = 1;
 //		if (this.updates[lane] < 10) {
 //			System.out.println(this.updates[lane]);
 //		}
-		
-		this.laneSpds[lane] *= oldW;
-		this.laneSpds[lane] += newW * spd;
-		this.updates[lane]++;
+//		
+//		this.laneSpds[lane] *= oldW;
+//		this.laneSpds[lane] += newW * spd;
+//		this.updates[lane]++;
+		this.laneSpds.put(lane, spd);
 	}
 	
 	public double getLaneSpeed(int lane) {
-		return this.laneSpds[lane];
+//		return this.laneSpds[lane];
+		Double speed = this.laneSpds.get(lane);
+		if (speed == null) {
+			return AbstractCANetwork.V_HAT;
+		}
+		return speed;
+		
 	}
 	
 	public void setNextLane(int lane) {

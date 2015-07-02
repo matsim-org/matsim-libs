@@ -52,8 +52,12 @@ import playground.gregor.vis.VisRequestHandler;
 
 /**
  * Centerpiece of the bidirectional 1d ca simulation. Basic idea is based on
- * Flötteröd and Lämmel (forthcoming); Bidirectional pedestrian fundamental
- * diagram. Transportation Research Part B
+ * Flötteröd and Lämmel (2015); Bidirectional pedestrian fundamental
+ * diagram. Transportation Research Part B, 71(1), pp. 192--212
+ * 
+ * Implementation is discussed in 
+ * Lämmel and Flötteröd (2015); A CA model for bidirectional pestrian streams. 
+ * Procedia Computer Science, 52, pp. 950--955
  * 
  * @author laemmel
  *
@@ -94,7 +98,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 
 	private static int EXP_WARN_CNT;
 
-	public static int NR_THREADS = 1;
+	public static int NR_THREADS = 3;
 
 	public static VisRequestHandler STATIC_VIS_HANDLER = null;
 	private final CyclicBarrier barrier1 = new CyclicBarrier(NR_THREADS + 1);
@@ -110,9 +114,11 @@ abstract public class AbstractCANetwork implements CANetwork {
 	private final CANetsimEngine engine;
 
 	private double time2;
+	
+	private double caSimTime = -1;
 
 	public static CAMultiLaneFlowAnalyzer f;
-	
+
 	public AbstractCANetwork(Network net, EventsManager em,
 			CANetsimEngine engine, CASimDensityEstimatorFactory fac) {
 		this.net = net;
@@ -168,8 +174,17 @@ abstract public class AbstractCANetwork implements CANetwork {
 			}
 			int cnt = 0;
 			while (this.events.peek() != null
-					&& this.events.peek().getEventExcexutionTime() <= timeFrameEnd) {
+					&& this.events.peek().getEventExcexutionTime() < timeFrameEnd) {
 				CAEvent e = this.events.poll();
+				if (this.monitors.size() > 0  && e.getEventExcexutionTime() >= (caSimTime+1./10.)) {
+					double diff = e.getEventExcexutionTime()-caSimTime;
+					for (Monitor m : this.monitors) {
+						m.trigger(e.getEventExcexutionTime());
+					}
+					caSimTime = e.getEventExcexutionTime()- (diff < 1 ? diff-0.1 : 0);
+				}
+				
+				
 				cnt++;
 				int thread = e.getCANetworkEntity().threadNR();
 				// log.info("added to thread: " + thread);
@@ -223,9 +238,9 @@ abstract public class AbstractCANetwork implements CANetwork {
 				throw new RuntimeException(e);
 			}
 		}
-		if (STATIC_VIS_HANDLER != null) {
-			// draw2(time);
-			STATIC_VIS_HANDLER.update(time);
+		if (STATIC_VIS_HANDLER != null || EMIT_VIS_EVENTS) {
+			draw2(time);
+			//			STATIC_VIS_HANDLER.update(time);
 		}
 	}
 
@@ -254,7 +269,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 				CAMultiLaneDensityEstimatorSPHII.ACTIVATED = true;
 				CAMultiLaneLink.LANESWITCH = true;
 			}
-			
+
 			if (time > endTime) {
 				break;
 			}
@@ -287,15 +302,15 @@ abstract public class AbstractCANetwork implements CANetwork {
 	}
 
 	private void draw2(double time) {
-//		if (time < 2*3600) {
-//			if (((int)time)%60 != 0) {
-//				return;
-//			}
-//		}
+		//		if (time < 2*3600) {
+		//			if (((int)time)%60 != 0) {
+		//				return;
+		//			}
+		//		}
 		for (CALink ll : this.caLinks.values()) {
-//			if (!ll.getLink().getId().toString().equals("0")){
-//				continue;
-//			}
+			//			if (!ll.getLink().getId().toString().equals("0")){
+			//				continue;
+			//			}
 			if (ll instanceof CASingleLaneLink) {
 				drawCALinkDynamic((CASingleLaneLink) ll, time);
 			} else if (ll instanceof CAMultiLaneLink) {
@@ -313,7 +328,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 	}
 
 	private void drawCANodeParallelQueues(CAMultiLaneNode n, double time) {
-		int lanes = n.getNRLanes();
+		int lanes = n.getNrLanes();
 		double laneWidth = n.getWidth() / lanes;
 
 		double x = n.getNode().getCoord().getX();
@@ -374,21 +389,23 @@ abstract public class AbstractCANetwork implements CANetwork {
 		for (int lane = 0; lane < l.getNrLanes(); lane++) {
 			double x = x0 + lane * hx;
 			double y = y0 + lane * hy;
-			
-			double lx0 = x - hx/2;
-			double ly0 = y - hy/2;
-			double lx1 = l.getLink().getToNode().getCoord().getX() - hx * lanes
-					/ 2  + dx / 2 + lane*hx;
-			double ly1 = l.getLink().getToNode().getCoord().getY() - hy * lanes
-					/ 2  + dy / 2 + lane*hy;
-			LineSegment ls = new LineSegment();
-			ls.x0 = lx0;
-			ls.x1 = lx1;
-			ls.y0 = ly0;
-			ls.y1 = ly1;
-			LineEvent le = new LineEvent(time,ls,false,0,0,0,128,0);
-			this.em.processEvent(le);
-			
+
+			if (lane == 0 || lane == l.getNrLanes()-1) {
+				double lx0 = x - hx/2;
+				double ly0 = y - hy/2;
+				double lx1 = l.getLink().getToNode().getCoord().getX() - hx * lanes
+						/ 2  + dx / 2 + lane*hx;
+				double ly1 = l.getLink().getToNode().getCoord().getY() - hy * lanes
+						/ 2  + dy / 2 + lane*hy;
+				LineSegment ls = new LineSegment();
+				ls.x0 = lx0;
+				ls.x1 = lx1;
+				ls.y0 = ly0;
+				ls.y1 = ly1;
+
+				LineEvent le = new LineEvent(time,ls,false,0,0,0,128,0);
+				this.em.processEvent(le);
+			}
 			for (int i = 0; i < l.getNumOfCells(); i++) {
 				if (l.getParticles(lane)[i] != null) {
 					double ddx = 1;
@@ -399,7 +416,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 							l.getParticles(lane)[i].getId(), x, y, ldx * ddx,
 							ldy * ddx, time);
 					this.em.processEvent(e);
-					
+
 				}
 				x += dx;
 				y += dy;
@@ -446,7 +463,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 				;
 				XYVxVyEventImpl e = new XYVxVyEventImpl(
 						l.getParticles()[i].getId(), x + dx / 2 + hx0 + lane
-								* hx, y + dy / 2 + hy0 + lane * hy, ldx * ddx,
+						* hx, y + dy / 2 + hy0 + lane * hy, ldx * ddx,
 						ldy * ddx, time);
 
 				this.em.processEvent(e);
@@ -478,10 +495,10 @@ abstract public class AbstractCANetwork implements CANetwork {
 		// log.info("==> " + event);
 		// }
 
-//		if (event.toString().equals("time:36.85267143895816 type:SWAP obsolete:false agent:r2316 pos:0 entity:2 thread:main")) {
-//			log.info("Gotcha!");
-//		}
-		
+		//		if (event.toString().equals("time:36.85267143895816 type:SWAP obsolete:false agent:r2316 pos:0 entity:2 thread:main")) {
+		//			log.info("Gotcha!");
+		//		}
+
 		event.getCAAgent().setCurrentEvent(event);
 		// this.events.add(event);
 		Worker w = this.workerMap.get(Thread.currentThread().getName());
@@ -564,7 +581,7 @@ abstract public class AbstractCANetwork implements CANetwork {
 					boolean gotLock = true;
 					while (this.local.peek() != null
 							&& this.local.peek().getEventExcexutionTime() < event
-									.getEventExcexutionTime()) {
+							.getEventExcexutionTime()) {
 						CAEvent levent = this.local.poll();
 						this.cnt++;
 						int state = levent.tryLock();
@@ -688,6 +705,10 @@ abstract public class AbstractCANetwork implements CANetwork {
 		for (int i = 0; i < NR_THREADS; i++) {
 			this.workers[i].add(new CAEvent(Double.NaN, null, null,
 					CAEventType.END_OF_SIM));
+		}
+		
+		for (Monitor m : this.monitors) {
+			m.reset();
 		}
 
 	}

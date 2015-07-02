@@ -1,9 +1,9 @@
-/* *******************************************import org.matsim.core.mobsim.qsim.QSim;
-: org.matsim.*
+/* *********************************************************************** *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,29 +16,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.gregor.casim.simulation;
+package playground.gregor.gctpeds;
 
-import org.matsim.core.mobsim.qsim.QSim;
+import playground.gregor.gctpeds.demand.DemandGenerator;
+import playground.gregor.gctpeds.network.NetworkFromOSM;
+import playground.gregor.gctpeds.trafficlights.NetworkChangeEventsGenerator;
 
-import playground.gregor.casim.simulation.physics.CAMultiLaneDensityEstimatorSPHFactory;
-import playground.gregor.casim.simulation.physics.CAMultiLaneNetworkFactory;
-import playground.gregor.casim.simulation.physics.CANetworkFactory;
+public class Generator {
 
-public final class CANetsimEngineModule {
-
-	public static void configure(QSim qSim) {
-		
-		
-		CANetworkFactory fac = new CAMultiLaneNetworkFactory();
-		fac.setDensityEstimatorFactory(new CAMultiLaneDensityEstimatorSPHFactory());
-		CANetsimEngine cae = new CANetsimEngine(qSim, fac);
-		if (qSim.getScenario().getConfig().network().isTimeVariantNetwork()) {
-			CANetworkChangeEventsEngine change = new CANetworkChangeEventsEngine(cae);
-			qSim.addMobsimEngine(change);
-		}
-		qSim.addMobsimEngine(cae);
-		qSim.addDepartureHandler(cae.getDepartureHandler());
-
+	public static void main(String [] args) {
+		NetworkFromOSM.main(null);
+//		NetworkChangeEventsGenerator.main(null);
+		DemandGenerator.main(null);
 	}
-
 }

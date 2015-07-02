@@ -574,4 +574,10 @@ public class CASingleLaneNode implements CANode {
 	public double getY() {
 		return y;
 	}
+
+	@Override
+	public int getNrLanes() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

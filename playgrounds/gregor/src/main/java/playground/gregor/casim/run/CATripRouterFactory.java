@@ -29,12 +29,14 @@ import org.matsim.core.router.old.DefaultRoutingModules;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 
+import playground.gregor.sim2d_v4.scenario.TransportMode;
+
 public class CATripRouterFactory implements TripRouterFactory {
 
 	private static final Logger log = Logger
 			.getLogger(CATripRouterFactory.class);
 
-	private final String mainMode = "walkca";
+	private final String mainMode = TransportMode.walkca;
 
 	private Scenario scenario;
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;

@@ -29,5 +29,7 @@ public interface Monitor {
 	public abstract void report(BufferedWriter bw) throws IOException;
 
 	void init();
+	
+	public abstract void reset();
 
 }

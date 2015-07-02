@@ -128,7 +128,7 @@ public class CASimVisRequestHandler implements VisRequestHandler {
 	}
 
 	private void update(CAMultiLaneNode n, EventContainer c) {
-		int lanes = n.getNRLanes();
+		int lanes = n.getNrLanes();
 		double laneWidth = n.getWidth() / lanes;
 
 		double x = n.getNode().getCoord().getX();

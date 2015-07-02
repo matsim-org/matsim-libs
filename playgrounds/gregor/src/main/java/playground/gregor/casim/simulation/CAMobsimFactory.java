@@ -69,9 +69,9 @@ public class CAMobsimFactory implements MobsimFactory {
 		} else {
 			agentFactory = new DefaultAgentFactory(qSim);
 		}
-		if (sc.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
-		}
+//		if (sc.getConfig().network().isTimeVariantNetwork()) {
+//			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
+//		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(
 				sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);

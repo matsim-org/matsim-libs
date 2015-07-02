@@ -57,7 +57,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	public static final double LANESWITCH_PROB = 10.1;
 
-	public static boolean LANESWITCH = false;
+	public static boolean LANESWITCH = true;
 	static final double LANESWITCH_TS_TTA = 0;
 	private static final double LANESWITCH_TS_SWAP = 0;
 	// private static final double LANESWITCH_TS_TTA = 1111.8;
@@ -89,12 +89,12 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	private final double width;
 
-	private final double tFree;
+	private double tFree;
 
 	private final double ratio;
-	private final double epsilon; // TODO check if this is still needed [GL Nov.
+	private double epsilon; // TODO check if this is still needed [GL Nov.
 	// '14] // Yes, it is needed - w/o epsilon
-	// agents get stuck [GL Jan. 14]
+	// agents get stuck [GL Jan. 15]
 
 	final ReentrantLock lock = new ReentrantLock();
 
@@ -116,6 +116,15 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 	private final LinkedHashSet<CAMoveableEntity> usWaitQ = new LinkedHashSet<>();
 
 	private final MultiLaneDensityEstimator k;
+	
+	//signals 
+	private boolean isSignalized = false;
+
+	private double offset;
+
+	private double green;
+
+	private double cycle;
 
 	public CAMultiLaneLink(Link dsl, Link usl, CAMultiLaneNode ds,
 			CAMultiLaneNode us, AbstractCANetwork net,
@@ -150,6 +159,37 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		this.y = this.getLink().getToNode().getCoord().getY();
 		this.k = k;
 	}
+	
+	public boolean isSignalized() {
+		return this.isSignalized;
+	}
+	
+	public void setSignalPlan(double offset, double green, double cycle) {
+		this.offset = offset;
+		this.green = green;
+		this.cycle = cycle;
+		this.isSignalized = true;
+	}
+	
+	public double timeToWait(double time) {
+		if (offset > time) {
+			return 0;
+		}
+		double cycleTime = (time-offset)%cycle;
+		if (cycleTime <= green) {
+			return 0;
+		}
+		return cycle-cycleTime;
+	}
+	
+	
+	public void changeFreeSpd(double spd) {
+		if (spd > AbstractCANetwork.V_HAT) {
+			spd = AbstractCANetwork.V_HAT;
+		}
+		this.tFree = this.laneCellLength / spd;
+		this.epsilon = this.tFree / 1000;
+	}
 
 	public void setThreadNr(int thread) {
 		this.threadNr = thread;
@@ -161,7 +201,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 	/* package */static int getIntendedLane(int current, int fromSz, int toSz) {
 		double ratio = (double)toSz/fromSz;
-		int ret = (int)(current*ratio);
+		int ret = (int)Math.floor(current*ratio);
 		return ret;
 	}
 
@@ -473,7 +513,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			CAMoveableEntity a, double time) {
 
 
-		int intendedSlot = getIntendedLane(a.getLane(), this.getNrLanes(), this.ds.getNRLanes());
+		int intendedSlot = getIntendedLane(a.getLane(), this.getNrLanes(), this.ds.getNrLanes());
 		CAMoveableEntity cand;
 		if ((cand = this.ds.peekForAgentInSlot(intendedSlot)) == null){
 			triggerTTA(a, this, time + this.tFree);	
@@ -650,7 +690,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 			CAMoveableEntity a, double time) {
 
 
-		int intendedSlot = getIntendedLane(a.getLane(), this.getNrLanes(), this.us.getNRLanes());
+		int intendedSlot = getIntendedLane(a.getLane(), this.getNrLanes(), this.us.getNrLanes());
 		CAMoveableEntity cand;
 		if ((cand = this.us.peekForAgentInSlot(intendedSlot)) == null) {
 			triggerTTA(a, this, time + this.tFree);
@@ -755,7 +795,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		int lane = a.getLane();
 		double[] exitTimes = this.ds.getLastNodeExitTimeForAgent(a);
-		int intendedSlot = getIntendedLane(lane, this.lanes, this.ds.getNRLanes());//simple spreading approach, let's see if it works out [GL March 2015]
+		int intendedSlot = getIntendedLane(lane, this.lanes, this.ds.getNrLanes());//simple spreading approach, let's see if it works out [GL March 2015]
 		int newLane = this.ds.peekForAgentInSlot(intendedSlot) == null && exitTimes[intendedSlot] < time-z ? intendedSlot : -1;
 		if (newLane > -1 && a.getRho() >= LANESWITCH_TS_TTA && MatsimRandom.getRandom().nextDouble() < LANESWITCH_PROB) {
 			updateLaneScore(a, time);
@@ -863,7 +903,7 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		// 1. try to find empty slot with last left time < time - z
 		double[] exitTimes = this.us.getLastNodeExitTimeForAgent(a);
 
-		int intendedSlot = getIntendedLane(lane, this.lanes, this.us.getNRLanes());//simple spreading approach, let's see if it works out [GL March 2015]
+		int intendedSlot = getIntendedLane(lane, this.lanes, this.us.getNrLanes());//simple spreading approach, let's see if it works out [GL March 2015]
 		int newLane = this.us.peekForAgentInSlot(intendedSlot) == null && exitTimes[intendedSlot] < time-z ? intendedSlot : -1;
 		if (newLane > -1 && a.getRho() >= LANESWITCH_TS_TTA && MatsimRandom.getRandom().nextDouble() < LANESWITCH_PROB) {
 			updateLaneScore(a, time);
@@ -940,8 +980,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 		CAMoveableEntity peek = this.ds
 				.peekForAgentWhoWantsToEnterLaneOnLink(lane,this.usl.getId(),this.getNrLanes());
 		if (peek == null) {
-			log.info("situation for agent: " + a
-					+ " at downstream node has changed, dropping event.");
+//			log.info("situation for agent: " + a
+//					+ " at downstream node has changed, dropping event.");
 			return;
 		}
 
@@ -983,8 +1023,8 @@ public class CAMultiLaneLink implements CANetworkEntity, CALink {
 
 		// validate situation
 		if (peek == null) {
-			log.info("situation for: " + a
-					+ " at upstream node has changed, dropping event.");
+//			log.info("situation for: " + a
+//					+ " at upstream node has changed, dropping event.");
 			return;
 		}
 		int nodeLane = peek.getLane();

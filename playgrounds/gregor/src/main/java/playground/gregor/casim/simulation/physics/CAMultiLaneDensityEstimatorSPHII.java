@@ -30,7 +30,7 @@ public class CAMultiLaneDensityEstimatorSPHII implements
 			.getLogger(CAMultiLaneDensityEstimatorSPHII.class);
 	private final int misses = 0;
 	private final AbstractCANetwork net;
-	public static int H = 6;
+	public static final int H = 6;
 	
 	public static boolean ACTIVATED = false;
 	
@@ -50,11 +50,11 @@ public class CAMultiLaneDensityEstimatorSPHII implements
 		CANetworkEntity ett = e.getCurrentCANetworkEntity();
 		int lane = e.getLane();
 		if (ett instanceof CAMultiLaneNode) {
-			collectNode(e,(CAMultiLaneNode)ett,parts,0,lane);
+			collectNode(e,(CAMultiLaneNode)ett,parts,0,lane,ett.getNrLanes());
 		} else {
 			int pos = e.getPos();
 			int dir = e.getDir();
-			collectLink(e, (CAMultiLaneLink)ett, parts, dir, pos, lane, 0);
+			collectLink(e, (CAMultiLaneLink)ett, parts, dir, pos, 0,lane, ett.getNrLanes());
 		}
 		double b = 0;		
 		if (parts[0] != null) {
@@ -71,20 +71,25 @@ public class CAMultiLaneDensityEstimatorSPHII implements
 	}
 
 	private void collectNode(CAMoveableEntity e, CAMultiLaneNode ett, CAMoveableEntity[] parts,
-			int idx, int lane) {
-		parts[idx++] =  ett.peekForAgentInSlot(lane);
+			int idx, int intendedLane, int lastNrLanes) {
+		
+		intendedLane = CAMultiLaneLink.getIntendedLane(intendedLane, lastNrLanes, ett.getNrLanes());
+		parts[idx++] =  ett.peekForAgentInSlot(intendedLane);
 		
 		if (idx == parts.length) {
 			return;
 		}
 		
-		if (++logWarnCnt < 100) {
-			log.warn("current implementation works only for equal link width networks");
-			if (logWarnCnt == 99) {
-				log.warn(Gbl.FUTURE_SUPPRESSED);
-			}
-		}
+//		if (++logWarnCnt < 100) {
+//			log.warn("current implementation works only for equal link width networks");
+//			if (logWarnCnt == 99) {
+//				log.warn(Gbl.FUTURE_SUPPRESSED);
+//			}
+//		}
 		Id<Link> nextId = e.getNextLinkId();
+		if (nextId == null) {
+			return;
+		}
 		CAMultiLaneLink next = (CAMultiLaneLink) this.net
 				.getCALink(nextId);
 		CANode nn = next.getUpstreamCANode();
@@ -97,15 +102,20 @@ public class CAMultiLaneDensityEstimatorSPHII implements
 			nextDir = -1;
 			nextIdx = next.getSize()-1;
 		}
-		collectLink(e,next,parts,nextDir, nextIdx,lane,idx);
+		collectLink(e,next,parts,nextDir, nextIdx,idx, intendedLane,ett.getNrLanes());
 	}
 
 	private void collectLink(CAMoveableEntity e, CAMultiLaneLink link,
-			CAMoveableEntity[] parts, int dir, int linkIdx, int lane,int idx) {
-		if (link.getSize() < parts.length) {
-			throw new RuntimeException("length of link " + link + " is shorter than kernel band width!");
+			CAMoveableEntity[] parts, int dir, int linkIdx, int idx, int intendedLane, int lastNrLanes) {
+		if (link.getSize() < parts.length && logWarnCnt++ < 10) {
+			log.warn("length of link " + link + " is shorter than kernel band width!");
+			if (logWarnCnt == 9) {
+				log.warn(Gbl.FUTURE_SUPPRESSED);
+			}
+//			return;
 		}
-		CAMoveableEntity[] linkParts = link.getParticles(lane);
+		intendedLane = CAMultiLaneLink.getIntendedLane(intendedLane, lastNrLanes, link.getNrLanes());
+		CAMoveableEntity[] linkParts = link.getParticles(intendedLane);
 		int stopIdx = dir == 1 ? linkParts.length : -1;
 		while (linkIdx != stopIdx && idx < parts.length) {
 			parts[idx++] = linkParts[linkIdx];
@@ -118,7 +128,7 @@ public class CAMultiLaneDensityEstimatorSPHII implements
 			} else {
 				n = (CAMultiLaneNode) link.getUpstreamCANode();
 			}
-			collectNode(e, n, parts, idx, lane);
+			collectNode(e, n, parts, idx, intendedLane,link.getNrLanes());
 		}
 	}
 

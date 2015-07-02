@@ -359,4 +359,10 @@ public class CALinkMultiLaneMonitor implements Monitor {
 		double rho;
 		double time;
 	}
+
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
 }

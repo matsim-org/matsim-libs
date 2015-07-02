@@ -84,9 +84,9 @@ public class EventBasedVisDebuggerEngine implements
 
 	private final List<ClockedVisDebuggerAdditionalDrawer> drawers = new ArrayList<ClockedVisDebuggerAdditionalDrawer>();
 	private int nrAgents;
-
-//	 FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/jupedsim/",
-//	 "png", 10);
+//
+//	 FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/nyc/",
+//	 "png", 20);
 
 	FrameSaver fs = null;
 
@@ -97,7 +97,7 @@ public class EventBasedVisDebuggerEngine implements
 				.getSim2DConfig().getTimeStepSize();
 		this.vis = new EventsBasedVisDebugger(sc, this.fs);
 
-		this.keyControl = new Control(this.vis.zoomer, 90, this.fs);
+		this.keyControl = new Control(this.vis.zoomer, 20, this.fs);
 		this.vis.addKeyControl(this.keyControl);
 		init();
 	}

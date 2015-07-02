@@ -20,11 +20,15 @@
 package playground.gregor.casim.simulation.physics;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.gregor.casim.monitoring.CAMultiLaneTrajectoryWriter;
+import playground.gregor.casim.proto.CALinkInfos.CALinInfos;
+import playground.gregor.casim.proto.CALinkInfos.CALinInfos.CALinkInfo;
 import playground.gregor.casim.simulation.CANetsimEngine;
 import playground.gregor.vis.CASimVisRequestHandler;
 
@@ -45,6 +49,9 @@ public class CAMultiLaneNetwork extends AbstractCANetwork {
 	}
 
 	private void init() {
+
+
+
 		super.tFreeMin = Double.POSITIVE_INFINITY;
 		for (Node n : this.net.getNodes().values()) {
 
@@ -87,6 +94,35 @@ public class CAMultiLaneNetwork extends AbstractCANetwork {
 		}
 
 		log.info("Minimal free speed cell travel time is: " + this.tFreeMin);
+
+
+		Object o = this.getEngine().getMobsim().getScenario().getScenarioElement("CALinkInfos");
+		CALinInfos infos = null;
+		if (o != null) {
+
+			infos = (CALinInfos) o;
+			log.info("creating signal plans");
+			for (CALinkInfo inf : infos.getCaLinkInfoList()) {
+				if (inf.getCycle() > 0) {
+					Id<Link> id = Id.createLinkId(inf.getId());
+					CAMultiLaneLink caLink = (CAMultiLaneLink) this.caLinks.get(id);
+					caLink.setSignalPlan(inf.getOffset(),inf.getWk(), inf.getCycle());
+				}
+			}
+			if (EMIT_VIS_EVENTS) {
+				log.info("creating monitors");
+				for (CALinkInfo inf : infos.getCaLinkInfoList()) {
+					if (inf.getMonitor()) {
+						Id<Link> id = Id.createLinkId(inf.getId());
+						CAMultiLaneLink caLink = (CAMultiLaneLink) this.caLinks.get(id);
+						String outDir = this.getEngine().getMobsim().getScenario().getConfig().controler().getOutputDirectory();
+						CAMultiLaneTrajectoryWriter m = new CAMultiLaneTrajectoryWriter(caLink, outDir);
+						this.addMonitor(m);
+					}
+				}
+			}
+		}
+
 
 	}
 }

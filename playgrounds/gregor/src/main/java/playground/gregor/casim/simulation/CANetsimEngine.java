@@ -27,6 +27,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+
 import playground.gregor.casim.simulation.physics.CANetwork;
 import playground.gregor.casim.simulation.physics.CANetworkFactory;
 import playground.gregor.casim.simulation.physics.CAVehicle;
@@ -65,7 +66,6 @@ public class CANetsimEngine implements MobsimEngine {
 		log.info("prepare");
 		this.caNet = fac.createCANetwork(sim.getScenario().getNetwork(),
 				sim.getEventsManager(), this);
-
 	}
 
 	@Override

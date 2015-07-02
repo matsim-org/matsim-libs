@@ -24,10 +24,17 @@ import java.io.IOException;
 
 import com.google.inject.Provider;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.cadyts.car.CadytsContext;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -37,6 +44,15 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
 
 import playground.gregor.casim.proto.CALinkInfos.CALinInfos;
 import playground.gregor.casim.simulation.CAMobsimFactory;
@@ -54,7 +70,7 @@ import playground.gregor.vis.CASimVisRequestHandler;
 import playground.gregor.vis.VisRequestHandler;
 import playground.gregor.vis.VisServer;
 
-public class CARunner implements IterationStartsListener {
+public class CAwCadytsRunner implements IterationStartsListener {
 
 	private Controler controller;
 	private QSimDensityDrawer qSimDrawer;
@@ -65,14 +81,15 @@ public class CARunner implements IterationStartsListener {
 			System.exit(-1);
 		}
 		String qsimConf = args[0];
-		Config c = ConfigUtils.loadConfig(qsimConf);
+		final Config c = ConfigUtils.loadConfig(qsimConf);
 
-		c.controler().setOutputDirectory("/Users/laemmel/devel/nyc/output2/");
+		c.plans().setInputFile("/Users/laemmel/devel/nyc/gct_vicinity/calibrated_plans.xml.gz");
 		
 		c.controler().setWriteEventsInterval(1);
 		c.controler().setMobsim("casim");
+		c.controler().setLastIteration(0);
+		c.controler().setOutputDirectory("/Users/laemmel/devel/nyc/output_measurements/");
 		Scenario sc = ScenarioUtils.loadScenario(c);
-		
 		
 		CALinInfos infos = null;
 		try {
@@ -84,7 +101,6 @@ public class CARunner implements IterationStartsListener {
 		}
 		sc.addScenarioElement("CALinkInfos", infos);
 		
-		
 		// sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME, sim2dsc);
 
 		// c.qsim().setEndTime(120);
@@ -93,6 +109,10 @@ public class CARunner implements IterationStartsListener {
 
 		final Controler controller = new Controler(sc);
 		
+		
+		// create the cadyts context and add it to the control(l)er:
+		final CadytsContext cContext = new CadytsContext(c);
+		controller.addControlerListener(cContext);
 		
 
 		controller.getConfig().controler().setOverwriteFileSetting(
@@ -122,11 +142,13 @@ public class CARunner implements IterationStartsListener {
 			}
 		});
 
+
+		
 		controller.addControlerListener(new IterationStartsListener() {
 			
 			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
-				if ((event.getIteration()) % 100 == 0 && (event.getIteration()) > 0) {
+				if (event.getIteration() % 100 == 0){// && event.getIteration() > 0) {
 					AbstractCANetwork.EMIT_VIS_EVENTS = true;
 				} else {
 					AbstractCANetwork.EMIT_VIS_EVENTS = false;
@@ -135,11 +157,31 @@ public class CARunner implements IterationStartsListener {
 			}
 		});
 
-		// DefaultTripRouterFactoryImpl fac = builder.build(sc);
-		// DefaultTripRouterFactoryImpl fac = new
-		// DefaultTripRouterFactoryImpl(sc, null, null);
+		
+		
+		// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
+		controller.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			@Override
+			public ScoringFunction createNewScoringFunction(Person person) {
 
-		// controller.setTripRouterFactory(fac);
+				final CharyparNagelScoringParameters params = CharyparNagelScoringParameters.getBuilder(c.planCalcScore()).create();
+				
+				SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controller.getScenario().getNetwork()));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+
+				final CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), c, cContext);
+				final double cadytsScoringWeight = 30. * c.planCalcScore().getBrainExpBeta() ;
+				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+
+				return scoringFunctionAccumulator;
+			}
+		}) ;
+
+		
+		
 		controller.run();
 	}
 

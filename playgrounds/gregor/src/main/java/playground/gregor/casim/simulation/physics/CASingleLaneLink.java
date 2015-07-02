@@ -971,4 +971,10 @@ public class CASingleLaneLink implements CANetworkEntity, CALink {
 	public double getY() {
 		return y;
 	}
+
+	@Override
+	public int getNrLanes() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
