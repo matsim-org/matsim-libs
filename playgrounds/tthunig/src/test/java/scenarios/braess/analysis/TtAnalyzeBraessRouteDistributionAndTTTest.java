@@ -1,5 +1,10 @@
 /**
+ * *This class tests the functionality of the getTotalTT method in the class TtAnalyzeBraessRouteDistributionAndTT.
+ * The network used is the basic Braess Scenario with unlimited capacity
+ * The number of persons traveling through the scenario and the traveltime per link can be varied.
  * 
+ * @author Tilmann Schlenther
+ *
  */
 package scenarios.braess.analysis;
 
@@ -23,20 +28,13 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import scenarios.braess.createInput.TtCreateBraessPopulation;
 
-/**This class tests the functionality of the getTotalTT method in the class TtAnalyzeBraessRouteDistributionAndTT.
- * The network used is the basic Braess Scenario with unlimited capacity
- * The number of persons traveling through the scenario and the traveltime per link can be varied.
- * 
- * @author Tilmann Schlenther
- *
- */
 public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	private final int NUMBER_OF_PERSONS = 5;
+	private final int NUMBER_OF_PERSONS = 1;
 	
-	private int TTPERLink = 10;
+	private int TTPerLink = 3;
 	
 	private boolean agentsToStuck = false;
 	
@@ -49,9 +47,9 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	@Test
 	public void testGetTotalTT() {
-		outputdir = utils.getOutputDirectory() + "/Test_LinkTT" + TTPERLink;
+		outputdir = utils.getOutputDirectory() + "/Test_LinkTT" + TTPerLink;
 		//TTperLink must not be 0;
-		if(TTPERLink == 0) TTPERLink = 1;
+		if(TTPerLink == 0) TTPerLink = 1;
 		runSimulation(agentsToStuck);
 		EventsManager events = EventsUtils.createEventsManager();
 		TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
@@ -61,14 +59,14 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		reader.readFile(outputdir+"/ITERS/it.0/0.events.xml");
 		
 		
-		/*expectedTravelTime depends on TTperLink
+		/*expectedTravelTime depends on variable TTperLink
 		*LinkTravelTime on Link 0_1 always is 1 sec
 		*LinkTravelTime on Links between Node 1 and 5 is TTperLink +1 (MATSim's TimeStep-logic)
 		*=> so you get 4 extra seconds in this scenario
 		*LinkTraveltime on Link 5_6 is equivalent to TTperLink
 		*/
 		
-		Double expectedTravelTime = (double) (1+5*TTPERLink+4)*NUMBER_OF_PERSONS;
+		Double expectedTravelTime = (double) (1+5*TTPerLink+4)*NUMBER_OF_PERSONS;
 		
 		Assert.assertEquals("iteration 0: TT stimmt nicht", expectedTravelTime , handler.getTotalTT(), MatsimTestUtils.EPSILON);
 		events.resetHandlers(0);
@@ -121,7 +119,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		config.controler().setWritePlansInterval(1);
 		
 		//set StuckTime
-		config.qsim().setStuckTime(1800);
+//		config.qsim().setStuckTime(20);
 		
 		ActivityParams dummyAct = new ActivityParams("dummy");
 		dummyAct.setTypicalDuration(12 * 3600);
@@ -137,16 +135,17 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		for(Link l : scenario.getNetwork().getLinks().values()){
 			// modify the capacity and/or length of the middle link to let agents stuck
 			if(agentsToStuck && l.getId().equals(Id.createLinkId("3_4"))){
-				if(agentsToStuck){
-						l.setLength(90000);
-						l.setFreespeed(1);
-						l.setCapacity(1);
-						// TODO
-				}
+						scenario.getConfig().qsim().setStuckTime(TTPerLink + 1);
+						scenario.getConfig().qsim().setRemoveStuckVehicles(true);
+						l.setFreespeed(200/(TTPerLink+10));
+						l.setCapacity(1);				
 			}
-			else{
+			else if (agentsToStuck && l.getId().equals(Id.createLinkId("4_5"))){
+				l.setCapacity(1);
+			}	
+			else{	
 				l.setCapacity(999999);
-				l.setFreespeed(200/TTPERLink);
+				l.setFreespeed(200/TTPerLink);
 			}
 		}
 	}
