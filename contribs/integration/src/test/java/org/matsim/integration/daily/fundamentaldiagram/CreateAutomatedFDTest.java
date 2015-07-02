@@ -66,7 +66,9 @@ import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -95,6 +97,114 @@ import org.matsim.vehicles.VehicleUtils;
 
 @RunWith(Parameterized.class)
 public class CreateAutomatedFDTest {
+
+	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
+		private static int counter = 0 ;
+		private MobsimVehicle vehicle;
+
+		@Override
+		public Id<Link> getCurrentLinkId() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public Id<Link> getDestinationLinkId() {
+			return null ;
+		}
+
+		@Override
+		public Id<Person> getId() {
+			counter++ ;
+			return Id.createPersonId("simpleRoundAndRoundAgent" + counter ) ;
+		}
+
+		@Override
+		public Id<Link> chooseNextLinkId() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public void notifyMoveOverNode(Id<Link> newLinkId) {
+		}
+
+		@Override
+		public boolean isWantingToArriveOnCurrentLink() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public void setVehicle(MobsimVehicle veh) {
+			this.vehicle = veh ;
+		}
+
+		@Override
+		public MobsimVehicle getVehicle() {
+			return this.vehicle ;
+		}
+
+		@Override
+		public Id<Vehicle> getPlannedVehicleId() {
+			return null ;
+		}
+
+		@Override
+		public State getState() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public double getActivityEndTime() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public void endActivityAndComputeNextState(double now) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public void endLegAndComputeNextState(double now) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public void setStateToAbort(double now) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public Double getExpectedTravelTime() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public Double getExpectedTravelDistance() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public String getMode() {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+		@Override
+		public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
+			// TODO Auto-generated method stub
+			throw new RuntimeException("not implemented");
+		}
+
+	}
 
 	public CreateAutomatedFDTest(LinkDynamics linkDynamics, TrafficDynamics trafficDynamics) {
 		this.linkDynamics = linkDynamics;
@@ -206,7 +316,7 @@ public class CreateAutomatedFDTest {
 			globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(scenario, mode2FlowData);
 			events.addHandler(globalFlowDynamicsUpdator);
 
-			QSim qSim = new QSim(scenario, events);
+			final QSim qSim = new QSim(scenario, events);
 			ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
@@ -219,6 +329,17 @@ public class CreateAutomatedFDTest {
 			AgentFactory agentFactory = new MyAgentFactory(qSim);
 
 			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+
+//			AgentSource agentSource = new AgentSource(){
+//				@Override
+//				public void insertAgentsIntoMobsim() {
+//					for ( int ii=0 ; ii<2000 ; ii++ ) {
+//						MobsimAgent agent = new MySimplifiedRoundAndRoundAgent() ;
+//						qSim.insertAgentIntoMobsim(agent);
+//					}
+//
+//				}
+//			} ;
 
 			Map<String, VehicleType> travelModesTypes = new HashMap<String, VehicleType>();
 			for(String mode :travelModes){
