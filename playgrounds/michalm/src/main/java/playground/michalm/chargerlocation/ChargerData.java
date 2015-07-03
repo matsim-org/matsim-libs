@@ -19,7 +19,7 @@
 
 package playground.michalm.chargerlocation;
 
-import java.util.List;
+import java.util.*;
 
 
 public class ChargerData
@@ -38,6 +38,15 @@ public class ChargerData
         for (ChargingStation s : stations) {
             powerSum += s.getPower();
         }
+
         totalPower = powerSum;
+
+        Collections.sort(stations, new Comparator<ChargingStation>() {
+            @Override
+            public int compare(ChargingStation o1, ChargingStation o2)
+            {
+                return o1.getId().compareTo(o2.getId());
+            }
+        });
     }
 }

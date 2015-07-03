@@ -36,24 +36,41 @@ import playground.michalm.zone.Zone;
 
 public class RunChargerLocationOptimization
 {
-    private ChargerLocationProblem problem;
-    private ChargerLocationSolution initSolution;
-    private ChargerLocationSolution finalSolution;
+    //TST'15 paper
+    private static final double DELTA_SOC = 16;//kWh
 
-    private Map<Id<Zone>, Double> zonePotentials = new HashMap<>();
-    private double totalPotential = 0;
+    //ANT'15 paper
+    private static final TimeHorizon HORIZON = TimeHorizon._16H;
+
+    //MIP
+    //this restrictions influences mostly the outskirts (where speeds > 25km/h ==> TT < 6 min)
+    private static final double MAX_DISTANCE = 2_500;//m
+
+    //high value -> no infuence (the current approach); low value -> lack of chargers at TXL
+    private static final int MAX_CHARGERS_PER_ZONE = 30;
 
 
-    private enum EnergyConsumption
+    private enum EScenario
     {
-        SUMMER_HEAT(69.75), NORMAL(41.75), WINTER_COLD(105.75), WINTER_COLD_FOSSIL_HEATING(41.75);
+        //works with includeDeltaSoc=true/false
+        //        STANDARD(41.75, 50, 1.5), //
+        //        HOT_SUMMER(69.75, 50, 1.2), //
+        //        COLD_WINTER(105.75, 25, 1.05), //
+        //        COLD_WINTER_FOSSIL_HEATING(41.75, 25, 1.2);
+
+        //includeDeltaSoc=false
+        COLD_WINTER_FOSSIL_HEATING(41.75, 25, 1.1);
 
         private final double energyPerVehicle;//kWh
+        private final double chargePower;//kW
+        private final double oversupply; //smaller demand -> larger oversupply (also sensitive to includeDeltaSOC)
 
 
-        private EnergyConsumption(double energyPerVehicle)
+        private EScenario(double energyPerVehicle, double chargePower, double oversupply)
         {
             this.energyPerVehicle = energyPerVehicle;
+            this.chargePower = chargePower;
+            this.oversupply = oversupply;
         }
     }
 
@@ -81,21 +98,21 @@ public class RunChargerLocationOptimization
     }
 
 
-    private void createProblem()
+    //TST'15 paper
+    private final boolean includeDeltaSoc;
+    private final EScenario eScenario;
+
+    private ChargerLocationProblem problem;
+    private ChargerLocationSolution solution;
+
+    private Map<Id<Zone>, Double> zonePotentials = new HashMap<>();
+    private double totalPotential = 0;
+
+
+    public RunChargerLocationOptimization(EScenario eScenario, boolean includeDeltaSoc)
     {
-        //TST'15 paper
-        double chargerPower = 50;//kW
-        EnergyConsumption energyConsumption = EnergyConsumption.NORMAL;
-        double deltaSOC = 16;//kWh
-
-        //ANT'15 paper
-        TimeHorizon horizon = TimeHorizon._16H;
-
-        //LP constraints
-        double maxDistance = 5_000;//m
-        int maxChargersInZone = 30;
-        //int maxChargers = 450;
-        double supplyBuffer = 1.1;
+        this.eScenario = eScenario;
+        this.includeDeltaSoc = includeDeltaSoc;
 
         String dir = "d:/svn-vsp/sustainability-w-michal-and-dlr/data/";
         String networkFile = dir + "scenarios/2015_02_basic_scenario_v6/berlin_brb.xml";
@@ -112,10 +129,11 @@ public class RunChargerLocationOptimization
         DistanceCalculator calculator = DistanceCalculators.BEELINE_DISTANCE_CALCULATOR;
 
         Map<Id<Zone>, Zone> zones = BerlinZoneUtils.readZones(scenario, zonesXmlFile, zonesShpFile);
-        readPotentials(zones, potentialFile, horizon);
+        readPotentials(zones, potentialFile, HORIZON);
 
-        double totalEnergyConsumed = Math.max(energyConsumption.energyPerVehicle - deltaSOC, 0)
-                * horizon.vehicleCount;
+        double totalEnergyConsumed = //
+        Math.max(eScenario.energyPerVehicle - (includeDeltaSoc ? DELTA_SOC : 0), 0)
+                * HORIZON.vehicleCount;
         ZoneData zoneData = new ZoneData(zones, zonePotentials, totalEnergyConsumed
                 / totalPotential);
 
@@ -123,25 +141,17 @@ public class RunChargerLocationOptimization
         List<ChargingStation> stations = new ArrayList<>();
         for (Zone z : zones.values()) {
             Id<ChargingStation> id = Id.create(z.getId(), ChargingStation.class);
-            ChargingStation station = new ChargingStation(id, z.getCoord(), chargerPower);
+            ChargingStation station = new ChargingStation(id, z.getCoord(), eScenario.chargePower);
             stations.add(station);
         }
-        ChargerData chargerData = new ChargerData(stations, horizon.hours);
+        ChargerData chargerData = new ChargerData(stations, HORIZON.hours);
 
-        //        double maxEnergyProduced = Math.min(maxChargersInZone * stations.size(), maxChargers)
-        //                * chargerPower * timeHorizon;
-        //
-        //        if (maxEnergyProduced < totalEnergyConsumed) {
-        //            throw new RuntimeException("demand > supply: " + totalEnergyConsumed + " > "
-        //                    + maxEnergyProduced);
-        //        }
+        int maxChargers = (int)Math.ceil(eScenario.oversupply * totalEnergyConsumed
+                / (eScenario.chargePower * HORIZON.hours));
+        System.out.println("minMaxChargers = " + maxChargers);
 
-        int minMaxChargers = (int)Math.ceil(supplyBuffer * totalEnergyConsumed
-                / (chargerPower * horizon.hours));
-        System.out.println("minMaxChargers = " + minMaxChargers);
-
-        problem = new ChargerLocationProblem(zoneData, chargerData, calculator, maxDistance,
-                maxChargersInZone, minMaxChargers);
+        problem = new ChargerLocationProblem(zoneData, chargerData, calculator, MAX_DISTANCE,
+                MAX_CHARGERS_PER_ZONE, maxChargers);
     }
 
 
@@ -187,12 +197,20 @@ public class RunChargerLocationOptimization
     }
 
 
+    private void solveProblem()
+    {
+        solution = new ChargerLocationSolver(problem).solve(null);
+        writeSolution(solution);
+    }
+
+
     private void writeSolution(ChargerLocationSolution solution)
     {
         String dir = "d:/PP-rad/berlin/chargerLocation/";
-
-        writeChargers(solution.x, dir + "chargers.csv");
-        writeFlows(solution.f, dir + "flows.csv");
+        String name = eScenario.name() + (includeDeltaSoc ? "_DeltaSOC" : "_noDeltaSOC");
+        writeChargers(solution.x, dir + "chargers_out_of_" + problem.maxChargers + "_" + name
+                + ".csv");
+        writeFlows(solution.f, dir + "flows_" + name + ".csv");
     }
 
 
@@ -236,20 +254,12 @@ public class RunChargerLocationOptimization
     }
 
 
-    private void solveProblem()
-    {
-        //initSolution = new ChargerLocationFinder(problem).findInitialSolution();
-        finalSolution = new ChargerLocationSolver(problem).solve(initSolution);
-
-        writeSolution(finalSolution);
-    }
-
-
     public static void main(String[] args)
     {
-        RunChargerLocationOptimization runOptimizer = new RunChargerLocationOptimization();
-        runOptimizer.createProblem();
-        runOptimizer.solveProblem();
-
+        for (EScenario es : EScenario.values()) {
+            System.err.println("==========================" + es.name());
+//            new RunChargerLocationOptimization(es, true).solveProblem();
+            new RunChargerLocationOptimization(es, false).solveProblem();
+        }
     }
 }

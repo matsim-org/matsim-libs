@@ -47,7 +47,7 @@ public class ChargerLocationSolver
             GRBEnv env = model.getEnv();
 
             //env.set(GRB.DoubleParam.TimeLimit, mode.timeLimit);// 2 hours
-            //env.set(GRB.DoubleParam.MIPGap, 0.001);//0.1%
+            env.set(GRB.DoubleParam.MIPGap, 0.01);//0.01=1%
 
             //env.set(GRB.IntParam.MIPFocus, 1);//the focus towards finding feasible solutions
             //or alternatively: focus towards finding feasible solutions after 1 hour
