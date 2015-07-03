@@ -86,42 +86,47 @@ public class LinkLaneTTTest {
 				
 		handler.printResults();
 		
-		Assert.assertEquals("unexpected TravelTime: configuration 1 (freespeed 75)",3.0, handler.getTTV1Sp75());
-		Assert.assertEquals("unexpected TravelTime: configuration 1 (freespeed 76)",3.0, handler.getTTV1Sp76());
+		Assert.assertEquals("unexpected TravelTime: configuration 1 (freespeed 75)",
+				3.0, handler.getTTV1Sp75());
+		Assert.assertEquals("unexpected TravelTime: configuration 1 (freespeed 76)",
+				3.0, handler.getTTV1Sp76());
 
-		Assert.assertEquals("unexpected TravelTime: configuration 2 (freespeed 75)",4.0, handler.getTTV2Sp75());
-		Assert.assertEquals("unexpected TravelTime: configuration 2 (freespeed 76)",3.0, handler.getTTV2Sp76());
+		Assert.assertEquals("unexpected TravelTime: configuration 2 (freespeed 75)",
+				4.0, handler.getTTV2Sp75());
+		Assert.assertEquals("unexpected TravelTime: configuration 2 (freespeed 76)",
+				3.0, handler.getTTV2Sp76());
 
-		Assert.assertEquals("unexpected TravelTime: configuration 3 (freespeed 75)",3.0, handler.getTTV3Sp75());
-		Assert.assertEquals("unexpected TravelTime: configuration 3 (freespeed 76) => bug might be fixed if value is 3.0",2.0, handler.getTTV3Sp76());
+		Assert.assertEquals("unexpected TravelTime: configuration 3 (freespeed 75)",
+				3.0, handler.getTTV3Sp75());
+		Assert.assertEquals("unexpected TravelTime: configuration 3 (freespeed 76) "
+				+ "=> bug might be fixed if value is 3.0", 2.0, handler.getTTV3Sp76());
 
 		
 	}
 	
+	/**
+	 * The network to be created has 10 links in total. One incoming and one 
+	 * outgoing both with the length 200m and freespeed 200 m/s.
+	 * 
+	 * the following versions of a 200m link are put twice inbetween (once with 
+	 * freespeed 75 m/s, once with freespeed 76 m/s):
+	 *
+	 * normal 200m link 											(1)
+	 * split in a 50m and a 150m link 								(2)
+	 * 200m link with 50m original lane leading to one 150m lanes	(3)
+	 * 
+	 * 	
+	 * (*) stands for a Node, + for end of a lane
+	 *
+	 *
+	 *  (1)						(2)							(3)
+	 *														   	   
+	 *  (*)=====(*)				(*)===(*)====(*)			(*) ===== + =======(*)
+	 *  [..200m...]				[.50m.][.150m..]					  
+	 *													     [..50m..][..150m..]
+	 */
 	static void createNetwork(Scenario scenario){
-		/**
-		 * 
-		 * the network to be created has 10 links in total. One incoming and one outgoing both with the length 200m and freespeed=200
-		 * 
-		 * the following versions of a 200m link are put twice inbetween (once with freespeed = 75 , once with freespeed = 76)
-		 *
-		 * normal 200m link 											(1)
-		 * split in a 50m and a 150m link 								(2)
-		 * 200m link with 50m original lane leading to one 150m lanes	(3)
-		 * 		
 		
-		(*) stands for a Node, + for end of a lane
-		
-		
-		(1)						(2)							(3)
-		
-																   	   
-		(*)=====(*)				(*)===(*)====(*)			(*) ===== + =======(*)
-		[..200m...]				[.50m.][.150m..]					  
-															 [..50m..][..150m..]
-		
-
-		**/
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
 		
