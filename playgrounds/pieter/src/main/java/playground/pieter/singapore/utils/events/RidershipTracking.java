@@ -20,6 +20,7 @@
 package playground.pieter.singapore.utils.events;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -53,41 +54,85 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class RidershipTracking {
+public class RidershipTracking implements Runnable {
 
-    private final ScenarioImpl loRes;
-    private final String eventsFile;
+    private RidershipHandler ridershipHandler;
+    private ScenarioImpl scenario;
+    private String eventsFile;
     private final double maxSpeed = 80 / 3.6;
+    private String path;
+    private String suffix;
     private Map<String, RidershipTracker> vehicletrackers;
     private HashMap<Id, TransitRoute> departureIdToRoute;
     private CSVWriter ridershipWriter;
 
-    private RidershipTracking(String loResNetwork, String loResSchedule, String loResEvents) {
-        loRes = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        loRes.getConfig().scenario().setUseTransit(true);
-        new MatsimNetworkReader(loRes).readFile(loResNetwork);
-        new TransitScheduleReader(loRes).readFile(loResSchedule);
+    private RidershipTracking( String loResNetwork, String loResSchedule, String loResEvents, String path, String suffix) {
+        scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+        scenario.getConfig().scenario().setUseTransit(true);
+        new MatsimNetworkReader(scenario).readFile(loResNetwork);
+        new TransitScheduleReader(scenario).readFile(loResSchedule);
         File outpath = new File(new File(loResEvents).getParent() + "/temp");
         outpath.mkdir();
         vehicletrackers = new HashMap<>();
         this.eventsFile = loResEvents;
+        this.path = path;
+        this.suffix = suffix;
+    }
+
+    public RidershipTracking(Scenario scenario, String path, String suffix){
+        vehicletrackers = new HashMap<>();
+        this.path=path;
+        this.suffix=suffix;
+        this.scenario = (ScenarioImpl) scenario;
+        try {
+            initWriter();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (NoConnectionException e) {
+            e.printStackTrace();
+        }
+        identifyVehicleRoutes();
+        ridershipHandler = new RidershipHandler();
     }
 
     public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException {
         String loResNetwork = args[0];
         String loResSchedule = args[1];
         String loResEvents = args[2];
-        RidershipTracking xfer = new RidershipTracking(loResNetwork, loResSchedule, loResEvents);
+        RidershipTracking xfer = new RidershipTracking(loResNetwork, loResSchedule, loResEvents, args[3],args[4]);
 
-        xfer.initWriter(args[3]);
         xfer.run();
     }
 
-    void run() {
+    @Override
+    public void run() {
 
+        try {
+            initWriter();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (NoConnectionException e) {
+            e.printStackTrace();
+        }
         identifyVehicleRoutes();
         readEvents();
-
+        ridershipWriter.finish();
     }
 
     private void readEvents() {
@@ -99,7 +144,7 @@ public class RidershipTracking {
 
     }
 
-    void initWriter(String suffix)
+    void initWriter()
             throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException,
             NoConnectionException {
         DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
@@ -117,14 +162,14 @@ public class RidershipTracking {
         columns.add(new PostgresqlColumnDefinition("ridership_increment", PostgresType.INT));
         columns.add(new PostgresqlColumnDefinition("boardings", PostgresType.INT));
         columns.add(new PostgresqlColumnDefinition("alightings", PostgresType.INT));
-        ridershipWriter = new CSVWriter("RIDERSHIP"+suffix, "./", 1000, columns);
+        ridershipWriter = new CSVWriter("RIDERSHIP" + suffix, path, 1000, columns);
         ridershipWriter.addComment(String.format("MATSim ridership from events file %s, created on %s.", eventsFile,
                 formattedDate));
     }
 
     private void identifyVehicleRoutes() {
         departureIdToRoute = new HashMap<>();
-        Collection<TransitLine> lines = loRes.getTransitSchedule().getTransitLines().values();
+        Collection<TransitLine> lines = scenario.getTransitSchedule().getTransitLines().values();
         for (TransitLine line : lines) {
             Collection<TransitRoute> routes = line.getRoutes().values();
             for (TransitRoute route : routes) {
@@ -135,6 +180,14 @@ public class RidershipTracking {
                 }
             }
         }
+    }
+
+    public RidershipHandler getRidershipHandler() {
+        return ridershipHandler;
+    }
+
+    public void finish() {
+        ridershipWriter.finish();
     }
 
     class DwellEvent {

@@ -18,20 +18,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.singapore.ptsim;
+package playground.pieter.ptsim;
 
 import com.google.inject.Provider;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.analysis.events2traveldiaries.EventsToTravelDiaries;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimePreCalcSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -45,13 +52,20 @@ import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import playground.pieter.singapore.utils.events.RidershipTracking;
+import playground.sergioo.eventAnalysisTools2013.excessWaitingTime.ExcessWaitingTimeCalculator;
+import playground.sergioo.ptsim2013.TransitSheduleToNetwork;
 import playground.singapore.ptsim.pt.BoardAlightVehicleTransitStopHandlerFactory;
 import playground.singapore.ptsim.qnetsimengine.PTLinkSpeedCalculatorWithPreCalcTimes;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.NoSuchElementException;
 
 
 /**
@@ -91,19 +105,27 @@ public class ControlerWSPreCalcTimes {
                 controler.getScenario().getTransitSchedule(),
                 controler.getScenario().getConfig());
 
+
+        final MyAfterMobsimAnalyses analyses = new MyAfterMobsimAnalyses(controler);
+
+        controler.addControlerListener(analyses);
+
+
         controler.getEvents().addHandler(
                 waitTimeStuckCalculator
         );
+
         controler.getEvents().addHandler(
                 stopStopTimeCalculatorSerializable
         );
+
         //need to make MRT slower, so identify the links with this mode with a hotfix
         for (Link l : controler.getScenario().getNetwork().getLinks().values()) {
             LinkImpl l1 = (LinkImpl) l;
             String[] parts = l.getId().toString().split(TransitSheduleToNetwork.SEPARATOR);
             if (parts[0].matches("[A-Z]+[0-9]*[_a-z]*")) {
                 l1.setType("rail");
-            }else{
+            } else {
                 l1.setType("road");
             }
         }
@@ -176,6 +198,95 @@ public class ControlerWSPreCalcTimes {
         controler.run();
 
     }
-
-
 }
+
+class MyAfterMobsimAnalyses implements AfterMobsimListener, Runnable {
+
+    private Controler controler;
+    private String eventsFileName;
+    private int currentIteration;
+    private ExcessWaitingTimeCalculator eWTCalculator;
+
+    public MyAfterMobsimAnalyses(Controler controler) {
+        this.controler = controler;
+    }
+
+    @Override
+    public void notifyAfterMobsim(AfterMobsimEvent event) {
+        if (event.getIteration() % controler.getConfig().controler().getWriteEventsInterval() == 0) {
+            eventsFileName = controler.getControlerIO().getIterationFilename(event.getIteration(), "events") + ".xml.gz";
+            currentIteration = event.getIteration();
+            new Thread(this).start();
+        }
+    }
+
+    @Override
+    public void run() {
+        EventsManager events = EventsUtils.createEventsManager();
+        eWTCalculator = new ExcessWaitingTimeCalculator();
+        RidershipTracking ridershipTracking = new RidershipTracking(controler.getScenario(), controler.getControlerIO().getTempPath(), "_" + currentIteration);
+        EventsToTravelDiaries eventsToTravelDiaries =
+                new EventsToTravelDiaries(controler.getScenario());
+
+        events.addHandler(eWTCalculator);
+        events.addHandler(ridershipTracking.getRidershipHandler());
+        events.addHandler(eventsToTravelDiaries);
+
+        new MatsimEventsReader(events).readFile(eventsFileName);
+
+        try {
+            eventsToTravelDiaries.writeSimulationResultsToTabSeparated(controler.getControlerIO().getTempPath(), "_" + currentIteration);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ridershipTracking.finish();
+        writeExcessWaitingTimes();
+    }
+
+    public void writeExcessWaitingTimes() {
+        String fileName = controler.getControlerIO().getTempPath() + "/EWT_" + currentIteration +
+                ".txt.gz";
+        BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
+        try {
+            writer.write("iter\tline\troute\tstop_id\tEWT_headway\tEWT_numPeople\tEWT_byPerson");
+            writer.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Logger logger = Logger.getLogger(this.getClass());
+        logger.info("Writing excess waiting time calculations...");
+        for (TransitLine line : controler.getScenario().getTransitSchedule().getTransitLines().values()) {
+            for (TransitRoute route : line.getRoutes().values()) {
+                for (TransitRouteStop stop : route.getStops()) {
+                    try {
+                        try {
+
+                            writer.write(
+                                    currentIteration +
+                                            "\t" + line.getId().toString() +
+                                            "\t" + route.getId().toString() +
+                                            "\t" + stop.getStopFacility().getId().toString() +
+                                            "\t" + eWTCalculator.getExcessWaitTime(line.getId(), route, stop.getStopFacility().getId(), ExcessWaitingTimeCalculator.Mode.TIME_WEIGHT) +
+                                            "\t" + eWTCalculator.getExcessWaitTime(line.getId(), route, stop.getStopFacility().getId(), ExcessWaitingTimeCalculator.Mode.NUM_PEOPLE_WEIGHT) +
+                                            "\t" + eWTCalculator.getExcessWaitTime(line.getId(), route, stop.getStopFacility().getId(), ExcessWaitingTimeCalculator.Mode.FULL_SAMPLE));
+                            writer.newLine();
+                        } catch (NoSuchElementException | NullPointerException ne) {
+                            writer.newLine();
+
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        try {
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
