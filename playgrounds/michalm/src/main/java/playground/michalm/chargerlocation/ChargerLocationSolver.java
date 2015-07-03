@@ -70,7 +70,9 @@ public class ChargerLocationSolver
 
             //model.write("D:/model.lp");
 
-            applyInitialSolution(initialSolution);
+            if (initialSolution != null) {
+                applyInitialSolution(initialSolution);
+            }
 
             model.optimize();
 

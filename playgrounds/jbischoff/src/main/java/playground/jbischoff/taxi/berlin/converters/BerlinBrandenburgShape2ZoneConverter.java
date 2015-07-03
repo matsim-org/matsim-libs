@@ -10,6 +10,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.michalm.berlin.BerlinZoneUtils;
 import playground.michalm.zone.Zone;
 import playground.michalm.zone.Zones;
 
@@ -76,7 +77,7 @@ public class BerlinBrandenburgShape2ZoneConverter
             Zone zone = new Zone(zoneId, zoneId.toString(), e.getValue());
             zoneMap.put(zoneId, zone);
         }
-        Zones.writeZones(zoneMap, "EPSG:25833",//ETRS89_UTM33N
+        Zones.writeZones(zoneMap, BerlinZoneUtils.ZONE_COORD_SYSTEM,
                 "C:/local_jb/data/OD/shp_merged/zones.xml",
                 "C:/local_jb/data/OD/shp_merged/zones.shp");
     }

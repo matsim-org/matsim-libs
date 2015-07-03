@@ -66,6 +66,12 @@ public class Zone
     }
 
 
+    public void setCoord(Coord coord)
+    {
+        this.centroid = coord;
+    }
+
+
     public String getType()
     {
         return type;

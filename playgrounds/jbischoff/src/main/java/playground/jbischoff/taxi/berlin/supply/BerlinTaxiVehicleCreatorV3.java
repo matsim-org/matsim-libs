@@ -19,32 +19,23 @@
 
 package playground.jbischoff.taxi.berlin.supply;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.text.*;
+import java.util.*;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
 import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
-import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrix;
+import org.matsim.core.utils.io.tabularFileParser.*;
+import org.matsim.matrices.*;
 
+import playground.michalm.berlin.BerlinZoneUtils;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.Zone;
-import playground.michalm.zone.Zones;
 
 
 public class BerlinTaxiVehicleCreatorV3
@@ -102,7 +93,7 @@ public class BerlinTaxiVehicleCreatorV3
     {
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
-        zones = Zones.readZones(scenario, zoneXmlFile, zoneShpFile);
+        zones = BerlinZoneUtils.readZones(scenario, zoneXmlFile, zoneShpFile);
     }
 
 

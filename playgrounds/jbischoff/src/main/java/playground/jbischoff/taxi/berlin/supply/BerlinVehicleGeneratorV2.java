@@ -29,6 +29,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 
 import playground.jbischoff.taxi.berlin.demand.LorShapeReader;
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
+import playground.michalm.berlin.BerlinZoneUtils;
 import playground.michalm.zone.Zone;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -48,12 +49,9 @@ public class BerlinVehicleGeneratorV2
     private static final String DATADIR = "C:/local_jb/data/";
     private final static String NETWORKFILE = DATADIR + "network/berlin_brb.xml.gz";
     private final static int PAXPERCAR = 4;
-    private final static Id<Zone> TXLLORID = Id.create("12214125", Zone.class);
     private final static double EVSHARE = 1.0;
 
     private NetworkImpl network;
-    private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
-            "EPSG:25833", TransformationFactory.DHDN_GK4);
 
 
     public static void main(String[] args)
@@ -228,9 +226,9 @@ public class BerlinVehicleGeneratorV2
     private Vehicle createTaxiFromLor(Id<Zone> lorId, Id<Vehicle> vid, int t0, int t1)
     {
         Link link;
-        if (lorId.equals(TXLLORID)) {
+        if (lorId.equals(BerlinZoneUtils.TXL_LOR_ID)) {
 
-            link = network.getLinks().get(Id.create("-35956", Link.class));
+            link = network.getLinks().get(BerlinZoneUtils.FROM_TXL_LINK_ID);
 
         }
         else {
@@ -247,7 +245,7 @@ public class BerlinVehicleGeneratorV2
     {
         Point p = TaxiDemandWriter.getRandomPointInFeature(this.rnd,
                 this.shapedata.get(lorId.toString()));
-        Coord coord = ct.transform(new CoordImpl(p.getX(), p.getY()));
+        Coord coord = BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(new CoordImpl(p.getX(), p.getY()));
         Link link = network.getNearestLinkExactly(coord);
 
         return link;

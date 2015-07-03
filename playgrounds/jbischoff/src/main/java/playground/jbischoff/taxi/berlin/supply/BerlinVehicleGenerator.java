@@ -26,6 +26,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.jbischoff.taxi.berlin.demand.LorShapeReader;
 import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
+import playground.michalm.berlin.BerlinZoneUtils;
 import playground.michalm.zone.Zone;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -46,9 +47,6 @@ public class BerlinVehicleGenerator
     private final static int T1 = 30 * 60 * 60;
     private final static int AMOUNTOFTAXIS = 3000;
     private NetworkImpl network;
-    private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
-            "EPSG:25833", TransformationFactory.DHDN_GK4);
-
 
     public static void main(String[] args)
     {
@@ -99,7 +97,7 @@ public class BerlinVehicleGenerator
     {
         Point p = TaxiDemandWriter.getRandomPointInFeature(this.rnd,
                 this.shapedata.get(lorId.toString()));
-        Coord coord = ct.transform(new CoordImpl(p.getX(), p.getY()));
+        Coord coord = BerlinZoneUtils.ZONE_TO_NETWORK_COORD_TRANSFORMATION.transform(new CoordImpl(p.getX(), p.getY()));
         Link link = network.getNearestLinkExactly(coord);
 
         return link;
