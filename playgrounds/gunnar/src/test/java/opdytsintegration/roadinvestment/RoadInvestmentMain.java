@@ -211,7 +211,7 @@ class RoadInvestmentMain {
 				// convergenceNoiseVarianceScale,
 				stateFactory, 5, maximumRelativeGap);
 
-		predictor.setLogFileName("road-investment-equil.txt");
+		predictor.setStandardLogFileName("road-investment-equil.txt");
 		predictor.setMemory(1);
 		predictor.setBinSize_s(10 * 60);
 		predictor.setStartBin(6 * 5);

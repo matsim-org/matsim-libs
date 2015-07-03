@@ -128,7 +128,7 @@ class TunnelMain {
 				decisionVariables, objectiveFunction,
 				// convergenceNoiseVarianceScale,
 				stateFactory, 5, maximumRelativeGap);
-		predictor.setLogFileName("tunnel-log.txt");
+		predictor.setStandardLogFileName("tunnel-log.txt");
 		predictor.setMemory(1);
 		predictor.setBinSize_s(15 * 60);
 		predictor.setBinCnt(24 * 4);

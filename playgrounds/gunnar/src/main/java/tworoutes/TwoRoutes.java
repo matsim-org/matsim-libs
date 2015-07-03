@@ -4,7 +4,8 @@ import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
-import optdyts.algorithms.DecisionVariableSetEvaluator;
+import optdyts.DecisionVariableSetEvaluator;
+import optdyts.logging.SearchStatisticsWriter;
 
 /**
  * 
@@ -144,7 +145,13 @@ class TwoRoutes {
 		final DecisionVariableSetEvaluator<TwoRoutesSimulatorState, TwoRoutesDecisionVariable> evaluator = new DecisionVariableSetEvaluator<TwoRoutesSimulatorState, TwoRoutesDecisionVariable>(
 				decisionVariables, objectiveFunction, minimumAverageIterations,
 				maximumRelativeGap);
-		evaluator.setLogFileName("twoRoutes.log");
+		evaluator.setStandardLogFileName("twoRoutes.log");
+
+		final SearchStatisticsWriter<TwoRoutesSimulatorState, TwoRoutesDecisionVariable> averageWriter = new SearchStatisticsWriter<TwoRoutesSimulatorState, TwoRoutesDecisionVariable>(
+				"twoRoutesAvg.txt");
+		averageWriter.addSearchStatistic(new TwoRoutesAverageToll(
+				decisionVariables));
+		evaluator.addSearchStatisticsWriter(averageWriter);
 
 		twoRoutes.run(evaluator);
 	}

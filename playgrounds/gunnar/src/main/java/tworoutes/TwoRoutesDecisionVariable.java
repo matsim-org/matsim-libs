@@ -18,6 +18,10 @@ class TwoRoutesDecisionVariable implements DecisionVariable {
 		this.theta = theta;
 	}
 
+	double getTheta() {
+		return this.theta;
+	}
+	
 	@Override
 	public void implementInSimulation() {
 		this.twoRoutes.setToll(this.theta);

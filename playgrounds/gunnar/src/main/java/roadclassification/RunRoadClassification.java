@@ -388,7 +388,7 @@ public class RunRoadClassification {
 				decisionVariables, objectiveFunction,
 				// convergenceNoiseVarianceScale,
 				stateFactory, 5, maximumRelativeGap);
-		predictor.setLogFileName("roadclassification-log.txt");
+		predictor.setStandardLogFileName("roadclassification-log.txt");
 		predictor.setMemory(1);
 		predictor.setBinSize_s(15 * 60);
 		predictor.setBinCnt(24 * 4);
