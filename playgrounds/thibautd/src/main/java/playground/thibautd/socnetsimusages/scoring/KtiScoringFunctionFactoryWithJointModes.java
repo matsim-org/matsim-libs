@@ -94,7 +94,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 	}
 
 	@Override
-	public ScoringFunction createNewScoringFunction(final Person person) {
+	public SumScoringFunction createNewScoringFunction(final Person person) {
 		final SumScoringFunction scoringFunctionAccumulator =
 			(SumScoringFunction) delegate.createNewScoringFunction( person );
 

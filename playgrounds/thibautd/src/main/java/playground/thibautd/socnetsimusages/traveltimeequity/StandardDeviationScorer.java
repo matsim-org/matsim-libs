@@ -31,13 +31,14 @@ import org.matsim.core.scoring.SumScoringFunction;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author thibautd
  */
 public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEventScoring {
 	private final TravelTimesRecord travelTimesRecord;
-	private final String activityType;
+	private final Set<String> activityType;
 
 	private boolean isInActivity = false;
 
@@ -47,7 +48,7 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 
 	public StandardDeviationScorer(
 			final TravelTimesRecord travelTimesRecord,
-			final String activityType,
+			final Set<String> activityType,
 			final double betaStdDev) {
 		this.travelTimesRecord = travelTimesRecord;
 		this.activityType = activityType;
@@ -62,7 +63,7 @@ public class StandardDeviationScorer implements SumScoringFunction.ArbitraryEven
 	}
 
 	private void handleActivityStartEvent(final ActivityStartEvent event) {
-		if ( event.getActType().equals( activityType ) ) {
+		if ( activityType.contains( event.getActType() ) ) {
 			isInActivity = true;
 			currentActivityValues = new ActivityValues();
 			activityValues.add( currentActivityValues );

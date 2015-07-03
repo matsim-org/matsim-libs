@@ -52,6 +52,7 @@ import org.matsim.contrib.socnetsim.run.ScoringFunctionConfigGroup;
 import playground.thibautd.socnetsimusages.scoring.KtiScoringFunctionFactoryWithJointModes;
 import org.matsim.contrib.socnetsim.usage.JointScenarioUtils;
 import playground.thibautd.socnetsimusages.traveltimeequity.EquityStrategiesModule;
+import playground.thibautd.socnetsimusages.traveltimeequity.KtiScoringWithEquityModule;
 
 /**
  * @author thibautd
@@ -80,24 +81,17 @@ public class RunMatsim2010SocialScenario {
 				new AbstractModule() {
 					@Override
 					public void install() {
-						install( new JointDecisionProcessModule() );
-						install( new SocnetsimDefaultAnalysisModule() );
-						install( new JointActivitiesScoringModule() );
-						install( new DefaultGroupStrategyRegistryModule() );
-						install( new JointTripsModule() );
-						install( new SocialNetworkModule() );
-						install( new EquityStrategiesModule() );
+						install(new JointDecisionProcessModule());
+						install(new SocnetsimDefaultAnalysisModule());
+						install(new JointActivitiesScoringModule());
+						install(new DefaultGroupStrategyRegistryModule());
+						install(new JointTripsModule());
+						install(new SocialNetworkModule());
+						install(new EquityStrategiesModule());
+						install(new KtiScoringWithEquityModule() );
 					}
-				} );
+				});
 
-				controller.setScoringFunctionFactory(
-						new KtiScoringFunctionFactoryWithJointModes(
-								new MATSim2010ScoringFunctionFactory(
-										scenario,
-										new StageActivityTypesImpl(
-												PtConstants.TRANSIT_ACTIVITY_TYPE,
-												JointActingTypes.INTERACTION)),
-								scenario));
 
 		controller.run();
 	}
