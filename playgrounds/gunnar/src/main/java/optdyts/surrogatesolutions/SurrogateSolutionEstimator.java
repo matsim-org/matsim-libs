@@ -35,10 +35,6 @@ import floetteroed.utilities.math.Vector;
 /**
  * Functionality to estimate a surrogate solution.
  * 
- * TODO Simplify structure of this class. Its current form is aligned with the
- * need to perform cross-validations, which is no longer necessary (and unlikely
- * to again become necessary in the future).
- * 
  * @author Gunnar Flötteröd
  * 
  */
@@ -46,11 +42,11 @@ class SurrogateSolutionEstimator {
 
 	// -------------------- CONSTANTS --------------------
 
-	// TODO current numerical precision checks are ad hoc
-	private static final double EPS = 1e-8;
-
-	// TODO make this configurable
+	// TODO
 	private static final int maxIterations = 1000;
+
+	// TODO
+	private static final boolean verbose = true;
 
 	// -------------------- NO CONSTRUCTION --------------------
 
@@ -59,8 +55,18 @@ class SurrogateSolutionEstimator {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	// TODO only used as absolute gap
-	private static double squareGap(final Matrix stateCovariances,
+	private static void print(final String msg) {
+		if (verbose) {
+			System.out.print(msg);
+		}
+	}
+
+	private static void println(final String msg) {
+		print(msg);
+		System.out.println();
+	}
+
+	private static double absoluteGap(final Matrix stateCovariances,
 			final Vector alphas, final double regularizationScale) {
 		double result = 0;
 		for (int i = 0; i < alphas.size(); i++) {
@@ -71,8 +77,9 @@ class SurrogateSolutionEstimator {
 						* stateCovariances.get(i, j);
 			}
 		}
+		result = Math.max(result, 0); // only to avoid numerical problems
 		result += regularizationScale * alphas.innerProd(alphas);
-		return result;
+		return Math.sqrt(result);
 	}
 
 	private static Vector computeAlphas(final Matrix stateCovariances,
@@ -89,10 +96,11 @@ class SurrogateSolutionEstimator {
 			throw new RuntimeException("an element in initialAlphas has value "
 					+ initialAlphas.max() + " > 0.0");
 		}
-		if (Math.abs(initialAlphas.sum() - 1.0) > EPS) {
+		if (Math.abs(initialAlphas.sum() - 1.0) > 1e-6) {
 			throw new RuntimeException(
 					"the sum of elements in inititalAlphas is "
-							+ initialAlphas.sum() + " != 1.0 [+/- " + EPS + "]");
+							+ initialAlphas.sum() + " != 1.0 [+/- " + 1e-6
+							+ "]");
 		}
 		if (stateCovariances.rowSize() != initialAlphas.size()
 				|| stateCovariances.columnSize() != initialAlphas.size()) {
@@ -101,7 +109,7 @@ class SurrogateSolutionEstimator {
 					+ stateCovariances.columnSize() + ") != ("
 					+ initialAlphas.size() + " x " + initialAlphas.size() + ")");
 		}
-		if ((1.0 / initialAlphas.innerProd(initialAlphas)) + EPS < minimumAverageIterations) {
+		if ((1.0 / initialAlphas.innerProd(initialAlphas)) + 1e-6 < minimumAverageIterations) {
 			throw new RuntimeException(
 					"equivalent averaging iterations of initial solution are "
 							+ (1.0 / initialAlphas.innerProd(initialAlphas))
@@ -110,19 +118,14 @@ class SurrogateSolutionEstimator {
 		}
 
 		final Vector alphas = initialAlphas.copy();
-		// alphas.mult(1.0 / alphas.absValueSum());
 		boolean noMoreImprovement = false;
-		// double gap2 = squareGap(stateCovariances, alphas,
-		// regularizationScale);
 
-		System.out.print("solving for alpha ");
+		print("solving for alpha ");
 		int iteration = 0;
 		while (!noMoreImprovement && iteration < maxIterations) {
 
-			// >>>>>>>>>> TODO NEW >>>>>>>>>>
 			noMoreImprovement = true;
-			System.out.print(".");
-			// <<<<<<<<<< TODO NEW <<<<<<<<<<
+			print(".");
 
 			for (int l = 1; l < alphas.size(); l++) {
 				double newAlpha = stateCovariances.get(0, 0)
@@ -136,9 +139,6 @@ class SurrogateSolutionEstimator {
 											.get(0, 0));
 					}
 				}
-				// newAlpha /= (stateCovariances.get(l, l) - 2.0
-				// * stateCovariances.get(l, 0)
-				// + stateCovariances.get(0, 0) + regularizationScale);
 				newAlpha /= Math.max(
 						stateCovariances.get(l, l) - 2.0
 								* stateCovariances.get(l, 0)
@@ -149,9 +149,6 @@ class SurrogateSolutionEstimator {
 				double lower = 0;
 				double upper = alphas.get(0) + alphas.get(l);
 
-				// newAlpha = Math.max(newAlpha, 0.0);
-				// newAlpha = Math.min(newAlpha, alphas.get(0) + alphas.get(l));
-
 				// sum of squares constraint
 				final double p = -(alphas.get(0) + alphas.get(l));
 				final double q = 0.5 * ((p * p)
@@ -160,38 +157,26 @@ class SurrogateSolutionEstimator {
 				final double sqrtArg = p * p / 4.0 - q;
 				if (sqrtArg >= 0.0) {
 					final double sqrt = Math.sqrt(sqrtArg);
-					// final double xMin = -p / 2.0 - sqrt;
-					// final double xMax = -p / 2.0 + sqrt;
 					lower = Math.max(lower, -p / 2.0 - sqrt);
 					upper = Math.min(upper, -p / 2.0 + sqrt);
 				}
-				// newAlpha = constrainToQuadraticSolutionInterval(newAlpha, p,
-				// q);
-				// <<<<<<<<<< TODO NEW <<<<<<<<<<
 
 				// establish constraints
 				newAlpha = Math.max(newAlpha, lower);
 				newAlpha = Math.min(newAlpha, upper);
 
 				// check convergence
-				if (Math.abs(newAlpha - alphas.get(l)) > 1e-8) {
+				if (Math.abs(newAlpha - alphas.get(l)) > 1e-6) {
 					noMoreImprovement = false;
 				}
 
 				// implement update
 				alphas.set(l, newAlpha);
 				alphas.set(0, 0.0);
-				alphas.set(0, Math.max(0.0, 1.0 - alphas.sum())); // TODO
+				alphas.set(0, Math.max(0.0, 1.0 - alphas.sum()));
 			}
-
-			// final double oldGap2 = gap2;
-			// gap2 = squareGap(stateCovariances, alphas, regularizationScale);
-			// if (Math.abs(oldGap2 - gap2) <= 1e-8 * oldGap2) {
-			// // TODO this is ad hoc
-			// noMoreImprovement = true;
-			// }
 		}
-		System.out.println();
+		println("");
 
 		return alphas;
 	}
@@ -263,12 +248,8 @@ class SurrogateSolutionEstimator {
 		}
 		final double equivalentAveragingIterations = 1.0 / alphas
 				.innerProd(alphas);
-		// TODO only one function call
-		final double squareConvergenceGap = squareGap(stateCovariances, alphas,
-				regularizationWeight);
-		// TODO because tiny negative numbers may come out
-		final double absoluteConvergenceGap = Math.sqrt(Math.max(0.0,
-				squareConvergenceGap));
+		final double absoluteConvergenceGap = absoluteGap(stateCovariances,
+				alphas, regularizationWeight);
 
 		// Create and return a properties object representing these results.
 		return new SurrogateSolutionProperties(decisionVariable2alphaSum,

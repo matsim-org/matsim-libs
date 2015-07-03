@@ -206,21 +206,26 @@ public class SurrogateSolution<X extends SimulatorState, U extends DecisionVaria
 
 			// TODO >>>>> CONTINUE HERE >>>>>
 
-			final double regularizationWeight;
+			final double absoluteMaximumGap;
 			if (this.properties == null) {
-				regularizationWeight = 1.0; // TODO arbitrary
+				double averageFromStateEuclideanNorm = 0;
+				for (Transition<U> transition : transitionList) {
+					averageFromStateEuclideanNorm += transition
+							.getFromStateEuclideanNorm();
+				}
+				averageFromStateEuclideanNorm /= transitionList.size();
+				absoluteMaximumGap = this.maximumRelativeGap
+						* averageFromStateEuclideanNorm;
 			} else {
-				regularizationWeight = 0.01
-						* this.size()
-						* Math.pow(
-								this.maximumRelativeGap
-										* this.properties
-												.getInterpolatedFromStateEuclideanNorm(),
-								2.0);
+				absoluteMaximumGap = this.maximumRelativeGap
+						* this.properties
+								.getInterpolatedFromStateEuclideanNorm();
 			}
+			final double regularizationWeight = 0.01 * this.size()
+					* Math.pow(absoluteMaximumGap, 2.0);
 
 			// TODO <<<<< CONTINUE HERE
-			
+
 			this.properties = SurrogateSolutionEstimator.computeProperties(
 					transitionList, this.minimumAverageIterations,
 					regularizationWeight);
