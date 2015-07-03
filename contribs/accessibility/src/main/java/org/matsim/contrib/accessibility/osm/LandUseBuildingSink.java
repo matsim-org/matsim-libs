@@ -172,8 +172,9 @@ public class LandUseBuildingSink implements Sink {
 			
 			String buildingType = tags.get("building");
 			String amenityType = tags.get("amenity");
-
-			// entities that carry an "amenity" tag need to be excluded since they are already considered via the AmenityReader
+		
+			
+			// Entities that possess an "amenity" tag need to be excluded here, because they are already considered via the AmenityReader
 			if(buildingType != null && amenityType == null) {
 				String name = tags.get("name");
 				if(name != null){
@@ -182,12 +183,14 @@ public class LandUseBuildingSink implements Sink {
 					log.warn("      ---> Land use " + entityKey + " does not have a name.");
 				}
 				
+				
+				// Get type of land use for the building under consideration
 				Coord coord = CoordUtils.getCoord(entity, ct, nodeMap, wayMap, relationMap);
 				Coordinate coordinate = new Coordinate(coord.getX(), coord.getY());
 				Geometry coordAsGeometry = geometryFactory.createPoint(coordinate);
 				
 				String activityType = null;
-				
+								
 				for (SimpleFeature feature : this.features) {
 					Geometry geometry = (Geometry) feature.getDefaultGeometry();
 
@@ -195,8 +198,32 @@ public class LandUseBuildingSink implements Sink {
 						activityType = (String) feature.getAttribute("type");
 					}
 				}
-
 				
+				
+				// Get number of levels/storeys
+				Integer buildingLevels = null;
+				String buildingLevelsAsString = tags.get("building:levels");
+				if (buildingLevelsAsString != null) {
+					buildingLevels = Integer.parseInt(buildingLevelsAsString);
+				}
+				System.out.println("building levels = " + buildingLevels);
+				
+				
+				// Get area of building under consideration
+				Coord[] buildingCoords = CoordUtils.getWayCoords((Way) entity, this.ct, this.nodeMap);
+				SimpleFeature buildingAsFeature = createFeature(buildingCoords, null);
+				Geometry buildingGeometry = (Geometry) buildingAsFeature.getDefaultGeometry();
+				double buildingArea = buildingGeometry.getArea();
+				System.out.println("building area = " + buildingArea);
+				
+				Double buildingFloorSpace = Double.NaN;
+				if (buildingLevels != null) {
+					buildingFloorSpace = buildingArea * buildingLevels;
+				}
+				System.out.println("building floor space = " + buildingFloorSpace);
+				
+
+				// Create facility for building
 				if (activityType != null) {
 					Id<ActivityFacility> facilityId = Id.create(entity.getId(), ActivityFacility.class);
 					ActivityFacility activityFacility;
