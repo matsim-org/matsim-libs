@@ -46,7 +46,7 @@ public class RunChargerLocationOptimization
     //this restrictions influences mostly the outskirts (where speeds > 25km/h ==> TT < 6 min)
     private static final double MAX_DISTANCE = 2_500;//m
 
-    //high value -> no infuence (the current approach); low value -> lack of chargers at TXL
+    //high value -> no influence (the current approach); low value -> lack of chargers at TXL
     private static final int MAX_CHARGERS_PER_ZONE = 30;
 
 
