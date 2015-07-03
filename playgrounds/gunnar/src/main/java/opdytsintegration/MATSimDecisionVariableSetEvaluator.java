@@ -6,9 +6,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import optdyts.DecisionVariable;
+import optdyts.DecisionVariableSetEvaluator;
 import optdyts.ObjectiveFunction;
 import optdyts.SimulatorState;
-import optdyts.algorithms.DecisionVariableSetEvaluator;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -116,14 +116,10 @@ public class MATSimDecisionVariableSetEvaluator<X extends SimulatorState, U exte
 	/**
 	 * Where to write logging information.
 	 */
-	public void setLogFileName(final String logFileName) {
-		this.evaluator.setLogFileName(logFileName);
+	public void setStandardLogFileName(final String logFileName) {
+		this.evaluator.setStandardLogFileName(logFileName);
 	}
-
-	public String getLogFileName() {
-		return this.evaluator.getLogFileName();
-	}
-
+	
 	/**
 	 * The time discretization (in seconds) according to which the simulated
 	 * conditions in MATSim affect the evaluation of a decision variable.

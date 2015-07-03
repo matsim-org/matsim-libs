@@ -26,9 +26,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import optdyts.DecisionVariable;
+import optdyts.DecisionVariableSetEvaluator;
 import optdyts.ObjectiveFunction;
 import optdyts.SimulatorState;
-import optdyts.algorithms.DecisionVariableSetEvaluator;
 import floetteroed.utilities.math.Vector;
 
 public class Run {
@@ -120,7 +120,7 @@ public class Run {
 				})), objectiveFunction, 5, 0.05);
 		// 2 * (1.0 / 12.0),
 		// 1.);
-		decisionVariableSetEvaluator.setLogFileName("testlog.txt");
+		decisionVariableSetEvaluator.setStandardLogFileName("testlog.txt");
 		
 		while (objectiveFunction.evaluateState(new MySimulatorState(statex,
 				statey)) > 1.0) {
