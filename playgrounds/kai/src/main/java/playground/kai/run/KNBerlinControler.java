@@ -48,7 +48,7 @@ class KNBerlinControler {
 //		config.qsim().setStorageCapFactor( Math.pow( sampleFactor, -0.25 ) );
 		config.qsim().setStorageCapFactor(0.03);
 		config.qsim().setTrafficDynamics( TrafficDynamics.withHoles );
-		config.qsim().setUsingFastCapacityUpdate(true);
+		config.qsim().setUsingFastCapacityUpdate(false);
 //		config.controler().setMobsim(MobsimType.JDEQSim.toString());
 //		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.END_TIME, "36:00:00") ;
 //		config.setParam(JDEQSimulation.JDEQ_SIM, JDEQSimulation.FLOW_CAPACITY_FACTOR, Double.toString(sampleFactor) ) ;
