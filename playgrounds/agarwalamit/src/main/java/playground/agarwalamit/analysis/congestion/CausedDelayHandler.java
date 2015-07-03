@@ -18,10 +18,10 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.congestion;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -46,7 +46,7 @@ public class CausedDelayHandler implements CongestionEventHandler {
 		double simulatioEndTime = scenario.getConfig().qsim().getEndTime();
 		this.timeBinSize = simulatioEndTime /noOfTimeBin;
 		this.network = scenario.getNetwork();
-
+		pf = new ExtendedPersonFilter();
 		initialize(noOfTimeBin, scenario);
 	}
 	
@@ -55,6 +55,7 @@ public class CausedDelayHandler implements CongestionEventHandler {
 		this.timeBinSize = simulatioEndTime /noOfTimeBin;
 		this.network = scenario.getNetwork();
 		this.isSortingForInsideMunich = sortingForInsideMunich;
+		pf  = new ExtendedPersonFilter(isSortingForInsideMunich);
 		
 		initialize(noOfTimeBin, scenario);
 	}
@@ -63,14 +64,14 @@ public class CausedDelayHandler implements CongestionEventHandler {
 		for (int i=0;i<noOfTimeBin;i++){
 			this.timeBin2Link2DelayCaused.put(this.timeBinSize*(i+1), new HashMap<Id<Link>,Double>());
 			this.timeBin2Person2DelayCaused.put(this.timeBinSize*(i+1), new HashMap<Id<Person>,Double>());
-			this.timeBin2Link2PersonCount.put(this.timeBinSize*(i+1), new HashMap<Id<Link>,Integer>());
-			this.getTimeBin2ListOfTollPayers().put(this.timeBinSize*(i+1), new ArrayList<Id<Person>>());
+			this.timeBin2Link2Persons.put(this.timeBinSize*(i+1), new HashMap<Id<Link>,Set<Id<Person>>>());
+			this.timeBin2ListOfTollPayers.put(this.timeBinSize*(i+1), new HashSet<Id<Person>>());
 			
 			Map<Id<Link>,Double> link2del = this.timeBin2Link2DelayCaused.get(this.timeBinSize*(i+1));
-			Map<Id<Link>, Integer> link2CausingPersonCount = this.timeBin2Link2PersonCount.get(this.timeBinSize*(i+1));
+			Map<Id<Link>, Set<Id<Person>>> link2CausingPersonCount = this.timeBin2Link2Persons.get(this.timeBinSize*(i+1));
 			for (Id<Link> linkId : this.network.getLinks().keySet()){
 				link2del.put(linkId, 0.);
-				link2CausingPersonCount.put(linkId, 0);
+				link2CausingPersonCount.put(linkId, new HashSet<Id<Person>>());
 			}
 			
 			Map<Id<Person>,Double> person2del = this.timeBin2Person2DelayCaused.get(this.timeBinSize*(i+1));				
@@ -83,23 +84,23 @@ public class CausedDelayHandler implements CongestionEventHandler {
 	private boolean isSortingForInsideMunich = false;
 	private final double timeBinSize;
 	private SortedMap<Double,Map<Id<Link>,Double>> timeBin2Link2DelayCaused = new TreeMap<Double, Map<Id<Link>,Double>>();
-	private SortedMap<Double,Map<Id<Link>,Integer>> timeBin2Link2PersonCount = new TreeMap<Double, Map<Id<Link>,Integer>>();
+	private SortedMap<Double,Map<Id<Link>,Set<Id<Person>>>> timeBin2Link2Persons = new TreeMap<Double, Map<Id<Link>,Set<Id<Person>>>>();
 	private SortedMap<Double,Map<Id<Person>,Double>> timeBin2Person2DelayCaused = new TreeMap<Double, Map<Id<Person>,Double>>();
 	
 	/**
 	 * Required to get timeBin2 userGroup2 tolledTrips
 	 */
-	private SortedMap<Double,List<Id<Person>>> timeBin2ListOfTollPayers = new TreeMap<>();
+	private SortedMap<Double,Set<Id<Person>>> timeBin2ListOfTollPayers = new TreeMap<>();
 	
 	private Network network;
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final ExtendedPersonFilter pf;
 	
 	@Override
 	public void reset(int iteration) {
 		this.timeBin2Link2DelayCaused.clear();
 		this.timeBin2Person2DelayCaused.clear();
-		this.timeBin2Link2PersonCount.clear();
-		this.getTimeBin2ListOfTollPayers().clear();
+		this.timeBin2Link2Persons.clear();
+		this.timeBin2ListOfTollPayers.clear();
 	}
 
 	@Override
@@ -119,12 +120,12 @@ public class CausedDelayHandler implements CongestionEventHandler {
 		Id<Person> causingAgentId = event.getCausingAgentId();
 
 		//tolled trip count --> causing agent 
-		List<Id<Person>> tollPayers = this.timeBin2ListOfTollPayers.get(endOfTimeInterval);
+		Set<Id<Person>> tollPayers = this.timeBin2ListOfTollPayers.get(endOfTimeInterval);
 		tollPayers.add(causingAgentId);
 		
-		//person count
-		Map<Id<Link>, Integer> link2PersonCount = this.timeBin2Link2PersonCount.get(endOfTimeInterval);
-		link2PersonCount.put(linkId, link2PersonCount.get(linkId)+1);
+		//person count (toll payers) == there is no meaning of counting congestion events
+		Set<Id<Person>> personSet = this.timeBin2Link2Persons.get(endOfTimeInterval).get(linkId);
+		personSet.add(causingAgentId);
 		
 		//causing person delay
 		Map<Id<Person>,Double> causingPerson2delay = this.timeBin2Person2DelayCaused.get(endOfTimeInterval);
@@ -139,15 +140,21 @@ public class CausedDelayHandler implements CongestionEventHandler {
 		return timeBin2Link2DelayCaused;
 	}
 
-	public SortedMap<Double, Map<Id<Link>, Integer>> getTimeBin2Link2PersonCount() {
-		return timeBin2Link2PersonCount;
+	/**
+	 * @return  set of UNIQUE causing persons (toll payers) on each link in each time bin
+	 */
+	public SortedMap<Double, Map<Id<Link>, Set<Id<Person>>>> getTimeBin2Link2CausingPersons() {
+		return timeBin2Link2Persons;
 	}
 
 	public SortedMap<Double, Map<Id<Person>, Double>> getTimeBin2CausingPerson2Delay() {
 		return timeBin2Person2DelayCaused;
 	}
 
-	public SortedMap<Double,List<Id<Person>>> getTimeBin2ListOfTollPayers() {
+	/**
+	 * @return  set of UNIQUE causing persons (toll payers)  in each time bin
+	 */
+	public SortedMap<Double,Set<Id<Person>>> getTimeBin2CausingPersons() {
 		return timeBin2ListOfTollPayers;
 	}
 }

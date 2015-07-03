@@ -56,12 +56,11 @@ public class PerLinkCongestionData {
 
 		Scenario scenario = LoadMyScenarios.loadScenarioFromNetworkAndConfig(this.networkFile,this.configFile);
 		this.network = scenario.getNetwork();
-		ExperiencedDelayAnalyzer linkAnalyzer = new ExperiencedDelayAnalyzer(this.eventFile,1);
-		linkAnalyzer.init(scenario);
+		ExperiencedDelayAnalyzer linkAnalyzer = new ExperiencedDelayAnalyzer(this.eventFile,scenario,1);
 		linkAnalyzer.preProcessData();
 		linkAnalyzer.postProcessData();
 		linkAnalyzer.checkTotalDelayUsingAlternativeMethod();
-		Map<Double, Map<Id<Link>, Double>> time2linkIdDelays = linkAnalyzer.getCongestionPerLinkTimeInterval();
+		Map<Double, Map<Id<Link>, Double>> time2linkIdDelays = linkAnalyzer.getTimeBin2LinkId2Delay();
 		
 		writer1.write("time \t linkId \t delay(in sec) \n");
 		for(double time : time2linkIdDelays.keySet()){

@@ -313,7 +313,7 @@ public class SpatialAveragingCongestion {
 	private void processCongestions(String eventFile) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
-		this.congestionPerLinkHandler = new ExperiencedDelayHandler(noOfTimeBins, scenario);
+		this.congestionPerLinkHandler = new ExperiencedDelayHandler(scenario,noOfTimeBins);
 		eventsManager.addHandler(this.congestionPerLinkHandler);
 		eventsReader.readFile(eventFile);
 	}

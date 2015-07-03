@@ -50,18 +50,18 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
 	public final Logger logger = Logger.getLogger(ExperiencedDelayHandler.class);
 
-	private SortedMap<Double, Map<Id<Person>, Double>> personId2DelaysPerTimeBin = new TreeMap<Double, Map<Id<Person>, Double>>();
+	private SortedMap<Double, Map<Id<Person>, Double>> personId2DelaysPerTimeBin = new TreeMap<>();
 	private Map<Double, Map<Id<Link>, Double>> linkId2DelaysPerTimeBin = new HashMap<>();
-	private Map<Id<Link>, Map<Id<Person>, Double>> linkId2PersonIdLinkEnterTime = new HashMap<Id<Link>, Map<Id<Person>,Double>>();
-	private Map<Id<Link>, Double> linkId2FreeSpeedLinkTravelTime = new HashMap<Id<Link>, Double>();
-	private Map<Double, Map<Id<Link>, Double>> time2linkIdLeaveCount = new HashMap<Double, Map<Id<Link>,Double>>();
+	private Map<Id<Link>, Map<Id<Person>, Double>> linkId2PersonIdLinkEnterTime = new HashMap<>();
+	private Map<Id<Link>, Double> linkId2FreeSpeedLinkTravelTime = new HashMap<>();
+	private Map<Double, Map<Id<Link>, Integer>> time2linkIdLeaveCount = new HashMap<>();
 	private double totalDelay;
 	private double warnCount=0;
 
 	private double timeBinSize;
 	private Network network;
 	private boolean isSortingForInsideMunich = false;
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final ExtendedPersonFilter pf;
 
 	/**
 	 * @param noOfTimeBins
@@ -69,8 +69,9 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	 * @param scenario must have minimally network, plans and config file.
 	 * @param isSortingForInsideMunich true if outside Munich city area links are not included in analysis
 	 */
-	public ExperiencedDelayHandler(int noOfTimeBins, Scenario scenario, boolean isSortingForInsideMunich){
+	public ExperiencedDelayHandler(Scenario scenario, int noOfTimeBins, boolean isSortingForInsideMunich){
 		this.isSortingForInsideMunich = isSortingForInsideMunich;
+		pf = new ExtendedPersonFilter(isSortingForInsideMunich);
 		logger.warn("Output data will only include links which fall inside the Munich city area");
 		initialize(scenario, noOfTimeBins);
 	}
@@ -80,7 +81,8 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	 * @param simulationEndTime
 	 * @param scenario must have minimally network and plans file.
 	 */
-	public ExperiencedDelayHandler(int noOfTimeBins, Scenario scenario){
+	public ExperiencedDelayHandler(Scenario scenario,int noOfTimeBins){
+		pf  = new ExtendedPersonFilter();
 		initialize(scenario, noOfTimeBins);
 	}
 	
@@ -98,7 +100,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		for(int i =0;i<noOfTimeBins;i++){
 			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Person>, Double>());
 			this.linkId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Double>());
-			this.time2linkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Double>());
+			this.time2linkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Integer>());
 			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Person>,Double>());
 
 			for(Person person : scenario.getPopulation().getPersons().values()){
@@ -109,8 +111,8 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 			for(Link link : this.network.getLinks().values()) {
 				Map<Id<Link>, Double>	delayOnLink = this.linkId2DelaysPerTimeBin.get(this.timeBinSize*(i+1));
 				delayOnLink.put(link.getId(), Double.valueOf(0.));
-				Map<Id<Link>, Double> countOnLink = this.time2linkIdLeaveCount.get(this.timeBinSize*(i+1));
-				countOnLink.put(link.getId(), Double.valueOf(0.));
+				Map<Id<Link>, Integer> countOnLink = this.time2linkIdLeaveCount.get(this.timeBinSize*(i+1));
+				countOnLink.put(link.getId(), Integer.valueOf(0));
 			}
 		}
 	}
@@ -165,7 +167,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		
 		Map<Id<Person>, Double> delayForPerson = this.personId2DelaysPerTimeBin.get(endOfTimeInterval);
 		Map<Id<Link>, Double> delayOnLink = this.linkId2DelaysPerTimeBin.get(endOfTimeInterval);
-		Map<Id<Link>, Double> countTotal = this.time2linkIdLeaveCount.get(endOfTimeInterval);
+		Map<Id<Link>, Integer> countTotal = this.time2linkIdLeaveCount.get(endOfTimeInterval);
 		
 		delayForPerson.put(personId, Double.valueOf(currentDelay+delayForPerson.get(personId)));
 		
@@ -173,7 +175,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		
 		double countsSoFar = countTotal.get(linkId);
 		double newValue = countsSoFar + 1.;
-		countTotal.put(linkId, Double.valueOf(newValue));
+		countTotal.put(linkId, Integer.valueOf((int) newValue));
 	}
 
 	@Override
@@ -215,7 +217,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		return this.totalDelay/3600;
 	}
 	
-	public Map<Double, Map<Id<Link>, Double>> getTime2linkIdLeaveCount() {
+	public Map<Double, Map<Id<Link>, Integer>> getTime2linkIdLeaveCount() {
 		return this.time2linkIdLeaveCount;
 	}
 }

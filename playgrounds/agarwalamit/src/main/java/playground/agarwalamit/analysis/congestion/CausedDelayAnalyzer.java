@@ -18,8 +18,8 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.congestion;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
@@ -44,7 +44,7 @@ public class CausedDelayAnalyzer {
 		this.eventsFile = eventsFile;
 		handler = new CausedDelayHandler(scenario, noOfTimeBin);
 	}
-	
+
 	public CausedDelayAnalyzer(String eventsFile, Scenario scenario, int noOfTimeBin,boolean sortingForInsideMunich) {
 		this.eventsFile = eventsFile;
 		handler = new CausedDelayHandler(scenario, noOfTimeBin, sortingForInsideMunich);
@@ -53,9 +53,9 @@ public class CausedDelayAnalyzer {
 	private CongestionEventsReader reader;
 	private CausedDelayHandler handler;
 	private String eventsFile;
-	
+
 	public void run(){
-		
+
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		reader = new CongestionEventsReader(eventsManager);
 
@@ -70,12 +70,29 @@ public class CausedDelayAnalyzer {
 	public SortedMap<Double, Map<Id<Link>, Double>> getTimeBin2LinkId2Delay() {
 		return handler.getTimeBin2Link2Delay();
 	}
-	
-	public SortedMap<Double, Map<Id<Link>, Integer>> getTimeBin2Link2PersonCount(){
-		return handler.getTimeBin2Link2PersonCount();
+
+	/**
+	 * @return  set of causing persons (toll payers) on each link in each time bin
+	 */
+	public SortedMap<Double, Map<Id<Link>, Set<Id<Person>>>> getTimeBin2Link2CausingPersons(){
+		return handler.getTimeBin2Link2CausingPersons();
 	}
-	
-	public SortedMap<Double,List<Id<Person>>> getTimeBin2ListOfTollPayers() {
-		return handler.getTimeBin2ListOfTollPayers();
+
+	/**
+	 * @return  set of UNIQUE causing persons (toll payers) in each time bin
+	 */
+	public SortedMap<Double,Set<Id<Person>>> getTimeBin2ListOfTollPayers() {
+		SortedMap<Double, Set<Id<Person>>> timeBin2ListOfTollPayers = handler.getTimeBin2CausingPersons();
+		// to avid any errors, check the number of persons in each time bin. This needs to be removed subsequently.
+
+		for(double d : timeBin2ListOfTollPayers.keySet()){
+			double sum = 0;
+			for(Id<Link> linkId : getTimeBin2Link2CausingPersons().get(d).keySet()){
+				sum += getTimeBin2Link2CausingPersons().get(d).get(linkId).size();
+			}
+			if(sum != timeBin2ListOfTollPayers.get(d).size()) throw new RuntimeException("Number of toll payers in each time bin are not equal from two maps. Aborting ....");
+		}
+
+		return timeBin2ListOfTollPayers;
 	}
 }

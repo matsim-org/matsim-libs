@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
@@ -47,6 +48,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV4;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV6;
 import playground.vsp.congestion.handlers.TollHandler;
 import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
@@ -54,76 +57,121 @@ import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
  * @author amit
  */
 
-public class TolledLinkCongestionTest {
+public class CongestionPricingTestExample {
+
+	public CongestionPricingTestExample (String congestionImpl){
+		this.isComparing = true;
+		this.congestionImpl = congestionImpl;
+	}
+
+	public CongestionPricingTestExample () {
+		this.isComparing = false;
+	}
 
 	private Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());;
 	private Link lo1;
 	private Link ld1;
 	private Link lo2;
 	private Link ld2;
-	
-	private final String outputDir = "./output/"+this.getClass().getSimpleName()+"/";
-	
+	private String congestionImpl = "noToll";
+	private boolean isComparing;
+
+	private final String outputDir = "../../../repos/shared-svn/papers/2014/congestionInternalization/implV4/hEART/testExample/";
+
 	public static void main(String[] args) {
-		
-		new TolledLinkCongestionTest().run();
+
+		// no toll case
+		CongestionPricingTestExample test = new CongestionPricingTestExample();
+		test.run();
+
+		// tolled cases
+		String [] congestionImpls = {"implV3","implV4","implV6"};
+
+		for (String str :congestionImpls) {
+			CongestionPricingTestExample pricingTest = new CongestionPricingTestExample(str);
+			pricingTest.run();
+		}
 	}
 	
 	public void run() {
-		
+
 		if(!new File(outputDir+"/input/").exists()) {
 			new File(outputDir+"/input/").mkdirs();
 		}
-		
+
 		createTolledNetwork();
 		createDemand();
 		createConfig();
 		Controler controler = new Controler(sc);
-		
-		TollHandler tollHandler = new TollHandler(sc);
-		final TollDisutilityCalculatorFactory fact = new TollDisutilityCalculatorFactory(tollHandler);
-		
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindTravelDisutilityFactory().toInstance(fact);
+
+		if(isComparing){
+			TollHandler tollHandler = new TollHandler(sc);
+			final TollDisutilityCalculatorFactory fact = new TollDisutilityCalculatorFactory(tollHandler);
+
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(fact);
+				}
+			});
+
+			switch (congestionImpl) {
+			case "implV3":
+				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV3(controler.getEvents(),  (ScenarioImpl)sc)));	
+				break;
+			case "implV4":
+				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV4(controler.getEvents(),  sc)));
+				break;
+			case "implV6":
+				controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV6(controler.getEvents(),  sc)));
+				break;
+			default:
+				break;
 			}
-		});
-		controler.addControlerListener(new MarginalCongestionPricingContolerListener(sc, tollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) sc)));
+		}
 		controler.run();
 	}
-	
+
 	private void createConfig(){
-		
+
 		Config config = sc.getConfig();
-		
-		config.controler().setOutputDirectory(outputDir+"/output/");
+
+		config.controler().setOutputDirectory(outputDir+"/output/"+congestionImpl);
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(20);
 		config.controler().setWriteEventsInterval(10);
 		config.controler().setMobsim("qsim");
 		config.controler().setOverwriteFileSetting(true ? OverwriteFileSetting.deleteDirectoryIfExists:OverwriteFileSetting.failIfDirectoryExists);
+
+		config.qsim().setEndTime(9*3600.);
 		
 		StrategySettings reRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 		reRoute.setWeight(0.10);
 		config.strategy().addStrategySettings(reRoute);
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.7);
-		
+
+		StrategySettings changeExpBeta = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
+		changeExpBeta.setStrategyName("ChangeExpBeta");
+		changeExpBeta.setWeight(0.9);
+		config.strategy().addStrategySettings(changeExpBeta);
+
 		ActivityParams o1 = new ActivityParams("o1");
 		ActivityParams o2 = new ActivityParams("o2");
 		ActivityParams d1 = new ActivityParams("d1");
 		ActivityParams d2 = new ActivityParams("d2");
-		
+
 		o1.setTypicalDuration(8*3600);
 		o2.setTypicalDuration(8*3600);
 		d1.setTypicalDuration(8*3600);
 		d2.setTypicalDuration(8*3600);
-		
+
 		config.planCalcScore().addActivityParams(o1);
 		config.planCalcScore().addActivityParams(o2);
 		config.planCalcScore().addActivityParams(d1);
 		config.planCalcScore().addActivityParams(d2);
+		
+		new ConfigWriter(config).write(outputDir+"/input/input_config.xml.gz");
 	}
 
 	private void createDemand(){
@@ -131,7 +179,7 @@ public class TolledLinkCongestionTest {
 		Population pop = sc.getPopulation();
 		PopulationFactory fact = pop.getFactory();
 
-		for (int i = 1; i <= 600; i++){
+		for (int i = 1; i <= 400; i++){
 
 			Person p =	fact.createPerson(Id.createPersonId(i));
 			Plan plan = fact.createPlan();
@@ -139,26 +187,26 @@ public class TolledLinkCongestionTest {
 			Leg leg = fact.createLeg(TransportMode.car);
 			Activity home;
 			Activity work;
-			
+
 			if(i%3==0){// o1 --d1
 				home = fact.createActivityFromCoord("o1", lo1.getCoord());
 				home.setEndTime(7*3600+i);
 				work = fact.createActivityFromCoord("d1", ld1.getCoord());
-			} else if(i%2==0){// o1 --d2
+			} else /*if(i%2==0)*/ { // o1 --d2
 				home = fact.createActivityFromCoord("o1", lo1.getCoord());
 				home.setEndTime(7*3600+i);
 				work = fact.createActivityFromCoord("d2", ld2.getCoord());
-			} else {// o2 --d2
+			} /*else {// o2 --d2
 				home = fact.createActivityFromCoord("o2", lo2.getCoord());
 				home.setEndTime(7*3600+i);
 				work = fact.createActivityFromCoord("d2", ld2.getCoord());
-			}
+			}*/
 			plan.addActivity(home);
 			plan.addLeg(leg);
 			plan.addActivity(work);
 			pop.addPerson(p);
 		}
-		new PopulationWriter(pop).write(outputDir+"/input/initialPlans.xml.gz");
+		new PopulationWriter(pop).write(outputDir+"/input/input_plans.xml.gz");
 	}
 
 
@@ -209,20 +257,20 @@ public class TolledLinkCongestionTest {
 		ld1 = network.createAndAddLink(Id.createLinkId("d1"), n4, nd1, 100, 20, 2700, 1);
 
 		// nodes between o2-d2 (all vertical links)
-		Node no2 = network.createAndAddNode(Id.createNodeId("o2"), sc.createCoord(2000, 1100));
-		Node n5 = network.createAndAddNode(Id.createNodeId(5), sc.createCoord(2000, 1000));
+		//		Node no2 = network.createAndAddNode(Id.createNodeId("o2"), sc.createCoord(2000, 1100));
+		//		Node n5 = network.createAndAddNode(Id.createNodeId(5), sc.createCoord(2000, 1000));
 		Node n6 = network.createAndAddNode(Id.createNodeId(6), sc.createCoord(2000,-1000));
 		Node nd2 = network.createAndAddNode(Id.createNodeId("d2"), sc.createCoord(2000, -1100));
 
-		lo2 = network.createAndAddLink(Id.createLinkId("o2"), no2, n5, 100, 20, 2700, 1);
-		Link l5 = network.createAndAddLink(Id.createLinkId(5), n5, n3, 3000, 30, 2700, 1);
+		//		lo2 = network.createAndAddLink(Id.createLinkId("o2"), no2, n5, 100, 20, 2700, 1);
+		//		Link l5 = network.createAndAddLink(Id.createLinkId(5), n5, n3, 3000, 20, 2700, 1);
 		//bottleneck link
-		Link l6 = network.createAndAddLink(Id.createLinkId(6), n3, n6, 800, 20, 1350, 1);
+		Link l6 = network.createAndAddLink(Id.createLinkId(6), n3, n6, 500, 20, 700, 1);
 		ld2 = network.createAndAddLink(Id.createLinkId("d2"), n6, nd2, 100, 20, 2700, 1);
 
 		// an alternative link with higher disutility
-		Link l7 = network.createAndAddLink(Id.createLinkId(7), n1, n6, 12500, 20, 2700, 1);
-		
-		new NetworkWriter(network).write(outputDir+"/input/tolledNetwork.xml");
+		Link l7 = network.createAndAddLink(Id.createLinkId(7), n1, n6, 15000, 20, 2700, 1);
+
+		new NetworkWriter(network).write(outputDir+"/input/input_network.xml");
 	}
 }

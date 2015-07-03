@@ -42,7 +42,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import playground.agarwalamit.congestionPricing.testExamples.CorridorNetworkAndPlans;
+import playground.agarwalamit.congestionPricing.testExamples.handlers.CorridorNetworkAndPlans;
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
 
 /**

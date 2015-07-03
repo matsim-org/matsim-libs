@@ -20,6 +20,7 @@ package playground.agarwalamit.congestionPricing.analysis;
 
 import java.io.BufferedWriter;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
@@ -69,7 +70,7 @@ public class BAUDelayAnalyzer {
 		BAUDelayAnalyzer analyzer = new BAUDelayAnalyzer("implV3");
 		analyzer.writeCongestionEvents();
 		analyzer.writeExperiecedAndCausingPersonDelay();
-		analyzer.writeAverageLinkTolls();
+//		analyzer.writeAverageLinkTolls();
 		analyzer.writeHourlyCausedDelayForEachPerson();
 	}
 	
@@ -140,7 +141,7 @@ public class BAUDelayAnalyzer {
 		delayAnalyzer.run();
 		
 		SortedMap<Double, Map<Id<Link>, Double>> timeBin2LinkId2Delay = delayAnalyzer.getTimeBin2LinkId2Delay();
-		SortedMap<Double, Map<Id<Link>, Integer>> timeBin2LinkCount = delayAnalyzer.getTimeBin2Link2PersonCount();
+		SortedMap<Double, Map<Id<Link>, Set<Id<Person>>>> timeBin2LinkCount = delayAnalyzer.getTimeBin2Link2CausingPersons();
 		
 		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/linkId2Toll"+congestionImpl+".txt");
 		
@@ -149,7 +150,7 @@ public class BAUDelayAnalyzer {
 			for (double d:timeBin2LinkId2Delay.keySet()){
 				for(Id<Link> linkId : timeBin2LinkId2Delay.get(d).keySet()){
 					double delay = timeBin2LinkId2Delay.get(d).get(linkId);
-					double count = timeBin2LinkCount.get(d).get(linkId);
+					int count = timeBin2LinkCount.get(d).get(linkId).size(); 
 					double avgToll  = 0;
 					/*
 					 *  if delay ==0 and count != 0 --> noone delayed
@@ -172,11 +173,10 @@ public class BAUDelayAnalyzer {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, noOfTimeBin);
-		personAnalyzer.init(scenario);
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin);
 		personAnalyzer.preProcessData();
 		personAnalyzer.postProcessData();
-		return personAnalyzer.getCongestionPerPersonTimeInterval();
+		return personAnalyzer.getTimeBin2AffectedPersonId2Delay();
 	}
 	
 	private SortedMap<Double, Map<Id<Person>, Double>> getCausingPersonDelay(int noOfTimeBin){

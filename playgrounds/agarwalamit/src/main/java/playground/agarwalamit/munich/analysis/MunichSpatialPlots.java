@@ -267,18 +267,17 @@ public class MunichSpatialPlots {
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndConfig(inputs.initialCaseNetworkFile,inputs.initialCaseConfig);
 
-		ExperiencedDelayAnalyzer delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.initialCaseEventsFile, noOfBins); 
-		delayAnalyzer.init(sc);
+		ExperiencedDelayAnalyzer delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.initialCaseEventsFile, sc, noOfBins); 
 		delayAnalyzer.preProcessData();
 		delayAnalyzer.postProcessData();
-		linkDelaysBau = delayAnalyzer.getCongestionPerLinkTimeInterval();
+		linkDelaysBau = delayAnalyzer.getTimeBin2LinkId2Delay();
 
 		if(inputs.isComparing){
-			delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.compareToCaseEventsFile, noOfBins);
-			delayAnalyzer.init(LoadMyScenarios.loadScenarioFromNetworkAndConfig(inputs.compareToCaseNetwork,inputs.compareToCaseConfig));
+			Scenario scCompareTo =LoadMyScenarios.loadScenarioFromNetworkAndConfig(inputs.compareToCaseNetwork,inputs.compareToCaseConfig); 
+			delayAnalyzer = new ExperiencedDelayAnalyzer(inputs.compareToCaseEventsFile, scCompareTo, noOfBins);
 			delayAnalyzer.preProcessData();
 			delayAnalyzer.postProcessData();
-			linkDelaysPolicy = delayAnalyzer.getCongestionPerLinkTimeInterval();
+			linkDelaysPolicy = delayAnalyzer.getTimeBin2LinkId2Delay();
 		}
 		double sumDelays =0;
 

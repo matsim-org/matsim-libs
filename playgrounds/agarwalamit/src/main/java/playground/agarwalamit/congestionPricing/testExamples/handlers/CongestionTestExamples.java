@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.congestionPricing.testExamples;
+package playground.agarwalamit.congestionPricing.testExamples.handlers;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;

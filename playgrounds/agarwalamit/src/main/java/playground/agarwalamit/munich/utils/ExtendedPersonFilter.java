@@ -44,12 +44,23 @@ public class ExtendedPersonFilter extends PersonFilter {
 	private Collection<SimpleFeature> munichFeatures;
 	private String shapeFile ;
 
+	/**
+	 * Use this if do not want to load shape file.
+	 */
+	public ExtendedPersonFilter (){};
+	
+	/**
+	 * @param shapeFile person will be soreted based on this shape file. In general this should be a polygon shape.
+	 */
 	public ExtendedPersonFilter (String shapeFile){
 		this.shapeFile = shapeFile;
 		this.munichFeatures = ShapeFileReader.getAllFeatures(this.shapeFile);
 	}
 
-	public ExtendedPersonFilter (){
+	/**
+	 * @param isSortingForInsideMunich true if want to sort person for Munich city area.
+	 */
+	public ExtendedPersonFilter (boolean isSortingForInsideMunich){
 		this.shapeFile = "../../../repos/shared-svn/projects/detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 		Logger.getLogger(ExtendedPersonFilter.class).info("Reading Munich city area shape file...");
 		this.munichFeatures = ShapeFileReader.getAllFeatures(this.shapeFile);

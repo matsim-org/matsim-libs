@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.congestionPricing.testExamples;
+package playground.agarwalamit.congestionPricing.testExamples.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,57 +42,47 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author amit
  */
 
-/**
- * generates network with 6 links. Out of 6, first 4 person go up and next 2 go down.
- *<p>				  o----3----o
- *<p> 				  |
- *<p>				  2 
- *<p>				  |
- *<p>				  |
- *<p>  o--0---o---1---o
- *<p>				  |
- *<p>				  |
- *<p>				  4
- *<p>				  |
- *<p>				  o----5----o
- */
- class DivergingNetworkAndPlans {
+public class CorridorNetworkAndPlans {
+
+
+	/**
+	 * generates network with 3 links. 
+	 *<p>			
+	 *<p>  o--0---o---1---o---2---o---3---o
+	 *<p>				  
+	 */
 	Scenario scenario;
 	Config config;
 	NetworkImpl network;
 	Population population;
+	
 	Link link0;
 	Link link1;
 	Link link2;
 	Link link3;
-	Link link4;
-	Link link5;
 
-	 DivergingNetworkAndPlans(){
+	public CorridorNetworkAndPlans(){
 		config=ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.loadScenario(config);
 		network =  (NetworkImpl) this.scenario.getNetwork();
 		population = this.scenario.getPopulation();
 	}
 
-	 void createNetwork(){
-		Node node1 = network.createAndAddNode(Id.createNodeId("1"), this.scenario.createCoord(0, 0)) ;
-		Node node2 = network.createAndAddNode(Id.createNodeId("2"), this.scenario.createCoord(100, 100));
-		Node node3 = network.createAndAddNode(Id.createNodeId("3"), this.scenario.createCoord(300, 90));
-		Node node4 = network.createAndAddNode(Id.createNodeId("4"), this.scenario.createCoord(500, 200));
-		Node node5 = network.createAndAddNode(Id.createNodeId("5"), this.scenario.createCoord(700, 150));
-		Node node6 = network.createAndAddNode(Id.createNodeId("6"), this.scenario.createCoord(500, 20));
-		Node node7 = network.createAndAddNode(Id.createNodeId("7"), this.scenario.createCoord(700, 100));
+	public void createNetwork(){
 
-		link0 = network.createAndAddLink(Id.createLinkId(String.valueOf("0")), node1, node2,1000.0,20.0,3600,1,null,"7");
-		link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node2, node3,100.0,40.0,3600,1,null,"7");
-		link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node3, node4,10.0,10.0,720,1,null,"7");
-		link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node4, node5,100.0,40.0,3600,1,null,"7");
-		link4 = network.createAndAddLink(Id.createLinkId(String.valueOf("4")), node3, node6,100.0,40.0,3600,1,null,"7");
-		link5 = network.createAndAddLink(Id.createLinkId(String.valueOf("5")), node6, node7,100.0,40.0,3600,1,null,"7");
+		Node node1 = network.createAndAddNode(Id.createNodeId("1"), this.scenario.createCoord(0, 0)) ;
+		Node node2 = network.createAndAddNode(Id.createNodeId("2"), this.scenario.createCoord(100, 10));
+		Node node3 = network.createAndAddNode(Id.createNodeId("3"), this.scenario.createCoord(300, -10));
+		Node node4 = network.createAndAddNode(Id.createNodeId("4"), this.scenario.createCoord(500, 20));
+		Node node5 = network.createAndAddNode(Id.createNodeId("5"), this.scenario.createCoord(700, 0));
+
+		link0 = network.createAndAddLink(Id.createLinkId(String.valueOf("0")), node1, node2, 1000.0, 20.0, 3600.,1,null,"7");
+		link1 = network.createAndAddLink(Id.createLinkId(String.valueOf("1")), node2, node3, 100.0, 40.0, 3600.,1,null,"7");
+		link2 = network.createAndAddLink(Id.createLinkId(String.valueOf("2")), node3, node4, 10.0, 9.0, 900.,1,null,"7");
+		link3 = network.createAndAddLink(Id.createLinkId(String.valueOf("3")), node4, node5, 1000.0, 20.0, 3600.,1,null,"7");
 	}
 
-	 void createPopulation(int numberOfPersons){
+	public void createPopulation(int numberOfPersons){
 
 		for(int i=1;i<=numberOfPersons;i++){
 			Id<Person> id = Id.createPersonId(i);
@@ -107,29 +97,19 @@ import org.matsim.core.scenario.ScenarioUtils;
 			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
 			NetworkRoute route;
 			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-			if(i <= 4 ) { // first 4 agents towards bottleneck and then 2 agents to other destination
-				route= (NetworkRoute) factory.createRoute(link0.getId(), link3.getId());
-				linkIds.add(link1.getId());
-				linkIds.add(link2.getId());
-				route.setLinkIds(link0.getId(), linkIds, link3.getId());
-				leg.setRoute(route);
-				Activity a2 = population.getFactory().createActivityFromLinkId("w", link3.getId());
-				plan.addActivity(a2);
-			} else {
-				route = (NetworkRoute) factory.createRoute(link0.getId(), link5.getId());
-				linkIds.add(link1.getId());
-				linkIds.add(link4.getId());
-				route.setLinkIds(link0.getId(), linkIds, link5.getId());
-				leg.setRoute(route);
-				Activity a2 = population.getFactory().createActivityFromLinkId("w", link5.getId());
-				plan.addActivity(a2);
-			}
+			route= (NetworkRoute) factory.createRoute(link0.getId(), link3.getId());
+			linkIds.add(link1.getId());
+			linkIds.add(link2.getId());
+			linkIds.add(link3.getId());
+			route.setLinkIds(link0.getId(), linkIds, link3.getId());
+			leg.setRoute(route);
+			Activity a2 = population.getFactory().createActivityFromLinkId("w", link3.getId());
+			plan.addActivity(a2);
 			population.addPerson(p);
 		}
 	}
 
-	 Scenario getDesiredScenario() {
+	public Scenario getDesiredScenario(){
 		return this.scenario;
 	}
 }
-

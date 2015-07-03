@@ -154,13 +154,12 @@ public class DelaysAndEmissionCostsDiff {
 	}
 
 	private Map<Id<Person>, Double> getDelaysPerPerson(String configFile, String eventsFile, Scenario sc){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile,1);
-		personAnalyzer.init(sc);
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile,sc,1);
 		personAnalyzer.preProcessData();
 		personAnalyzer.postProcessData();
 
 		Map<Id<Person>, Double> personId2DelaysCosts= new HashMap<Id<Person>, Double>();
-		Map<Id<Person>, Double> personId2DelaysInSec = personAnalyzer.getCongestionPerPersonTimeInterval().get(sc.getConfig().qsim().getEndTime());
+		Map<Id<Person>, Double> personId2DelaysInSec = personAnalyzer.getTimeBin2AffectedPersonId2Delay().get(sc.getConfig().qsim().getEndTime());
 		for(Id<Person> id :personId2DelaysInSec.keySet() ){
 			personId2DelaysCosts.put(id, vtts_car*personId2DelaysInSec.get(id));
 		}

@@ -50,6 +50,8 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 		this.sc = sc;
 		this.noOfTimeBins = noOfTimeBins;
 		this.isSortingForMunich = isSortingForMunich;
+		if(isSortingForMunich) pf = new ExtendedPersonFilter(isSortingForMunich);
+		else pf = new ExtendedPersonFilter();
 	}
 
 	private String eventsFile;
@@ -57,7 +59,7 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 	private int noOfTimeBins;
 	private boolean isSortingForMunich;
 	private CausedDelayAnalyzer cda;
-	private ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private ExtendedPersonFilter pf ;
 	private final String suffixForSoring = "_sorted";
 
 	private SortedMap<Double, SortedMap<UserGroup, Integer>> userGroup2TollPayers = new TreeMap<Double, SortedMap<UserGroup,Integer>>();
@@ -116,16 +118,16 @@ public class TollCounterInfoWriter extends AbstractAnalysisModule {
 			}
 		}
 
-		//timeBin2UserGrp2TolledTrips
-		SortedMap<Double,List<Id<Person>>> timeBin2TolledPersonsList = this.cda.getTimeBin2ListOfTollPayers();
-		for(Double d : timeBin2TolledPersonsList.keySet()){
-			SortedMap<UserGroup,Integer> usrGrp2Trips = this.userGroup2TolledTrips.get(d);
-			
-			for(Id<Person> personId : timeBin2TolledPersonsList.get(d)){
-				UserGroup ug = this.pf.getUserGroupFromPersonId(personId);
-				usrGrp2Trips.put(ug, usrGrp2Trips.get(ug)+1);
-			}
-		}
+//		//timeBin2UserGrp2TolledTrips
+//		SortedMap<Double,Set<Id<Person>>> timeBin2TolledPersonsList = this.cda.getTimeBin2ListOfTollPayers();
+//		for(Double d : timeBin2TolledPersonsList.keySet()){
+//			SortedMap<UserGroup,Integer> usrGrp2Trips = this.userGroup2TolledTrips.get(d);
+//			
+//			for(Id<Person> personId : timeBin2TolledPersonsList.get(d)){
+//				UserGroup ug = this.pf.getUserGroupFromPersonId(personId);
+//				usrGrp2Trips.put(ug, usrGrp2Trips.get(ug)+1);
+//			}
+//		}
 
 		//timeBin2TolledLinks
 		SortedMap<Double, Map<Id<Link>, Double>> timeBin2LinkDelay = this.cda.getTimeBin2LinkId2Delay();

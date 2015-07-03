@@ -20,6 +20,7 @@ package playground.agarwalamit.congestionPricing.analysis;
 
 import java.io.BufferedWriter;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
@@ -67,12 +68,12 @@ public class CongestionPricingComperator {
 	private final boolean isSortingForInsideMunich = true;
 	private final String suffixForSoring = "_sorted";
 	private double vtts_car;
-	private final ExtendedPersonFilter pf = new ExtendedPersonFilter();
+	private final ExtendedPersonFilter pf = new ExtendedPersonFilter(isSortingForInsideMunich);
 
 	public static void main(String[] args) {
 		CongestionPricingComperator analyzer = new CongestionPricingComperator("implV3");
 //		analyzer.writeExperiecedAndCausingPersonDelay();
-		analyzer.writeAverageLinkTolls();
+//		analyzer.writeAverageLinkTolls();
 //		analyzer.writeHourlyCausedDelayForEachPerson();
 	}
 
@@ -133,7 +134,7 @@ public class CongestionPricingComperator {
 		delayAnalyzer.run();
 
 		SortedMap<Double, Map<Id<Link>, Double>> timeBin2LinkId2Delay = delayAnalyzer.getTimeBin2LinkId2Delay();//delays on each link for each time bin
-		SortedMap<Double, Map<Id<Link>, Integer>> timeBin2LinkCount = delayAnalyzer.getTimeBin2Link2PersonCount();//delays on each link for each time bin
+		SortedMap<Double, Map<Id<Link>, Set<Id<Person>>>> timeBin2LinkCount = delayAnalyzer.getTimeBin2Link2CausingPersons();//number of congestion events.
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+"/analysis/linkId2Toll_"+noOfTimeBins+"Bins_"+pricingScenario+suffixForSoring+".txt");
 
@@ -142,7 +143,7 @@ public class CongestionPricingComperator {
 			for (double d:timeBin2LinkId2Delay.keySet()){
 				for(Id<Link> linkId : timeBin2LinkId2Delay.get(d).keySet()){
 					double delay = timeBin2LinkId2Delay.get(d).get(linkId);
-					double count = timeBin2LinkCount.get(d).get(linkId);
+					int count = timeBin2LinkCount.get(d).get(linkId).size();
 					double avgToll  = 0;
 					/*
 					 *  if delay ==0 and count != 0 --> noone delayed (cant happen)
@@ -164,11 +165,10 @@ public class CongestionPricingComperator {
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getExperiencedPersonDelay(int noOfTimeBin){
-		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, noOfTimeBin, isSortingForInsideMunich);
-		personAnalyzer.init(scenario);
+		ExperiencedDelayAnalyzer personAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, scenario, noOfTimeBin, isSortingForInsideMunich);
 		personAnalyzer.preProcessData();
 		personAnalyzer.postProcessData();
-		return personAnalyzer.getCongestionPerPersonTimeInterval();
+		return personAnalyzer.getTimeBin2AffectedPersonId2Delay();
 	}
 
 	private SortedMap<Double, Map<Id<Person>, Double>> getCausingPersonDelay(int noOfTimeBin){

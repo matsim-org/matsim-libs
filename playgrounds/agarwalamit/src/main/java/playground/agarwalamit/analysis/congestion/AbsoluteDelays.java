@@ -85,8 +85,8 @@ public class AbsoluteDelays  {
 
 		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 
-		ExperiencedDelayAnalyzer congestionHandler = new ExperiencedDelayAnalyzer(eventFile, 1);
-		congestionHandler.run(sc);
+		ExperiencedDelayAnalyzer congestionHandler = new ExperiencedDelayAnalyzer(eventFile, sc,1);
+		congestionHandler.run();
 
 		return congestionHandler.getTotalDelaysInHours();
 	}

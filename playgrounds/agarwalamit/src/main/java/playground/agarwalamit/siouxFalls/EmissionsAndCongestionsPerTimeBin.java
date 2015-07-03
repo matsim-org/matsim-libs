@@ -78,13 +78,12 @@ public class EmissionsAndCongestionsPerTimeBin {
 		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotal = eLinkAnalyzer.getLink2TotalEmissions();
 		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotalFilled = setNonCalculatedEmissions(time2EmissionsTotal);
 
-		ExperiencedDelayAnalyzer cLinkAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, noOfTimeBins);
-		cLinkAnalyzer.init(this.scenario);
+		ExperiencedDelayAnalyzer cLinkAnalyzer = new ExperiencedDelayAnalyzer(eventsFile, this.scenario, noOfTimeBins);
 		cLinkAnalyzer.preProcessData();
 		cLinkAnalyzer.postProcessData();
 		cLinkAnalyzer.checkTotalDelayUsingAlternativeMethod();
 
-		Map<Double, Map<Id<Link>, Double>> time2linkIdDelays = cLinkAnalyzer.getCongestionPerLinkTimeInterval();
+		Map<Double, Map<Id<Link>, Double>> time2linkIdDelays = cLinkAnalyzer.getTimeBin2LinkId2Delay();
 		new File(outputDir+runCase+"/analysis/emissionVsCongestion/").mkdirs();
 		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+runCase+"/analysis/emissionVsCongestion/"+runCase+".hourlyDelaysAndEmissionsPerLink.txt");
 

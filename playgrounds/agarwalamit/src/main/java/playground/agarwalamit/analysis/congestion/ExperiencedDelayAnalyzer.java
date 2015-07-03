@@ -47,38 +47,30 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
 	
 	private final Logger logger = Logger.getLogger(ExperiencedDelayAnalyzer.class);
 	private final String eventsFile;
-	private ExperiencedDelayHandler congestionPerPersonHandler;
-	private final int noOfTimeBins;
-	private SortedMap<Double, Map<Id<Person>, Double>> congestionPerPersonTimeInterval;
-	private Map<Double, Map<Id<Link>, Double>> congestionPerLinkTimeInterval;
+	private ExperiencedDelayHandler congestionHandler;
 	private EventsManager eventsManager;
 	private Scenario scenario;
-	private boolean isSortingForInsideMunich = false;
 
-	public ExperiencedDelayAnalyzer(String eventFile, int noOfTimeBins) {
+	public ExperiencedDelayAnalyzer(String eventFile, Scenario scenario, int noOfTimeBins) {
 		super(ExperiencedDelayAnalyzer.class.getSimpleName());
+		this.scenario = scenario;
 		this.eventsFile = eventFile;
-		this.noOfTimeBins = noOfTimeBins;
+		this.congestionHandler = new ExperiencedDelayHandler(this.scenario, noOfTimeBins);
 	}
 	
-	public ExperiencedDelayAnalyzer(String eventFile, int noOfTimeBins, boolean isSortingForInsideMunich) {
+	public ExperiencedDelayAnalyzer(String eventFile, Scenario scenario, int noOfTimeBins, boolean isSortingForInsideMunich) {
 		super(ExperiencedDelayAnalyzer.class.getSimpleName());
 		this.eventsFile = eventFile;
-		this.noOfTimeBins = noOfTimeBins;
-		this.isSortingForInsideMunich = isSortingForInsideMunich;
+		this.scenario = scenario;
+		this.congestionHandler = new ExperiencedDelayHandler(this.scenario, noOfTimeBins, isSortingForInsideMunich);
 	}
 	
-	public void run(Scenario scenario){
-		init(scenario);
+	public void run(){
 		preProcessData();
 		postProcessData();
 		checkTotalDelayUsingAlternativeMethod();
 	}
 	
-	public void init(Scenario scenario){
-		this.scenario = scenario;
-		this.congestionPerPersonHandler = new ExperiencedDelayHandler(this.noOfTimeBins,  this.scenario, isSortingForInsideMunich);
-	}
 	@Override
 	public List<EventHandler> getEventHandler() {
 		List<EventHandler> handler = new LinkedList<EventHandler>();
@@ -89,31 +81,33 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
 	public void preProcessData() {
 		this.eventsManager = EventsUtils.createEventsManager();
 		MatsimEventsReader eventsReader = new MatsimEventsReader(this.eventsManager);
-		this.eventsManager.addHandler(this.congestionPerPersonHandler);
+		this.eventsManager.addHandler(this.congestionHandler);
 		eventsReader.readFile(this.eventsFile);
 	}
 
 	@Override
 	public void postProcessData() {
-		this.congestionPerPersonTimeInterval= this.congestionPerPersonHandler.getDelayPerPersonAndTimeInterval();
-		this.congestionPerLinkTimeInterval= this.congestionPerPersonHandler.getDelayPerLinkAndTimeInterval();
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-
+		logger.error("Not implemented yet.");
 	}
 
 	public double getTotalDelaysInHours (){
-		return this.congestionPerPersonHandler.getTotalDelayInHours();
+		return this.congestionHandler.getTotalDelayInHours();
 	}
 	
-	public SortedMap<Double, Map<Id<Person>, Double>> getCongestionPerPersonTimeInterval() {
-		return this.congestionPerPersonTimeInterval;
+	public SortedMap<Double, Map<Id<Person>, Double>> getTimeBin2AffectedPersonId2Delay() {
+		return this.congestionHandler.getDelayPerPersonAndTimeInterval();
 	}
 	
-	public Map<Double, Map<Id<Link>, Double>> getCongestionPerLinkTimeInterval() {
-		return this.congestionPerLinkTimeInterval;
+	public Map<Double, Map<Id<Link>, Double>> getTimeBin2LinkId2Delay() {
+		return this.congestionHandler.getDelayPerLinkAndTimeInterval();
+	}
+	
+	public Map<Double, Map<Id<Link>, Integer>> getTimeBin2LinkLeaveCount(){
+		return this.congestionHandler.getTime2linkIdLeaveCount();
 	}
 	
 	public void checkTotalDelayUsingAlternativeMethod(){
@@ -122,7 +116,7 @@ public class ExperiencedDelayAnalyzer extends AbstractAnalysisModule {
 		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
 		em.addHandler(implV3);
 		eventsReader.readFile(this.eventsFile);
-		if(implV3.getTotalDelay()/3600!=this.congestionPerPersonHandler.getTotalDelayInHours())
-			throw new RuntimeException("Total Delays are not equal using two methods; values are "+implV3.getTotalDelay()/3600+","+this.congestionPerPersonHandler.getTotalDelayInHours());
+		if(implV3.getTotalDelay()/3600!=this.congestionHandler.getTotalDelayInHours())
+			throw new RuntimeException("Total Delays are not equal using two methods; values are "+implV3.getTotalDelay()/3600+","+this.congestionHandler.getTotalDelayInHours());
 	}
 }
