@@ -46,11 +46,9 @@ import org.matsim.testcases.MatsimTestUtils;
  * 
  * the network.xml and the Lanedefintions.xml files are written to the testOutputDirectory
  * 
- * @author Tille
+ * @author Tilmann Schlenther
  *
  */
-
-
 public class LinkLaneTTTest {
 	
 	

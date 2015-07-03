@@ -1,11 +1,3 @@
-/**
- * *This class tests the functionality of the getTotalTT method in the class TtAnalyzeBraessRouteDistributionAndTT.
- * The network used is the basic Braess Scenario with unlimited capacity
- * The number of persons traveling through the scenario and the traveltime per link can be varied.
- * 
- * @author Tilmann Schlenther
- *
- */
 package scenarios.braess.analysis;
 
 import org.junit.Assert;
@@ -28,6 +20,15 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import scenarios.braess.createInput.TtCreateBraessPopulation;
 
+/**
+ * This class tests the functionality of the getTotalTT method in the class
+ * TtAnalyzeBraessRouteDistributionAndTT. The network used is the basic Braess
+ * scenario with unlimited capacity, the number of persons traveling through the
+ * scenario and the travel time per link can be varied.
+ * 
+ * @author Tilmann Schlenther
+ * 
+ */
 public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
@@ -43,8 +44,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	/**
 	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraessRouteDistributionAndTT#getTotalTT()}.
-	 */
-	
+	 */	
 	@Test
 	public void testGetTotalTT() {
 		outputdir = utils.getOutputDirectory() + "/Test_LinkTT" + TTPerLink;
