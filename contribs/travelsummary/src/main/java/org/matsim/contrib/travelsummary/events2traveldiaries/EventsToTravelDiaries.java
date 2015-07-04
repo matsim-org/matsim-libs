@@ -79,8 +79,6 @@ public class EventsToTravelDiaries implements
     }
 
     public EventsToTravelDiaries(Scenario scenario) {
-        // yy seems a bit overkill to generate a config just to obtain one scalar value. kai, may'15
-
         this.network = scenario.getNetwork();
         isTransitScenario = scenario.getConfig().scenario().isUseTransit() ;
         if (isTransitScenario) {
