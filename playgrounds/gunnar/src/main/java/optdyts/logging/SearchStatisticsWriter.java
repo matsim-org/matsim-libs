@@ -35,10 +35,9 @@ public class SearchStatisticsWriter<X extends SimulatorState, U extends Decision
 		this.statistics.add(new AbsoluteEquilibriumGap<X, U>());
 		this.statistics.add(new MaximumAbsoluteEquilibriumGap<X, U>());
 		this.statistics.add(new IsConverged<X, U>());
-		this.statistics.add(new EquivalentAveragingSolutions<X, U>());
 		this.statistics.add(new InterpolatedObjectiveFunctionValue<X, U>());
 		this.statistics.add(new SolutionSize<X, U>());
-		this.statistics.add(new AllSolutions<X, U>("\t"));
+		this.statistics.add(new EquivalentAveragingSolutions<X, U>());
 	}
 
 	public void addSearchStatistic(final SearchStatistic<X, U> statistic) {
@@ -54,7 +53,6 @@ public class SearchStatisticsWriter<X extends SimulatorState, U extends Decision
 	private boolean wroteHeader = false;
 
 	public void writeToFile(final SurrogateSolution<X, U> surrogateSolution) {
-
 		try {
 			final BufferedWriter writer;
 			if (!this.wroteHeader) {

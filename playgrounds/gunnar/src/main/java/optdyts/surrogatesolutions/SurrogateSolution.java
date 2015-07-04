@@ -94,8 +94,13 @@ public class SurrogateSolution<X extends SimulatorState, U extends DecisionVaria
 		return this.properties.getInterpolatedFromStateEuclideanNorm();
 	}
 
-	public Double getAlphaSum(final U decisionVariable) {
-		return this.properties.getAlphaSum(decisionVariable);
+	public double getAlphaSum(final U decisionVariable) {
+		final Double result = this.properties.getAlphaSum(decisionVariable);
+		if (result != null) {
+			return result;
+		} else {
+			return 0.0;
+		}
 	}
 
 	public X getLastState(final U decisionVariable) {
@@ -204,27 +209,23 @@ public class SurrogateSolution<X extends SimulatorState, U extends DecisionVaria
 
 		} else {
 
-			// TODO >>>>> CONTINUE HERE >>>>>
-
 			final double absoluteMaximumGap;
 			if (this.properties == null) {
-				double averageFromStateEuclideanNorm = 0;
+				double sumOfFromStateEuclideanNorm = 0;
 				for (Transition<U> transition : transitionList) {
-					averageFromStateEuclideanNorm += transition
+					sumOfFromStateEuclideanNorm += transition
 							.getFromStateEuclideanNorm();
 				}
-				averageFromStateEuclideanNorm /= transitionList.size();
 				absoluteMaximumGap = this.maximumRelativeGap
-						* averageFromStateEuclideanNorm;
+						* (sumOfFromStateEuclideanNorm / transitionList.size());
 			} else {
 				absoluteMaximumGap = this.maximumRelativeGap
 						* this.properties
 								.getInterpolatedFromStateEuclideanNorm();
 			}
-			final double regularizationWeight = 0.01 * this.size()
+			final double regularizationWeight = 0.01
+					* this.minimumAverageIterations
 					* Math.pow(absoluteMaximumGap, 2.0);
-
-			// TODO <<<<< CONTINUE HERE
 
 			this.properties = SurrogateSolutionEstimator.computeProperties(
 					transitionList, this.minimumAverageIterations,

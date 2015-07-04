@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.Set;
 
 import optdyts.DecisionVariableSetEvaluator;
+import optdyts.logging.AllSolutions;
 import optdyts.logging.SearchStatisticsWriter;
 
 /**
@@ -149,8 +150,10 @@ class TwoRoutes {
 
 		final SearchStatisticsWriter<TwoRoutesSimulatorState, TwoRoutesDecisionVariable> averageWriter = new SearchStatisticsWriter<TwoRoutesSimulatorState, TwoRoutesDecisionVariable>(
 				"twoRoutesAvg.txt");
-		averageWriter.addSearchStatistic(new TwoRoutesAverageToll(
-				decisionVariables));
+		averageWriter.addSearchStatistic(new TwoRoutesAverageToll());
+		averageWriter
+				.addSearchStatistic(new AllSolutions<TwoRoutesSimulatorState, TwoRoutesDecisionVariable>(
+						decisionVariables, "\t"));
 		evaluator.addSearchStatisticsWriter(averageWriter);
 
 		twoRoutes.run(evaluator);

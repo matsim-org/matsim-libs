@@ -1,7 +1,5 @@
 package tworoutes;
 
-import java.util.Set;
-
 import optdyts.logging.AbstractDecisionVariableAverage;
 
 /**
@@ -13,9 +11,8 @@ public class TwoRoutesAverageToll
 		extends
 		AbstractDecisionVariableAverage<TwoRoutesSimulatorState, TwoRoutesDecisionVariable> {
 
-	public TwoRoutesAverageToll(
-			final Set<TwoRoutesDecisionVariable> allDecisionVariables) {
-		super(allDecisionVariables, "\t");
+	public TwoRoutesAverageToll() {
+		super();
 	}
 
 	@Override

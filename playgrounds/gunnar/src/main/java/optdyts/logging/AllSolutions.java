@@ -1,5 +1,9 @@
 package optdyts.logging;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import optdyts.DecisionVariable;
 import optdyts.SimulatorState;
 import optdyts.surrogatesolutions.SurrogateSolution;
@@ -11,34 +15,52 @@ import optdyts.surrogatesolutions.SurrogateSolution;
  * @param <X>
  * @param <U>
  */
-class AllSolutions<X extends SimulatorState, U extends DecisionVariable>
+public class AllSolutions<X extends SimulatorState, U extends DecisionVariable>
 		implements SearchStatistic<X, U> {
+
+	// -------------------- MEMBERS --------------------
+
+	private final List<U> allDecisionVariables;
 
 	private final String separator;
 
-	public AllSolutions(final String separator) {
+	// -------------------- CONSTRUCTION --------------------
+
+	public AllSolutions(final Set<U> allDecisionVariables,
+			final String separator) {
+		this.allDecisionVariables = new ArrayList<U>(allDecisionVariables);
 		this.separator = separator;
 	}
 
+	// --------------- IMPLEMENTATION OF SearchStatistic ---------------
+
 	@Override
 	public String label() {
-		return "Decision variable" + this.separator + "alpha" + this.separator
-				+ "...";
+		final StringBuffer result = new StringBuffer();
+		result.append(this.allDecisionVariables.get(0));
+		for (int i = 1; i < this.allDecisionVariables.size(); i++) {
+			result.append(this.separator);
+			result.append("alpha(" + this.allDecisionVariables.get(i) + ")");
+		}
+		return result.toString();
 	}
 
 	@Override
-	public String value(SurrogateSolution<X, U> surrogateSolution) {
+	public String value(final SurrogateSolution<X, U> surrogateSolution) {
+		final StringBuffer result = new StringBuffer();
 		if (surrogateSolution.hasProperties()) {
-			final StringBuffer result = new StringBuffer();
-			for (U decisionVariable : surrogateSolution.getDecisionVariables()) {
-				result.append(decisionVariable + "\t");
-				result.append(surrogateSolution.getAlphaSum(decisionVariable)
-						+ "\t");
+			result.append(this.allDecisionVariables.get(0));
+			for (int i = 1; i < this.allDecisionVariables.size(); i++) {
+				result.append(this.separator);
+				result.append(surrogateSolution
+						.getAlphaSum(this.allDecisionVariables.get(i)));
 			}
-			return result.toString();
 		} else {
-			return "--";
+			for (int i = 0; i < this.allDecisionVariables.size(); i++) {
+				result.append(this.separator);
+				result.append("--"); // no alpha
+			}
 		}
+		return result.toString();
 	}
-
 }
