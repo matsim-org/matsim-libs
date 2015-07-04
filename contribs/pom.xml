@@ -122,6 +122,7 @@
 		<module>common</module>
 		<module>eventsBasedPTRouter</module>
 		<module>map2mapmatching</module>
+		<module>travelsummary</module>
 	</modules>
 	<repositories>
 		<repository>
