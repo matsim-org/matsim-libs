@@ -21,14 +21,15 @@
 package playground.pieter.ptsim;
 
 import com.google.inject.Provider;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.analysis.events2traveldiaries.EventsToTravelDiaries;
 import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWSFactory;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
 import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimePreCalcSerializable;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
+import org.matsim.contrib.travelsummary.events2traveldiaries.EventsToTravelDiaries;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -57,6 +58,7 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+
 import playground.pieter.singapore.utils.events.RidershipTracking;
 import playground.sergioo.eventAnalysisTools2013.excessWaitingTime.ExcessWaitingTimeCalculator;
 import playground.sergioo.ptsim2013.TransitSheduleToNetwork;

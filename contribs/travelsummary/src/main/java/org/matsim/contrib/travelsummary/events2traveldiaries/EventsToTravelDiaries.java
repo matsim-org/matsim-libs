@@ -1,4 +1,4 @@
-package org.matsim.contrib.analysis.events2traveldiaries;
+package org.matsim.contrib.travelsummary.events2traveldiaries;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.analysis.events2traveldiaries.travelcomponents.*;
+import org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;

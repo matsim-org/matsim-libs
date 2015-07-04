@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.analysis.events2traveldiaries.travelcomponents.*;
+import org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -39,6 +39,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
+
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 import playground.pieter.singapore.utils.postgresql.PostgresType;
@@ -51,8 +52,8 @@ import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetwo
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeCalculator;
 
-
 import javax.management.timer.Timer;
+
 import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;

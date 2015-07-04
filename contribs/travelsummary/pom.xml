@@ -6,6 +6,6 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
-  <artifactId>_template</artifactId>
-  <name>_template</name>
+  <artifactId>travelsummary</artifactId>
+  <name>travelsummary</name>
 </project>

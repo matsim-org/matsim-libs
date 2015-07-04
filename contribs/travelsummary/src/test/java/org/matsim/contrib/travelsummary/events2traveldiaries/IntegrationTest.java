@@ -16,10 +16,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.analysis.events2traveldiaries;
+package org.matsim.contrib.travelsummary.events2traveldiaries;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.travelsummary.events2traveldiaries.RunEventsToTravelDiaries;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**

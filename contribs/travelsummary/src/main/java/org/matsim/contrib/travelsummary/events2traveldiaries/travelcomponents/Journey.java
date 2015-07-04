@@ -1,4 +1,4 @@
-package org.matsim.contrib.analysis.events2traveldiaries.travelcomponents;
+package org.matsim.contrib.travelsummary.events2traveldiaries.travelcomponents;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
