@@ -15,9 +15,8 @@ public class RunCreatePopulationAndDemand {
 	private final static Logger log = Logger.getLogger(RunCreatePopulationAndDemand.class);
 	private Scenario scenario;
 	
-	private String facilitiesFile = "./input/facilities.xml.gz";
-	private String networkFile = "./input/network.xml";
-	
+	private String facilitiesFile = "output/facilities.xml";
+
 	// --------------------------------------------------------------------------
 	public static void main(String[] args) {
 		RunCreatePopulationAndDemand creator = new RunCreatePopulationAndDemand();
@@ -39,14 +38,7 @@ public class RunCreatePopulationAndDemand {
 		 */
 		Config config = ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.createScenario(config);
-		/*
-		 * Read the network and store it in the scenario
-		 */
-		new MatsimNetworkReader(this.scenario).readFile(networkFile);
-		/*
-		 * Read the facilities and store them in the scenario
-		 */
-		new FacilitiesReaderMatsimV1((ScenarioImpl)this.scenario).readFile(this.facilitiesFile);	
+		new FacilitiesReaderMatsimV1(this.scenario).readFile(this.facilitiesFile);
 	}
 	
 	private void write() {

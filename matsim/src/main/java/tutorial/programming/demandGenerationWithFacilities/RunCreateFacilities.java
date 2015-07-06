@@ -108,6 +108,7 @@ public class RunCreateFacilities {
 				
 				ActivityFacility facility = this.scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(startIndex + cnt, ActivityFacility.class), homeCoord);
 				addActivityOption(facility, "home");
+				scenario.getActivityFacilities().addActivityFacility(facility);
 				cnt++;
 			}
 			bufferedReader.close();
@@ -130,6 +131,6 @@ public class RunCreateFacilities {
 	}
 		
 	public void write() {
-		new FacilitiesWriter(((ScenarioImpl) this.scenario).getActivityFacilities()).write("./output/facilities.xml.gz");
+		new FacilitiesWriter(this.scenario.getActivityFacilities()).write("./output/facilities.xml");
 	}
 }

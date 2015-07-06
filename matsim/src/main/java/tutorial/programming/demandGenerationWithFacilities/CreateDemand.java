@@ -3,12 +3,7 @@ package tutorial.programming.demandGenerationWithFacilities;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Vector;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -39,9 +34,8 @@ class CreateDemand {
 	// We need another population, the PUS population
 	private Scenario scenarioPUS;
 	
-	// [[ 3 ]] here you have to fill in the path of the pus files
-	private String pusTripsFile = "...";
-	private String pusPersonsFile = "...";
+	private String pusTripsFile = "examples/tutorial/programming/demandGenerationWithFacilities/travelsurvey_trips.txt";
+	private String pusPersonsFile = "examples/tutorial/programming/demandGenerationWithFacilities/travelsurvey_persons.txt";
 	
 	private ObjectAttributes personHomeAndWorkLocations;
 	private Random random = new Random(3838494); 
@@ -96,6 +90,8 @@ class CreateDemand {
 				/*
 				 * Create a person and add it to the population
 				 */
+				System.out.println(Arrays.asList(parts));
+				System.out.println(parts[index_personId]);
 				Person person = populationFactory.createPerson(Id.create(parts[index_personId].trim(), Person.class));
 				population.addPerson(person);
 				
@@ -105,7 +101,7 @@ class CreateDemand {
 				 */
 				Plan plan = populationFactory.createPlan();
 				person.addPlan(plan);
-				((PersonImpl)person).setSelectedPlan(plan);
+				person.setSelectedPlan(plan);
 			}
 			bufferedReader.close();
 		} // end try
@@ -251,14 +247,15 @@ class CreateDemand {
 				
 				if (activity.getType().startsWith("h")) {
 					facility = (ActivityFacility)this.personHomeAndWorkLocations.getAttribute(person.getId().toString(), "home");
-				}
-				else if (activity.getType().startsWith("w")) {
+				} else if (activity.getType().startsWith("w")) {
 					facility = (ActivityFacility)this.personHomeAndWorkLocations.getAttribute(person.getId().toString(), "work");
-				}
-				else {
+				} else {
 					facility = this.getRandomLocation(activity, previousActivity.getCoord());
 				}
-				
+				if (facility == null) {
+					throw new RuntimeException();
+				}
+
 				if (counter == 0) {
 					time = 8.0 * 3600.0 + this.randomizeTimes();
 					int suffix = (int)(time / 3600.0);
@@ -278,7 +275,7 @@ class CreateDemand {
 					if (dur.equals("0")) dur = "0.5";
 					activity.setType(activity.getType().substring(0, 1) + dur);
 					activity.setEndTime(time);
-				}								
+				}
 				activity.setFacilityId(facility.getId());
 				activity.setLinkId(facility.getLinkId());
 				activity.setCoord(facility.getCoord());

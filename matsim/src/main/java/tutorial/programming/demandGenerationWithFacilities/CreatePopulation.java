@@ -28,8 +28,8 @@ class CreatePopulation {
 	private Scenario scenario;
 	
 	// [[ 0 ]] here you have to fill in the path of the census file
-	private String censusFile = "...";	
-	private String municipalitiesFile = "./input/swiss_municipalities.txt";
+	private static final String censusFile = "examples/tutorial/programming/demandGenerationWithFacilities/census.txt";
+	private static final String municipalitiesFile = "examples/tutorial/programming/demandGenerationWithFacilities/swiss_municipalities.txt";
 	
 	private QuadTree<ActivityFacility> homeFacilitiesTree;
 	private QuadTree<ActivityFacility> workFacilitiesTree;
@@ -73,15 +73,11 @@ class CreatePopulation {
 			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.censusFile));
 			String line = bufferedReader.readLine(); //skip header
 			
-			/* 
-			 * [[ 1 ]] here you have to set the indices accordingly. 
-			 *  Please note that in programming we always start with 0 and not with 1
-			 */
-			int index_personId = -1;
-			int index_age = -1;
-			int index_workLocation = -1;
-			int index_xHomeCoord = -1;
-			int index_yHomeCoord = -1;
+			int index_personId = 4;
+			int index_age = 6;
+			int index_workLocation = 8;
+			int index_xHomeCoord = 10;
+			int index_yHomeCoord = 11;
 			
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
@@ -105,6 +101,9 @@ class CreatePopulation {
 				Coord homeCoord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
 						Double.parseDouble(parts[index_yHomeCoord]));
 				ActivityFacility homeFacility = this.homeFacilitiesTree.get(homeCoord.getX(), homeCoord.getY());
+				if (homeFacility == null) {
+					throw new RuntimeException();
+				}
 				personHomeAndWorkLocations.putAttribute(person.getId().toString(), "home", homeFacility);
 				
 				if (employed) {
@@ -142,9 +141,8 @@ class CreatePopulation {
 			}
 			bufferedReader.close();
 			
-		} // end try
-		catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -168,16 +166,7 @@ class CreatePopulation {
 	}
 	
 	public QuadTree<ActivityFacility> createActivitiesTree(String activityType, Scenario scenario) {
-		QuadTree<ActivityFacility> facQuadTree;
-		
-		if (activityType.equals("all")) {
-			facQuadTree = this.builFacQuadTree(
-					activityType, scenario.getActivityFacilities().getFacilities());	
-		}
-		else {
-			facQuadTree = this.builFacQuadTree(
-				activityType, scenario.getActivityFacilities().getFacilitiesForActivityType(activityType));	
-		}
+		QuadTree<ActivityFacility> facQuadTree = this.builFacQuadTree(activityType, scenario.getActivityFacilities().getFacilitiesForActivityType(activityType));
 		return facQuadTree;
 	}
 
