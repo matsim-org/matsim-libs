@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.config.experimental;
+package org.matsim.core.config;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.config.ConfigGroup;
 
 /**
  * A module using reflection for easy implementation of config groups.

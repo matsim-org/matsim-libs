@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgensimulated.framework;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * Allows to specify parameters useful for any use case

@@ -21,7 +21,7 @@ package eu.eunoiaproject.bikesharing.scoring;
 
 import java.util.Map;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author thibautd

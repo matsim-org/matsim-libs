@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package playground.vsp.bvwp;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author nagel

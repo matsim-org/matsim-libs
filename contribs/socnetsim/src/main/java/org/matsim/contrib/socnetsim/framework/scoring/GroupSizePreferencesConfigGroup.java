@@ -22,7 +22,7 @@ package org.matsim.contrib.socnetsim.framework.scoring;
 import java.util.Random;
 
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author thibautd

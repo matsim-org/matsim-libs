@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.carsharing.config;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 
 public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {

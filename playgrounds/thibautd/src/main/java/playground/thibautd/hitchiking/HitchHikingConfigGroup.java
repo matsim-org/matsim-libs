@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author thibautd

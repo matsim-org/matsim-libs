@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 
 /**

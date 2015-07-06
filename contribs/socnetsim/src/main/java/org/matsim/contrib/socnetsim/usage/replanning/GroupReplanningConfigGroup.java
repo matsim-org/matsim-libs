@@ -20,7 +20,7 @@
 package org.matsim.contrib.socnetsim.usage.replanning;
 
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.Collection;
 

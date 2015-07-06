@@ -22,7 +22,7 @@ package org.matsim.roadpricing;
 
 import java.util.Map;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class RoadPricingConfigGroup extends ReflectiveConfigGroup {
 	// has to be public

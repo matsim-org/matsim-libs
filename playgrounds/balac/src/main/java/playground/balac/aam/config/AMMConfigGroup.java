@@ -1,6 +1,6 @@
 package playground.balac.aam.config;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 
 public class AMMConfigGroup extends ReflectiveConfigGroup {

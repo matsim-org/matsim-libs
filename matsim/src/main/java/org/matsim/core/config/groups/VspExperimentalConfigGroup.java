@@ -21,7 +21,7 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * config group for experimental parameters. this group and its parameters should not be used outside of vsp.

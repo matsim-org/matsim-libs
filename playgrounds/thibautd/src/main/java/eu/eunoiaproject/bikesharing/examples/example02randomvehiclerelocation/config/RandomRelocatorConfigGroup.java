@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.config;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * Demonstate how to easily create a config group for a specific purpose.

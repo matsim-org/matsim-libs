@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * This config Module can be used to specify the paths to the

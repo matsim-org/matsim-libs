@@ -25,7 +25,7 @@ package org.matsim.contrib.matrixbasedptrouter;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author nagel

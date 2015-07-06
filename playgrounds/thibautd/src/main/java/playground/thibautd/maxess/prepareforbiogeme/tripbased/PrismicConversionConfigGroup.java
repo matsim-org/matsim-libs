@@ -19,7 +19,7 @@
 package playground.thibautd.maxess.prepareforbiogeme.tripbased;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 import java.util.Arrays;

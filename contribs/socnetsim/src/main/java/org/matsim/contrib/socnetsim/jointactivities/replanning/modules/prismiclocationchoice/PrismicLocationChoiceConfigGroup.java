@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author thibautd

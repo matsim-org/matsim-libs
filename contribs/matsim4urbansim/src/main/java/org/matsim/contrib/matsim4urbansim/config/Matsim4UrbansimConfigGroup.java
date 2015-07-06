@@ -19,7 +19,7 @@
 package org.matsim.contrib.matsim4urbansim.config;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author nagel

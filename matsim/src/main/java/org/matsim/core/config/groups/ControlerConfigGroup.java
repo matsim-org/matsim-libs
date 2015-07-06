@@ -26,12 +26,9 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringGetter;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;

@@ -23,10 +23,7 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringGetter;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup.StringSetter;
-import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class PlansConfigGroup extends ReflectiveConfigGroup {
 

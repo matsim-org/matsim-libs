@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.run;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * @author thibautd

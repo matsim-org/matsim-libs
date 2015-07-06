@@ -26,7 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultPlansRemover;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultSelector;

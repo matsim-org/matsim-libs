@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetsim.framework.scoring;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.Map;
 

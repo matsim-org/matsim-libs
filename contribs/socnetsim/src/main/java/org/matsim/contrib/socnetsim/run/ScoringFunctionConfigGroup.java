@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.socnetsim.run;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.contrib.socnetsim.framework.scoring.BeingTogetherScoring;
 

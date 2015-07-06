@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;

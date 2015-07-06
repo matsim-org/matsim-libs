@@ -20,10 +20,9 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.misc.StringUtils;
 
 /**

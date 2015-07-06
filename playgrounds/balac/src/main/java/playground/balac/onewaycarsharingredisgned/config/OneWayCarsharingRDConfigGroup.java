@@ -1,6 +1,6 @@
 package playground.balac.onewaycarsharingredisgned.config;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 
 public class OneWayCarsharingRDConfigGroup extends ReflectiveConfigGroup {

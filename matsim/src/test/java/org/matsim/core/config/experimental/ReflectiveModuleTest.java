@@ -26,11 +26,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup.InconsistentModuleException;
+import org.matsim.core.config.*;
+import org.matsim.core.config.ReflectiveConfigGroup.InconsistentModuleException;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 

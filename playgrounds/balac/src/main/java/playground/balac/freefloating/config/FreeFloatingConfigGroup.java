@@ -19,7 +19,7 @@
 
 package playground.balac.freefloating.config;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 
 public class FreeFloatingConfigGroup extends ReflectiveConfigGroup {

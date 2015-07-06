@@ -22,7 +22,7 @@
 
 package playground.mzilske.clones;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class ClonesConfigGroup extends ReflectiveConfigGroup {
 

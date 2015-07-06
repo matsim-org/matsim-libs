@@ -1,6 +1,6 @@
 package playground.artemc.heterogeneity;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 import java.util.Map;
 

@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 /**

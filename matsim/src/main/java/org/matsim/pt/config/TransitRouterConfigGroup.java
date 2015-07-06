@@ -21,7 +21,7 @@ package org.matsim.pt.config;
 
 import java.util.Map;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class TransitRouterConfigGroup extends ReflectiveConfigGroup {
 

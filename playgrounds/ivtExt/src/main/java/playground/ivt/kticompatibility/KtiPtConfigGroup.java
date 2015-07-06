@@ -20,7 +20,7 @@
 
 package playground.ivt.kticompatibility;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
  * information necesary to a Kti scenario, which cannot be added

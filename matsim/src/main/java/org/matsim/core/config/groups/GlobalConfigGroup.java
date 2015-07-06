@@ -23,7 +23,7 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class GlobalConfigGroup extends ReflectiveConfigGroup {
 	private static final Logger log = Logger.getLogger(GlobalConfigGroup.class);

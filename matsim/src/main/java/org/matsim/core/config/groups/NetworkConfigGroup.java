@@ -20,7 +20,7 @@
 
 package org.matsim.core.config.groups;
 
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class NetworkConfigGroup extends ReflectiveConfigGroup {
 

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.experimental.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	// yyyy todo: change in similar way as with other modes ("_mode") 
