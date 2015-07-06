@@ -102,9 +102,9 @@ public class KTFreight_v3 {
 	private static final Logger log = Logger.getLogger(KTFreight_v3.class) ;
 
 		//Beginn Namesdefinition KT Für Berlin-Szenario 
-		private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/" ;
-		private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Berlin/aldi/base/" ;
-		private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/";
+		private static final String INPUT_DIR = "C:/Users/kturner/workspace/projects_freight/studies/MA_Turner-Kai/input/Berlin_Szenario/" ;
+		private static final String OUTPUT_DIR = "Z:/WinHome/Docs/runs/Berlin/aldi/Base/" ;
+		private static final String TEMP_DIR = "Z:/WinHome/Docs/runs/Temp/";
 	
 		//Dateinamen ohne XML-Endung
 		private static final String NETFILE_NAME = "network" ;
@@ -171,13 +171,13 @@ public class KTFreight_v3 {
 
 
 	// Einstellungen für den Run	
-	private static final boolean addingCongestion = false ;  //doesn't work correctly, KT 10.12.2014
+	private static final boolean addingCongestion = true ;  //doesn't work correctly, KT 10.12.2014
 	private static final boolean addingToll = false;  //added, kt. 07.08.2014
 	private static final boolean usingUCC = false;	 //Using Transshipment-Center, added kt 30.04.2015
 	private static final boolean runMatsim = true;	 //when false only jsprit run will be performed
 	private static final int LAST_MATSIM_ITERATION = 0;  //only one iteration for writing events.
-	private static final int MAX_JSPRIT_ITERATION = 2000;
-	private static final int NU_OF_TOTAL_RUNS = 1;	
+	private static final int MAX_JSPRIT_ITERATION = 4000;
+	private static final int NU_OF_TOTAL_RUNS = 100;	
 
 	//temporär zum Programmieren als Ausgabe
 	private static WriteTextToFile textInfofile; 
@@ -598,23 +598,50 @@ public class KTFreight_v3 {
 		NetworkChangeEventFactory cef = new NetworkChangeEventFactoryImpl() ;
 		for ( Link link : scenario.getNetwork().getLinks().values() ) {
 			double speed = link.getFreespeed() ;
-			final double threshold = 5./3.6;		//5km/h
-//			if (link.getId().toString().startsWith("j(1,")) {  //Nur für bestimmte Links Nordwärts zu Service 1, KT 7.1.86
+//			final double threshold = 5./3.6;		//5km/h
+//				if ( speed > threshold ) {
+//					{
+//						NetworkChangeEvent event = cef.createNetworkChangeEvent(0*3600.) ;
+//						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold )); //KT, 7.1.15 vorher threshold/10 hatte leere Lösung
+//						event.addLink(link);
+//						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+//					}
+//					{
+//						NetworkChangeEvent event = cef.createNetworkChangeEvent(24*3600.) ;
+//						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+//						event.addLink(link);
+//						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+//					}
+//				}
+				
+			//Berufsverkehr von 7-10 Uhr und 16:30 bis 19 Uhr; Für alle Kanten mit fressped > 25 km/h wird dieser auf 50% reduziert
+				final double threshold = 25./3.6;		//25km/h
 				if ( speed > threshold ) {
 					{
-						NetworkChangeEvent event = cef.createNetworkChangeEvent(0*3600.) ;
-						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  threshold )); //KT, 7.1.15 vorher threshold/10 hatte leere Lösung
+						NetworkChangeEvent event = cef.createNetworkChangeEvent(7*3600.) ;
+						event.setFreespeedChange(new ChangeValue( ChangeType.FACTOR,  0.5 )); 
 						event.addLink(link);
 						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 					}
 					{
-						NetworkChangeEvent event = cef.createNetworkChangeEvent(24*3600.) ;
+						NetworkChangeEvent event = cef.createNetworkChangeEvent(10*3600.) ;
+						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
+						event.addLink(link);
+						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					}
+					{
+						NetworkChangeEvent event = cef.createNetworkChangeEvent(16.5*3600.) ;
+						event.setFreespeedChange(new ChangeValue( ChangeType.FACTOR,  0.5 )); 
+						event.addLink(link);
+						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
+					}
+					{
+						NetworkChangeEvent event = cef.createNetworkChangeEvent(19*3600.) ;
 						event.setFreespeedChange(new ChangeValue( ChangeType.ABSOLUTE,  speed ));
 						event.addLink(link);
 						((NetworkImpl)scenario.getNetwork()).addNetworkChangeEvent(event);
 					}
 				}
-//			} // End-Klammer: Bestimmte Links
 		}
 	}
 
