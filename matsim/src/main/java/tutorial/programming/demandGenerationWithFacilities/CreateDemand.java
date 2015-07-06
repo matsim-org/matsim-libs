@@ -1,4 +1,4 @@
-package tutorial;
+package tutorial.programming.demandGenerationWithFacilities;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -33,7 +33,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
-public class CreateDemand {
+class CreateDemand {
 	private Scenario scenario;
 	
 	// We need another population, the PUS population

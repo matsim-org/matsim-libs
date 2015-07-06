@@ -1,4 +1,4 @@
-package tutorial;
+package tutorial.programming.demandGenerationWithFacilities;
 
 
 import java.io.BufferedReader;
@@ -23,7 +23,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
-public class CreatePopulation {
+class CreatePopulation {
 	
 	private Scenario scenario;
 	

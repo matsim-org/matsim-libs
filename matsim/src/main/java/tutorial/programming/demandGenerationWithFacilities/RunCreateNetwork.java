@@ -1,4 +1,4 @@
-package tutorial;
+package tutorial.programming.demandGenerationWithFacilities;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -12,7 +12,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.OsmNetworkReader;
 
 
-public class CreateNetwork {
+public class RunCreateNetwork {
 
    public static void main(String[] args) {
       String osm = "./input/merged-network.osm";

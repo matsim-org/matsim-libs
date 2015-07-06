@@ -1,4 +1,4 @@
-package tutorial;
+package tutorial.programming.demandGenerationWithFacilities;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,15 +19,15 @@ import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.FacilitiesWriter;
 import org.matsim.facilities.OpeningTimeImpl;
 
-public class CreateFacilities {
+public class RunCreateFacilities {
 	
-	private final static Logger log = Logger.getLogger(CreateFacilities.class);
+	private final static Logger log = Logger.getLogger(RunCreateFacilities.class);
 	private Scenario scenario;
-	private String censusFile = "./input/census.txt";
-	private String businessCensusFile = "./input/business_census.txt";
+	private String censusFile = "examples/tutorial/programming/demandGenerationWithFacilities/census.txt";
+	private String businessCensusFile = "examples/tutorial/programming/demandGenerationWithFacilities/business_census.txt";
 
 	public static void main(String[] args) {
-		CreateFacilities facilitiesCreator = new CreateFacilities();
+		RunCreateFacilities facilitiesCreator = new RunCreateFacilities();
 		facilitiesCreator.init();
 		facilitiesCreator.run();
 		facilitiesCreator.write();
