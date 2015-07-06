@@ -46,7 +46,6 @@ public class CalculateAdditionalData {
 		
 //		System.out.println("measuringPoints.getFacilities().size() = " + measuringPoints.getFacilities().size());
 		
-		
 		for (ActivityFacility measuringPoint : measuringPoints.getFacilities().values()) {
 			
 			Coord measuringPointCoord = ct.transform(measuringPoint.getCoord());
@@ -69,7 +68,5 @@ public class CalculateAdditionalData {
 			System.out.println("distance to water from measuringPoint = " + numberOfMeasurePoints + " with coordinate"
 					+ measuringPoint.getCoord() + " is = " + minDistanceToWater + "m.");
 		}
-		
 	}
-
 }
