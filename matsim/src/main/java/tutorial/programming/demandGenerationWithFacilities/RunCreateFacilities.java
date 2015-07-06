@@ -111,9 +111,8 @@ public class RunCreateFacilities {
 				cnt++;
 			}
 			bufferedReader.close();
-		} // end try
-		catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -124,21 +123,10 @@ public class RunCreateFacilities {
 		 * [[ 1 ]] Specify the opening hours here for shopping and leisure. An example is given for the activities work and home.
 		 */
 		ActivityOptionImpl actOption = (ActivityOptionImpl)facility.getActivityOptions().get(type);
-		OpeningTimeImpl opentime;
-		if (type.equals("shop")) {
-			opentime = null;
+		if (type.equals("work")) {
+			actOption.addOpeningTime(new OpeningTimeImpl(8.0 * 3600.0, 19.0 * 3600)); //[[ 1 ]] opentime = null;
 		}
-		else if (type.equals("leisure") || type.equals("education")) {
-			opentime = null;
-		}
-		else if (type.equals("work")) {
-			opentime = new OpeningTimeImpl(8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
-		}
-		// home
-		else {
-			opentime = new OpeningTimeImpl(0.0 * 3600.0, 24.0 * 3600);
-		}
-		actOption.addOpeningTime(opentime);	
+
 	}
 		
 	public void write() {
