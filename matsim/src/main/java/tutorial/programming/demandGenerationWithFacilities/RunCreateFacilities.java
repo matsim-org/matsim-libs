@@ -1,30 +1,25 @@
 package tutorial.programming.demandGenerationWithFacilities;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.ActivityFacilityImpl;
-import org.matsim.facilities.ActivityOptionImpl;
-import org.matsim.facilities.FacilitiesWriter;
-import org.matsim.facilities.OpeningTimeImpl;
+import org.matsim.facilities.*;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class RunCreateFacilities {
 	
 	private final static Logger log = Logger.getLogger(RunCreateFacilities.class);
 	private Scenario scenario;
-	private String censusFile = "examples/tutorial/programming/demandGenerationWithFacilities/census.txt";
-	private String businessCensusFile = "examples/tutorial/programming/demandGenerationWithFacilities/business_census.txt";
+	private static final String censusFile = "examples/tutorial/programming/demandGenerationWithFacilities/census.txt";
+	private static final String businessCensusFile = "examples/tutorial/programming/demandGenerationWithFacilities/business_census.txt";
 
 	public static void main(String[] args) {
 		RunCreateFacilities facilitiesCreator = new RunCreateFacilities();
@@ -59,15 +54,15 @@ public class RunCreateFacilities {
 	private int readBusinessCensus() {
 		int cnt = 0;
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.businessCensusFile));
-			String line = bufferedReader.readLine(); //skip header
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(businessCensusFile));
+			bufferedReader.readLine(); //skip header
 			
 			// id = 0
 			int index_xCoord = 1;
 			int index_yCoord = 2;
 			int index_types = 3;
 			
-			
+			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
 				
@@ -78,8 +73,8 @@ public class RunCreateFacilities {
 				this.scenario.getActivityFacilities().addActivityFacility(facility);
 				
 				String types [] = parts[index_types].split(",");
- 				for (int i = 0; i < types.length; i++) {
- 					this.addActivityOption(facility, types[i]);
+				for (String type : types) {
+					this.addActivityOption(facility, type);
 				}
 				cnt++;
 			}
@@ -93,13 +88,14 @@ public class RunCreateFacilities {
 	
 	private void readCensus(int startIndex) {
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.censusFile));
-			String line = bufferedReader.readLine(); //skip header
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(censusFile));
+			bufferedReader.readLine(); //skip header
 			
 			int index_xHomeCoord = 10;
 			int index_yHomeCoord = 11;
 			
 			int cnt = 0;
+			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
 				

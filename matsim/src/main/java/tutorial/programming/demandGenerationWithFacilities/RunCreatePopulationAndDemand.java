@@ -5,8 +5,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 
@@ -15,7 +13,7 @@ public class RunCreatePopulationAndDemand {
 	private final static Logger log = Logger.getLogger(RunCreatePopulationAndDemand.class);
 	private Scenario scenario;
 	
-	private String facilitiesFile = "output/facilities.xml";
+	private static final String facilitiesFile = "output/facilities.xml";
 
 	// --------------------------------------------------------------------------
 	public static void main(String[] args) {
@@ -38,7 +36,7 @@ public class RunCreatePopulationAndDemand {
 		 */
 		Config config = ConfigUtils.createConfig();
 		this.scenario = ScenarioUtils.createScenario(config);
-		new FacilitiesReaderMatsimV1(this.scenario).readFile(this.facilitiesFile);
+		new FacilitiesReaderMatsimV1(this.scenario).readFile(facilitiesFile);
 	}
 	
 	private void write() {

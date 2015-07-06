@@ -1,31 +1,23 @@
 package tutorial.programming.demandGenerationWithFacilities;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
 
 
 class CreateDemand {
@@ -34,14 +26,14 @@ class CreateDemand {
 	// We need another population, the PUS population
 	private Scenario scenarioPUS;
 	
-	private String pusTripsFile = "examples/tutorial/programming/demandGenerationWithFacilities/travelsurvey_trips.txt";
-	private String pusPersonsFile = "examples/tutorial/programming/demandGenerationWithFacilities/travelsurvey_persons.txt";
+	private static final String pusTripsFile = "examples/tutorial/programming/demandGenerationWithFacilities/travelsurvey_trips.txt";
+	private static final String pusPersonsFile = "examples/tutorial/programming/demandGenerationWithFacilities/travelsurvey_persons.txt";
 	
 	private ObjectAttributes personHomeAndWorkLocations;
 	private Random random = new Random(3838494); 
 	
-	private List<Id> pusWorkers = new Vector<Id>();
-	private List<Id> pusNonWorkers = new Vector<Id>();
+	private List<Id> pusWorkers = new Vector<>();
+	private List<Id> pusNonWorkers = new Vector<>();
 	
 	private QuadTree<ActivityFacility> shopFacilitiesTree;
 	private QuadTree<ActivityFacility> leisureFacilitiesTree;
@@ -80,11 +72,12 @@ class CreateDemand {
 		 * Read the PUS file
 		 */
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.pusPersonsFile));
-			String line = bufferedReader.readLine(); //skip header
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(pusPersonsFile));
+			bufferedReader.readLine(); //skip header
 			
 			int index_personId = 0;
-			
+
+			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
 				/*
@@ -124,8 +117,8 @@ class CreateDemand {
 		 * Read the PUS trips file
 		 */
 		try {
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(this.pusTripsFile));
-			String line = bufferedReader.readLine(); //skip header
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(pusTripsFile));
+			bufferedReader.readLine(); //skip header
 			
 			int index_personId = 0;
 			int index_xCoordOrigin = 2;
@@ -138,7 +131,8 @@ class CreateDemand {
 			
 			Id<Person> previousPerson = null;
 			boolean worker = false;
-			
+
+			String line;
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
 
@@ -295,7 +289,7 @@ class CreateDemand {
 	private ActivityFacility getRandomLocation(Activity activity, Coord coordPreviousActivity) {		
 		double xCoordCenter = coordPreviousActivity.getX();
 		double yCoordCenter = coordPreviousActivity.getY();
-		ArrayList<ActivityFacility> facilities = new ArrayList<ActivityFacility>();
+		ArrayList<ActivityFacility> facilities = new ArrayList<>();
 		
 		if (activity.getType().startsWith("s")) {
 			double radius = 8000.0;
@@ -332,16 +326,7 @@ class CreateDemand {
 	}
 	
 	public QuadTree<ActivityFacility> createActivitiesTree(String activityType, Scenario scenario) {
-		QuadTree<ActivityFacility> facQuadTree;
-		
-		if (activityType.equals("all")) {
-			facQuadTree = this.builFacQuadTree(
-					activityType, scenario.getActivityFacilities().getFacilities());	
-		}
-		else {
-			facQuadTree = this.builFacQuadTree(
-				activityType, ((ScenarioImpl)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));	
-		}
+		QuadTree<ActivityFacility> facQuadTree = this.builFacQuadTree(activityType, scenario.getActivityFacilities().getFacilitiesForActivityType(activityType));
 		return facQuadTree;
 	}
 
@@ -363,7 +348,7 @@ class CreateDemand {
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<ActivityFacility> quadtree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+		QuadTree<ActivityFacility> quadtree = new QuadTree<>(minx, miny, maxx, maxy);
 		for (final ActivityFacility f : facilities_of_type.values()) {
 			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 		}
