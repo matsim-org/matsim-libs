@@ -87,7 +87,8 @@ public class RunBraessSimulation {
 		}
 		
 		// adapt sigma for randomized routing
-		final RandomizingTimeDistanceTravelDisutility.Builder builder = new RandomizingTimeDistanceTravelDisutility.Builder();
+		final RandomizingTimeDistanceTravelDisutility.Builder builder = 
+				new RandomizingTimeDistanceTravelDisutility.Builder();
 		builder.setSigma(SIGMA);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override public void install() {
@@ -113,7 +114,7 @@ public class RunBraessSimulation {
 		config.scenario().setUseSignalSystems( false );
 		
 		// set brain exp beta
-		config.planCalcScore().setBrainExpBeta( 20 );
+		config.planCalcScore().setBrainExpBeta( 2 );
 
 		// choose between link to link and node to node routing
 		config.controler().setLinkToLinkRoutingEnabled( true );
@@ -147,7 +148,7 @@ public class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
-			strat.setWeight( 0.1 ) ;
+			strat.setWeight( 1.0 ) ;
 			strat.setDisableAfter( config.controler().getLastIteration() );
 			config.strategy().addStrategySettings(strat);
 		}
@@ -161,7 +162,7 @@ public class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.KeepLastSelected.toString() );
-			strat.setWeight( 0.9 ) ;
+			strat.setWeight( 0.0 ) ;
 			strat.setDisableAfter( config.controler().getLastIteration() );
 			config.strategy().addStrategySettings(strat);
 		}

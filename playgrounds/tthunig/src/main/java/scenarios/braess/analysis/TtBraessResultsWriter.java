@@ -63,7 +63,7 @@ public class TtBraessResultsWriter {
 		this.overallItWritingStream.close();
 		
 		// write last iteration specific analysis
-		log.info("Starting to do final analysis.");		
+		log.info("Final analysis:");		
 		writeResults(handler.getTotalTT(), handler.getTotalRouteTTs(), 
 				handler.calculateAvgRouteTTs(), handler.getRouteUsers());
 		writeOnRoutes(handler.getOnRoutePerSecond());
@@ -80,7 +80,11 @@ public class TtBraessResultsWriter {
 				+ " the middle one and " + routeUsers[2] + " the lower one.");
 		log.info("The average travel times are " + avgRouteTTs[0] + ", " + 
 				avgRouteTTs[1] + " and " + avgRouteTTs[2] + ".");
-		
+		log.info("Latex format: " + (int)totalTT + " & " + routeUsers[0] + " & "
+				+ routeUsers[1] + " & " + routeUsers[2] + " & "
+				+ (int)avgRouteTTs[0] + " & " + (int)avgRouteTTs[1] + " & "
+				+ (int)avgRouteTTs[2] + " \\\\");
+
 		PrintStream stream;
 		String filename = outputDir + "results.txt";
 		try {

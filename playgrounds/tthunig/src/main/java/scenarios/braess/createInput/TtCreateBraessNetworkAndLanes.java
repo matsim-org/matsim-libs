@@ -110,7 +110,7 @@ public class TtCreateBraessNetworkAndLanes {
 					net.getNodes().get(Id.createNodeId(3)));
 			l.setCapacity(CAP_MAIN);
 			l.setLength(LINK_LENGTH);
-			linkTT = 8; // 10 - link travel time of inflow link - 1 additional matsim link second
+			linkTT = 98; // 10 - link travel time of inflow link - 1 additional matsim link second
 			l.setFreespeed(l.getLength() / linkTT);
 			net.addLink(l);
 		}
@@ -120,7 +120,7 @@ public class TtCreateBraessNetworkAndLanes {
 					net.getNodes().get(Id.createNodeId(3)));
 			l.setCapacity(CAP_MAIN);
 			l.setLength(LINK_LENGTH);
-			linkTT = 10;
+			linkTT = 100;
 			l.setFreespeed(l.getLength() / linkTT);
 			net.addLink(l);
 		}
@@ -130,7 +130,7 @@ public class TtCreateBraessNetworkAndLanes {
 				net.getNodes().get(Id.createNodeId(4)));
 		l.setCapacity(CAP_MAIN);
 		l.setLength(LINK_LENGTH);
-		linkTT = 20;
+		linkTT = 200;
 		l.setFreespeed(l.getLength() / linkTT);
 		net.addLink(l);
 		
@@ -148,7 +148,7 @@ public class TtCreateBraessNetworkAndLanes {
 				net.getNodes().get(Id.createNodeId(5)));
 		l.setCapacity(CAP_MAIN);
 		l.setLength(LINK_LENGTH);
-		linkTT = 20;
+		linkTT = 200;
 		l.setFreespeed(l.getLength() / linkTT);
 		net.addLink(l);
 		
@@ -167,7 +167,7 @@ public class TtCreateBraessNetworkAndLanes {
 					net.getNodes().get(Id.createNodeId(5)));
 			l.setCapacity(CAP_MAIN);
 			l.setLength(LINK_LENGTH);
-			linkTT = 8; // 10 - link travel time of inflow link - 1 additional matsim link second
+			linkTT = 98; // 10 - link travel time of inflow link - 1 additional matsim link second
 			l.setFreespeed(l.getLength() / linkTT);
 			net.addLink(l);
 		}
@@ -177,7 +177,7 @@ public class TtCreateBraessNetworkAndLanes {
 					net.getNodes().get(Id.createNodeId(5)));
 			l.setCapacity(CAP_MAIN);
 			l.setLength(LINK_LENGTH);
-			linkTT = 10;
+			linkTT = 100;
 			l.setFreespeed(l.getLength() / linkTT);
 			net.addLink(l);
 		}
