@@ -45,14 +45,14 @@ public class IntegrationTest {
 		
 
 		try {
-			RunCreateNetwork.main(null);
+			RunCreatePopulationAndDemand.main(null);
 		} catch ( Exception eee ) {
 			eee.printStackTrace(); 
 			Assert.fail();
 		}
 
 		try {
-			RunCreatePopulationAndDemand.main(null);
+			RunCreateNetwork.main(null);
 		} catch ( Exception eee ) {
 			eee.printStackTrace(); 
 			Assert.fail();
