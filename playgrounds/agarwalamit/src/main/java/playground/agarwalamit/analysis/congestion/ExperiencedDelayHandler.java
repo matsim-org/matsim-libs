@@ -50,11 +50,11 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
 	public final Logger logger = Logger.getLogger(ExperiencedDelayHandler.class);
 
-	private SortedMap<Double, Map<Id<Person>, Double>> personId2DelaysPerTimeBin = new TreeMap<>();
-	private Map<Double, Map<Id<Link>, Double>> linkId2DelaysPerTimeBin = new HashMap<>();
+	private SortedMap<Double, Map<Id<Person>, Double>> timebin2PersonId2Delay = new TreeMap<>();
+	private Map<Double, Map<Id<Link>, Double>> timebin2LinkId2Delay = new HashMap<>();
 	private Map<Id<Link>, Map<Id<Person>, Double>> linkId2PersonIdLinkEnterTime = new HashMap<>();
 	private Map<Id<Link>, Double> linkId2FreeSpeedLinkTravelTime = new HashMap<>();
-	private Map<Double, Map<Id<Link>, Integer>> time2linkIdLeaveCount = new HashMap<>();
+	private Map<Double, Map<Id<Link>, Integer>> timebin2LinkIdLeaveCount = new HashMap<>();
 	private double totalDelay;
 	private double warnCount=0;
 
@@ -98,20 +98,19 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		}
 
 		for(int i =0;i<noOfTimeBins;i++){
-			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Person>, Double>());
-			this.linkId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Double>());
-			this.time2linkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Integer>());
-			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Person>,Double>());
+			this.timebin2PersonId2Delay.put(this.timeBinSize*(i+1), new HashMap<Id<Person>, Double>());
+			this.timebin2LinkId2Delay.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Double>());
+			this.timebin2LinkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Integer>());
 
 			for(Person person : scenario.getPopulation().getPersons().values()){
-				Map<Id<Person>, Double>	delayForPerson = this.personId2DelaysPerTimeBin.get(this.timeBinSize*(i+1));
+				Map<Id<Person>, Double>	delayForPerson = this.timebin2PersonId2Delay.get(this.timeBinSize*(i+1));
 				delayForPerson.put(person.getId(), Double.valueOf(0.));
 			}
 			
 			for(Link link : this.network.getLinks().values()) {
-				Map<Id<Link>, Double>	delayOnLink = this.linkId2DelaysPerTimeBin.get(this.timeBinSize*(i+1));
+				Map<Id<Link>, Double>	delayOnLink = this.timebin2LinkId2Delay.get(this.timeBinSize*(i+1));
 				delayOnLink.put(link.getId(), Double.valueOf(0.));
-				Map<Id<Link>, Integer> countOnLink = this.time2linkIdLeaveCount.get(this.timeBinSize*(i+1));
+				Map<Id<Link>, Integer> countOnLink = this.timebin2LinkIdLeaveCount.get(this.timeBinSize*(i+1));
 				countOnLink.put(link.getId(), Integer.valueOf(0));
 			}
 		}
@@ -119,13 +118,13 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	@Override
 	public void reset(int iteration) {
-		this.linkId2DelaysPerTimeBin.clear();
-		this.personId2DelaysPerTimeBin.clear();
-		this.logger.info("Resetting person delays to   " + this.personId2DelaysPerTimeBin);
+		this.timebin2LinkId2Delay.clear();
+		this.timebin2PersonId2Delay.clear();
+		this.logger.info("Resetting person delays to   " + this.timebin2PersonId2Delay);
 		this.linkId2PersonIdLinkEnterTime.clear();
 		this.linkId2FreeSpeedLinkTravelTime.clear();
-		this.time2linkIdLeaveCount.clear();
-		this.logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
+		this.timebin2LinkIdLeaveCount.clear();
+		this.logger.info("Resetting linkLeave counter to " + this.timebin2LinkIdLeaveCount);
 	}
 
 	@Override
@@ -165,9 +164,9 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
 		if(this.isSortingForInsideMunich && (!pf.isCellInsideMunichCityArea(linkCoord))) return;
 		
-		Map<Id<Person>, Double> delayForPerson = this.personId2DelaysPerTimeBin.get(endOfTimeInterval);
-		Map<Id<Link>, Double> delayOnLink = this.linkId2DelaysPerTimeBin.get(endOfTimeInterval);
-		Map<Id<Link>, Integer> countTotal = this.time2linkIdLeaveCount.get(endOfTimeInterval);
+		Map<Id<Person>, Double> delayForPerson = this.timebin2PersonId2Delay.get(endOfTimeInterval);
+		Map<Id<Link>, Double> delayOnLink = this.timebin2LinkId2Delay.get(endOfTimeInterval);
+		Map<Id<Link>, Integer> countTotal = this.timebin2LinkIdLeaveCount.get(endOfTimeInterval);
 		
 		delayForPerson.put(personId, Double.valueOf(currentDelay+delayForPerson.get(personId)));
 		
@@ -206,11 +205,11 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	}
 
 	public SortedMap<Double, Map<Id<Person>, Double>> getDelayPerPersonAndTimeInterval(){
-		return this.personId2DelaysPerTimeBin;
+		return this.timebin2PersonId2Delay;
 	}
 
 	public Map<Double, Map<Id<Link>, Double>> getDelayPerLinkAndTimeInterval(){
-		return this.linkId2DelaysPerTimeBin;
+		return this.timebin2LinkId2Delay;
 	}
 	
 	public double getTotalDelayInHours(){
@@ -218,6 +217,6 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	}
 	
 	public Map<Double, Map<Id<Link>, Integer>> getTime2linkIdLeaveCount() {
-		return this.time2linkIdLeaveCount;
+		return this.timebin2LinkIdLeaveCount;
 	}
 }

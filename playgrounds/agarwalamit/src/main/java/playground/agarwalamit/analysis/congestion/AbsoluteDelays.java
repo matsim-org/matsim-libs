@@ -42,8 +42,8 @@ public class AbsoluteDelays  {
 	}
 
 	public static void main(String[] args) {
-		String clusterPathDesktop = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run9/";
-		String [] runCases =  {"baseCaseCtd","ei","ci","eci"};
+		String clusterPathDesktop = "/Users/amit/Documents/repos/runs-svn/detEval/emissionCongestionInternalization/output/1pct/run11/policies_0.05/";
+		String [] runCases =  {"bau","implV3","implV4","implV6"};
 		
 		new AbsoluteDelays(clusterPathDesktop).runAndWrite(runCases);
 	}
@@ -80,12 +80,14 @@ public class AbsoluteDelays  {
 
 		String configFile = outputDir+runCase+"/output_config.xml";
 		String networkFile = outputDir+runCase+"/output_network.xml.gz";
-		int lastIt = LoadMyScenarios.getLastIteration(configFile);
-		String eventFile = outputDir+runCase+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";		
+		String plansFile = outputDir+runCase+"/output_plans.xml.gz";
 
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFile, networkFile,configFile);
+		
+		int lastIt = sc.getConfig().controler().getLastIteration();
+		String eventFile = outputDir+runCase+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
 
-		ExperiencedDelayAnalyzer congestionHandler = new ExperiencedDelayAnalyzer(eventFile, sc,1);
+		ExperiencedDelayAnalyzer congestionHandler = new ExperiencedDelayAnalyzer(eventFile, sc, 1);
 		congestionHandler.run();
 
 		return congestionHandler.getTotalDelaysInHours();
