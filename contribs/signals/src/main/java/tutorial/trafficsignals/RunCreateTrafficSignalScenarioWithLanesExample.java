@@ -39,7 +39,6 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.*;
-import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
@@ -51,6 +50,7 @@ import java.util.Arrays;
  * signalized intersections.
  * 
  * @author dgrether
+ * @author tthunig
  * 
  * @see org.matsim.signalsystems
  *
@@ -68,190 +68,112 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 
 	private void createGroupsAndSystem2(Scenario scenario,
 			SignalSystemsData systems, SignalGroupsData groups) {
-		// signal system 2
+		
+		// create signal system 2
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(
 				Id.create("2", SignalSystem.class));
 		systems.addSignalSystemData(sys);
 		SignalSystemsDataFactory factory = systems.getFactory();
+		
 		SignalUtils.createAndAddSignal(sys, factory,
-				Id.create("1", Signal.class), Id.create("12", Link.class),
+				Id.create("1", Signal.class), Id.createLinkId("12"),
 				Arrays.asList(Id.create("1", Lane.class)));
 
 		SignalUtils.createAndAddSignal(sys, factory,
-				Id.create("2", Signal.class), Id.create("12", Link.class),
+				Id.create("2", Signal.class), Id.createLinkId("12"),
 				Arrays.asList(Id.create("2", Lane.class)));
 
-		// create the groups TODO reconsider if this would be better done by
-		// utils
-		SignalGroupData group4signal = groups.getFactory()
-				.createSignalGroupData(sys.getId(),
-						Id.create("1", SignalGroup.class));
-		groups.addSignalGroupData(group4signal);
-		group4signal.addSignalId(Id.create("1", Signal.class));
+		SignalUtils.createAndAddSignal(sys, factory,
+				Id.create("3", Signal.class), Id.createLinkId("32"), null);
 
-		group4signal = groups.getFactory().createSignalGroupData(sys.getId(),
-				Id.create("2", SignalGroup.class));
-		groups.addSignalGroupData(group4signal);
-		group4signal.addSignalId(Id.create("2", Signal.class));
-
-		SignalData signal = systems.getFactory().createSignalData(
-				Id.create("3", Signal.class));
-		sys.addSignalData(signal);
-		signal.setLinkId(Id.create("32", Link.class));
-		group4signal = groups.getFactory().createSignalGroupData(
-				Id.create("2", SignalSystem.class),
-				Id.create("3", SignalGroup.class));
-		groups.addSignalGroupData(group4signal);
-		// SignalGroupData group4signal =
-		// groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(Id.create("1"));
-		group4signal.addSignalId(Id.create("3", Signal.class));
-		signal = systems.getFactory().createSignalData(
-				Id.create("4", Signal.class));
-		sys.addSignalData(signal);
-		signal.setLinkId(Id.create("72", Link.class));
-		group4signal = groups.getFactory().createSignalGroupData(
-				Id.create("2", SignalSystem.class),
-				Id.create("4", SignalGroup.class));
-		groups.addSignalGroupData(group4signal);
-		// group4signal =
-		// groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(Id.create("2"));
-		group4signal.addSignalId(Id.create("4", Signal.class));
+		SignalUtils.createAndAddSignal(sys, factory,
+				Id.create("4", Signal.class), Id.createLinkId("72"), null);
+		
+		// create a signal group for every signal
+		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
 	}
 
 	private void createGroupsAndSystem5(Scenario scenario,
 			SignalSystemsData systems, SignalGroupsData groups) {
-		// signal system 5
+		
+		// create signal system 5
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(
 				Id.create("5", SignalSystem.class));
 		systems.addSignalSystemData(sys);
 		SignalSystemsDataFactory factory = systems.getFactory();
 
 		SignalUtils.createAndAddSignal(sys, factory,
-				Id.create("1", Signal.class), Id.create("65", Link.class),
+				Id.create("1", Signal.class), Id.createLinkId("65"),
 				Arrays.asList(Id.create("1", Lane.class)));
 
 		SignalUtils.createAndAddSignal(sys, factory,
-				Id.create("2", Signal.class), Id.create("65", Link.class),
+				Id.create("2", Signal.class), Id.createLinkId("65"),
 				Arrays.asList(Id.create("2", Lane.class)));
 
-		// create the groups
-		SignalGroupData group4signal = groups.getFactory()
-				.createSignalGroupData(sys.getId(),
-						Id.create("1", SignalGroup.class));
-		groups.addSignalGroupData(group4signal);
-		group4signal.addSignalId(Id.create("1", Signal.class));
+		SignalUtils.createAndAddSignal(sys, factory,
+				Id.create("3", Signal.class), Id.createLinkId("45"), null);
 
-		group4signal = groups.getFactory().createSignalGroupData(sys.getId(),
-				Id.create("2", SignalGroup.class));
-		groups.addSignalGroupData(group4signal);
-		group4signal.addSignalId(Id.create("2", Signal.class));
-		// signals 3 and 4
-		SignalData signal = systems.getFactory().createSignalData(
-				Id.create("3", Signal.class));
-		sys.addSignalData(signal);
-		signal.setLinkId(Id.create("45", Link.class));
-		// creates a separate group for signal 3
-		group4signal = groups.getFactory().createSignalGroupData(
-				Id.create("5", SignalSystem.class),
-				Id.create("3", SignalGroup.class));
-		groups.addSignalGroupData(group4signal);
-		// eventually better: add them to existing group
-		// SignalGroupData group4signal =
-		// groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(Id.create("1"));
-		group4signal.addSignalId(Id.create("3", Signal.class));
-		signal = systems.getFactory().createSignalData(
-				Id.create("4", Signal.class));
-		sys.addSignalData(signal);
-		signal.setLinkId(Id.create("85", Link.class));
-		// creates a separate group for signal 4
-		group4signal = groups.getFactory().createSignalGroupData(
-				Id.create("5", SignalSystem.class),
-				Id.create("4", SignalGroup.class));
-		groups.addSignalGroupData(group4signal);
-		// eventually better: add to existing group
-		// group4signal =
-		// groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(Id.create("2"));
-		group4signal.addSignalId(Id.create("4", Signal.class));
+		SignalUtils.createAndAddSignal(sys, factory,
+				Id.create("4", Signal.class), Id.createLinkId("85"), null);
+
+		// create a signal group for every signal
+		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
 	}
 
 	private void createSystem5Control(Scenario scenario,
 			SignalControlData control) {
-		// signal system 5 control
-		SignalSystemControllerData controller = control.getFactory()
-				.createSignalSystemControllerData(
+		
+		SignalControlDataFactory fac = control.getFactory();
+		
+		// create and add signal control for system 5
+		SignalSystemControllerData controller = fac.
+				createSignalSystemControllerData(
 						Id.create("5", SignalSystem.class));
 		control.addSignalSystemControllerData(controller);
-		controller
-				.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		SignalPlanData plan = control.getFactory().createSignalPlanData(
-				Id.create("1", SignalPlan.class));
+		controller.setControllerIdentifier(
+				DefaultPlanbasedSignalSystemController.IDENTIFIER);
+		
+		// create and add signal plan with defined cycle time and offset 0		
+		SignalPlanData plan = SignalUtils.createSignalPlan(fac, this.cycle, 0);
 		controller.addSignalPlanData(plan);
-		plan.setCycleTime(this.cycle);
-		plan.setOffset(0);
-		SignalGroupSettingsData settings1 = control.getFactory()
-				.createSignalGroupSettingsData(
-						Id.create("1", SignalGroup.class));
-		plan.addSignalGroupSettings(settings1);
-		settings1.setOnset(this.onset2);
-		settings1.setDropping(this.dropping2);
-		SignalGroupSettingsData settings2 = control.getFactory()
-				.createSignalGroupSettingsData(
-						Id.create("2", SignalGroup.class));
-		plan.addSignalGroupSettings(settings2);
-		settings2.setOnset(this.onset2);
-		settings2.setDropping(this.dropping2);
-		SignalGroupSettingsData settings3 = control.getFactory()
-				.createSignalGroupSettingsData(
-						Id.create("3", SignalGroup.class));
-		plan.addSignalGroupSettings(settings3);
-		settings3.setOnset(this.onset1);
-		settings3.setDropping(this.dropping1);
-		SignalGroupSettingsData settings4 = control.getFactory()
-				.createSignalGroupSettingsData(
-						Id.create("4", SignalGroup.class));
-		plan.addSignalGroupSettings(settings4);
-		settings4.setOnset(this.onset1);
-		settings4.setDropping(this.dropping1);
+		
+		// create and add control settings for signal groups
+		plan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
+				fac, Id.create("1", SignalGroup.class), this.onset2, this.dropping2));
+		plan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
+				fac, Id.create("2", SignalGroup.class), this.onset2, this.dropping2));
+		plan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
+				fac, Id.create("3", SignalGroup.class), this.onset1, this.dropping1));
+		plan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(
+				fac, Id.create("4", SignalGroup.class), this.onset1, this.dropping1));
 	}
 
 	private void createSystem2Control(Scenario scenario,
 			SignalControlData control) {
-		// signal system 2 control
+		
+		SignalControlDataFactory fac = control.getFactory();
+		
+		// create and add signal control for system 2
 		SignalSystemControllerData controller = control.getFactory()
 				.createSignalSystemControllerData(
 						Id.create("2", SignalSystem.class));
 		control.addSignalSystemControllerData(controller);
-		controller
-				.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		SignalPlanData plan = control.getFactory().createSignalPlanData(
-				Id.create("1", SignalPlan.class));
+		controller.setControllerIdentifier(
+				DefaultPlanbasedSignalSystemController.IDENTIFIER);
+		
+		// create and add signal plan with defined cycle time and offset 0		
+		SignalPlanData plan = SignalUtils.createSignalPlan(fac, this.cycle, 0);
 		controller.addSignalPlanData(plan);
-		plan.setCycleTime(this.cycle);
-		plan.setOffset(0);
-		SignalGroupSettingsData settings1 = control.getFactory()
-				.createSignalGroupSettingsData(
-						Id.create("1", SignalGroup.class));
-		plan.addSignalGroupSettings(settings1);
-		settings1.setOnset(this.onset1);
-		settings1.setDropping(this.dropping1);
-		SignalGroupSettingsData settings2 = control.getFactory()
-				.createSignalGroupSettingsData(
-						Id.create("2", SignalGroup.class));
-		plan.addSignalGroupSettings(settings2);
-		settings2.setOnset(this.onset1);
-		settings2.setDropping(this.dropping1);
-		SignalGroupSettingsData settings3 = control.getFactory()
-				.createSignalGroupSettingsData(
-						Id.create("3", SignalGroup.class));
-		plan.addSignalGroupSettings(settings3);
-		settings3.setOnset(this.onset2);
-		settings3.setDropping(this.dropping2);
-		SignalGroupSettingsData settings4 = control.getFactory()
-				.createSignalGroupSettingsData(
-						Id.create("4", SignalGroup.class));
-		plan.addSignalGroupSettings(settings4);
-		settings4.setOnset(this.onset2);
-		settings4.setDropping(this.dropping2);
+		
+		// create and add control settings for signal groups
+		plan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac,
+				Id.create("1", SignalGroup.class), this.onset1, this.dropping1));
+		plan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac,
+				Id.create("2", SignalGroup.class), this.onset1, this.dropping1));
+		plan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac,
+				Id.create("3", SignalGroup.class), this.onset2, this.dropping2));
+		plan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(fac,
+				Id.create("4", SignalGroup.class), this.onset2, this.dropping2));
 	}
 
 	private void createLanes(ScenarioImpl scenario) {
@@ -259,35 +181,42 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		LaneDefinitionsFactory11 factory = lanes.getFactory();
 		//lanes for link 12
-		LanesToLinkAssignment11 lanesForLink12 = factory.createLanesToLinkAssignment(Id.create("12", Link.class));
+		LanesToLinkAssignment11 lanesForLink12 = factory
+				.createLanesToLinkAssignment(Id.create("12", Link.class));
 		lanes.addLanesToLinkAssignment(lanesForLink12);
-		LanesUtils11.createAndAddLane11(lanesForLink12, factory, Id.create("1", Lane.class),
-				laneLenght, 1, Id.create("23", Link.class));
+		LanesUtils11.createAndAddLane11(lanesForLink12, factory,
+				Id.create("1", Lane.class), laneLenght, 1,
+				Id.create("23", Link.class));
 
-		LanesUtils11.createAndAddLane11(lanesForLink12, factory, Id.create("2", Lane.class),
-				laneLenght, 1, Id.create("27", Link.class));
+		LanesUtils11.createAndAddLane11(lanesForLink12, factory,
+				Id.create("2", Lane.class), laneLenght, 1,
+				Id.create("27", Link.class));
 
-		//lanes for link 65
-		LanesToLinkAssignment11 lanesForLink65 = factory.createLanesToLinkAssignment(Id.create("65", Link.class));
+		// lanes for link 65
+		LanesToLinkAssignment11 lanesForLink65 = factory
+				.createLanesToLinkAssignment(Id.create("65", Link.class));
 		lanes.addLanesToLinkAssignment(lanesForLink65);
 
-		LanesUtils11.createAndAddLane11(lanesForLink65, factory, Id.create("1", Lane.class),
-				laneLenght, 1, Id.create("54", Link.class));
+		LanesUtils11.createAndAddLane11(lanesForLink65, factory,
+				Id.create("1", Lane.class), laneLenght, 1,
+				Id.create("54", Link.class));
 
-		LanesUtils11.createAndAddLane11(lanesForLink65, factory, Id.create("2", Lane.class),
-				laneLenght, 1, Id.create("58", Link.class));
-		
-		LaneDefinitionsV11ToV20Conversion.convertTo20(lanes, scenario.getLanes(), scenario.getNetwork());
+		LanesUtils11.createAndAddLane11(lanesForLink65, factory,
+				Id.create("2", Lane.class), laneLenght, 1,
+				Id.create("58", Link.class));
+
+		LaneDefinitionsV11ToV20Conversion.convertTo20(lanes,
+				scenario.getLanes(), scenario.getNetwork());
 	}
 
 	public String run() {
+		
+		String inputDir = "../../matsim/examples/tutorial/unsupported/example90TrafficLights/";
+		String outputDir = "../../matsim/output/example90TrafficLights/";
+		
 		Config config = ConfigUtils.createConfig();
-		config.network()
-				.setInputFile(
-						"../../matsim/examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
-		config.plans()
-				.setInputFile(
-						"../../matsim/examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
+		config.network().setInputFile(inputDir + "network.xml.gz");
+		config.plans().setInputFile(inputDir + "population.xml.gz");
 		config.scenario().setUseLanes(true);
 		config.scenario().setUseSignalSystems(true);
 		config.controler().setMobsim("qsim");
@@ -314,38 +243,42 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		this.createSystem2Control(scenario, signalsData.getSignalControlData());
 		this.createSystem5Control(scenario, signalsData.getSignalControlData());
 
-		File outputDirectory = new File(
-				"../../matsim/output/example90TrafficLights/");
+		File outputDirectory = new File(outputDir);
 		if (!outputDirectory.exists()) {
 			outputDirectory.mkdir();
 		}
 
+		config.network().setLaneDefinitionsFile(
+				outputDir + "lane_definitions_v2.0.xml");
+		config.signalSystems().setSignalSystemFile(
+				outputDir + "signal_systems.xml");
+		config.signalSystems().setSignalGroupsFile(
+				outputDir + "signal_groups.xml");
+		config.signalSystems().setSignalControlFile(
+				outputDir + "signal_control.xml");
+
 		// write to file
-		String configFile = "../../matsim/output/example90TrafficLights/config.xml";
-		String lanesFile = "../../matsim/output/example90TrafficLights/lane_definitions_v2.0.xml";
-		String signalSystemsFile = "../../matsim/output/example90TrafficLights/signal_systems.xml";
-		String signalGroupsFile = "../../matsim/output/example90TrafficLights/signal_groups.xml";
-		String signalControlFile = "../../matsim/output/example90TrafficLights/signal_control.xml";
-
-		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(scenario.getLanes());
-		writerDelegate.write(lanesFile);
-
-		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
-		signalsWriter.setSignalSystemsOutputFilename(signalSystemsFile);
-		signalsWriter.setSignalGroupsOutputFilename(signalGroupsFile);
-		signalsWriter.setSignalControlOutputFilename(signalControlFile);
-		signalsWriter.writeSignalsData(signalsData);
-
-		config.network().setLaneDefinitionsFile(lanesFile);
-		config.signalSystems().setSignalSystemFile(signalSystemsFile);
-		config.signalSystems().setSignalGroupsFile(signalGroupsFile);
-		config.signalSystems().setSignalControlFile(signalControlFile);
+		String configFile = outputDir + "config.xml";
 		ConfigWriter configWriter = new ConfigWriter(config);
 		configWriter.write(configFile);
+		
+		LaneDefinitionsWriter20 writerDelegate = new LaneDefinitionsWriter20(
+				scenario.getLanes());
+		writerDelegate.write(config.network().getLaneDefinitionsFile());
+
+		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
+		signalsWriter.setSignalSystemsOutputFilename(config.signalSystems()
+				.getSignalSystemFile());
+		signalsWriter.setSignalGroupsOutputFilename(config.signalSystems()
+				.getSignalGroupsFile());
+		signalsWriter.setSignalControlOutputFilename(config.signalSystems()
+				.getSignalControlFile());
+		signalsWriter.writeSignalsData(signalsData);
 
 		log.info("Config of traffic light scenario with lanes is written to "
 				+ configFile);
-		log.info("Visualize scenario by calling VisTrafficSignalScenarioWithLanes.main() of contrib.otfvis project.");
+		log.info("Visualize scenario by calling "
+				+ "VisTrafficSignalScenarioWithLanes.main() of contrib.otfvis project.");
 		return configFile;
 
 	}

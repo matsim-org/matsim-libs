@@ -23,13 +23,17 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.lanes.data.v20.Lane;
 
 /**
@@ -79,6 +83,45 @@ public class SignalUtils {
 				signal.addLaneId(laneId);
 			}
 		}
+	}
+	
+	/**
+	 * Creates a signal plan with the given cycle time and offset.
+	 * The plan gets the default signal plan id 1.
+	 * 
+	 * @param fac
+	 * @param cycleTime
+	 * @param offset
+	 * @return the signal plan
+	 */
+	public static SignalPlanData createSignalPlan(SignalControlDataFactory fac, int cycleTime, int offset) {
+		
+		SignalPlanData signalPlan = fac.createSignalPlanData(Id.create(1,
+				SignalPlan.class));
+		signalPlan.setCycleTime(cycleTime);
+		signalPlan.setOffset(offset);
+		return signalPlan;
+	}
+
+	/**
+	 * Creates and returns a signal group setting for the given signal group id with the
+	 * given onset and dropping time.
+	 * 
+	 * @param fac
+	 * @param signalGroupId
+	 * @param onset
+	 * @param dropping
+	 * @return the signal group setting
+	 */
+	public static SignalGroupSettingsData createSetting4SignalGroup(
+			SignalControlDataFactory fac, Id<SignalGroup> signalGroupId,
+			int onset, int dropping) {
+
+		SignalGroupSettingsData signalGroupSettings = fac
+				.createSignalGroupSettingsData(signalGroupId);
+		signalGroupSettings.setOnset(onset);
+		signalGroupSettings.setDropping(dropping);
+		return signalGroupSettings;
 	}
 
 }

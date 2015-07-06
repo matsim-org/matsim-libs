@@ -20,7 +20,6 @@
 package tutorial.trafficsignals;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignals;
@@ -42,7 +41,8 @@ public class VisTrafficSignalScenarioWithLanes {
 		String configFile = new RunCreateTrafficSignalScenarioWithLanesExample().run();
 		Config config = ConfigUtils.loadConfig(configFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, 
+				new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
 		OTFVisWithSignals.playScenario(scenario);
 	}
 

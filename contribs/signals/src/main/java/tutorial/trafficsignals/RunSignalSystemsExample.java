@@ -44,30 +44,34 @@ public class RunSignalSystemsExample {
 	 * @param args is ignored
 	 */
 	public static void main(String[] args) {
+		
+		String inputDir = "./../../matsim/examples/equil-extended/";
+		
 		File f = new File("t");
 		System.out.println(f.getAbsolutePath());
-		Config config = ConfigUtils.loadConfig("./../../matsim/examples/equil-extended/config.xml") ;
+		Config config = ConfigUtils.loadConfig(inputDir + "config.xml") ;
 		
 		config.controler().setLastIteration(0); // use higher values if you want to iterate
 		
-		config.network().setInputFile("./../../matsim/examples/equil-extended/network.xml");
+		config.network().setInputFile(inputDir + "network.xml");
 		
-		config.plans().setInputFile("./../../matsim/examples/equil-extended/plans100.xml");
+		config.plans().setInputFile(inputDir + "plans100.xml");
 		
 		// the following makes the contrib load  the signalSystems files, but not to do anything with them:
 		// (this switch will eventually go away)
 		config.scenario().setUseSignalSystems(true);
 		
 		// these are the paths to the signal systems definition files:
-		config.signalSystems().setSignalSystemFile("./../../matsim/examples/equil-extended/signalSystems_v2.0.xml");
-		config.signalSystems().setSignalGroupsFile("./../../matsim/examples/equil-extended/signalGroups_v2.0.xml");
-		config.signalSystems().setSignalControlFile("./../../matsim/examples/equil-extended/signalControl_v2.0.xml");
+		config.signalSystems().setSignalSystemFile(inputDir + "signalSystems_v2.0.xml");
+		config.signalSystems().setSignalGroupsFile(inputDir + "signalGroups_v2.0.xml");
+		config.signalSystems().setSignalControlFile(inputDir + "signalControl_v2.0.xml");
 		
 //		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 //		config.controler().setLinkToLinkRoutingEnabled(true);
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, 
+				new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
 		// ---
 
 		// add the signals module to the simulation:
@@ -76,9 +80,7 @@ public class RunSignalSystemsExample {
 		
 		//do it, do it, do it, now
 		c.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		c.run();
 	}
 
