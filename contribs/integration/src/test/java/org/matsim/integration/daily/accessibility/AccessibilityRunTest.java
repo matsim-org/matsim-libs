@@ -33,6 +33,10 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+//for postgres connection
+import java.sql.*;
+import java.util.*;
+import java.lang.*;
 
 public class AccessibilityRunTest {
 	public static final Logger log = Logger.getLogger( AccessibilityRunTest.class ) ;
@@ -236,11 +240,13 @@ public class AccessibilityRunTest {
 
 			controler.addControlerListener(listener);
 		}
-
+					
 		controler.run();
-			
+				
 		String workingDirectory =  config.controler().getOutputDirectory();
 	
+		
+		
 		String osName = System.getProperty("os.name");
 	
 		for (String actType : activityTypes) {
@@ -255,5 +261,85 @@ public class AccessibilityRunTest {
 				VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}
+		
+		// writing to PostresDB
+		
+		System.out.println("Working Directory is now = " + workingDirectory);
+		// Working Directory is now = test/output/org/matsim/integration/daily/accessibility/AccessibilityRunTest/doAccessibilityTest/
+		
+				
+				System.out.println("starting to build export csv data to VSP's opengeo server");
+		
+				System.out.println("-------- PostgreSQL "
+						+ "JDBC Connection Testing ------------");
+		 
+				try {
+		 
+					Class.forName("org.postgresql.Driver");
+		 
+				} catch (ClassNotFoundException e) {
+		 
+					System.out.println("Where is your PostgreSQL JDBC Driver? "
+							+ "Include in your library path!");
+					e.printStackTrace();
+					return;
+		 
+				}
+		 
+				System.out.println("PostgreSQL JDBC Driver Registered!");
+		 
+				Connection connection = null;
+		 
+				try {
+		 
+					connection = DriverManager.getConnection(
+							"jdbc:postgresql://wiki.vsp.tu-berlin.de:5432/vspgeo", "postgres",
+							"jafs30_A");
+		 
+				} catch (SQLException e) {
+		 
+					System.out.println("Connection Failed! Check output console");
+					e.printStackTrace();
+					return;
+		 
+				}
+		 
+				if (connection != null) {
+					System.out.println("connection established");
+				    
+					//Execute SQL query
+				    //System.out.println("Inserting records into the table...");
+					try {
+						Statement stmt = connection.createStatement();
+						
+						String locationCSV = "test/input/org/matsim/integration/daily/Accessibility";
+											  
+					    String sql = "COPY accessibilities(xcoord,ycoord,freespeed_accessibility,car_accessibility,bike_accessibility,walk_accessibility,pt_accessibility,population_density1,population_density2) " +
+					    			  "FROM '" + locationCSV + "/accessibilities_WGS84_conv.csv' DELIMITERS ',' CSV HEADER;";
+					    
+					    System.out.println("SQL statement is  = " + sql);
+					    //SQL statement is  = COPY accessibilities(xcoord,ycoord,freespeed_accessibility,car_accessibility,bike_accessibility,walk_accessibility,pt_accessibility,population_density1,population_density2) \
+					    //FROM 'test/output/org/matsim/integration/daily/accessibility/AccessibilityRunTest/doAccessibilityTest/../../../../../../../../input/org/matsim/integration/daily/Accessibility/accessibilities_WGS84_conv.csv' DELIMITERS ',' CSV HEADER;
+					    
+					    //commented out due to: cannot find CSV file
+					    //stmt.executeUpdate(sql);
+					    
+					    sql = "UPDATE accessibilities " +
+					    		"SET the_geom = ST_GeomFromText('POINT(' || xcoord || ' ' || ycoord || ')',4326)";
+					    //stmt.executeUpdate(sql);
+
+					    //System.out.println("Inserted data from accessibilities.csv into table vspgeo");
+					} catch (SQLException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				    
+				    
+				} else {
+					System.out.println("Failed to make connection!");
+				}
+			}
+		 
+		
+		// End of writing to PostgresDB
 	}
-}
