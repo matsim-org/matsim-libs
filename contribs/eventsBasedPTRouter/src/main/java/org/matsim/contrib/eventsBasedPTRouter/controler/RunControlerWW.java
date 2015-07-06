@@ -36,7 +36,7 @@ import org.matsim.pt.router.TransitRouter;
  * @author sergioo
  */
 
-public class ControlerWW {
+public class RunControlerWW {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
