@@ -180,7 +180,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
                 legWriter.writeLegToFile(leg);
                 legWriter.writeTextLineToFile("LegTimeCosts per s: \t"+ getTimeParameter(vehicle)+ "\t LegTimeCosts: "+ timeCosts  +  "\t LegDistanceCosts per m: "+ getDistanceParameter(vehicle) + "\t LegDistanceCosts: " + distanceCosts );
             } else {
-				log.warn("Route not scored in LegScoring") ;
+				log.warn("Route not scored in LegScoring:" + leg.toString()) ;
 			}
 			
 		}
@@ -341,8 +341,8 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 		@Override
 		public void handleLastActivity(Activity act) {	
 			activityWriterInclScore.addLastActToWriter(act, null);
-			handleActivity(act);
-			// no penalty for everything that is after the last act (people don't work)		
+			//Am Ende geschieht nichts (Rückkehr ans Depot).
+
 		}
 
 		//Costs für Zeit von Begin bis Ende der Aktivität (enthält aktuell jun '15 auch Wartezeit bis Service beginnt)

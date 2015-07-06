@@ -101,63 +101,62 @@ public class KTFreight_v3 {
 
 	private static final Logger log = Logger.getLogger(KTFreight_v3.class) ;
 
-//		//Beginn Namesdefinition KT Für Berlin-Szenario 
-//		private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/" ;
-//		private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Matsim/Berlin/aldi/ucc_toll2/" ;
-//		private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/";
-//	
-//		//Dateinamen ohne XML-Endung
-//		private static final String NETFILE_NAME = "network" ;
-//		private static final String VEHTYPES_NAME = "vehicleTypes" ;
-//		private static final String CARRIERS_NAME = "carrierLEH_v2_withFleet" ;
-//		private static final String ALGORITHM_NAME = "grid-algorithm" ;
-//		private static final String TOLL_NAME = "toll_cordon";		//Zur Mautberechnung
-//		private static final String LEZ_NAME = "toll_area";  //Zonendefinition (Links) für anhand eines Maut-Files
-//		
-//		
-//		//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
-//		private static final String uccC_prefix = "UCC-";	
+		//Beginn Namesdefinition KT Für Berlin-Szenario 
+		private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/" ;
+		private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Berlin/aldi/base/" ;
+		private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/";
+	
+		//Dateinamen ohne XML-Endung
+		private static final String NETFILE_NAME = "network" ;
+		private static final String VEHTYPES_NAME = "vehicleTypes" ;
+		private static final String CARRIERS_NAME = "carrierLEH_v2_withFleet" ;
+		private static final String ALGORITHM_NAME = "mdvrp_algorithmConfig_2" ;
+		private static final String TOLL_NAME = "toll_cordon20";		//Zur Mautberechnung
+		private static final String LEZ_NAME = "toll_area";  //Zonendefinition (Links) für anhand eines Maut-Files
+		
+		//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId).
+		private static final String uccC_prefix = "UCC-";	
+
+		//All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if all should be used.
+		private static final ArrayList<String> retailerNames = 
+				new ArrayList<String>(Arrays.asList("aldi")); 
+		//Location of UCC
+		private static final ArrayList<String> uccDepotsLinkIdsString = 
+				new ArrayList<String>(Arrays.asList("6874", "3058", "5468")); 
+		// VehicleTypes die vom Maut betroffen seien sollen. null, wenn alle (ohne Einschränkung) bemautet werden sollen
+		private static final ArrayList<String> onlyTollVehTypes = 
+				new ArrayList<String>(Arrays.asList("heavy40t", "heavy26t", "heavy26t_frozen", "medium18t", "light8t", "light8t_frozen")); 
+		//Ende  Namesdefinition Berlin
+
+
+////Beginn Namesdefinition KT Für Test-Szenario (Grid)
+//	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
+//	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Grid/UCC_2/" ;
+//	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
 //
-//		//All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if all should be used.
-//		private static final ArrayList<String> retailerNames = 
-//				new ArrayList<String>(Arrays.asList("aldi")); 
-//		//Location of UCC
-//		private static final ArrayList<String> uccDepotsLinkIdsString = 
-//				new ArrayList<String>(Arrays.asList("6874", "3058", "5468")); 
-//		// VehicleTypes die vom Maut betroffen seien sollen. null, wenn alle (ohne Einschränkung) bemautet werden sollen
-//		private static final ArrayList<String> tolledVehTypes = 
-//				new ArrayList<String>(Arrays.asList("heavy40t", "heavy26t", "heavy26t_frozen", "medium18t", "light8t", "light8t_frozen")); 
-//		//Ende  Namesdefinition Berlin
-
-
-//Beginn Namesdefinition KT Für Test-Szenario (Grid)
-	private static final String INPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/" ;
-	private static final String OUTPUT_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Grid/CordonToll3/" ;
-	private static final String TEMP_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/Temp/" ;	
-
-	//Dateinamen ohne XML-Endung
-	private static final String NETFILE_NAME = "grid-network" ;
-	private static final String VEHTYPES_NAME = "grid-vehTypes_kt" ;
-	private static final String CARRIERS_NAME = "grid-carrier_kt" ;
-	private static final String ALGORITHM_NAME = "mdvrp_algorithmConfig_2" ;
-	private static final String TOLL_NAME = "grid-tollCordon";
-	private static final String LEZ_NAME = "grid-tollDistance"; 
-	//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId). Vermeide "_", 
-	//um die Analyse der MATSIMEvents einfacher zu gestalten (Dort ist "_" als Trennzeichen verwendet.
-	private static final String uccC_prefix = "UCC-";		
-	// All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if all should be used.
-	//TODO: add Warning, if Name does not exists in carrier-File
-	private static final ArrayList<String> retailerNames = null ;
-//			new ArrayList<String>(Arrays.asList("gridCarrier3"));
-//		= new ArrayList<String>("gridCarrier", "gridCarrier1", "gridCarrier2", "gridCarrier3"); 
-	//Location of UCC
-	private static final ArrayList<String> uccDepotsLinkIdsString =
-		new ArrayList<String>(Arrays.asList("j(0,5)", "j(10,5)")); 
-	// VehicleTypes die vom Maut betroffen seien sollen. null, wenn alle (ohne Einschränkung) bemautet werden sollen
-	//TODO: add Warning, if Name does not exists in carrier-File and /or vehType-File (oder andere klare Restriktion)
-	private static final ArrayList<String> onlyTollVehTypes =  null;
-//		new ArrayList<String>(Arrays.asList("gridType01", "gridType03", "gridType05", "gridType10")); 
-//	//Ende Namesdefinition Grid
+//	//Dateinamen ohne XML-Endung
+//	private static final String NETFILE_NAME = "grid-network" ;
+//	private static final String VEHTYPES_NAME = "grid-vehTypes_kt" ;
+//	private static final String CARRIERS_NAME = "grid-carrier_kt2" ;
+//	private static final String ALGORITHM_NAME = "mdvrp_algorithmConfig_2" ;
+//	private static final String TOLL_NAME = "grid-tollDistance";
+//	private static final String LEZ_NAME = "grid-tollArea"; 
+//	//Prefix mit denen UCC-CarrierIds beginnen (Rest identisch mit CarrierId). Vermeide "_", 
+//	//um die Analyse der MATSIMEvents einfacher zu gestalten (Dort ist "_" als Trennzeichen verwendet.
+//	private static final String uccC_prefix = "UCC-";		
+//	// All retailer/carrier to handle in UCC-Case. (begin of CarrierId); null if all should be used.
+//	//TODO: add Warning, if Name does not exists in carrier-File
+//	private static final ArrayList<String> retailerNames = null ;
+////			new ArrayList<String>(Arrays.asList("gridCarrier3"));
+////		= new ArrayList<String>("gridCarrier", "gridCarrier1", "gridCarrier2", "gridCarrier3"); 
+//	//Location of UCC
+//	private static final ArrayList<String> uccDepotsLinkIdsString =
+//		new ArrayList<String>(Arrays.asList("j(0,5)", "j(10,5)")); 
+//	// VehicleTypes die vom Maut betroffen seien sollen. null, wenn alle (ohne Einschränkung) bemautet werden sollen
+//	//TODO: add Warning, if Name does not exists in carrier-File and /or vehType-File (oder andere klare Restriktion)
+//	private static final ArrayList<String> onlyTollVehTypes =  null;
+////		new ArrayList<String>(Arrays.asList("gridType01", "gridType03", "gridType05", "gridType10")); 
+////	//Ende Namesdefinition Grid
 
 	
 	private static final String RUN = "Run_" ;
@@ -173,12 +172,12 @@ public class KTFreight_v3 {
 
 	// Einstellungen für den Run	
 	private static final boolean addingCongestion = false ;  //doesn't work correctly, KT 10.12.2014
-	private static final boolean addingToll = true;  //added, kt. 07.08.2014
+	private static final boolean addingToll = false;  //added, kt. 07.08.2014
 	private static final boolean usingUCC = false;	 //Using Transshipment-Center, added kt 30.04.2015
 	private static final boolean runMatsim = true;	 //when false only jsprit run will be performed
 	private static final int LAST_MATSIM_ITERATION = 0;  //only one iteration for writing events.
 	private static final int MAX_JSPRIT_ITERATION = 2000;
-	private static final int NU_OF_TOTAL_RUNS = 100;	
+	private static final int NU_OF_TOTAL_RUNS = 1;	
 
 	//temporär zum Programmieren als Ausgabe
 	private static WriteTextToFile textInfofile; 
@@ -199,7 +198,7 @@ public class KTFreight_v3 {
 			multipleRun(args);	
 		}
 		writeRunInfo();	
-		moveTempFile(new File(TEMP_DIR), new File(OUTPUT_DIR)); //move of temp-files
+		moveTempFiles(new File(TEMP_DIR), new File(OUTPUT_DIR)); //move of temp-files
 		System.out.println("#### End of all runs --Y Finished ####");
 	}
 
@@ -231,14 +230,11 @@ public class KTFreight_v3 {
 
 		//Building the Carriers with jsprit, incl jspritOutput KT 03.12.2014
 		Carriers carriers = jspritRun(config, scenario);			
-
-		//### additional output for multiple-run analysis: ### KT 03.12.2014
 		
 		if ( runMatsim){
 			matsimRun(scenario, carriers);	//final MATSim configurations and start of the MATSim-Run
 		}
 		finalOutput(config, carriers);	//write some final Output
-//		moveTempFile(new File(TEMP_DIR), new File(OUTPUT_DIR)); //move of temp-files
 	} 
 
 	private static Carriers jspritRun(Config config, Scenario scenario) {
@@ -264,11 +260,9 @@ public class KTFreight_v3 {
 				uccDepotsLinkIds.add(Id.createLinkId(linkId));
 			}
 			
-//			UccCarrierCreator uccCarrierCreator = new UccCarrierCreator(carriers, vehicleTypes, ZONEFILE, uccC_prefix, retailerNames, uccDepotsLinkIds);
-			UccCarrierCreator uccCarrierCreator = new UccCarrierCreator(carriers, vehicleTypes, ZONEFILE, uccC_prefix, retailerNames, uccDepotsLinkIds, 0.0, (24.0*3600)-1 );
+			UccCarrierCreator uccCarrierCreator = new UccCarrierCreator(carriers, vehicleTypes, ZONEFILE, uccC_prefix, retailerNames, uccDepotsLinkIds, 0.0, 0.0 );
 			uccCarrierCreator.createSplittedUccCarrriers();
 			carriers = uccCarrierCreator.getSplittedCarriers();
-//			new CarrierPlanXmlWriterV2(carriers).write( TEMP_DIR + "splittedCarriers_" + RUN + runIndex+".xml") ;
 			
 			Carriers uccCarriers = new Carriers();
 			Carriers nonUccCarriers = new Carriers();
@@ -279,18 +273,17 @@ public class KTFreight_v3 {
 					nonUccCarriers.addCarrier(c);
 				};
 			}
-			generateCarrierPlans(scenario.getNetwork(), uccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die UCC-Carriers
-//			new CarrierPlanXmlWriterV2(uccCarriers).write( TEMP_DIR +  RUN + runIndex + "/jsprit_plannedCarriers_UCC_" + RUN + runIndex+".xml") ;
-//			new WriteCarrierScoreInfos(uccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_UCC.txt"), runIndex);
-
-			nonUccCarriers = uccCarrierCreator.createServicesToUCC(uccCarriers, nonUccCarriers); // Nachfrage den der UCCC ausliefert muss an die Umschlagpunkte geliefert werden. 
-			//TODO: DepotÖffnungszeiten der normalen Carrier anpassen, damit UCC rechtzeitig beliefert werden können.
 			
+			generateCarrierPlans(scenario.getNetwork(), uccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die UCC-Carriers
+
+			//TODO: DepotÖffnungszeiten der normalen Carrier anpassen, damit UCC rechtzeitig beliefert werden können. -> für künftige Erweiterung
+			nonUccCarriers = uccCarrierCreator.createServicesToUCC(uccCarriers, nonUccCarriers); // Nachfrage den der UCCC ausliefert muss an die Umschlagpunkte geliefert werden. 
 			generateCarrierPlans(scenario.getNetwork(), nonUccCarriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs für die NonUCC-Carriers
-//			new CarrierPlanXmlWriterV2(nonUccCarriers).write( TEMP_DIR +  RUN + runIndex + "/jsprit_plannedCarriers_NonUCC" + RUN + runIndex+".xml") ;
-//			new WriteCarrierScoreInfos(nonUccCarriers, new File(TEMP_DIR + "#JspritCarrierScoreInformation_NonUCC.txt"), runIndex);
+
 
 		} else {  // ohne UCCs 
+			carriers = new UccCarrierCreator().extractCarriers(carriers, retailerNames);
+			carriers = new UccCarrierCreator().renameVehId(carriers);
 			generateCarrierPlans(scenario.getNetwork(), carriers, vehicleTypes, config); // Hier erfolgt Lösung des VRPs
 		}
 			
@@ -309,8 +302,7 @@ public class KTFreight_v3 {
 	 * Falls nicht: log.Error und Ausgabe einer Datei: "#UnassignedServices.txt" mit den Service-Ids.
 	 * @param carriers
 	 */
-	
-	//TODO: Ausgabe der Anassigned Services in Run-Verzeichnis und dafürin der Übersicht nur eine Nennung der Anzahl unassignedServices je Run 
+	//TODO: Ausgabe der Assigned Services in Run-Verzeichnis und dafür in der Übersicht nur eine Nennung der Anzahl unassignedServices je Run 
 	//TODO: multiassigned analog.
 	private static void checkServiceAssignment(Carriers carriers) {
 		for (Carrier c :carriers.getCarriers().values()){
@@ -323,19 +315,19 @@ public class KTFreight_v3 {
 			for (ScheduledTour tour : c.getSelectedPlan().getScheduledTours()){
 				for (TourElement te : tour.getTour().getTourElements()){
 					if (te instanceof  ServiceActivity){
-						CarrierService assigService = ((ServiceActivity) te).getService();
-						if (!assignedServices.contains(assigService)){
-							assignedServices.add(assigService);
+						CarrierService assignedService = ((ServiceActivity) te).getService();
+						if (!assignedServices.contains(assignedService)){
+							assignedServices.add(assignedService);
 							System.out.println("Assigned Service: " +assignedServices.toString());
 						} else {
-							multiassignedServices.add(assigService);
-							log.error("Service wurde von dem Carrier " + c.getId().toString() + " bereits angefahren: " + assigService.getId().toString() );
+							multiassignedServices.add(assignedService);
+							log.error("Service wurde von dem Carrier " + c.getId().toString() + " bereits angefahren: " + assignedService.getId().toString() );
 						}
 					}
 				}
 			}
 			
-			//Nun prüfe, ob alle definierten Service zugeordnet wurden
+			//Nun prüfe, ob alle definierten Services zugeordnet wurden
 			for (CarrierService service : c.getServices()){
 				System.out.println("Service to Check: " + service.toString());
 				if (!assignedServices.contains(service)){
@@ -426,7 +418,7 @@ public class KTFreight_v3 {
 		System.out.println("Verzeichnis " + file + " erstellt: "+ file.mkdirs());	
 	}
 
-	private static void moveTempFile (File sourceDir, File destDir) {
+	private static void moveTempFiles (File sourceDir, File destDir) {
 		File[] files = sourceDir.listFiles();
 		File destFile = null;
 		destDir.mkdirs();
