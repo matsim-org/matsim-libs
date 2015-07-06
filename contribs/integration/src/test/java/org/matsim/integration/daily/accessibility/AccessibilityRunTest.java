@@ -53,8 +53,8 @@ public class AccessibilityRunTest {
 		System.out.println("class input directory = " + utils.getClassInputDirectory());
 		System.out.println("input directory = " + utils.getInputDirectory());
 
-		String folderStructure = "../../"; // local
-//		String folderStructure = "../../../"; // server
+//		String folderStructure = "../../"; // local
+		String folderStructure = "../../../"; // server
 			
 		String networkFile = folderStructure + "matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
