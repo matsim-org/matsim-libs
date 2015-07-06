@@ -165,12 +165,12 @@ class CreatePopulation {
 		return personHomeAndWorkLocations;
 	}
 	
-	public QuadTree<ActivityFacility> createActivitiesTree(String activityType, Scenario scenario) {
-		QuadTree<ActivityFacility> facQuadTree = this.builFacQuadTree(activityType, scenario.getActivityFacilities().getFacilitiesForActivityType(activityType));
+	static QuadTree<ActivityFacility> createActivitiesTree(String activityType, Scenario scenario) {
+		QuadTree<ActivityFacility> facQuadTree = CreatePopulation.builFacQuadTree(activityType, scenario.getActivityFacilities().getFacilitiesForActivityType(activityType));
 		return facQuadTree;
 	}
 
-	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities_of_type) {
+	private static QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities_of_type) {
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;

@@ -56,9 +56,9 @@ class CreateDemand {
 		/*
 		 * Build quad trees for assigning home and work locations
 		 */
-		this.shopFacilitiesTree = this.createActivitiesTree("shop", this.scenario); 
-		this.leisureFacilitiesTree = this.createActivitiesTree("leisure", this.scenario); 
-		this.educationFacilitiesTree = this.createActivitiesTree("education", this.scenario);
+		this.shopFacilitiesTree = CreatePopulation.createActivitiesTree("shop", this.scenario); 
+		this.leisureFacilitiesTree = CreatePopulation.createActivitiesTree("leisure", this.scenario); 
+		this.educationFacilitiesTree = CreatePopulation.createActivitiesTree("education", this.scenario);
 	}
 		
 	private void createPUSPersons() {
@@ -325,34 +325,5 @@ class CreateDemand {
 		return scenario;
 	}
 	
-	public QuadTree<ActivityFacility> createActivitiesTree(String activityType, Scenario scenario) {
-		QuadTree<ActivityFacility> facQuadTree = this.builFacQuadTree(activityType, scenario.getActivityFacilities().getFacilitiesForActivityType(activityType));
-		return facQuadTree;
-	}
 
-	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities_of_type) {
-		log.info(" building " + type + " facility quad tree");
-		double minx = Double.POSITIVE_INFINITY;
-		double miny = Double.POSITIVE_INFINITY;
-		double maxx = Double.NEGATIVE_INFINITY;
-		double maxy = Double.NEGATIVE_INFINITY;
-	
-		for (final ActivityFacility f : facilities_of_type.values()) {
-			if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-			if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-			if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-			if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-		}
-		minx -= 1.0;
-		miny -= 1.0;
-		maxx += 1.0;
-		maxy += 1.0;
-		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<ActivityFacility> quadtree = new QuadTree<>(minx, miny, maxx, maxy);
-		for (final ActivityFacility f : facilities_of_type.values()) {
-			quadtree.put(f.getCoord().getX(),f.getCoord().getY(),f);
-		}
-		log.info("Quadtree size: " + quadtree.size());
-		return quadtree;
-	}	
 }
