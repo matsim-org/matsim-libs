@@ -70,6 +70,9 @@ public class MainForQGisWriter {
 		
 		//use case 4: accessibility
 		double[] extent = {2790381,-4035858, 2891991,-3975105};
+		Double lowerBound = 1.75;
+		Double upperBound = 7.;
+		Integer range = 9;
 		writer.setExtent(extent);
 		
 		//example for adding a raster layer
@@ -93,7 +96,8 @@ public class MainForQGisWriter {
 		//2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
 		accessibilityLayer.setXField(1);
 		accessibilityLayer.setYField(2);
-		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
+//		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
+		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, upperBound, lowerBound, range);
 		renderer.setRenderingAttribute(3); // choose column/header to visualize
 		writer.addLayer(accessibilityLayer);
 

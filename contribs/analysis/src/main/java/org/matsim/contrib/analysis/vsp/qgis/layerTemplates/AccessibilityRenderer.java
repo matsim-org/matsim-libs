@@ -11,25 +11,61 @@ import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 public class AccessibilityRenderer extends GraduatedSymbolRenderer {
 	
 	private Range[] ranges;
+	private Double lowerBound;
+	private Double upperBound;
+	private Integer range = 9;
 
-	public AccessibilityRenderer(VectorLayer layer) {
+//	public AccessibilityRenderer(VectorLayer layer) {
+//		super(layer.getHeader(),layer);
+//		init();
+//	}
+	
+	
+	public AccessibilityRenderer(VectorLayer layer, Double lowerBound, Double upperBound, Integer range) {
 		super(layer.getHeader(),layer);
+		this.lowerBound = lowerBound;
+		this.upperBound = upperBound;
+//		this.range = range;
 		init();
 	}
 
 	@Override
 	public void init() {
+		double spread = this.upperBound - this.lowerBound;
+		double stepSize = spread / (this.range - 2);
 		
-		this.ranges = new Range[9];
-		this.ranges[0] = new Range(-67.38258, 2, " 2");
-		this.ranges[1] = new Range(2, 2.5, "2 - 2.5");
-		this.ranges[2] = new Range(2.5, 3, "2 - 3");
-		this.ranges[3] = new Range(3, 3.5, "3 - 3.5");
-		this.ranges[4] = new Range(3.5, 4, "3.5 - 4");
-		this.ranges[5] = new Range(4, 4.5, "4 - 4.5");
-		this.ranges[6] = new Range(4.5, 5, "4.5 - 5");
-		this.ranges[7] = new Range(5, 5.5, "5 - 5.5");
-		this.ranges[8] = new Range(5.5, 5.863296, "> 5.5");
+		this.ranges = new Range[this.range];
+		// color ramp suited for NMBM work facilities
+//		this.ranges[0] = new Range(-67.38258, 2, " 2");
+//		this.ranges[1] = new Range(2, 2.5, "2 - 2.5");
+//		this.ranges[2] = new Range(2.5, 3, "2 - 3");
+//		this.ranges[3] = new Range(3, 3.5, "3 - 3.5");
+//		this.ranges[4] = new Range(3.5, 4, "3.5 - 4");
+//		this.ranges[5] = new Range(4, 4.5, "4 - 4.5");
+//		this.ranges[6] = new Range(4.5, 5, "4.5 - 5");
+//		this.ranges[7] = new Range(5, 5.5, "5 - 5.5");
+//		this.ranges[8] = new Range(5.5, 5.863296, "> 5.5");
+		
+		// color ramp suited for BE shopping facilities
+//		this.ranges[0] = new Range(-67.38258, 1.75, " 1.75");
+//		this.ranges[1] = new Range(1.75, 2.5, "1.75 - 2.5");
+//		this.ranges[2] = new Range(2.5, 3.25, "2.5 - 3.25");
+//		this.ranges[3] = new Range(3.25, 4, "3.25 - 4");
+//		this.ranges[4] = new Range(4, 4.75, "4 - 4.75");
+//		this.ranges[5] = new Range(4.75, 5.5, "4.75 - 5.5");
+//		this.ranges[6] = new Range(5.5, 6.25, "5.5 - 6.25");
+//		this.ranges[7] = new Range(6.25, 7, "6.25 - 7");
+//		this.ranges[8] = new Range(7, 8, "> 7");
+		
+		// adjustable color ramp
+		this.ranges[0] = new Range(-200., this.lowerBound, " " + this.lowerBound.toString());
+		for (int i = 0; i < range - 2; i++) {
+			Double lowerBoundary = this.lowerBound + i * stepSize;
+			Double upperBoundary = this.lowerBound + (i+1) * stepSize;
+			this.ranges[i+1] = new Range(lowerBoundary, upperBoundary, lowerBoundary.toString() + " - " + upperBoundary.toString());
+		}
+		this.ranges[this.range - 2] = new Range(this.upperBound, 100, "> " + this.upperBound.toString());
+		
 		
 		double sizeMapUnitScale[] = {0,0};
 		int size = 1010;
