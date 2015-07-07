@@ -29,7 +29,6 @@ import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityDensitiesRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ExeRunner;
 
 /**
@@ -41,13 +40,13 @@ public class VisualizationUtilsDZ {
 	private VisualizationUtilsDZ(){} // do not instantiate
 
 	
-	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent, String workingDirectory) {
+	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent,
+			String workingDirectory, String crs, boolean includeDensityLayer) {
 		// create Mapnik file that is needed to have OSM layer in QGis project
 		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
 
 		// Write QGis project file
-//		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_SA_Albers, workingDirectory);
-		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
+		QGisWriter writer = new QGisWriter(crs, workingDirectory);
 		String qGisProjectFile = "QGisProjectFile_" + mode + ".qgs";
 		writer.setExtent(mapViewExtent);
 
@@ -65,13 +64,15 @@ public class VisualizationUtilsDZ {
 		writer.changeWorkingDirectory(actSpecificWorkingDirectory);
 
 		// density layer
-//		VectorLayer densityLayer = new VectorLayer(
-//				"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
-//		densityLayer.setXField(Labels.X_COORDINATE);
-//		densityLayer.setYField(Labels.Y_COORDINATE);
-//		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
-//		dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
-//		writer.addLayer(densityLayer);
+		if (includeDensityLayer == true) {
+			VectorLayer densityLayer = new VectorLayer(
+					"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
+			densityLayer.setXField(Labels.X_COORDINATE);
+			densityLayer.setYField(Labels.Y_COORDINATE);
+			AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
+			dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
+			writer.addLayer(densityLayer);
+		}
 
 		// accessibility layer
 		VectorLayer accessibilityLayer = new VectorLayer(

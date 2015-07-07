@@ -16,6 +16,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -27,6 +28,7 @@ public class RunAccessibilityBe {
 	private static final double cellSize = 1000.;
 
 	public static void main(String[] args) {
+		// Input and output
 //		String networkFile = "../../shared-svn/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/network.all.xml";
 		String networkFile = "../../shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
 		String facilitiesFile = "../../shared-svn/projects/accessibility_berlin/osm/facilities_amenities_modified.xml";
@@ -35,6 +37,11 @@ public class RunAccessibilityBe {
 //		String travelDistanceMatrix = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/travelDistanceMatrix.csv.gz";
 //		String ptStops = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/pt/be_04/stops.csv.gz";
 
+		// Parameters
+		boolean includeDensityLayer = true;
+		String crs = TransformationFactory.DHDN_GK4;
+				
+				
 //		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
 		
@@ -200,6 +207,14 @@ public class RunAccessibilityBe {
 //			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
 			// Boundaries of Berlin are approx.: 4570000, 4613000, 5836000, 5806000
 			
+			
+			// new; more additional data
+	
+			
+//			listener.addAdditionalFacilityData(lakes);
+			
+			// end new
+			
 			listener.generateGridsAndMeasuringPointsByCustomBoundary(4574000, 5802000, 4620000, 5839000, cellSize);
 //			listener.generateGridsAndMeasuringPointsByCustomBoundary(4590000, 5815000, 4595000, 5820000, cellSize);
 			
@@ -229,7 +244,7 @@ public class RunAccessibilityBe {
 //					RunAccessibilityBe.log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 //					continue ;
 //				}
-				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory);
+				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}

@@ -1,7 +1,9 @@
 package playground.dziemke.accessibility;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -20,8 +22,8 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 
 
-public class RunAccessibilityNMBMWorkEquiv {
-	public static final Logger log = Logger.getLogger(RunAccessibilityNMBMWorkEquiv.class);
+public class RunAccessibilityNMBM {
+	public static final Logger log = Logger.getLogger(RunAccessibilityNMBM.class);
 	
 	private static final double cellSize = 1000.;
 
@@ -30,7 +32,7 @@ public class RunAccessibilityNMBMWorkEquiv {
 		// Input and output	
 		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
-		String outputDirectory = "../../accessibility-sa/data/02/";
+		String outputDirectory = "../../accessibility-sa/data/03/";
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelDistanceMatrix.csv.gz";
 //		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/measuringPointsAsStops.csv.gz";
@@ -53,26 +55,14 @@ public class RunAccessibilityNMBMWorkEquiv {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
-		String typeWEQ = "w-eq";
 		List<String> activityTypes = new ArrayList<String>() ;
-		activityTypes.add(typeWEQ);
-
 		ActivityFacilities homes = FacilitiesUtils.createActivityFacilities("homes") ;
-		ActivityFacilities amenities = FacilitiesUtils.createActivityFacilities("amenities") ;
 		for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
 			for ( ActivityOption option : fac.getActivityOptions().values() ) {
 				// figure out all activity types
 				if ( !activityTypes.contains(option.getType()) ) {
 					activityTypes.add( option.getType() ) ;
 				}
-
-				// add all facilites that are not home or work
-				if ( !option.getType().equals("h") && !option.getType().equals("w") ) {
-					if (!amenities.getFacilities().containsKey(fac.getId())) {
-						amenities.addActivityFacility(fac);
-					}
-				}
-
 				// figure out where the homes are
 				if ( option.getType().equals("h") ) {
 					homes.addActivityFacility(fac);
@@ -85,18 +75,49 @@ public class RunAccessibilityNMBMWorkEquiv {
 		// choose map view a bit bigger
 		double[] mapViewExtent = {100000,-3720000,180000,-3675000};
 
-		Controler controler = new Controler(scenario);
+		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
+		Controler controler = new Controler(scenario) ;
 
-		GridBasedAccessibilityControlerListenerV3 listener = 
-				new GridBasedAccessibilityControlerListenerV3(amenities, config, scenario.getNetwork());
+		log.warn( "found activity types: " + activityTypes );
+		
+		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
+		for ( String actType : activityTypes ) {
+//			if ( !actType.equals("w") ) {
+//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//				continue ;
+//			}
 
-		listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
-		listener.addAdditionalFacilityData(homes) ;
-		listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
-		listener.writeToSubdirectoryWithName("w-eq");
-		listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
+			ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
+			for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
+				for ( ActivityOption option : fac.getActivityOptions().values() ) {
+					if ( option.getType().equals(actType) ) {
+						opportunities.addActivityFacility(fac);
+					}
+				}
+			}
 
-		controler.addControlerListener(listener);
+			activityFacilitiesMap.put(actType, opportunities);
+
+			GridBasedAccessibilityControlerListenerV3 listener = 
+					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
+//					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
+				
+			// define the mode that will be considered
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
+			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+//			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+				
+			listener.addAdditionalFacilityData(homes) ;
+			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
+				
+			listener.writeToSubdirectoryWithName(actType);
+				
+			listener.setUrbansimMode(false); // avoid writing some (eventually: all) files that related to matsim4urbansim
+
+			controler.addControlerListener(listener);
+		}
 
 		controler.run();
 
@@ -104,13 +125,17 @@ public class RunAccessibilityNMBMWorkEquiv {
 
 		String osName = System.getProperty("os.name");
 
-//		for (String actType : activityTypes) {
-			String actSpecificWorkingDirectory =  workingDirectory + typeWEQ + "/";
+		for (String actType : activityTypes) {
+			String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
 
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
+//				if ( !actType.equals("w") ) {
+//					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//					continue ;
+//				}
+				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
-//		}
+		}
 	}
 }

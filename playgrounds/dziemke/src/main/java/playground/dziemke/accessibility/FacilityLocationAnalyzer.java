@@ -25,15 +25,24 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author dziemke
  */
 public class FacilityLocationAnalyzer {
-	private static PointFeatureFactory pointFeatureFactory;
+	// Input file and output directory
+	private static String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml";
+//	private static String facilitiesFile = "../../projects/accessibility_berlin/osm/schlesische_str/facilities_landuse6.xml";
+//	private static String facilitiesFile = "../../projects/accessibility_berlin/osm/berlin/08/facilities_buildings.xml";
+//	private static String facilitiesFile = "../../projects/accessibility_berlin/osm/berlin/facilities_amenities_modified.xml";
+	
+	private static String outputFileName = "../../accessibility-sa/data/facilities.shp";
+//	private static String outputFileName = "../../projects/accessibility_berlin/osm/schlesische_str/facilities_landuse6.shp";
+//	private static String outputFileName = "../../shared-svn/projects/accessibility_berlin/osm/berlin/08/facilities_buildings.shp";
+//	private static String outputFileName = "../../projects/accessibility_berlin/osm/berlin/facilities_amenities.shp";
 	
 	// Parameters
 	private static String[] attributeLabel = {"FacilityId","Type"};
+//	static String crs = TransformationFactory.DHDN_GK4;
+	static String crs = TransformationFactory.WGS84_SA_Albers;
 	
-	// Input file and output directory
-	private static String facilitiesFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/facilities_landuse6.xml";
-//	private static String facilitiesFile = "/Users/dominik/Workspace/matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml";
-	private static String outputFileName = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/facilities_landuse6.shp";
+	
+	private static PointFeatureFactory pointFeatureFactory;
 	
 	
 	public static void main(String[] args) {
@@ -63,7 +72,7 @@ public class FacilityLocationAnalyzer {
 	
 	private static void initFeatureType(String[] attributeLabel) {
 		pointFeatureFactory = new PointFeatureFactory.Builder().
-		setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4)).
+		setCrs(MGC.getCRS(crs)).
 		setName("points").
 		addAttribute(attributeLabel[0], String.class).
 		addAttribute(attributeLabel[1], String.class).

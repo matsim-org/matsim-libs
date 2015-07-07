@@ -12,6 +12,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 public class PointShapeFileWriter {
 	// Other objects
@@ -33,17 +34,13 @@ public class PointShapeFileWriter {
 	private static void initFeatureType(String attributeLabel) {
 		// Before single feature can be created, the type has to be initialized here
 		
-		// NOTE: "TransformationFactory.DHDN_GK4" does not transform anything, but just returns the string "DHDN_GK4"
-		// Essentially, one could also just fill in the string, but then there is no check if the spelling is correct.
-		
 		// Via "addAttribute" a attributes of the feature type can be added and its name specified.
 		// The value for this attribute can then be filled in when a single attribute of this type is created.
 		
 		// The effect of "setName" could not be retrieved yet.
-				
-		pointFeatureFactory = new PointFeatureFactory.Builder().
+		
+		new PointFeatureFactory.Builder().
 		setCrs(MGC.getCRS(TransformationFactory.DHDN_GK4)).
-		//setCrs(MGC.getCRS("DHDN_GK4")).
 		setName("points").
 		addAttribute(attributeLabel, String.class).
 		//addAttribute("Attribute2", String.class).

@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.controler.OutputDirectoryLogging;
 
 import playground.dziemke.cemdapMatsimCadyts.CommuterFileReader;
 import playground.dziemke.cemdapMatsimCadyts.CommuterRelation;
+import playground.dziemke.utils.LogToOutputSaver;
 import playground.dziemke.utils.TwoAttributeShapeReader;
 
 public class DemandGeneratorOnePersonV2 {
@@ -45,7 +45,7 @@ public class DemandGeneratorOnePersonV2 {
 		
 		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/21/";
 		
-		initLogging(outputBase);
+		LogToOutputSaver.setOutputDirectory(outputBase);
 		
 		
 		// create a PendlerMatrixReader and store its output to a list
@@ -356,17 +356,4 @@ public class DemandGeneratorOnePersonV2 {
         }
 		log.info("Households file " + fileName + " written.");
     }
-	
-	
-	private static void initLogging(String outputBase) {
-		try
-		{
-			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputBase);
-		}
-		catch (IOException e)
-		{
-			log.error("Cannot create logfiles: " + e.getMessage());
-			e.printStackTrace();
-		}
-	}
 }
