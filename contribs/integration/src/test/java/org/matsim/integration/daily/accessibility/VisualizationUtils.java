@@ -29,7 +29,6 @@ import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityDensitiesRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.ExeRunner;
 
 /**
@@ -41,12 +40,15 @@ public class VisualizationUtils {
 	private VisualizationUtils(){} // do not instantiate
 
 	
-	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent, String workingDirectory) {
+	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent,
+			String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
+			Double upperBound, Integer range) {
+		
 		// create Mapnik file that is needed to have OSM layer in QGis project
 		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
 
 		// Write QGis project file
-		QGisWriter writer = new QGisWriter(TransformationFactory.WGS84_SA_Albers, workingDirectory);
+		QGisWriter writer = new QGisWriter(crs, workingDirectory);
 		String qGisProjectFile = "QGisProjectFile_" + mode + ".qgs";
 		writer.setExtent(mapViewExtent);
 
@@ -64,13 +66,15 @@ public class VisualizationUtils {
 		writer.changeWorkingDirectory(actSpecificWorkingDirectory);
 
 		// density layer
-		VectorLayer densityLayer = new VectorLayer(
-				"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
-		densityLayer.setXField(Labels.X_COORDINATE);
-		densityLayer.setYField(Labels.Y_COORDINATE);
-		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
-		dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
-		writer.addLayer(densityLayer);
+		if (includeDensityLayer == true) {
+			VectorLayer densityLayer = new VectorLayer(
+					"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
+			densityLayer.setXField(Labels.X_COORDINATE);
+			densityLayer.setYField(Labels.Y_COORDINATE);
+			AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
+			dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
+			writer.addLayer(densityLayer);
+		}
 
 		// accessibility layer
 		VectorLayer accessibilityLayer = new VectorLayer(
@@ -80,7 +84,7 @@ public class VisualizationUtils {
 		// 2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
 		accessibilityLayer.setXField(Labels.X_COORDINATE);
 		accessibilityLayer.setYField(Labels.Y_COORDINATE);
-		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
+		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, upperBound, lowerBound, range);
 		if (mode.equals(Modes4Accessibility.freeSpeed)) {
 			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_FREESPEED); // choose column/header to visualize
 		} else if (mode.equals(Modes4Accessibility.car)) {
@@ -100,6 +104,7 @@ public class VisualizationUtils {
 		writer.write(qGisProjectFile);
 	}		
 
+	
 	/**
 	 * This method creates a snapshot of the accessibility map that is held in the created QGis file.
 	 * The syntax within the method is different dependent on the operating system.

@@ -28,6 +28,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
@@ -48,11 +49,7 @@ public class AccessibilityRunTest {
 	
 	@Test
 	public void doAccessibilityTest() {
-		System.out.println("Working Directory = " + System.getProperty("user.dir"));
-		System.out.println("package input directory = " + utils.getPackageInputDirectory());
-		System.out.println("class input directory = " + utils.getClassInputDirectory());
-		System.out.println("input directory = " + utils.getInputDirectory());
-
+		// Input
 //		String folderStructure = "../../"; // local
 		String folderStructure = "../../../"; // server
 			
@@ -61,6 +58,14 @@ public class AccessibilityRunTest {
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
 //		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/measuringPointsAsStops/stops.csv.gz";
+		
+		// Parameters
+		boolean includeDensityLayer = true;
+		String crs = TransformationFactory.WGS84_SA_Albers;
+		Double lowerBound = 2.;
+		Double upperBound = 5.5;
+		Integer range = 9;
+		
 
 //		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
@@ -257,7 +262,8 @@ public class AccessibilityRunTest {
 					AccessibilityRunTest.log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 					continue ;
 				}
-				VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory);
+				VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+						lowerBound, upperBound, range);
 				VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}
