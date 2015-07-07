@@ -44,6 +44,7 @@ public class RunAccessibilityNMBMWorkEquiv {
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
 		Integer range = 9;
+		int symbolSize = 1010;
 		
 
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
@@ -113,7 +114,7 @@ public class RunAccessibilityNMBMWorkEquiv {
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
 //				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
 				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
-						lowerBound, upperBound, range);
+						lowerBound, upperBound, range, symbolSize);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 //		}

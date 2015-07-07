@@ -46,6 +46,7 @@ public class RunAccessibilityNMBM {
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
 		Integer range = 9;
+		int symbolSize = 1010;
 		
 
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
@@ -137,7 +138,7 @@ public class RunAccessibilityNMBM {
 					continue ;
 				}
 				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
-						lowerBound, upperBound, range);
+						lowerBound, upperBound, range, symbolSize);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}

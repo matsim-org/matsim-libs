@@ -43,6 +43,7 @@ public class RunAccessibilityBe {
 		Double lowerBound = 1.75;
 		Double upperBound = 7.;
 		Integer range = 9;
+		int symbolSize = 1010;
 				
 				
 //		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
@@ -249,7 +250,7 @@ public class RunAccessibilityBe {
 //				}
 //				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
 				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
-						lowerBound, upperBound, range);
+						lowerBound, upperBound, range, symbolSize);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}
