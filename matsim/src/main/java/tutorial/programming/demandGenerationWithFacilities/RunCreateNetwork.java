@@ -14,18 +14,19 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 
 public class RunCreateNetwork {
 
-   public static void main(String[] args) {
-      String osm = "./input/merged-network.osm";
-      Config config = ConfigUtils.createConfig();
-      Scenario sc = ScenarioUtils.createScenario(config);
-      Network net = sc.getNetwork();
-      CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
-    		  TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
-      OsmNetworkReader onr = new OsmNetworkReader(net,ct);
-      onr.parse(osm); 
-      new NetworkCleaner().run(net);
-      new NetworkWriter(net).write("./output/network.xml");
-   }
+	private static final String osm = "examples/tutorial/programming/demandGenerationWithFacilities/zrh-center-bigroads.osm.gz";
+
+	public static void main(String[] args) {
+		Config config = ConfigUtils.createConfig();
+		Scenario sc = ScenarioUtils.createScenario(config);
+		Network net = sc.getNetwork();
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
+				TransformationFactory.WGS84, TransformationFactory.CH1903_LV03);
+		OsmNetworkReader onr = new OsmNetworkReader(net,ct);
+		onr.parse(osm); 
+		new NetworkCleaner().run(net);
+		new NetworkWriter(net).write("./output/network.xml");
+	}
 }
 
 
