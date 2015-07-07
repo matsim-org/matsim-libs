@@ -73,6 +73,7 @@ public class MainForQGisWriter {
 		Double lowerBound = 1.75;
 		Double upperBound = 7.;
 		Integer range = 9;
+		int symbolSize = 1010;
 		writer.setExtent(extent);
 		
 		//example for adding a raster layer
@@ -97,7 +98,8 @@ public class MainForQGisWriter {
 		accessibilityLayer.setXField(1);
 		accessibilityLayer.setYField(2);
 //		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
-		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, upperBound, lowerBound, range);
+		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, upperBound, lowerBound,
+				range, symbolSize);
 		renderer.setRenderingAttribute(3); // choose column/header to visualize
 		writer.addLayer(accessibilityLayer);
 
