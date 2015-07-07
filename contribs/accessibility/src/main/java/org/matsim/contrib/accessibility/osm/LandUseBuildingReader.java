@@ -46,7 +46,7 @@ import org.openstreetmap.osmosis.xml.v0_6.XmlReader;
 
 
 /**
- * Parses all landuse ??? from an OpenStreetMap file.
+ * Parses all landuse and building tags from an OpenStreetMap file.
  * 
  * @author dziemke
  * @see <a href="http://wiki.openstreetmap.org/wiki/Key:landuse">OpenStreetMap: Land Use</a>
@@ -57,11 +57,15 @@ public class LandUseBuildingReader {
 	private ActivityFacilities landuse;
 	private ObjectAttributes amenityAttributes;
 	private final CoordinateTransformation ct;
-	private Map<String, String> osmToMatsimTypeMap;
+	private Map<String, String> osmLandUseToMatsimTypeMap;
+	private Map<String, String> osmBuildingToMatsimTypeMap;
+	
+	private double buildingTypeFromVicinityRange;
+	private String[] tagsToIgnoreBuildings;
 	
 
 	/**
-	 * Constructing a landuse ??? reader to parse the OpenStreetMap landuse ???.
+	 * Constructing a LandUseBuildingReader to parse the OpenStreetMap landuse and Buildings.
 	 * 
 	 * @param file the path to the *.osm OpenStreetMap file;
 	 * @param ct the (projected) coordinate reference system to which the 
@@ -70,15 +74,18 @@ public class LandUseBuildingReader {
 	 * 		  <a href="http://wiki.openstreetmap.org/wiki/Key:landuse">Land Use</a>
 	 * 		  to MATSim activity types.
 	 */
-//	public LandUseReader(String file, CoordinateTransformation ct, 
-//			Map<String, String> osmToMatsimTypeMap) {
-	public LandUseBuildingReader(CoordinateTransformation ct, Map<String, String> osmToMatsimTypeMap) {
-		log.info("Creating landuse ??? reader");
+	public LandUseBuildingReader(CoordinateTransformation ct, Map<String, String> osmLandUseToMatsimTypeMap,
+			Map<String, String> osmBuildingToMatsimTypeMap, double buildingTypeFromVicinityRange,
+			String[] tagsToIgnoreBuildings) {
+		log.info("Creating LandUseAndBuildingReader");
 		
 		this.ct = ct;
-		this.osmToMatsimTypeMap = osmToMatsimTypeMap;
+		this.osmLandUseToMatsimTypeMap = osmLandUseToMatsimTypeMap;
+		this.osmBuildingToMatsimTypeMap = osmBuildingToMatsimTypeMap;
 		this.landuse = FacilitiesUtils.createActivityFacilities("OpenStreetMap landuse ???");
-//		this.amenityAttributes = new ObjectAttributes();
+		
+		this.buildingTypeFromVicinityRange = buildingTypeFromVicinityRange;
+		this.tagsToIgnoreBuildings = tagsToIgnoreBuildings;
 	}
 	
 	
@@ -92,24 +99,23 @@ public class LandUseBuildingReader {
 	 * @param file the {@code *.osm} file to parse for land use
 	 * @throws FileNotFoundException 
 	 */
-	public void parseLandUse(String file) throws FileNotFoundException{
+	public void parseLandUseAndBuildings(String file) throws FileNotFoundException{
 		File f = new File(file);
 		if(!f.exists()){
 			throw new FileNotFoundException("Could not find " + file);
 		}
-		LandUseBuildingSink landUseSink = new LandUseBuildingSink(this.ct, this.osmToMatsimTypeMap);
+		LandUseBuildingSink landUseBuildingSink = new LandUseBuildingSink(this.ct,
+				this.osmLandUseToMatsimTypeMap, this.osmBuildingToMatsimTypeMap,
+				this.buildingTypeFromVicinityRange, this.tagsToIgnoreBuildings);
 		XmlReader xmlReader = new XmlReader(f, false, CompressionMethod.None);
-		xmlReader.setSink(landUseSink);
+		xmlReader.setSink(landUseBuildingSink);
 		xmlReader.run();		
 		
-		this.landuse = landUseSink.getFacilities();
-		this.amenityAttributes = landUseSink.getFacilityAttributes();		
+		this.landuse = landUseBuildingSink.getFacilities();
+		this.amenityAttributes = landUseBuildingSink.getFacilityAttributes();		
 	}
-	
-	
-	// here
 
-
+	
 	/**
 	 * Writes the facility coordinates so that it can be imported into QGis.
 	 */
