@@ -109,36 +109,10 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 			return false;
 		}
 
-		boolean remainsActive;
-
 		if ( this.movingNodes ) {
-
-			// move nodes
-			this.lockNodes = true;
-			QNode node;
-			Iterator<QNode> simNodes = this.nodesQueue.iterator();
-			while (simNodes.hasNext()) {
-				node = simNodes.next();
-				remainsActive = node.doSimStep(time);
-				if (!remainsActive) simNodes.remove();
-			}
-			this.lockNodes = false;
-
+			moveNodes();
 		} else {
-
-			// move links
-			lockLinks = true;
-			QLinkInternalI link;
-			ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
-			while (simLinks.hasNext()) {
-				link = simLinks.next();
-
-				remainsActive = link.doSimStep(time);
-
-				if (!remainsActive) simLinks.remove();
-			}
-			lockLinks = false;
-
+			moveLinks();
 		}
 		return true ;
 	}
@@ -161,34 +135,12 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 				return;
 			}
 
-			boolean remainsActive;
-
-			// move nodes
-			this.lockNodes = true;
-			QNode node;
-			Iterator<QNode> simNodes = this.nodesQueue.iterator();
-			while (simNodes.hasNext()) {
-				node = simNodes.next();
-				remainsActive = node.doSimStep(time);
-				if (!remainsActive) simNodes.remove();
-			}
-			this.lockNodes = false;
+			moveNodes();
 
 			// After moving the QNodes all we use a Phaser to synchronize the threads.
 			this.separationBarrier.arriveAndAwaitAdvance();
 
-			// move links
-			lockLinks = true;
-			QLinkInternalI link;
-			ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
-			while (simLinks.hasNext()) {
-				link = simLinks.next();
-
-				remainsActive = link.doSimStep(time);
-
-				if (!remainsActive) simLinks.remove();
-			}
-			lockLinks = false;
+			moveLinks();
 
 			/*
 			 * The end of moving is synchronized with the endBarrier. If all threads 
@@ -196,6 +148,32 @@ class QNetsimEngineRunner extends NetElementActivator implements Runnable, Calla
 			 */
 			this.endBarrier.arriveAndAwaitAdvance();
 		}
+	}
+	private void moveNodes() {
+		boolean remainsActive;
+		this.lockNodes = true;
+		QNode node;
+		Iterator<QNode> simNodes = this.nodesQueue.iterator();
+		while (simNodes.hasNext()) {
+			node = simNodes.next();
+			remainsActive = node.doSimStep(time);
+			if (!remainsActive) simNodes.remove();
+		}
+		this.lockNodes = false;
+	}
+	private void moveLinks() {
+		boolean remainsActive;
+		lockLinks = true;
+		QLinkInternalI link;
+		ListIterator<QLinkInternalI> simLinks = this.linksList.listIterator();
+		while (simLinks.hasNext()) {
+			link = simLinks.next();
+
+			remainsActive = link.doSimStep(time);
+
+			if (!remainsActive) simLinks.remove();
+		}
+		lockLinks = false;
 	}
 
 	/*

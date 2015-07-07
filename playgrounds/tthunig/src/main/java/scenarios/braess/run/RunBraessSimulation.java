@@ -114,7 +114,7 @@ public class RunBraessSimulation {
 		config.scenario().setUseSignalSystems( false );
 		
 		// set brain exp beta
-		config.planCalcScore().setBrainExpBeta( 2 );
+		config.planCalcScore().setBrainExpBeta( 20 );
 
 		// choose between link to link and node to node routing
 		config.controler().setLinkToLinkRoutingEnabled( true );
@@ -200,6 +200,9 @@ public class RunBraessSimulation {
 		TtCreateBraessNetworkAndLanes netCreator = new TtCreateBraessNetworkAndLanes(scenario);
 		netCreator.setSimulateInflowCap( true );
 		netCreator.createNetwork();
+		
+		Link link = scenario.getNetwork().getLinks().get( Id.createLinkId("3_4") ) ;
+		link.setFreespeed(0.1);
 		
 		if (scenario.getConfig().scenario().isUseLanes()){
 			netCreator.createLanes();
