@@ -84,7 +84,7 @@ public class VisualizationUtils {
 		// 2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
 		accessibilityLayer.setXField(Labels.X_COORDINATE);
 		accessibilityLayer.setYField(Labels.Y_COORDINATE);
-		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, upperBound, lowerBound,
+		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, lowerBound, upperBound,
 				range, symbolSize);
 		if (mode.equals(Modes4Accessibility.freeSpeed)) {
 			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_FREESPEED); // choose column/header to visualize
