@@ -30,8 +30,8 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface NetsimNetworkFactory<QN extends NetsimNode, QL extends NetsimLink> extends MatsimFactory {
 
-	public QN createNetsimNode(Node node, QNetwork network);
+	QN createNetsimNode(Node node, QNetwork network);
 
-	public QL createNetsimLink(Link link, QNetwork network, QN queueNode);
+	QL createNetsimLink(Link link, QNetwork network, QN queueNode);
 
 }

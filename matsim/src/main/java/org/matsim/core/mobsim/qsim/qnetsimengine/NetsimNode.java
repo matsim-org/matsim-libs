@@ -6,6 +6,6 @@ import org.matsim.core.api.internal.MatsimNetworkObject;
 
 public interface NetsimNode extends Customizable, MatsimNetworkObject {
 
-	public Node getNode();
+	Node getNode();
 
 }

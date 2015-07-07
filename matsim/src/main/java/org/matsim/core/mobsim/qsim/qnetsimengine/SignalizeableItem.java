@@ -35,10 +35,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
  */
 public interface SignalizeableItem {
 	
-	public void setSignalized( final boolean isSignalized);
+	void setSignalized(final boolean isSignalized);
 	
-	public void setSignalStateAllTurningMoves( final SignalGroupState state);
+	void setSignalStateAllTurningMoves(final SignalGroupState state);
 	
-	public void setSignalStateForTurningMove( final SignalGroupState state, final Id<Link> toLinkId);
+	void setSignalStateForTurningMove(final SignalGroupState state, final Id<Link> toLinkId);
 
 }

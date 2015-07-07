@@ -32,9 +32,9 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
  * @author nagel
  *
  */
-public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
+class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuilder {
 
-	public QueueAgentSnapshotInfoBuilder(Scenario scenario, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
+	QueueAgentSnapshotInfoBuilder(Scenario scenario, AgentSnapshotInfoFactory agentSnapshotInfoFactory) {
 		super(scenario, agentSnapshotInfoFactory);
 	}
 

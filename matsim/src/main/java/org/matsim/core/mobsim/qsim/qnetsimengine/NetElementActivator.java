@@ -20,7 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-public abstract class NetElementActivator {
+abstract class NetElementActivator {
 
 	protected abstract void activateNode(final QNode node);
 	
