@@ -23,13 +23,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.otfvis.io.OTFLaneReader;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
-import org.matsim.signals.vis.VisSignal;
-import org.matsim.signals.vis.VisSignalGroup;
-import org.matsim.signals.vis.VisSignalSystem;
+import org.matsim.lanes.vis.VisSignal;
 import org.matsim.vis.otfvis.caching.SceneGraph;
 
 /**

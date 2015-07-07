@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFSignalPosition
+ * OTFSignalSystem
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,57 +17,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signals.vis;
+package org.matsim.contrib.signals.otfvis;
 
-import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
-import org.matsim.lanes.vis.VisLinkWLanes;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
+import java.awt.geom.Point2D;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author dgrether
  *
  */
-public class VisSignal implements Serializable {
-
-	private String id;
-	private SignalGroupState state;
-	private List<VisLinkWLanes> turningMoveRestrictions = null;
-	private String systemId;
+public class VisSignalSystem {
 	
-	public VisSignal(String systemId, String signalId) {
-		this.systemId = systemId;
-		this.id = signalId;
+	private String id;
+	private Map<String, VisSignalGroup> signalGroups = new HashMap<String, VisSignalGroup>();
+	private Point2D.Float visCoordinate;
+
+	public VisSignalSystem(String id){
+		this.id = id;
 	}
 
-	public String getId(){
+	public String getId() {
 		return this.id;
 	}
 
-	public String getSignalSystemId(){
-		return this.systemId;
+	public void addOTFSignalGroup(VisSignalGroup group){
+		this.signalGroups.put(group.getId(), group);
 	}
 	
-	public void setState(SignalGroupState state){
-		this.state = state;
+	public Map<String, VisSignalGroup> getOTFSignalGroups(){
+		return this.signalGroups;
 	}
 	
-	public SignalGroupState getSignalGroupState(){
-		return this.state;
+	public void setVisCoordinate(Point2D.Float visCoordinate) {
+		this.visCoordinate = visCoordinate;
 	}
 	
-	public List<VisLinkWLanes> getTurningMoveRestrictions(){
-		return this.turningMoveRestrictions;
+	public Point2D.Float getVisCoordinate(){
+		return this.visCoordinate;
 	}
-
-	public void addTurningMoveRestriction(VisLinkWLanes toLink) {
-		if (this.turningMoveRestrictions == null){
-			this.turningMoveRestrictions = new ArrayList<VisLinkWLanes>();
-		}
-		this.turningMoveRestrictions.add(toLink);
-	}
-
+	
 }

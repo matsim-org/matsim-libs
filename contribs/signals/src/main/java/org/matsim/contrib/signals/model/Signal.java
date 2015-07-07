@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.signals.mobsim.SignalizeableItem;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalizeableItem;
 
 
 /**

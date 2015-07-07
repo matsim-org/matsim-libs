@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFSignalGroup
+ * OTFSignalPosition
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +17,56 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signals.vis;
+package org.matsim.lanes.vis;
 
 import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
  * @author dgrether
  *
  */
-public class VisSignalGroup {
+public class VisSignal implements Serializable {
 
 	private String id;
-	private Map<String, VisSignal> signalPositions = new HashMap<String, VisSignal>();
+	private SignalGroupState state;
+	private List<VisLinkWLanes> turningMoveRestrictions = null;
 	private String systemId;
 	
-	public VisSignalGroup(String signalSystemId, String id){
-		this.systemId = signalSystemId;
-		this.id = id;
+	public VisSignal(String systemId, String signalId) {
+		this.systemId = systemId;
+		this.id = signalId;
 	}
-	
-	public String getId() {
+
+	public String getId(){
 		return this.id;
 	}
-	
+
 	public String getSignalSystemId(){
 		return this.systemId;
 	}
-
-	public void setState(SignalGroupState state) {
-		for (VisSignal p : this.signalPositions.values()){
-			p.setState(state);
-		}
-	}
-
-	public void addSignal(VisSignal signal) {
-		this.signalPositions.put(signal.getId(), signal);
-	}
-
-	public Map<String, VisSignal> getSignals() {
-		return this.signalPositions;
+	
+	public void setState(SignalGroupState state){
+		this.state = state;
 	}
 	
+	public SignalGroupState getSignalGroupState(){
+		return this.state;
+	}
+	
+	public List<VisLinkWLanes> getTurningMoveRestrictions(){
+		return this.turningMoveRestrictions;
+	}
+
+	public void addTurningMoveRestriction(VisLinkWLanes toLink) {
+		if (this.turningMoveRestrictions == null){
+			this.turningMoveRestrictions = new ArrayList<VisLinkWLanes>();
+		}
+		this.turningMoveRestrictions.add(toLink);
+	}
+
 }

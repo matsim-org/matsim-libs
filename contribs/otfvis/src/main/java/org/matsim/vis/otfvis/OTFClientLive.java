@@ -26,10 +26,7 @@ import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
 import org.jdesktop.swingx.mapviewer.wms.WMSService;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
-import org.matsim.lanes.otfvis.io.OTFLaneReader;
-import org.matsim.lanes.otfvis.io.OTFLaneWriter;
-import org.matsim.pt.otfvis.FacilityDrawer;
+import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.otfvis.caching.SimpleSceneLayer;
 import org.matsim.vis.otfvis.data.OTFClientQuadTree;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
@@ -67,11 +64,6 @@ public class OTFClientLive {
 					connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
 				}
 				
-				if (config.scenario().isUseLanes()) {
-					connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
-					connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
-					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
-				}
 				OTFClient otfClient = new OTFClient();
 				otfClient.setServer(server);
 				SettingsSaver saver = new SettingsSaver("otfsettings");

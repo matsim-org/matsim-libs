@@ -38,9 +38,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser.FileType;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.otfvis.io.OTFLaneWriter;
-import org.matsim.pt.otfvis.FacilityDrawer;
+import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.*;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -205,11 +203,6 @@ public class OTFVis {
 			server.addAdditionalElement(facilityWriter);
 		}
 
-		if (config.scenario().isUseLanes()) {
-			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
-			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), scenario.getLanes(), scenario.getConfig());
-			server.addAdditionalElement(otfLaneWriter);
-		}
 		server.pause();
 		return server;
 	}

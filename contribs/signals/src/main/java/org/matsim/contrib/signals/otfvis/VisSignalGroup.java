@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFLaneReader2
+ * OTFSignalGroup
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,50 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.otfvis.io;
+package org.matsim.contrib.signals.otfvis;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
+import org.matsim.lanes.vis.VisSignal;
 
-import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.otfvis.drawer.OTFLaneSignalDrawer;
-import org.matsim.lanes.vis.VisLaneModelBuilder;
-import org.matsim.lanes.vis.VisLinkWLanes;
-import org.matsim.vis.otfvis.caching.SceneGraph;
-import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+import java.util.HashMap;
+import java.util.Map;
+
 
 
 /**
  * @author dgrether
  *
  */
-public class OTFLaneReader extends OTFDataReader {
-	
-	protected OTFLaneSignalDrawer drawer = new OTFLaneSignalDrawer();
+public class VisSignalGroup {
 
-	private VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
+	private String id;
+	private Map<String, VisSignal> signalPositions = new HashMap<String, VisSignal>();
+	private String systemId;
 	
-	public OTFLaneReader(){
+	public VisSignalGroup(String signalSystemId, String id){
+		this.systemId = signalSystemId;
+		this.id = id;
 	}
 	
-	@Override
-	public void readConstData(ByteBuffer in) throws IOException {
-		int noLinks = in.getInt();
-		for (int i = 0; i < noLinks; i++){
-			//read link data
-			VisLinkWLanes lanesLinkData = (VisLinkWLanes) ByteBufferUtils.getObject(in);
-			this.drawer.addLaneLinkData(lanesLinkData);
+	public String getId() {
+		return this.id;
+	}
+	
+	public String getSignalSystemId(){
+		return this.systemId;
+	}
+
+	public void setState(SignalGroupState state) {
+		for (VisSignal p : this.signalPositions.values()){
+			p.setState(state);
 		}
-		this.laneModelBuilder.connect(this.drawer.getLanesLinkData());
-	}
-	
-	@Override
-	public void invalidate(SceneGraph graph) {
-		this.drawer.addToSceneGraph(graph);
 	}
 
-	@Override
-	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
-		// nothing to do as lanes are non dynamical data
+	public void addSignal(VisSignal signal) {
+		this.signalPositions.put(signal.getId(), signal);
 	}
+
+	public Map<String, VisSignal> getSignals() {
+		return this.signalPositions;
+	}
+	
 }

@@ -37,8 +37,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.Lane;
-import org.matsim.signals.mobsim.DefaultSignalizeableItem;
-import org.matsim.signals.mobsim.SignalizeableItem;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;

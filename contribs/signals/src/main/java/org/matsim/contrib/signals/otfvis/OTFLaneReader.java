@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * OTFSignalSystem
+ * OTFLaneReader2
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,44 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signals.vis;
+package org.matsim.contrib.signals.otfvis;
 
-import java.awt.geom.Point2D;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import org.matsim.core.utils.misc.ByteBufferUtils;
+import org.matsim.lanes.vis.VisLaneModelBuilder;
+import org.matsim.lanes.vis.VisLinkWLanes;
+import org.matsim.vis.otfvis.caching.SceneGraph;
+import org.matsim.vis.otfvis.interfaces.OTFDataReader;
+
 
 /**
  * @author dgrether
  *
  */
-public class VisSignalSystem {
+public class OTFLaneReader extends OTFDataReader {
 	
-	private String id;
-	private Map<String, VisSignalGroup> signalGroups = new HashMap<String, VisSignalGroup>();
-	private Point2D.Float visCoordinate;
+	protected OTFLaneSignalDrawer drawer = new OTFLaneSignalDrawer();
 
-	public VisSignalSystem(String id){
-		this.id = id;
+	private VisLaneModelBuilder laneModelBuilder = new VisLaneModelBuilder();
+	
+	public OTFLaneReader(){
+	}
+	
+	@Override
+	public void readConstData(ByteBuffer in) throws IOException {
+		int noLinks = in.getInt();
+		for (int i = 0; i < noLinks; i++){
+			//read link data
+			VisLinkWLanes lanesLinkData = (VisLinkWLanes) ByteBufferUtils.getObject(in);
+			this.drawer.addLaneLinkData(lanesLinkData);
+		}
+		this.laneModelBuilder.connect(this.drawer.getLanesLinkData());
+	}
+	
+	@Override
+	public void invalidate(SceneGraph graph) {
+		this.drawer.addToSceneGraph(graph);
 	}
 
-	public String getId() {
-		return this.id;
+	@Override
+	public void readDynData(ByteBuffer in, SceneGraph graph) throws IOException {
+		// nothing to do as lanes are non dynamical data
 	}
-
-	public void addOTFSignalGroup(VisSignalGroup group){
-		this.signalGroups.put(group.getId(), group);
-	}
-	
-	public Map<String, VisSignalGroup> getOTFSignalGroups(){
-		return this.signalGroups;
-	}
-	
-	public void setVisCoordinate(Point2D.Float visCoordinate) {
-		this.visCoordinate = visCoordinate;
-	}
-	
-	public Point2D.Float getVisCoordinate(){
-		return this.visCoordinate;
-	}
-	
 }

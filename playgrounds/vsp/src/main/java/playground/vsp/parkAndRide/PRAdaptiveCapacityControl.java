@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.signals.mobsim.SignalizeableItem;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
 import java.util.HashMap;

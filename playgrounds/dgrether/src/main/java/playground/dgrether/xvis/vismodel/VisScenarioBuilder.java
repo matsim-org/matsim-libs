@@ -44,9 +44,9 @@ import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
-import org.matsim.signals.vis.VisSignal;
-import org.matsim.signals.vis.VisSignalGroup;
-import org.matsim.signals.vis.VisSignalSystem;
+import org.matsim.lanes.vis.VisSignal;
+import org.matsim.contrib.signals.otfvis.VisSignalGroup;
+import org.matsim.contrib.signals.otfvis.VisSignalSystem;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
 

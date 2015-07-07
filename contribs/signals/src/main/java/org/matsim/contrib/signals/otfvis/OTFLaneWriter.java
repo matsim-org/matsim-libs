@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes.otfvis.io;
+package org.matsim.contrib.signals.otfvis;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

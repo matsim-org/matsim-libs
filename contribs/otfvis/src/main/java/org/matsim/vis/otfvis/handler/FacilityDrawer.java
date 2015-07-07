@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.pt.otfvis;
+package org.matsim.vis.otfvis.handler;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;

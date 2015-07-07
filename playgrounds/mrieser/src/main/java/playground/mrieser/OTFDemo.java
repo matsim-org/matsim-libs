@@ -20,7 +20,7 @@
 
 package playground.mrieser;
 
-import org.matsim.pt.otfvis.FacilityDrawer;
+import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.otfvis.data.OTFConnectionManager;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;

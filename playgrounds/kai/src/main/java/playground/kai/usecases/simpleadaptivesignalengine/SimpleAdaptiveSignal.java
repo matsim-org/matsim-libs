@@ -39,7 +39,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.signals.mobsim.SignalizeableItem;
+import org.matsim.core.mobsim.qsim.qnetsimengine.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.qnetsimengine.SignalGroupState;
 
 /**
