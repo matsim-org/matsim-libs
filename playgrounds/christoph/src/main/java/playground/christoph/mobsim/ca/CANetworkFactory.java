@@ -24,10 +24,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
 
-public class CANetworkFactory implements NetsimNetworkFactory<CANode, CALink> {
+public class CANetworkFactory  {
 
 	private final double spatialResolution;
 	
@@ -35,7 +34,6 @@ public class CANetworkFactory implements NetsimNetworkFactory<CANode, CALink> {
 		this.spatialResolution = spatialResolution;
 	}
 	
-	@Override
 	public CANode createNetsimNode(Node node, QNetwork network) {
 		return null;
 	}
@@ -44,7 +42,6 @@ public class CANetworkFactory implements NetsimNetworkFactory<CANode, CALink> {
 		return new CANode(node, network);
 	}
 	
-	@Override
 	public CALink createNetsimLink(Link link, QNetwork network, CANode queueNode) {
 		return null;
 	}

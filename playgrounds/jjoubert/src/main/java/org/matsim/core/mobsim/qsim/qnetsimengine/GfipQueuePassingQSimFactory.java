@@ -80,7 +80,7 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 		qsim.addActivityHandler(activityEngine);
 		
 		/* This is the crucial part for changing the queue type. */ 
-		NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
+		NetsimNetworkFactory netsimNetworkFactory = new NetsimNetworkFactory() {
 			@Override
 			public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
 				VehicleQ<QVehicle> vehicleQ = null;

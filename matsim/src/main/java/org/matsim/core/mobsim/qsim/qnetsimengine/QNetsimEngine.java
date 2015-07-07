@@ -122,7 +122,7 @@ public class QNetsimEngine implements MobsimEngine {
 		this(sim, null);
 	}
 
-	public QNetsimEngine(final QSim sim, NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory ) {
+	public QNetsimEngine(final QSim sim, NetsimNetworkFactory netsimNetworkFactory ) {
 		this.qsim = sim;
 
 		final QSimConfigGroup qsimConfigGroup = sim.getScenario().getConfig().qsim();
@@ -174,7 +174,7 @@ public class QNetsimEngine implements MobsimEngine {
 		} else if ( netsimNetworkFactory != null ){
 			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
 		} else if ( qsimConfigGroup.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ) {
-			network = new QNetwork(sim.getScenario().getNetwork(), new NetsimNetworkFactory<QNode, QLinkImpl>() {
+			network = new QNetwork(sim.getScenario().getNetwork(), new NetsimNetworkFactory() {
 				@Override
 				public QLinkImpl createNetsimLink(final Link link, final QNetwork network2, final QNode toQueueNode) {
 					return new QLinkImpl(link, network2, toQueueNode, new PassingVehicleQ());

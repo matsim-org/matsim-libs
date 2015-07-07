@@ -31,12 +31,12 @@ import org.matsim.lanes.LanesUtils;
 import java.util.List;
 
 
-class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+class QLanesNetworkFactory implements NetsimNetworkFactory {
 
-	private final NetsimNetworkFactory<QNode, QLinkInternalI> delegate;
+	private final NetsimNetworkFactory delegate;
 	private final LaneDefinitions20 laneDefinitions;
 
-	public QLanesNetworkFactory(NetsimNetworkFactory<QNode, QLinkInternalI> delegate, LaneDefinitions20 laneDefintions){
+	public QLanesNetworkFactory(NetsimNetworkFactory delegate, LaneDefinitions20 laneDefintions){
 		this.delegate = delegate;
 		this.laneDefinitions = laneDefintions;
 	}

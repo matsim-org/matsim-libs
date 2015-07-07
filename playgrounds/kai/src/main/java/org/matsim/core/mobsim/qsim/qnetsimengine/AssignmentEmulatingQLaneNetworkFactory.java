@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.LaneFactory;
 
-public final class AssignmentEmulatingQLaneNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+public final class AssignmentEmulatingQLaneNetworkFactory implements NetsimNetworkFactory {
 	@Override
 	public QNode createNetsimNode(Node node, QNetwork network) {
 		return new QNode(node, network);

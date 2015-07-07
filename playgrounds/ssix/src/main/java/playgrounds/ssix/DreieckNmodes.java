@@ -607,7 +607,7 @@ public class DreieckNmodes {
 		qSim.addActivityHandler(activityEngine);
 		
 		//First modification: Mobsim needs to create queue links with mzilske's passing queue
-        NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
+        NetsimNetworkFactory netsimNetworkFactory = new NetsimNetworkFactory() {
 
             @Override
             public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {

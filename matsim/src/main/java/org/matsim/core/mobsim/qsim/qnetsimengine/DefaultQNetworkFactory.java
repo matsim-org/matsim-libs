@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Node;
 /**
  * @author dgrether
  */
-final class DefaultQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+final class DefaultQNetworkFactory implements NetsimNetworkFactory {
 
 	public DefaultQNetworkFactory() {}
 	

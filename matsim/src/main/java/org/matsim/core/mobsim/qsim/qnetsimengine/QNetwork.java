@@ -47,14 +47,14 @@ public class QNetwork implements NetsimNetwork {
 
 	private final Network network;
 
-	private final NetsimNetworkFactory<QNode, ? extends QLinkInternalI> queueNetworkFactory;
+	private final NetsimNetworkFactory queueNetworkFactory;
 	private final SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 	private final 	AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
 
 	
 	QNetsimEngine simEngine;
 
-	QNetwork(final Network network, final NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory ) {
+	QNetwork(final Network network, final NetsimNetworkFactory netsimNetworkFactory ) {
 		this.network = network;
 		this.queueNetworkFactory = netsimNetworkFactory;
 		this.links = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);

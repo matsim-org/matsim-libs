@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Node;
  * <li> It would probably be much better to have this in a separate package.  But this means to move a lot of scopes from
  * "package" to protected.  Worse, the interfaces are not sorted out.  So I remain here for the time being.  kai, jan'11
  */
-public final class KaiHybridNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+public final class KaiHybridNetworkFactory implements NetsimNetworkFactory {
 
 	private final KaiHybridEngine hybridEngine;
 

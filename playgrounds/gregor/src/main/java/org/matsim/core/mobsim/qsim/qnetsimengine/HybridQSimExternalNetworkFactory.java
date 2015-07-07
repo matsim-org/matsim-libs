@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Node;
 import playground.gregor.hybridsim.simulation.ExternalEngine;
 
 public class HybridQSimExternalNetworkFactory implements
-		NetsimNetworkFactory<QNode, QLinkInternalI> {
+		NetsimNetworkFactory {
 
 	private final ExternalEngine e;
 

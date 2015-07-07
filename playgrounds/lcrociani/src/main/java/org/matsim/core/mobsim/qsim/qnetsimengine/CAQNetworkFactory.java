@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.network.Node;
 
 import pedCA.environment.markers.FinalDestination;
 
-public class CAQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+public class CAQNetworkFactory implements NetsimNetworkFactory {
 	
 	private CAEngine engineCA;
 	private CAAgentFactory agentFactoryCA;
