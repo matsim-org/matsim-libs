@@ -7,7 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
@@ -31,7 +33,7 @@ public class GenerateRandomNetworks {
 	private static Logger log = Logger.getLogger(GenerateRandomNetworks.class.toString());
 	/**
 	 * @param String input edge list
-	 * @param String path to folder where output networks should be written
+	 * @param String path to folder where output networks should be written (empty string on Hobbes)
 	 * @param int number of random networks to generate
 	 */
 	public static void main(String[] args) {
@@ -55,11 +57,23 @@ public class GenerateRandomNetworks {
 			log.info("Checking for self loops.");
 			ArrayList<Tuple<Integer, Integer>> randomNetworkNoSelfEdges = checkNoSelfEdges(randomToNodes, fromNodes);
 			log.info("Checking for duplicate edges.");
-			ArrayList<Tuple<Integer, Integer>> randomNoDuplicates = checkNoDuplicates(randomNetworkNoSelfEdges);
-			writeRandomNetwork(outputFolder, randomNoDuplicates, i);
+			List<Tuple<Integer, Integer>> randomNoDuplicates = checkNoDuplicates(randomNetworkNoSelfEdges);
+			log.info("Sorting network.");
+//			List<Tuple<Integer, Integer>> randomSorted = sortNetwork(randomNoDuplicates);
+			String networkName = "random" + i;
+			writeRandomNetwork(outputFolder, networkName, randomNoDuplicates, i);
 		}
 		
 		Header.printFooter();
+	}
+
+	private static List<Tuple<Integer, Integer>> sortNetwork(
+			List<Tuple<Integer, Integer>> randomNoDuplicates) {
+		
+		IntegerTupleComparator itc = new IntegerTupleComparator();
+		Collections.sort(randomNoDuplicates, itc);
+		
+		return randomNoDuplicates;
 	}
 
 	private static Tuple<ArrayList<Integer>, ArrayList<Integer>> arrayListToTuple (
@@ -147,18 +161,18 @@ public class GenerateRandomNetworks {
 		return newRandomNetwork;
 	}
 
-	private static void writeRandomNetwork(String outputFolder,
-			ArrayList<Tuple<Integer, Integer>> randomNoDuplicates, int i) {
+	private static void writeRandomNetwork(String outputPath, String networkName,
+			List<Tuple<Integer, Integer>> randomSorted, int i) {
 		
-		log.info("Writing " + outputFolder + "randomNMBM_" +  i + " to file.");
+		log.info("Writing " + outputPath + networkName + "/" + networkName + " to file.");
 		try {
 			BufferedWriter output = new BufferedWriter(
-					new FileWriter(new File(outputFolder + "random_" + i + ".txt")));
+					new FileWriter(new File(outputPath + networkName + "/" + networkName + ".txt")));
 			try {
 				
-					for (int j = 0; j < randomNoDuplicates.size(); j++) {
-						Integer source = randomNoDuplicates.get(j).getFirst();
-						Integer destination = randomNoDuplicates.get(j).getSecond();
+					for (int j = 0; j < randomSorted.size(); j++) {
+						Integer source = randomSorted.get(j).getFirst();
+						Integer destination = randomSorted.get(j).getSecond();
 						output.write(String.valueOf(source));
 						output.write("	");
 						output.write(String.valueOf(destination));
