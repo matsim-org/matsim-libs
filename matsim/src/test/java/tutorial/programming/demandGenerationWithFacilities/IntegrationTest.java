@@ -51,12 +51,13 @@ public class IntegrationTest {
 			Assert.fail();
 		}
 
-		try {
-			RunCreateNetwork.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
+		// We don't want to check in the input network.
+//		try {
+//			RunCreateNetwork.main(null);
+//		} catch ( Exception eee ) {
+//			eee.printStackTrace();
+//			Assert.fail();
+//		}
 
 		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
 		
