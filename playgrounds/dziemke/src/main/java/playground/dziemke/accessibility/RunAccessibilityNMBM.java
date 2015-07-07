@@ -43,6 +43,9 @@ public class RunAccessibilityNMBM {
 		// Parameters
 		boolean includeDensityLayer = true;
 		String crs = TransformationFactory.WGS84_SA_Albers;
+		Double lowerBound = 2.;
+		Double upperBound = 5.5;
+		Integer range = 9;
 		
 
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
@@ -82,10 +85,10 @@ public class RunAccessibilityNMBM {
 		
 		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
-//			if ( !actType.equals("w") ) {
-//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-//				continue ;
-//			}
+			if ( !actType.equals("w") ) {
+				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+				continue ;
+			}
 
 			ActivityFacilities opportunities = FacilitiesUtils.createActivityFacilities() ;
 			for ( ActivityFacility fac : scenario.getActivityFacilities().getFacilities().values()  ) {
@@ -129,11 +132,12 @@ public class RunAccessibilityNMBM {
 			String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
 
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-//				if ( !actType.equals("w") ) {
-//					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
-//					continue ;
-//				}
-				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
+				if ( !actType.equals("w") ) {
+					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+					continue ;
+				}
+				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+						lowerBound, upperBound, range);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}

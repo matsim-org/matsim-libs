@@ -41,6 +41,9 @@ public class RunAccessibilityNMBMWorkEquiv {
 		// Parameters
 		boolean includeDensityLayer = true;
 		String crs = TransformationFactory.WGS84_SA_Albers;
+		Double lowerBound = 2.;
+		Double upperBound = 5.5;
+		Integer range = 9;
 		
 
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
@@ -108,7 +111,9 @@ public class RunAccessibilityNMBMWorkEquiv {
 			String actSpecificWorkingDirectory =  workingDirectory + typeWEQ + "/";
 
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
+//				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
+				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+						lowerBound, upperBound, range);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 //		}

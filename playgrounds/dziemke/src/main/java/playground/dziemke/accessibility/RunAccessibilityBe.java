@@ -40,6 +40,9 @@ public class RunAccessibilityBe {
 		// Parameters
 		boolean includeDensityLayer = true;
 		String crs = TransformationFactory.DHDN_GK4;
+		Double lowerBound = 1.75;
+		Double upperBound = 7.;
+		Integer range = 9;
 				
 				
 //		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
@@ -244,7 +247,9 @@ public class RunAccessibilityBe {
 //					RunAccessibilityBe.log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 //					continue ;
 //				}
-				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
+//				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
+				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
+						lowerBound, upperBound, range);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}
