@@ -63,7 +63,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	 * Put the vehicles from the waiting list in positions. Their actual position doesn't matter, PositionInfo provides a
 	 * constructor for handling this situation.
 	 */
-	public int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
+	public final int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
 			Collection<Identifiable> peopleInVehicle = getPeopleInVehicle(veh);
@@ -87,7 +87,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		return cnt2 ;
 	}
 
-	public int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
+	public final int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
 			Collection<MobsimAgent> agentsInActivities,  int cnt2) {
 		for (MobsimAgent pa : agentsInActivities) {
 			AgentSnapshotInfo agInfo = snapshotInfoFactory.createAgentSnapshotInfo(pa.getId(), link, 0.9*link.getLength(), cnt2) ;
@@ -102,7 +102,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	 * Put the transit vehicles from the transit stop list in positions.
 	 * @param transitVehicleStopQueue 
 	 */
-	public int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
+	public final int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
 				List<Identifiable> peopleInVehicle = getPeopleInVehicle(veh);
@@ -132,7 +132,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		return cnt2 ;
 	}
 
-	public void positionAgentOnLink(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord,
+	public final void positionAgentOnLink(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord,
 			double lengthOfCurve, double euclideanLength, QVehicle veh, 
 			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne){
 		MobsimDriverAgent driverAgent = veh.getDriver();
@@ -157,7 +157,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		positions.add(pos);
 	}
 	
-	public void positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
+	public final void positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
 			double now, Collection<MobsimVehicle> vehs, double curvedLength, double storageCapacity, 
 			double euklideanDistance, Coord upstreamCoord, Coord downstreamCoord, double inverseFlowCapPerTS, 
 			double freeSpeed, int numberOfLanesAsInt)
@@ -184,7 +184,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 
 
-	public void positionQItem(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 
+	public final void positionQItem(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 
 			double lengthOfCurve, double euclideanLength, QItem veh, 
 			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne){
 		AgentSnapshotInfo pos = snapshotInfoFactory.createAgentSnapshotInfo(Id.create("hole", Person.class), endCoord, startCoord, 
@@ -194,7 +194,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		positions.add(pos);
 	}
 	
-	public double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed){
+	public final static double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed){
 		int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 		// "inverseSimulatedFlowCapacity" is there to keep vehicles green that only wait for capacity (i.e. have no vehicle
 		// ahead). Especially important with small samples sizes.  This is debatable :-).  kai, jan'11
@@ -203,7 +203,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		return speed;
 	}
 	
-	public Integer guessLane(QVehicle veh, int numberOfLanes){
+	public final static Integer guessLane(QVehicle veh, int numberOfLanes){
 		Integer tmpLane;
 		try {
 			tmpLane = Integer.parseInt(veh.getId().toString()) ;
@@ -217,7 +217,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 		return lane;
 	}
 	
-	void positionPassengers(Collection<AgentSnapshotInfo> positions,
+	final void positionPassengers(Collection<AgentSnapshotInfo> positions,
                             Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord,
                             double lengthOfCurve, double euclideanLength, Integer lane, double speedValueBetweenZeroAndOne) {
 		int cnt = passengers.size();
@@ -243,7 +243,7 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 	 * @param vehicle
 	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
 	 */
-    List<Identifiable> getPeopleInVehicle(QVehicle vehicle) {
+    final List<Identifiable> getPeopleInVehicle(QVehicle vehicle) {
 		ArrayList<Identifiable> people = new ArrayList<>();
 		people.add(vehicle.getDriver());
 //		if (vehicle instanceof TransitVehicle) {
