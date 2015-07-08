@@ -200,12 +200,12 @@ public class NoiseWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			
-			bw.write("Receiver Point Id;Immission " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.write("Receiver Point Id;Immission " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";x;y;t");
 			bw.newLine();
 			
 			for (NoiseReceiverPoint rp : noiseContext.getReceiverPoints().values()) {
 				
-				bw.write(rp.getId() + ";" + rp.getFinalImmission());
+				bw.write(rp.getId() + ";" + rp.getFinalImmission() + ";" + rp.getCoord().getX() + ";" + rp.getCoord().getY() + ";" + timeInterval );
 				bw.newLine();
 			}
 			
