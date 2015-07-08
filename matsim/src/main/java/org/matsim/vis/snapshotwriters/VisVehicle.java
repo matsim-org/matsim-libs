@@ -16,7 +16,7 @@ public interface VisVehicle extends Identifiable<Vehicle> {
 	/**
 	 * @return the <code>Vehicle</code> that this simulation vehicle represents
 	 */
-	public Vehicle getVehicle();
+	Vehicle getVehicle();
 
 	MobsimDriverAgent getDriver() ;
 

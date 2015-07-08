@@ -31,16 +31,16 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
 
 public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
 	private EventsManager eventsManager;
-	private AgentCounterI agentCounter;
+	private AgentCounter agentCounter;
 
-	public ActivityEngine(EventsManager eventsManager, AgentCounterI agentCounter) {
+	public ActivityEngine(EventsManager eventsManager, AgentCounter agentCounter) {
 		this.eventsManager = eventsManager;
 		this.agentCounter = agentCounter;
 	}
@@ -193,7 +193,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 				// re-activate the agent
 				activityEndsList.add(new AgentEntry(agent, newActivityEndTime));
 				internalInterface.registerAdditionalAgentOnLink(agent);
-				((AgentCounter) agentCounter).incLiving();
+				((org.matsim.core.mobsim.qsim.AgentCounter) agentCounter).incLiving();
 			}
 		} else if (newActivityEndTime == Double.POSITIVE_INFINITY) {
 			/*

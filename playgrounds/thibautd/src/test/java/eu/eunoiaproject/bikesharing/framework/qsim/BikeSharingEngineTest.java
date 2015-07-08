@@ -41,7 +41,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.population.LegImpl;
@@ -167,7 +167,7 @@ public class BikeSharingEngineTest {
 				}
 
 				@Override
-				public AgentCounterI getAgentCounter() {
+				public AgentCounter getAgentCounter() {
 					throw new UnsupportedOperationException();
 				}
 

@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim;
 
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
-
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -31,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author dgrether
  *
  */
-class AgentCounter implements AgentCounterI {
+class AgentCounter implements org.matsim.core.mobsim.qsim.interfaces.AgentCounter {
 
     /**
      * Number of agents that have not yet reached their final activity location

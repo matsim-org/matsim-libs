@@ -21,8 +21,6 @@ package playground.sergioo.ptsim2013;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
-
 
 /**
  * This class replaces static functionality of abstract class Simulation.
@@ -50,7 +48,7 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
  * @author dgrether
  *
  */
-class AgentCounter implements AgentCounterI {
+class AgentCounter implements org.matsim.core.mobsim.qsim.interfaces.AgentCounter {
 	/**
 	 * Number of agents that have not yet reached their final activity location
 	 */

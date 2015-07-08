@@ -37,13 +37,13 @@ public interface MobsimEngine extends Steppable {
   /**
    * called in a predefined Order when the simulation is started
    */
-  public void onPrepareSim();
+  void onPrepareSim();
  
   /**
    * Do some clean up.
    */
-  public void afterSim();
+  void afterSim();
   
-  public void setInternalInterface(InternalInterface internalInterface);
+  void setInternalInterface(InternalInterface internalInterface);
 
 }

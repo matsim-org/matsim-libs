@@ -44,7 +44,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -120,7 +120,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private final Scenario scenario;
 	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
-	private final AgentCounter agentCounter;
+	private final org.matsim.core.mobsim.qsim.AgentCounter agentCounter;
 	//	private final Collection<MobsimAgent> agents = new LinkedHashSet<>();
 	private final Map<Id<Person>,MobsimAgent> agents = new LinkedHashMap<>();
 	private final List<AgentSource> agentSources = new ArrayList<>();
@@ -191,7 +191,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			this.events = events;
 		}
 		this.listenerManager = new MobsimListenerManager(this);
-		this.agentCounter = new AgentCounter();
+		this.agentCounter = new org.matsim.core.mobsim.qsim.AgentCounter();
 		this.simTimer = new MobsimTimer(sc.getConfig().qsim().getTimeStepSize());
 	}
 
@@ -509,7 +509,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	}
 
 	@Override
-	public AgentCounterI getAgentCounter() {
+	public AgentCounter getAgentCounter() {
 		return this.agentCounter;
 	}
 

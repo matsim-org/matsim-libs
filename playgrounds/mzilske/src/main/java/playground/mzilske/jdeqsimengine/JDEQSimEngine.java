@@ -16,7 +16,7 @@ import org.matsim.core.mobsim.jdeqsim.Vehicle;
 import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 class JDEQSimEngine implements MobsimEngine, ActivityHandler {
@@ -28,9 +28,9 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
     private Timer t;
     private SteppableScheduler scheduler;
     private int numberOfAgents = 0;
-    private AgentCounterI agentCounter;
+    private AgentCounter agentCounter;
 
-    public JDEQSimEngine(Scenario scenario, EventsManager eventsManager, AgentCounterI agentCounter, SteppableScheduler scheduler) {
+    public JDEQSimEngine(Scenario scenario, EventsManager eventsManager, AgentCounter agentCounter, SteppableScheduler scheduler) {
         this.scheduler = scheduler;
         this.scenario = scenario;
         this.eventsManager = eventsManager;

@@ -24,13 +24,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -40,8 +38,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class QNode implements NetsimNode {
 
 	private static final Logger log = Logger.getLogger(QNode.class);
-
-	private static final QueueLinkIdComparator qlinkIdComparator = new QueueLinkIdComparator();
 
 	private final QLinkInternalI[] inLinksArrayCache;
 	private final QLinkInternalI[] tempLinks;
@@ -98,7 +94,12 @@ public class QNode implements NetsimNode {
 		/* As the order of nodes has an influence on the simulation results,
 		 * the nodes are sorted to avoid indeterministic simulations. dg[april08]
 		 */
-		Arrays.sort(this.inLinksArrayCache, QNode.qlinkIdComparator);
+		Arrays.sort(this.inLinksArrayCache, new Comparator<NetsimLink>() {
+			@Override
+			public int compare(NetsimLink o1, NetsimLink o2) {
+				return o1.getLink().getId().compareTo(o2.getLink().getId());
+			}
+		});
 	}
 
 	@Override
@@ -242,9 +243,6 @@ public class QNode implements NetsimNode {
 	// Queue related movement code
 	// ////////////////////////////////////////////////////////////////////
 	/**
-	 * @param veh
-	 * @param fromLaneBuffer
-	 * @param now
 	 * @return <code>true</code> if the vehicle was successfully moved over the node, <code>false</code>
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
@@ -328,15 +326,6 @@ public class QNode implements NetsimNode {
 
 	private boolean vehicleIsStuck(final QInternalI fromLaneBuffer, final double now) {
 		return (now - fromLaneBuffer.getLastMovementTimeOfFirstVehicle()) > network.simEngine.getStuckTime();
-	}
-
-
-	protected static class QueueLinkIdComparator implements Comparator<NetsimLink>, Serializable, MatsimComparator {
-		private static final long serialVersionUID = 1L;
-		@Override
-		public int compare(final NetsimLink o1, final NetsimLink o2) {
-			return o1.getLink().getId().compareTo(o2.getLink().getId());
-		}
 	}
 
 	@Override

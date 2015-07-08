@@ -446,7 +446,7 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public AgentCounterI getAgentCounter() {
+	public org.matsim.core.mobsim.qsim.interfaces.AgentCounter getAgentCounter() {
 		return this.agentCounter;
 	}
 

@@ -31,7 +31,7 @@ public interface Netsim extends ObservableMobsim {
 
 	EventsManager getEventsManager();
 
-	AgentCounterI getAgentCounter();
+	AgentCounter getAgentCounter();
 
 	Scenario getScenario();
 
