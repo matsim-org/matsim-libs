@@ -22,14 +22,17 @@ package playground.dgrether.koehlerstrehlersignal.analysis;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -41,10 +44,13 @@ import org.matsim.api.core.v01.population.Person;
  * @author tthunig
  *
  */
-public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
+public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
 
+	private static final Logger log = Logger
+			.getLogger(TtTotalDelay.class);
+	
 	private Network network;
-	private Map<Id<Person>, LinkEnterEvent> linkEnterByPerson;
+	private Map<Id<Person>, Double> earliestLinkExitTimeByPerson;
 	private double totalDelay;
 
 	public TtTotalDelay(Network network) {
@@ -54,19 +60,17 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void reset(int iteration) {
-		this.linkEnterByPerson = new HashMap<>();
+		this.earliestLinkExitTimeByPerson = new HashMap<>();
 		this.totalDelay = 0.0;
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		//calculate total delay for signalized links, so the delay caused by the signals
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
-			LinkEnterEvent linkEnterEvent = this.linkEnterByPerson.remove(event.getPersonId());
-			Link link = this.network.getLinks().get(event.getLinkId());
-			double freespeedTravelTime = link.getLength()/link.getFreespeed();
-			if (linkEnterEvent != null) {
-				this.totalDelay += event.getTime() - linkEnterEvent.getTime() - freespeedTravelTime;
+			Double earliestLinkExitTime = this.earliestLinkExitTimeByPerson.remove(event.getPersonId());
+			if (earliestLinkExitTime != null) {
+				this.totalDelay += event.getTime() - earliestLinkExitTime;
+//				creates 1 second delay per link because of matsims step logik (?!) TODO test and fix. Theresa, Jul'2015
 			}
 		}
 	}
@@ -74,23 +78,34 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
-			this.linkEnterByPerson.put(event.getPersonId(), event);
+			Link link = this.network.getLinks().get(event.getLinkId());
+			double freespeedTT = link.getLength()/link.getFreespeed();
+			this.earliestLinkExitTimeByPerson.put(event.getPersonId(), event.getTime() + freespeedTT);
 		}
 	}
 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
-		this.linkEnterByPerson.remove(event.getPersonId());
+		this.earliestLinkExitTimeByPerson.remove(event.getPersonId());
+		log.warn("Agent " + event.getPersonId() + " got stucked at link "
+				+ event.getLinkId() + ". His delay is not considered in the total delay.");
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		this.linkEnterByPerson.remove(event.getPersonId());		
+		this.earliestLinkExitTimeByPerson.remove(event.getPersonId());		
 	}
 
 	
 	public double getTotalDelay() {
 		return totalDelay;
+	}
+
+	@Override
+	public void handleEvent(PersonDepartureEvent event) {
+		if (this.network.getLinks().containsKey(event.getLinkId())){
+			this.earliestLinkExitTimeByPerson.put(event.getPersonId(), event.getTime());
+		}
 	}
 
 }
