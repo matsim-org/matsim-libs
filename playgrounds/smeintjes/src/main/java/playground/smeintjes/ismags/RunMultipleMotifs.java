@@ -35,26 +35,27 @@ public class RunMultipleMotifs {
 	
 	/**
 	 * @param String path to file containing list of all motif specifications 
-	 * to look for (including file name and extension)
-	 * @param String path to the folder containing one- and bidirectional edges 
+	 * to look for (including file name and extension) ("motifSpecifications/3-node-motifSpecifications.txt")
+	 * @param String path to the folder containing one- and bidirectional edges ("20_20_NMBM/")
+	 * @param String path to output folder (example "20_20_NMBM/3-node-motifs/")
 	 * @param String name of the output file (will be written to same folder)
 	 */
 	public static void main(String[] args) {
 
 		Header.printHeader(RunMultipleMotifs.class.toString(), args);
 		String motifSpecificationPath = args[0];
-		String pathToFolder = args[1];
+		String pathToInputFolder = args[1];
 		String outputPath = args[2];
-		String networkNumber = args[3];
+		String networkName = args[3];
 
 		ArrayList<String> motifList = readMotifs(motifSpecificationPath);
-		runMotifs(motifList, pathToFolder, outputPath, networkNumber);
+		runMotifs(motifList, pathToInputFolder, outputPath, networkName);
 		
 		Header.printFooter();
 	}
 	
 	private static int countMotifs(String pathToFolder, String networkNumber, String motif, int j) {
-log.info("Reading motif list from " + pathToFolder + networkNumber);
+		log.info("Reading motif list from " + pathToFolder + networkNumber);
 		
 		int i = 0;
 		
@@ -74,9 +75,9 @@ log.info("Reading motif list from " + pathToFolder + networkNumber);
 	}
 
 	private static void runMotifs(ArrayList<String> motifList,
-			String pathToFolder, String outputPath, String networkNumber) {
+			String pathToInputFolder, String outputPath, String networkName) {
 		
-		String foldername = pathToFolder;
+		String foldername = pathToInputFolder;
 		/* When network contains both onedirectional and bidirectional edges */
 		String linkfiles  = "\"A d A A onedirectional.txt X u X X bidirectional.txt\""; //Remember to change motif file!
 		/* When network only contains onedirectional edges */
@@ -84,18 +85,18 @@ log.info("Reading motif list from " + pathToFolder + networkNumber);
 		int totalMotifs = 0;
 		int j = 0;
 		for (String motif : motifList) {
-			String output = outputPath + networkNumber + "_" + motif + "_" + j + ".txt";
+			String output = outputPath + networkName + "_" + motif + ".txt";
 			 String[] ar = new String[]{"-folder", foldername, "-linkfiles", linkfiles, "-output", output, "-motif", motif};
 	        try {
 				CommandLineInterface.main(ar);
-				totalMotifs = totalMotifs + countMotifs(pathToFolder, networkNumber, motif, j);
+//				totalMotifs = totalMotifs + countMotifs(pathToFolder, networkNumber, motif, j);
 			} catch (IOException e) {
 				log.info("Cannot run CommandLineInterface.");
 				e.printStackTrace();
 			}
 	        j++;
 		}
-		log.info("Total number of motifs ---------------> " + totalMotifs);
+//		log.info("Total number of motifs ---------------> " + totalMotifs);
 		
 	}
 

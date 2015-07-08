@@ -20,8 +20,9 @@ import playground.southafrica.utilities.Header;
  * This class takes as input an edge list consisting of both one-directional and 
  * bi-directional edges, removes the bi-directional edges and writes it to a 
  * separate bi-directional edge list. The edge lists have with one edge per line, 
- * and each source and destination node is separated by a space or tab (specified 
- * by user).
+ * and each source and destination node is separated by a space or tab. This
+ * class assumes that the input edges are separated by a space, and the output
+ * edges will be separated by a tab.
  * 
  * This is done to create two edge lists for ISMAGS: one containing all one-
  * directional edges, and one containing all bi-directional edges.
@@ -29,14 +30,14 @@ import playground.southafrica.utilities.Header;
  * Use this class if you only need to perform this activity for one network. If you
  * want to perform it on multiple networks, use FindBidirectionalEdgesMultipleNetworks.
  * 
+ * The network should be located in a subfolder of the same name as the network file.
+ * 
  * @param inputPath path to the folder containing the input file, including trailing '/'
  * @param fileName the name of the network file (should be same as its parent folder)
  * @param extension file extension
  * @param outputPath the path to the folder where output files will be written, including trailing "/"
  * (can be the same as the inputPath)
- * @param inputSeparator the separator separating the source and destination nodes in the
- * INPUT edge list
- * @param outputSeparator the separator that should be used in the OUTPUT edge lists
+ * 
  * @author sumarie
  *
  */
@@ -52,11 +53,11 @@ public class FindBidirectionalEdges {
 		String fileName = args[1];
 		String extension = args[2];
 		String outputPath = args[3];
-		String inputSeparator = args[4];
-		String outputSeparator = args[5];
-		
-		List<Tuple<Integer, Integer>> edgeList = readInputList(inputEdgePath, fileName, extension, inputSeparator);
-		findBidirectionalEdges(edgeList, outputPath, fileName, outputSeparator);
+//		String inputSeparator = args[4];
+//		String outputSeparator = args[5];
+//		
+		List<Tuple<Integer, Integer>> edgeList = readInputList(inputEdgePath, fileName, extension);
+		findBidirectionalEdges(edgeList, outputPath, fileName);
 		Header.printFooter();
 	}
 	
@@ -71,8 +72,7 @@ public class FindBidirectionalEdges {
 	 * @param edgeList
 	 */
 	private static void findBidirectionalEdges(
-			List<Tuple<Integer, Integer>> edgeList, String path, String fileName,
-			String outputSeparator) {
+			List<Tuple<Integer, Integer>> edgeList, String path, String fileName) {
 		
 		log.info("Looking for bidirectional edges.");
 		List<Tuple<Integer, Integer>> bidirectionalList = new ArrayList<Tuple<Integer, Integer>>();
@@ -102,14 +102,14 @@ public class FindBidirectionalEdges {
 		edgeList.removeAll(toRemoveList);
 		String bidirectionalFileName = fileName + "_bidirectional.txt";
 		String onedirectionalFileName = fileName + "_onedirectional.txt";
-		writeOutput(bidirectionalList, path, fileName, bidirectionalFileName, outputSeparator);
-		writeOutput(edgeList, path, fileName, onedirectionalFileName, outputSeparator);
+		writeOutput(bidirectionalList, path, fileName, bidirectionalFileName);
+		writeOutput(edgeList, path, fileName, onedirectionalFileName);
 		
 		
 	}
 
 	private static void writeOutput(List<Tuple<Integer, Integer>> edgeList,
-			String outputPath, String folderName, String fileName, String separator) {
+			String outputPath, String folderName, String fileName) {
 		
 		log.info("Writing " + fileName + " to file.");
 		try {
@@ -120,7 +120,7 @@ public class FindBidirectionalEdges {
 						String source = Integer.toString(edge.getFirst());
 						String destination = Integer.toString(edge.getSecond());
 						output.write(source);
-						output.write(separator);
+						output.write("	");
 						output.write(destination);
 						output.newLine();
 					}
@@ -140,14 +140,12 @@ public class FindBidirectionalEdges {
 	 * bi-directional edges. 
 	 * 
 	 * NOTE: The input list should not contain a header.
-	 * @param inputSeparator 
-	 * 
 	 * @param the path to the input edge list
 	 * @param the filename
 	 * @param the separator used to separate the source and destination nodes
 	 */
 	public static List<Tuple<Integer, Integer>> readInputList(String inputPath,
-			String fileName, String extension, String inputSeparator) {
+			String fileName, String extension) {
 		
 		String filePathAndName = inputPath + fileName + "/" + fileName + extension;
 		log.info("Reading edge list list from " + filePathAndName);
@@ -157,7 +155,7 @@ public class FindBidirectionalEdges {
 			BufferedReader br = IOUtils.getBufferedReader(filePathAndName);
 			String lines;
 			while ((lines = br.readLine()) != null) {
-				String[] inputString = lines.split(inputSeparator);
+				String[] inputString = lines.split(" ");
 				int source = Integer.parseInt(inputString[0]);
 				int destination = Integer.parseInt(inputString[1]);
 				Tuple<Integer, Integer> thisEdgeTuple = 

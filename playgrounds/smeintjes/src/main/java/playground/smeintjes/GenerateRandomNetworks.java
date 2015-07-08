@@ -33,7 +33,7 @@ public class GenerateRandomNetworks {
 	private static Logger log = Logger.getLogger(GenerateRandomNetworks.class.toString());
 	/**
 	 * @param String input edge list
-	 * @param String path to folder where output networks should be written (empty string on Hobbes)
+	 * @param String path to folder where output networks should be written ("randomNetworks/" on Hobbes)
 	 * @param int number of random networks to generate
 	 */
 	public static void main(String[] args) {

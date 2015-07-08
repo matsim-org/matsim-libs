@@ -44,6 +44,8 @@ public class RunMultipleMotifsMultipleNetworks {
 	 * when in run10-ismags/ on Hobbes)
 	 * @param String path to parent folder containing the random network subfolders 
 	 * (which contain the one- and bidirectional edges files) ("randomNetworks/" on Hobbes)
+	 * @param String the name of the output folder (in the same path as second argument) to where
+	 * output files will be written ("3-node-specifications/" on Hobbes, for example)
 	 * @param Integer number of random networks on which class must be run (currently, 100 on Hobbes)
 	 */
 	public static void main(String[] args) {
@@ -51,11 +53,12 @@ public class RunMultipleMotifsMultipleNetworks {
 		Header.printHeader(RunMultipleMotifsMultipleNetworks.class.toString(), args);
 		String motifSpecificationPath = args[0];
 		String pathToParentFolder = args[1];
-		Integer numberNetworks = Integer.parseInt(args[2]);
+		String outputFolder = args[2]; //In each random network folder, there are two folders, one for 3-node-motifs and one for 4-node-motifs
+		Integer numberNetworks = Integer.parseInt(args[3]);
 
 		ArrayList<String> motifList = readMotifs(motifSpecificationPath);
 		for(int i = 0; i < numberNetworks; i++){
-			runMotifs(motifList, pathToParentFolder, i);
+			runMotifs(motifList, pathToParentFolder, outputFolder, i);
 		}
 		
 		Header.printFooter();
@@ -83,7 +86,7 @@ public class RunMultipleMotifsMultipleNetworks {
 	}
 
 	private static void runMotifs(ArrayList<String> motifList,
-			String pathToFolder, int networkNumber) {
+			String pathToFolder, String outputFolder, int networkNumber) {
 		
 		String foldername = pathToFolder + "random" + networkNumber + "/";
 		/* When network contains both onedirectional and bidirectional edges */
@@ -93,18 +96,18 @@ public class RunMultipleMotifsMultipleNetworks {
 		int totalMotifs = 0;
 		int j = 0;
 		for (String motif : motifList) {
-			String output = foldername + "random" + networkNumber + "_" + motif + ".txt";
+			String output = foldername + outputFolder + "random" + networkNumber + "_" + motif + ".txt";
 			 String[] ar = new String[]{"-folder", foldername, "-linkfiles", linkfiles, "-output", output, "-motif", motif};
 	        try {
 				CommandLineInterface.main(ar);
-				totalMotifs = totalMotifs + countMotifs(foldername, networkNumber, motif, j);
+//				totalMotifs = totalMotifs + countMotifs(foldername, networkNumber, motif, j);
 			} catch (IOException e) {
 				log.info("Cannot run CommandLineInterface.");
 				e.printStackTrace();
 			}
 	        j++;
 		}
-		log.info("Total number of motifs ---------------> " + totalMotifs);
+//		log.info("Total number of motifs ---------------> " + totalMotifs);
 		
 	}
 

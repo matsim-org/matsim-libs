@@ -34,7 +34,7 @@ import playground.southafrica.utilities.Header;
  * each containing its random network. Example, the first random network will
  * be located in random0/ and called random0.txt.
  * 
- * @param inputPath path to the folder containing the input file, including trailing '/' ("" on Hobbes)
+ * @param inputPath path to the folder containing the input file, including trailing '/' ("randomNetworks/" on Hobbes)
  * @param numberNetworks the number of random networks that this class should be run on (100 on Hobbes)
  * @param extension file extension (.txt)
  * @param outputPath the path to the folder where output files will be written, including trailing "/" ("" on Hobbes)
