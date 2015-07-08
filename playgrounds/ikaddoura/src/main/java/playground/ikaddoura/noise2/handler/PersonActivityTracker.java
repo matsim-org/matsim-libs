@@ -128,8 +128,19 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 			if (!event.getActType().toString().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				
 				if (this.consideredActivityTypes.contains(event.getActType())) {
-										
-					int newActNr = this.personId2currentActNr.get(event.getPersonId()) + 1;
+//					Logger.getLogger(this.getClass()).warn( "event:" + event ) ;
+//					Logger.getLogger(this.getClass()).warn( "personId:" + event.getPersonId() ) ;
+//					Logger.getLogger(this.getClass()).warn( "map:" + this.personId2currentActNr ) ;
+//					Logger.getLogger(this.getClass()).warn( "nr:" + this.personId2currentActNr.get( event.getPersonId() ) ) ;
+					
+//					int newActNr = this.personId2currentActNr.get(event.getPersonId()) + 1;
+					// I had null pointer exceptions with the previous line.  Presumably, some agents were not initialized.  Thus
+					// replacing it with the following lines. kai, jul'15
+					int newActNr = 0 ;
+					if ( this.personId2currentActNr.get(event.getPersonId())!= null ) {
+						newActNr = this.personId2currentActNr.get(event.getPersonId()) + 1;
+					}
+					
 					this.personId2currentActNr.put(event.getPersonId(), newActNr);
 										
 					Coord coord = noiseContext.getGrid().getPersonId2listOfConsideredActivityCoords().get(event.getPersonId()).get(this.personId2currentActNr.get(event.getPersonId()));
