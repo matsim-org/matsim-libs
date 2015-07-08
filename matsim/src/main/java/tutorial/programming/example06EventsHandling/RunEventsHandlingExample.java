@@ -49,9 +49,9 @@ public class RunEventsHandlingExample {
 		MyEventHandler2 handler2 = new MyEventHandler2(500);
 		MyEventHandler3 handler3 = new MyEventHandler3();
 		events.addHandler(handler1);
-        events.addHandler(handler2);
-        events.addHandler(handler3);
-
+		events.addHandler(handler2);
+		events.addHandler(handler3);
+		
         //create the reader and read the file
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(inputFile);
