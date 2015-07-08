@@ -1,9 +1,15 @@
 package playground.kai.run;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
@@ -16,14 +22,25 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.replanning.modules.ChangeLegMode;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.ikaddoura.noise2.NoiseParameters;
+import playground.ikaddoura.noise2.NoiseWriter;
+import playground.ikaddoura.noise2.data.GridParameters;
+import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
+import playground.ikaddoura.noise2.handler.PersonActivityTracker;
+
 class KNBerlinControler {
+	private static final Logger log = Logger.getLogger("blabla");
 	
 	public static void main ( String[] args ) {
-		Logger.getLogger("blabla").warn("here") ;
+		log.warn("here") ;
 		
 		// ### prepare the config:
 		Config config = ConfigUtils.loadConfig( "/Users/nagel/kairuns/a100/config.xml" ) ;
@@ -32,7 +49,7 @@ class KNBerlinControler {
 //		config.network().setInputFile("/Users/nagel/");
 		config.controler().setOutputDirectory("/Users/nagel/kairuns/a100/output/");
 		
-		config.controler().setLastIteration(100); 
+		config.controler().setLastIteration(0); 
 		config.controler().setWriteSnapshotsInterval(0);
 		config.controler().setWritePlansInterval(100);
 		config.controler().setWriteEventsInterval(100);
@@ -108,26 +125,115 @@ class KNBerlinControler {
 		// prepare the scenario
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
-		for ( Link link : scenario.getNetwork().getLinks().values() ) {
-//			if ( link.getCapacity() <= 2000. ) {
-//				link.setFreespeed(20./3.6);
-//			}
-			if ( link.getFreespeed() >= 51./3.6 ) {
-				link.setFreespeed( link.getFreespeed() * 1.2 ) ;
-			}
-		}
-
 		// ===
-
+		
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
 		controler.addControlerListener(new KaiAnalysisListener()) ;
 //		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 //		controler.setMobsimFactory(new OldMobsimFactory()) ;
-
+		
 		// run everything:
 		controler.run();
+		
+		// ===
+		// post-processing:
+
+		// grid parameters
+		GridParameters gridParameters = new GridParameters();
+		
+		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+				
+		gridParameters.setReceiverPointGap(1000.);
+
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+		
+		// noise parameters
+		NoiseParameters noiseParameters = new NoiseParameters();
+		noiseParameters.setScaleFactor(1./sampleFactor); // yyyyyy sample size!!!!
+
+		
+		// yyyyyy Same link ids?  Otherwise ask student
+		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+		tunnelLinkIDs.add(Id.create("108041", Link.class));
+		tunnelLinkIDs.add(Id.create("108142", Link.class));
+		tunnelLinkIDs.add(Id.create("108970", Link.class));
+		tunnelLinkIDs.add(Id.create("109085", Link.class));
+		tunnelLinkIDs.add(Id.create("109757", Link.class));
+		tunnelLinkIDs.add(Id.create("109919", Link.class));
+		tunnelLinkIDs.add(Id.create("110060", Link.class));
+		tunnelLinkIDs.add(Id.create("110226", Link.class));
+		tunnelLinkIDs.add(Id.create("110164", Link.class));
+		tunnelLinkIDs.add(Id.create("110399", Link.class));
+		tunnelLinkIDs.add(Id.create("96503", Link.class));
+		tunnelLinkIDs.add(Id.create("110389", Link.class));
+		tunnelLinkIDs.add(Id.create("110116", Link.class));
+		tunnelLinkIDs.add(Id.create("110355", Link.class));
+		tunnelLinkIDs.add(Id.create("92604", Link.class));
+		tunnelLinkIDs.add(Id.create("92603", Link.class));
+		tunnelLinkIDs.add(Id.create("25651", Link.class));
+		tunnelLinkIDs.add(Id.create("25654", Link.class));
+		tunnelLinkIDs.add(Id.create("112540", Link.class));
+		tunnelLinkIDs.add(Id.create("112556", Link.class));
+		tunnelLinkIDs.add(Id.create("5052", Link.class));
+		tunnelLinkIDs.add(Id.create("5053", Link.class));
+		tunnelLinkIDs.add(Id.create("5380", Link.class));
+		tunnelLinkIDs.add(Id.create("5381", Link.class));
+		tunnelLinkIDs.add(Id.create("106309", Link.class));
+		tunnelLinkIDs.add(Id.create("106308", Link.class));
+		tunnelLinkIDs.add(Id.create("26103", Link.class));
+		tunnelLinkIDs.add(Id.create("26102", Link.class));
+		tunnelLinkIDs.add(Id.create("4376", Link.class));
+		tunnelLinkIDs.add(Id.create("4377", Link.class));
+		tunnelLinkIDs.add(Id.create("106353", Link.class));
+		tunnelLinkIDs.add(Id.create("106352", Link.class));
+		tunnelLinkIDs.add(Id.create("103793", Link.class));
+		tunnelLinkIDs.add(Id.create("103792", Link.class));
+		tunnelLinkIDs.add(Id.create("26106", Link.class));
+		tunnelLinkIDs.add(Id.create("26107", Link.class));
+		tunnelLinkIDs.add(Id.create("4580", Link.class));
+		tunnelLinkIDs.add(Id.create("4581", Link.class));
+		tunnelLinkIDs.add(Id.create("4988", Link.class));
+		tunnelLinkIDs.add(Id.create("4989", Link.class));
+		tunnelLinkIDs.add(Id.create("73496", Link.class));
+		tunnelLinkIDs.add(Id.create("73497", Link.class));
+		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
+
+		// ---
+
+		String outputDirectory = config.controler().getOutputDirectory() ;
+		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
+		File file = new File(outputFilePath);
+		file.mkdirs();
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		
+		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		events.addHandler(eventWriter);
+			
+		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		noiseContext.initialize();
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
+				
+		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
+		events.addHandler(timeTracker);
+		
+		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
+		events.addHandler(actTracker);
+		
+		log.info("Reading events file...");
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(outputDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
+		log.info("Reading events file... Done.");
+		
+		timeTracker.computeFinalTimeIntervals();
+
+		eventWriter.closeFile();
+		log.info("Noise calculation completed.");
+
 	
 	}
 	
