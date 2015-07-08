@@ -96,7 +96,6 @@
 	<modules>
 		<module>accessibility</module>
 		<module>analysis</module>
-		<module>bdiintegration</module>
 		<module>cadytsIntegration</module>
 		<module>carsharing</module>
 		<module>dvrp</module>
