@@ -57,21 +57,21 @@ import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
  * @author amit
  */
 
-public class CongestionPricingTestExample {
+class CongestionPricingTestExample {
 
-	public CongestionPricingTestExample (String congestionImpl){
+	CongestionPricingTestExample (String congestionImpl){
 		this.isComparing = true;
 		this.congestionImpl = congestionImpl;
 	}
 
-	public CongestionPricingTestExample () {
+	CongestionPricingTestExample () {
 		this.isComparing = false;
 	}
 
 	private Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());;
 	private Link lo1;
 	private Link ld1;
-	private Link lo2;
+//	private Link lo2;
 	private Link ld2;
 	private String congestionImpl = "noToll";
 	private boolean isComparing;
@@ -81,19 +81,19 @@ public class CongestionPricingTestExample {
 	public static void main(String[] args) {
 
 		// no toll case
-		CongestionPricingTestExample test = new CongestionPricingTestExample();
-		test.run();
+		new CongestionPricingTestExample().run();
 
 		// tolled cases
 		String [] congestionImpls = {"implV3","implV4","implV6"};
 
 		for (String str :congestionImpls) {
-			CongestionPricingTestExample pricingTest = new CongestionPricingTestExample(str);
-			pricingTest.run();
+			new CongestionPricingTestExample(str).run();
 		}
+
+		new PricingTestAnalyser().run();
 	}
-	
-	public void run() {
+
+	void run() {
 
 		if(!new File(outputDir+"/input/").exists()) {
 			new File(outputDir+"/input/").mkdirs();
@@ -144,7 +144,7 @@ public class CongestionPricingTestExample {
 		config.controler().setOverwriteFileSetting(true ? OverwriteFileSetting.deleteDirectoryIfExists:OverwriteFileSetting.failIfDirectoryExists);
 
 		config.qsim().setEndTime(9*3600.);
-		
+
 		StrategySettings reRoute = new StrategySettings(ConfigUtils.createAvailableStrategyId(config));
 		reRoute.setStrategyName(DefaultPlanStrategiesModule.DefaultStrategy.ReRoute.name());
 		reRoute.setWeight(0.10);
@@ -170,7 +170,7 @@ public class CongestionPricingTestExample {
 		config.planCalcScore().addActivityParams(o2);
 		config.planCalcScore().addActivityParams(d1);
 		config.planCalcScore().addActivityParams(d2);
-		
+
 		new ConfigWriter(config).write(outputDir+"/input/input_config.xml.gz");
 	}
 
@@ -188,7 +188,7 @@ public class CongestionPricingTestExample {
 			Activity home;
 			Activity work;
 
-			if(i%3==0){// o1 --d1
+			if(i%2==0){// o1 --d1
 				home = fact.createActivityFromCoord("o1", lo1.getCoord());
 				home.setEndTime(7*3600+i);
 				work = fact.createActivityFromCoord("d1", ld1.getCoord());
@@ -250,11 +250,11 @@ public class CongestionPricingTestExample {
 		Node n4 = network.createAndAddNode(Id.createNodeId(4), sc.createCoord(3000, 0));
 		Node nd1 = network.createAndAddNode(Id.createNodeId("d1"), sc.createCoord(3100, 0));
 
-		lo1 = network.createAndAddLink(Id.createLinkId("o1"), no1, n1, 100, 20, 2700, 1);
-		Link l1 = network.createAndAddLink(Id.createLinkId(1), n1, n2, 1000, 20, 2700, 1);
-		Link l2 = network.createAndAddLink(Id.createLinkId(2), n2, n3, 1000, 20, 2700, 1);
-		Link l3 = network.createAndAddLink(Id.createLinkId(3), n3, n4, 1000, 20, 2700, 1);
-		ld1 = network.createAndAddLink(Id.createLinkId("d1"), n4, nd1, 100, 20, 2700, 1);
+		lo1 = network.createAndAddLink(Id.createLinkId("o1"), no1, n1, 100, 15, 3600, 1);
+		Link l1 = network.createAndAddLink(Id.createLinkId(1), n1, n2, 1000, 15, 3600, 1);
+		Link l2 = network.createAndAddLink(Id.createLinkId(2), n2, n3, 1000, 15, 3600, 1);
+		Link l3 = network.createAndAddLink(Id.createLinkId(3), n3, n4, 1000, 15, 3600, 1);
+		ld1 = network.createAndAddLink(Id.createLinkId("d1"), n4, nd1, 100, 15, 3600, 1);
 
 		// nodes between o2-d2 (all vertical links)
 		//		Node no2 = network.createAndAddNode(Id.createNodeId("o2"), sc.createCoord(2000, 1100));
@@ -265,11 +265,11 @@ public class CongestionPricingTestExample {
 		//		lo2 = network.createAndAddLink(Id.createLinkId("o2"), no2, n5, 100, 20, 2700, 1);
 		//		Link l5 = network.createAndAddLink(Id.createLinkId(5), n5, n3, 3000, 20, 2700, 1);
 		//bottleneck link
-		Link l6 = network.createAndAddLink(Id.createLinkId(6), n3, n6, 500, 20, 700, 1);
-		ld2 = network.createAndAddLink(Id.createLinkId("d2"), n6, nd2, 100, 20, 2700, 1);
+		Link l6 = network.createAndAddLink(Id.createLinkId(6), n3, n6, 600, 15, 600, 1);
+		ld2 = network.createAndAddLink(Id.createLinkId("d2"), n6, nd2, 100, 15, 1500, 1);
 
 		// an alternative link with higher disutility
-		Link l7 = network.createAndAddLink(Id.createLinkId(7), n1, n6, 15000, 20, 2700, 1);
+		Link l7 = network.createAndAddLink(Id.createLinkId(7), n1, n6, 17000, 20, 2700, 1);
 
 		new NetworkWriter(network).write(outputDir+"/input/input_network.xml");
 	}

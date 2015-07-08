@@ -38,7 +38,7 @@ import playground.agarwalamit.utils.LoadMyScenarios;
  * @author amit
  */
 
-public class PricingTestAnalyser {
+ class PricingTestAnalyser {
 
 	private final String outputDir = "../../../repos/shared-svn/papers/2014/congestionInternalization/implV4/hEART/testExample/";
 
@@ -46,7 +46,7 @@ public class PricingTestAnalyser {
 		new PricingTestAnalyser().run();
 	}
 	
-	private void run (){
+	 void run (){
 		String [] congestionImpls = {"noToll","implV3","implV4","implV6"};
 
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/output/analysis/pricingComparison.txt");
