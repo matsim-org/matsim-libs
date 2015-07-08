@@ -87,7 +87,7 @@ public class NoiseContext {
 	}
 
 	// for routing purposes
-	public void storeTimeInterval() {
+	public final void storeTimeInterval() {
 		
 		Map<Id<Link>, NoiseLink> noiseLinksThisTimeBinCopy = new HashMap<>();
 		noiseLinksThisTimeBinCopy.putAll(this.noiseLinks);
@@ -97,7 +97,8 @@ public class NoiseContext {
 		this.timeInterval2linkId2noiseLinks.put(currentTimeIntervalCopy, noiseLinksThisTimeBinCopy);
 	}
 	
-	public void initialize() {
+	public final void initialize() {
+		// yy why not move this material into the constructor? kai, jul'15
 		checkConsistency();
 		setRelevantLinkInfo();
 	}
@@ -441,43 +442,43 @@ public class NoiseContext {
 		return immissionCorrection;
 	}
 	
-	public Scenario getScenario() {
+	public final Scenario getScenario() {
 		return scenario;
 	}
 	
-	public Map<Id<ReceiverPoint>, NoiseReceiverPoint> getReceiverPoints() {
+	public final Map<Id<ReceiverPoint>, NoiseReceiverPoint> getReceiverPoints() {
 		return noiseReceiverPoints;
 	}
 	
-	public NoiseParameters getNoiseParams() {
+	public final NoiseParameters getNoiseParams() {
 		return noiseParams;
 	}
 
-	public double getCurrentTimeBinEndTime() {
+	public final double getCurrentTimeBinEndTime() {
 		return currentTimeBinEndTime;
 	}
 
-	public void setCurrentTimeBinEndTime(double currentTimeBinEndTime) {
+	public final void setCurrentTimeBinEndTime(double currentTimeBinEndTime) {
 		this.currentTimeBinEndTime = currentTimeBinEndTime;
 	}
 
-	public Map<Id<Link>, NoiseLink> getNoiseLinks() {
+	public final Map<Id<Link>, NoiseLink> getNoiseLinks() {
 		return noiseLinks;
 	}
 
-	public Map<Double, Map<Id<Link>, NoiseLink>> getTimeInterval2linkId2noiseLinks() {
+	public final Map<Double, Map<Id<Link>, NoiseLink>> getTimeInterval2linkId2noiseLinks() {
 		return timeInterval2linkId2noiseLinks;
 	}
 
-	public void setEventTime(double time) {
+	public final void setEventTime(double time) {
 		this.eventTime = time;
 	}
 
-	public double getEventTime() {
+	public final double getEventTime() {
 		return eventTime;
 	}
 
-	public Grid getGrid() {
+	public final Grid getGrid() {
 		return grid;
 	}
 
