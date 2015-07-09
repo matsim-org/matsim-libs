@@ -105,7 +105,12 @@ public class NoiseParameters {
 			}
 		}
 		
-		if (this.tunnelLinkIdFile != null && this.tunnelLinkIDs.isEmpty()) {
+		if (this.tunnelLinkIdFile != null || this.tunnelLinkIdFile != "") {
+			
+			if (this.tunnelLinkIDs.size() > 0) {
+				log.warn("Loading the tunnel link IDs from a file. Deleting the existing tunnel link IDs that are added manually.");
+				this.tunnelLinkIDs.clear();
+			}
 			
 			// loading tunnel link IDs from file
 			BufferedReader br = IOUtils.getBufferedReader(this.tunnelLinkIdFile);
@@ -134,10 +139,10 @@ public class NoiseParameters {
 								log.warn("This message is only given once.");
 							}
 							countWarning++;
-						}
-						this.tunnelLinkIDs.add(linkId);
-						
+						}						
 					}
+					log.info("Adding tunnel link ID " + linkId);
+					this.tunnelLinkIDs.add(linkId);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
