@@ -20,6 +20,8 @@
 
 package org.matsim.core.utils.io.tabularFileParser;
 
+import java.nio.charset.Charset;
+
 /**
  * Configuration for a <code>TabularFileParser</code>.
  *
@@ -45,6 +47,8 @@ public class TabularFileParserConfig {
     private String commentRegex = null;
 
     private String delimiterRegex = null;
+    
+    private Charset charset = Charset.forName("UTF8");
 
     // -------------------- CONSTRUCTION --------------------
 
@@ -64,6 +68,15 @@ public class TabularFileParserConfig {
      */
     public void setFileName(String file) {
         this.file = file;
+    }
+    
+    /**
+     * Sets the charset for the file. Defaults to UTF-8
+     * 
+     * @param charset the charset used to reade the file
+     */
+    public void setCharset(Charset charset) {
+    	this.charset = charset;
     }
 
     // ---------- DIRECT SETTING OF REGULAR EXPRESSIONS ----------
@@ -208,6 +221,10 @@ public class TabularFileParserConfig {
 
     public String getDelimiterRegex() {
         return delimiterRegex;
+    }
+    
+    public Charset getCharset() {
+    	return this.charset;
     }
 
     // MISC

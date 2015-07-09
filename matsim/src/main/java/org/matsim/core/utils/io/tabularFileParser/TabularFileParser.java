@@ -102,7 +102,7 @@ public class TabularFileParser implements MatsimSomeReader {
 //        } catch (FileNotFoundException e) {
 //            throw new RuntimeException(e);
 //        }
-        try ( BufferedReader reader = IOUtils.getBufferedReader(config.getFile()) ) {
+        try ( BufferedReader reader = IOUtils.getBufferedReader(config.getFile(), config.getCharset()) ) {
         	String line;
 	        while ((line = reader.readLine()) != null && !ended) {
 	            if (started) {
