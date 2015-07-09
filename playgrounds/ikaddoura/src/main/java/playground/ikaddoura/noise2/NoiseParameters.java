@@ -23,12 +23,15 @@
 package playground.ikaddoura.noise2;
 
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.io.IOUtils;
 
 import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 
@@ -49,6 +52,7 @@ public class NoiseParameters {
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+	private String tunnelLinkIdFile = null;
 	private int writeOutputIteration = 1;
 	
 	private boolean throwNoiseEventsAffected = true;
@@ -99,6 +103,47 @@ public class NoiseParameters {
 				log.warn("Inconsistent parameters will be adjusted:");
 				this.setComputeCausingAgents(true);
 			}
+		}
+		
+		if (this.tunnelLinkIdFile != null && this.tunnelLinkIDs.isEmpty()) {
+			
+			// loading tunnel link IDs from file
+			BufferedReader br = IOUtils.getBufferedReader(this.tunnelLinkIdFile);
+			
+			String line = null;
+			try {
+				line = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} // headers
+
+			log.info("Reading tunnel link Id file...");
+			try {
+				int countWarning = 0;
+				while ((line = br.readLine()) != null) {
+					
+					String[] columns = line.split(";");
+					Id<Link> linkId = null;
+					for (int column = 0; column < columns.length; column++) {
+						if (column == 0) {
+							linkId = Id.createLinkId(columns[column]);
+						} else {
+							if (countWarning < 1) {
+								log.warn("Expecting the tunnel link Id to be in the first column. Ignoring further columns...");
+							} else if (countWarning == 1) {
+								log.warn("This message is only given once.");
+							}
+							countWarning++;
+						}
+						this.tunnelLinkIDs.add(linkId);
+						
+					}
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			log.info("Reading tunnel link Id file... Done.");
 		}
 	}
 	
@@ -219,6 +264,11 @@ public class NoiseParameters {
 	public void setWriteOutputIteration(int writeOutputIteration) {
 		log.info("Writing output every " + writeOutputIteration + " iteration.");
 		this.writeOutputIteration = writeOutputIteration;
+	}
+
+	public void setTunnelLinkIdFile(String tunnelLinkIdFile) {
+		log.info("Setting file which contains the tunnel link Ids to " + tunnelLinkIdFile + ".");
+		this.tunnelLinkIdFile = tunnelLinkIdFile;
 	}
 	
 }
