@@ -39,7 +39,8 @@ import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * 
- * this class tests the TravelTime of one agent on different configuration of a 200m link. currently, the following phenomenon occurs:
+ * this class tests the TravelTime of one agent on different configuration of a 200m link. currently, the following phenomenon occurs
+ * for certain values of freespeed:
  * the TravelTime on a 200m link is reduced if lanes are enabled
  * 
  * see method createNetwork for details on links configuration 
