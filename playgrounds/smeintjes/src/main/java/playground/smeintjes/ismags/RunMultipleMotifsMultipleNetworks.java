@@ -44,8 +44,8 @@ public class RunMultipleMotifsMultipleNetworks {
 	 * when in run10-ismags/ on Hobbes)
 	 * @param String path to parent folder containing the random network subfolders 
 	 * (which contain the one- and bidirectional edges files) ("randomNetworks/" on Hobbes)
-	 * @param String the name of the output folder (in the same path as second argument) to where
-	 * output files will be written ("3-node-specifications/" on Hobbes, for example)
+	 * @param String the name of the output folder (on the same path as second argument) to where
+	 * output files will be written ("3-node-motifs/" on Hobbes, for example)
 	 * @param Integer number of random networks on which class must be run (currently, 100 on Hobbes)
 	 */
 	public static void main(String[] args) {

@@ -37,8 +37,9 @@ import playground.southafrica.utilities.Header;
  * @param inputPath path to the folder containing the input file, including trailing '/' ("randomNetworks/" on Hobbes)
  * @param numberNetworks the number of random networks that this class should be run on (100 on Hobbes)
  * @param extension file extension (.txt)
- * @param outputPath the path to the folder where output files will be written, including trailing "/" ("" on Hobbes)
+ * @param outputPath the path to the folder where output files will be written, including trailing "/" ("randomNetworks/" on Hobbes)
  * (can be the same as the inputPath)
+ * 
  * @author sumarie
  *
  */
@@ -54,8 +55,6 @@ public class FindBidirectionalEdgesMultipleNetworks {
 		Integer numberNetworks = Integer.parseInt(args[1]);
 		String extension = args[2];
 		String outputPath = args[3];
-//		String inputSeparator = args[4];
-//		String outputSeparator = args[5];
 		
 		for(int i = 0; i < numberNetworks; i++){
 			String fileName = "random" + i;
