@@ -69,9 +69,8 @@ class CongestionPricingTestExample {
 	}
 
 	private Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());;
-	private Link lo1;
+	private Link lo;
 	private Link ld1;
-//	private Link lo2;
 	private Link ld2;
 	private String congestionImpl = "noToll";
 	private boolean isComparing;
@@ -188,19 +187,15 @@ class CongestionPricingTestExample {
 			Activity home;
 			Activity work;
 
-			if(i%2==0){// o1 --d1
-				home = fact.createActivityFromCoord("o1", lo1.getCoord());
+			if(i%2==0){// o --d1
+				home = fact.createActivityFromCoord("o1", lo.getCoord());
 				home.setEndTime(7*3600+i);
 				work = fact.createActivityFromCoord("d1", ld1.getCoord());
-			} else /*if(i%2==0)*/ { // o1 --d2
-				home = fact.createActivityFromCoord("o1", lo1.getCoord());
+			} else /*if(i%2==0)*/ { // o --d2
+				home = fact.createActivityFromCoord("o1", lo.getCoord());
 				home.setEndTime(7*3600+i);
 				work = fact.createActivityFromCoord("d2", ld2.getCoord());
-			} /*else {// o2 --d2
-				home = fact.createActivityFromCoord("o2", lo2.getCoord());
-				home.setEndTime(7*3600+i);
-				work = fact.createActivityFromCoord("d2", ld2.getCoord());
-			}*/
+			} 
 			plan.addActivity(home);
 			plan.addLeg(leg);
 			plan.addActivity(work);
@@ -211,29 +206,15 @@ class CongestionPricingTestExample {
 
 
 	/*
-	 * 								o
-	 * 								|
-	 * 								|
-	 * 								o2
-	 * 								|
-	 * 								|
-	 * 								o
-	 * 								|
-	 * 								|
-	 * 								5
-	 * 								|
-	 * 								|
-	 * o--o1--o----1----o----2------o-----3----o---d1---o
-	 * 							 \  |  /
-	 * 							  |	| |
-	 * 							  |	6 |
-	 * 							  |	| |
-	 * 							  |	| |
-	 * 						     /	o  \
-	 * 								|
+	 * o--o--o----1----o----2------o-----3----o---d1---o
+	 * 		  \					 \  |  /
+	 * 			\				  |	| |
+	 * 			 \				  |	4 |
+	 * 			  5				  |	| |
+	 * 			   \			 /	|  \
+	 * 				 \______________o  
 	 * 								|
 	 * 								d2
-	 * 								|
 	 * 								|
 	 * 								o
 	 * 
@@ -242,34 +223,29 @@ class CongestionPricingTestExample {
 
 		NetworkImpl network = (NetworkImpl) sc.getNetwork();
 
-		// nodes between o1-d1 (all horizonal links)
-		Node no1 = network.createAndAddNode(Id.createNodeId("o1"), sc.createCoord(-100, 0));
+		// nodes between o-d1 (all horizonal links)
+		Node no = network.createAndAddNode(Id.createNodeId("o"), sc.createCoord(-100, 0));
 		Node n1 = network.createAndAddNode(Id.createNodeId(1), sc.createCoord(0, 0));
 		Node n2 = network.createAndAddNode(Id.createNodeId(2), sc.createCoord(1000, 0));
 		Node n3 = network.createAndAddNode(Id.createNodeId(3), sc.createCoord(2000, 0));
 		Node n4 = network.createAndAddNode(Id.createNodeId(4), sc.createCoord(3000, 0));
 		Node nd1 = network.createAndAddNode(Id.createNodeId("d1"), sc.createCoord(3100, 0));
 
-		lo1 = network.createAndAddLink(Id.createLinkId("o1"), no1, n1, 100, 15, 3600, 1);
-		Link l1 = network.createAndAddLink(Id.createLinkId(1), n1, n2, 1000, 15, 3600, 1);
-		Link l2 = network.createAndAddLink(Id.createLinkId(2), n2, n3, 1000, 15, 3600, 1);
-		Link l3 = network.createAndAddLink(Id.createLinkId(3), n3, n4, 1000, 15, 3600, 1);
+		lo = network.createAndAddLink(Id.createLinkId("o"), no, n1, 100, 15, 3600, 1);
+		network.createAndAddLink(Id.createLinkId(1), n1, n2, 1000, 15, 3600, 1);
+		network.createAndAddLink(Id.createLinkId(2), n2, n3, 1000, 15, 3600, 1);
+		network.createAndAddLink(Id.createLinkId(3), n3, n4, 1000, 15, 3600, 1);
 		ld1 = network.createAndAddLink(Id.createLinkId("d1"), n4, nd1, 100, 15, 3600, 1);
 
-		// nodes between o2-d2 (all vertical links)
-		//		Node no2 = network.createAndAddNode(Id.createNodeId("o2"), sc.createCoord(2000, 1100));
-		//		Node n5 = network.createAndAddNode(Id.createNodeId(5), sc.createCoord(2000, 1000));
 		Node n6 = network.createAndAddNode(Id.createNodeId(6), sc.createCoord(2000,-1000));
 		Node nd2 = network.createAndAddNode(Id.createNodeId("d2"), sc.createCoord(2000, -1100));
 
-		//		lo2 = network.createAndAddLink(Id.createLinkId("o2"), no2, n5, 100, 20, 2700, 1);
-		//		Link l5 = network.createAndAddLink(Id.createLinkId(5), n5, n3, 3000, 20, 2700, 1);
 		//bottleneck link
-		Link l6 = network.createAndAddLink(Id.createLinkId(6), n3, n6, 600, 15, 600, 1);
+		network.createAndAddLink(Id.createLinkId(4), n3, n6, 600, 15, 600, 1);
 		ld2 = network.createAndAddLink(Id.createLinkId("d2"), n6, nd2, 100, 15, 1500, 1);
 
 		// an alternative link with higher disutility
-		Link l7 = network.createAndAddLink(Id.createLinkId(7), n1, n6, 17000, 20, 2700, 1);
+		network.createAndAddLink(Id.createLinkId(5), n1, n6, 17000, 20, 2700, 1);
 
 		new NetworkWriter(network).write(outputDir+"/input/input_network.xml");
 	}
