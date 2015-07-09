@@ -25,7 +25,7 @@ public class JDEQSimModuleTest extends MatsimTestCase {
     }
 
     public void testRunsEquil() {
-        Scenario scenario = ScenarioUtils.loadScenario(loadConfig("examples/equil/config.xml"));
+        Scenario scenario = ScenarioUtils.loadScenario(loadConfig("test/scenarios/equil/config.xml"));
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
         eventsManager.initProcessing();
         QSim qsim = new QSim(scenario, eventsManager);
