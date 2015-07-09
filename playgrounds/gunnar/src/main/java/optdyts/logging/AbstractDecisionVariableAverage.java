@@ -26,15 +26,23 @@ public abstract class AbstractDecisionVariableAverage<X extends SimulatorState, 
 		return "Average " + this.realValueLabel();
 	}
 
-	@Override
-	public String value(final SurrogateSolution<X, U> surrogateSolution) {
+	public Double numericalValue(final SurrogateSolution<X, U> surrogateSolution) {
 		if (surrogateSolution.hasProperties()) {
 			double average = 0;
 			for (U decisionVariable : surrogateSolution.getDecisionVariables()) {
 				average += surrogateSolution.getAlphaSum(decisionVariable)
 						* this.realValue(decisionVariable);
 			}
-			return Double.toString(average);
+			return average;
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public String value(final SurrogateSolution<X, U> surrogateSolution) {
+		if (surrogateSolution.hasProperties()) {
+			return Double.toString(this.numericalValue(surrogateSolution));
 		} else {
 			return "--";
 		}

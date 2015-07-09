@@ -27,6 +27,8 @@ class TwoRoutes {
 
 	private final int maxIterations;
 
+	private final boolean terminateWhenSolutionFound;
+
 	// -------------------- MEMBERS --------------------
 
 	// the decision variable
@@ -38,11 +40,13 @@ class TwoRoutes {
 	// -------------------- CONSTRUCTION --------------------
 
 	TwoRoutes(final int totalDemand, final double capacity,
-			final double replanningFraction, final int maxIterations) {
+			final double replanningFraction, final int maxIterations,
+			final boolean terminateWhenSolutionFound) {
 		this.totalDemand = totalDemand;
 		this.capacity = capacity;
 		this.replanningFraction = replanningFraction;
 		this.maxIterations = maxIterations;
+		this.terminateWhenSolutionFound = terminateWhenSolutionFound;
 	}
 
 	// -------------------- SETTERS AND GETTERS --------------------
@@ -66,7 +70,8 @@ class TwoRoutes {
 
 		System.out.println("tt1\ttt2\tflow1\tflow2");
 
-		for (int it = 1; it <= this.maxIterations; it++) {
+		for (int it = 1; it <= this.maxIterations
+				&& !(this.terminateWhenSolutionFound && evaluator.foundSolution()); it++) {
 
 			final double tt1 = Math.pow(this.flow1 / this.capacity, 2.0);
 			final double tt2 = Math.pow((this.totalDemand - this.flow1)
@@ -98,7 +103,6 @@ class TwoRoutes {
 			final TwoRoutesSimulatorState newState = new TwoRoutesSimulatorState(
 					this, this.flow1, this.totalDemand - this.flow1, tt1, tt2);
 			evaluator.afterIteration(newState);
-
 		}
 	}
 
@@ -110,8 +114,9 @@ class TwoRoutes {
 		final double capacity = 750;
 		final double replanningFraction = 0.05;
 		final int maxIterations = 100;
+		final boolean terminateWhenSolutionFound = true;
 		final TwoRoutes twoRoutes = new TwoRoutes(totalDemand, capacity,
-				replanningFraction, maxIterations);
+				replanningFraction, maxIterations, terminateWhenSolutionFound);
 
 		final double maxTheta = Math.pow(totalDemand / capacity, 2.0);
 

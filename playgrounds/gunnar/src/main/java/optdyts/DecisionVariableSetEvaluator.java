@@ -188,4 +188,16 @@ public class DecisionVariableSetEvaluator<X extends SimulatorState, U extends De
 
 		this.currentDecisionVariable.implementInSimulation();
 	}
+
+	// TODO NEW
+	public boolean foundSolution() {
+		return ((this.decisionVariablesToBeTriedOut.size() == 0) && (this.surrogateSolution
+				.size() == 1));
+	}
+	
+	// TODO NEW
+	public SurrogateSolution<X, U> getCurrentSurrogateSolution() {
+		return this.surrogateSolution;
+	}
+	
 }
