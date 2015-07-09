@@ -138,7 +138,7 @@ public class MGC {
 	}
 
 	/**
-	 * Converts x, y Coordinates to Geotool
+	 * Converts x, y Coordinates to Geotools
 	 * @param x
 	 * @param y
 	 * @return
@@ -173,4 +173,21 @@ public class MGC {
 		return crs;
 	}
 
+	/**
+	 * Guesses the  Universal Transverse Mercator (UTM) zone for a given WGS 84 coordinate, returns the corresponding 
+	 * EPSG code  
+	 * @param lon the longitude of the WGS 84 coordinate
+	 * @param lat the latitude of the WGS 84 coordinate
+	 * @return EPSG code
+	 */
+	public static String getUTMEPSGCodeForWGS84Coordinate(final double lon, final double lat) {
+		int utmZone = (int) (Math.ceil((180+lon) / 6)+0.5);
+		String epsgCode = null;
+		if (lat > 0 ) { //northern hemisphere 
+		  epsgCode = "EPSG:326" + utmZone;
+		} else { //southern hemisphere
+		  epsgCode = "EPSG:327" + utmZone;
+		}
+		return epsgCode;
+	}
 }
