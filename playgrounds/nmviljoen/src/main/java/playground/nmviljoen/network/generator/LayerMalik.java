@@ -61,7 +61,7 @@ public class LayerMalik {
 			repeat = true;
 			while (repeat){
 				use = true;
-				gen = randomGen.nextInt(101);
+				gen = randomGen.nextInt(2501);
 				//test if it's been used
 				for (int t = 0; t<taken.length;t++){
 					if(taken[t]==gen) use = false;
@@ -85,7 +85,7 @@ public class LayerMalik {
 		//place spoke nodes
 		int count = hub;
 		int[][] hubDist = new int[hub][5];//hub-grid #, hub-grid index, spoke-grid #, spoke-grid index, distance
-		int incumbent = 99;
+		int incumbent = 400;
 		boolean beaten = false;
 		//assign the grid numbers and indices to the hubDist array for the HUB nodes
 		for (int y =0; y<hub;y++){
@@ -110,7 +110,7 @@ public class LayerMalik {
 				repeat = true;
 				while (repeat){
 					use = true;
-					gen = randomGen.nextInt(101);
+					gen = randomGen.nextInt(2501);
 					//test if taken
 					for (int t = 0; t<taken.length;t++){
 						if(taken[t]==gen)use = false;

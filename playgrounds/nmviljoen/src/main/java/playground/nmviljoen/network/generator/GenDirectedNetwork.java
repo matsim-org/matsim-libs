@@ -56,8 +56,8 @@ public class GenDirectedNetwork {
 	}
 	public void constructGridGraph(){
 		//get the linklist
-		int row=10;
-		int col = 10;
+		int row=50;
+		int col = 50;
 		int [][] linkList = Grid.linkList(row, col);
 		double defaultWeight = 1;
 		double defaultTransProb = 1;
@@ -239,15 +239,15 @@ public class GenDirectedNetwork {
 		//int [][] assocList = LayerGraphs.assocList(linkListGrid, linkListHub, nodeListGrid, nodeListHub);
 		String shortListFile;
 		String assocFile;
-		for (int rep = 0; rep<500;rep++){
-			shortListFile = "/Users/nadiaviljoen/Documents/workspace/ArticleRegister/GridNetworkFiles/Malik/experiment1/shortListFile";
-			shortListFile =shortListFile.concat(String.valueOf(rep));
-			shortListFile =shortListFile.concat(".csv");
-			assocFile = "/Users/nadiaviljoen/Documents/workspace/ArticleRegister/GridNetworkFiles/Malik/experiment1/assocFile";
+		for (int rep = 0; rep<1000;rep++){
+//			shortListFile = "/Users/nadiaviljoen/Documents/workspace/ArticleRegister/GridNetworkFiles/Malik/fixShortestPath/shortListFile";
+//			shortListFile =shortListFile.concat(String.valueOf(rep));
+//			shortListFile =shortListFile.concat(".csv");
+			assocFile = "/Users/nadiaviljoen/Documents/workspace/ArticleRegister/GridNetworkFiles/baseline50x50/assocFile/assocFile";
 			assocFile =assocFile.concat(String.valueOf(rep));
 			assocFile =assocFile.concat(".csv");
 			int [][] assocList = LayerMalik.assocList(myAppGrid.myGraphGrid,linkListGrid, linkListHub, nodeListGrid, nodeListHub);
-			ShortestPath.collectShortest(myAppGrid.myGraphGrid,myAppGrid.myGraphHub,linkListGrid, linkListHub, nodeListGrid, nodeListHub, assocList,shortListFile);
+//			ShortestPath.collectShortest(myAppGrid.myGraphGrid,myAppGrid.myGraphHub,linkListGrid, linkListHub, nodeListGrid, nodeListHub, assocList,shortListFile);
 			BufferedWriter bw = IOUtils.getBufferedWriter(assocFile);
 			try{
 				bw.write("Malik id, Malik index,Grid id, Grid index");

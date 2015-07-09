@@ -64,7 +64,7 @@ public class Malik {
 		System.out.println(links);
 		
 			try {
-				File file = new File("/Users/nadiaviljoen/Documents/workspace/ArticleRegister/GridNetworkFiles/Malik/linkList.csv");
+				File file = new File("/Users/nadiaviljoen/Documents/workspace/ArticleRegister/GridNetworkFiles/baseline50x50/linkListMalik.csv");
 				FileWriter fw = new FileWriter(file.getAbsoluteFile());
 				BufferedWriter bw = new BufferedWriter(fw);
 				for (int r =0;r<links;r++) {
