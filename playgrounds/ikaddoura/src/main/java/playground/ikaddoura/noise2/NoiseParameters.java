@@ -105,7 +105,7 @@ public class NoiseParameters {
 			}
 		}
 		
-		if (this.tunnelLinkIdFile != null || this.tunnelLinkIdFile != "") {
+		if (this.tunnelLinkIdFile != null) {
 			
 			if (this.tunnelLinkIDs.size() > 0) {
 				log.warn("Loading the tunnel link IDs from a file. Deleting the existing tunnel link IDs that are added manually.");
