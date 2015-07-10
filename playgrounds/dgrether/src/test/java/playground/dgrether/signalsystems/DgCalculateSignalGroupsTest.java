@@ -243,11 +243,15 @@ public class DgCalculateSignalGroupsTest {
 
 		//load the network
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(scenario.getConfig().signalSystems()).loadSignalsData());
-		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-//		
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
+				new SignalsScenarioLoader(scenario.getConfig().signalSystems())
+						.loadSignalsData());
+		SignalsData signalsData = (SignalsData) scenario
+				.getScenarioElement(SignalsData.ELEMENT_NAME);
+		
 		//calculate the signal groups
-		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(signalsData.getSignalSystemsData(), scenario.getNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME));
+		DgCalculateSignalGroups calcSignalGroups = new DgCalculateSignalGroups(
+				signalsData.getSignalSystemsData(), scenario.getNetwork(), scenario.getLanes());
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 		//test them
 		Assert.assertNotNull(signalGroups);
