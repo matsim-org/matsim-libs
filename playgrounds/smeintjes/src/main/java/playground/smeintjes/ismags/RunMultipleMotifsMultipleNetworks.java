@@ -47,6 +47,7 @@ public class RunMultipleMotifsMultipleNetworks {
 	 * @param String the name of the output folder (on the same path as second argument) to where
 	 * output files will be written ("3-node-motifs/" on Hobbes, for example)
 	 * @param Integer number of random networks on which class must be run (currently, 100 on Hobbes)
+	 * @param Integer the integer of the first network that should be analysed
 	 */
 	public static void main(String[] args) {
 
@@ -55,9 +56,10 @@ public class RunMultipleMotifsMultipleNetworks {
 		String pathToParentFolder = args[1];
 		String outputFolder = args[2]; //In each random network folder, there are two folders, one for 3-node-motifs and one for 4-node-motifs
 		Integer numberNetworks = Integer.parseInt(args[3]);
+		Integer startNetwork = Integer.parseInt(args[4]);
 
 		ArrayList<String> motifList = readMotifs(motifSpecificationPath);
-		for(int i = 0; i < numberNetworks; i++){
+		for(int i = startNetwork.intValue(); i < numberNetworks; i++){
 			runMotifs(motifList, pathToParentFolder, outputFolder, i);
 		}
 		
