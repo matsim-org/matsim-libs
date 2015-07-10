@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import jsprit.core.problem.job.Service;
+
 //import jsprit.core.problem.vehicle.VehicleType;
 
 import org.junit.Assert;
@@ -229,12 +231,14 @@ class UccCarrierCreator {
 				ArrayList<TimeWindow> timeWindows = calcTimeWindows(uccCarrier);
 				System.out.println("Zeitfenster: " + timeWindows.toString());
 				for (TimeWindow tw : timeWindows) {
-				addVehicles(uccCarrier, vehicleTypes, uccDepotsLinkIds2, 
+					addVehicles(uccCarrier, vehicleTypes, uccDepotsLinkIds2, 
 						Math.max(0, tw.getStart() -uccEarlierOpeningTime), Math.min(24*3500, tw.getEnd() +uccLaterClosingTime)); 
 				}
+//				checkCapacity(uccCarrier, vehicleTypes);
 				uccCarrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
 				splittedCarriers.addCarrier(uccCarrier);
 			}
+			
 			
 //			// Fahrzeug steht über maximale Zeitspanne zur Verfügung.
 //			if (!uccCarrier.getServices().isEmpty()){		//keinen UCC ohne Nachfrage übernehmen.
@@ -250,18 +254,71 @@ class UccCarrierCreator {
 	}
 
 
+	//TODO:Neu muss ausbrobiert werden (10.07.15; KT)
+//	private void checkCapacity(Carrier carrier, CarrierVehicleTypes vehicleTypes2) {
+//		Set<CarrierService> serviceToRemove= new HashSet<CarrierService>(); 
+//		for (CarrierService service : carrier.getServices()){
+//			//Alphabetsliste erstellen
+//			List<Character> alph = new ArrayList<Character>() ;
+//			for(char c='a'; c<='z'; c++) {
+//				alph.add(c);
+//			}
+//			
+//			int demand = service.getCapacityDemand();
+//			
+//			//Calc max VehicleCapacity
+//			int maxVehicleCapacity = -1;
+//			for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles()) {
+//				 if (maxVehicleCapacity < vehicle.getVehicleType().getCarrierVehicleCapacity()){
+//					 maxVehicleCapacity = vehicle.getVehicleType().getCarrierVehicleCapacity();
+//				 }
+//			}
+//			//TODO: Neuerstellung geteilter Services
+//			if (demand > maxVehicleCapacity){
+//				int demandtoAssignLeft = demand;
+//				int numberOfNewServices = 1;
+//				//Assign with heighest deliverable Capacity
+//				while (demandtoAssignLeft / maxVehicleCapacity > 1.){
+//					int assignDemand = maxVehicleCapacity;
+//					Id<CarrierService> id = Id.create(service.getId().toString() + "_" + alph.get(numberOfNewServices), CarrierService.class);
+//					CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, service.getLocationLinkId());
+//					serviceBuilder.setCapacityDemand(assignDemand)
+//						.setServiceStartTimeWindow(service.getServiceStartTimeWindow())
+//						.setServiceDuration(service.getServiceDuration()); //TODO: Aufteilen!
+//					
+//					demandtoAssignLeft = demandtoAssignLeft - demandtoAssignLeft;
+//					numberOfNewServices++;
+//				}
+//				//Assign Rest
+//				if 	(demandtoAssignLeft != 0){
+//					Id<CarrierService> id = Id.create(service.getId().toString() + "_" + alph.get(numberOfNewServices), CarrierService.class);
+//					CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, service.getLocationLinkId());
+//					serviceBuilder.setCapacityDemand(demandtoAssignLeft)
+//						.setServiceStartTimeWindow(service.getServiceStartTimeWindow())
+//						.setServiceDuration(service.getServiceDuration()); //TODO: Aufteilen!
+//				}
+//				serviceToRemove.add(service);
+//			}
+//		}
+//		
+//		//neue Schleife, da sonst innerhalb der Schleife das Set modifiziert wird..
+//		for (CarrierService service: serviceToRemove){ 
+//			carrier.getServices().remove(service);	//und lösche ihn aus dem normalen Carrier raus
+//		}
+//	}
+
 	//TODO: Absichern, dass zu erstellende VehicleType auch in VehicleTypes vorhanden sind! 
 	/*
 	 * Step3b: Elektro-Fahrzeug-Typen den UCC zuordnen
 	 * Dabei gilt, dass frozen nur über den light8telectro_frozen verfügt  und alle anderen
 	 * light8telectro und medium18telectro verfügen. Es werden Fahrzeuge für jedes Depot angelegt.
 	 */
-	private void addVehicles(Carrier Carrier, CarrierVehicleTypes vehicleTypes, 
+	private void addVehicles(Carrier carrier, CarrierVehicleTypes vehicleTypes, 
 			List<Id<Link>> uccDepotsLinkIds, double uccOpeningTime, double uccClosingTime) {
 
-		if (Carrier.getId().toString().endsWith("TIEFKUEHL")){
+		if (carrier.getId().toString().endsWith("TIEFKUEHL")){
 			for (Id<Link> linkId : uccDepotsLinkIds ){
-				Carrier.getCarrierCapabilities().getCarrierVehicles()
+				carrier.getCarrierCapabilities().getCarrierVehicles()
 					.add(CarrierVehicle.Builder.newInstance(Id.create("light8telectro_frozen", Vehicle.class), linkId)
 						.setType(vehicleTypes.getVehicleTypes().get(Id.create("light8telectro_frozen", VehicleType.class)))
 						.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
@@ -269,13 +326,13 @@ class UccCarrierCreator {
 			}
 		} else {
 			for (Id<Link> linkId : uccDepotsLinkIds ){
-				Carrier.getCarrierCapabilities().getCarrierVehicles()
+				carrier.getCarrierCapabilities().getCarrierVehicles()
 					.add(CarrierVehicle.Builder.newInstance(Id.create("light8telectro", Vehicle.class), linkId)
 						.setType(vehicleTypes.getVehicleTypes().get(Id.create("light8telectro", VehicleType.class)))
 						.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
 						.build());
 
-				Carrier.getCarrierCapabilities().getCarrierVehicles()
+				carrier.getCarrierCapabilities().getCarrierVehicles()
 					.add(CarrierVehicle.Builder.newInstance(Id.create("medium18telectro", Vehicle.class), linkId)
 						.setType(vehicleTypes.getVehicleTypes().get(Id.create("medium18telectro", VehicleType.class)))
 						.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
