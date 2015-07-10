@@ -28,7 +28,7 @@ public class CalculateAdditionalData {
 		GeometryFactory geometryFactory = new GeometryFactory();
 		
 		//String inputFile = "../../shared-svn/projects/accessibility_berlin/output/01/s/accessibilities.csv";
-		String parkInputFile = "../../shared-svn/projects/accessibility_berlin/landvaluecapture/QGIs/Gewaesser.shp";
+		String parkInputFile = "/Users/ich/Documents/VSP SVN/landvaluecapture/QGIs/Gewaesser.shp";
 		
 		double minX = 4574000;
 		double minY = 5802000;
