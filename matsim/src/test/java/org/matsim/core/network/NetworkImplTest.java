@@ -174,5 +174,28 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		network.addNode(node3);
 		Assert.assertEquals(3, network.getNodes().size());
 	}
+	
+	/**
+	 * MATSIM-278, 10jun2015: adding a node if quadtree only contained one node
+	 * 
+	 * @author mrieser / Senozon AG
+	 */
+	@Test
+	public void testAddNode_singleNodeFirstOnly() {
+		NetworkImpl network = new NetworkImpl();
+		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new CoordImpl(500, 400));
+		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new CoordImpl(600, 500));
+		network.addNode(node1);
+		Assert.assertEquals(1, network.getNodes().size());
+
+		Node n = network.getNearestNode(new CoordImpl(550, 450));
+		Assert.assertEquals(node1, n);
+		
+		network.addNode(node2);
+		Assert.assertEquals(2, network.getNodes().size());
+
+		n = network.getNearestNode(new CoordImpl(590, 490));
+		Assert.assertEquals(node2, n);
+	}
 
 }
