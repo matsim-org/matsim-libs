@@ -87,7 +87,7 @@ public class MatrixOperations {
 				if (val2 == null)
 					val2 = new Double(0);
 				
-				mErr.set(i, j, val2 - val1);
+				mErr.set(i, j, val1 - val2);
 			}
 		}
 		

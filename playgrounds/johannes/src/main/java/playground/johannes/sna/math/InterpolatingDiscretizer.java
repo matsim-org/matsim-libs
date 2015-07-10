@@ -17,31 +17,65 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.sna.math;
 
-import java.util.Random;
+import gnu.trove.TDoubleArrayList;
 
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import java.util.Arrays;
 
 /**
  * @author johannes
  *
  */
-public class IncomeMutatorFactory implements MutatorFactory {
+public class InterpolatingDiscretizer implements Discretizer {
 
-	private final Random random;
+	private double[] binValues;
 	
-	private final HistogramSync1D histSync;
+	private Discretizer borders;
 	
-	public IncomeMutatorFactory(Random random, HistogramSync1D histSync) {
-		this.random = random;
-		this.histSync = histSync;
+	public InterpolatingDiscretizer(double[] values) {
+		Arrays.sort(values);
+		TDoubleArrayList tmpBorders = new TDoubleArrayList();
+		TDoubleArrayList tmpValues = new TDoubleArrayList();
+		double low = values[0];
+		double high;
+		for(int i = 1; i < values.length; i++) {
+			high = values[i];
+			if(low < high) {
+				tmpBorders.add(low + (high - low)/2.0);
+				tmpValues.add(low);
+			}
+			low = high;
+		}
+		tmpValues.add(values[values.length - 1]);
+		
+		borders = new FixedBordersDiscretizer(tmpBorders.toNativeArray());
+		binValues = tmpValues.toNativeArray();
 	}
 	
+	/* (non-Javadoc)
+	 * @see playground.johannes.sna.math.Discretizer#discretize(double)
+	 */
 	@Override
-	public Mutator newInstance() {
-		return new IncomeMutator(random, histSync);
+	public double discretize(double value) {
+		int idx = (int)index(value);
+		return binValues[idx];
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.sna.math.Discretizer#index(double)
+	 */
+	@Override
+	public double index(double value) {
+		return borders.index(value);
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.sna.math.Discretizer#binWidth(double)
+	 */
+	@Override
+	public double binWidth(double value) {
+		return borders.binWidth(value);
 	}
 
 }

@@ -85,9 +85,14 @@ public class Simulator {
 		
 		MutatorCompositeFactory factory = new MutatorCompositeFactory(random);
 //		factory.addFactory(new IncomeMutatorFactory(random));
-		HistogramSync1D histSync = new HistogramSync1D(persons, simPersons, CommonKeys.PERSON_AGE, new DummyDiscretizer());
-		factory.addFactory(new AgeMutatorFactory(random, histSync));
-		h.addComponent(histSync, 100000);
+		HistogramSync1D histSyncAge = new HistogramSync1D(persons, simPersons, CommonKeys.PERSON_AGE, null);
+		HistogramSync1D histSyncIncome = new HistogramSync1D(persons, simPersons, CommonKeys.HH_INCOME, null);
+		
+		factory.addFactory(new AgeMutatorFactory(random, histSyncAge));
+		factory.addFactory(new IncomeMutatorFactory(random, histSyncIncome));
+		
+		h.addComponent(histSyncAge, 50000);
+		h.addComponent(histSyncIncome);
 		
 		Sampler sampler = new Sampler(simPersons, h, factory, random);
 		
@@ -106,7 +111,7 @@ public class Simulator {
 		
 		sampler.setSamplerListener(listener);
 		
-		sampler.run(1000001, 1);
+		sampler.run(10000001, 1);
 	}
 
 }

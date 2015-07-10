@@ -21,6 +21,8 @@ package playground.johannes.gsv.matrices.misc;
 
 import java.io.IOException;
 
+import org.apache.commons.math.linear.MatrixIndexException;
+
 import playground.johannes.gsv.matrices.io.VisumOMatrixReader;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
@@ -41,7 +43,7 @@ public class TTCompare {
 //		String zoneFile = args[2];
 //		String primKey = args[3];
 		
-		KeyMatrix tt2009 = VisumOMatrixReader.read("/home/johannes/gsv/prognose-update/Kreis_024.txt");
+		KeyMatrix tt2009 = VisumOMatrixReader.read("/home/johannes/gsv/prognose-update/infra2030lkw2030.txt");
 		KeyMatrix tt2030 = VisumOMatrixReader.read("/home/johannes/gsv/prognose-update/Kreis_025.txt");
 //		System.out.println("Loading matrix 2009...");
 //		KeyMatrix tt2009 = VisumOMatrixReader.read(file2009);
@@ -55,7 +57,8 @@ public class TTCompare {
 //		tt2009 = ExtractDE.extract(tt2009, zoneFile, primKey);
 //		tt2030 = ExtractDE.extract(tt2030, zoneFile, primKey);
 		
-		KeyMatrix ttErr = MatrixOperations.errorMatrix(tt2009, tt2030);
+//		KeyMatrix ttErr = MatrixOperations.errorMatrix(tt2009, tt2030);
+		KeyMatrix ttErr = MatrixOperations.diffMatrix(tt2030, tt2009);
 		
 		double sum = MatrixOperations.sum(ttErr);
 		int N = ttErr.keys().size();

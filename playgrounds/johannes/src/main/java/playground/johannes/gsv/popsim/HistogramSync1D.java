@@ -30,6 +30,8 @@ import playground.johannes.gsv.synPop.sim3.SamplerListener;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.math.InterpolatingDiscretizer;
+import playground.johannes.sna.math.LinearDiscretizer;
 
 /**
  * @author johannes
@@ -64,8 +66,10 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener {
 				refValues.add(Double.parseDouble(value));
 			}
 		}
-//		this.discretizer = FixedSampleSizeDiscretizer.create(refValues.toNativeArray(), 1, 10);
-		refHist = Histogram.createHistogram(refValues.toNativeArray(), discretizer, false);
+		this.discretizer = new InterpolatingDiscretizer(refValues.toNativeArray());
+//		this.discretizer = new LinearDiscretizer(10);
+		
+		refHist = Histogram.createHistogram(refValues.toNativeArray(), this.discretizer, false);
 //		keys = refHist.keys();
 		Histogram.normalize(refHist);
 		
@@ -76,7 +80,7 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener {
 				simValues.add(Double.parseDouble(value));
 			}
 		}
-		simHist = Histogram.createHistogram(simValues.toNativeArray(), discretizer, false);
+		simHist = Histogram.createHistogram(simValues.toNativeArray(), this.discretizer, false);
 		simFactor = 1/(double)simValues.size();
 //		Histogram.normalize(simHist);
 		

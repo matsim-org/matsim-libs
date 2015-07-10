@@ -17,31 +17,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.sna.math;
 
-import java.util.Random;
-
-import playground.johannes.gsv.synPop.sim3.Mutator;
-import playground.johannes.gsv.synPop.sim3.MutatorFactory;
+import junit.framework.TestCase;
 
 /**
  * @author johannes
  *
  */
-public class IncomeMutatorFactory implements MutatorFactory {
+public class InterpolatingDiscretizerTest extends TestCase {
 
-	private final Random random;
-	
-	private final HistogramSync1D histSync;
-	
-	public IncomeMutatorFactory(Random random, HistogramSync1D histSync) {
-		this.random = random;
-		this.histSync = histSync;
+	public void test1() {
+		double[] values = new double[10];
+		values[0] = 5;
+		values[1] = 2;
+		values[2] = 5;
+		values[3] = 5;
+		values[4] = 2;
+		values[5] = 6.8;
+		values[6] = 2.3;
+		values[7] = 10;
+		values[8] = 2.3;
+		values[9] = 10;
+		
+		InterpolatingDiscretizer discretizer = new InterpolatingDiscretizer(values);
+		
+		assertEquals(2.0, discretizer.discretize(-1));
+		assertEquals(2.0, discretizer.discretize(2));
+		assertEquals(2.0, discretizer.discretize(2.14));
+		
+		assertEquals(5.0, discretizer.discretize(5));
+		assertEquals(5.0, discretizer.discretize(5.89));
+		assertEquals(5.0, discretizer.discretize(4.15));
+		
+		assertEquals(10.0, discretizer.discretize(1000));
+		
+		assertEquals(6.8, discretizer.discretize(6.77));
 	}
-	
-	@Override
-	public Mutator newInstance() {
-		return new IncomeMutator(random, histSync);
-	}
-
 }

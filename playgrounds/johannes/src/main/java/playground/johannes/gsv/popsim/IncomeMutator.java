@@ -32,8 +32,8 @@ public class IncomeMutator extends AttributeMutator {
 
 	private final Random random;
 	
-	public IncomeMutator(Random random) {
-		super(random, CommonKeys.HH_INCOME, DistanceVector.INCOME_KEY, null);
+	public IncomeMutator(Random random, HistogramSync1D histSync) {
+		super(random, CommonKeys.HH_INCOME, DistanceVector.INCOME_KEY, histSync);
 		this.random = random;
 	}
 
