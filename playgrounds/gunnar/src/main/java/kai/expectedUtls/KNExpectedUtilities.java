@@ -29,7 +29,7 @@ import org.apache.commons.math3.util.FastMath;
  * @author nagel
  *
  */
-class Main {
+class KNExpectedUtilities {
 
 	public static void main(String[] args) {
 		final double fact = 1. ; // weight of eta
