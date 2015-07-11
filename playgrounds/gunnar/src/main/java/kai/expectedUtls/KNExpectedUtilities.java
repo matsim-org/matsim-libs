@@ -54,6 +54,9 @@ class KNExpectedUtilities {
 
 		final double N_DRAWS = 10000. ;
 		double utlsSum = 0. ;
+		double diff = 0 ;
+		double sumEta = 0. ;
+
 		for ( int jj=0 ; jj<N_DRAWS ; jj++ ) {
 			// average over N_DRAWS:
 			
@@ -69,14 +72,21 @@ class KNExpectedUtilities {
 			}
 			
 			// this computes the index where V_i + eps_i + eta_i is max:
-			int index = vvPlsEpsPlsEta.indexOf( Collections.max( vvPlsEpsPlsEta ) ) ;
+			final Double scoreThatAgentHopesFor = Collections.max( vvPlsEpsPlsEta );
+			int index = vvPlsEpsPlsEta.indexOf( scoreThatAgentHopesFor ) ;
 			
 			// use V_i + eps_i from this and add another eta_i (this is the utl the agent will receive) and average over that:
-			utlsSum += vvPlsEps.get(index)  + gmb.sample() ;
+			final double actualScore = vvPlsEps.get(index)  + fact * gmb.sample();
+			utlsSum += actualScore ;
 			
+			// collect some other quantities as candidates for correction:
+			sumEta += scoreThatAgentHopesFor - vvPlsEps.get(index) ;
+			diff += scoreThatAgentHopesFor - actualScore ;
 		}
 
 		System.out.println( "numerical max is: " + utlsSum/N_DRAWS ) ;
+		System.out.println( "diff is: " + diff/N_DRAWS ) ;
+		System.out.println( "av eta (before) is: " + sumEta/N_DRAWS ) ;
 		
 		double sum = 0. ;
 		for ( Double vv : vvv ) {
