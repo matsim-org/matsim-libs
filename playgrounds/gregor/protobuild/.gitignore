@@ -1,1 +1,2 @@
 /protoc-gen-grpc-java-*
+/.gitignore~

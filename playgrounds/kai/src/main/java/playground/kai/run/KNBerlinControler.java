@@ -35,6 +35,7 @@ import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
+import playground.ikaddoura.noise2.utils.MergeNoiseCSVFile;
 
 class KNBerlinControler {
 	private static final Logger log = Logger.getLogger("blabla");
@@ -233,6 +234,11 @@ class KNBerlinControler {
 
 		eventWriter.closeFile();
 		log.info("Noise calculation completed.");
+		
+		// ---
+		
+//		MergeNoiseCSVFile.main(null);
+		// yy needs settable paths
 
 	
 	}
