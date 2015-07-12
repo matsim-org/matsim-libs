@@ -71,9 +71,9 @@ class KNExpectedUtilities {
 		for ( int jj=0 ; jj<N_DRAWS ; jj++ ) {
 			// average over N_DRAWS:
 			
+			// these are the V_i + eps_i:
 			List<Double> vvPlsEps = new ArrayList<>() ;			
 			for ( Double vv : vvv ) {
-				// these are the V_i + eps_i:
 				final double vvPlsEp = vv + gmb.sample();
 				vvPlsEps.add( vvPlsEp  ) ;				
 			}
@@ -97,8 +97,8 @@ class KNExpectedUtilities {
 			int index = vvPlsEpsPlsEta.indexOf( scoreThatAgentHopesFor ) ;
 			expectedUtlSum += scoreThatAgentHopesFor;
 						
-			// create new etas (to be experienced; also the basis for the
-			// next iterations decision)
+			// create new etas (to be experienced in the mobsim; these will then
+			// also be the basis for the next iteration's decision)
 			List<Double> newEta = new ArrayList<Double>();		
 			for (int ii = 0; ii < NNN; ii++) {
 				newEta.add(etaInertia * eta.get(ii) + (1.0 - etaInertia) * fact * gmb.sample());
@@ -109,11 +109,10 @@ class KNExpectedUtilities {
 			receivedUtlSum += actualScore ;
 			
 			// This is the correction. It does not become zero for reasons
-			// explained via Email. It is straightforward to compute from
-			// "MATSim-variables" as (the received score of the selected plan)
-			// minus (the score of the selected plan on which the choice was 
-			// based).
-			final double gamma = actualScore - scoreThatAgentHopesFor;
+			// explained via Email. Using only directly available "MATSim-variables".
+			final double scoreBeforeDecision = vvv.get(index) + eta.get(index);
+			final double scoreThatWasReceived = vvv.get(index) + newEta.get(index);
+			final double gamma = scoreThatWasReceived - scoreBeforeDecision;
 			gammaSum += gamma;
 			
 			// take over etas
