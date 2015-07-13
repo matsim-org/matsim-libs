@@ -78,25 +78,29 @@ public class RunMultipleMotifs {
 			String pathToInputFolder, String outputPath, String networkName) {
 		
 		String foldername = pathToInputFolder;
+		
 		/* When network contains both onedirectional and bidirectional edges */
 		String linkfiles  = "\"A d A A onedirectional.txt X u X X bidirectional.txt\""; //Remember to change motif file!
+		
 		/* When network only contains onedirectional edges */
 //		String linkfiles  = "\"A d A A onedirectional.txt\""; //Remember to change motif file!
+//		String linkfiles  = "\"A d A A " + networkName + ".txt\"";
+		
 		int totalMotifs = 0;
 		int j = 0;
 		for (String motif : motifList) {
-			String output = outputPath + networkName + "_" + motif + ".txt";
+			String output = outputPath + networkName + "_" + motif + "_" + j + ".txt";
 			 String[] ar = new String[]{"-folder", foldername, "-linkfiles", linkfiles, "-output", output, "-motif", motif};
 	        try {
 				CommandLineInterface.main(ar);
-//				totalMotifs = totalMotifs + countMotifs(pathToFolder, networkNumber, motif, j);
+				totalMotifs = totalMotifs + countMotifs(pathToInputFolder, networkName, motif, j);
 			} catch (IOException e) {
 				log.info("Cannot run CommandLineInterface.");
 				e.printStackTrace();
 			}
 	        j++;
 		}
-//		log.info("Total number of motifs ---------------> " + totalMotifs);
+		log.info("Total number of motifs ---------------> " + totalMotifs);
 		
 	}
 

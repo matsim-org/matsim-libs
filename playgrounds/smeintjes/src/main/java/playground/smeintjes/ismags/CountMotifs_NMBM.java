@@ -12,82 +12,72 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.southafrica.utilities.Header;
-
+//TODO rewrite code to read NMBM files
 /**
  * This class calculates, for all random networks, the number of each type of
  * motif and writes these frequencies to file.
  * 
  * @param String input motif specification file (a list containing all possible 
  * motif specifications for a motif of certain size) (example "motifSpecifications/3-node-motifSpecifications.txt")
- * @param String path to folder containing random networks ("randomNetworks/")
- * @param String path to output file (example "random-3-node-frequencies.txt")
- * @param Integer number of random networks ("100")
+ * @param String path to folder containing random networks ("20_20_NMBM/")
+ * @param String path to output file (example "nmbm-3-node-frequencies.txt")
  * @param String the name of the subfolder containing the motif results (example "3-node-motifs/" when looking at 3-node motifs)
  * 
  * @author sumarie
  *
  9+*/
-public class CountMotifs {
+public class CountMotifs_NMBM {
 
-	private static Logger log = Logger.getLogger(CountMotifs.class);
+	private static Logger log = Logger.getLogger(CountMotifs_NMBM.class);
 	/** 
 	 * @param args
 	 */
 	public static void main(String[] args) {
 
-		Header.printHeader(CountMotifs.class.toString(), args);
+		Header.printHeader(CountMotifs_NMBM.class.toString(), args);
 		
 		String motifSpecificationFile = args[0];
-		String randomNetworksFolder = args[1];
+		String networkFolder = args[1];
 		String outputFile = args[2];
-		Integer numberNetworks = Integer.parseInt(args[3]);
-		String inputSubFolder = args[4];
+		String inputSubFolder = args[3];
 		
 		
 		ArrayList<String> motifSpecifications = readMotifSpecifications(motifSpecificationFile);
 		
-		int[][] motifFrequencyBlock = new int[motifSpecifications.size()][numberNetworks.intValue()];
-		
-		for(int i = 0; i < numberNetworks; i++){
-			log.info("Counting network " + i + "'s frequencies.");
-			motifFrequencyBlock = readMotifOutput(motifSpecifications, randomNetworksFolder, inputSubFolder, i, motifFrequencyBlock);
-		}
-		writeOutput(motifSpecifications, motifFrequencyBlock, outputFile, numberNetworks);
+		int[][] motifFrequencyBlock = new int[motifSpecifications.size()][1];
+
+		motifFrequencyBlock = readMotifOutput(motifSpecifications, networkFolder, inputSubFolder, motifFrequencyBlock);
+
+		writeOutput(motifSpecifications, motifFrequencyBlock, outputFile);
 		
 		Header.printFooter();
 		
 	}
 	
 	private static int[][] readMotifOutput(
-			ArrayList<String> motifSpecifications, String randomNetworksFolder,
-			String inputSubFolder, int i, int[][] motifFrequencyBlock) {
+			ArrayList<String> motifSpecifications, String nmbmNetworksFolder,
+			String inputSubFolder, int[][] motifFrequencyBlock) {
 		
-		/* Uncomment for running on random networks on Hobbes */
-		String thisNetworkOutputFolder = randomNetworksFolder + "random" + i + "/";
-
 		for(int j = 0; j < motifSpecifications.size(); j++){
-			
-			
-			String thisOutputFile = inputSubFolder + "random" + i + "_" + motifSpecifications.get(j) + ".txt";
-			
+
+			String thisOutputFile = nmbmNetworksFolder + inputSubFolder + "20_20_NMBM_" + motifSpecifications.get(j) + ".txt";
 			int k = 0;
 			try {
 				log.info("Reading motif output file: " + thisOutputFile);
 				
-				
-				BufferedReader br = IOUtils.getBufferedReader(thisNetworkOutputFolder + thisOutputFile);
-				
-				String lines;
-				while ((lines = br.readLine()) != null) {
-					k++;
-				}
-				
+					BufferedReader br = IOUtils.getBufferedReader(thisOutputFile);
+					
+					String lines;
+					while ((lines = br.readLine()) != null) {
+						k++;
+					}
+ 
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			motifFrequencyBlock[j][i] = k;
+			motifFrequencyBlock[j][0] = k;
 			
 		}
 		
@@ -118,7 +108,7 @@ public class CountMotifs {
 
 	private static void writeOutput(
 			ArrayList<String> motifSpecifications,
-			int[][] motifFrequencyBlock, String outputFile, int numberNetworks) {
+			int[][] motifFrequencyBlock, String outputFile) {
 		
 		log.info("Writing " + outputFile + " to file.");
 		try {
@@ -128,14 +118,10 @@ public class CountMotifs {
 					for (int i = 0; i < motifSpecifications.size(); i++) {
 						String motif = motifSpecifications.get(i);
 						output.write(motif);
-						for(int j = 0; j < numberNetworks; j++){
-							int frequency = motifFrequencyBlock[i][j];
-							output.write(",");
-							output.write(Integer.toString(frequency));
-							
-						}
+						int frequency = motifFrequencyBlock[i][0];
+						output.write(",");
+						output.write(Integer.toString(frequency));	
 						output.newLine();
-						
 					}
 			} finally {
 				output.close();
