@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -41,13 +42,13 @@ public class CottbusUtils {
 		c2.scenario().setUseSignalSystems(true);
 		c2.network().setInputFile(DgCottbusScenarioPaths.NETWORK_FILENAME);
 		c2.network().setLaneDefinitionsFile(DgCottbusScenarioPaths.LANES_FILENAME);
-		c2.signalSystems().setSignalSystemFile(DgCottbusScenarioPaths.SIGNALS_FILENAME);
-		c2.signalSystems().setSignalGroupsFile(DgCottbusScenarioPaths.SIGNAL_GROUPS_FILENAME);
+		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(DgCottbusScenarioPaths.SIGNALS_FILENAME);
+		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(DgCottbusScenarioPaths.SIGNAL_GROUPS_FILENAME);
 		if (fixedTimeSignals){
-			c2.signalSystems().setSignalControlFile(DgCottbusScenarioPaths.SIGNAL_CONTROL_FIXEDTIME_FILENAME);
+			ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(DgCottbusScenarioPaths.SIGNAL_CONTROL_FIXEDTIME_FILENAME);
 		}
 		else {
-			c2.signalSystems().setSignalControlFile(DgCottbusScenarioPaths.SIGNAL_CONTROL_SYLVIA_FILENAME);
+			ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(DgCottbusScenarioPaths.SIGNAL_CONTROL_SYLVIA_FILENAME);
 		}
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.loadScenario(c2);
 		return sc;

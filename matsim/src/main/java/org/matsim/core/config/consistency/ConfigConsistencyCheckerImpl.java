@@ -111,7 +111,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 
 	private void checkEventsFormatLanesSignals(final Config c) {
 		ScenarioConfigGroup scg = c.scenario();
-		if (scg.isUseLanes() || scg.isUseSignalSystems()) {
+		if (scg.isUseLanes()) {
 			if (!c.controler().getEventsFileFormats().contains(EventsFileFormat.xml)){
 				log.error("Xml events are not enabled, but lanes and eventually signal systems" +
 						"are enalbed. Events from this features will only be written to the xml format, consider" +
@@ -122,7 +122,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 
 	private void checkScenarioFeaturesEnabled(final Config c) {
 		ScenarioConfigGroup scg = c.scenario();
-		if (scg.isUseSignalSystems() && ! ("qsim".equals(c.controler().getMobsim()) ||  c.qsim() != null)){
+		if (! ("qsim".equals(c.controler().getMobsim()) ||  c.qsim() != null)){
 		  log.warn("The signal system implementation is only supported by the org.matsim.ptproject.qsim mobility simulation that is not activated. Please make sure you are using the correct" +
 		  		"mobility simulation. This warning can be ingored if a customized mobility simulation developed outside of org.matsim is used and set correctly.");
 		}

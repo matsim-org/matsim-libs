@@ -68,11 +68,11 @@ public class DefaultPlanbasedSignalControlTest {
 		config.network().setInputFile(networkInputFile);
 		//signals
 		String signalsFile = inputDir + "signal_systems.xml";
-		config.signalSystems().setSignalSystemFile(signalsFile);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalsFile);
 		String signalGroupsFile = inputDir + "signal_groups.xml";
-		config.signalSystems().setSignalGroupsFile(signalGroupsFile);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);
 		String signalControlFile = inputDir + "signal_control.xml";
-		config.signalSystems().setSignalControlFile(signalControlFile);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFile);
 	
 		Controler controler = new Controler(config);
         controler.getConfig().controler().setCreateGraphs(false);

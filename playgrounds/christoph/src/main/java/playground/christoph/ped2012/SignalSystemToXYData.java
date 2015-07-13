@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -69,7 +70,7 @@ public class SignalSystemToXYData implements BasicEventHandler {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(inputNetworkFile);
 		config.scenario().setUseSignalSystems(true);
-		config.signalSystems().setSignalSystemFile(inputSignalSystemsFile);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(inputSignalSystemsFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);

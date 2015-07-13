@@ -30,6 +30,7 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
 public class CreateSignals {
 	
@@ -57,7 +58,7 @@ public class CreateSignals {
 	}
 	
 	private SignalsData createSignals(String signalgroupsFile, String greentimesXMLFile) {
-		SignalsData signalsData = new SignalsDataImpl(ConfigUtils.createConfig().signalSystems());
+		SignalsData signalsData = new SignalsDataImpl(ConfigUtils.addOrGetModule(ConfigUtils.createConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		
 		// read file and 
 		List<Intersection> intersections = this.readIntersections(signalgroupsFile);

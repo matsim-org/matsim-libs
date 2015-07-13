@@ -31,6 +31,7 @@ import org.matsim.contrib.signals.data.ambertimes.v10.IntergreenTimesDataFactory
 import org.matsim.contrib.signals.data.ambertimes.v10.IntergreensForSignalSystemData;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
 
 /**
@@ -62,8 +63,8 @@ public class RunCreateIntergreensExample {
 	public static void main(String[] args) {
 		String configFile = new RunCreateTrafficSignalScenarioExample().run();
 		Config config = ConfigUtils.loadConfig(configFile);
-		config.signalSystems().setUseIntergreenTimes(true);
-		SignalsScenarioLoader loader = new SignalsScenarioLoader(config.signalSystems());
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseIntergreenTimes(true);
+		SignalsScenarioLoader loader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signalsData = loader.loadSignalsData();
 		createIntergreens(signalsData);
 		IntergreenTimesWriter10 writer = new IntergreenTimesWriter10(signalsData.getIntergreenTimesData());

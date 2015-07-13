@@ -26,6 +26,7 @@ import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -62,16 +63,16 @@ public class RunSignalSystemsExample {
 		config.scenario().setUseSignalSystems(true);
 		
 		// these are the paths to the signal systems definition files:
-		config.signalSystems().setSignalSystemFile(inputDir + "signalSystems_v2.0.xml");
-		config.signalSystems().setSignalGroupsFile(inputDir + "signalGroups_v2.0.xml");
-		config.signalSystems().setSignalControlFile(inputDir + "signalControl_v2.0.xml");
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(inputDir + "signalSystems_v2.0.xml");
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(inputDir + "signalGroups_v2.0.xml");
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(inputDir + "signalControl_v2.0.xml");
 		
 //		config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 //		config.controler().setLinkToLinkRoutingEnabled(true);
 
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, 
-				new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
+				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		// ---
 
 		// add the signals module to the simulation:

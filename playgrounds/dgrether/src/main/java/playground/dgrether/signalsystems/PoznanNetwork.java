@@ -33,6 +33,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
@@ -254,7 +255,7 @@ public class PoznanNetwork
         lanes.addLanesToLinkAssignment(l2l);
 
         // create the traffic signal infrastructure
-        scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataImpl(scenario.getConfig().signalSystems()));
+        scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataImpl(ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)));
         SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalSystemsData signals = signalsData.getSignalSystemsData();
 
@@ -570,9 +571,9 @@ public class PoznanNetwork
         otfconfig.setAgentSize(70.0f);
         otfconfig.setMapOverlayMode(false);
         config.qsim().setNodeOffset(30);
-        config.signalSystems().setUseAmbertimes(true);
+        ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseAmbertimes(true);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
-        scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataImpl(config.signalSystems()));
+        scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataImpl(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)));
 
         // create network lanes and signals
         createPhysics();
@@ -604,16 +605,16 @@ public class PoznanNetwork
         SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
         String signalSystemsFile = baseDir + "signal_systems.xml";
         signalsWriter.setSignalSystemsOutputFilename(signalSystemsFile);
-        config.signalSystems().setSignalSystemFile(signalSystemsFile);
+        ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalSystemsFile);
         String signalGroupsFile = baseDir + "signal_groups.xml";
         signalsWriter.setSignalGroupsOutputFilename(signalGroupsFile);
-        config.signalSystems().setSignalGroupsFile(signalGroupsFile);
+        ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);
         String signalControlFile = baseDir + "signal_control.xml";
         signalsWriter.setSignalControlOutputFilename(signalControlFile);
-        config.signalSystems().setSignalControlFile(signalControlFile);
+        ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFile);
         String amberTimesFile = baseDir + "amber_times.xml";
         signalsWriter.setAmberTimesOutputFilename(amberTimesFile);
-        config.signalSystems().setAmberTimesFile(amberTimesFile);
+        ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setAmberTimesFile(amberTimesFile);
         signalsWriter.writeSignalsData((SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME));
 
         String lanesOutputFile = baseDir + "lanes.xml";

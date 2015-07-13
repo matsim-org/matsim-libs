@@ -48,6 +48,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -178,7 +179,7 @@ public class RunCreateTrafficSignalScenarioExample {
 		config.controler().setMobsim("qsim");
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		this.createSignalSystemsAndGroups(scenario, signalsData);
 		this.createSignalControl(scenario, signalsData);
@@ -201,9 +202,9 @@ public class RunCreateTrafficSignalScenarioExample {
 		signalsWriter.setSignalControlOutputFilename(signalControlFile);
 		signalsWriter.writeSignalsData(signalsData);
 
-		config.signalSystems().setSignalSystemFile(signalSystemsFile);
-		config.signalSystems().setSignalGroupsFile(signalGroupsFile);
-		config.signalSystems().setSignalControlFile(signalControlFile);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalSystemsFile);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFile);
 		ConfigWriter configWriter = new ConfigWriter(config);
 		configWriter.write(configFile);
 		

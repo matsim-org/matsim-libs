@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -149,11 +150,11 @@ public class RunResultsLoader {
 	}
 
 	private SignalsData loadSignals(String systemspath, String groupspath, String controlpath) {
-		Config c = ConfigUtils.createConfig(); 
-		c.signalSystems().setSignalSystemFile(systemspath);
-		c.signalSystems().setSignalGroupsFile(groupspath);
-		c.signalSystems().setSignalControlFile(controlpath);
-		SignalsScenarioLoader loader = new SignalsScenarioLoader(c.signalSystems());
+		Config c = ConfigUtils.createConfig();
+		ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(systemspath);
+		ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(groupspath);
+		ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(controlpath);
+		SignalsScenarioLoader loader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(c, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		return loader.loadSignalsData();
 	}
 

@@ -29,6 +29,7 @@ import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
@@ -57,7 +58,7 @@ public class ConvertFigure9Solution2Matsim {
 		
 		//load config and signals
 		Config config = ConfigUtils.loadConfig(matsimConfig);
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(config.signalSystems());
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signals = signalsLoader.loadSignalsData();
 		
 		//convert solution to signal plans

@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -239,12 +240,12 @@ public class DgCalculateSignalGroupsTest {
 		conf.network().setLaneDefinitionsFile(lanes20);
 		conf.scenario().setUseSignalSystems(true);
 		String signalSystemsFile = inputDirectory + "testSignalSystems_v2.0.xml";
-		conf.signalSystems().setSignalSystemFile(signalSystemsFile);
+		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalSystemsFile);
 
 		//load the network
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(scenario.getConfig().signalSystems())
+				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class))
 						.loadSignalsData());
 		SignalsData signalsData = (SignalsData) scenario
 				.getScenarioElement(SignalsData.ELEMENT_NAME);

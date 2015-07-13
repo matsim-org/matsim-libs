@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.data;
 
-import org.matsim.core.config.groups.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesDataImpl;
 import org.matsim.contrib.signals.data.intergreens.v10.IntergreenTimesDataImpl;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;

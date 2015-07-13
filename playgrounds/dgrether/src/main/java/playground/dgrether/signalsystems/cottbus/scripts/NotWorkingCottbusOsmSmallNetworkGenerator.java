@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -101,7 +102,7 @@ public class NotWorkingCottbusOsmSmallNetworkGenerator {
 		c1.network().setInputFile(networkWoJunctionsFile);
 		String signalsSystems = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
 		c1.scenario().setUseSignalSystems(true);
-		c1.signalSystems().setSignalSystemFile(signalsSystems);
+		ConfigUtils.addOrGetModule(c1, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalsSystems);
 		Scenario scenario = ScenarioUtils.loadScenario(c1);
 		
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);

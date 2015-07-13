@@ -13,6 +13,7 @@ import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup.TravelTimeCalculatorType;
 import org.matsim.core.controler.AbstractModule;
@@ -67,8 +68,8 @@ public class RunBraessSimulation {
 		createRunNameAndOutputDir(scenario);
 		
 		if (config.scenario().isUseSignalSystems()){
-			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, 
-					new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
+					new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 			
 			createSignals(scenario);
 		}

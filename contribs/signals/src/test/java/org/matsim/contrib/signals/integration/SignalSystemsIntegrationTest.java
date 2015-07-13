@@ -26,7 +26,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.router.InvertedNetworkTripRouterFactoryModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -71,7 +73,7 @@ public class SignalSystemsIntegrationTest {
 		config.controler().setWriteEventsInterval(10);
 		config.controler().setWritePlansInterval(10);
 		Controler c = new Controler(config);
-		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
@@ -144,7 +146,7 @@ public class SignalSystemsIntegrationTest {
 		//		config.network().setLaneDefinitionsFile(lanes20);
 
 		Controler c = new Controler(configFile);
-		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(config.signalSystems()).loadSignalsData());
+		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);

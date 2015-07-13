@@ -39,6 +39,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.network.NetworkUtils;
@@ -242,8 +243,8 @@ public class DaganzoScenarioGenerator {
 		if (isUseSignalSystems) {
 			//enable lanes and signal system feature in config
 			config.scenario().setUseSignalSystems(true);
-			config.signalSystems().setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
-			config.signalSystems().setSignalControlFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
+			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
+			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 			//create the signal systems and write them
 //			SignalSystems signalSystems = createSignalSystems(scenario);
 //			MatsimSignalSystemsWriter ssWriter = new MatsimSignalSystemsWriter(signalSystems);
@@ -365,8 +366,8 @@ public class DaganzoScenarioGenerator {
 			config.network().setLaneDefinitionsFile(lanesInputFile);
 		}
 		if (isUseSignalSystems){
-			config.signalSystems().setSignalSystemFile(signalInputFile);
-			config.signalSystems().setSignalControlFile(this.signalConfigInputFile);
+			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalInputFile);
+			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(this.signalConfigInputFile);
 		}
 
 		if (runId != null) {

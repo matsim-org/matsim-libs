@@ -36,6 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.*;
@@ -226,7 +227,7 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-				new SignalsScenarioLoader(config.signalSystems())
+				new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class))
 						.loadSignalsData());
 
 		this.createLanes((ScenarioImpl) scenario);
@@ -250,11 +251,11 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 
 		config.network().setLaneDefinitionsFile(
 				outputDir + "lane_definitions_v2.0.xml");
-		config.signalSystems().setSignalSystemFile(
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(
 				outputDir + "signal_systems.xml");
-		config.signalSystems().setSignalGroupsFile(
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(
 				outputDir + "signal_groups.xml");
-		config.signalSystems().setSignalControlFile(
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(
 				outputDir + "signal_control.xml");
 
 		// write to file
@@ -267,11 +268,11 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		writerDelegate.write(config.network().getLaneDefinitionsFile());
 
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter();
-		signalsWriter.setSignalSystemsOutputFilename(config.signalSystems()
+		signalsWriter.setSignalSystemsOutputFilename(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)
 				.getSignalSystemFile());
-		signalsWriter.setSignalGroupsOutputFilename(config.signalSystems()
+		signalsWriter.setSignalGroupsOutputFilename(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)
 				.getSignalGroupsFile());
-		signalsWriter.setSignalControlOutputFilename(config.signalSystems()
+		signalsWriter.setSignalControlOutputFilename(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)
 				.getSignalControlFile());
 		signalsWriter.writeSignalsData(signalsData);
 

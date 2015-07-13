@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.data.SignalsDataImpl;
 import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
-import org.matsim.contrib.signals.integration.invertednetworks.InvertedNetworkRoutingTestFixture;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
@@ -41,6 +40,8 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
 /**
  * @author dgrether
@@ -58,7 +59,7 @@ public class InvertedNetworkRoutingSignalsFixture extends InvertedNetworkRouting
 	}
 	
 	private void createSignals() {
-		SignalsData signalsData = new SignalsDataImpl( scenario.getConfig().signalSystems() );
+		SignalsData signalsData = new SignalsDataImpl(ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 		SignalSystemsData ssd = signalsData.getSignalSystemsData();
 		SignalSystemsDataFactory f = ssd.getFactory();

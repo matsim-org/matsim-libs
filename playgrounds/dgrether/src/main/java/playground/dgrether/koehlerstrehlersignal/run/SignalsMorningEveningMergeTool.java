@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
@@ -112,9 +113,9 @@ public class SignalsMorningEveningMergeTool {
 				break;
 			}
 		}
-		Config config = ConfigUtils.createConfig(); 
-		config.signalSystems().setSignalControlFile(infile.getAbsolutePath());
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(config.signalSystems());
+		Config config = ConfigUtils.createConfig();
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(infile.getAbsolutePath());
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signals = signalsLoader.loadSignalsData();
 		return signals.getSignalControlData();
 	}

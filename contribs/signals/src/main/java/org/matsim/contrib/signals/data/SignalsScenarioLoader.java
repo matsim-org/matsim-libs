@@ -20,7 +20,7 @@
 package org.matsim.contrib.signals.data;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.groups.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.MatsimSignalSystemsReader;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesReader10;
 import org.matsim.contrib.signals.data.ambertimes.v10.AmberTimesWriter10;

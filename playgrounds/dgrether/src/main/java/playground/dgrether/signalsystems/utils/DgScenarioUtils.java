@@ -22,6 +22,7 @@ package playground.dgrether.signalsystems.utils;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -43,9 +44,9 @@ public class DgScenarioUtils {
 			c2.plans().setInputFile(pop);
 		}
 		c2.network().setLaneDefinitionsFile(lanesFilename);
-		c2.signalSystems().setSignalSystemFile(signalsFilename);
-		c2.signalSystems().setSignalGroupsFile(signalGroupsFilename);
-		c2.signalSystems().setSignalControlFile(signalControlFilename);
+		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalsFilename);
+		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFilename);
+		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFilename);
 		Scenario scenario = ScenarioUtils.loadScenario(c2);
 		return scenario;
 	}

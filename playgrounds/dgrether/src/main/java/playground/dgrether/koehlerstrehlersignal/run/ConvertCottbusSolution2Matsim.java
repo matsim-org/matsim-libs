@@ -26,6 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
@@ -116,14 +117,14 @@ public class ConvertCottbusSolution2Matsim {
 
 	private SignalsData loadSignalsData(String directory) {
 		Config config = ConfigUtils.createConfig();
-		config.signalSystems().setSignalSystemFile(
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(
 				directory + "output_signal_systems_v2.0.xml.gz");
-		config.signalSystems().setSignalGroupsFile(
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(
 				directory + "output_signal_groups_v2.0.xml.gz");
-		config.signalSystems().setSignalControlFile(
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(
 				directory + "output_signal_control_v2.0.xml.gz");
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(
-				config.signalSystems());
+				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signals = signalsLoader.loadSignalsData();
 		return signals;
 	}

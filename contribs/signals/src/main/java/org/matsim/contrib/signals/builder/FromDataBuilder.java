@@ -42,6 +42,8 @@ import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalPlan;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 
 /**
  * @author dgrether
@@ -112,7 +114,7 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	
 	public void createAndAddAmberLogic(SignalSystemsManager manager){
 		//process information of AmberTimesData object
-		if (this.scenario.getConfig().signalSystems().isUseAmbertimes()){
+		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseAmbertimes()){
 			AmberLogic amberLogic = new AmberLogicImpl(this.signalsData.getAmberTimesData());
 			manager.setAmberLogic(amberLogic);
 		}
@@ -126,8 +128,8 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 	}
 	
 	public void createAndAddIntergreenTimesLogic(SignalSystemsManager manager){
-		if (this.scenario.getConfig().signalSystems().isUseIntergreenTimes()){
-			IntergreensLogic intergreensLogic = new IntergreensLogicImpl(this.signalsData.getIntergreenTimesData(), this.scenario.getConfig().signalSystems());
+		if (ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseIntergreenTimes()){
+			IntergreensLogic intergreensLogic = new IntergreensLogicImpl(this.signalsData.getIntergreenTimesData(), ConfigUtils.addOrGetModule(this.scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 			this.events.addHandler(intergreensLogic);
 		}
 	}

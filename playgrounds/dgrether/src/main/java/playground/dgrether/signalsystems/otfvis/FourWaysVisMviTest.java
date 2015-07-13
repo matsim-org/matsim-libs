@@ -26,6 +26,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -71,10 +72,10 @@ public class FourWaysVisMviTest {
     
     conf.network().setLaneDefinitionsFile(lanesFile);
     conf.scenario().setUseLanes(true);
-    
-		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
-		scenario.getConfig().signalSystems().setSignalGroupsFile(signalGroupsFile);
-		scenario.getConfig().signalSystems().setSignalControlFile(signalControlFile);
+
+    ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalFile);
+    ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);
+    ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFile);
 		scenario.getConfig().scenario().setUseSignalSystems(true);
     
     conf.controler().setFirstIteration(0);

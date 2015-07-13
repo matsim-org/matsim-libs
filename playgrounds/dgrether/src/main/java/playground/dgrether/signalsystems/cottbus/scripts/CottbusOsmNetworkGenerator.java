@@ -22,6 +22,7 @@ package playground.dgrether.signalsystems.cottbus.scripts;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -102,7 +103,7 @@ public class CottbusOsmNetworkGenerator {
 		c1.network().setInputFile(cleanedNetworkFile);
 		String signalsSystems = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
 		c1.scenario().setUseSignalSystems(true);
-		c1.signalSystems().setSignalSystemFile(signalsSystems);
+		ConfigUtils.addOrGetModule(c1, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalsSystems);
 		Scenario scenario = ScenarioUtils.loadScenario(c1);
 		
 		String signalsShapeFile = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_from_osm/signalized_links.shp";

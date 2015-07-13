@@ -28,6 +28,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -61,11 +62,11 @@ public class FourWaysVis {
 		config.plans().setInputFile(popFile);
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		config.qsim().setStuckTime(100.0);
-		
-		
-		config.signalSystems().setSignalSystemFile(signalFile);
-		config.signalSystems().setSignalGroupsFile(signalGroupsFile);
-		config.signalSystems().setSignalControlFile(signalControlFile);
+
+
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalFile);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFile);
 		config.scenario().setUseSignalSystems(true);
 		
 		OTFVisConfigGroup otfconfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.config.groups;
+package org.matsim.contrib.signals;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 

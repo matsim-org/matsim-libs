@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
@@ -39,7 +40,6 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.households.HouseholdsReaderV10;
 import org.matsim.lanes.data.v20.LaneDefinitionsReader;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.contrib.signals.data.SignalsData;
@@ -296,7 +296,7 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadSignalSystems() {
-		this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(this.config.signalSystems()).loadSignalsData());
+		this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(this.config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 	}
 
 }

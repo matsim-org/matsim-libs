@@ -31,6 +31,7 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
@@ -118,7 +119,7 @@ public class XVis {
 		else if (MatsimFileTypeGuesser.FileType.SignalControl.equals(guesser.getGuessedFileType())){
 			Config config = ConfigUtils.createConfig();
 			config.scenario().setUseSignalSystems(true);
-			config.signalSystems().setSignalControlFile(filename);
+			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(filename);
 			scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		}
 		

@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.utils.io.IOUtils;
@@ -81,7 +82,7 @@ public class SylviaMainBatch {
 			DgCottbusSylviaAnalysisControlerListener analysis = new DgCottbusSylviaAnalysisControlerListener();
 			baseConfig.controler().setOutputDirectory(outputDirBase + "fixed-time_scale_"+scale + "/");
 			baseConfig.plans().setInputFile( footballPlansBaseFilename + scale + ".xml.gz");
-			baseConfig.signalSystems().setSignalControlFile(fixedTimeSignals);
+			ConfigUtils.addOrGetModule(baseConfig, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(fixedTimeSignals);
 			baseConfig.controler().setRunId("fixed-time_scale_" + scale);
 			Controler controler = new Controler(baseConfig);
 			controler.addControlerListener(analysis);
@@ -95,7 +96,7 @@ public class SylviaMainBatch {
 			analysis = new DgCottbusSylviaAnalysisControlerListener();
 			baseConfig.controler().setOutputDirectory(outputDirBase + "sylvia_scale_"+ scale + "/");
 			baseConfig.plans().setInputFile( footballPlansBaseFilename + scale + ".xml.gz");
-			baseConfig.signalSystems().setSignalControlFile(sylviaSignals);
+			ConfigUtils.addOrGetModule(baseConfig, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(sylviaSignals);
 			baseConfig.controler().setRunId("sylvia_scale" + scale);
 			
 			controler = new Controler(baseConfig);

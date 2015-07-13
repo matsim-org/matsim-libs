@@ -31,7 +31,6 @@ import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -69,7 +68,7 @@ public class TravelTimeFourWaysTest {
 		conf.scenario().setUseSignalSystems(false);
 		Scenario scenario = ScenarioUtils.createScenario(conf);
 
-		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		String signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
 		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
 		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";
@@ -84,7 +83,7 @@ public class TravelTimeFourWaysTest {
 	}
 	
 	private SignalEngine initSignalEngine(Scenario scenario, EventsManager events) {
-		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
 		SignalsData signalsData = signalsLoader.loadSignalsData();
 		scenario.addScenarioElement( SignalsData.ELEMENT_NAME , signalsData);

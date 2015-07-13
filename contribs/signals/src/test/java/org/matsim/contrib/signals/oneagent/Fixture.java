@@ -28,7 +28,7 @@ import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.SignalSystemsConfigGroup;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v11.LaneDefinitonsV11ToV20Converter;
@@ -83,7 +83,7 @@ public class Fixture {
 		//as signals are configured below we don't need signals on
 		conf.qsim().setStuckTime(1000);
 		conf.qsim().setStartTime(0.0);
-		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		
 		if (useIntergreens) {
 			signalsConfig.setIntergreenTimesFile(testUtils.getClassInputDirectory() + "testIntergreenTimes_v1.0.xml");

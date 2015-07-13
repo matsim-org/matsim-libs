@@ -33,7 +33,7 @@ import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.SignalSystemsConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -84,7 +84,7 @@ public class TravelTimeOneWayTest {
 		conf.qsim().setRemoveStuckVehicles(false);
 		conf.scenario().setUseSignalSystems(true);
 
-		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
+		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setSignalSystemFile(signalSystemsFile);
 		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
 		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";

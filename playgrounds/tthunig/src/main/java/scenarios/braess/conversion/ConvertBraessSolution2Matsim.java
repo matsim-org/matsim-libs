@@ -10,6 +10,7 @@ import org.matsim.contrib.signals.data.SignalsScenarioLoader;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.data.SignalsData;
 
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
@@ -49,14 +50,14 @@ public class ConvertBraessSolution2Matsim {
 	
 	private SignalsData loadSignalsData(String directory) {
 		Config config = ConfigUtils.createConfig();
-		config.signalSystems().setSignalSystemFile(
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(
 				directory + "output_signal_systems_v2.0.xml.gz");
-		config.signalSystems().setSignalGroupsFile(
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(
 				directory + "output_signal_groups_v2.0.xml.gz");
-		config.signalSystems().setSignalControlFile(
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(
 				directory + "output_signal_control_v2.0.xml.gz");
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(
-				config.signalSystems());
+				ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signals = signalsLoader.loadSignalsData();
 		return signals;
 	}

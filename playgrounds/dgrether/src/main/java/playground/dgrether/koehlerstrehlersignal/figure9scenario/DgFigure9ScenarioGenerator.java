@@ -29,6 +29,7 @@ import org.matsim.contrib.signals.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.contrib.signals.utils.SignalUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -86,7 +87,7 @@ public class DgFigure9ScenarioGenerator {
 	public ScenarioImpl loadScenario(){
 		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(baseDir + "config_signals_coordinated.xml");
 		ScenarioImpl sc = (ScenarioImpl) scl.loadScenario();
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(sc.getConfig().signalSystems());
+		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class));
 		SignalsData signals = signalsLoader.loadSignalsData();
 		sc.addScenarioElement(SignalsData.ELEMENT_NAME, signals);
 		return sc;

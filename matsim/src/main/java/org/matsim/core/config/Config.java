@@ -65,7 +65,6 @@ public class Config {
 	private PlansConfigGroup plans = null;
 	private QSimConfigGroup qSimConfigGroup = null;
 	private ScenarioConfigGroup scenarioConfigGroup = null;
-	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
 	private StrategyConfigGroup strategy = null;
 	private TransitConfigGroup transit = null;
 	private TransitRouterConfigGroup transitRouter = null;
@@ -133,9 +132,6 @@ public class Config {
 
 		this.strategy = new StrategyConfigGroup();
 		this.modules.put(StrategyConfigGroup.GROUP_NAME, this.strategy);
-
-		this.signalSystemConfigGroup = new SignalSystemsConfigGroup();
-		this.modules.put(SignalSystemsConfigGroup.GROUPNAME, this.signalSystemConfigGroup);
 
 		this.travelTimeCalculatorConfigGroup = new TravelTimeCalculatorConfigGroup();
 		this.modules.put(TravelTimeCalculatorConfigGroup.GROUPNAME, this.travelTimeCalculatorConfigGroup);
@@ -417,14 +413,6 @@ public class Config {
 
     public final StrategyConfigGroup strategy() {
 		return this.strategy;
-	}
-
-//	public final LocationChoiceConfigGroup locationchoice() {
-//		return this.locationchoice;
-//	}
-
-	public SignalSystemsConfigGroup signalSystems() {
-		return this.signalSystemConfigGroup;
 	}
 
 	public TravelTimeCalculatorConfigGroup travelTimeCalculator() {

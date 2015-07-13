@@ -20,6 +20,7 @@
 package playground.cottbus;
 
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -65,16 +66,16 @@ public class FourWaysVis {
 		
 		scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
 		scenario.getConfig().scenario().setUseLanes(true);
-		
-		scenario.getConfig().signalSystems().setSignalSystemFile(signalFile);
-		scenario.getConfig().signalSystems().setSignalControlFile(signalConfigFile);
+
+		ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalFile);
+		ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalConfigFile);
 		scenario.getConfig().scenario().setUseSignalSystems(true);
 		
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadScenario();
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
+		QSim otfVisQSim = QSimUtils.createDefaultQSim(scenario, events);
 			
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
 		OTFClientLive.run(scenario.getConfig(), server);
