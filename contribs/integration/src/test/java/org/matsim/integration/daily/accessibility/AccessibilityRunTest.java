@@ -317,8 +317,10 @@ public class AccessibilityRunTest {
 				Statement stmt = connection.createStatement();
 
 				String locationCSV = "test/input/org/matsim/integration/daily/Accessibility";
-				// yyyyyy the above should be automatic ("utils" or "config" have directory names). kai, jul'15
-				// yyyyyy the above does not feel right (results should be in "output" not in "input"). kai, jul'15
+				// yy the above should be automatic ("utils" or "config" have directory names). kai, jul'15
+				// yy the above does not feel right (results should be in "output" not in "input"). kai, jul'15
+				// yyyyyy however, in reality the data should be written directly from java, and we should NOT use java in order to essentially
+				// write a shell script that copies data from a file into the data base.  kai, jul'15
 
 				String sql = "COPY accessibilities(xcoord,ycoord,freespeed_accessibility,car_accessibility,bike_accessibility,walk_accessibility,pt_accessibility,population_density1,population_density2) " +
 						"FROM '" + locationCSV + "/accessibilities_WGS84_conv.csv' DELIMITERS ',' CSV HEADER;";
