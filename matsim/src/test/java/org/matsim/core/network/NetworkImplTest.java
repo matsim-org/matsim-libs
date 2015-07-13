@@ -181,14 +181,17 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	 * @author mrieser / Senozon AG
 	 */
 	@Test
-	public void testAddNode_singleNodeFirstOnly() {
+	public void testAddTwoNodes_initializedEmptyQuadtree() {
 		NetworkImpl network = new NetworkImpl();
 		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new CoordImpl(500, 400));
 		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new CoordImpl(600, 500));
-		network.addNode(node1);
-		Assert.assertEquals(1, network.getNodes().size());
 
 		Node n = network.getNearestNode(new CoordImpl(550, 450));
+		Assert.assertNull(n);
+		
+		network.addNode(node1);
+		Assert.assertEquals(1, network.getNodes().size());
+		n = network.getNearestNode(new CoordImpl(550, 450));
 		Assert.assertEquals(node1, n);
 		
 		network.addNode(node2);
