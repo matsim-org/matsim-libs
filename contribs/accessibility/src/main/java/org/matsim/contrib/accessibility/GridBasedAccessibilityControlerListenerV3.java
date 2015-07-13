@@ -326,6 +326,8 @@ public final class GridBasedAccessibilityControlerListenerV3
 		writer.writeField(Labels.ACCESSIBILITY_BY_BIKE);
 		writer.writeField(Labels.ACCESSIBILITY_BY_WALK);
 		writer.writeField(Labels.ACCESSIBILITY_BY_PT);
+		// yyyyyy the above needs to be replaced by a loop over Modes4Accessibility.values() . kai/mz, jul'15
+		
 		writer.writeField(Labels.POPULATION_DENSITIY);
 		writer.writeField(Labels.POPULATION_DENSITIY);
 		writer.writeNewLine(); 
