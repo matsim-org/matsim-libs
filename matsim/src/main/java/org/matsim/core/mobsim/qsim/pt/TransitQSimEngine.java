@@ -183,7 +183,8 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
-		if (agent.getMode().equals(TransportMode.pt)) {
+		String requestedMode = agent.getMode();
+		if (qSim.getScenario().getConfig().transit().getTransitModes().contains(requestedMode)) {
 			handleAgentPTDeparture(agent, linkId);
 			return true ;
 		}
