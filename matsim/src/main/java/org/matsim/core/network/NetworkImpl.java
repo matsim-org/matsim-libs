@@ -20,6 +20,14 @@
 
 package org.matsim.core.network;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -27,8 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.QuadTree;
-
-import java.util.*;
 
 /**
  * Design thoughts:<ul>
@@ -143,7 +149,11 @@ public final class NetworkImpl implements Network {
 		}
 		this.nodes.put(id, nn);
 		if (this.nodeQuadTree != null) {
-			if (this.nodeQuadTree.getMinEasting() <= nn.getCoord().getX() && this.nodeQuadTree.getMaxEasting() > nn.getCoord().getX()
+			if (Double.isInfinite(this.nodeQuadTree.getMinEasting())) {
+				// looks like the quad tree was initialized with infinite bounds, see MATSIM-278.
+				this.nodeQuadTree.clear();
+				this.nodeQuadTree = null;
+			} else if (this.nodeQuadTree.getMinEasting() <= nn.getCoord().getX() && this.nodeQuadTree.getMaxEasting() > nn.getCoord().getX()
 					&& this.nodeQuadTree.getMinNorthing() <= nn.getCoord().getY() && this.nodeQuadTree.getMaxNorthing() > nn.getCoord().getY()) {
 				this.nodeQuadTree.put(nn.getCoord().getX(), nn.getCoord().getY(), nn);
 			} else {
