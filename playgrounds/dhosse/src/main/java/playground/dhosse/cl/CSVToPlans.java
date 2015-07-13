@@ -2,6 +2,7 @@ package playground.dhosse.cl;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,7 +22,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -39,6 +39,7 @@ import playground.dhosse.cl.population.Etapa;
 import playground.dhosse.cl.population.Persona;
 import playground.dhosse.cl.population.Viaje;
 
+import com.sun.xml.bind.v2.schemagen.xmlschema.List;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class CSVToPlans {
@@ -155,7 +156,7 @@ public class CSVToPlans {
 				
 				String x = splittedLine[idxCoordX].replace("," , ".");
 				String y = splittedLine[idxCoordY].replace("," , ".");
-				if(!x.equals("") && !y.equals("")){
+				if(!x.equals("") && !y.equals("") && !x.equals("0") && !y.equals("0")){
 					persona.setWorkCoord(new CoordImpl(x, y));
 				}
 				
@@ -311,12 +312,12 @@ public class CSVToPlans {
 
 			boolean toAdd = true;
 			
-//			if(persona.getId().equals("10430102") || persona.getId().equals("12220001") || persona.getId().equals("14676102") || persona.getId().equals("15520101") ||
-//					persona.getId().equals("18982103") || persona.getId().equals("22078102") || persona.getId().equals("23832104") || persona.getId().equals("14510001") ||
-//					persona.getId().equals("32430002") || persona.getId().equals("24903102") || persona.getId().equals("11390103") || persona.getId().equals("17135101") ||
-//					persona.getId().equals("16709103")){
-//				continue;
-//			}
+			if(persona.getId().equals("10430102") || persona.getId().equals("12220001") || persona.getId().equals("14676102") || persona.getId().equals("15520101") ||
+					persona.getId().equals("18982103") || persona.getId().equals("22078102") || persona.getId().equals("23832104") || persona.getId().equals("14510001") ||
+					persona.getId().equals("32430002") || persona.getId().equals("24903102") || persona.getId().equals("11390103") || persona.getId().equals("17135101") ||
+					persona.getId().equals("16709103")){
+				continue;
+			}
 			
 			Person person = popFactory.createPerson(Id.createPersonId(persona.getId()));
 			
@@ -360,6 +361,9 @@ public class CSVToPlans {
 							
 							}
 							
+						} else{
+							toAdd = false;
+							break;
 						}
 						
 					}
@@ -385,6 +389,10 @@ public class CSVToPlans {
 						}
 						
 						anterior = popFactory.createActivityFromCoord(actType, origin);
+						if(viaje.getStartTime() < 0){
+							toAdd = false;
+							break;
+						}
 						anterior.setEndTime(viaje.getStartTime());
 						
 					} else{
@@ -507,14 +515,187 @@ public class CSVToPlans {
 			//a plan needs at least 3 plan elements (act - leg - act)
 			int add = 0;
 			if(plan.getPlanElements().size() > 2){
-				if(!((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
-					population.addPerson(person);
-					add++;
+				if(person.getId().toString().equals("11508001")){
+					System.out.println("");
 				}
+				if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
+					plan.getPlanElements().remove(plan.getPlanElements().size()-1);
+					plan.getPlanElements().remove(plan.getPlanElements().size()-1);
+				}
+				if(plan.getPlanElements().size() < 2) continue;
+				else if(plan.getPlanElements().size() >= 2){
+					if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
+						continue;
+					}
+				}
+				
+				System.out.println(person.getId());
+				if(person.getId().toString().equals("21009101")){
+					System.out.println("");
+				}
+				Plan modifiedPlan = checkConsistencyOfPlan(person.getSelectedPlan());
+				
+				person.removePlan(plan);
+				plan = modifiedPlan;
+				person.addPlan(plan);
+				person.setSelectedPlan(plan);
+				
+				if(plan.getPlanElements().size() > 2){
+					if(plan.getPlanElements().get(plan.getPlanElements().size() - 1) instanceof Leg){
+						plan.getPlanElements().remove(plan.getPlanElements().size() - 1);
+					}
+					if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
+						continue;
+					}
+				}
+				if(plan.getPlanElements().size() <= 2) continue;
+				
+				population.addPerson(person);
+				add++;
 			}
 			this.legCounter += add * nLegs;
 			
 		}
+		
+	}
+	
+	private Plan checkConsistencyOfPlan(Plan plan){
+		
+		Plan newPlan = this.scenario.getPopulation().getFactory().createPlan();
+		java.util.List<PlanElement> planElements = new ArrayList<>();
+		
+		Activity firstAct = null;
+		double firstEndTime = Double.POSITIVE_INFINITY;
+		double lastStartTime = Double.NEGATIVE_INFINITY;
+		int indexToInsert = 0;
+		
+		boolean wrapAround = ((Activity)plan.getPlanElements().get(0)).getType().equals(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType());
+		
+		for(int ii = 0; ii < plan.getPlanElements().size(); ii++){
+
+			PlanElement pe = plan.getPlanElements().get(ii);
+			
+			if(pe instanceof Activity){
+				
+				Activity act = (Activity) pe;
+				
+				Activity wrappedAct = null;
+				
+				double startTime = act.getStartTime();
+				
+				double endTime = act.getEndTime();
+				
+				if(ii == 0){
+					
+					firstAct = act;
+					firstEndTime = endTime;
+				
+				} 
+				
+				if(startTime > lastStartTime){
+					
+					lastStartTime = startTime;
+					
+				}
+
+				if(startTime > 24 * 3600){
+					
+					if(!wrapAround) break;
+
+					double reducedStartTime = startTime - 24*3600;
+					
+					if(reducedStartTime >= firstEndTime){
+					
+						continue;
+						
+					} else{
+						
+						if(!act.getType().equals(firstAct.getType())){
+							act.setStartTime(reducedStartTime);
+							if(indexToInsert >= ii){
+								indexToInsert = 0;
+							}
+						} else{
+							
+							firstAct.setStartTime(reducedStartTime);
+							continue;
+							
+						}
+						
+					}
+					
+				}
+				
+				if(endTime > 24 * 3600){
+					
+					if(!wrapAround){
+						
+						act.setEndTime(24*3600);
+						
+					} else{
+						
+						double reducedEndTime = endTime - 24 * 3600;
+						
+						if(reducedEndTime >= firstEndTime){
+							
+							break;
+							
+						} else{
+							
+							if(act.getStartTime() <= reducedEndTime){
+								
+								act.setEndTime(reducedEndTime);
+								
+//								if(indexToInsert >= ii){
+//									indexToInsert = 0;
+//								}
+								
+							} else{
+								
+								Activity temp = act;
+								
+								act = this.scenario.getPopulation().getFactory().createActivityFromCoord(temp.getType(), temp.getCoord());
+								act.setStartTime(temp.getStartTime());
+								
+								wrappedAct = this.scenario.getPopulation().getFactory().createActivityFromCoord(temp.getType(), temp.getCoord());
+								wrappedAct.setEndTime(reducedEndTime);
+								
+							}
+							
+						}
+						
+					}
+					
+				}
+				
+				planElements.add(indexToInsert, act);
+				if(wrappedAct != null){
+					if(indexToInsert >= ii){
+						indexToInsert = 0;
+					}
+					planElements.add(indexToInsert, wrappedAct);
+						
+				}
+				
+			} else{
+				
+				planElements.add(indexToInsert, pe);
+				
+			}
+			
+			indexToInsert++;
+			
+		}
+		
+		for(PlanElement pe : planElements){
+			if(pe instanceof Activity){
+				newPlan.addActivity((Activity)pe);
+			} else{
+				newPlan.addLeg((Leg)pe);
+			}
+		}
+		
+		return newPlan;
 		
 	}
 	
@@ -534,7 +715,7 @@ public class CSVToPlans {
 	
 	private void write(){
 		
-		new ObjectAttributesXmlWriter(agentAttributes).writeFile("C:/Users/dhosse/workspace/shared-svn/studies/countries/cl/Kai_und_Daniel/inputFiles/agentAttributes.xml");
+		new ObjectAttributesXmlWriter(agentAttributes).writeFile("C:/Users/Daniel/Documents/work/shared-svn/studies/countries/cl/Kai_und_Daniel/inputFiles/agentAttributes.xml");
 		new PopulationWriter(this.scenario.getPopulation()).write(this.ouputPlansFile);
 		
 	}

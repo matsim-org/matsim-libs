@@ -43,6 +43,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.operation.overlay.PointBuilder;
 
 public class NetConverter {
 	
@@ -87,7 +88,7 @@ public class NetConverter {
 	
 	public void convertCoordinates(Network net, String outputFile){
 		
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:3857", "EPSG:32719");
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("EPSG:32719", TransformationFactory.WGS84);
 		
 		for(Node node : net.getNodes().values()){
 			Coord newCoord = ct.transform(node.getCoord());
@@ -183,6 +184,7 @@ public class NetConverter {
 	public void plans2Shape(Population population, String outputFile){
 	
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setCRS(MGC.getCRS("EPSG:32719"));
 		typeBuilder.setName("shape");
 		typeBuilder.add("geometry", Point.class);
 		typeBuilder.add("id", String.class);
@@ -201,7 +203,7 @@ public class NetConverter {
 					Coord coord = act.getCoord();
 					
 					SimpleFeature feature = builder.buildFeature(null, new Object[]{
-							new GeometryFactory().createPoint(new Coordinate(coord.getX(), coord.getY())),
+							new GeometryFactory().createPoint(MGC.coord2Coordinate(coord)),
 							person.getId().toString(),
 							act.getType()
 						});
