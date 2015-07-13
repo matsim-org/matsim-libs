@@ -234,7 +234,7 @@ class UccCarrierCreator {
 					addVehicles(uccCarrier, vehicleTypes, uccDepotsLinkIds2, 
 						Math.max(0, tw.getStart() -uccEarlierOpeningTime), Math.min(24*3500, tw.getEnd() +uccLaterClosingTime)); 
 				}
-//				checkCapacity(uccCarrier, vehicleTypes);
+				checkCapacity(uccCarrier, vehicleTypes);
 				uccCarrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
 				splittedCarriers.addCarrier(uccCarrier);
 			}
@@ -254,58 +254,79 @@ class UccCarrierCreator {
 	}
 
 
-	//TODO:Neu muss ausbrobiert werden (10.07.15; KT)
-//	private void checkCapacity(Carrier carrier, CarrierVehicleTypes vehicleTypes2) {
-//		Set<CarrierService> serviceToRemove= new HashSet<CarrierService>(); 
-//		for (CarrierService service : carrier.getServices()){
-//			//Alphabetsliste erstellen
-//			List<Character> alph = new ArrayList<Character>() ;
-//			for(char c='a'; c<='z'; c++) {
-//				alph.add(c);
-//			}
-//			
-//			int demand = service.getCapacityDemand();
-//			
-//			//Calc max VehicleCapacity
-//			int maxVehicleCapacity = -1;
-//			for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles()) {
-//				 if (maxVehicleCapacity < vehicle.getVehicleType().getCarrierVehicleCapacity()){
-//					 maxVehicleCapacity = vehicle.getVehicleType().getCarrierVehicleCapacity();
-//				 }
-//			}
-//			//TODO: Neuerstellung geteilter Services
-//			if (demand > maxVehicleCapacity){
-//				int demandtoAssignLeft = demand;
-//				int numberOfNewServices = 1;
-//				//Assign with heighest deliverable Capacity
-//				while (demandtoAssignLeft / maxVehicleCapacity > 1.){
-//					int assignDemand = maxVehicleCapacity;
-//					Id<CarrierService> id = Id.create(service.getId().toString() + "_" + alph.get(numberOfNewServices), CarrierService.class);
-//					CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, service.getLocationLinkId());
-//					serviceBuilder.setCapacityDemand(assignDemand)
-//						.setServiceStartTimeWindow(service.getServiceStartTimeWindow())
-//						.setServiceDuration(service.getServiceDuration()); //TODO: Aufteilen!
-//					
-//					demandtoAssignLeft = demandtoAssignLeft - demandtoAssignLeft;
-//					numberOfNewServices++;
-//				}
-//				//Assign Rest
-//				if 	(demandtoAssignLeft != 0){
-//					Id<CarrierService> id = Id.create(service.getId().toString() + "_" + alph.get(numberOfNewServices), CarrierService.class);
-//					CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, service.getLocationLinkId());
-//					serviceBuilder.setCapacityDemand(demandtoAssignLeft)
-//						.setServiceStartTimeWindow(service.getServiceStartTimeWindow())
-//						.setServiceDuration(service.getServiceDuration()); //TODO: Aufteilen!
-//				}
-//				serviceToRemove.add(service);
-//			}
-//		}
-//		
-//		//neue Schleife, da sonst innerhalb der Schleife das Set modifiziert wird..
-//		for (CarrierService service: serviceToRemove){ 
-//			carrier.getServices().remove(service);	//und lösche ihn aus dem normalen Carrier raus
-//		}
-//	}
+	/**Überprüft, ob die Services auf Grund der Kapazität der zur Verfügung stehenden Flotte bedient werden kann.
+	 * Falls nicht, wird der betreffende Service durch mehrere Kleinere ersetzt, die sich an der größten 
+	 * zur VErfügugn stehenden Fzg-Kapazität orientiert.
+	 * @param carrier
+	 * @param vehicleTypes
+	 */
+	private void checkCapacity(Carrier carrier, CarrierVehicleTypes vehicleTypes) {
+		Set<CarrierService> servicesToRemove= new HashSet<CarrierService>(); 
+		Set<CarrierService> servicesToAdd= new HashSet<CarrierService>(); 
+		
+		for (CarrierService service : carrier.getServices()){
+			//Alphabetsliste erstellen
+			List<Character> alph = new ArrayList<Character>() ;
+			for(char c='a'; c<='z'; c++) {
+				alph.add(c);
+			}
+			
+			int totalServiceDemand = service.getCapacityDemand();
+			double totalServiceDuration = service.getServiceDuration();
+			
+			//Calc max VehicleCapacity
+			int maxVehicleCapacity = -1;
+			for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles()) {
+				 if (maxVehicleCapacity < vehicle.getVehicleType().getCarrierVehicleCapacity()){
+					 maxVehicleCapacity = vehicle.getVehicleType().getCarrierVehicleCapacity();
+				 }
+			}
+//			System.out.println("MaxVehicleCapacity: " + maxVehicleCapacity);
+			// Neuerstellung geteilter Services
+			if (totalServiceDemand > maxVehicleCapacity){
+				int demandtoAssignLeft = totalServiceDemand;
+//				System.out.println("Totel Service Demand: " + totalServiceDemand);
+//				System.out.println("Demand2AssignLeft1: " + demandtoAssignLeft);
+				int numberOfNewServices = 1;
+				//Assign with heighest deliverable Capacity
+				while ((demandtoAssignLeft / maxVehicleCapacity) > 0.){
+//					System.out.println("AssignLeft/vehCap: "+ demandtoAssignLeft / maxVehicleCapacity);
+					int assignDemand = maxVehicleCapacity;
+//					System.out.println("AssignDemand1: " + assignDemand);
+					Id<CarrierService> id = Id.create(service.getId().toString() + "_" + alph.get(numberOfNewServices-1), CarrierService.class);
+					CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, service.getLocationLinkId());
+					serviceBuilder.setCapacityDemand(assignDemand)
+						.setServiceStartTimeWindow(service.getServiceStartTimeWindow())
+						.setServiceDuration(totalServiceDuration*assignDemand/totalServiceDemand); 
+					servicesToAdd.add(serviceBuilder.build());
+					demandtoAssignLeft = demandtoAssignLeft - assignDemand;
+//					System.out.println("Demand2AssignLeft2: " + demandtoAssignLeft);
+//					System.out.println("AssignLeft/vehCap2: "+ demandtoAssignLeft / maxVehicleCapacity);
+					numberOfNewServices++;
+				}
+				//Assign Rest
+				if 	(demandtoAssignLeft != 0){
+					Id<CarrierService> id = Id.create(service.getId().toString() + "_" + alph.get(numberOfNewServices-1), CarrierService.class);
+					CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, service.getLocationLinkId());
+					serviceBuilder.setCapacityDemand(demandtoAssignLeft)
+						.setServiceStartTimeWindow(service.getServiceStartTimeWindow())
+						.setServiceDuration(totalServiceDuration*demandtoAssignLeft/totalServiceDemand);
+					servicesToAdd.add(serviceBuilder.build());
+				}
+				servicesToRemove.add(service);
+			}
+		}
+		
+		//neue Schleife, da sonst innerhalb der Schleife das Set modifiziert wird..
+		for (CarrierService service: servicesToAdd){ 
+			carrier.getServices().add(service);
+		}
+		
+		//neue Schleife, da sonst innerhalb der Schleife das Set modifiziert wird..
+		for (CarrierService service: servicesToRemove){ 
+			carrier.getServices().remove(service);	//und lösche ihn aus dem normalen Carrier raus
+		}
+	}
 
 	//TODO: Absichern, dass zu erstellende VehicleType auch in VehicleTypes vorhanden sind! 
 	/*
