@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -44,7 +45,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
@@ -96,8 +96,8 @@ public class InvertedNetworkRoutingTestFixture {
 		params.setTypicalDuration(24.0 * 3600.0);
 		config.planCalcScore().addActivityParams(params);
 		config.scenario().setUseLanes(doCreateLanes);
-		config.scenario().setUseSignalSystems(doCreateSignals);
-		
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(doCreateSignals);
+
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		createNetwork();
 		if (doCreateLanes){

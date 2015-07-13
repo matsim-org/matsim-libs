@@ -566,7 +566,7 @@ public class PoznanNetwork
         config.qsim().setStartTime(0.0);
         config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
         config.scenario().setUseLanes(true);
-        config.scenario().setUseSignalSystems(true);
+        ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
         OTFVisConfigGroup otfconfig = ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
         otfconfig.setAgentSize(70.0f);
         otfconfig.setMapOverlayMode(false);

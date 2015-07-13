@@ -174,7 +174,7 @@ public class RunCreateTrafficSignalScenarioExample {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile("examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
 		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
-		config.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		config.qsim().setNodeOffset(20.0);
 		config.controler().setMobsim("qsim");
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;

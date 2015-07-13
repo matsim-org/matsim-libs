@@ -86,7 +86,7 @@ public class DgOTFVisReplayLastIteration {
 			config.network().setLaneDefinitionsFile(
 					oldConfControlerIO.getOutputFilename(Controler.FILENAME_LANES));
 		}
-		if (config.scenario().isUseSignalSystems()) {
+		if (ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(
 					oldConfControlerIO.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_SYSTEMS));
 			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(
@@ -122,7 +122,7 @@ public class DgOTFVisReplayLastIteration {
 				sc.getConfig().controler().getOutputDirectory(),
 						false ? OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles : OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 		QSim otfVisQSim = (QSim) QSimUtils.createDefaultQSim(sc, events);
-		if (sc.getConfig().scenario().isUseSignalSystems()) {
+		if ((boolean) ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			SignalEngine engine = new QSimSignalEngine(
 					new FromDataBuilder(sc, events)
 							.createAndInitializeSignalSystemsManager());

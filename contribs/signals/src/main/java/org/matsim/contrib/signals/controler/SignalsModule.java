@@ -22,12 +22,14 @@
 
 package org.matsim.contrib.signals.controler;
 
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 
 public class SignalsModule extends AbstractModule {
     @Override
     public void install() {
-        if (getConfig().scenario().isUseSignalSystems()) {
+        if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
             bind(SignalsControllerListener.class).to(DefaultSignalsControllerListener.class);
             addControlerListenerBinding().to(SignalsControllerListener.class);
         }

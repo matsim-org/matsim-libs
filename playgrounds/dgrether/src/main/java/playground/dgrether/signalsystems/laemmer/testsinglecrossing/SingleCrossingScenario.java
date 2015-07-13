@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -345,7 +346,7 @@ public class SingleCrossingScenario {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(network);
 		config.scenario().setUseLanes(false);
-		config.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		QSimConfigGroup qsim = config.qsim();
 		qsim.setSnapshotStyle( SnapshotStyle.queue ) ;;
 		qsim.setStuckTime(1000.0);

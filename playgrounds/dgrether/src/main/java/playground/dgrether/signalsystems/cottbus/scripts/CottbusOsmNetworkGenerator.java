@@ -102,7 +102,7 @@ public class CottbusOsmNetworkGenerator {
 		Config c1 = ConfigUtils.createConfig();
 		c1.network().setInputFile(cleanedNetworkFile);
 		String signalsSystems = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
-		c1.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(c1, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		ConfigUtils.addOrGetModule(c1, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalsSystems);
 		Scenario scenario = ScenarioUtils.loadScenario(c1);
 		

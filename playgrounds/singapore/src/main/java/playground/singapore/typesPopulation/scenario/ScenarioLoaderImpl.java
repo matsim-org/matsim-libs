@@ -151,7 +151,7 @@ public class ScenarioLoaderImpl {
 		if (this.config.scenario().isUseLanes()) {
 			this.loadLanes();
 		}
-		if (this.config.scenario().isUseSignalSystems()){
+		if ((boolean) ConfigUtils.addOrGetModule(this.config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
 			this.loadSignalSystems();
 		}
 		return this.scenario;

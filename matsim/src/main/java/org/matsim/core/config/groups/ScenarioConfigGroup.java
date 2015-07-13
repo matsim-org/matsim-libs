@@ -32,12 +32,10 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "scenario";
 
 	private static final String USE_LANES = "useLanes";
-	private static final String USE_SIGNALSYSTEMS = "useSignalsystems";
 	private static final String USE_HOUSEHOLDS = "useHouseholds";
 	private static final String USE_TRANSIT = "useTransit";
 
 	private boolean useLanes = false;
-	private boolean useSignalSystems = false;
 	private boolean useHouseholds = false;
 	private boolean useTransit = false;
 
@@ -50,7 +48,6 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
-		map.put(USE_SIGNALSYSTEMS, "Set this parameter to true if signal systems should be used, false if not.");
 		map.put(USE_HOUSEHOLDS, "Set this parameter to true if households should be used, false if not.");
 		map.put(USE_TRANSIT, "Set this parameter to true if transit should be simulated, false if not.");
 		return map;
@@ -64,16 +61,6 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( USE_LANES )
 	public void setUseLanes(final boolean useLanes) {
 		this.useLanes = useLanes;
-	}
-
-	@StringGetter( USE_SIGNALSYSTEMS )
-	public boolean isUseSignalSystems() {
-		return this.useSignalSystems;
-	}
-
-	@StringSetter( USE_SIGNALSYSTEMS )
-	public void setUseSignalSystems(final boolean useSignalSystems) {
-		this.useSignalSystems = useSignalSystems;
 	}
 
 	@StringGetter( USE_HOUSEHOLDS )

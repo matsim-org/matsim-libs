@@ -76,8 +76,8 @@ public class FourWaysVisMviTest {
     ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalFile);
     ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);
     ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalControlFile);
-		scenario.getConfig().scenario().setUseSignalSystems(true);
-    
+    ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
+
     conf.controler().setFirstIteration(0);
     conf.controler().setLastIteration(0);
     conf.controler().setOutputDirectory(DgPaths.OUTDIR + "fourwaysmvitest");

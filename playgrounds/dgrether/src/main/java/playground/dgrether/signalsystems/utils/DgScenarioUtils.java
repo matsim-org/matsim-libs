@@ -38,7 +38,7 @@ public class DgScenarioUtils {
 			String signalGroupsFilename, String signalControlFilename){
 		Config c2 = ConfigUtils.createConfig();
 		c2.scenario().setUseLanes(true);
-		c2.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		c2.network().setInputFile(net);
 		if (loadPopulation){
 			c2.plans().setInputFile(pop);

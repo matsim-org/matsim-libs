@@ -242,7 +242,7 @@ public class DaganzoScenarioGenerator {
 		}
 		if (isUseSignalSystems) {
 			//enable lanes and signal system feature in config
-			config.scenario().setUseSignalSystems(true);
+			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(SIGNALSYSTEMSOUTPUTFILE);
 			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(SIGNALSYSTEMCONFIGURATIONSOUTPUTFILE);
 			//create the signal systems and write them

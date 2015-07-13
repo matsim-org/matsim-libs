@@ -69,7 +69,7 @@ public class SignalSystemToXYData implements BasicEventHandler {
 		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(inputNetworkFile);
-		config.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(inputSignalSystemsFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

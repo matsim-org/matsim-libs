@@ -24,6 +24,7 @@ package org.matsim.contrib.signals.otfvis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
@@ -49,7 +50,7 @@ public class OTFVisWithSignals {
 	public static void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();
 		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
-		if (scenario.getConfig().scenario().isUseSignalSystems()){
+		if ((boolean) ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}
@@ -84,11 +85,11 @@ public class OTFVisWithSignals {
 			server.addAdditionalElement(facilityWriter);
 		}
 
-		if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
+		if (config.scenario().isUseLanes() && (!(boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems())) {
 			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), scenario.getConfig());
 			server.addAdditionalElement(otfLaneWriter);
-		} else if (config.scenario().isUseSignalSystems()) {
+		} else if ((boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 			SignalGroupStateChangeTracker signalTracker = new SignalGroupStateChangeTracker();
 			events.addHandler(signalTracker);

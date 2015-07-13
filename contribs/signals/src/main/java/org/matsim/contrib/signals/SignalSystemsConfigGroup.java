@@ -29,6 +29,7 @@ import org.matsim.core.config.ReflectiveConfigGroup;
  *
  */
 public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
+	private static final String USE_SIGNALSYSTEMS = "useSignalsystems";
 
 	public  static final String SIGNALSYSTEM_FILE = "signalsystems";
 	public  static final String SIGNALCONTROL_FILE = "signalcontrol";
@@ -57,6 +58,8 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	private boolean useAmbertimes = false;
 	
 	private String actionOnIntergreenViolation = WARN_ON_INTERGREEN_VIOLATION;
+
+	private boolean useSignalSystems = false;
 
 	public SignalSystemsConfigGroup() {
 		super(GROUPNAME);
@@ -159,5 +162,17 @@ public final class SignalSystemsConfigGroup extends ReflectiveConfigGroup {
 	public void setUseAmbertimes(boolean useAmbertimes) {
 		this.useAmbertimes = useAmbertimes;
 	}
+
+	@StringGetter( USE_SIGNALSYSTEMS )
+	public boolean isUseSignalSystems() {
+		return this.useSignalSystems;
+	}
+
+	@StringSetter( USE_SIGNALSYSTEMS )
+	public void setUseSignalSystems(final boolean useSignalSystems) {
+		this.useSignalSystems = useSignalSystems;
+	}
+
+
 
 }

@@ -66,8 +66,8 @@ public class RunBraessSimulation {
 		createNetwork(scenario);
 		createPopulation(scenario);
 		createRunNameAndOutputDir(scenario);
-		
-		if (config.scenario().isUseSignalSystems()){
+
+		if ((boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
 			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
 					new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 			
@@ -76,8 +76,8 @@ public class RunBraessSimulation {
 		
 		// prepare the controller
 		Controler controler = new Controler(scenario);
-		
-		if (config.scenario().isUseSignalSystems()){
+
+		if ((boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
 			// add the signals module if signal systems are used
 			controler.addOverridingModule(new SignalsModule());
 		}
@@ -112,8 +112,8 @@ public class RunBraessSimulation {
 
 		// able or enable signals and lanes
 		config.scenario().setUseLanes( false );
-		config.scenario().setUseSignalSystems( false );
-		
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(false);
+
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta( 20 );
 
@@ -296,8 +296,8 @@ public class RunBraessSimulation {
 			runName += "_link2link";
 		else
 			runName += "_node2node";
-		
-		if (config.scenario().isUseSignalSystems()){
+
+		if (ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
 			runName += "_signals";
 		}
 

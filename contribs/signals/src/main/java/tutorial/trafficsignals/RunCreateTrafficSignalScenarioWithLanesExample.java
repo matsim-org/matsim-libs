@@ -219,7 +219,7 @@ public class RunCreateTrafficSignalScenarioWithLanesExample {
 		config.network().setInputFile(inputDir + "network.xml.gz");
 		config.plans().setInputFile(inputDir + "population.xml.gz");
 		config.scenario().setUseLanes(true);
-		config.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		config.controler().setMobsim("qsim");
 		config.qsim().setNodeOffset(20.0);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);

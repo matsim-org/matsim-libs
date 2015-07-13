@@ -3,6 +3,7 @@ package playground.dgrether;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.mobsim.SignalEngine;
@@ -58,7 +59,7 @@ public class DgOTFVis {
 //		events.addHandler(new LogOutputEventHandler());
 		QSim qSim = (QSim) QSimUtils.createDefaultQSim(scenario, events);
 
-		if (scenario.getConfig().scenario().isUseSignalSystems()){
+		if (ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
 			SignalEngine engine = new QSimSignalEngine(new FromDataBuilder(scenario, events).createAndInitializeSignalSystemsManager());
 			qSim.addQueueSimulationListeners(engine);
 		}

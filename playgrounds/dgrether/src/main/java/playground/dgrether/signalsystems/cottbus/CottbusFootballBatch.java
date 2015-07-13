@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigReader;
@@ -99,7 +100,7 @@ public class CottbusFootballBatch {
 			CottbusFootballAnalysisControllerListener cbfbControllerListener = new CottbusFootballAnalysisControllerListener();
 			controler.addControlerListener(cbfbControllerListener);
 			// enable sylvia
-			if (baseConfig.scenario().isUseSignalSystems()){
+			if ((boolean) ConfigUtils.addOrGetModule(baseConfig, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
                 //FIXME: Take care that the normal SignalsControllerListener is NOT added.
                 controler.addControlerListener(new DgSylviaControlerListenerFactory(new DgSylviaConfig()).createSignalsControllerListener());
             }

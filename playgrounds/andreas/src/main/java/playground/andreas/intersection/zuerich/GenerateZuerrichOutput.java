@@ -3,6 +3,7 @@ package playground.andreas.intersection.zuerich;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsScenarioWriter;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
@@ -54,7 +55,7 @@ public class GenerateZuerrichOutput {
 	public GenerateZuerrichOutput() {
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseLanes(generateLanes);
-		config.scenario().setUseSignalSystems(generateSignalSystems);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(generateSignalSystems);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network net = scenario.getNetwork();
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);

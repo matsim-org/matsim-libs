@@ -60,8 +60,8 @@ public class RunSignalSystemsExample {
 		
 		// the following makes the contrib load  the signalSystems files, but not to do anything with them:
 		// (this switch will eventually go away)
-		config.scenario().setUseSignalSystems(true);
-		
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
+
 		// these are the paths to the signal systems definition files:
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(inputDir + "signalSystems_v2.0.xml");
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(inputDir + "signalGroups_v2.0.xml");

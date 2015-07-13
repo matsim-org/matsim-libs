@@ -82,7 +82,7 @@ public class TravelTimeOneWayTest {
 		}
 		conf.qsim().setStuckTime(1000);
 		conf.qsim().setRemoveStuckVehicles(false);
-		conf.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 
 		SignalSystemsConfigGroup signalsConfig = ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalsConfig.setSignalSystemFile(signalSystemsFile);

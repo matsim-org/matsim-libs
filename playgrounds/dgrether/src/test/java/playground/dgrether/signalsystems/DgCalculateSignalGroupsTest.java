@@ -80,7 +80,7 @@ public class DgCalculateSignalGroupsTest {
 	@Test
 	public void test3WayCrossing1Signal(){
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		Scenario sc = ScenarioUtils.createScenario(config);
 		
 		this.create3WayNetwork(sc);
@@ -113,7 +113,7 @@ public class DgCalculateSignalGroupsTest {
 	public void test3WayCrossingManySignals(){
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseLanes(true);
-		config.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		this.create3WayNetwork(sc);
@@ -166,7 +166,7 @@ public class DgCalculateSignalGroupsTest {
 	@Test
 	public void test4WayCrossing1Signal(){
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		File f = new File("a");
 		System.err.println(f.getAbsolutePath());
 		//network
@@ -238,7 +238,7 @@ public class DgCalculateSignalGroupsTest {
 		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
 		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions, lanes20, conf.network().getInputFile());
 		conf.network().setLaneDefinitionsFile(lanes20);
-		conf.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		String signalSystemsFile = inputDirectory + "testSignalSystems_v2.0.xml";
 		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalSystemsFile);
 

@@ -26,9 +26,9 @@ import org.jdesktop.swingx.mapviewer.DefaultTileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactory;
 import org.jdesktop.swingx.mapviewer.TileFactoryInfo;
 import org.jdesktop.swingx.mapviewer.wms.WMSService;
+import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.otfvis.OTFClient;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -40,6 +40,7 @@ import org.matsim.vis.otfvis.data.fileio.SettingsSaver;
 import org.matsim.vis.otfvis.gui.OTFHostControlBar;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControlToolBar;
+import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.otfvis.handler.OTFAgentsListHandler;
 import org.matsim.vis.otfvis.handler.OTFLinkAgentsHandler;
 import org.matsim.vis.otfvis.interfaces.OTFServer;
@@ -68,12 +69,12 @@ public class OTFClientLiveWithSignals {
 					connectionManager.connectReaderToReceiver(FacilityDrawer.Reader.class, FacilityDrawer.DataDrawer.class);
 					connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
 				}
-				
-				if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
+
+				if (config.scenario().isUseLanes() && (!ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems())) {
 					connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
 					connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
 					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);
-				} else if (config.scenario().isUseSignalSystems()) {
+				} else if ((boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
 					connectionManager.connectWriterToReader(OTFSignalWriter.class, OTFSignalReader.class);
 					connectionManager.connectReaderToReceiver(OTFSignalReader.class, OTFLaneSignalDrawer.class);
 					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);

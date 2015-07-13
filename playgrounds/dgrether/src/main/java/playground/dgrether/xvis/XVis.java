@@ -118,7 +118,7 @@ public class XVis {
 		}
 		else if (MatsimFileTypeGuesser.FileType.SignalControl.equals(guesser.getGuessedFileType())){
 			Config config = ConfigUtils.createConfig();
-			config.scenario().setUseSignalSystems(true);
+			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 			ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(filename);
 			scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		}

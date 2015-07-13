@@ -63,7 +63,7 @@ public class DefaultPlanbasedSignalControlTest {
 	
 		String inputDir = utils.getClassInputDirectory();
 		//scenario
-		config.scenario().setUseSignalSystems(true);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		String networkInputFile = inputDir + "network.xml";
 		config.network().setInputFile(networkInputFile);
 		//signals
