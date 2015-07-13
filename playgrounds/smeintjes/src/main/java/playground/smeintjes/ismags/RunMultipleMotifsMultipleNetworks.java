@@ -60,6 +60,7 @@ public class RunMultipleMotifsMultipleNetworks {
 
 		ArrayList<String> motifList = readMotifs(motifSpecificationPath);
 		for(int i = startNetwork.intValue(); i < numberNetworks; i++){
+			log.info("Looking for motifs in network " + i);
 			runMotifs(motifList, pathToParentFolder, outputFolder, i);
 		}
 		
