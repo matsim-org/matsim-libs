@@ -92,8 +92,8 @@ public class Simulator {
 		factory.addFactory(new IncomeMutatorFactory(random, histSyncIncome));
 		
 		h.addComponent(histSyncAge, 50000);
-		h.addComponent(histSyncIncome);
-		
+		h.addComponent(histSyncIncome, 50000);
+
 		Sampler sampler = new Sampler(simPersons, h, factory, random);
 		
 		SamplerListenerComposite listener = new SamplerListenerComposite();
@@ -111,7 +111,7 @@ public class Simulator {
 		
 		sampler.setSamplerListener(listener);
 		
-		sampler.run(10000001, 1);
+		sampler.run(1000001, 1);
 	}
 
 }

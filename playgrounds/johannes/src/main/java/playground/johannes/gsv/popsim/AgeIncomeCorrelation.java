@@ -74,7 +74,7 @@ public class AgeIncomeCorrelation extends AnalyzerTask {
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(ages.toNativeArray(), new DummyDiscretizer(), false);
 			TXTWriter.writeMap(hist, "age", "n", getOutputDirectory() + "/age.txt");
 			
-			hist = Histogram.createHistogram(incomes.toNativeArray(), new LinearDiscretizer(1000), false);
+			hist = Histogram.createHistogram(incomes.toNativeArray(), new LinearDiscretizer(500), false);
 			TXTWriter.writeMap(hist, "income", "n", getOutputDirectory() +  "/income.txt");
 			
 			TXTWriter.writeScatterPlot(ages, incomes, "age", "income", getOutputDirectory() + "/age.income.txt");
