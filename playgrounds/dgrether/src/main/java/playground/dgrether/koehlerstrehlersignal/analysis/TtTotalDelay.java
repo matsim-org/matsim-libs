@@ -80,6 +80,8 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
 			Link link = this.network.getLinks().get(event.getLinkId());
 			double freespeedTT = link.getLength()/link.getFreespeed();
+			// idea to fix (see above):
+//			double matsimFreespeedTT = Math.floor(freespeedTT + 1);
 			this.earliestLinkExitTimeByPerson.put(event.getPersonId(), event.getTime() + freespeedTT);
 		}
 	}
