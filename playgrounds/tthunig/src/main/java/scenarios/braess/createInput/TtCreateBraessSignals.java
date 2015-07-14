@@ -269,8 +269,8 @@ public class TtCreateBraessSignals {
 	}	
 
 	/**
-	 * Sets the second signal at node 3 (which is for the middle edge) green for
-	 * only one second a cycle. (Green for no seconds is not possible.)
+	 * Sets the signal at link 3_4 (i.e. the middle route) green for only one
+	 * second a cycle. (Green for no seconds is not possible.)
 	 */
 	private void changeSignalControlTo1Z() {
 
@@ -278,25 +278,19 @@ public class TtCreateBraessSignals {
 				.getScenarioElement(SignalsData.ELEMENT_NAME);
 		SignalControlData signalControl = signalsData.getSignalControlData();
 
-		SignalSystemControllerData signalSystem3Control = signalControl
+		SignalSystemControllerData signalSystem4Control = signalControl
 				.getSignalSystemControllerDataBySystemId().get(
-						Id.create("signalSystem3", SignalSystem.class));
-		for (SignalPlanData signalPlan : signalSystem3Control
+						Id.create("signalSystem4", SignalSystem.class));
+		for (SignalPlanData signalPlan : signalSystem4Control
 				.getSignalPlanData().values()) {
 			// note: every signal system has only one signal plan here
 
-			// pick the second signal (which is for the middle path) from the
+			// pick the signal at link 3_4 (which is the middle link) from the
 			// signal plan
 			SignalGroupSettingsData signalGroupZSetting;
-			if (simulateInflowCap7) {
-				signalGroupZSetting = signalPlan
+			signalGroupZSetting = signalPlan
 						.getSignalGroupSettingsDataByGroupId().get(
-								Id.create("signal7_3.2", SignalGroup.class));
-			} else {
-				signalGroupZSetting = signalPlan
-						.getSignalGroupSettingsDataByGroupId().get(
-								Id.create("signal2_3.2", SignalGroup.class));
-			}
+								Id.create("signal3_4", SignalGroup.class));
 
 			// set the signal green for only one second
 			signalGroupZSetting.setOnset(0);

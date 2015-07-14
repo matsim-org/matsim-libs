@@ -31,6 +31,8 @@ public class TtCreateBraessNetworkAndLanes {
 	private Scenario scenario;
 	
 	private boolean simulateInflowCap = false;
+
+	private boolean retardMiddleRoute = false;
 	
 	// capacity at the links that all agents have to use
 	private long CAP_FIRST_LAST = 3600; // [veh/h]
@@ -139,7 +141,10 @@ public class TtCreateBraessNetworkAndLanes {
 				net.getNodes().get(Id.createNodeId(4)));
 		l.setCapacity(CAP_MAIN);
 		l.setLength(LINK_LENGTH);
-		linkTT = 1;
+		if (this.retardMiddleRoute)
+			linkTT = 1000;
+		else
+			linkTT = 1;
 		l.setFreespeed(l.getLength() / linkTT);
 		net.addLink(l);
 		
@@ -290,6 +295,10 @@ public class TtCreateBraessNetworkAndLanes {
 	 */
 	public void setSimulateInflowCap(boolean simulateInflowCap) {
 		this.simulateInflowCap = simulateInflowCap;
+	}
+
+	public void setRetardMiddleRoute(boolean retardMiddleRoute) {
+		this.retardMiddleRoute = retardMiddleRoute;
 	}
 
 }
