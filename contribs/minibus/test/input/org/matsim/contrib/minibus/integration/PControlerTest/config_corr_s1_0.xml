@@ -303,11 +303,6 @@
 		<!-- Set this parameter to true if roadpricing should be used, false if not. -->
 		<!-- <param name="useRoadpricing" value="false" />-->
 
-		<!-- Set this parameter to true if signal systems should be used, false if not. -->
-		<param name="useSignalsystems" value="false" />
-
-		<!-- Set this parameter to true if transit should be simulated, false if not. -->
-		<param name="useTransit" value="true" />
 	</module>
 
 	
@@ -328,6 +323,10 @@
 		<param name="transitScheduleFile" value="&INPUTBASE;transitSchedule.xml" />
 		<param name="vehiclesFile" value="&INPUTBASE;transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
+		
+				<!-- Set this parameter to true if transit should be simulated, false if not. -->
+		<param name="useTransit" value="true" />
+		
 	</module>
 
 </config>

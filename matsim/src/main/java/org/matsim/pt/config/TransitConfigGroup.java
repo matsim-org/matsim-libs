@@ -147,7 +147,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	public boolean isUseTransit() {
 		return this.useTransit;
 	}
-	@StringGetter( USE_TRANSIT )
+	@StringSetter( USE_TRANSIT )
 	public void setUseTransit( boolean val ) {
 		this.useTransit = val ;
 	}

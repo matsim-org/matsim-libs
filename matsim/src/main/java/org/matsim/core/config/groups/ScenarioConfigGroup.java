@@ -75,15 +75,15 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 
 	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
-	@StringSetter( USE_VEHICLES )
+//	@StringSetter( USE_VEHICLES )
 	public void setUseVehicles(@SuppressWarnings("unused") final boolean b) {
 		throw new RuntimeException( "The " + USE_VEHICLES + " switch is no longer operational.  The vehicles file is loaded if the file name"
 				+ " is different from null.  If you needed this for the creation of the vehicles container, use the ScenarioBuilder in "
 				+ "ScenarioUtils.  If this does not work for you, please let us know. kai, jun'15" ) ;
 	}
-
+	
 	@SuppressWarnings("static-method")
-	@StringSetter( USE_TRANSIT )
+//	@StringSetter( USE_TRANSIT )
 	@Deprecated // since jul'15
 	public void setUseTransit(final boolean b) {
 		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
