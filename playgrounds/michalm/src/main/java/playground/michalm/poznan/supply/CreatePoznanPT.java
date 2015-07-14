@@ -22,7 +22,7 @@ public class CreatePoznanPT
             String transitNetworkFile, String vehicleFile)
     {
         Config config = ConfigUtils.createConfig();
-        config.scenario().setUseTransit(true);
+        config.transit().setUseTransit(true);
         config.scenario().setUseVehicles(true);
         Scenario scenario = ScenarioUtils.createScenario(config);
 

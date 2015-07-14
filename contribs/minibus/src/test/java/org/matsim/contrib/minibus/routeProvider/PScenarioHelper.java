@@ -94,7 +94,7 @@ public class PScenarioHelper {
 		final TransitRoute route;		
 		
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		network = scenario.getNetwork();
 		schedule = scenario.getTransitSchedule();
 		NetworkFactory nf = network.getFactory();

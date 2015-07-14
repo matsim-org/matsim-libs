@@ -48,7 +48,7 @@ public class TransitScheduleAfter24H {
 	public static void main(String[] args) {
 		Integer numHours = Integer.parseInt(args[0]);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		new TransitScheduleWriter(TransitScheduleAfter24H.addHours(((ScenarioImpl)scenario).getTransitSchedule(),numHours)).writeFile(args[2]);
 	}

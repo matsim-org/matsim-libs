@@ -55,7 +55,7 @@ public class OsmTransitMain {
 		
 		log.info("Start...");		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		JOSMTolerantFastXMLReader reader = new JOSMTolerantFastXMLReader(new File(inFile), false, CompressionMethod.None);		
 
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(this.fromCoordSystem, this.toCoordSystem);

@@ -987,7 +987,7 @@ public class TransitQueueNetworkTest extends TestCase {
                 throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
             // setup: config
             ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-            scenario.getConfig().scenario().setUseTransit(true);
+            scenario.getConfig().transit().setUseTransit(true);
             Id<Node> nodeId1 = Id.create("1", Node.class);
             Id<Node> nodeId2 = Id.create("2", Node.class);
             Id<Node> nodeId3 = Id.create("3", Node.class);

@@ -111,7 +111,7 @@ public abstract class CongestionHandler implements
 			log.warn("Storage capacity factor unequal 1.0 is not tested.");
 		}
 			
-		if (this.scenario.getConfig().scenario().isUseTransit()) {
+		if (this.scenario.getConfig().transit().isUseTransit()) {
 			log.warn("Mixed traffic (simulated public transport) is not tested. Vehicles may have different effective cell sizes than 7.5 meters.");
 		}
 		

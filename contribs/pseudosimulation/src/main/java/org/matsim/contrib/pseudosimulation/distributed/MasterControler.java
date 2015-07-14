@@ -325,7 +325,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         }
 
 
-        if (config.scenario().isUseTransit()) {
+        if (config.transit().isUseTransit()) {
             waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), config.travelTimeCalculator().getTraveltimeBinSize(),
                     (int) (config.qsim().getEndTime() - config.qsim().getStartTime()));
             matsimControler.getEvents().addHandler(waitTimeCalculator);
@@ -864,7 +864,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
             slaveLogger.warn("About to send travel times to slave number " + myNumber);
             writer.writeInt(currentIteration);
             writer.writeObject(linkTravelTimes);
-            if (config.scenario().isUseTransit()) {
+            if (config.transit().isUseTransit()) {
                 writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
                 writer.writeObject(waitTimeCalculator.getWaitTimes());
                 if (FullTransitPerformanceTransmission)

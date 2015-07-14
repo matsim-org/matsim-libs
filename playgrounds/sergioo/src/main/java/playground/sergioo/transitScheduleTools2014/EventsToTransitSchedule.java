@@ -114,7 +114,7 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 	}
 	public static void main(String[] args) throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		new VehicleReaderV1(((ScenarioImpl)scenario).getTransitVehicles()).readFile(args[1]);

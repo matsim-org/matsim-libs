@@ -69,7 +69,7 @@ public class CapacitiesReduction {
 		} while(line!=null);
 		reader.close();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new MatsimNetworkReader(scenario).readFile(args[2]);
 		new TransitScheduleReader(scenario).readFile(args[3]);
 		Set<String> lineLinks = new HashSet<String>();

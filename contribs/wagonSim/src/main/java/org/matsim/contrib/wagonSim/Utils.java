@@ -246,7 +246,7 @@ public class Utils {
 	public static final Config getDefaultWagonSimConfig() {
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(1);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		config.controler().setFirstIteration(0);
 		// don't know which number is good here. From my point of view

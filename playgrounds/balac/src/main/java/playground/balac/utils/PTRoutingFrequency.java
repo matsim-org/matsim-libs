@@ -135,7 +135,7 @@ public class PTRoutingFrequency {
 	    config.transit().setTransitScheduleFile("./schedule.20120117.ch-edited.xml.gz");
 	    config.transit().setVehiclesFile("./transitVehicles.ch.xml.gz");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		//config.scenario().setUseKnowledge(true);
 		

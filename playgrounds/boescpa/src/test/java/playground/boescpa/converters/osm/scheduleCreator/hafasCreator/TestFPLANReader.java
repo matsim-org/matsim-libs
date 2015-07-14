@@ -54,7 +54,7 @@ public class TestFPLANReader {
 	@Before
 	public void prepareTests() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		this.schedule = scenario.getTransitSchedule();
 		this.vehicles = scenario.getTransitVehicles();
 		StopReader stopReader = new StopReader(TransformationFactory.getCoordinateTransformation("WGS84", "CH1903_LV03_Plus"));

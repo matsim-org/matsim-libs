@@ -92,7 +92,7 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 				event.getControler().getTravelDisutilityFactory(),
 				event.getControler().getTravelTimeCalculatorFactory().createTravelTimeCalculator(event.getControler().getNetwork(), event.getControler().getConfig().travelTimeCalculator()).getLinkTravelTimes(),
 				new FastDijkstraFactory(),
-				event.getControler().getScenario().getConfig().scenario().isUseTransit() ? transitRouterFactory : null);*/
+				event.getControler().getScenario().getConfig().transit().isUseTransit() ? transitRouterFactory : null);*/
 		for(Person person: persons.values())
 			toBeAdded.add(BasePersonImpl.convertToBasePerson((PersonImpl) person));
 			//toBeAdded.add(BasePersonImpl.getBasePerson(fixedTypes, types, (PersonImpl)person, tripRouterFactory.createTripRouter(), ((ScenarioImpl)event.getControler().getScenario()).getActivityFacilities()));

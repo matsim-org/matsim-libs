@@ -52,7 +52,7 @@ public class ScenarioCut {
 		String shapeFile = args[3];
 		
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);

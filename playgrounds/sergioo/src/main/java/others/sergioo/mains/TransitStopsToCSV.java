@@ -22,7 +22,7 @@ public class TransitStopsToCSV {
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		int numRoutesBus = 0, numRoutesRail = 0, numDeparturesBus = 0, numDeparturesRail = 0;
 		Set<Id<TransitStopFacility>> railPlatforms = new HashSet<Id<TransitStopFacility>>();

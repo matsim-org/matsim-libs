@@ -120,7 +120,7 @@ public class PRTripRouterFactory implements TripRouterFactory {
 
         tripRouter.setRoutingModule("empty", new DummyRoutingModule());
         
-        if ( scenario.getConfig().scenario().isUseTransit() ) {
+        if ( scenario.getConfig().transit().isUseTransit() ) {
             TransitRouterWrapper routingModule = new TransitRouterWrapper(
                     transitRouterFactory.get(),
                     scenario.getTransitSchedule(),

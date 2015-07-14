@@ -81,7 +81,7 @@ public final class ScenarioImpl implements Scenario {
 		if (this.config.scenario().isUseLanes()) {
 			createLanesContainer();
 		}
-		if (this.config.scenario().isUseTransit()) {
+		if (this.config.transit().isUseTransit()) {
 			this.createTransitSchedule();
 			this.createTransitVehicleContainer();
 		}
@@ -98,7 +98,7 @@ public final class ScenarioImpl implements Scenario {
 	public final boolean createTransitVehicleContainer(){
 		if ( this.transitVehicles != null ) return false;
 
-		if ( !this.config.scenario().isUseTransit() ) {
+		if ( !this.config.transit().isUseTransit() ) {
 			log.info("creating transit vehicles container while transit switch in config set to false. File will not be loaded automatically.");
 		}
 		this.transitVehicles = VehicleUtils.createVehiclesContainer();
@@ -144,7 +144,7 @@ public final class ScenarioImpl implements Scenario {
 	public final boolean createTransitSchedule() {
 		if ( this.transitSchedule != null ) return false;
 
-		if ( !this.config.scenario().isUseTransit() ) {
+		if ( !this.config.transit().isUseTransit() ) {
 			log.info( "creating transit schedule while switch in config set to false. File will not be loaded automatically." );
 		}
 
@@ -232,7 +232,7 @@ public final class ScenarioImpl implements Scenario {
 	public final Vehicles getTransitVehicles() {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.transitVehicles == null ) {
-			if ( this.config.scenario().isUseTransit() ) {
+			if ( this.config.transit().isUseTransit() ) {
 				this.createTransitVehicleContainer();
 			}
 			else {
@@ -271,7 +271,7 @@ public final class ScenarioImpl implements Scenario {
 	public final TransitSchedule getTransitSchedule() {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.transitSchedule == null ) {
-			if ( this.config.scenario().isUseTransit() ) {
+			if ( this.config.transit().isUseTransit() ) {
 				this.createTransitSchedule();
 			}
 			else {

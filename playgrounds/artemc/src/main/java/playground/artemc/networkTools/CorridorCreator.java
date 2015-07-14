@@ -29,7 +29,7 @@ public class CorridorCreator {
 		int numLanes = 3;
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 

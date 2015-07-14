@@ -127,7 +127,7 @@ public class MainEventAnalyzer {
 	/* Count vehicles
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		((ScenarioImpl)scenario).getConfig().scenario().setUseTransit(true);
+		((ScenarioImpl)scenario).getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
 		int numBuses = 0;
 		int numTrains = 0;
@@ -198,7 +198,7 @@ public class MainEventAnalyzer {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
 		new MatsimPopulationReader(scenario).parse("./data/MATSim-Sin-2.0/input/population/plansShort.xml.gz");
-		((ScenarioImpl)scenario).getConfig().scenario().setUseTransit(true);
+		((ScenarioImpl)scenario).getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
 		for(Person person:scenario.getPopulation().getPersons().values())
 			for(int p=0; p<person.getSelectedPlan().getPlanElements().size(); p++) {
@@ -283,7 +283,7 @@ public class MainEventAnalyzer {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).parse("./data/MATSim-Sin-2.0/input/network/singapore6.xml");
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReaderV1(scenario).parse("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario2).parse("./data/MATSim-Sin-2.0/input/network/singapore6.xml");
@@ -354,7 +354,7 @@ public class MainEventAnalyzer {
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.WGS84_UTM48N);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReaderV1(scenario).parse("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
 		TravelTimeCalculator ttc = new TravelTimeCalculator(scenario.getNetwork(), 15*60, 30*3600, scenario.getConfig().travelTimeCalculator());
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();

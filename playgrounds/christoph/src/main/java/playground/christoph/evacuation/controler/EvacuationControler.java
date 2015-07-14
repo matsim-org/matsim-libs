@@ -274,10 +274,10 @@ public class EvacuationControler extends WithinDayController implements
 //			 * is created. Since we need one, we enable transit, call getTransitSchedule
 //			 * (which triggers the creation in the scenario) and disable transit again.
 //			 */
-//			if (!getConfig().scenario().isUseTransit()) {
-//				getConfig().scenario().setUseTransit(true);
+//			if (!getConfig().transit().isUseTransit()) {
+//				getConfig().transit().setUseTransit(true);
 //				getScenario().getTransitSchedule();
-//				getConfig().scenario().setUseTransit(false);
+//				getConfig().transit().setUseTransit(false);
 //			}
 //			
 //			new TransitScheduleReader(getScenario()).readFile(getConfig().transit().getTransitScheduleFile());

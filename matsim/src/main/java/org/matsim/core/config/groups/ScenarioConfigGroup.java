@@ -34,10 +34,10 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 	private static final String USE_LANES = "useLanes";
 	private static final String USE_HOUSEHOLDS = "useHouseholds";
 	private static final String USE_TRANSIT = "useTransit";
+	private static final String USE_VEHICLES = "useVehicles";
 
 	private boolean useLanes = false;
 	private boolean useHouseholds = false;
-	private boolean useTransit = false;
 
 
 	public ScenarioConfigGroup() {
@@ -68,11 +68,6 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 		return this.useHouseholds;
 	}
 
-	@StringGetter( USE_TRANSIT )
-	public boolean isUseTransit() {
-		return this.useTransit;
-	}
-
 	@StringSetter( USE_HOUSEHOLDS )
 	public void setUseHouseholds(final boolean b) {
 		this.useHouseholds = b;
@@ -80,15 +75,18 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 
 	@SuppressWarnings("static-method")
 	@Deprecated
+	@StringSetter( USE_VEHICLES )
 	public void setUseVehicles(@SuppressWarnings("unused") final boolean b) {
-		throw new RuntimeException( "The setUseVehicles switch is no longer operational.  The vehicles file is loaded if the file name"
+		throw new RuntimeException( "The " + USE_VEHICLES + " switch is no longer operational.  The vehicles file is loaded if the file name"
 				+ " is different from null.  If you needed this for the creation of the vehicles container, use the ScenarioBuilder in "
 				+ "ScenarioUtils.  If this does not work for you, please let us know. kai, jun'15" ) ;
 	}
 
+	@SuppressWarnings("static-method")
 	@StringSetter( USE_TRANSIT )
-    public void setUseTransit(final boolean b) {
-		this.useTransit = b;
+	@Deprecated
+	public void setUseTransit(final boolean b) {
+		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
 	}
 
 }

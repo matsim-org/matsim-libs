@@ -66,7 +66,7 @@ public class CreateMatrixBasedPtInputs {
 		config.network().setInputFile(networkFile);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 
 
 		// Read in public transport schedule

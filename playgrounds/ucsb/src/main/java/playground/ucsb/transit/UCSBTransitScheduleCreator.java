@@ -482,7 +482,7 @@ public class UCSBTransitScheduleCreator {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		String ptTimesFile = "D:/balmermi/documents/eclipse/input/raw/america/usa/losAngeles/UCSB/0000/transit/preparation/times/times_tuesday_sorted.txt";
 		String ptStopsFile = "D:/balmermi/documents/eclipse/input/raw/america/usa/losAngeles/UCSB/0000/transit/preparation/stops/stops_UTM_Zone_11N.shp";

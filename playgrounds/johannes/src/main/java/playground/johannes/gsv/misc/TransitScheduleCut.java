@@ -36,7 +36,7 @@ public class TransitScheduleCut {
 
 	public static void main(String[] args) throws IOException, FactoryException, TransformException {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		Set<SimpleFeature> features = FeatureSHP.readFeatures("/home/johannes/gsv/matsim/studies/netz2030/data/raw/Zonierung_Kreise_WGS84_Stand2008Attr_WGS84_region.shp");

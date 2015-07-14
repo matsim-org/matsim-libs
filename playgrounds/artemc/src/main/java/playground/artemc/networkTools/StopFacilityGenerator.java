@@ -464,7 +464,7 @@ public class StopFacilityGenerator {
 
 	private void prepareConfig() {
 		Config config = this.sc.getConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 	}
 }

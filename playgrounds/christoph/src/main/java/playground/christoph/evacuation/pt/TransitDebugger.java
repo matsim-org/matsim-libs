@@ -17,7 +17,7 @@ public class TransitDebugger {
 		
 	public static void main(String[] args) {	
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.transit().setTransitScheduleFile("../../matsim/mysimulations/census2000V2/input_10pct/OeV/schedule_dummy.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		

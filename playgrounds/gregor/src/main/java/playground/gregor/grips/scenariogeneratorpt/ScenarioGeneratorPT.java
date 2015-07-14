@@ -81,7 +81,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		this.em.processEvent(e);
 		this.c = ConfigUtils.loadConfig(this.configFile);
 		
-		this.c.scenario().setUseTransit(true);
+		this.c.transit().setUseTransit(true);
 		this.c.scenario().setUseVehicles(true);
 		
 		this.c.addModule( new SimulationConfigGroup() );

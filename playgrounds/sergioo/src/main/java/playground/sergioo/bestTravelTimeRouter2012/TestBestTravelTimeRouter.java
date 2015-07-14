@@ -34,7 +34,7 @@ public class TestBestTravelTimeRouter {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("./data/MATSim-Sin-2.0/input/transit/transitScheduleWAM.xml");
 		NetworkFactory factory = new NetworkFactoryImpl(scenario.getNetwork());
 		//Add travel links

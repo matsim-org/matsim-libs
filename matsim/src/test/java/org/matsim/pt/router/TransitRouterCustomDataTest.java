@@ -35,7 +35,7 @@ public class TransitRouterCustomDataTest {
 	@Test
 	public void testCustomDataIntegration() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		createTestSchedule(scenario);
 		
 		TransitRouterConfig config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),

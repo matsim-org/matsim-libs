@@ -60,13 +60,13 @@ public class DwellTime2Schedule {
 
 	public void run() {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 		Network PTnetwork = sc.getNetwork();
 		TransitSchedule PTschedule = sc.getTransitSchedule();
 		
 		ScenarioImpl scWrite = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scWrite.getConfig().scenario().setUseTransit(true);
+		scWrite.getConfig().transit().setUseTransit(true);
 		scWrite.getConfig().scenario().setUseVehicles(true);
 		Network newPTnetwork = scWrite.getNetwork();
 		TransitSchedule newPTschedule = scWrite.getTransitSchedule();

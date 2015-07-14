@@ -164,7 +164,7 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 						routeAlgo));
 		}
 
-		if ( config.scenario().isUseTransit() ) {
+		if ( config.transit().isUseTransit() ) {
 			tripRouter.setRoutingModule(
 					TransportMode.pt,
 					 new TransitRouterWrapper(

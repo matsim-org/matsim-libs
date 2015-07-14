@@ -232,7 +232,7 @@ public class TransitScheduleAreaCut {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().network().setInputFile(netFile);
 		ScenarioUtils.loadScenario(sc);
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		TransitScheduleReader scheduleReader = new TransitScheduleReader(sc);
 		scheduleReader.readFile(scheduleFile);
 		

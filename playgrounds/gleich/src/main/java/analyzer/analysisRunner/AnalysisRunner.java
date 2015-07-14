@@ -242,7 +242,7 @@ public class AnalysisRunner {
 			config.network().setInputFile(pathToScenarioData + "input/network.xml");
 			config.transit().setTransitScheduleFile(pathToScenarioData + "input/transitSchedule.xml");
 			config.transit().setVehiclesFile(pathToScenarioData + "input/Vehicles.xml");
-			config.scenario().setUseTransit(true);
+			config.transit().setUseTransit(true);
 			config.scenario().setUseVehicles(true);
 			
 			/* Some analyzers read the result plan files.

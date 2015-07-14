@@ -105,7 +105,7 @@ public class SfCottbusPtSchedule {
 		config.network().setInputFile(cottbus.NETWORK);
 		ScenarioUtils.loadScenario(scen);		
 		cottbus.network = scen.getNetwork();
-		scen.getConfig().scenario().setUseTransit(true);
+		scen.getConfig().transit().setUseTransit(true);
 		scen.getConfig().scenario().setUseVehicles(true);
 				
 		cottbus.schedulefactory = new TransitScheduleFactoryImpl();

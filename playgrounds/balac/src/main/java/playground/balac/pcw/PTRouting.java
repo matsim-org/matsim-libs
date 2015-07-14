@@ -148,7 +148,7 @@ public class PTRouting {
 	    config.transit().setTransitScheduleFile("C:/Users/balacm/Desktop/InputPt/schedule.20120117.ch-edited.xml.gz");
 	    config.transit().setVehiclesFile("C:/Users/balacm/Desktop/InputPt/transitVehicles.ch.xml.gz");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		
 		

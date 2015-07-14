@@ -75,7 +75,7 @@ public class RunAccessibilityBe {
 		
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		
-//		scenario.getConfig().scenario().setUseTransit(true);
+//		scenario.getConfig().transit().setUseTransit(true);
 		
 //		mbpcg.setUsingTravelTimesAndDistances(true);
 //		mbpcg.setPtStopsInputFile(ptStops);

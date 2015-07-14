@@ -19,8 +19,8 @@ public class FixingPlansNewSchedule {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
-		scenario2.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
+		scenario2.getConfig().transit().setUseTransit(true);
 		new MatsimPopulationReader(scenario).readFile(args[0]);
 		new TransitScheduleReader(scenario2).readFile(args[1]);
 		ExperimentalTransitRouteFactory factory = new ExperimentalTransitRouteFactory();

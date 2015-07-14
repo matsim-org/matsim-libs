@@ -88,7 +88,7 @@ import java.util.List;
 		Config config = ConfigUtils.createConfig();	
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		this.config = this.scenario.getConfig();
-		this.config.scenario().setUseTransit(true);
+		this.config.transit().setUseTransit(true);
 		this.network = this.scenario.getNetwork();
 		this.schedule = this.scenario.getTransitSchedule();
 		this.builder = this.schedule.getFactory();

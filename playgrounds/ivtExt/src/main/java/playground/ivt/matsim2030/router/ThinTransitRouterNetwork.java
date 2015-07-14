@@ -63,7 +63,7 @@ public class ThinTransitRouterNetwork {
 		config.plans().setInputFile(null);
 		config.facilities().setInputFile(null);
 		config.network().setInputFile(null);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 	
 		final TransitRouterConfig transitRouterConfig =

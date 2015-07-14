@@ -237,7 +237,7 @@ public class TransitSchedule2Tikz {
 	public static void main(String[] args) {
 		String dir = "C:/Users/Daniel/Desktop/test/";
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 //		new TransitScheduleReader(sc).readFile(dir + "schedule.xml");
 		new TransitScheduleReader(sc).readFile(dir + "schedule.xml.gz");
 		new TransitSchedule2Tikz(true, 10).createTikzPictures(sc.getTransitSchedule(), dir);

@@ -104,7 +104,7 @@ ActivityEndEventHandler
 		this.events = events;
 		this.scenario = scenario;
 
-		if (this.scenario.getConfig().scenario().isUseTransit()) {
+		if (this.scenario.getConfig().transit().isUseTransit()) {
 			log.warn("Mixed traffic (simulated public transport) is not tested. Vehicles may have different effective cell sizes than 7.5 meters.");
 		}
 

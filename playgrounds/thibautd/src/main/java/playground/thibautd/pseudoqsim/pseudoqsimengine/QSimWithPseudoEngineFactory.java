@@ -91,11 +91,11 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 		qSim.addMobsimEngine(teleportationEngine);
 
 		final AgentFactory agentFactory = 
-				sc.getConfig().scenario().isUseTransit() ?
+				sc.getConfig().transit().isUseTransit() ?
 					new TransitAgentFactory( qSim ) :
 					new DefaultAgentFactory( qSim );
 
-		if (sc.getConfig().scenario().isUseTransit()) {
+		if (sc.getConfig().transit().isUseTransit()) {
 			final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);

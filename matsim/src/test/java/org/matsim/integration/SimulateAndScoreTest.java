@@ -62,7 +62,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 	public void testRealPtScore() {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);

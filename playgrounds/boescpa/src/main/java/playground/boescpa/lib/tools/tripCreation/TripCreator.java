@@ -61,7 +61,8 @@ public class TripCreator {
 		EventsManager events = EventsUtils.createEventsManager();
 		
 		ScenarioImpl  scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+
+		scenario.getConfig().transit().setUseTransit(true);
 		
 		log.info("Reading network xml file...");
 		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);

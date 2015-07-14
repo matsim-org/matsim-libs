@@ -53,7 +53,7 @@ public class TestTorontoRouterNetwork {
 	public void testTrnCreation() throws UnsupportedEncodingException, NetworkFormattingException {
 		
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
@@ -208,7 +208,7 @@ public class TestTorontoRouterNetwork {
 		
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(networkFileName);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.transit().setTransitScheduleFile(scheduleFileName);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);

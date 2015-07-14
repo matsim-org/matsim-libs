@@ -30,7 +30,7 @@ public class TransitRouterModule extends AbstractModule {
 
     @Override
     public void install() {
-        if (getConfig().scenario().isUseTransit()) {
+        if (getConfig().transit().isUseTransit()) {
             bind(TransitRouter.class).toProvider(TransitRouterImplFactory.class);
         } else {
             bind(TransitRouter.class).toProvider(DummyTransitRouterFactory.class);

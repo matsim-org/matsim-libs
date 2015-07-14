@@ -146,7 +146,7 @@ private static Provider<TransitRouter> transitRouterFactory;
     config.transit().setTransitScheduleFile("./mmSchedule.xml.gz");
     config.transit().setVehiclesFile("./mmVehicles.xml.gz");
 
-    config.scenario().setUseTransit(true);
+    config.transit().setUseTransit(true);
     config.scenario().setUseVehicles(true);
 
     Scenario scenario = ScenarioUtils.loadScenario(config);

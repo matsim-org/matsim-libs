@@ -71,7 +71,7 @@ public class ScenarioPlayer {
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().qsim().setSnapshotPeriod(0.0);
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();

@@ -37,7 +37,7 @@ public class ScenarioElementsModule extends AbstractModule {
     public void install() {
         bind(Network.class).toProvider(NetworkProvider.class);
         bind(Population.class).toProvider(PopulationProvider.class);
-        if (getConfig().scenario().isUseTransit()) {
+        if (getConfig().transit().isUseTransit()) {
             bind(TransitSchedule.class).toProvider(TransitScheduleProvider.class);
         }
     }

@@ -169,7 +169,7 @@ public class ControlerWSPreCalcTimes {
                         qSim.addMobsimEngine(teleportationEngine);
                         AgentFactory agentFactory;
 
-                        if (config.scenario().isUseTransit()) {
+                        if (config.transit().isUseTransit()) {
                             agentFactory = new TransitAgentFactory(qSim);
                             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
                             transitEngine.setTransitStopHandlerFactory(new BoardAlightVehicleTransitStopHandlerFactory());

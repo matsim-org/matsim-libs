@@ -138,7 +138,7 @@ public class ScenarioLoaderImpl {
 		if (this.config.scenario().isUseHouseholds()) {
 			this.loadHouseholds();
 		}
-		if (this.config.scenario().isUseTransit()) {
+		if (this.config.transit().isUseTransit()) {
 			this.loadTransit();
 			this.loadTransitVehicles();
 		}

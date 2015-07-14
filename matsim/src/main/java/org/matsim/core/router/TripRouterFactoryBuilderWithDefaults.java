@@ -54,7 +54,7 @@ public class TripRouterFactoryBuilderWithDefaults {
 			leastCostPathCalculatorFactory = createDefaultLeastCostPathCalculatorFactory(scenario);
 		}
 
-		if (transitRouterFactory == null && config.scenario().isUseTransit()) {
+		if (transitRouterFactory == null && config.transit().isUseTransit()) {
             transitRouterFactory = createDefaultTransitRouter(scenario);
         }
 		

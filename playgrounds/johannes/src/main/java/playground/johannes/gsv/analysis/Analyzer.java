@@ -45,7 +45,7 @@ public class Analyzer {
 		String eventsFile = args[1];
 		String outputDir = args[2];
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		

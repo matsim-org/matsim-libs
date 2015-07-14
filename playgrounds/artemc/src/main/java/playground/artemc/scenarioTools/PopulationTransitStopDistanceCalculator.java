@@ -30,7 +30,7 @@ public class PopulationTransitStopDistanceCalculator {
 		String distanceAttributesPath = args[2];
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new PopulationReaderMatsimV5(scenario).readFile(populationPath);
 		new TransitScheduleReaderV1(scenario).readFile(transitSchedulePath);
 

@@ -80,7 +80,7 @@ public class ScenarioGenerator {
 		log.info("OutputDir: " + outputDir);
 		
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		this.baseScenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(this.baseScenario).readFile(netFile);
 		new TransitScheduleReaderV1(this.baseScenario).readFile(scheduleFile);

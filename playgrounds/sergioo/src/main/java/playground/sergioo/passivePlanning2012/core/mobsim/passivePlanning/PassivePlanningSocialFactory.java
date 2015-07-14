@@ -59,7 +59,7 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
 		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory;
-		if(sc.getConfig().scenario().isUseTransit()) {
+		if(sc.getConfig().transit().isUseTransit()) {
 			agentFactory = new PassivePlannerTransitSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());

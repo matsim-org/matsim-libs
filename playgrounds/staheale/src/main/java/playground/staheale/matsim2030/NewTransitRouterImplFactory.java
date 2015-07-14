@@ -23,7 +23,7 @@ public class NewTransitRouterImplFactory implements Provider<TransitRouter> {
 		
 		// read thinned transit router network from file
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 		TransitScheduleReader ScheduleReader = new TransitScheduleReader(sc); 
 		ScheduleReader.readFile(config.transit().getTransitScheduleFile());

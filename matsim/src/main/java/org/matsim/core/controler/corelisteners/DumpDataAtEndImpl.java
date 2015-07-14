@@ -81,10 +81,10 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
 					((NetworkImpl) scenarioData.getNetwork()).getNetworkChangeEvents());
 		}
-		if (this.scenarioData.getConfig().scenario().isUseTransit()) {
+		if (this.scenarioData.getConfig().transit().isUseTransit()) {
 			new TransitScheduleWriter(this.scenarioData.getTransitSchedule()).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
 		}
-		if (this.scenarioData.getConfig().scenario().isUseTransit()) {
+		if (this.scenarioData.getConfig().transit().isUseTransit()) {
 			new VehicleWriterV1(this.scenarioData.getTransitVehicles()).writeFile(controlerIO.getOutputFilename("output_transitVehicles.xml.gz"));
 		}
 		if (this.scenarioData.getConfig().vehicles().getVehiclesFile() != null ) {

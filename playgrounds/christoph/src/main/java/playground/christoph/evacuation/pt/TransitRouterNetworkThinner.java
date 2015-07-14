@@ -66,7 +66,7 @@ public class TransitRouterNetworkThinner {
 		config.plans().setInputFile(null);
 		config.facilities().setInputFile(null);
 		config.network().setInputFile(null);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 				
 		log.info("Reading transit router network from file...");

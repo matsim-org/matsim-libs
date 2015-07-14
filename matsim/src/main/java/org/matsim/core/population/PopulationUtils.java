@@ -87,7 +87,7 @@ public final class PopulationUtils {
         for (String transportMode : config.plansCalcRoute().getNetworkModes()) {
             routeFactory.setRouteFactory(transportMode, factory);
         }
-        if (config.scenario().isUseTransit()) {
+        if (config.transit().isUseTransit()) {
             for (String transportMode : config.transit().getTransitModes()) {
                 routeFactory.setRouteFactory(transportMode, new ExperimentalTransitRouteFactory());
             }

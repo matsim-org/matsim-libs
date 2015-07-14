@@ -65,7 +65,7 @@ public class PseudoNetworkDemo {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().scenario().setUseVehicles(true);
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 
 		Network network = scenario.getNetwork();

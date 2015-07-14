@@ -127,7 +127,7 @@ public class RunSimulationWithThinnedRouterNetwork {
 		final Config config = scenario.getConfig();
 		// if actual simulation of transit is disabled, the transit schedule
 		// is not loaded automatically: we need to do it by hand
-		if ( !config.scenario().isUseTransit() ) {
+		if ( !config.transit().isUseTransit() ) {
 			((ScenarioImpl) scenario).createTransitSchedule();
 			log.info( "read schedule from "+config.transit().getTransitScheduleFile() );
 			new TransitScheduleReader( scenario ).readFile( config.transit().getTransitScheduleFile() );

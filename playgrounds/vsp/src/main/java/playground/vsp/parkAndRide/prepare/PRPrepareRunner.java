@@ -110,7 +110,7 @@ public class PRPrepareRunner {
 
 	private void loadScenario() {
 		Config config = scenario.getConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		config.transit().setTransitScheduleFile(scheduleFile);
 		config.transit().setVehiclesFile(vehiclesFile);

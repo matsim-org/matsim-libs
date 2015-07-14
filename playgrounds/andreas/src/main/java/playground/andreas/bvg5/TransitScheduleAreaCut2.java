@@ -128,7 +128,7 @@ public class TransitScheduleAreaCut2 {
 	public void run(String outdir){
 		TransitLine line;
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		this.newSchedule = sc.getTransitSchedule();
 		this.newVehicles = ((ScenarioImpl) sc).getTransitVehicles();
 		TransitScheduleFactory factory = this.newSchedule.getFactory();
@@ -417,7 +417,7 @@ public class TransitScheduleAreaCut2 {
 		String dir ="C:/Users/Daniel/Desktop/para/";
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(sc).readFile(dir + "remainingSchedule.xml.gz");
 		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles() ).readFile(dir + "transitVehicles100.final.xml.gz");
 		
@@ -433,7 +433,7 @@ public class TransitScheduleAreaCut2 {
 		DaShapeWriter.writeTransitLines2Shape(dir + "cuttedSchedule.shp", areacut.getNewSchedule(), null, TransitSchedule2Shape.getAttributesForLines(areacut.getNewSchedule(), "p"), TransformationFactory.WGS84_UTM33N);
 
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc2.getConfig().scenario().setUseTransit(true);
+		sc2.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(sc2).readFile(dir + "cuttedSchedule.xml.gz");
 		new MatsimNetworkReader(sc2).readFile(dir + "network.final.xml.gz");
 		
@@ -449,7 +449,7 @@ public class TransitScheduleAreaCut2 {
 //	public static void main(String[] args) {
 //		
 //		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		sc.getConfig().scenario().setUseTransit(true);
+//		sc.getConfig().transit().setUseTransit(true);
 //		sc.getConfig().scenario().setUseVehicles(true);
 //		
 //		VehicleType type = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(sc.createId("bus"));

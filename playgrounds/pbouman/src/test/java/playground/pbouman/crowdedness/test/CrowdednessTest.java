@@ -182,7 +182,7 @@ public class CrowdednessTest
 	private ScenarioImpl generateScenario()
 	{
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		config.controler().setLastIteration(1000);
 		config.controler().setWriteEventsInterval(50);

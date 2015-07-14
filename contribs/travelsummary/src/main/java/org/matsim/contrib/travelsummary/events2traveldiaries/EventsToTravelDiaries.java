@@ -80,7 +80,7 @@ public class EventsToTravelDiaries implements
 
     public EventsToTravelDiaries(Scenario scenario) {
         this.network = scenario.getNetwork();
-        isTransitScenario = scenario.getConfig().scenario().isUseTransit() ;
+        isTransitScenario = scenario.getConfig().transit().isUseTransit() ;
         if (isTransitScenario) {
             this.transitSchedule = scenario.getTransitSchedule();
             this.walkSpeed = new TransitRouterConfig(scenario.getConfig()).getBeelineWalkSpeed();
@@ -92,7 +92,7 @@ public class EventsToTravelDiaries implements
         boolean isTransit = false;
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
                 .createScenario(ConfigUtils.loadConfig(properties.get("configFile").toString()));
-        scenario.getConfig().scenario().setUseTransit(true);
+        scenario.getConfig().transit().setUseTransit(true);
         if (!properties.get("transitScheduleFile").toString().equals("")) {
             new TransitScheduleReader(scenario)
                     .readFile(properties.get("transitScheduleFile").toString());

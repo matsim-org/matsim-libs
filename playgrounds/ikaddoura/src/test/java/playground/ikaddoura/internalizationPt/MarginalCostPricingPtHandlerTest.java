@@ -107,7 +107,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -211,7 +211,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	config.controler().setMobsim(MobsimType.qsim.toString());
 	config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 	
-	config.scenario().setUseTransit(true);
+	config.transit().setUseTransit(true);
 	
 	ActivityParams hParams = new ActivityParams("h");
 	hParams.setTypicalDuration(3600.);
@@ -331,7 +331,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -490,7 +490,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -589,7 +589,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -690,7 +690,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -797,7 +797,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 			
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 			
 		ActivityParams hParams = new ActivityParams("h");
@@ -899,7 +899,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1020,7 +1020,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1141,7 +1141,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1260,7 +1260,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1331,7 +1331,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1399,7 +1399,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1479,7 +1479,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1556,7 +1556,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.setParam("vspExperimental", "isGeneratingBoardingDeniedEvent", "true");
 		
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);

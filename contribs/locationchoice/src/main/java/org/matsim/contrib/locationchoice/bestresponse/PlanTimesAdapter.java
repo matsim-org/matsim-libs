@@ -279,7 +279,7 @@ public class PlanTimesAdapter {
 				pathCosts.setRoute(route);
 			}
 			
-//		} else if (mode.equals(TransportMode.pt) && config.scenario().isUseTransit()) {
+//		} else if (mode.equals(TransportMode.pt) && config.transit().isUseTransit()) {
 //			LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.pt);
 //			leg.setDepartureTime(0.0);
 //			leg.setTravelTime(0.0);

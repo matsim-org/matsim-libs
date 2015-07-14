@@ -31,7 +31,7 @@ public class VehiclesGenerator {
 	 */
 	/*public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		new CreateVehiclesForSchedule(((ScenarioImpl)scenario).getTransitSchedule(), ((ScenarioImpl)scenario).getVehicles()).run();
@@ -41,7 +41,7 @@ public class VehiclesGenerator {
 	
 	public static void main(String[] args) throws IOException, SAXException, ParserConfigurationException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(args[1]);

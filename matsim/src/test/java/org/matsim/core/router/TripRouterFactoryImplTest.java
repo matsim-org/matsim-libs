@@ -63,7 +63,7 @@ public class TripRouterFactoryImplTest {
 	@Test
 	public void testRestrictedNetworkPt() throws Exception {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit( true );
+		config.transit().setUseTransit( true );
 
 		testRestrictedNetwork( config );
 	}
@@ -75,7 +75,7 @@ public class TripRouterFactoryImplTest {
 	@Test
 	public void testRestrictedNetworkNoPt() throws Exception {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit( false );
+		config.transit().setUseTransit( false );
 
 		testRestrictedNetwork( config );
 	}

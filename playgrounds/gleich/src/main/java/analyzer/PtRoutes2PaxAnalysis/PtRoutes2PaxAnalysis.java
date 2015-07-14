@@ -163,7 +163,7 @@ public class PtRoutes2PaxAnalysis extends AbstractAnalysisModule {
 		VspAnalyzer analyzer = new VspAnalyzer(dir, dir + "ITERS\\it.300\\testReRoute3Old.300.events.xml.gz");
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(sc).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.transitSchedule.xml.gz");
 		new VehicleReaderV1(((ScenarioImpl) sc).getTransitVehicles()).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.vehicles.xml.gz");

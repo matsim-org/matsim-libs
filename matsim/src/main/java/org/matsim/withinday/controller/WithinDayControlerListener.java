@@ -245,7 +245,7 @@ public class WithinDayControlerListener implements StartupListener {
 			this.travelDisutilityFactory = controler.getTravelDisutilityFactory();
 		} else log.info("TravelDisutilityFactory has already been set - it is NOT overwritten!");
 		
-		if (scenario.getConfig().scenario().isUseTransit()) {
+		if (scenario.getConfig().transit().isUseTransit()) {
 			if (this.transitRouterFactory == null) {
 				this.transitRouterFactory = controler.getTransitRouterFactory();
 			} else log.info("TransitRouterFactory has already been set - it is NOT overwritten!");			

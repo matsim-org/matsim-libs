@@ -41,7 +41,7 @@ protected static TransitScheduleImpl getCadytsSchedule (final TransitSchedule sc
 		if(cadytsSchedule ==null){
 			//create an alternative scenario layer for cadyts
 			Config cadytsConfig = ConfigUtils.createConfig();
-			cadytsConfig.scenario().setUseTransit(true);
+			cadytsConfig.transit().setUseTransit(true);
 			cadytsConfig.scenario().setUseVehicles(true);
 			Scenario cadytsScn = ScenarioUtils.createScenario(cadytsConfig);
 			cadytsSchedule = (TransitScheduleImpl) cadytsScn.getTransitSchedule();

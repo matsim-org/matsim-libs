@@ -92,7 +92,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 	public Fixture() {
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.config = this.scenario.getConfig();
-		this.config.scenario().setUseTransit(true);
+		this.config.transit().setUseTransit(true);
 		this.network = this.scenario.getNetwork();
 		this.schedule = this.scenario.getTransitSchedule();
 		this.builder = this.schedule.getFactory();

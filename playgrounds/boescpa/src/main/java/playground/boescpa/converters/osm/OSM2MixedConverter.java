@@ -57,7 +57,7 @@ public class OSM2MixedConverter {
 		// **************** Preparations ****************
 		// Get an empty network and an empty schedule:
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		network = scenario.getNetwork();
 		schedule = scenario.getTransitSchedule();

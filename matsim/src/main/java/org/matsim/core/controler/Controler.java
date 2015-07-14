@@ -208,7 +208,7 @@ public class Controler extends AbstractController {
 				this.config.controler().getOutputDirectory(),
 				this.config.controler().getRunId(),
 				this.config.controler().getOverwriteFileSetting() );
-		if (this.config.scenario().isUseTransit()) {
+		if (this.config.transit().isUseTransit()) {
 			setupTransitSimulation();
 		}
 

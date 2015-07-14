@@ -92,7 +92,7 @@ public class TransitQueryEngineForR implements Serializable {
 
     public TransitQueryEngineForR(double densityDistance) {
         Config config = ConfigUtils.createConfig();
-        config.scenario().setUseTransit(true);
+        config.transit().setUseTransit(true);
         scenario = ScenarioUtils.createScenario(config);
         this.densityDistance = densityDistance;
         densityArea = PI * pow(densityDistance / 1000, 2);

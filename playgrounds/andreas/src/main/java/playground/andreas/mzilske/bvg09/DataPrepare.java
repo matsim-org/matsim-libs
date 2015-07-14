@@ -97,7 +97,7 @@ public class DataPrepare {
 	}
 
 	protected void prepareConfig() {
-		this.config.scenario().setUseTransit(true);
+		this.config.transit().setUseTransit(true);
 	}
 
 	protected void convertSchedule() {

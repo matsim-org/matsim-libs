@@ -67,7 +67,7 @@ public class VisualizeTransitPlans {
 
 	public VisualizeTransitPlans() {
 		this.realScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.realScenario.getConfig().scenario().setUseTransit(true);
+		this.realScenario.getConfig().transit().setUseTransit(true);
 		this.visScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 

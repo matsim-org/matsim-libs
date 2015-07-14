@@ -142,7 +142,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 				controler.getLinkTravelTimes(),
 				controler.getLeastCostPathCalculatorFactory(),
 				((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory(),
-				controler.getConfig().scenario().isUseTransit() ?
+				controler.getConfig().transit().isUseTransit() ?
 					controler.getScenario().getTransitSchedule() :
 					null,
 				controler.getConfig().plansCalcRoute(),

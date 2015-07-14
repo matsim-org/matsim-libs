@@ -50,7 +50,7 @@ public final class PassivePlannerTransitSocialAgentFactory implements AgentFacto
 		this.personHouseholdMapping = personHouseholdMapping;
 		modes = new HashSet<String>();
 		modes.addAll(simulation.getScenario().getConfig().plansCalcRoute().getNetworkModes());
-		if(simulation.getScenario().getConfig().scenario().isUseTransit())
+		if(simulation.getScenario().getConfig().transit().isUseTransit())
 			modes.add("pt");
 	}
 

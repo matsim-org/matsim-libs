@@ -820,7 +820,7 @@ public class BusLineAllocator {
 		String newPopFile = "../berlin-bvg09/pt/baseplan_900s_smallnetwork/test/newPopBiggerTest.xml.gz";
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 
 		Network multiModalNetwork = scenario.getNetwork();
 		new MatsimNetworkReader(scenario)

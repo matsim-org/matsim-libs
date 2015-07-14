@@ -112,7 +112,7 @@ public class VehiclesDataProcessor {
 		}
 		reader.close();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("./data/currentSimulation/transitScheduleWVWAM.xml");
 		for(TransitLine transitLine:((ScenarioImpl)scenario).getTransitSchedule().getTransitLines().values())
 			if(transitLine.getRoutes().values().iterator().hasNext() && transitLine.getRoutes().values().iterator().next().getTransportMode().trim().equals("bus")) {
@@ -171,7 +171,7 @@ public class VehiclesDataProcessor {
 	private void relateVehiclesToTransitSchedule(String transitFile, String newVehiclesFile, double fraction) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseVehicles  = new DataBaseAdmin(new File("./data/ptSystems/DataBase.properties"));
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(transitFile);
 		Vehicles vehicles = ((ScenarioImpl)scenario).getTransitVehicles();

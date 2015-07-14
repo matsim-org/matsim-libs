@@ -35,7 +35,7 @@ public class ptCountGenerator extends MatsimXmlWriter{
 		DataBaseAdmin dbKrakatau = new DataBaseAdmin(new File("./data/dataBases/artemcKrakatau.properties"));
 		Config config = ConfigUtils.createConfig();
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("H:/FCL/Operations/Data/MATSimXMLCurrentData/transitScheduleWV.xml");
 		TransitSchedule transitSchedule = scenario.getTransitSchedule();
 		transitSchedule.getFacilities();

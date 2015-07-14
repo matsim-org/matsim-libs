@@ -122,7 +122,7 @@ public class NewMultiModalNetworkWithoutBusLink {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 
 		Network multiModalNetwork = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(multiModalNetworkFile);

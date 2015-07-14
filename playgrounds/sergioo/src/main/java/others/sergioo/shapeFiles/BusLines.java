@@ -30,7 +30,7 @@ public class BusLines {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new MatsimNetworkReader(scenario).readFile(args[0]);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();

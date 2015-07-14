@@ -72,7 +72,7 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		ScenarioImpl scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 		EventsManager events = EventsUtils.createEventsManager();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.getClassInputDirectory() + "vehicles.xml");
 			
 		events.addHandler(new TransferDelayInVehicleEventHandler() {
@@ -218,7 +218,7 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 			Config config = ConfigUtils.createConfig();;
 			ScenarioImpl scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 			EventsManager events = EventsUtils.createEventsManager();
-			config.scenario().setUseTransit(true);
+			config.transit().setUseTransit(true);
 			new VehicleReaderV1(scenario.getTransitVehicles()).readFile(this.getClassInputDirectory() + "vehicles.xml");
 				
 			events.addHandler(new TransferDelayInVehicleEventHandler() {

@@ -64,7 +64,7 @@ public class TransitTripRouterFactory implements TripRouterFactory {
 
 		TripRouter tripRouter = this.delegateFactory.instantiateAndConfigureTripRouter(routingContext);
 		
-		if (this.scenario.getConfig().scenario().isUseTransit()) {
+		if (this.scenario.getConfig().transit().isUseTransit()) {
 
             PopulationFactory populationFactory = this.scenario.getPopulation().getFactory();
 			ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();

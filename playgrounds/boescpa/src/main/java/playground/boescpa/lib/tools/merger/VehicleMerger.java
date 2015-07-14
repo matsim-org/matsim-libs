@@ -42,7 +42,7 @@ public class VehicleMerger {
 
 	public static Vehicles mergeVehicles(Vehicles vehiclesA, Vehicles vehiclesB) {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		vehicles = scenario.getVehicles();
 		factory = vehicles.getFactory();

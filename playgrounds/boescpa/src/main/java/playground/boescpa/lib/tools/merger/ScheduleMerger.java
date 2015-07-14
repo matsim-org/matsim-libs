@@ -50,7 +50,7 @@ public class ScheduleMerger {
 
 	public static TransitSchedule mergeSchedules(TransitSchedule transitScheduleA, TransitSchedule transitScheduleB) {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		mergedSchedule = scenario.getTransitSchedule();
 		factory = mergedSchedule.getFactory();

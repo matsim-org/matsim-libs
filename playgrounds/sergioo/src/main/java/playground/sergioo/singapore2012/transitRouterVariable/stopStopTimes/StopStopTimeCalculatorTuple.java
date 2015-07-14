@@ -63,7 +63,7 @@ public class StopStopTimeCalculatorTuple implements VehicleArrivesAtFacilityEven
 	}
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		new StopStopTimeCalculatorTuple(scenario.getTransitSchedule(), 900, 30*3600);
 	}

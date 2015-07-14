@@ -67,7 +67,7 @@ public class MATSimNetworkScheduleMergerMain {
 	//////////////////////////////////////////////////////////////////////
 	
 	public MATSimNetworkScheduleMergerMain() {
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 	}
 
 	//////////////////////////////////////////////////////////////////////

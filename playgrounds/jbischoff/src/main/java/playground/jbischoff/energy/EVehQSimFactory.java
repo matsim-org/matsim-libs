@@ -94,7 +94,7 @@ public class EVehQSimFactory implements MobsimFactory {
 	private static AgentFactory createAgentFactory(
 			final QSim qSim,
 			final Scenario sc) {
-		if (sc.getConfig().scenario().isUseTransit()) {
+		if (sc.getConfig().transit().isUseTransit()) {
 			final AgentFactory agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());

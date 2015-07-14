@@ -211,7 +211,7 @@ public class OSM2MixedV2 {
 
 	protected static Scenario getEmptyScenario() {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		return scenario;
 	}

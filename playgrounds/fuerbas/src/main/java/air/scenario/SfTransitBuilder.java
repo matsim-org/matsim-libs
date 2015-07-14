@@ -78,7 +78,7 @@ public class SfTransitBuilder {
 	public void createSchedule(String inputOagFlights, String inputNetworkFile, String outputDirectory) throws IOException {
 		ScenarioImpl scen = (ScenarioImpl) this.loadScenario(inputNetworkFile);
 		Network network = scen.getNetwork();
-		scen.getConfig().scenario().setUseTransit(true);
+		scen.getConfig().transit().setUseTransit(true);
 		scen.getConfig().scenario().setUseVehicles(true);
 		
 		BufferedReader br = new BufferedReader(new FileReader(new File(inputOagFlights)));

@@ -52,7 +52,7 @@ public final class MatrixBasedPtRouterFactoryImpl implements TripRouterFactory {
 
 	@Override
 	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
-		if ( scenario.getConfig().scenario().isUseTransit() ) {
+		if ( scenario.getConfig().transit().isUseTransit() ) {
 			log.warn("you try to use PseudoPtRoutingModule and physical transit simulation at the same time. This probably will not work!");
 		}
 		TripRouter tripRouter = this.delegate.instantiateAndConfigureTripRouter(iterationContext);

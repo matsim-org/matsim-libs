@@ -68,7 +68,7 @@ public class RESTest {
 		netReader.read("/home/johannes/gsv/matsim/studies/netz2030/data/raw/network.net");
 		
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		MatsimNetworkReader reader = new MatsimNetworkReader(scenario);

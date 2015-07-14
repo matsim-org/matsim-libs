@@ -64,7 +64,7 @@ public class RouterTester {
 
 	public static void main(String[] args) {
 		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		s.getConfig().scenario().setUseTransit(true);
+		s.getConfig().transit().setUseTransit(true);
 		s.getConfig().scenario().setUseVehicles(true);
 
 		Vehicles v = s.getTransitVehicles();

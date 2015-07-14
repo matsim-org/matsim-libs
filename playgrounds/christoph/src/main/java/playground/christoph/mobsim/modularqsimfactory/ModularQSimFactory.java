@@ -53,7 +53,7 @@ public class ModularQSimFactory implements MobsimFactory {
 			factory.addMobsimEngineFactory(new NetworkChangeEventsEngineFactory());
 		}
 		
-		if (config.scenario().isUseTransit()) {
+		if (config.transit().isUseTransit()) {
 			factory.setAgentFactoryFactory(new TransitAgentFactoryFactory());
 			factory.addMobsimEngineFactory(new TransitQSimEngineFactory());
 		} else {

@@ -96,7 +96,7 @@ public class AnalysisRunner {
 		System.setProperty("java.io.tmpdir", newJavaIoTempDir);
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		
 //		String targetCoordinateSystem = TransformationFactory.WGS84_UTM35S; // Gauteng
 //		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin

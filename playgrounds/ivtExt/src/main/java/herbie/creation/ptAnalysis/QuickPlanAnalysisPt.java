@@ -192,7 +192,7 @@ public class QuickPlanAnalysisPt {
 		
 		
 		scenario.getConfig().scenario().setUseVehicles(true);
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		
 		Network network = scenario.getNetwork();
 //		network.setCapacityPeriod(3600.0);

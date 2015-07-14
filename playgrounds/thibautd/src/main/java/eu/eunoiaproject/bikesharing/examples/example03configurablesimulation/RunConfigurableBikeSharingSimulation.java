@@ -167,7 +167,7 @@ public class RunConfigurableBikeSharingSimulation {
 		final Config config = scenario.getConfig();
 		// if actual simulation of transit is disabled, the transit schedule
 		// is not loaded automatically: we need to do it by hand
-		if ( !config.scenario().isUseTransit() ) {
+		if ( !config.transit().isUseTransit() ) {
 			if ( config.transit().getTransitScheduleFile() == null ) {
 				log.info( "no schedule file defined in config: not loading any schedule information" );
 				return;

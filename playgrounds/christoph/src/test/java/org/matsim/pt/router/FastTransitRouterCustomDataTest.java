@@ -74,7 +74,7 @@ public class FastTransitRouterCustomDataTest {
 	
 	public void testCustomDataIntegration(boolean fastRouter) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		createTestSchedule(scenario);
 		
 		TransitRouterConfig config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),

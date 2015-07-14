@@ -66,7 +66,7 @@ public class CreatePTLegs {
 		config.facilities().setInputFile("/data/matsim/cdobler/2030/facilities.xml.gz");
 		config.transit().setTransitScheduleFile("/data/matsim/cdobler/2030/schedule.20120117.ch-edited.xml.gz");
 		config.transit().setVehiclesFile("/data/matsim/cdobler/2030/transitVehicles.ch.xml.gz");
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		//config.scenario().setUseKnowledge(true);
 		
@@ -105,7 +105,7 @@ public class CreatePTLegs {
 		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 
 		TripRouter tripRouter = new TripRouter();
-        if ( scenario.getConfig().scenario().isUseTransit() ) {
+        if ( scenario.getConfig().transit().isUseTransit() ) {
             TransitRouterWrapper routingModule = new TransitRouterWrapper(
             		transitRouterFactory.get(),
                     scenario.getTransitSchedule(),

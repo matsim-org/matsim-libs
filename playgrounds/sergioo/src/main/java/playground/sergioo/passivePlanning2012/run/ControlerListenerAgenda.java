@@ -74,7 +74,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		Set<String> modes = new HashSet<String>();
 		modes.addAll(controler.getConfig().plansCalcRoute().getNetworkModes());
-		if(controler.getConfig().scenario().isUseTransit())
+		if(controler.getConfig().transit().isUseTransit())
 			modes.add("pt");
         for(Person person: controler.getScenario().getPopulation().getPersons().values())
 			toBeAdded.add(AgendaBasePersonImpl.convertToAgendaBasePerson((PersonImpl) person, controler.getScenario().getActivityFacilities(), new HashSet<String>(controler.getConfig().qsim().getMainModes()), modes, controler.getConfig().qsim().getEndTime()));

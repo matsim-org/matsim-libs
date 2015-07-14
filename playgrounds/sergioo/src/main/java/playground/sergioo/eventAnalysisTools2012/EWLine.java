@@ -129,7 +129,7 @@ public class EWLine implements ActivityEndEventHandler, PersonDepartureEventHand
 	public static void main(String[] args) throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).parse("./data/MATSim-Sin-2.0/input/network/singapore7.xml");
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReaderV1(scenario).parse("./data/EWService/transitScheduleWAM_MRT_EW_Modified.xml");
 		EWLine ewLine = new EWLine(scenario.getTransitSchedule());
 		EventsManager events = (EventsManager)EventsUtils.createEventsManager();

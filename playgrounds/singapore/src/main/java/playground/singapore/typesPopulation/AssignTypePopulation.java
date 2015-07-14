@@ -62,7 +62,7 @@ public class AssignTypePopulation {
 		return null;
 	}
 	private static Population getPopulationTypesTransitLine(Scenario scenario, String[] args) {
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		(new TransitScheduleReader(scenario)).readFile(args[4]);
 		TransitLine line = scenario.getTransitSchedule().getTransitLines().get(Id.create(args[5],TransitLine.class));
         ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());

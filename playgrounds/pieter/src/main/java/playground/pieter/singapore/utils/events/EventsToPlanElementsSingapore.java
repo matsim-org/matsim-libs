@@ -118,7 +118,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 			ClassNotFoundException, SQLException, NoConnectionException {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(args[3]));
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		new MatsimNetworkReader(scenario).readFile(args[1]);
 

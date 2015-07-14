@@ -28,7 +28,7 @@ public class AssignStopsToHITS {
 	
 	public  AssignStopsToHITS(){
 		//new NetworkReaderMatsimV1(scenario).parse("C:/Work/MATSim/singapore7.xml");
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("C:/Work/MATSim/transitScheduleWAM.xml");		
 	}
 	

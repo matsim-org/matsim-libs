@@ -24,7 +24,7 @@ public class TransitScheduleStopsToCSV {
 	 */
 	public static void main(String[] args) throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		(new TransitScheduleReader(scenario)).readFile(args[0]);
 		PrintWriter writer = new PrintWriter(args[1]);
 		for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values()) {

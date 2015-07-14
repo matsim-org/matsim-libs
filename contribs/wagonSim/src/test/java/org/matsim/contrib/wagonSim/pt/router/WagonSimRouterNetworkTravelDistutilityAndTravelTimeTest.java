@@ -201,7 +201,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		// something very small
 		config.plansCalcRoute().setTeleportedModeSpeed("walk", 0.00000000001);
 		Scenario sc = ScenarioUtils.createScenario(config);
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		return sc;
 	}
 	
@@ -245,7 +245,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		sc.getNetwork().addNode(three);
 		sc.getNetwork().addLink(factory.createLink(Id.create("l1", Link.class), one, two));
 		sc.getNetwork().addLink(factory.createLink(Id.create("l2", Link.class), two, three));
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 	}
 	
 	/**

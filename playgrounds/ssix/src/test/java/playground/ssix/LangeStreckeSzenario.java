@@ -302,7 +302,7 @@ public class LangeStreckeSzenario{
 		qSim.addMobsimEngine(teleportationEngine);
         
 		AgentFactory agentFactory;
-		if (scenario.getConfig().scenario().isUseTransit()) {
+		if (scenario.getConfig().transit().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());

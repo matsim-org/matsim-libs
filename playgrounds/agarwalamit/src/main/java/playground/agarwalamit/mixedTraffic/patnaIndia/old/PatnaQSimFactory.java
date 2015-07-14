@@ -76,7 +76,7 @@ public class PatnaQSimFactory implements MobsimFactory {
 
 		AgentFactory agentFactory;
 
-		if (sc.getConfig().scenario().isUseTransit()) {
+		if (sc.getConfig().transit().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());

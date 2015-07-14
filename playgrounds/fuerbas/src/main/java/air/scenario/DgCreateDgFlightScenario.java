@@ -79,7 +79,7 @@ public class DgCreateDgFlightScenario {
 	
 	private ScenarioImpl initScenario(){
 		Config conf = ConfigUtils.createConfig();
-		conf.scenario().setUseTransit(true);
+		conf.transit().setUseTransit(true);
 		conf.scenario().setUseVehicles(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
 		((NetworkImpl)scenario.getNetwork()).setCapacityPeriod(CAPACITY_PERIOD);

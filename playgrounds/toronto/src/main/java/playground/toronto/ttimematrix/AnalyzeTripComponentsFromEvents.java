@@ -76,7 +76,7 @@ public class AnalyzeTripComponentsFromEvents {
 	private static void loadFiles(String networkFile, String scheduleFile, String zonesFile) throws FileNotFoundException, IOException{
 		
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.network().setInputFile(networkFile);
 		config.transit().setTransitScheduleFile(scheduleFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);

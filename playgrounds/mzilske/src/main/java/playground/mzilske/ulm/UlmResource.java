@@ -83,7 +83,7 @@ class UlmResource {
 		config.plans().setInputFile(wd + "/population.xml");
 		config.global().setCoordinateSystem(CRS);
 		config.scenario().setUseVehicles(true);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue ) ;;
 		config.qsim().setSnapshotPeriod(1);
 		config.qsim().setRemoveStuckVehicles(false);
@@ -149,7 +149,7 @@ class UlmResource {
 
     private TransitSchedule readTransitSchedule() {
         Config config = ConfigUtils.createConfig();
-        config.scenario().setUseTransit(true);
+        config.transit().setUseTransit(true);
         Scenario scenario = ScenarioUtils.createScenario(config);
         new TransitScheduleReader(scenario).readFile(wd + "/output/output_transitSchedule.xml.gz");
         return scenario.getTransitSchedule();
@@ -157,7 +157,7 @@ class UlmResource {
 
     private Population readPopulation(int it) {
         Config config = ConfigUtils.createConfig();
-        config.scenario().setUseTransit(true);
+        config.transit().setUseTransit(true);
         Scenario scenario = ScenarioUtils.createScenario(config);
         new MatsimPopulationReader(scenario).readFile(wd + "/output/ITERS/it."+it+"/"+it+".experienced_plans.xml.gz");
         return scenario.getPopulation();

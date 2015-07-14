@@ -46,7 +46,7 @@ public class TransitControler {
 		Config config = new Config();
 		config.addCoreModules();
 		new ConfigReader(config).readFile(args[0]);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setColoringScheme( OTFVisConfigGroup.ColoringScheme.bvg ) ;
 		

@@ -383,7 +383,7 @@ public class PTNetworkSimplifier {
 
 		ScenarioImpl osmScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config osmConfig = osmScenario.getConfig();
-		osmConfig.scenario().setUseTransit(true);
+		osmConfig.transit().setUseTransit(true);
 		osmConfig.network().setInputFile(this.netInFile);
 		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(osmScenario);
 		osmLoader.loadScenario();

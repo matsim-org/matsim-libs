@@ -88,7 +88,7 @@ public class ElFarolTrainScenario
 	public static ScenarioImpl generateScenario(int numAgents, int timeSlots, int intervalLength, double headWay, int seatCap, int standCap)
 	{
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		
 		config.controler().setLastIteration(1000);

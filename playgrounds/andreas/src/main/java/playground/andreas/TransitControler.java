@@ -79,7 +79,7 @@ public class TransitControler extends Controler {
 		Config config = new Config();
 		config.addCoreModules();
 		new ConfigReader(config).readFile(args[0]);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 				
 		TransitControler tc = new TransitControler(config);
 		if(args.length > 1 && args[1].equalsIgnoreCase("true")){

@@ -118,7 +118,7 @@ public class TransitFareTravelDisutility implements TransitTravelDisutility {
 //	private static Double FARELINE2 = 1.;
 //	public static void main(String[] args) {
 //		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		scenario.getConfig().scenario().setUseTransit(true);
+//		scenario.getConfig().transit().setUseTransit(true);
 //		scenario.getConfig().planCalcScore().setUtilityOfLineSwitch(0);
 //		scenario.getConfig().planCalcScore().setMarginalUtlOfWaitingPt_utils_hr(0.);
 //		createTestSchedule(scenario);

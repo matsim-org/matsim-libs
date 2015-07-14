@@ -43,7 +43,7 @@ public class VisualizerRunner {
 			window = new SimpleNetworkWindow(args[0], networkPainter); 
 		}*/
 		else { 
-			((ScenarioImpl)scenario).getConfig().scenario().setUseTransit(true);
+			((ScenarioImpl)scenario).getConfig().transit().setUseTransit(true);
 			new TransitScheduleReader(scenario).readFile(args[2]);
 			if(args.length<4)
 				window = new PublicTransportNetworkWindow(args[0], new PublicTransportNetworkPainter(scenario.getNetwork(),((ScenarioImpl)scenario).getTransitSchedule()));

@@ -83,7 +83,7 @@ public class PTQSimFactory implements MobsimFactory {
 		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory;
-		if (sc.getConfig().scenario().isUseTransit()) {
+		if (sc.getConfig().transit().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setTransitStopHandlerFactory(new BoardAlightVehicleTransitStopHandlerFactory());

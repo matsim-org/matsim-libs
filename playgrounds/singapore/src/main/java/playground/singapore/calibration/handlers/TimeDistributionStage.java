@@ -189,7 +189,7 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 	 */
 	public static void main(String[] args) throws IOException {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		int lastIteration = new Integer(args[1]);
 		int iterationsInterval = new Integer(args[2]);

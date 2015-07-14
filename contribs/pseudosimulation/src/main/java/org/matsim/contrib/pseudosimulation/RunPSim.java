@@ -307,7 +307,7 @@ public class RunPSim {
         this.carTravelTimeCalculator = new PSimTravelTimeCalculator(matsimControler.getScenario().getNetwork(),
                 config.travelTimeCalculator(), (int) (config.qsim().getEndTime() - config.qsim().getStartTime()), mobSimSwitcher);
         matsimControler.getEvents().addHandler(carTravelTimeCalculator);
-        if (config.scenario().isUseTransit()) {
+        if (config.transit().isUseTransit()) {
             if (FullTransitPerformanceTransmission) {
                 transitPerformanceRecorder = new TransitPerformanceRecorder(matsimControler.getScenario(), matsimControler.getEvents(), mobSimSwitcher);
             }
@@ -491,7 +491,7 @@ public class RunPSim {
                 selectedPlanScoreMemory.remove(plan.getPerson().getId());
             }
             pSimFactory.setPlans(plancatcher.getPlansForPSim());
-            if (matsimControler.getConfig().scenario().isUseTransit() ) {
+            if (matsimControler.getConfig().transit().isUseTransit() ) {
                 if(FullTransitPerformanceTransmission)
                     pSimFactory.setTransitPerformance(transitPerformanceRecorder.getTransitPerformance());
                 else{

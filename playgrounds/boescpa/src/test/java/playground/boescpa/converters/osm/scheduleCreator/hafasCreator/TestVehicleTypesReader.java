@@ -47,7 +47,7 @@ public class TestVehicleTypesReader {
 	@Before
 	public void prepareTests() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		this.vehicles = scenario.getTransitVehicles();
 	}
 

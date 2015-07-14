@@ -62,7 +62,7 @@ class PQSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(teleportationEngine);
         AgentFactory agentFactory;
         
-        if (scenario.getConfig().scenario().isUseTransit()) {
+        if (scenario.getConfig().transit().isUseTransit()) {
             agentFactory = new PTransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());

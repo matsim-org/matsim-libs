@@ -163,7 +163,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(this.scenario);
 //		TransitRouterFactory transitRouterFactory = null;
-//		if (this.scenario.getConfig().scenario().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(this.scenario);
+//		if (this.scenario.getConfig().transit().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(this.scenario);
 		
 		this.toHomeFacilityRouterFactory = new EvacuationTripRouterFactory(this.scenario, this.travelTimes, 
 				this.disutilityFactory, leastCostPathCalculatorFactory, this.transitRouterFactory);

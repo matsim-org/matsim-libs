@@ -199,7 +199,7 @@ public class RunAnalyses {
 	}
 
 	public void readTransitSchedule() {
-		this.scenario.getConfig().scenario().setUseTransit(true);
+		this.scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(this.scenario).readFile(transitScheduleFilename);
 	}
 

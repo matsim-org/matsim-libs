@@ -95,7 +95,7 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;
-		if (this.sc.getConfig().scenario().isUseTransit()) {
+		if (this.sc.getConfig().transit().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(qSim);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine

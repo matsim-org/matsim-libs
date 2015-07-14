@@ -73,7 +73,7 @@ public class TransitSubModeQSimFactory implements MobsimFactory {
 		QSim qSim = qSim1;
 		AgentFactory agentFactory;
 		
-		if (sc.getConfig().scenario().isUseTransit()) {
+		if (sc.getConfig().transit().isUseTransit()) {
 			//##### changes here ############
 
 			agentFactory = new TransitSubModeAgentFactory(qSim, this.routeOnSameMode);

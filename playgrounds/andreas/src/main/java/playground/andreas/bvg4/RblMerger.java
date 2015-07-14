@@ -161,7 +161,7 @@ public class RblMerger {
 	 */
 	private void init(String networkFile, String transitScheduleInFile) {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.network().setInputFile(networkFile);
 		config.transit().setTransitScheduleFile(transitScheduleInFile);
 		this.scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);;

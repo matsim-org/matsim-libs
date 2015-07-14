@@ -95,7 +95,7 @@ public class Generator {
 //		String scheduleFile =  baseDir + "transitSchedule.longdist.linked.xml";
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile(netFile);

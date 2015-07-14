@@ -257,7 +257,7 @@ public class NetworkAdaption {
 
 		log.info("parsing network, transitSchedule and transitVehicles...");
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 		new MatsimNetworkReader(sc).readFile(networkFile);
 		new TransitScheduleReaderV1(sc).readFile(transitScheduleFile);

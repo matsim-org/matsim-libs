@@ -34,7 +34,7 @@ public class OsmUtils {
 
 	public static Scenario getEmptyPTScenario() {
 		final Scenario scenario = getEmptyScenario();
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		return scenario;
 	}

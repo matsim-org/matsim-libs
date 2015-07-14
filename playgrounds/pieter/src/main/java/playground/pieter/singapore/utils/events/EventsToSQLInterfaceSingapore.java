@@ -376,7 +376,7 @@ public class EventsToSQLInterfaceSingapore extends JFrame {
 	void runEventsProcessing() {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(configFile));
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario)
 				.readFile(transitScheduleFileComponent.getText());
 		new MatsimNetworkReader(scenario).readFile(networkFileComponent

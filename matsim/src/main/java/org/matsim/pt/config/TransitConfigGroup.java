@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
@@ -49,6 +50,12 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	private String transitStopsAttributesFile = null;
 
 	private Set<String> transitModes;
+	
+	// ---
+	private static final String USE_TRANSIT = "useTransit";
+	private boolean useTransit = false;
+
+	// ---
 
 	public TransitConfigGroup() {
 		super(GROUP_NAME);
@@ -84,6 +91,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 		comments.put(TRANSIT_MODES, "Comma-separated list of transportation modes that are handled as transit. Defaults to 'pt'.");
 		comments.put(TRANSIT_LINES_ATTRIBUTES, "Optional input file containing additional attributes for transit lines, stored as ObjectAttributes.");
 		comments.put(TRANSIT_STOPS_ATTRIBUTES, "Optional input file containing additional attributes for transit stop facilities, stored as ObjectAttributes.");
+		comments.put(USE_TRANSIT, "Set this parameter to true if transit should be simulated, false if not.");
 		return comments;
 	}
 
@@ -134,4 +142,15 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	public void setTransitStopsAttributesFile(final String transitStopsAttributesFile) {
 		this.transitStopsAttributesFile = transitStopsAttributesFile;
 	}
+	
+	@StringGetter( USE_TRANSIT )
+	public boolean isUseTransit() {
+		return this.useTransit;
+	}
+	@StringGetter( USE_TRANSIT )
+	public void setUseTransit( boolean val ) {
+		this.useTransit = val ;
+	}
+
+
 }

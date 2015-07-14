@@ -54,7 +54,7 @@ public class Convert {
 		config.global().setCoordinateSystem(CRS);
 		config.controler().setLastIteration(0);
 		config.scenario().setUseVehicles(true);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		// GtfsConverter gtfs = new GtfsConverter("/Users/zilske/gtfs-bvg", scenario, new GeotoolsTransformation("WGS84", CRS));
 		GtfsConverter gtfs = new GtfsConverter("/Users/zilske/gtfs-bvg", scenario, new CoordinateTransformation() {

@@ -74,7 +74,7 @@ public class OTFVisWithSignals {
 
 		server.setSimulation(qSim);
 
-		if (config.scenario().isUseTransit()) {
+		if (config.transit().isUseTransit()) {
 
 			Network network = scenario.getNetwork();
 			TransitSchedule transitSchedule = scenario.getTransitSchedule();

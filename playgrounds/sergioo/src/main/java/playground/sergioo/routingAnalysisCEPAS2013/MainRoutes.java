@@ -236,7 +236,7 @@ public class MainRoutes {
 		};
 		RoutesWindow window = new RoutesWindow(panel);
 		window.setVisible(true);
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[2]);
 		RoutesPopulation routesPopulation = new RoutesPopulation(scenario, list.get(index).getKey());
 		((PopulationImpl)scenario.getPopulation()).setIsStreaming(true);

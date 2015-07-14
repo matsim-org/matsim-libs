@@ -246,7 +246,7 @@ public class PtOccupancy implements PersonEntersVehicleEventHandler,
 
 		ScenarioImpl s = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
-		s.getConfig().scenario().setUseTransit(true);
+		s.getConfig().transit().setUseTransit(true);
 
 		new MatsimNetworkReader(s).readFile(netFilename);
 

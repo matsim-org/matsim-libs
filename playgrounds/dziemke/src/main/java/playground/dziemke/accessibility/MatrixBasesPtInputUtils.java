@@ -45,7 +45,7 @@ public class MatrixBasesPtInputUtils {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.createConfig());
 
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		
 		TransitScheduleReader transitScheduleReader = new TransitScheduleReader(scenario);
 		transitScheduleReader.readFile(transitScheduleFile);

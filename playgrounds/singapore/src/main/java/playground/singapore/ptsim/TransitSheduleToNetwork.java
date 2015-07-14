@@ -33,7 +33,7 @@ public class TransitSheduleToNetwork {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		(new MatsimNetworkReader(scenario)).readFile(args[0]);
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		(new TransitScheduleReader(scenario)).readFile(args[1]);
 		Network network = NetworkImpl.createNetwork();
 		NetworkFactory factory =  new NetworkFactoryImpl(network);

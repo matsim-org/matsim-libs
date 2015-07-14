@@ -42,7 +42,7 @@ public class RunResource {
 	public Scenario getOutputScenario() {
 		Scenario scenario = getConfigAndNetwork();
 		new MatsimPopulationReader(scenario).readFile(wd + "/" + runPrefix() + "output_plans.xml.gz");
-		if (scenario.getConfig().scenario().isUseTransit()) {
+		if (scenario.getConfig().transit().isUseTransit()) {
 			new TransitScheduleReader(scenario).readFile(wd + "/" + runPrefix() + "output_transitSchedule.xml.gz");
 			new VehicleReaderV1(scenario.getTransitVehicles()).readFile(wd + "/" + runPrefix() + "output_vehicles.xml.gz");
 		}

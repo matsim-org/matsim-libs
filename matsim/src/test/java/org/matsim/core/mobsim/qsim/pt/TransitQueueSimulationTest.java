@@ -81,7 +81,7 @@ public class TransitQueueSimulationTest {
     public void testCreateAgents() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        scenario.getConfig().scenario().setUseTransit(true);
+        scenario.getConfig().transit().setUseTransit(true);
         scenario.getConfig().qsim().setEndTime(8.0*3600);
 
         // setup: network
@@ -211,7 +211,7 @@ public class TransitQueueSimulationTest {
     public void testAddAgentToStop() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        scenario.getConfig().scenario().setUseTransit(true);
+        scenario.getConfig().transit().setUseTransit(true);
         
         // setup: network
         Network network = scenario.getNetwork();
@@ -287,7 +287,7 @@ public class TransitQueueSimulationTest {
     public void testAddAgentToStopWrongLink() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        scenario.getConfig().scenario().setUseTransit(true);
+        scenario.getConfig().transit().setUseTransit(true);
    
         // setup: network
         Network network = scenario.getNetwork();
@@ -352,7 +352,7 @@ public class TransitQueueSimulationTest {
     public void testHandleStop() {
         // setup: config
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        scenario.getConfig().scenario().setUseTransit(true);
+        scenario.getConfig().transit().setUseTransit(true);
         scenario.getConfig().qsim().setEndTime(8.0*3600);
 
         // setup: network
@@ -634,7 +634,7 @@ public class TransitQueueSimulationTest {
         network.addLink(link2);
 
         // build simple schedule with a single line
-        config.scenario().setUseTransit(true);
+        config.transit().setUseTransit(true);
         double depTime = 7.0*3600;
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory sb = schedule.getFactory();
@@ -723,7 +723,7 @@ public class TransitQueueSimulationTest {
         network.addLink(link2);
 
         // build simple schedule with a single line
-        config.scenario().setUseTransit(true);
+        config.transit().setUseTransit(true);
         double depTime = 7.0*3600;
         TransitSchedule schedule = scenario.getTransitSchedule();
         TransitScheduleFactory sb = schedule.getFactory();

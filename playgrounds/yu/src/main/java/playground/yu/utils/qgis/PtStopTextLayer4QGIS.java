@@ -66,7 +66,7 @@ public class PtStopTextLayer4QGIS extends TextLayer4QGIS {
 		String txtFilename = "../berlin-bvg09/pt/nullfall_M44_344/QGIS/stops.txt";
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 

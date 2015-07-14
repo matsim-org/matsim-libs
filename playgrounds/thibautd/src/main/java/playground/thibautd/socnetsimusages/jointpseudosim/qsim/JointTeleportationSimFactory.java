@@ -96,7 +96,7 @@ public class JointTeleportationSimFactory implements MobsimFactory {
 		final TeleportationEngine teleportationEngine = new TeleportationEngine(sc, eventsManager);
 		qSim.addMobsimEngine( teleportationEngine );
 
-        if (sc.getConfig().scenario().isUseTransit()) {
+        if (sc.getConfig().transit().isUseTransit()) {
 			log.warn( "pt trips will be teleported!" );
             //final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
             //transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
@@ -107,7 +107,7 @@ public class JointTeleportationSimFactory implements MobsimFactory {
 
 		final PassengerUnboardingAgentFactory passAgentFactory =
 					new PassengerUnboardingAgentFactory(
-						sc.getConfig().scenario().isUseTransit() ?
+						sc.getConfig().transit().isUseTransit() ?
 							new TransitAgentFactory(qSim) :
 							new DefaultAgentFactory(qSim) ,
 						vehicles );

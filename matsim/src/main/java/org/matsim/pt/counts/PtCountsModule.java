@@ -27,7 +27,7 @@ import org.matsim.core.controler.AbstractModule;
 public class PtCountsModule extends AbstractModule {
     @Override
     public void install() {
-        if (getConfig().scenario().isUseTransit()) {
+        if (getConfig().transit().isUseTransit()) {
             if (getConfig().ptCounts().getAlightCountsFileName() != null) {
                 // only works when all three files are defined! kai, oct'10
                 addControlerListenerBinding().toInstance(new PtCountControlerListener(getConfig()));

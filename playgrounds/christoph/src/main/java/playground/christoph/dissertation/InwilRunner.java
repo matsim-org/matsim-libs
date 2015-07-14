@@ -84,27 +84,27 @@ public class InwilRunner {
 //			config.plans().setInputFile(null);
 			Scenario scenario = ScenarioUtils.loadScenario(config);
 			
-			config.scenario().setUseTransit(true);
+			config.transit().setUseTransit(true);
 			config.scenario().setUseVehicles(true);
 			new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
 			new VehicleReaderV1(((ScenarioImpl) scenario).getTransitVehicles()).readFile(config.transit().getVehiclesFile());
-			config.scenario().setUseTransit(false);
+			config.transit().setUseTransit(false);
 			config.scenario().setUseVehicles(false);
 			
 //			new MatsimPopulationReader(scenario).parse(populationFile);
 			
-//			boolean useTransit = config.scenario().isUseTransit();
+//			boolean useTransit = config.transit().isUseTransit();
 //			boolean useVehicles = config.scenario().isUseVehicles();
 //			
 //			// workaround to load transit schedule and vehicles even if they are not simulated physically
 //			boolean enableUseTransit = (useTransit == false);
 //			boolean enableUseVehicles = (useVehicles == false);
 //			
-//			if (enableUseTransit) config.scenario().setUseTransit(true);
-//			if (enableUseVehicles) config.scenario().setUseTransit(true);						
+//			if (enableUseTransit) config.transit().setUseTransit(true);
+//			if (enableUseVehicles) config.transit().setUseTransit(true);						
 //			Scenario scenario = ScenarioUtils.loadScenario(config);
-//			if (enableUseTransit) config.scenario().setUseTransit(false);
-//			if (enableUseVehicles) config.scenario().setUseTransit(false);
+//			if (enableUseTransit) config.transit().setUseTransit(false);
+//			if (enableUseVehicles) config.transit().setUseTransit(false);
 			
 			new EvacuationConfigReader().readFile(args[1]);
 			EvacuationConfig.deterministicRNGOffset = Long.parseLong(args[2]);

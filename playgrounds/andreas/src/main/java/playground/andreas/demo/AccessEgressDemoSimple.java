@@ -76,7 +76,7 @@ public class AccessEgressDemoSimple {
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.qsim().setSnapshotStyle( SnapshotStyle.queue );
 		config.qsim().setEndTime(24.0*3600);
 	}

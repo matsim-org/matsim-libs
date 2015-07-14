@@ -75,7 +75,7 @@ public class SingleLineScenario
 	public static ScenarioImpl buildScenario(int numAgents)
 	{
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		
 		HashSet<String> transitModes = new HashSet<String>();

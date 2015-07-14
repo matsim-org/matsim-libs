@@ -87,7 +87,7 @@ public class PreProcessor {
 //	 */
 //	private static String removeCarFromRailLinks(String inputNetwork, String outdir) {
 //		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		sc.getConfig().scenario().setUseTransit(true);
+//		sc.getConfig().transit().setUseTransit(true);
 //		
 //		// remove car and bus from rail-network######
 //		new MatsimNetworkReader(sc).readFile(inputNetwork);
@@ -128,7 +128,7 @@ public class PreProcessor {
 //	 */
 //	private static String simplifyNetwork(String inputNetwork, String inputschedule, String outdir) {
 //		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-//		sc.getConfig().scenario().setUseTransit(true);
+//		sc.getConfig().transit().setUseTransit(true);
 //		new MatsimNetworkReader(sc).readFile(inputNetwork);
 //		new TransitScheduleReader(sc).readFile(inputschedule);
 //		PTNetworkSimplifier simpli = new PTNetworkSimplifier(inputNetwork, inputschedule, null, null);

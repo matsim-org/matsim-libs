@@ -63,7 +63,7 @@ class FareRoutingTestScenario {
 	
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		// take into account only in-veh-time and money 
 		scenario.getConfig().planCalcScore().setUtilityOfLineSwitch(0.);
 		scenario.getConfig().planCalcScore().setTravelingWalk_utils_hr(0.00000000001);

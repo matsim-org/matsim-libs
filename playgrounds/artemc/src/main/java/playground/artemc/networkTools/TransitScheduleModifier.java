@@ -106,7 +106,7 @@ public class TransitScheduleModifier {
 	public TransitScheduleModifier(String networkFile, String transitScheduleFile, String vehicleFile){
 		this.sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = this.sc.getConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 
 		new MatsimNetworkReader(sc).readFile(networkFile);

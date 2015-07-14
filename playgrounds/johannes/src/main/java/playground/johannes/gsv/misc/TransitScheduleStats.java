@@ -13,7 +13,7 @@ public class TransitScheduleStats {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		TransitScheduleReader reader = new TransitScheduleReader(scenario);

@@ -33,7 +33,7 @@ public class TransitLiveSimMain {
 		Config config = new Config();
 		config.addCoreModules();
 		new ConfigReader(config).readFile(configFilename);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		scenario = (ScenarioImpl) new ScenarioLoaderImpl(scenario).loadScenario();
 

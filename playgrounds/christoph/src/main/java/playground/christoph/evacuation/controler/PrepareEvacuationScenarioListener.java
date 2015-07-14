@@ -269,7 +269,7 @@ public class PrepareEvacuationScenarioListener {
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(scenario);
 		Provider<TransitRouter> transitRouterFactory = null;
-		if (scenario.getConfig().scenario().isUseTransit()) {
+		if (scenario.getConfig().transit().isUseTransit()) {
 //			transitRouterFactory = builder.createDefaultTransitRouter(scenario);
 			Config config = scenario.getConfig();
 	        TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(),

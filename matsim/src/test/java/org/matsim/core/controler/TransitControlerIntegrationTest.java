@@ -46,7 +46,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 
 	public void testTransitRouteCopy() {
 		Config config = super.loadConfig(null);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		Id<Node> nodeId1 = Id.create("1", Node.class);

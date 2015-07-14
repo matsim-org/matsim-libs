@@ -58,7 +58,7 @@ public class TransitRouterNetworkCreator {
 	public static void main(String args[]) {
 
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		config.transit().setVehiclesFile("../../matsim/mysimulations/matsim2030/input/uvek2005vehicles_final.xml");
 		config.transit().setTransitScheduleFile("../../matsim/mysimulations/matsim2030/input/uvek2005schedule_adjusted.xml.gz");

@@ -1566,7 +1566,7 @@ public class CepasToEvents {
         this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         MatsimNetworkReader nwr = new MatsimNetworkReader(scenario);
         nwr.readFile(networkFile);
-        scenario.getConfig().scenario().setUseTransit(true);
+        scenario.getConfig().transit().setUseTransit(true);
         scenario.getConfig().scenario().setUseVehicles(true);
         TransitScheduleReader tsr = new TransitScheduleReader(scenario);
         tsr.readFile(transitSchedule);

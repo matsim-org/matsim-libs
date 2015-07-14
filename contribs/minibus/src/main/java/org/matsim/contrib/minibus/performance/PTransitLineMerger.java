@@ -160,7 +160,7 @@ public class PTransitLineMerger {
 		String vehicleFile = folder + "bvg6_b_0.1250.vehicles.xml.gz";
 		
 		Scenario scenario =  ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(networkFile);

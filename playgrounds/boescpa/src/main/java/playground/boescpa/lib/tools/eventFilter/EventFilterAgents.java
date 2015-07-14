@@ -68,7 +68,7 @@ public class EventFilterAgents {
 		EventsManager events = EventsUtils.createEventsManager();
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 
 		log.info("Reading network xml file...");

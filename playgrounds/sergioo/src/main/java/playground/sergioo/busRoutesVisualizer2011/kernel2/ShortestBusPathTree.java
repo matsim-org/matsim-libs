@@ -42,7 +42,7 @@ public class ShortestBusPathTree {
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		double time = Time.parseTime(args[2]);
 		int numStops = new Integer(args[3]);

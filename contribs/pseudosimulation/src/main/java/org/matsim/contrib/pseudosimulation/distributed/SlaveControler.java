@@ -248,7 +248,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
             }
         });
 //        new Thread(new TimesReceiver()).start();
-        if (config.scenario().isUseTransit()) {
+        if (config.transit().isUseTransit()) {
 
             stopStopTimes = new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
                     config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
@@ -353,7 +353,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         lastIterationStartTime = System.currentTimeMillis();
         travelTime.setTravelTime(linkTravelTimes);
         pSimFactory.setTravelTime(linkTravelTimes);
-        if (config.scenario().isUseTransit()) {
+        if (config.transit().isUseTransit()) {
             pSimFactory.setStopStopTime(stopStopTimes);
             pSimFactory.setWaitTime(waitTimes);
             pSimFactory.setTransitPerformance(transitPerformance);
@@ -415,7 +415,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         slaveLogger.warn("RECEIVING travel times...");
         masterCurrentIteration = reader.readInt();
         linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
-        if (config.scenario().isUseTransit()) {
+        if (config.transit().isUseTransit()) {
             stopStopTimes = (StopStopTime) reader.readObject();
             waitTimes = (WaitTime) reader.readObject();
             if (fullTransitPerformanceTransmission) {

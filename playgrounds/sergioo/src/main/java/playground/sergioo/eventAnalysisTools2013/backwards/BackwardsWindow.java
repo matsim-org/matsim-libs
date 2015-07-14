@@ -151,7 +151,7 @@ public class BackwardsWindow extends LayersWindow implements PersonAlgorithm {
 	public static void main(String[] args) throws IOException {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[1]);
 		TransitRoute routeA = scenario.getTransitSchedule().getTransitLines().get(Id.create("EW", TransitLine.class)).getRoutes().get(Id.create("EW_weeksatday_1", TransitRoute.class));
 		TransitRoute routeB = scenario.getTransitSchedule().getTransitLines().get(Id.create("EW", TransitLine.class)).getRoutes().get(Id.create("EW_weeksatday_2", TransitRoute.class));

@@ -221,7 +221,7 @@ class CreateTestScenario {
 	private void createScheduleAndVehicles(Scenario sc){
 		
 		sc.getConfig().scenario().setUseVehicles(true);
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		
 		createStops(sc);
 		createBus(sc);

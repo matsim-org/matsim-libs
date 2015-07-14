@@ -180,7 +180,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			log.log( lvl, PlansConfigGroup.ActivityDurationInterpretation.endTimeOnly + " is deprecated. Use " + PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration + " instead.") ;
 			problem = true;
 			// added before nov'12
-			if( config.scenario().isUseTransit()) {
+			if( config.transit().isUseTransit()) {
 				problem = true;
 				System.out.flush() ;
 				log.error("You are using " + config.plans().getActivityDurationInterpretation() + " as activityDurationInterpretation in " +

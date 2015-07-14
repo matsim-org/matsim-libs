@@ -70,7 +70,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	private Map<String, Double> distFactors;
 	
 	public  SimpleTripAnalyzer(Config c, Network net, Set<Id<Person>> pIds) throws RuntimeException{
-		if(c.scenario().isUseTransit() ){
+		if(c.transit().isUseTransit() ){
 			throw new RuntimeException("This analysis is structured very simple. " +
 					"Thus, it does not allow physically simulated transit!");
 		}

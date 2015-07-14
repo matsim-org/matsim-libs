@@ -38,7 +38,7 @@ public class CompleteBusArrivalEvents implements VehicleArrivesAtFacilityEventHa
 	}
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile(args[0]);
 		EventsManager outEventsManager = EventsUtils.createEventsManager();
 		outEventsManager.addHandler(new EventWriterXML(args[2]));

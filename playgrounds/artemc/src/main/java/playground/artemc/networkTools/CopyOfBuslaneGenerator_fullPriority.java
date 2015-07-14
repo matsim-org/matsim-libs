@@ -26,7 +26,7 @@ public class CopyOfBuslaneGenerator_fullPriority {
 		String outputNetworkPath = args[2];
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 
 		new NetworkReaderMatsimV1(scenario).parse(networkPath);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();

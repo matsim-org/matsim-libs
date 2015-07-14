@@ -281,7 +281,7 @@ public class EvacuationControlerListener implements StartupListener {
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.linkEnteredProvider);
 		
 		// workaround
-		scenario.getConfig().scenario().setUseTransit(false);
+		scenario.getConfig().transit().setUseTransit(false);
 		
 		// init within-day travel times and trip router factory
 		this.initWithinDayTravelTimes(controler);

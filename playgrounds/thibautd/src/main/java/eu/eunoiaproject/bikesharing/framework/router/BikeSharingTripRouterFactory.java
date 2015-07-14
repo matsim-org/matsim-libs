@@ -73,7 +73,7 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 			final TripRouterFactory delegate,
 			final Scenario scenario,
 			final LinkSlopeScorer slopeScorer) {
-		this( scenario.getConfig().scenario().isUseTransit() ?
+		this( scenario.getConfig().transit().isUseTransit() ?
 					new TransitMultiModalAccessRoutingModule.RoutingData( scenario ) :
 					null,
 			delegate,
@@ -113,7 +113,7 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 					configGroup.getSearchRadius(),
 					router) );
 
-		if ( routePtUsingSchedule || scenario.getConfig().scenario().isUseTransit() ) {
+		if ( routePtUsingSchedule || scenario.getConfig().transit().isUseTransit() ) {
 			// XXX should be person-dependent
 			final CharyparNagelScoringParameters scoringParams =
 					CharyparNagelScoringParameters.getBuilder(scenario.getConfig().planCalcScore()).create();

@@ -267,7 +267,7 @@ public class PtRoute2QGIS extends MATSimNet2QGIS {
 	public PtRoute2QGIS(String netFilename, String coordRefSys,
 			String scheduleFilename) {
 		super(netFilename, coordRefSys);
-		this.scenario.getConfig().scenario().setUseTransit(true);
+		this.scenario.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(this.scenario).readFile(scheduleFilename);
 		p2g = new PtRoute2PolygonGraph(crs, ((ScenarioImpl) this.scenario)
 				.getTransitSchedule());

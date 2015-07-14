@@ -81,14 +81,14 @@ public class SimpleHafasOsmMerger {
 
 		this.hafasScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.hafasConfig = this.hafasScenario.getConfig();
-		this.hafasConfig.scenario().setUseTransit(true);
+		this.hafasConfig.transit().setUseTransit(true);
 		this.hafasConfig.network().setInputFile(this.osmNetworkFile);
 		ScenarioLoaderImpl hafasLoader = new ScenarioLoaderImpl(this.hafasScenario);
 		hafasLoader.loadScenario();
 
 		this.osmScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.osmConfig = this.osmScenario.getConfig();
-		this.osmConfig.scenario().setUseTransit(true);
+		this.osmConfig.transit().setUseTransit(true);
 		this.osmConfig.network().setInputFile(this.osmNetworkFile);
 		ScenarioLoaderImpl osmLoader = new ScenarioLoaderImpl(this.osmScenario);
 		osmLoader.loadScenario();

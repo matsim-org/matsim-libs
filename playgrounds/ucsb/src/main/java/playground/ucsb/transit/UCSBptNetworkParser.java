@@ -387,7 +387,7 @@ public class UCSBptNetworkParser {
 	
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		ObjectAttributes nodeObjectAttributes = new ObjectAttributes();
 		UCSBptNetworkParser parser = new UCSBptNetworkParser();
 		parser.createNetworkFromPtStops(

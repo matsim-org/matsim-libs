@@ -108,7 +108,7 @@ public class AccessibilityCalculator {
 		Header.printHeader(AccessibilityCalculator.class.toString(), args);
 		
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		

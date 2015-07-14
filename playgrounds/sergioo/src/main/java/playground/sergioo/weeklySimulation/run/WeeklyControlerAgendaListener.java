@@ -87,7 +87,7 @@ public class WeeklyControlerAgendaListener implements StartupListener, Iteration
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		Set<String> modes = new HashSet<String>();
 		modes.addAll(controler.getConfig().plansCalcRoute().getNetworkModes());
-		if(controler.getConfig().scenario().isUseTransit())
+		if(controler.getConfig().transit().isUseTransit())
 			modes.add("pt");
         if(createPersons) {
 			boolean fixedTypes = controler.getConfig().findParam("locationchoice", "flexible_types")==null ||controler.getConfig().findParam("locationchoice", "flexible_types").equals("");

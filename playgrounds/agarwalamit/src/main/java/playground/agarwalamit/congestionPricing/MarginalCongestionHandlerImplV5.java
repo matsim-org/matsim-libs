@@ -74,7 +74,7 @@ public class MarginalCongestionHandlerImplV5 implements PersonDepartureEventHand
 		congestedModes.addAll(this.scenario.getConfig().qsim().getMainModes());
 		if (congestedModes.size()>1) throw new RuntimeException("Mixed traffic is not tested yet.");
 
-		if (this.scenario.getConfig().scenario().isUseTransit()) {
+		if (this.scenario.getConfig().transit().isUseTransit()) {
 			log.warn("Mixed traffic (simulated public transport) is not tested. Vehicles may have different effective cell sizes than 7.5 meters.");
 		}
 		storeLinkInfo();

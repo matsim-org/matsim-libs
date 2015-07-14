@@ -451,7 +451,7 @@ public class MyTransitRouterImplTest {
 
 		/*package*/ WalkFixture() {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			this.scenario.getConfig().scenario().setUseTransit(true);
+			this.scenario.getConfig().transit().setUseTransit(true);
 			this.routerConfig = new TransitRouterConfig(this.scenario.getConfig().planCalcScore(),
 					this.scenario.getConfig().plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 					this.scenario.getConfig().vspExperimental());

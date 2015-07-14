@@ -51,11 +51,11 @@ public class AdaptPTNetwork {
 
 	public void run() {
 		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 
 		final ScenarioImpl sc2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc2.getConfig().scenario().setUseTransit(true);
+		sc2.getConfig().transit().setUseTransit(true);
 		sc2.getConfig().scenario().setUseVehicles(true);
 		this.scheduleWrite = sc2.getTransitSchedule();
 

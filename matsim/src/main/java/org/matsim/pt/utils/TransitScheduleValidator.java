@@ -255,7 +255,7 @@ public abstract class TransitScheduleValidator {
 		}
 		
 		ScenarioImpl s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		s.getConfig().scenario().setUseTransit(true);
+		s.getConfig().transit().setUseTransit(true);
 		TransitSchedule ts = s.getTransitSchedule();
 		Network net = s.getNetwork();
 

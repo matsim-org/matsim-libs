@@ -51,7 +51,7 @@ public class CreateRscript {
 	public static void main(String[] args) {
 		String dir = "E:\\VSP\\svn\\droeder\\southAfrica\\testReRoute\\testReRoute3Old\\";
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		new TransitScheduleReader(sc).readFile(dir + "ITERS\\it.299\\testReRoute3Old.299.transitSchedule.xml.gz");
 		createScript(sc.getTransitSchedule().getTransitLines(), dir + "PtRoutes2PaxAnalysis\\", 60*60.0, 24);
 	}

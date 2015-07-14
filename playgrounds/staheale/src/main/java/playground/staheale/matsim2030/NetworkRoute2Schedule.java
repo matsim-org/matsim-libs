@@ -60,7 +60,7 @@ public class NetworkRoute2Schedule {
 	public void run() throws Exception {
 
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 		Network PTnetwork = sc.getNetwork();
 		TransitSchedule PTschedule = sc.getTransitSchedule();

@@ -382,7 +382,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(configFileComponent
 						.getText()));
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		if (!transitScheduleFileComponent.getText().equals("NA")
 				&& !transitScheduleFileComponent.getText().equals("")) {
 			new TransitScheduleReader(scenario)

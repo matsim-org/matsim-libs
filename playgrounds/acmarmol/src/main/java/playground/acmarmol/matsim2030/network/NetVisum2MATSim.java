@@ -89,7 +89,7 @@ public class NetVisum2MATSim {
 	public void writeTransitScheduleAndVehiclesFiles(String outputTransitScheduleFile,String outputPTVehiclesFile){
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		Visum2TransitSchedule converter = new Visum2TransitSchedule(visumNet, scenario.getTransitSchedule(), scenario.getTransitVehicles());	
 		for(ModeType mode: visumNet.getModeTypes().values()){

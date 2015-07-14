@@ -69,7 +69,7 @@ class ExtendPtTutorial {
 	 */
 	public static void main(String[] args) {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().transit().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 		new MatsimNetworkReader(sc).readFile(DIR + "multimodalnetwork.xml");
 		new TransitScheduleReader(sc).readFile(DIR + "transitschedule.xml");

@@ -142,7 +142,7 @@ public class ScenarioLoaderImpl {
 		if (this.config.scenario().isUseHouseholds()) {
 			this.loadHouseholds();
 		}
-		if (this.config.scenario().isUseTransit()) {
+		if (this.config.transit().isUseTransit()) {
 			this.loadTransit();
 		}
 		if (this.config.vehicles().getVehiclesFile() != null ) {
@@ -175,7 +175,7 @@ public class ScenarioLoaderImpl {
 				log.info("use TimeVariantLinks in NetworkFactory.");
 				network.getFactory().setLinkFactory(new TimeVariantLinkFactory());
 			}
-			if (this.config.scenario().isUseTransit()) {
+			if (this.config.transit().isUseTransit()) {
 				((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 			}
 			new MatsimNetworkReader(this.scenario).parse(networkFileName);

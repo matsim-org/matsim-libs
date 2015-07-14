@@ -44,7 +44,7 @@ public class WriteTransitRouterNetwork {
 		config.plans().setInputFile(null);
 		config.facilities().setInputFile(null);
 		config.network().setInputFile(null);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		new WriteTransitRouterNetwork().writeTransitRouterNetwork(scenario, args[1]);

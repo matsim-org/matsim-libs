@@ -55,7 +55,7 @@ public class LinkStopFacilities {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		
 		MatsimNetworkReader netReader = new MatsimNetworkReader(scenario);
 		netReader.readFile("/home/johannes/gsv/matsim/studies/netz2030/data/network.gk3.xml");

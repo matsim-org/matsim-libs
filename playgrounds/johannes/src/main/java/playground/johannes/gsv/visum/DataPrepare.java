@@ -80,7 +80,7 @@ public class DataPrepare {
 	}
 
 	protected void prepareConfig() {
-		this.config.scenario().setUseTransit(true);
+		this.config.transit().setUseTransit(true);
 		this.config.scenario().setUseVehicles(true);
 	}
 
@@ -213,7 +213,7 @@ X;Dritte GV;OV;1.000
 		new MatsimPopulationReader(this.scenario).parse(INPUT_PLANS_FILE);
 
 		FreespeedTravelTimeAndDisutility timeCostCalculator = new FreespeedTravelTimeAndDisutility(this.scenario.getConfig().planCalcScore());
-//		if ( scenario.getConfig().scenario().isUseTransit() ) {
+//		if ( scenario.getConfig().transit().isUseTransit() ) {
 //			throw new IllegalStateException( "Routing will not behave as desired" );
 //		}
 		PlanRouter router =

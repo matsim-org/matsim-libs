@@ -108,7 +108,7 @@ public class DataPrepare {
 	}
 
 	protected void prepareConfig() {
-		this.config.scenario().setUseTransit(true);
+		this.config.transit().setUseTransit(true);
 		this.config.scenario().setUseVehicles(true);
 	}
 
@@ -182,7 +182,7 @@ public class DataPrepare {
 		//		.plansCalcRoute(), this.scenario.getConfig().transitRouter(),
 		//		this.scenario.getConfig().vspExperimental());
 
-		if ( scenario.getConfig().scenario().isUseTransit() ) {
+		if ( scenario.getConfig().transit().isUseTransit() ) {
 			throw new IllegalStateException( "Routing will not behave as desired" );
 		}
 		PlanRouter router =

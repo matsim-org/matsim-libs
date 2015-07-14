@@ -46,7 +46,7 @@ public class RsaAnalysis {
 //		
 //		
 //		Config c = ConfigUtils.createConfig();
-//		c.scenario().setUseTransit(true);
+//		c.transit().setUseTransit(true);
 //		c.transit().setTransitModes(ptModes);
 //		
 //		Scenario sc = ScenarioUtils.createScenario(c);

@@ -56,7 +56,7 @@ public class TransitControler {
 		config.addCoreModules();
 		new ConfigReader(config).readFile(args[0]);
 		if ( useTransit ) {
-			config.scenario().setUseTransit(true);
+			config.transit().setUseTransit(true);
 			config.scenario().setUseVehicles(true);
 //		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
 		}

@@ -128,7 +128,7 @@ public class PSeudoQSimCompareEventsTest {
 	private Scenario createTestScenario(final boolean useTransit) {
 		final Config config = ConfigUtils.createConfig();
 		if ( useTransit ) {
-			config.scenario().setUseTransit( true );
+			config.transit().setUseTransit( true );
 
 			config.qsim().setEndTime( 30 * 3600 );
 		}

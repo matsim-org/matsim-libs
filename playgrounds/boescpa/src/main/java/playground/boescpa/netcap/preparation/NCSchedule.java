@@ -49,7 +49,7 @@ public class NCSchedule {
 		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
 		final int desiredFrequency = Integer.parseInt(args[1])*60;
 
-		scenario.getConfig().scenario().setUseTransit(true);
+		scenario.getConfig().transit().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		new TransitScheduleReader(scenario).readFile(scenario.getConfig().transit().getTransitScheduleFile());
 		TransitSchedule schedule = scenario.getTransitSchedule();

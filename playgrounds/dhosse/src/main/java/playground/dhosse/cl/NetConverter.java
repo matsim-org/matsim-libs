@@ -64,7 +64,7 @@ public class NetConverter {
 	public void convertTransitSchedule(String file){
 		
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseTransit(true);
+		config.transit().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		

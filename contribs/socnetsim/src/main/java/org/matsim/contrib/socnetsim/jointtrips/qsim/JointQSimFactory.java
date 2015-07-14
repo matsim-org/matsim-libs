@@ -103,7 +103,7 @@ public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 		final TeleportationEngine teleportationEngine = new TeleportationEngine(sc1, eventsManager);
 		qSim.addMobsimEngine( teleportationEngine );
 
-        if (sc1.getConfig().scenario().isUseTransit()) {
+        if (sc1.getConfig().transit().isUseTransit()) {
             final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
@@ -113,7 +113,7 @@ public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 
 		final PassengerUnboardingAgentFactory passAgentFactory =
 					new PassengerUnboardingAgentFactory(
-						sc1.getConfig().scenario().isUseTransit() ?
+						sc1.getConfig().transit().isUseTransit() ?
 							new TransitAgentFactory(qSim) :
 							new DefaultAgentFactory(qSim) ,
 						new NetsimWrappingQVehicleProvider(
