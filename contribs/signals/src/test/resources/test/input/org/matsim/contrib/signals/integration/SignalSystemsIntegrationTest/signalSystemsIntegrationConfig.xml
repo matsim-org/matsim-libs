@@ -16,8 +16,6 @@
   <module name="scenario">
     <!-- Set this parameter to true if lanes should be used, false if not. -->
     <param name="useLanes" value="true" />
-    <!-- Set this parameter to true if signal systems should be used, false if not. -->
-    <param name="useSignalsystems" value="true" />
   </module>
 
   <module name="network">
@@ -30,6 +28,8 @@
   </module>
 
   <module name="signalsystems">
+    <!-- Set this parameter to true if signal systems should be used, false if not. -->
+    <param name="useSignalsystems" value="true" />
     <param name="signalsystems" value="&INPUTBASE;/testSignalSystems_v2.0.xml" />
     <param name="signalcontrol" value="&INPUTBASE;/testSignalControl_v2.0.xml" />
     <param name="signalgroups" value="&INPUTBASE;/testSignalGroups_v2.0.xml" />
