@@ -70,9 +70,11 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	private Map<Id<Person>, Double> personId2firstActivityEndTime = new HashMap<Id<Person>, Double>();
 	private Map<Id<Person>, String> personId2currentActivityType = new HashMap<Id<Person>, String>();
 	private Map<Id<Person>, String> personId2firstActivityType = new HashMap<Id<Person>, String>();
+	private Map<Id<Person>, Integer> personId2currentTripNr = new HashMap<>();
 	
 	private Map<Id<Person>, List<Double>> personId2VTTSh = new HashMap<>();
-
+	private Map<Id<Person>, Map<Integer, Double>> personId2TripNr2VTTSh = new HashMap<>();
+		
 	private MarginalSumScoringFunction marginaSumScoringFunction;
 	
 	public VTTSHandler(Scenario scenario) {
@@ -91,13 +93,22 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		this.personId2firstActivityEndTime.clear();
 		this.personId2currentActivityType.clear();
 		this.personId2firstActivityType.clear();
+		this.personId2TripNr2VTTSh.clear();
 		
 		this.personId2VTTSh.clear();
+		personId2TripNr2VTTSh.clear();
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		this.departedPersonIds.add(event.getPersonId());
+		
+		if (this.personId2currentTripNr.containsKey(event.getPersonId())){
+			this.personId2currentTripNr.put(event.getPersonId(), this.personId2currentTripNr.get(event.getPersonId()) + 1);
+			
+		} else {
+			this.personId2currentTripNr.put(event.getPersonId(), 1);
+		}
 	}
 	
 	@Override
@@ -186,18 +197,25 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		}
 		
 		// Calculate the agent's trip delay disutility (could be done similar to the activity delay disutility).
-		double tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
-		
+		double tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1); // TODO: make this mode dependent!
 		// Translate the disutility into monetary units.
 		double delayCostPerSec_usingActivityDelayOneSec = (activityDelayDisutilityOneSec + tripDelayDisutilityOneSec) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
-		
+
 		// store the VTTS for analysis purposes
 		if (this.personId2VTTSh.containsKey(personId)) {
+					
 			this.personId2VTTSh.get(personId).add(delayCostPerSec_usingActivityDelayOneSec * 3600);
+			this.personId2TripNr2VTTSh.get(personId).put(this.personId2currentTripNr.get(personId), delayCostPerSec_usingActivityDelayOneSec * 3600);
+	
 		} else {
+
 			List<Double> vTTSh = new ArrayList<>();
 			vTTSh.add(delayCostPerSec_usingActivityDelayOneSec * 3600.);
 			this.personId2VTTSh.put(personId, vTTSh);
+
+			Map<Integer, Double> tripNr2VTTSh = new HashMap<>();
+			tripNr2VTTSh.put(this.personId2currentTripNr.get(personId), delayCostPerSec_usingActivityDelayOneSec * 3600.);
+			this.personId2TripNr2VTTSh.put(personId, tripNr2VTTSh);
 		}
 	}
 	
@@ -207,12 +225,12 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("person Id;VTTS (money/hour)");
+			bw.write("person Id;TripNr;VTTS (money/hour)");
 			bw.newLine();
 			
-			for (Id<Person> personId : this.personId2VTTSh.keySet()){
-				for (Double vTTS : this.personId2VTTSh.get(personId)){
-					bw.write(personId + ";" + vTTS);
+			for (Id<Person> personId : this.personId2TripNr2VTTSh.keySet()){
+				for (Integer tripNr : this.personId2TripNr2VTTSh.get(personId).keySet()){
+					bw.write(personId + ";" + tripNr + ";" + this.personId2TripNr2VTTSh.get(personId).get(tripNr));
 					bw.newLine();		
 				}
 			}
@@ -251,6 +269,10 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public Map<Id<Person>, Map<Integer, Double>> getPersonId2TripNr2VTTSh() {
+		return personId2TripNr2VTTSh;
 	}
 
 }
