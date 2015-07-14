@@ -92,5 +92,18 @@ public interface CommonKeys {
 	public static final String HH_MEMBERS = "hhmembers";
 	
 	public static final String PERSON_AGE = "age";
-	
+
+	public static final String PERSON_SEX = "sex";
+
+	public static final String MALE = "male";
+
+	public static final String FEMALE = "female";
+
+	public static final String PERSON_CARAVAIL = "caravail";
+
+	public static final String ALWAYS = "always";
+
+	public static final String SOMETIMES = "sometimes";
+
+	public static final String NEVER = "never";
 }

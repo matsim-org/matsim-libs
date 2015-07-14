@@ -37,18 +37,23 @@ public class PersonAgeHandler implements PersonAttributeHandler {
 	public void handle(ProxyPerson person, Map<String, String> attributes) {
 		String val = attributes.get(MIDKeys.PERSON_AGE);
 
+
 		if(val != null) {
-			if(val.equalsIgnoreCase("0 - 9 Jahre")) person.setAttribute(CommonKeys.PERSON_AGE, "2");
-			else if(val.equalsIgnoreCase("5 - 10")) person.setAttribute(CommonKeys.PERSON_AGE, "7");
-			else if(val.equalsIgnoreCase("11 - 13")) person.setAttribute(CommonKeys.PERSON_AGE, "12");
-			else if(val.equalsIgnoreCase("14 - 17")) person.setAttribute(CommonKeys.PERSON_AGE, "15");
-			else if(val.equalsIgnoreCase("18 - 29")) person.setAttribute(CommonKeys.PERSON_AGE, "24");
-			else if(val.equalsIgnoreCase("30 - 39")) person.setAttribute(CommonKeys.PERSON_AGE, "35");
-			else if(val.equalsIgnoreCase("40 - 49")) person.setAttribute(CommonKeys.PERSON_AGE, "45");
-			else if(val.equalsIgnoreCase("50 - 59")) person.setAttribute(CommonKeys.PERSON_AGE, "55");
-			else if(val.equalsIgnoreCase("60 - 64")) person.setAttribute(CommonKeys.PERSON_AGE, "62");
-			else if(val.equalsIgnoreCase("65 - 74")) person.setAttribute(CommonKeys.PERSON_AGE, "70");
-			else if(val.equalsIgnoreCase("75 und älter")) person.setAttribute(CommonKeys.PERSON_AGE, "80");
+			Integer age = Integer.parseInt(val);
+			if(age > 0 && age < 102) {
+				person.setAttribute(CommonKeys.PERSON_AGE, String.valueOf(age));
+			}
+//			if(val.equalsIgnoreCase("0 - 9 Jahre")) person.setAttribute(CommonKeys.PERSON_AGE, "2");
+//			else if(val.equalsIgnoreCase("5 - 10")) person.setAttribute(CommonKeys.PERSON_AGE, "7");
+//			else if(val.equalsIgnoreCase("11 - 13")) person.setAttribute(CommonKeys.PERSON_AGE, "12");
+//			else if(val.equalsIgnoreCase("14 - 17")) person.setAttribute(CommonKeys.PERSON_AGE, "15");
+//			else if(val.equalsIgnoreCase("18 - 29")) person.setAttribute(CommonKeys.PERSON_AGE, "24");
+//			else if(val.equalsIgnoreCase("30 - 39")) person.setAttribute(CommonKeys.PERSON_AGE, "35");
+//			else if(val.equalsIgnoreCase("40 - 49")) person.setAttribute(CommonKeys.PERSON_AGE, "45");
+//			else if(val.equalsIgnoreCase("50 - 59")) person.setAttribute(CommonKeys.PERSON_AGE, "55");
+//			else if(val.equalsIgnoreCase("60 - 64")) person.setAttribute(CommonKeys.PERSON_AGE, "62");
+//			else if(val.equalsIgnoreCase("65 - 74")) person.setAttribute(CommonKeys.PERSON_AGE, "70");
+//			else if(val.equalsIgnoreCase("75 und älter")) person.setAttribute(CommonKeys.PERSON_AGE, "80");
 		}
 	}
 

@@ -99,7 +99,11 @@ public interface MIDKeys {
 	
 	public static final String HH_INCOME = "hheink";
 	
-	public static final String PERSON_AGE = "hp_altg3";
+	public static final String PERSON_AGE = "hp_alter";
 	
 	public static final String HH_MEMEBERS = "h02";
+
+	public static final String PERSON_SEX = "hp_sex";
+
+	public static final String PERSON_CARAVAIL = "p01_1";
 }

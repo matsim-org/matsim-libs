@@ -39,33 +39,7 @@ import playground.johannes.gsv.synPop.SetActivityTypeTask;
 import playground.johannes.gsv.synPop.SetFirstActivityTypeTask;
 import playground.johannes.gsv.synPop.SortLegsTimeTask;
 import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.gsv.synPop.mid.AddReturnPlan;
-import playground.johannes.gsv.synPop.mid.ConstrainedPersonTask;
-import playground.johannes.gsv.synPop.mid.DeletePlansDestination;
-import playground.johannes.gsv.synPop.mid.PersonHHIncomeHandler;
-import playground.johannes.gsv.synPop.mid.InfereVacationsType;
-import playground.johannes.gsv.synPop.mid.JourneyDaysHandler;
-import playground.johannes.gsv.synPop.mid.JourneyDestinationHandler;
-import playground.johannes.gsv.synPop.mid.JourneyDistanceHandler;
-import playground.johannes.gsv.synPop.mid.JourneyModeHandler;
-import playground.johannes.gsv.synPop.mid.JourneyPlans2PersonTask;
-import playground.johannes.gsv.synPop.mid.JourneyPurposeHandler;
-import playground.johannes.gsv.synPop.mid.LegDistanceHandler;
-import playground.johannes.gsv.synPop.mid.LegEndTimeHandler;
-import playground.johannes.gsv.synPop.mid.LegMainPurposeHandler;
-import playground.johannes.gsv.synPop.mid.LegModeHandler;
-import playground.johannes.gsv.synPop.mid.LegOriginHandler;
-import playground.johannes.gsv.synPop.mid.LegRoundTrip;
-import playground.johannes.gsv.synPop.mid.LegSortedIdHandler;
-import playground.johannes.gsv.synPop.mid.LegStartTimeHandler;
-import playground.johannes.gsv.synPop.mid.PersonAgeHandler;
-import playground.johannes.gsv.synPop.mid.PersonDayHandler;
-import playground.johannes.gsv.synPop.mid.PersonHHMembersHandler;
-import playground.johannes.gsv.synPop.mid.PersonMonthHandler;
-import playground.johannes.gsv.synPop.mid.PersonMunicipalityClassHandler;
-import playground.johannes.gsv.synPop.mid.PersonStateHandler;
-import playground.johannes.gsv.synPop.mid.PersonWeightHandler;
-import playground.johannes.gsv.synPop.mid.TXTReader;
+import playground.johannes.gsv.synPop.mid.*;
 
 /**
  * @author johannes
@@ -97,6 +71,8 @@ public class PopulationGenerator {
 		reader.addPersonAttributeHandler(new PersonHHIncomeHandler());
 		reader.addPersonAttributeHandler(new PersonAgeHandler());
 		reader.addPersonAttributeHandler(new PersonHHMembersHandler());
+		reader.addPersonAttributeHandler(new PersonSexHandler());
+		reader.addPersonAttributeHandler(new PersonCarAvailHandler());
 		
 		reader.addLegAttributeHandler(new LegSortedIdHandler());
 		reader.addLegAttributeHandler(new LegMainPurposeHandler());
