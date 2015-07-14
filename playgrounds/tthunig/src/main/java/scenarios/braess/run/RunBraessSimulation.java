@@ -41,13 +41,18 @@ public class RunBraessSimulation {
 
 	private static final Logger log = Logger
 			.getLogger(RunBraessSimulation.class);
-	
+
 	/* population parameter */
 	// If false, agents are initialized without any routes. If true, with all
 	// three possible routes.
-	private final boolean INIT_WITH_ALL_ROUTES = true;
+	private final boolean INIT_WITH_ALL_ROUTES = false;
 	// initial score for all initial plans
 	private final Double INIT_PLAN_SCORE = 110.;
+
+	// If true and signals are used, the signal at the middle link (3_4) gets
+	// only green for one second a cycle. If false and signals are used, they
+	// are green all day.
+	private final boolean RETARD_MIDDLE_ROUTE_BY_SIGNALS = true;
 	
 	// choose a sigma for the randomized router
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
@@ -112,7 +117,8 @@ public class RunBraessSimulation {
 
 		// able or enable signals and lanes
 		config.scenario().setUseLanes( false );
-		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(false);
+		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,
+				SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta( 20 );
@@ -135,7 +141,7 @@ public class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultStrategy.ReRoute.toString() );
-			strat.setWeight( 0.0 ) ;
+			strat.setWeight( 0.1 ) ;
 			strat.setDisableAfter( config.controler().getLastIteration() - 50 );
 			config.strategy().addStrategySettings(strat);
 		}
@@ -149,7 +155,7 @@ public class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings() ;
 			strat.setStrategyName( DefaultSelector.ChangeExpBeta.toString() );
-			strat.setWeight( 1.0 ) ;
+			strat.setWeight( 0.9 ) ;
 			strat.setDisableAfter( config.controler().getLastIteration() );
 			config.strategy().addStrategySettings(strat);
 		}
@@ -200,10 +206,8 @@ public class RunBraessSimulation {
 		
 		TtCreateBraessNetworkAndLanes netCreator = new TtCreateBraessNetworkAndLanes(scenario);
 		netCreator.setSimulateInflowCap( true );
+		netCreator.setRetardMiddleRoute( false );
 		netCreator.createNetwork();
-		
-		Link link = scenario.getNetwork().getLinks().get( Id.createLinkId("3_4") ) ;
-		link.setFreespeed(0.1);
 		
 		if (scenario.getConfig().scenario().isUseLanes()){
 			netCreator.createLanes();
@@ -229,7 +233,7 @@ public class RunBraessSimulation {
 	private void createSignals(Scenario scenario) {
 
 		TtCreateBraessSignals signalsCreator = new TtCreateBraessSignals(scenario);
-		signalsCreator.setRetardMiddleRoute( false );		
+		signalsCreator.setRetardMiddleRoute( RETARD_MIDDLE_ROUTE_BY_SIGNALS );		
 		signalsCreator.createSignals();
 	}
 
@@ -299,6 +303,10 @@ public class RunBraessSimulation {
 
 		if (ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()){
 			runName += "_signals";
+			if (RETARD_MIDDLE_ROUTE_BY_SIGNALS)
+				runName += "1sZ";
+			else
+				runName += "Green";
 		}
 
 		String outputDir = DgPaths.RUNSSVN + "braess/" + runName + "/";
