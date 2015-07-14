@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="utf-8"?>
+<events version="1.0">
+	<event time="33171.0" type="actend" person="b1240739" link="102259" facility="110404611" actType="home"  />
+	<event time="33171.0" type="departure" person="b1240739" link="102259" legMode="walk"  />
+	<event time="36444.0" type="travelled" person="b1240739" distance="5456.116157435636"  />
+	<event time="36444.0" type="arrival" person="b1240739" link="8079" legMode="walk"  />
+	<event time="36444.0" type="actstart" person="b1240739" link="8079" facility="110705613" actType="shop_other"  />
+	<event time="45551.0" type="actend" person="b1240739" link="8079" facility="110705613" actType="shop_other"  />
+	<event time="45551.0" type="departure" person="b1240739" link="8079" legMode="walk"  />
+	<event time="48281.0" type="travelled" person="b1240739" distance="4550.800047090952"  />
+	<event time="48281.0" type="arrival" person="b1240739" link="107793" legMode="walk"  />
+	<event time="48281.0" type="actstart" person="b1240739" link="107793" facility="110402427" actType="shop_other"  />
+	<event time="48281.0" type="actend" person="b1240739" link="107793" facility="110402427" actType="shop_other"  />
+	<event time="48281.0" type="departure" person="b1240739" link="107793" legMode="car"  />
+	<event time="48281.0" type="PersonEntersVehicle" person="b1240739" vehicle="b1240739"  />
+	<event time="48282.0" type="wait2link" person="b1240739" link="107793" vehicle="b1240739"  />
+	<event time="48283.0" type="left link" person="b1240739" link="107793" vehicle="b1240739"  />
+	<event time="48283.0" type="entered link" person="b1240739" link="36244" vehicle="b1240739"  />
+	<event time="48300.0" type="left link" person="b1240739" link="36244" vehicle="b1240739"  />
+	<event time="48300.0" type="entered link" person="b1240739" link="36524" vehicle="b1240739"  />
+	<event time="48315.0" type="left link" person="b1240739" link="36524" vehicle="b1240739"  />
+	<event time="48315.0" type="entered link" person="b1240739" link="36631" vehicle="b1240739"  />
+	<event time="48325.0" type="left link" person="b1240739" link="36631" vehicle="b1240739"  />
+	<event time="48325.0" type="entered link" person="b1240739" link="36649" vehicle="b1240739"  />
+	<event time="48331.0" type="left link" person="b1240739" link="36649" vehicle="b1240739"  />
+	<event time="48331.0" type="entered link" person="b1240739" link="108246" vehicle="b1240739"  />
+	<event time="48336.0" type="left link" person="b1240739" link="108246" vehicle="b1240739"  />
+	<event time="48336.0" type="entered link" person="b1240739" link="6914" vehicle="b1240739"  />
+	<event time="48350.0" type="left link" person="b1240739" link="6914" vehicle="b1240739"  />
+	<event time="48350.0" type="entered link" person="b1240739" link="36864" vehicle="b1240739"  />
+	<event time="48354.0" type="left link" person="b1240739" link="36864" vehicle="b1240739"  />
+	<event time="48354.0" type="entered link" person="b1240739" link="6753" vehicle="b1240739"  />
+	<event time="48364.0" type="left link" person="b1240739" link="6753" vehicle="b1240739"  />
+	<event time="48364.0" type="entered link" person="b1240739" link="108184" vehicle="b1240739"  />
+	<event time="48380.0" type="left link" person="b1240739" link="108184" vehicle="b1240739"  />
+	<event time="48380.0" type="entered link" person="b1240739" link="87249" vehicle="b1240739"  />
+	<event time="48388.0" type="left link" person="b1240739" link="87249" vehicle="b1240739"  />
+	<event time="48388.0" type="entered link" person="b1240739" link="6444" vehicle="b1240739"  />
+	<event time="48397.0" type="left link" person="b1240739" link="6444" vehicle="b1240739"  />
+	<event time="48397.0" type="entered link" person="b1240739" link="12981" vehicle="b1240739"  />
+	<event time="48412.0" type="left link" person="b1240739" link="12981" vehicle="b1240739"  />
+	<event time="48412.0" type="entered link" person="b1240739" link="107859" vehicle="b1240739"  />
+	<event time="48416.0" type="left link" person="b1240739" link="107859" vehicle="b1240739"  />
+	<event time="48416.0" type="entered link" person="b1240739" link="6536" vehicle="b1240739"  />
+	<event time="48427.0" type="left link" person="b1240739" link="6536" vehicle="b1240739"  />
+	<event time="48427.0" type="entered link" person="b1240739" link="38276" vehicle="b1240739"  />
+	<event time="48431.0" type="left link" person="b1240739" link="38276" vehicle="b1240739"  />
+	<event time="48431.0" type="entered link" person="b1240739" link="38491" vehicle="b1240739"  />
+	<event time="48439.0" type="left link" person="b1240739" link="38491" vehicle="b1240739"  />
+	<event time="48439.0" type="entered link" person="b1240739" link="75122" vehicle="b1240739"  />
+	<event time="48444.0" type="left link" person="b1240739" link="75122" vehicle="b1240739"  />
+	<event time="48444.0" type="entered link" person="b1240739" link="38517" vehicle="b1240739"  />
+	<event time="48447.0" type="left link" person="b1240739" link="38517" vehicle="b1240739"  />
+	<event time="48447.0" type="entered link" person="b1240739" link="38658" vehicle="b1240739"  />
+	<event time="48456.0" type="left link" person="b1240739" link="38658" vehicle="b1240739"  />
+	<event time="48456.0" type="entered link" person="b1240739" link="38862" vehicle="b1240739"  />
+	<event time="48469.0" type="left link" person="b1240739" link="38862" vehicle="b1240739"  />
+	<event time="48469.0" type="entered link" person="b1240739" link="39031" vehicle="b1240739"  />
+	<event time="48479.0" type="left link" person="b1240739" link="39031" vehicle="b1240739"  />
+	<event time="48479.0" type="entered link" person="b1240739" link="107915" vehicle="b1240739"  />
+	<event time="48494.0" type="left link" person="b1240739" link="107915" vehicle="b1240739"  />
+	<event time="48494.0" type="entered link" person="b1240739" link="102258" vehicle="b1240739"  />
+	<event time="48551.0" type="left link" person="b1240739" link="102258" vehicle="b1240739"  />
+	<event time="48551.0" type="entered link" person="b1240739" link="102259" vehicle="b1240739"  />
+	<event time="48607.0" type="PersonLeavesVehicle" person="b1240739" vehicle="b1240739"  />
+	<event time="48607.0" type="arrival" person="b1240739" link="102259" legMode="car"  />
+	<event time="48607.0" type="actstart" person="b1240739" link="102259" facility="110404611" actType="home"  />
+	<event time="48607.0" type="actend" person="b1240739" link="102259" facility="110404611" actType="home"  />
+	<event time="48607.0" type="departure" person="b1240739" link="102259" legMode="walk"  />
+	<event time="50240.0" type="travelled" person="b1240739" distance="2721.991765700326"  />
+	<event time="50240.0" type="arrival" person="b1240739" link="108122" legMode="walk"  />
+	<event time="50240.0" type="actstart" person="b1240739" link="108122" facility="110404612" actType="shop_daily"  />
+	<event time="50240.0" type="actend" person="b1240739" link="108122" facility="110404612" actType="shop_daily"  />
+	<event time="50240.0" type="departure" person="b1240739" link="108122" legMode="walk"  />
+	<event time="51873.0" type="travelled" person="b1240739" distance="2721.991765700326"  />
+	<event time="51873.0" type="arrival" person="b1240739" link="102259" legMode="walk"  />
+	<event time="51873.0" type="actstart" person="b1240739" link="102259" facility="110404611" actType="home"  />
+	<event time="51873.0" type="actend" person="b1240739" link="102259" facility="110404611" actType="home"  />
+	<event time="51873.0" type="departure" person="b1240739" link="102259" legMode="car"  />
+	<event time="51873.0" type="PersonEntersVehicle" person="b1240739" vehicle="b1240739"  />
+	<event time="51874.0" type="wait2link" person="b1240739" link="102259" vehicle="b1240739"  />
+	<event time="51875.0" type="left link" person="b1240739" link="102259" vehicle="b1240739"  />
+	<event time="51875.0" type="entered link" person="b1240739" link="107914" vehicle="b1240739"  />
+	<event time="51890.0" type="left link" person="b1240739" link="107914" vehicle="b1240739"  />
+	<event time="51890.0" type="entered link" person="b1240739" link="102248" vehicle="b1240739"  />
+	<event time="51912.0" type="left link" person="b1240739" link="102248" vehicle="b1240739"  />
+	<event time="51912.0" type="entered link" person="b1240739" link="13909" vehicle="b1240739"  />
+	<event time="51947.0" type="left link" person="b1240739" link="13909" vehicle="b1240739"  />
+	<event time="51947.0" type="entered link" person="b1240739" link="40056" vehicle="b1240739"  />
+	<event time="51957.0" type="left link" person="b1240739" link="40056" vehicle="b1240739"  />
+	<event time="51957.0" type="entered link" person="b1240739" link="40100" vehicle="b1240739"  />
+	<event time="51960.0" type="left link" person="b1240739" link="40100" vehicle="b1240739"  />
+	<event time="51960.0" type="entered link" person="b1240739" link="40196" vehicle="b1240739"  />
+	<event time="51966.0" type="left link" person="b1240739" link="40196" vehicle="b1240739"  />
+	<event time="51966.0" type="entered link" person="b1240739" link="108308" vehicle="b1240739"  />
+	<event time="51971.0" type="left link" person="b1240739" link="108308" vehicle="b1240739"  />
+	<event time="51971.0" type="entered link" person="b1240739" link="73573" vehicle="b1240739"  />
+	<event time="51973.0" type="left link" person="b1240739" link="73573" vehicle="b1240739"  />
+	<event time="51973.0" type="entered link" person="b1240739" link="73574" vehicle="b1240739"  />
+	<event time="51975.0" type="left link" person="b1240739" link="73574" vehicle="b1240739"  />
+	<event time="51975.0" type="entered link" person="b1240739" link="40401" vehicle="b1240739"  />
+	<event time="51999.0" type="left link" person="b1240739" link="40401" vehicle="b1240739"  />
+	<event time="51999.0" type="entered link" person="b1240739" link="40762" vehicle="b1240739"  />
+	<event time="52008.0" type="left link" person="b1240739" link="40762" vehicle="b1240739"  />
+	<event time="52008.0" type="entered link" person="b1240739" link="107847" vehicle="b1240739"  />
+	<event time="52031.0" type="left link" person="b1240739" link="107847" vehicle="b1240739"  />
+	<event time="52031.0" type="entered link" person="b1240739" link="107773" vehicle="b1240739"  />
+	<event time="52052.0" type="left link" person="b1240739" link="107773" vehicle="b1240739"  />
+	<event time="52052.0" type="entered link" person="b1240739" link="108029" vehicle="b1240739"  />
+	<event time="52063.0" type="left link" person="b1240739" link="108029" vehicle="b1240739"  />
+	<event time="52063.0" type="entered link" person="b1240739" link="108042" vehicle="b1240739"  />
+	<event time="52086.0" type="left link" person="b1240739" link="108042" vehicle="b1240739"  />
+	<event time="52086.0" type="entered link" person="b1240739" link="108142" vehicle="b1240739"  />
+	<event time="52108.0" type="left link" person="b1240739" link="108142" vehicle="b1240739"  />
+	<event time="52108.0" type="entered link" person="b1240739" link="96564" vehicle="b1240739"  />
+	<event time="52118.0" type="left link" person="b1240739" link="96564" vehicle="b1240739"  />
+	<event time="52118.0" type="entered link" person="b1240739" link="108338" vehicle="b1240739"  />
+	<event time="52150.0" type="left link" person="b1240739" link="108338" vehicle="b1240739"  />
+	<event time="52150.0" type="entered link" person="b1240739" link="3511" vehicle="b1240739"  />
+	<event time="52156.0" type="left link" person="b1240739" link="3511" vehicle="b1240739"  />
+	<event time="52156.0" type="entered link" person="b1240739" link="3504" vehicle="b1240739"  />
+	<event time="52160.0" type="left link" person="b1240739" link="3504" vehicle="b1240739"  />
+	<event time="52160.0" type="entered link" person="b1240739" link="45571" vehicle="b1240739"  />
+	<event time="52163.0" type="left link" person="b1240739" link="45571" vehicle="b1240739"  />
+	<event time="52163.0" type="entered link" person="b1240739" link="45685" vehicle="b1240739"  />
+	<event time="52178.0" type="left link" person="b1240739" link="45685" vehicle="b1240739"  />
+	<event time="52178.0" type="entered link" person="b1240739" link="72721" vehicle="b1240739"  />
+	<event time="52210.0" type="left link" person="b1240739" link="72721" vehicle="b1240739"  />
+	<event time="52210.0" type="entered link" person="b1240739" link="46086" vehicle="b1240739"  />
+	<event time="52230.0" type="left link" person="b1240739" link="46086" vehicle="b1240739"  />
+	<event time="52230.0" type="entered link" person="b1240739" link="7664" vehicle="b1240739"  />
+	<event time="52265.0" type="left link" person="b1240739" link="7664" vehicle="b1240739"  />
+	<event time="52265.0" type="entered link" person="b1240739" link="46815" vehicle="b1240739"  />
+	<event time="52277.0" type="left link" person="b1240739" link="46815" vehicle="b1240739"  />
+	<event time="52277.0" type="entered link" person="b1240739" link="14862" vehicle="b1240739"  />
+	<event time="52298.0" type="left link" person="b1240739" link="14862" vehicle="b1240739"  />
+	<event time="52298.0" type="entered link" person="b1240739" link="109067" vehicle="b1240739"  />
+	<event time="52316.0" type="left link" person="b1240739" link="109067" vehicle="b1240739"  />
+	<event time="52316.0" type="entered link" person="b1240739" link="47399" vehicle="b1240739"  />
+	<event time="52323.0" type="left link" person="b1240739" link="47399" vehicle="b1240739"  />
+	<event time="52323.0" type="entered link" person="b1240739" link="47556" vehicle="b1240739"  />
+	<event time="52337.0" type="left link" person="b1240739" link="47556" vehicle="b1240739"  />
+	<event time="52337.0" type="entered link" person="b1240739" link="47653" vehicle="b1240739"  />
+	<event time="52345.0" type="left link" person="b1240739" link="47653" vehicle="b1240739"  />
+	<event time="52345.0" type="entered link" person="b1240739" link="47742" vehicle="b1240739"  />
+	<event time="52347.0" type="left link" person="b1240739" link="47742" vehicle="b1240739"  />
+	<event time="52347.0" type="entered link" person="b1240739" link="109375" vehicle="b1240739"  />
+	<event time="52378.0" type="left link" person="b1240739" link="109375" vehicle="b1240739"  />
+	<event time="52378.0" type="entered link" person="b1240739" link="48422" vehicle="b1240739"  />
+	<event time="52386.0" type="left link" person="b1240739" link="48422" vehicle="b1240739"  />
+	<event time="52386.0" type="entered link" person="b1240739" link="7721" vehicle="b1240739"  />
+	<event time="52399.0" type="left link" person="b1240739" link="7721" vehicle="b1240739"  />
+	<event time="52399.0" type="entered link" person="b1240739" link="48920" vehicle="b1240739"  />
+	<event time="52407.0" type="left link" person="b1240739" link="48920" vehicle="b1240739"  />
+	<event time="52407.0" type="entered link" person="b1240739" link="49131" vehicle="b1240739"  />
+	<event time="52410.0" type="left link" person="b1240739" link="49131" vehicle="b1240739"  />
+	<event time="52410.0" type="entered link" person="b1240739" link="7866" vehicle="b1240739"  />
+	<event time="52440.0" type="left link" person="b1240739" link="7866" vehicle="b1240739"  />
+	<event time="52440.0" type="entered link" person="b1240739" link="87355" vehicle="b1240739"  />
+	<event time="52452.0" type="left link" person="b1240739" link="87355" vehicle="b1240739"  />
+	<event time="52452.0" type="entered link" person="b1240739" link="50264" vehicle="b1240739"  />
+	<event time="52460.0" type="left link" person="b1240739" link="50264" vehicle="b1240739"  />
+	<event time="52460.0" type="entered link" person="b1240739" link="50417" vehicle="b1240739"  />
+	<event time="52464.0" type="left link" person="b1240739" link="50417" vehicle="b1240739"  />
+	<event time="52464.0" type="entered link" person="b1240739" link="50671" vehicle="b1240739"  />
+	<event time="52477.0" type="left link" person="b1240739" link="50671" vehicle="b1240739"  />
+	<event time="52477.0" type="entered link" person="b1240739" link="109062" vehicle="b1240739"  />
+	<event time="52486.0" type="left link" person="b1240739" link="109062" vehicle="b1240739"  />
+	<event time="52486.0" type="entered link" person="b1240739" link="109023" vehicle="b1240739"  />
+	<event time="52498.0" type="left link" person="b1240739" link="109023" vehicle="b1240739"  />
+	<event time="52498.0" type="entered link" person="b1240739" link="51438" vehicle="b1240739"  />
+	<event time="52510.0" type="left link" person="b1240739" link="51438" vehicle="b1240739"  />
+	<event time="52510.0" type="entered link" person="b1240739" link="7409" vehicle="b1240739"  />
+	<event time="52547.0" type="left link" person="b1240739" link="7409" vehicle="b1240739"  />
+	<event time="52547.0" type="entered link" person="b1240739" link="52438" vehicle="b1240739"  />
+	<event time="52551.0" type="left link" person="b1240739" link="52438" vehicle="b1240739"  />
+	<event time="52551.0" type="entered link" person="b1240739" link="7580" vehicle="b1240739"  />
+	<event time="52566.0" type="left link" person="b1240739" link="7580" vehicle="b1240739"  />
+	<event time="52566.0" type="entered link" person="b1240739" link="52849" vehicle="b1240739"  />
+	<event time="52577.0" type="left link" person="b1240739" link="52849" vehicle="b1240739"  />
+	<event time="52577.0" type="entered link" person="b1240739" link="53291" vehicle="b1240739"  />
+	<event time="52600.0" type="left link" person="b1240739" link="53291" vehicle="b1240739"  />
+	<event time="52600.0" type="entered link" person="b1240739" link="103585" vehicle="b1240739"  />
+	<event time="52608.0" type="left link" person="b1240739" link="103585" vehicle="b1240739"  />
+	<event time="52608.0" type="entered link" person="b1240739" link="103582" vehicle="b1240739"  />
+	<event time="52613.0" type="left link" person="b1240739" link="103582" vehicle="b1240739"  />
+	<event time="52613.0" type="entered link" person="b1240739" link="53666" vehicle="b1240739"  />
+	<event time="52623.0" type="left link" person="b1240739" link="53666" vehicle="b1240739"  />
+	<event time="52623.0" type="entered link" person="b1240739" link="53873" vehicle="b1240739"  />
+	<event time="52631.0" type="left link" person="b1240739" link="53873" vehicle="b1240739"  />
+	<event time="52631.0" type="entered link" person="b1240739" link="92914" vehicle="b1240739"  />
+	<event time="52650.0" type="left link" person="b1240739" link="92914" vehicle="b1240739"  />
+	<event time="52650.0" type="entered link" person="b1240739" link="109235" vehicle="b1240739"  />
+	<event time="52659.0" type="left link" person="b1240739" link="109235" vehicle="b1240739"  />
+	<event time="52659.0" type="entered link" person="b1240739" link="54504" vehicle="b1240739"  />
+	<event time="52667.0" type="left link" person="b1240739" link="54504" vehicle="b1240739"  />
+	<event time="52667.0" type="entered link" person="b1240739" link="2373" vehicle="b1240739"  />
+	<event time="52670.0" type="left link" person="b1240739" link="2373" vehicle="b1240739"  />
+	<event time="52670.0" type="entered link" person="b1240739" link="2374" vehicle="b1240739"  />
+	<event time="52680.0" type="left link" person="b1240739" link="2374" vehicle="b1240739"  />
+	<event time="52680.0" type="entered link" person="b1240739" link="1031" vehicle="b1240739"  />
+	<event time="52700.0" type="left link" person="b1240739" link="1031" vehicle="b1240739"  />
+	<event time="52700.0" type="entered link" person="b1240739" link="1028" vehicle="b1240739"  />
+	<event time="52706.0" type="left link" person="b1240739" link="1028" vehicle="b1240739"  />
+	<event time="52706.0" type="entered link" person="b1240739" link="76206" vehicle="b1240739"  />
+	<event time="52713.0" type="left link" person="b1240739" link="76206" vehicle="b1240739"  />
+	<event time="52713.0" type="entered link" person="b1240739" link="55270" vehicle="b1240739"  />
+	<event time="52744.0" type="left link" person="b1240739" link="55270" vehicle="b1240739"  />
+	<event time="52744.0" type="entered link" person="b1240739" link="55269" vehicle="b1240739"  />
+	<event time="52762.0" type="PersonLeavesVehicle" person="b1240739" vehicle="b1240739"  />
+	<event time="52762.0" type="arrival" person="b1240739" link="55269" legMode="car"  />
+	<event time="52762.0" type="actstart" person="b1240739" link="55269" facility="110606422" actType="shop_other"  />
+	<event time="58101.0" type="actend" person="b1240739" link="55269" facility="110606422" actType="shop_other"  />
+	<event time="58101.0" type="departure" person="b1240739" link="55269" legMode="car"  />
+	<event time="58101.0" type="PersonEntersVehicle" person="b1240739" vehicle="b1240739"  />
+	<event time="58101.0" type="wait2link" person="b1240739" link="55269" vehicle="b1240739"  />
+	<event time="58102.0" type="left link" person="b1240739" link="55269" vehicle="b1240739"  />
+	<event time="58102.0" type="entered link" person="b1240739" link="55129" vehicle="b1240739"  />
+	<event time="58120.0" type="left link" person="b1240739" link="55129" vehicle="b1240739"  />
+	<event time="58120.0" type="entered link" person="b1240739" link="1551" vehicle="b1240739"  />
+	<event time="58124.0" type="left link" person="b1240739" link="1551" vehicle="b1240739"  />
+	<event time="58124.0" type="entered link" person="b1240739" link="1552" vehicle="b1240739"  />
+	<event time="58138.0" type="left link" person="b1240739" link="1552" vehicle="b1240739"  />
+	<event time="58138.0" type="entered link" person="b1240739" link="54723" vehicle="b1240739"  />
+	<event time="58157.0" type="left link" person="b1240739" link="54723" vehicle="b1240739"  />
+	<event time="58157.0" type="entered link" person="b1240739" link="7875" vehicle="b1240739"  />
+	<event time="58161.0" type="PersonLeavesVehicle" person="b1240739" vehicle="b1240739"  />
+	<event time="58161.0" type="arrival" person="b1240739" link="7875" legMode="car"  />
+	<event time="58161.0" type="actstart" person="b1240739" link="7875" facility="110606422" actType="leisure"  />
+	<event time="63651.0" type="actend" person="b1240739" link="7875" facility="110606422" actType="leisure"  />
+	<event time="63651.0" type="departure" person="b1240739" link="7875" legMode="car"  />
+	<event time="63651.0" type="PersonEntersVehicle" person="b1240739" vehicle="b1240739"  />
+	<event time="63651.0" type="wait2link" person="b1240739" link="7875" vehicle="b1240739"  />
+	<event time="63652.0" type="left link" person="b1240739" link="7875" vehicle="b1240739"  />
+	<event time="63652.0" type="entered link" person="b1240739" link="7874" vehicle="b1240739"  />
+	<event time="63657.0" type="left link" person="b1240739" link="7874" vehicle="b1240739"  />
+	<event time="63657.0" type="entered link" person="b1240739" link="54722" vehicle="b1240739"  />
+	<event time="63685.0" type="left link" person="b1240739" link="54722" vehicle="b1240739"  />
+	<event time="63685.0" type="entered link" person="b1240739" link="1553" vehicle="b1240739"  />
+	<event time="63700.0" type="left link" person="b1240739" link="1553" vehicle="b1240739"  />
+	<event time="63700.0" type="entered link" person="b1240739" link="1550" vehicle="b1240739"  />
+	<event time="63704.0" type="left link" person="b1240739" link="1550" vehicle="b1240739"  />
+	<event time="63704.0" type="entered link" person="b1240739" link="55128" vehicle="b1240739"  />
+	<event time="63722.0" type="left link" person="b1240739" link="55128" vehicle="b1240739"  />
+	<event time="63722.0" type="entered link" person="b1240739" link="55127" vehicle="b1240739"  />
+	<event time="63750.0" type="left link" person="b1240739" link="55127" vehicle="b1240739"  />
+	<event time="63750.0" type="entered link" person="b1240739" link="55293" vehicle="b1240739"  />
+	<event time="63785.0" type="left link" person="b1240739" link="55293" vehicle="b1240739"  />
+	<event time="63785.0" type="entered link" person="b1240739" link="2232" vehicle="b1240739"  />
+	<event time="63886.0" type="PersonLeavesVehicle" person="b1240739" vehicle="b1240739"  />
+	<event time="63886.0" type="arrival" person="b1240739" link="2232" legMode="car"  />
+	<event time="63886.0" type="actstart" person="b1240739" link="2232" facility="110606422" actType="shop_other"  />
+	<event time="63886.0" type="actend" person="b1240739" link="2232" facility="110606422" actType="shop_other"  />
+	<event time="63886.0" type="departure" person="b1240739" link="2232" legMode="car"  />
+	<event time="63886.0" type="PersonEntersVehicle" person="b1240739" vehicle="b1240739"  />
+	<event time="63886.0" type="wait2link" person="b1240739" link="2232" vehicle="b1240739"  />
+	<event time="63887.0" type="left link" person="b1240739" link="2232" vehicle="b1240739"  />
+	<event time="63887.0" type="entered link" person="b1240739" link="15160" vehicle="b1240739"  />
+	<event time="63991.0" type="left link" person="b1240739" link="15160" vehicle="b1240739"  />
+	<event time="63991.0" type="entered link" person="b1240739" link="55271" vehicle="b1240739"  />
+	<event time="64001.0" type="left link" person="b1240739" link="55271" vehicle="b1240739"  />
+	<event time="64001.0" type="entered link" person="b1240739" link="76207" vehicle="b1240739"  />
+	<event time="64008.0" type="left link" person="b1240739" link="76207" vehicle="b1240739"  />
+	<event time="64008.0" type="entered link" person="b1240739" link="1029" vehicle="b1240739"  />
+	<event time="64014.0" type="left link" person="b1240739" link="1029" vehicle="b1240739"  />
+	<event time="64014.0" type="entered link" person="b1240739" link="1030" vehicle="b1240739"  />
+	<event time="64034.0" type="left link" person="b1240739" link="1030" vehicle="b1240739"  />
+	<event time="64034.0" type="entered link" person="b1240739" link="2375" vehicle="b1240739"  />
+	<event time="64044.0" type="left link" person="b1240739" link="2375" vehicle="b1240739"  />
+	<event time="64044.0" type="entered link" person="b1240739" link="2372" vehicle="b1240739"  />
+	<event time="64047.0" type="left link" person="b1240739" link="2372" vehicle="b1240739"  />
+	<event time="64047.0" type="entered link" person="b1240739" link="54505" vehicle="b1240739"  />
+	<event time="64055.0" type="left link" person="b1240739" link="54505" vehicle="b1240739"  />
+	<event time="64055.0" type="entered link" person="b1240739" link="109234" vehicle="b1240739"  />
+	<event time="64064.0" type="left link" person="b1240739" link="109234" vehicle="b1240739"  />
+	<event time="64064.0" type="entered link" person="b1240739" link="92915" vehicle="b1240739"  />
+	<event time="64083.0" type="left link" person="b1240739" link="92915" vehicle="b1240739"  />
+	<event time="64083.0" type="entered link" person="b1240739" link="53872" vehicle="b1240739"  />
+	<event time="64091.0" type="left link" person="b1240739" link="53872" vehicle="b1240739"  />
+	<event time="64091.0" type="entered link" person="b1240739" link="53667" vehicle="b1240739"  />
+	<event time="64101.0" type="left link" person="b1240739" link="53667" vehicle="b1240739"  />
+	<event time="64101.0" type="entered link" person="b1240739" link="103583" vehicle="b1240739"  />
+	<event time="64106.0" type="left link" person="b1240739" link="103583" vehicle="b1240739"  />
+	<event time="64106.0" type="entered link" person="b1240739" link="103584" vehicle="b1240739"  />
+	<event time="64114.0" type="left link" person="b1240739" link="103584" vehicle="b1240739"  />
+	<event time="64114.0" type="entered link" person="b1240739" link="53290" vehicle="b1240739"  />
+	<event time="64137.0" type="left link" person="b1240739" link="53290" vehicle="b1240739"  />
+	<event time="64137.0" type="entered link" person="b1240739" link="52848" vehicle="b1240739"  />
+	<event time="64148.0" type="left link" person="b1240739" link="52848" vehicle="b1240739"  />
+	<event time="64148.0" type="entered link" person="b1240739" link="7581" vehicle="b1240739"  />
+	<event time="64162.0" type="left link" person="b1240739" link="7581" vehicle="b1240739"  />
+	<event time="64162.0" type="entered link" person="b1240739" link="52439" vehicle="b1240739"  />
+	<event time="64163.0" type="left link" person="b1240739" link="52439" vehicle="b1240739"  />
+	<event time="64163.0" type="entered link" person="b1240739" link="52414" vehicle="b1240739"  />
+	<event time="64166.0" type="left link" person="b1240739" link="52414" vehicle="b1240739"  />
+	<event time="64166.0" type="entered link" person="b1240739" link="52408" vehicle="b1240739"  />
+	<event time="64183.0" type="left link" person="b1240739" link="52408" vehicle="b1240739"  />
+	<event time="64183.0" type="entered link" person="b1240739" link="52011" vehicle="b1240739"  />
+	<event time="64187.0" type="left link" person="b1240739" link="52011" vehicle="b1240739"  />
+	<event time="64187.0" type="entered link" person="b1240739" link="51915" vehicle="b1240739"  />
+	<event time="64191.0" type="left link" person="b1240739" link="51915" vehicle="b1240739"  />
+	<event time="64191.0" type="entered link" person="b1240739" link="51816" vehicle="b1240739"  />
+	<event time="64201.0" type="left link" person="b1240739" link="51816" vehicle="b1240739"  />
+	<event time="64201.0" type="entered link" person="b1240739" link="51512" vehicle="b1240739"  />
+	<event time="64216.0" type="left link" person="b1240739" link="51512" vehicle="b1240739"  />
+	<event time="64216.0" type="entered link" person="b1240739" link="2011" vehicle="b1240739"  />
+	<event time="64224.0" type="left link" person="b1240739" link="2011" vehicle="b1240739"  />
+	<event time="64224.0" type="entered link" person="b1240739" link="2008" vehicle="b1240739"  />
+	<event time="64231.0" type="left link" person="b1240739" link="2008" vehicle="b1240739"  />
+	<event time="64231.0" type="entered link" person="b1240739" link="50817" vehicle="b1240739"  />
+	<event time="64248.0" type="left link" person="b1240739" link="50817" vehicle="b1240739"  />
+	<event time="64248.0" type="entered link" person="b1240739" link="50513" vehicle="b1240739"  />
+	<event time="64256.0" type="left link" person="b1240739" link="50513" vehicle="b1240739"  />
+	<event time="64256.0" type="entered link" person="b1240739" link="50384" vehicle="b1240739"  />
+	<event time="64267.0" type="left link" person="b1240739" link="50384" vehicle="b1240739"  />
+	<event time="64267.0" type="entered link" person="b1240739" link="50147" vehicle="b1240739"  />
+	<event time="64277.0" type="left link" person="b1240739" link="50147" vehicle="b1240739"  />
+	<event time="64277.0" type="entered link" person="b1240739" link="49934" vehicle="b1240739"  />
+	<event time="64280.0" type="left link" person="b1240739" link="49934" vehicle="b1240739"  />
+	<event time="64280.0" type="entered link" person="b1240739" link="49858" vehicle="b1240739"  />
+	<event time="64284.0" type="left link" person="b1240739" link="49858" vehicle="b1240739"  />
+	<event time="64284.0" type="entered link" person="b1240739" link="49763" vehicle="b1240739"  />
+	<event time="64286.0" type="left link" person="b1240739" link="49763" vehicle="b1240739"  />
+	<event time="64286.0" type="entered link" person="b1240739" link="49722" vehicle="b1240739"  />
+	<event time="64295.0" type="left link" person="b1240739" link="49722" vehicle="b1240739"  />
+	<event time="64295.0" type="entered link" person="b1240739" link="49539" vehicle="b1240739"  />
+	<event time="64297.0" type="left link" person="b1240739" link="49539" vehicle="b1240739"  />
+	<event time="64297.0" type="entered link" person="b1240739" link="49500" vehicle="b1240739"  />
+	<event time="64303.0" type="left link" person="b1240739" link="49500" vehicle="b1240739"  />
+	<event time="64303.0" type="entered link" person="b1240739" link="49354" vehicle="b1240739"  />
+	<event time="64309.0" type="left link" person="b1240739" link="49354" vehicle="b1240739"  />
+	<event time="64309.0" type="entered link" person="b1240739" link="49203" vehicle="b1240739"  />
+	<event time="64311.0" type="left link" person="b1240739" link="49203" vehicle="b1240739"  />
+	<event time="64311.0" type="entered link" person="b1240739" link="49142" vehicle="b1240739"  />
+	<event time="64317.0" type="left link" person="b1240739" link="49142" vehicle="b1240739"  />
+	<event time="64317.0" type="entered link" person="b1240739" link="7671" vehicle="b1240739"  />
+	<event time="64365.0" type="left link" person="b1240739" link="7671" vehicle="b1240739"  />
+	<event time="64365.0" type="entered link" person="b1240739" link="7808" vehicle="b1240739"  />
+	<event time="64381.0" type="left link" person="b1240739" link="7808" vehicle="b1240739"  />
+	<event time="64381.0" type="entered link" person="b1240739" link="48301" vehicle="b1240739"  />
+	<event time="64382.0" type="left link" person="b1240739" link="48301" vehicle="b1240739"  />
+	<event time="64382.0" type="entered link" person="b1240739" link="48284" vehicle="b1240739"  />
+	<event time="64391.0" type="left link" person="b1240739" link="48284" vehicle="b1240739"  />
+	<event time="64391.0" type="entered link" person="b1240739" link="48050" vehicle="b1240739"  />
+	<event time="64403.0" type="left link" person="b1240739" link="48050" vehicle="b1240739"  />
+	<event time="64403.0" type="entered link" person="b1240739" link="47821" vehicle="b1240739"  />
+	<event time="64416.0" type="left link" person="b1240739" link="47821" vehicle="b1240739"  />
+	<event time="64416.0" type="entered link" person="b1240739" link="47569" vehicle="b1240739"  />
+	<event time="64426.0" type="left link" person="b1240739" link="47569" vehicle="b1240739"  />
+	<event time="64426.0" type="entered link" person="b1240739" link="47384" vehicle="b1240739"  />
+	<event time="64447.0" type="left link" person="b1240739" link="47384" vehicle="b1240739"  />
+	<event time="64447.0" type="entered link" person="b1240739" link="7822" vehicle="b1240739"  />
+	<event time="64466.0" type="left link" person="b1240739" link="7822" vehicle="b1240739"  />
+	<event time="64466.0" type="entered link" person="b1240739" link="87081" vehicle="b1240739"  />
+	<event time="64470.0" type="left link" person="b1240739" link="87081" vehicle="b1240739"  />
+	<event time="64470.0" type="entered link" person="b1240739" link="46696" vehicle="b1240739"  />
+	<event time="64480.0" type="left link" person="b1240739" link="46696" vehicle="b1240739"  />
+	<event time="64480.0" type="entered link" person="b1240739" link="109156" vehicle="b1240739"  />
+	<event time="64492.0" type="left link" person="b1240739" link="109156" vehicle="b1240739"  />
+	<event time="64492.0" type="entered link" person="b1240739" link="46235" vehicle="b1240739"  />
+	<event time="64494.0" type="left link" person="b1240739" link="46235" vehicle="b1240739"  />
+	<event time="64494.0" type="entered link" person="b1240739" link="46196" vehicle="b1240739"  />
+	<event time="64517.0" type="left link" person="b1240739" link="46196" vehicle="b1240739"  />
+	<event time="64517.0" type="entered link" person="b1240739" link="45651" vehicle="b1240739"  />
+	<event time="64527.0" type="left link" person="b1240739" link="45651" vehicle="b1240739"  />
+	<event time="64527.0" type="entered link" person="b1240739" link="45389" vehicle="b1240739"  />
+	<event time="64540.0" type="left link" person="b1240739" link="45389" vehicle="b1240739"  />
+	<event time="64540.0" type="entered link" person="b1240739" link="14879" vehicle="b1240739"  />
+	<event time="64560.0" type="left link" person="b1240739" link="14879" vehicle="b1240739"  />
+	<event time="64560.0" type="entered link" person="b1240739" link="45016" vehicle="b1240739"  />
+	<event time="64571.0" type="left link" person="b1240739" link="45016" vehicle="b1240739"  />
+	<event time="64571.0" type="entered link" person="b1240739" link="44864" vehicle="b1240739"  />
+	<event time="64573.0" type="left link" person="b1240739" link="44864" vehicle="b1240739"  />
+	<event time="64573.0" type="entered link" person="b1240739" link="44721" vehicle="b1240739"  />
+	<event time="64585.0" type="left link" person="b1240739" link="44721" vehicle="b1240739"  />
+	<event time="64585.0" type="entered link" person="b1240739" link="108041" vehicle="b1240739"  />
+	<event time="64613.0" type="left link" person="b1240739" link="108041" vehicle="b1240739"  />
+	<event time="64613.0" type="entered link" person="b1240739" link="43166" vehicle="b1240739"  />
+	<event time="64623.0" type="left link" person="b1240739" link="43166" vehicle="b1240739"  />
+	<event time="64623.0" type="entered link" person="b1240739" link="108281" vehicle="b1240739"  />
+	<event time="64638.0" type="left link" person="b1240739" link="108281" vehicle="b1240739"  />
+	<event time="64638.0" type="entered link" person="b1240739" link="99778" vehicle="b1240739"  />
+	<event time="64658.0" type="left link" person="b1240739" link="99778" vehicle="b1240739"  />
+	<event time="64658.0" type="entered link" person="b1240739" link="99780" vehicle="b1240739"  />
+	<event time="64660.0" type="left link" person="b1240739" link="99780" vehicle="b1240739"  />
+	<event time="64660.0" type="entered link" person="b1240739" link="96585" vehicle="b1240739"  />
+	<event time="64668.0" type="left link" person="b1240739" link="96585" vehicle="b1240739"  />
+	<event time="64668.0" type="entered link" person="b1240739" link="96586" vehicle="b1240739"  />
+	<event time="64674.0" type="left link" person="b1240739" link="96586" vehicle="b1240739"  />
+	<event time="64674.0" type="entered link" person="b1240739" link="108197" vehicle="b1240739"  />
+	<event time="64689.0" type="left link" person="b1240739" link="108197" vehicle="b1240739"  />
+	<event time="64689.0" type="entered link" person="b1240739" link="107782" vehicle="b1240739"  />
+	<event time="64721.0" type="left link" person="b1240739" link="107782" vehicle="b1240739"  />
+	<event time="64721.0" type="entered link" person="b1240739" link="107857" vehicle="b1240739"  />
+	<event time="64740.0" type="left link" person="b1240739" link="107857" vehicle="b1240739"  />
+	<event time="64740.0" type="entered link" person="b1240739" link="38772" vehicle="b1240739"  />
+	<event time="64753.0" type="left link" person="b1240739" link="38772" vehicle="b1240739"  />
+	<event time="64753.0" type="entered link" person="b1240739" link="38547" vehicle="b1240739"  />
+	<event time="64755.0" type="left link" person="b1240739" link="38547" vehicle="b1240739"  />
+	<event time="64755.0" type="entered link" person="b1240739" link="107896" vehicle="b1240739"  />
+	<event time="64766.0" type="left link" person="b1240739" link="107896" vehicle="b1240739"  />
+	<event time="64766.0" type="entered link" person="b1240739" link="102259" vehicle="b1240739"  />
+	<event time="64822.0" type="PersonLeavesVehicle" person="b1240739" vehicle="b1240739"  />
+	<event time="64822.0" type="arrival" person="b1240739" link="102259" legMode="car"  />
+	<event time="64822.0" type="actstart" person="b1240739" link="102259" facility="110404611" actType="home"  />
+	<event time="64830.0" type="actend" person="b1240739" link="102259" facility="110404611" actType="home"  />
+	<event time="64830.0" type="departure" person="b1240739" link="102259" legMode="walk"  />
+	<event time="67054.0" type="travelled" person="b1240739" distance="3707.1092432028927"  />
+	<event time="67054.0" type="arrival" person="b1240739" link="12926" legMode="walk"  />
+	<event time="67054.0" type="actstart" person="b1240739" link="12926" facility="110404511" actType="leisure"  />
+	<event time="69671.0" type="actend" person="b1240739" link="12926" facility="110404511" actType="leisure"  />
+	<event time="69671.0" type="departure" person="b1240739" link="12926" legMode="walk"  />
+	<event time="71895.0" type="travelled" person="b1240739" distance="3707.1092432028927"  />
+	<event time="71895.0" type="arrival" person="b1240739" link="102259" legMode="walk"  />
+	<event time="71895.0" type="actstart" person="b1240739" link="102259" facility="110404611" actType="home"  />
+</events>
