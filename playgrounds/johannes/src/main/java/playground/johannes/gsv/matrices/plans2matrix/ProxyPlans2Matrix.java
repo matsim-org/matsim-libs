@@ -207,6 +207,13 @@ public class ProxyPlans2Matrix {
 		/*
 		 * types
 		 */
+		PredicateORComposite wkDayPred = new PredicateORComposite();
+		wkDayPred.addComponent(new DayPredicate(CommonKeys.MONDAY));
+		wkDayPred.addComponent(new DayPredicate(CommonKeys.TUESDAY));
+		wkDayPred.addComponent(new DayPredicate(CommonKeys.WEDNESDAY));
+		wkDayPred.addComponent(new DayPredicate(CommonKeys.THURSDAY));
+		wkDayPred.addComponent(new DayPredicate(CommonKeys.FRIDAY));
+		
 		String[] types = new String[] { "work", "buisiness", "shop", "edu", "vacations_short", "vacations_long" };
 		for (String type : types) {
 			logger.info(String.format("Extracting matrix %s...", type));
@@ -218,6 +225,15 @@ public class ProxyPlans2Matrix {
 			m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 
 			writer.write(m, String.format("%s/miv.%s.xml", outdir, type));
+			/*
+			 * types for mo-fr only
+			 */
+			logger.info(String.format("Extracting matrix %s.wkday...", type));
+			pred.addComponent(wkDayPred);
+			p2m.setPredicate(pred);
+			m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
+
+			writer.write(m, String.format("%s/miv.wkday.%s.xml", outdir, type));
 		}
 		/*
 		 * one-day leisure
@@ -238,6 +254,15 @@ public class ProxyPlans2Matrix {
 
 		writer.write(m, String.format("%s/miv.leisure.xml", outdir));
 		/*
+		 * one-day leisure only mo-fr
+		 */
+		logger.info("Extracting matrix leisure wkday...");
+		pred.addComponent(wkDayPred);
+		p2m.setPredicate(pred);
+		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
+
+		writer.write(m, String.format("%s/miv.wkday.leisure.xml", outdir));
+		/*
 		 * wecommuter
 		 */
 		logger.info("Extracting matrix wecommuter...");
@@ -247,6 +272,14 @@ public class ProxyPlans2Matrix {
 		p2m.setPredicate(pred);
 		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 		writer.write(m, String.format("%s/miv.wecommuter.xml", outdir));
+		/*
+		 * wecommuter only mo-fr
+		 */
+		logger.info("Extracting matrix wecommuter wkday...");
+		pred.addComponent(wkDayPred);
+		p2m.setPredicate(pred);
+		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
+		writer.write(m, String.format("%s/miv.wkday.wecommuter.xml", outdir));
 		/*
 		 * misc -- for validation
 		 */
@@ -283,6 +316,14 @@ public class ProxyPlans2Matrix {
 		p2m.setPredicate(pred);
 		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
 		writer.write(m, String.format("%s/miv.dimido.xml", outdir));
+		
+		logger.info("Extracting matrix mo-fr...");
+		pred = new PredicateANDComposite();
+		pred.addComponent(modePred);
+		pred.addComponent(wkDayPred);
+		p2m.setPredicate(pred);
+		m = p2m.run(persons, zones, scenario.getActivityFacilities(), key);
+		writer.write(m, String.format("%s/miv.wkday.xml", outdir));
 		/*
 		 * seasons
 		 */

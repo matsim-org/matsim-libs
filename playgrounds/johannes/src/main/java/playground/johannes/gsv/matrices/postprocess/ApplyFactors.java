@@ -88,6 +88,30 @@ public class ApplyFactors {
 			
 			MatrixOperations.symetrize(m);
 			writeMatrix(m, String.format("%s/miv.%s.sym.xml", outDir, type));
+			/*
+			 * purpose per wkday
+			 */
+			logger.info(String.format("Processing matrix wkday.%s...", type));
+			
+			file = String.format("%s/miv.wkday.%s.xml", baseDir, type);
+			m = loadMatrix(file);
+			
+			MatrixOperations.applyFactor(m, scaleFactor);
+			MatrixOperations.applyDiagonalFactor(m, diagonalFactor);
+			
+			sum2 = MatrixOperations.sum(m);
+			logger.info(String.format("Trip share: wkday.%s", sum2/sum));
+			
+			double f = sum/sum2 * 1.076;
+			MatrixOperations.applyFactor(m, f);
+			logger.info(String.format("Scale factor: wkday", f));
+			
+			logger.info(String.format("Trip share: wkday.%s", MatrixOperations.sum(m)/sum));
+			file = String.format("%s/miv.wkday.%s.xml", outDir, type);
+			writeMatrix(m, file);
+			
+			MatrixOperations.symetrize(m);
+			writeMatrix(m, String.format("%s/miv.wkday.%s.sym.xml", outDir, type));
 		}
 //		System.exit(-1);
 		/*
@@ -99,8 +123,9 @@ public class ApplyFactors {
 		factors.put(CommonKeys.SATURDAY, 0.95);
 		factors.put(CommonKeys.SUNDAY, 0.67);
 		factors.put("dimido", 1.07);
+		factors.put("wkday", 1.076);
 		
-		String[] days = new String[] {CommonKeys.MONDAY, CommonKeys.FRIDAY, CommonKeys.SATURDAY, CommonKeys.SUNDAY, "dimido"};
+		String[] days = new String[] {CommonKeys.MONDAY, CommonKeys.FRIDAY, CommonKeys.SATURDAY, CommonKeys.SUNDAY, "dimido", "wkday"};
 		for(String day : days) {
 			logger.info(String.format("Processing matrix %s...", day));
 			
