@@ -50,7 +50,8 @@ import org.matsim.testcases.MatsimTestUtils;
  * 
  * see methods createNetwork and modifyNetwork for details on links configuration 
  *
- * you can add cases of network configuration in modifyNetwork(). Therefore you need to adapt the field NUMBER_OF_CASES.
+ * you can add cases of network configuration in modifyNetwork(). Therefore you need to adapt the field NUMBER_OF_CASES as well as
+ * the methods getTTofCase() and printResults() in LinkLaneTTTestEventHandler2. 
  * please note that only Link2 is to be modified. otherwise the eventhandler won't recognize changes.
  * 
  * if you want to have a look at the LaneDefintion or network files or the events, set the field writeOutput true.
