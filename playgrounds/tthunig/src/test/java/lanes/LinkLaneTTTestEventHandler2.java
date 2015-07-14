@@ -30,20 +30,16 @@ class LinkLaneTTTestEventHandler2 implements LinkEnterEventHandler,  LinkLeaveEv
 	private TreeMap<Integer,Double> caselinkTravelTimes ;
 	private TreeMap<Integer,Map<Id<Lane>,Double>> caseLaneTravelTimes;
 
-	
-	
-	public LinkLaneTTTestEventHandler2(int caseNr){
-		this.caseNr = caseNr;
+	public LinkLaneTTTestEventHandler2(){
+		this.caseNr = 1;
 		this.linkEnterTimes = new HashMap<Id<Link>,Double>();
 		this.linkTravelTimes = new HashMap<Id<Link>,Double>();
 		this.laneEnterTimes = new HashMap<Id<Lane>,Double>();
 		this.laneTravelTimes = new HashMap<Id<Lane>,Double>();
 		this.caselinkTravelTimes = new TreeMap<Integer,Double>() ;
 		this.caseLaneTravelTimes = new TreeMap<Integer,Map<Id<Lane>,Double>>();
-		
 	}
-	
-	
+
 	public void setToNextCase(){
 		this.caseNr ++;
 		this.linkEnterTimes.clear();
@@ -52,16 +48,11 @@ class LinkLaneTTTestEventHandler2 implements LinkEnterEventHandler,  LinkLeaveEv
 		this.laneTravelTimes.clear();
 	}
 	
-	
-	
 	@Override
 	public void reset(int iteration) {
 		setToNextCase();
 	}
 	
-	
-
-
 	@Override
 	public void handleEvent(LaneEnterEvent event) {
 			this.laneEnterTimes.put(event.getLaneId(), event.getTime());
@@ -106,7 +97,6 @@ class LinkLaneTTTestEventHandler2 implements LinkEnterEventHandler,  LinkLeaveEv
 		return -1;
 	}
 	
-	
 	public void printResults(){
 		System.out.println("\n-----PRINTING RESULTS-----");
 		
@@ -126,14 +116,7 @@ class LinkLaneTTTestEventHandler2 implements LinkEnterEventHandler,  LinkLeaveEv
 			}
 			System.out.println("\n");
 		}
-			
-
-
-		}
-
-
-
-		
 	}
+}
 	
 
