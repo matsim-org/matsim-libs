@@ -67,7 +67,7 @@ public class LinkLaneTTTest2 {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	private final int NUMBER_OF_CASES = 8;									//needs to be modified if you add cases
 
-	private static boolean writeOutput = true;
+	private static boolean writeOutput = false;
 	
 	@Test
 	public void testLinkTT(){
