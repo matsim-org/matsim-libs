@@ -57,7 +57,7 @@ public class ReducedLinkCapacityTemporary {
 			out.write("<networkChangeEvents xmlns=\"http://www.matsim.org/files/dtd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/networkChangeEvents.xsd\">");
 			out.newLine();
 			// reduce capacity and speed:
-			out.write("    <networkChangeEvent startTime=\"07:00:00\">");
+			out.write("    <networkChangeEvent startTime=\"17:00:00\">");
 			out.newLine();
 			for (Link link : network.getLinks().values()) {
 				out.write("        <link refId=\"" + link.getId().toString() + "\"/>");
@@ -70,7 +70,7 @@ public class ReducedLinkCapacityTemporary {
 			out.write("    </networkChangeEvent>");
 			out.newLine();
 			// reset capacity and speed:
-			for (Link link : network.getLinks().values()) {
+			/*for (Link link : network.getLinks().values()) {
 				out.write("    <networkChangeEvent startTime=\"09:00:00\">");
 				out.newLine();
 				out.write("        <link refId=\"" + link.getId().toString() + "\"/>");
@@ -81,7 +81,7 @@ public class ReducedLinkCapacityTemporary {
 				out.newLine();
 				out.write("    </networkChangeEvent>");
 				out.newLine();
-			}
+			}*/
 			// Footer:
 			out.write("</networkChangeEvents>");
 			out.newLine();
