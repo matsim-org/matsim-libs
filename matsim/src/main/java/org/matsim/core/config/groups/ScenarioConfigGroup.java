@@ -74,7 +74,7 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@SuppressWarnings("static-method")
-	@Deprecated
+	@Deprecated // since jul'15
 	@StringSetter( USE_VEHICLES )
 	public void setUseVehicles(@SuppressWarnings("unused") final boolean b) {
 		throw new RuntimeException( "The " + USE_VEHICLES + " switch is no longer operational.  The vehicles file is loaded if the file name"
@@ -84,7 +84,7 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 
 	@SuppressWarnings("static-method")
 	@StringSetter( USE_TRANSIT )
-	@Deprecated
+	@Deprecated // since jul'15
 	public void setUseTransit(final boolean b) {
 		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
 	}
