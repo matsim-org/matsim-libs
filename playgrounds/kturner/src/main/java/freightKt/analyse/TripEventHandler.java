@@ -109,7 +109,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 			double emissionsPerMeter = -99999.0;
 			switch (vehType.getId().toString()) {
 			case "heavy40t" : emissionsPerMeter = 0.917;
-					break;
+				break;
 			case "heavy26t" : emissionsPerMeter =	0.786;
 				break;
 			case "heavy26t_frozen" : emissionsPerMeter = 0.786;
@@ -123,6 +123,8 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 			case "light8telectro" : emissionsPerMeter = 0.346;
 				break;
 			case "light8t_frozen" : emissionsPerMeter = 0.524;
+				break;
+			case "light8telectro_frozen" : emissionsPerMeter = 0.524;
 			}
 				
 			VehicleTypeSpezificCapabilities vehTypeCapabilities = 
