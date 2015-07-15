@@ -26,7 +26,7 @@ import java.util.Map;
 public class EmissionsConfigGroup
     extends ReflectiveConfigGroup
 {
-    private static final String GROUP_NAME = "emissions";
+    public static final String GROUP_NAME = "emissions";
 
     private static final String EMISSION_ROADTYPE_MAPPING_FILE = "emissionRoadTypeMappingFile";
     private String emissionRoadTypeMappingFile = null;

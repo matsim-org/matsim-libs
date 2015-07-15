@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
 <config>
 
 <!-- ====================================================================== -->
@@ -26,7 +26,7 @@
 		<param name="firstIteration" value="0" />
 
 		<!-- Default=1000;  -->
-		<param name="lastIteration" value="20" />
+		<param name="lastIteration" value="5" />
 
 		<!-- Defines which mobility simulation will be used. Currently supported: qsim JDEQSim 
 		Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim.
@@ -125,7 +125,10 @@
 
 	<module name="global" >
 		<param name="coordinateSystem" value="Atlantis" />
+
+		<!-- "global" number of threads.  This number is used, e.g., for replanning, but NOT in the mobsim.  This can typically be set to as many cores as you have available, or possibly even slightly more. -->
 		<param name="numberOfThreads" value="2" />
+
 		<param name="randomSeed" value="4711" />
 	</module>
 
@@ -150,9 +153,9 @@
 <!-- ====================================================================== -->
 
 	<module name="locationchoice" >
-		<param name="algorithm" value="random" />
-		<param name="analysisBinSize" value="20000.0" />
-		<param name="analysisBoundary" value="200000.0" />
+		<param name="algorithm" value="bestResponse" />
+		<param name="analysisBinSize" value="20000" />
+		<param name="analysisBoundary" value="200000" />
 		<param name="centerNode" value="null" />
 		<param name="destinationSamplePercent" value="100.0" />
 		<param name="epsilonDistribution" value="gumbel" />
@@ -177,7 +180,7 @@
 		<param name="scaleFactor" value="1" />
 		<param name="travelSpeed_car" value="8.5" />
 		<param name="travelSpeed_pt" value="5.0" />
-		<param name="tt_approximationLevel" value="0" />
+		<param name="tt_approximationLevel" value="1" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -204,124 +207,146 @@
 
 	<module name="planCalcScore" >
 
-		<!-- There used to be a plateau between duration=0 and duration=zeroUtilityDuration. This caused durations to evolve to zero once they were below zeroUtilityDuration, causing problems.  Only use this switch if you need to be backwards compatible with some old results.  (changed nov'13) -->
-		<param name="usingOldScoringBelowZeroUtilityDuration" value="false" />
-
-		<!-- new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates close to zero emulate score averaging, but slow down initial convergence -->
-		<param name="learningRate" value="1.0" />
-
-		<!-- logit model scale parameter. default: 2.  Has name and default value for historical reasons (see Bryan Raney's phd thesis). -->
+		<!-- logit model scale parameter. default: 1.  Has name and default value for historical reasons (see Bryan Raney's phd thesis). -->
 		<param name="BrainExpBeta" value="1.0" />
 
 		<param name="PathSizeLogitBeta" value="1.0" />
 
-		<!-- [utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative -->
-		<param name="lateArrival" value="-18.0" />
-
 		<!-- [utils/hr] utility for departing early (i.e. before the earliest end time).  Normally negative.  Probably implemented correctly, but not tested. -->
 		<param name="earlyDeparture" value="-0.0" />
 
-		<!-- [utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing.  MATSim separates the resource value of time from the direct (dis)utility of travel time, see, e.g., Boerjesson and Eliasson, TR-A 59 (2014) 144-158. -->
-		<param name="performing" value="6.0" />
+		<!-- [utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative -->
+		<param name="lateArrival" value="-18.0" />
 
-		<!-- [utils/hr] additional marginal utility for waiting. normally negative. this comes on top of the opportunity cost of time.  Probably implemented correctly, but not tested. -->
-		<param name="waiting" value="-0.0" />
-
-		<!-- [utils/hr] additional marginal utility for waiting for a pt vehicle. normally negative. this comes on top of the opportunity cost of time. Default: if not set explicitly, it is equal to traveling_pt!!! -->
-		<param name="waitingPt" value="-6.0" />
+		<!-- new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates close to zero emulate score averaging, but slow down initial convergence -->
+		<param name="learningRate" value="1.0" />
 
 		<!-- [utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils. Normall positive (i.e. toll/cost/fare are processed as negative amounts of money). -->
 		<param name="marginalUtilityOfMoney" value="1.0" />
 
+		<!-- [utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of time if agent is doing nothing.  MATSim separates the resource value of time from the direct (dis)utility of travel time, see, e.g., Boerjesson and Eliasson, TR-A 59 (2014) 144-158. -->
+		<param name="performing" value="6.0" />
+
+		<!-- There used to be a plateau between duration=0 and duration=zeroUtilityDuration. This caused durations to evolve to zero once they were below zeroUtilityDuration, causing problems.  Only use this switch if you need to be backwards compatible with some old results.  (changed nov'13) -->
+		<param name="usingOldScoringBelowZeroUtilityDuration" value="false" />
+
 		<!-- [utils] utility of switching a line (= transfer penalty).  Normally negative -->
 		<param name="utilityOfLineSwitch" value="-1.0" />
+
+		<!-- [utils/hr] additional marginal utility for waiting. normally negative. this comes on top of the opportunity cost of time.  Probably implemented correctly, but not tested. -->
+		<param name="waiting" value="-0.0" />
 
 		<!-- write a plans file in each iteration directory which contains what each agent actually did, and the score it received. -->
 		<param name="writeExperiencedPlans" value="false" />
 
-		<!-- **************************** -->
-		<param name="activityType_0" value="home" />
+		<parameterset type="activityParams" >
+			<param name="activityType" value="home" />
+			<param name="closingTime" value="-Infinity" />
+			<param name="earliestEndTime" value="-Infinity" />
+			<param name="latestStartTime" value="-Infinity" />
+			<param name="minimalDuration" value="-Infinity" />
+			<param name="openingTime" value="-Infinity" />
+			<param name="priority" value="1.0" />
+			<param name="scoringThisActivityAtAll" value="true" />
+			<param name="typicalDuration" value="43200.0" />
+		</parameterset>
 
-		<param name="activityPriority_0" value="1.0" />
-		<param name="activityTypicalDuration_0" value="12:00:00" />
-		<param name="activityMinimalDuration_0" value="undefined" />
-		<param name="activityOpeningTime_0" value="undefined" />
-		<param name="activityLatestStartTime_0" value="undefined" />
-		<param name="activityEarliestEndTime_0" value="undefined" />
-		<param name="activityClosingTime_0" value="undefined" />
-		<param name="scoringThisActivityAtAll_0" value="true" />
+		<parameterset type="activityParams" >
+			<param name="activityType" value="work" />
+			<param name="closingTime" value="-Infinity" />
+			<param name="earliestEndTime" value="-Infinity" />
+			<param name="latestStartTime" value="-Infinity" />
+			<param name="minimalDuration" value="-Infinity" />
+			<param name="openingTime" value="-Infinity" />
+			<param name="priority" value="1.0" />
+			<param name="scoringThisActivityAtAll" value="true" />
+			<param name="typicalDuration" value="28800.0" />
+		</parameterset>
 
-		<!-- **************************** -->
-		<param name="activityType_1" value="work" />
+		<parameterset type="modeParams" >
 
-		<param name="activityPriority_1" value="1.0" />
-		<param name="activityTypicalDuration_1" value="08:00:00" />
-		<param name="activityMinimalDuration_1" value="undefined" />
-		<param name="activityOpeningTime_1" value="undefined" />
-		<param name="activityLatestStartTime_1" value="undefined" />
-		<param name="activityEarliestEndTime_1" value="undefined" />
-		<param name="activityClosingTime_1" value="undefined" />
-		<param name="scoringThisActivityAtAll_1" value="true" />
+			<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+			<param name="constant" value="0.0" />
 
-		<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
-		<param name="traveling_car" value="-6.0" />
+			<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
 
-		<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
-		<param name="marginalUtlOfDistance_car" value="0.0" />
+			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
 
-		<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-		<param name="monetaryDistanceCostRate_car" value="0.0" />
+			<param name="mode" value="car" />
 
-		<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
-		<param name="constant_car" value="0.0" />
+			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
+			<param name="monetaryDistanceCostRate" value="0.0" />
+		</parameterset>
 
-		<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
-		<param name="traveling_pt" value="-6.0" />
+		<parameterset type="modeParams" >
 
-		<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
-		<param name="marginalUtlOfDistance_pt" value="0.0" />
+			<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+			<param name="constant" value="0.0" />
 
-		<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-		<param name="monetaryDistanceCostRate_pt" value="0.0" />
+			<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
 
-		<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
-		<param name="constant_pt" value="0.0" />
+			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
 
-		<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
-		<param name="traveling_walk" value="-6.0" />
+			<param name="mode" value="pt" />
 
-		<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
-		<param name="marginalUtlOfDistance_walk" value="0.0" />
+			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
+			<param name="monetaryDistanceCostRate" value="0.0" />
+		</parameterset>
 
-		<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-		<param name="monetaryDistanceCostRate_walk" value="0.0" />
+		<parameterset type="modeParams" >
 
-		<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
-		<param name="constant_walk" value="0.0" />
+			<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+			<param name="constant" value="0.0" />
 
-		<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
-		<param name="traveling_bike" value="-6.0" />
+			<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
 
-		<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
-		<param name="marginalUtlOfDistance_bike" value="0.0" />
+			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
 
-		<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-		<param name="monetaryDistanceCostRate_bike" value="0.0" />
+			<param name="mode" value="walk" />
 
-		<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
-		<param name="constant_bike" value="0.0" />
+			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
+			<param name="monetaryDistanceCostRate" value="0.0" />
+		</parameterset>
 
-		<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
-		<param name="traveling_other" value="-6.0" />
+		<parameterset type="modeParams" >
 
-		<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
-		<param name="marginalUtlOfDistance_other" value="0.0" />
+			<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+			<param name="constant" value="0.0" />
 
-		<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
-		<param name="monetaryDistanceCostRate_other" value="0.0" />
+			<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
 
-		<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
-		<param name="constant_other" value="0.0" />
+			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+
+			<param name="mode" value="bike" />
+
+			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
+			<param name="monetaryDistanceCostRate" value="0.0" />
+		</parameterset>
+
+		<parameterset type="modeParams" >
+
+			<!-- [utils] alternative-specific constant.  no guarantee that this is used anywhere. default=0 to be backwards compatible for the time being -->
+			<param name="constant" value="0.0" />
+
+			<!-- [utils/m] utility of walking per m, normally negative.  this is on top of the time (dis)utility. -->
+			<param name="marginalUtilityOfDistance_util_m" value="0.0" />
+
+			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
+			<param name="marginalUtilityOfTraveling_util_hr" value="-6.0" />
+
+			<param name="mode" value="other" />
+
+			<!-- [unit_of_money/m] conversion of distance into money. Probably needs to be negative to work. -->
+			<param name="monetaryDistanceCostRate" value="0.0" />
+		</parameterset>
 	</module>
 
 <!-- ====================================================================== -->
@@ -353,17 +378,45 @@
 		<!-- All the modes for which the router is supposed to generate network routes (like car) -->
 		<param name="networkModes" value="car,ride" />
 
-		<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
-		<param name="teleportedModeFreespeedFactor_pt" value="2.0" />
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="bike" />
 
-		<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
-		<param name="teleportedModeSpeed_bike" value="4.166666666666667" />
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="null" />
 
-		<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
-		<param name="teleportedModeSpeed_undefined" value="13.88888888888889" />
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="4.166666666666667" />
+		</parameterset>
 
-		<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
-		<param name="teleportedModeSpeed_walk" value="0.8333333333333333" />
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="walk" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="null" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="0.8333333333333333" />
+		</parameterset>
+
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="undefined" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="null" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="13.88888888888889" />
+		</parameterset>
+
+		<parameterset type="teleportedModeParameters" >
+			<param name="mode" value="pt" />
+
+			<!-- Free-speed factor for a teleported mode. Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +teleportedModeFreespeedFactor wins over teleportedModeSpeed. -->
+			<param name="teleportedModeFreespeedFactor" value="2.0" />
+
+			<!-- Speed for a teleported mode. Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode. -->
+			<param name="teleportedModeSpeed" value="null" />
+		</parameterset>
 	</module>
 
 <!-- ====================================================================== -->
@@ -407,13 +460,16 @@
 		<!-- default: FIFO; options: FIFO PassingQ -->
 		<param name="linkDynamics" value="FIFO" />
 
-		<!-- Defines which modes are congested modes. Technically, these are the modes that the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense. -->
+		<!-- The (initial) width of the links of the network. Use positive floating point values. -->
+		<param name="linkWidth" value="30.0" />
+
+		<!-- [comma-separated list] Defines which modes are congested modes. Technically, these are the modes that the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity factor, and storage capacity factor need to be set with diligence.  Need to be vehicular modes to make sense. -->
 		<param name="mainMode" value="car" />
 
 		<!-- Shortens a link in the visualization, i.e. its start and end point are moved into towards the center. Does not affect traffic flow.  -->
 		<param name="nodeOffset" value="0.0" />
 
-		<!-- Use number of threads > 1 for parallel version using the specified number of threads -->
+		<!-- Number of threads used for the QSim.  Note that this setting is independent from the "global" threads setting.  In contrast to earlier versions, the non-parallel special version is no longer there. -->
 		<param name="numberOfThreads" value="1" />
 
 		<!-- Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice. -->
@@ -422,7 +478,7 @@
 		<!-- `maxOfStarttimeAndEarliestActivityEnd' (default behavior) or `onlyUseStarttime' -->
 		<param name="simStarttimeInterpretation" value="maxOfStarttimeAndEarliestActivityEnd" />
 
-		<!-- snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) or `withHolesExperimental' (experimental!!) -->
+		<!-- snapshotStyle. One of: equiDist (vehicles equidistant on link) or queue (vehicles queued at end of link) or withHoles (experimental!!) -->
 		<param name="snapshotStyle" value="equiDist" />
 
 		<param name="snapshotperiod" value="00:00:00" />
@@ -434,8 +490,14 @@
 
 		<param name="timeStepSize" value="00:00:01" />
 
-		<!-- `queue' for the standard queue model, `withHolesExperimental' (experimental!!) for the queue model with holes -->
+		<!-- `queue' for the standard queue model, `withHoles' (experimental!!) for the queue model with holes -->
 		<param name="trafficDynamics" value="queue" />
+
+		<!-- If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties. -->
+		<param name="useDefaultVehicles" value="true" />
+
+		<!-- If a route does not reference a vehicle, agents will use the vehicle with the same id as their own. -->
+		<param name="usePersonIdForMissingVehicleId" value="true" />
 
 		<!-- Defines what happens if an agent wants to depart, but the specified vehicle is not available. One of: teleport, wait, exception -->
 		<param name="vehicleBehavior" value="teleport" />
@@ -477,38 +539,41 @@
 
 	<module name="strategy" >
 
-		<!-- maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number -->
-		<param name="maxAgentPlanMemorySize" value="5" />
-
-		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-		<param name="Module_1" value="ChangeExpBeta" />
-
-		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-		<param name="ModuleProbability_1" value="1.0" />
-
-		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
-		<param name="ModuleDisableAfterIteration_1" value="null" />
-
-		<!-- path to external executable (if applicable) -->
-		<param name="ModuleExePath_1" value="null" />
-
-		<!-- subpopulation to which the module applies. "null" refers to the default population, that is, the set of persons for which no explicit subpopulation is defined (ie no subpopulation attribute) -->
-		<param name="ModuleSubpopulation_1" value="null" />
-
 		<!-- the external executable will be called with a config file as argument.  This is the pathname to a possible skeleton config, to which additional information will be added.  Can be null. -->
 		<param name="ExternalExeConfigTemplate" value="null" />
-
-		<!-- root directory for temporary files generated by the external executable. Provided as a service; I don't think this is used by MATSim. -->
-		<param name="ExternalExeTmpFileRootDir" value="null" />
 
 		<!-- time out value (in seconds) after which matsim will consider the external module as failed -->
 		<param name="ExternalExeTimeOut" value="3600" />
 
-		<!-- name of PlanSelector for plans removal.  If not full class name, resolved in StrategyManagerConfigLoader.  default is `null', which eventually calls SelectWorstPlan. This is not a good choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically tested. kai, feb'12 -->
-		<param name="planSelectorForRemoval" value="null" />
+		<!-- root directory for temporary files generated by the external executable. Provided as a service; I don't think this is used by MATSim. -->
+		<param name="ExternalExeTmpFileRootDir" value="null" />
 
 		<!-- fraction of iterations where innovative strategies are switched off.  Something link 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480 -->
 		<param name="fractionOfIterationsToDisableInnovation" value="Infinity" />
+
+		<!-- maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number -->
+		<param name="maxAgentPlanMemorySize" value="5" />
+
+		<!-- name of PlanSelector for plans removal. WorstPlanSelector is not a good choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically tested. kai, feb'12 -->
+		<param name="planSelectorForRemoval" value="WorstPlanSelector" />
+
+		<parameterset type="strategysettings" >
+
+			<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
+			<param name="disableAfterIteration" value="-1" />
+
+			<!-- path to external executable (if applicable) -->
+			<param name="executionPath" value="null" />
+
+			<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
+			<param name="moduleName" value="ChangeExpBeta" />
+
+			<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
+			<param name="probability" value="1.0" />
+
+			<!-- subpopulation to which the module applies. "null" refers to the default population, that is, the set of persons for which no explicit subpopulation is defined (ie no subpopulation attribute) -->
+			<param name="subpopulation" value="null" />
+		</parameterset>
 	</module>
 
 <!-- ====================================================================== -->
@@ -589,6 +654,9 @@
 		<!-- (do not use) set chainBasedModes for subTourModeChoice by Yu. E.g. "car,bike", "car" -->
 		<param name="chainBasedModes" value="car" />
 
+		<!-- fraction of iterations at which MSA score averaging is started. The matsim theory department suggests to use this together with switching off choice set innovation (where a similar switch exists), but it has not been tested yet. -->
+		<param name="fractionOfIterationsToStartScoreMSA" value="null" />
+
 		<!-- (do not use) Set this filename of MZ05 daily analysis -->
 		<param name="inputMZ05File" value="" />
 
@@ -611,7 +679,7 @@
 		<!-- (not tested) will remove plan attributes that are presumably not used, such as activityStartTime. default=false -->
 		<param name="removingUnnecessaryPlanAttributes" value="false" />
 
-		<!-- first iteration of MSA score averaging. The matsim theory department suggests to use this together with switching of choice set innovation, but it has not been tested yet. -->
+		<!-- (deprecated, use fractionOfIterationsToStartScoreMSA) first iteration of MSA score averaging. The matsim theory department suggests to use this together with switching of choice set innovation, but it has not been tested yet. -->
 		<param name="scoreMSAStartsAtIteration" value="null" />
 
 		<!-- Options: `ignore', `warn', `abort'.  Default: either `ignore' or `warn'.

@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.vehicles.Vehicle;
@@ -149,7 +150,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrival
 	    if (!this.emissionVehicles.getVehicles().containsKey(vehicleId)) {
 	        throw new RuntimeException("No vehicle defined for person " + personId + ". " +
 	                "Please make sure that requirements for emission vehicles in " +
-	                VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+	                EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 	    }
 	
 	    Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);

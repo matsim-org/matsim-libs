@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.types.*;
+import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -118,15 +119,13 @@ public class ColdEmissionAnalysisModule {
 		if(vehicleInformation == null){
 			throw new RuntimeException("Vehicle type description for person " + personId + "is missing. " +
 					"Please make sure that requirements for emission vehicles in "
-					+ VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-			// yyyy todo: check above error message.  Is this really still in VspExperimentalConfigGroup??? kai, may'15
+					+ EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
 		Tuple<HbefaVehicleCategory, HbefaVehicleAttributes> vehicleInformationTuple = convertString2Tuple(vehicleInformation);
 		if (vehicleInformationTuple.getFirst() == null){
 			throw new RuntimeException("Vehicle category for person " + personId + " is not valid. " +
 					"Please make sure that requirements for emission vehicles in " + 
-					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-			// yyyy todo: check above error message.  Is this really still in VspExperimentalConfigGroup??? kai, may'15
+					EmissionsConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
         coldEmissions = getColdPollutantDoubleMap(personId, parkingDuration, vehicleInformationTuple, distance_km);
 
