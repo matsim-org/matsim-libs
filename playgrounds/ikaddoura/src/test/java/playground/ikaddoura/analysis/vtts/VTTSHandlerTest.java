@@ -112,7 +112,7 @@ public class VTTSHandlerTest {
 		VTTSHandler vttsHandler = new VTTSHandler(scenario);
 		events.addHandler(vttsHandler);
 						
-		String eventsFile = testUtils.getInputDirectory() + "100.events.b1240739_shortened.xml";
+		String eventsFile = testUtils.getInputDirectory() + "100.events.b1240739.xml";
 
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
@@ -122,6 +122,9 @@ public class VTTSHandlerTest {
 		vttsHandler.printVTTS(testUtils.getOutputDirectory() + "VTTS.csv");
 		vttsHandler.printAvgVTTSperPerson(testUtils.getOutputDirectory() + "avgVTTS.csv"); 
 		
-		Assert.assertEquals("wrong VTTS", 7.11783916424133, vttsHandler.getPersonId2TripNr2VTTSh().get(Id.createPersonId("b1240739")).get(2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong VTTS", 13.4866868060989, vttsHandler.getPersonId2TripNr2VTTSh().get(Id.createPersonId("b1240739")).get(1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong VTTS", 77.0949637642268, vttsHandler.getPersonId2TripNr2VTTSh().get(Id.createPersonId("b1240739")).get(2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong VTTS", "walk", vttsHandler.getPersonId2TripNr2Mode().get(Id.createPersonId("b1240739")).get(2));
+		Assert.assertEquals("wrong VTTS", "car", vttsHandler.getPersonId2TripNr2Mode().get(Id.createPersonId("b1240739")).get(3));
 	}
 }
