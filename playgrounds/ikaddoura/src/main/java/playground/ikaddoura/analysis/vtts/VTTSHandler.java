@@ -66,14 +66,16 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 	private final Scenario scenario;
 	
 	private Set<Id<Person>> departedPersonIds = new HashSet<>();
-	private Map<Id<Person>, Double> personId2currentActivityStartTime = new HashMap<Id<Person>, Double>();
-	private Map<Id<Person>, Double> personId2firstActivityEndTime = new HashMap<Id<Person>, Double>();
-	private Map<Id<Person>, String> personId2currentActivityType = new HashMap<Id<Person>, String>();
-	private Map<Id<Person>, String> personId2firstActivityType = new HashMap<Id<Person>, String>();
+	private Map<Id<Person>, Double> personId2currentActivityStartTime = new HashMap<>();
+	private Map<Id<Person>, Double> personId2firstActivityEndTime = new HashMap<>();
+	private Map<Id<Person>, String> personId2currentActivityType = new HashMap<>();
+	private Map<Id<Person>, String> personId2firstActivityType = new HashMap<>();
 	private Map<Id<Person>, Integer> personId2currentTripNr = new HashMap<>();
+	private Map<Id<Person>, String> personId2currentTripMode = new HashMap<>();
 	
 	private Map<Id<Person>, List<Double>> personId2VTTSh = new HashMap<>();
 	private Map<Id<Person>, Map<Integer, Double>> personId2TripNr2VTTSh = new HashMap<>();
+	private Map<Id<Person>, Map<Integer, String>> personId2TripNr2Mode = new HashMap<>();
 		
 	private MarginalSumScoringFunction marginaSumScoringFunction;
 	
@@ -93,15 +95,23 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		this.personId2firstActivityEndTime.clear();
 		this.personId2currentActivityType.clear();
 		this.personId2firstActivityType.clear();
-		this.personId2TripNr2VTTSh.clear();
+		this.personId2currentTripNr.clear();
+		this.personId2currentTripMode.clear();
 		
 		this.personId2VTTSh.clear();
-		personId2TripNr2VTTSh.clear();
+		this.personId2TripNr2VTTSh.clear();
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		this.departedPersonIds.add(event.getPersonId());
+		
+		if (this.personId2currentTripMode.containsKey(event.getPersonId())){
+			this.personId2currentTripMode.put(event.getPersonId(), event.getLegMode());
+			
+		} else {
+			this.personId2currentTripMode.put(event.getPersonId(), event.getLegMode());
+		}
 		
 		if (this.personId2currentTripNr.containsKey(event.getPersonId())){
 			this.personId2currentTripNr.put(event.getPersonId(), this.personId2currentTripNr.get(event.getPersonId()) + 1);
@@ -206,6 +216,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 					
 			this.personId2VTTSh.get(personId).add(delayCostPerSec_usingActivityDelayOneSec * 3600);
 			this.personId2TripNr2VTTSh.get(personId).put(this.personId2currentTripNr.get(personId), delayCostPerSec_usingActivityDelayOneSec * 3600);
+			this.personId2TripNr2Mode.get(personId).put(this.personId2currentTripNr.get(personId), this.personId2currentTripMode.get(personId));
 	
 		} else {
 
@@ -216,6 +227,10 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 			Map<Integer, Double> tripNr2VTTSh = new HashMap<>();
 			tripNr2VTTSh.put(this.personId2currentTripNr.get(personId), delayCostPerSec_usingActivityDelayOneSec * 3600.);
 			this.personId2TripNr2VTTSh.put(personId, tripNr2VTTSh);
+			
+			Map<Integer, String> tripNr2Mode = new HashMap<>();
+			tripNr2Mode.put(this.personId2currentTripNr.get(personId), this.personId2currentTripMode.get(personId));
+			this.personId2TripNr2Mode.put(personId, tripNr2Mode);
 		}
 	}
 	
@@ -225,12 +240,12 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("person Id;TripNr;VTTS (money/hour)");
+			bw.write("person Id;TripNr;Mode;VTTS (money/hour)");
 			bw.newLine();
 			
 			for (Id<Person> personId : this.personId2TripNr2VTTSh.keySet()){
 				for (Integer tripNr : this.personId2TripNr2VTTSh.get(personId).keySet()){
-					bw.write(personId + ";" + tripNr + ";" + this.personId2TripNr2VTTSh.get(personId).get(tripNr));
+					bw.write(personId + ";" + tripNr + ";" + this.personId2TripNr2Mode.get(personId).get(tripNr) + ";" + this.personId2TripNr2VTTSh.get(personId).get(tripNr));
 					bw.newLine();		
 				}
 			}
@@ -275,4 +290,7 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 		return personId2TripNr2VTTSh;
 	}
 
+	public Map<Id<Person>, Map<Integer, String>> getPersonId2TripNr2Mode() {
+		return personId2TripNr2Mode;
+	}
 }
