@@ -571,7 +571,8 @@ public class RoutePath {
 	public String allStopsWithInRouteLink() {
 		for(StopTime stopTime: trip.getStopTimes().values()) {
 			Stop stop = stops.get(stopTime.getStopId());
-			Link link = network.getLinks().get(stop.getLinkId());
+			Link link = network.getLinks().get(Id.createLinkId(stop.getLinkId()));
+			//Link link = network.getLinks().get(stop.getLinkId());
 			if(!links.contains(link))
 				return stopTime.getStopId();
 		}
