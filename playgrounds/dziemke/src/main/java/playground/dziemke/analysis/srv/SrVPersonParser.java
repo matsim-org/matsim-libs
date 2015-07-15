@@ -80,7 +80,7 @@ public class SrVPersonParser {
 			}
 			
 			
-			// read data and write ...
+			// read data
 			while ((currentLine = bufferedReader.readLine()) != null) {
 				String[] entries = currentLine.split(";", -1);
 				lineCount++;

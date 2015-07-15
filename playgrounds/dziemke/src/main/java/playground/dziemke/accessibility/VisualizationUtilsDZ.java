@@ -91,7 +91,7 @@ public class VisualizationUtilsDZ {
 		accessibilityLayer.setXField(Labels.X_COORDINATE);
 		accessibilityLayer.setYField(Labels.Y_COORDINATE);
 //		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
-		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, upperBound, lowerBound, range, symbolSize);
+		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, lowerBound, upperBound, range, symbolSize);
 		if (mode.equals(Modes4Accessibility.freeSpeed)) {
 			renderer.setRenderingAttribute(Labels.ACCESSIBILITY_BY_FREESPEED); // choose column/header to visualize
 		} else if (mode.equals(Modes4Accessibility.car)) {

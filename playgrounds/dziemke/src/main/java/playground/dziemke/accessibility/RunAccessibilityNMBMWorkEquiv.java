@@ -30,7 +30,7 @@ public class RunAccessibilityNMBMWorkEquiv {
 		// Input and output	
 		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
-		String outputDirectory = "../../accessibility-sa/data/02/";
+		String outputDirectory = "../../accessibility-sa/data/12/";
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelDistanceMatrix.csv.gz";
 //		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/measuringPointsAsStops.csv.gz";
@@ -71,7 +71,7 @@ public class RunAccessibilityNMBMWorkEquiv {
 				}
 
 				// add all facilites that are not home or work
-				if ( !option.getType().equals("h") && !option.getType().equals("w") ) {
+				if ( !option.getType().equals("h") && !option.getType().equals("w") && !option.getType().equals("minor")) {
 					if (!amenities.getFacilities().containsKey(fac.getId())) {
 						amenities.addActivityFacility(fac);
 					}
@@ -86,8 +86,9 @@ public class RunAccessibilityNMBMWorkEquiv {
 
 		// extends of the network are (as they can looked up by using the bounding box):
 		// minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
-		// choose map view a bit bigger
-		double[] mapViewExtent = {100000,-3720000,180000,-3675000};
+		
+//		double[] mapViewExtent = {100000,-3720000,180000,-3675000}; // choose map view a bit bigger
+		double[] mapViewExtent = {115000,-3718000,161000,-3679000}; // what actually needs to be drawn
 
 		Controler controler = new Controler(scenario);
 

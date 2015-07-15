@@ -32,7 +32,7 @@ public class RunAccessibilityNMBM {
 		// Input and output	
 		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
-		String outputDirectory = "../../accessibility-sa/data/03/";
+		String outputDirectory = "../../accessibility-sa/data/13/";
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelDistanceMatrix.csv.gz";
 //		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/measuringPointsAsStops.csv.gz";
@@ -41,12 +41,17 @@ public class RunAccessibilityNMBM {
 //		String measuringPointsAsPtStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_07/measuringPointsAsStops.csv";
 		
 		// Parameters
-		boolean includeDensityLayer = true;
+		boolean includeDensityLayer = false;
 		String crs = TransformationFactory.WGS84_SA_Albers;
 		Double lowerBound = 2.;
 		Double upperBound = 5.5;
 		Integer range = 9;
 		int symbolSize = 1010;
+
+		// extends of the network are (as they can looked up by using the bounding box):
+		// minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
+		// choose map view a bit bigger
+		double[] mapViewExtent = {100000,-3720000,180000,-3675000};
 		
 
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
@@ -74,10 +79,7 @@ public class RunAccessibilityNMBM {
 			}
 		}
 
-		// extends of the network are (as they can looked up by using the bounding box):
-		// minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
-		// choose map view a bit bigger
-		double[] mapViewExtent = {100000,-3720000,180000,-3675000};
+		
 
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		Controler controler = new Controler(scenario) ;

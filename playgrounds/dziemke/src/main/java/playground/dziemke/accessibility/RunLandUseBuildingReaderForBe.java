@@ -21,13 +21,11 @@
 package playground.dziemke.accessibility;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.osm.LandUseBuildingReader;
-import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.Facility;
