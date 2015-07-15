@@ -50,7 +50,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * 
  * You can add cases of network configuration in modifyNetwork(). Therefore you
  * need to adapt the field NUMBER_OF_CASES as well as the methods getTTofCase()
- * and printResults() in LinkLaneTTTestEventHandler2. Please note that only
+ * and printResults() in LinkLaneTTTestEventHandler. Please note that only
  * Link2 is to be modified. Otherwise the event handler won't recognize changes.
  * 
  * If you want to have a look at the lane definition, network or event file,
@@ -59,7 +59,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author Tilmann Schlenther
  */
 
-public class LinkLaneTTTest2 {
+public class LinkLaneTTTest {
 	
 	private static Id<Link> LINK_ID1 = Id.create("Link1", Link.class);
 	private static Id<Link> LINK_ID2 = Id.create("Link2", Link.class);
@@ -92,7 +92,7 @@ public class LinkLaneTTTest2 {
 			}
 		});
 		
-		LinkLaneTTTestEventHandler2 handler = new LinkLaneTTTestEventHandler2();
+		LinkLaneTTTestEventHandler handler = new LinkLaneTTTestEventHandler();
 		events.addHandler(handler);
 		
 		for(int i = 1; i<= NUMBER_OF_CASES ; i++){

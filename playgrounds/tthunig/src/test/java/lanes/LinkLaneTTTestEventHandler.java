@@ -19,7 +19,7 @@ import org.matsim.lanes.data.v20.Lane;
 /**
  * @author Tilmann Schlenther
  */
-class LinkLaneTTTestEventHandler2 implements LinkEnterEventHandler,  LinkLeaveEventHandler , LaneEnterEventHandler, LaneLeaveEventHandler{
+class LinkLaneTTTestEventHandler implements LinkEnterEventHandler,  LinkLeaveEventHandler , LaneEnterEventHandler, LaneLeaveEventHandler{
 	
 	
 	private int caseNr;
@@ -30,7 +30,7 @@ class LinkLaneTTTestEventHandler2 implements LinkEnterEventHandler,  LinkLeaveEv
 	private TreeMap<Integer,Double> caselinkTravelTimes ;
 	private TreeMap<Integer,Map<Id<Lane>,Double>> caseLaneTravelTimes;
 
-	public LinkLaneTTTestEventHandler2(){
+	public LinkLaneTTTestEventHandler(){
 		this.caseNr = 1;
 		this.linkEnterTimes = new HashMap<Id<Link>,Double>();
 		this.linkTravelTimes = new HashMap<Id<Link>,Double>();
@@ -110,7 +110,7 @@ class LinkLaneTTTestEventHandler2 implements LinkEnterEventHandler,  LinkLeaveEv
 		String laneString;
 		System.out.println("\n----- RESULTS -----");
 		
-		System.out.println("\n °°NOTE: See quellcode of LinkLaneTTTest2 for further "
+		System.out.println("\n °°NOTE: See quellcode of LinkLaneTTTest for further "
 				+ "information and graphical view of the link configurations°°\n");
 		
 		System.out.println("normal link of 200 m");
