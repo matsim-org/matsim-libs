@@ -35,44 +35,48 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
+ * This class tests the travel time of one agent on different configuration of a
+ * 200m link. Currently, the following phenomenon occurs for certain values of
+ * free speed: the travel time on a 200m link is reduced if lanes are enabled
+ * 
+ * See methods createNetwork and modifyNetwork for details on link
+ * configurations.
+ * 
+ * You can add cases of network configuration in modifyNetwork(). Therefore you
+ * need to adapt the field NUMBER_OF_CASES as well as the methods getTTofCase()
+ * and printResults() in LinkLaneTTTestEventHandler2. Please note that only
+ * Link2 is to be modified. Otherwise the event handler won't recognize changes.
+ * 
+ * If you want to have a look at the lane definition, network or event file,
+ * enable the field writeOutput.
  * 
  * @author Tilmann Schlenther
- * this class tests the TravelTime of one agent on different configuration of a 200m link. currently, the following phenomenon occurs
- * for certain values of freespeed:
- * the TravelTime on a 200m link is reduced if lanes are enabled
- * 
- * see methods createNetwork and modifyNetwork for details on links configuration 
- *
- * you can add cases of network configuration in modifyNetwork(). Therefore you need to adapt the field NUMBER_OF_CASES as well as
- * the methods getTTofCase() and printResults() in LinkLaneTTTestEventHandler2. 
- * please note that only Link2 is to be modified. otherwise the eventhandler won't recognize changes.
- * 
- * if you want to have a look at the LaneDefintion or network files or the events, set the field writeOutput true.
- * 
  */
 
 public class LinkLaneTTTest2 {
 	
-	private static String OUTPUT_DIR = "";
-	private static Id<Link> linkId1 = Id.create("Link1", Link.class);
-	private static Id<Link> linkId2 = Id.create("Link2", Link.class);
-	private static Id<Link> linkId3 = Id.create("Link3", Link.class);
+	private static Id<Link> LINK_ID1 = Id.create("Link1", Link.class);
+	private static Id<Link> LINK_ID2 = Id.create("Link2", Link.class);
+	private static Id<Link> LINK_ID3 = Id.create("Link3", Link.class);
+	
+	// needs to be enabled if you want to have output files like events, network
+	// and lanes
+	private static boolean WRITE_OUTPUT = false;
+	
+	// needs to be modified if you add cases
+	private static final int NUMBER_OF_CASES = 8;									
+
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-	private final int NUMBER_OF_CASES = 8;									//needs to be modified if you add cases
-
-	private static boolean writeOutput = false;
 	
 	@Test
 	public void testLinkTT(){
-		OUTPUT_DIR = utils.getOutputDirectory();
 		EventsManager events = EventsUtils.createEventsManager();
 		Config config = createConfig();
 		
@@ -92,44 +96,55 @@ public class LinkLaneTTTest2 {
 		events.addHandler(handler);
 		
 		for(int i = 1; i<= NUMBER_OF_CASES ; i++){
-			Scenario scenario = ScenarioUtils.createScenario(config); 		//since modifyNetwork acts in the assumption of Case1-network 
-			createAndModifyNetwork(scenario, i);							//and the plan needs to be modified dependent on the case	
-			createPopulation(scenario, i);						 			//these three lines need to be here and not above
+			
+			/*
+			 * since modifyNetwork acts in the assumption of Case1-network and
+			 * the plan needs to be modified dependent on the case these three
+			 * lines need to be here and not above
+			 */
+			Scenario scenario = ScenarioUtils.createScenario(config);
+			createAndModifyNetwork(scenario, i);
+			createPopulation(scenario, i);				 			
+			
 			QSim qsim = QSimUtils.createDefaultQSim(scenario, events);
 			qsim.run();
 			
-			//write events to OUTPUT_DIR
-			if(writeOutput){
-			NetworkWriter networkWriter = new NetworkWriter(scenario.getNetwork()) ;
-			networkWriter.write(OUTPUT_DIR + "CASE" + i + "_network");
-			EventWriterXML eventWriter = new EventWriterXML(OUTPUT_DIR+"CASE"+i+"_events");
-			for(Event e: eventslist){
-				eventWriter.handleEvent(e);
-			}
-			eventWriter.closeFile();
+			// write network and events
+			if (WRITE_OUTPUT) {
+				NetworkWriter networkWriter = new NetworkWriter(
+						scenario.getNetwork());
+				networkWriter.write(utils.getOutputDirectory() + "CASE" + i
+						+ "_network");
+				
+				EventWriterXML eventWriter = new EventWriterXML(
+						utils.getOutputDirectory() + "CASE" + i + "_events");
+				for (Event e : eventslist) {
+					eventWriter.handleEvent(e);
+				}
+				eventWriter.closeFile();
 			}		
 			System.out.println("-----------------------------------------------");
 			events.resetHandlers(0);
 		}
 		
 		handler.printResults();
-
 	}
 	
 	
-	/**create the basic Case1 Network as shown below and modify it dependent on @param caseNr. 
-	 * Only the second Link2 is to be modified.
-	 * Link2 has originally (in Case1) a freespeed of 75m/s and a length of 200m
-				
+	/**
+	 * Creates the basic Case1 network as shown below and modifies it 
+	 * dependent on the case number.
+	 *  
+	 * Only the second link is to be modified.
+	 * In Case1 it has a freespeed of 75m/s and a length of 200m		
 															
 	   Link1   Link2   Link3												
 	(1)=====(2)=====(3)=====(4)
 	[..200m..][.200m.][.200m.]	
-	 * @param caseNr 
-													
-
-	**/
-	static void createAndModifyNetwork(Scenario scenario, int caseNr){
+	
+	 * @param caseNr the case number 								
+	 */
+	private void createAndModifyNetwork(Scenario scenario, int caseNr){
 		
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
@@ -144,19 +159,20 @@ public class LinkLaneTTTest2 {
 		network.addNode(node3);
 		network.addNode(node4);
 		
-		Link link1 = factory.createLink((linkId1), node1, node2);		
+		Link link1 = factory.createLink(LINK_ID1, node1, node2);		
 		link1.setCapacity(3600);
 		link1.setLength(200);
 		link1.setFreespeed(200);
 		network.addLink(link1);
 		
-		Link link2 = factory.createLink((linkId2), node2, node3);		//normal 200m link with freespeed=75
+		// create a normal 200m link with freespeed 75 m/s
+		Link link2 = factory.createLink(LINK_ID2, node2, node3);		
 		link2.setCapacity(3600);
 		link2.setLength(200);
 		link2.setFreespeed(75);
 		network.addLink(link2);		
 	
-		Link link3 = factory.createLink((linkId3), node3 , node4);		
+		Link link3 = factory.createLink(LINK_ID3, node3 , node4);		
 		link3.setCapacity(3600);
 		link3.setLength(200);
 		link3.setFreespeed(200);
@@ -168,163 +184,175 @@ public class LinkLaneTTTest2 {
 		
 	}
 	
-	/**method to modify the CASE1 network 
-	 * @param caseNr: indicates the network version to be created 
-	 * NOTE: only Link2 is to be modified!
-	 * if you add cases, adapt the field NUMBER_OF_CASES
-	 **/
-	
-	static void modifyNetwork(Scenario scenario, int caseNr){
+	/**
+	 * Method to modify the CASE1 network. 
+	 * Note: only Link2 is to be modified.
+	 * 
+	 * If you add cases, adapt the field NUMBER_OF_CASES
+	 * 
+	 * @param caseNr indicates the network version to be created 
+	 * 
+	 */
+	private void modifyNetwork(Scenario scenario, int caseNr){
 		Network network = scenario.getNetwork();
-		Link link2 = network.getLinks().get(linkId2);
+		Link link2 = network.getLinks().get(LINK_ID2);
 		NetworkFactory factory = network.getFactory();
 		
-		
-		//set speed to 76 m/s
-		if(caseNr == 2){
+		switch (caseNr){
+		case 2:
+			//set speed to 76 m/s
 			link2.setFreespeed(76);
-		}
-
-		
-		/**
-		 * split Link2 in four lanes of 50m 
-																
-		   Link1  		Link2		 Link3	
-		   
-		   		 [50m][50m][50m][50m]							
-		(1)=====(2)===+===+===+===(3)=====(4)
-		[..200m..][......200m......][.200m.]	
-		**/
-		else if(caseNr == 3 || caseNr == 4){
+			break;
+		case 3:
+		case 4:
+			/*
+			 * split Link2 into four lanes of 50m 
+																	
+			   Link1  		Link2		 Link3	
+			   
+			   		   [50m][50m][50m][50m]							
+			  (1)=====(2)===+===+===+===(3)=====(4)
+			  [..200m..][......200m......][.200m.]	
+			 */
 			LaneDefinitions20 lanes = scenario.getLanes();
 			LaneDefinitionsFactory20 lfactory = lanes.getFactory();
 			Id<Lane> olId = Id.create("2.1", Lane.class);
 			Id<Lane> secondLaneId = Id.create("2.2", Lane.class);
 			Id<Lane> thirdLaneId = Id.create("2.3", Lane.class);
 			Id<Lane> fourthLaneId = Id.create("2.4", Lane.class);
-			LanesToLinkAssignment20 l2l = lfactory.createLanesToLinkAssignment(linkId2);
+			LanesToLinkAssignment20 l2l = lfactory.createLanesToLinkAssignment(LINK_ID2);
 			
 			//create 4 lanes following each other
-			Lane olLane = lfactory.createLane(olId);
-			olLane.setNumberOfRepresentedLanes(1);
-			olLane.setStartsAtMeterFromLinkEnd(200.0);
-			olLane.addToLaneId(secondLaneId);
-			l2l.addLane(olLane);
+			Lane lane = lfactory.createLane(olId);
+			lane.setNumberOfRepresentedLanes(1);
+			lane.setStartsAtMeterFromLinkEnd(200.0);
+			lane.addToLaneId(secondLaneId);
+			l2l.addLane(lane);
 			
-			Lane secondLane = lfactory.createLane(secondLaneId);
-			secondLane.setNumberOfRepresentedLanes(1);
-			secondLane.setStartsAtMeterFromLinkEnd(150.0);
-			secondLane.setAlignment(0);
-			secondLane.addToLaneId(thirdLaneId);
-			l2l.addLane(secondLane);
+			lane = lfactory.createLane(secondLaneId);
+			lane.setNumberOfRepresentedLanes(1);
+			lane.setStartsAtMeterFromLinkEnd(150.0);
+			lane.setAlignment(0);
+			lane.addToLaneId(thirdLaneId);
+			l2l.addLane(lane);
 			
-			Lane thirdLane = lfactory.createLane(thirdLaneId);
-			thirdLane.setNumberOfRepresentedLanes(1);
-			thirdLane.setStartsAtMeterFromLinkEnd(100.0);
-			thirdLane.setAlignment(0);
-			thirdLane.addToLaneId(fourthLaneId);
-			l2l.addLane(thirdLane);
+			lane = lfactory.createLane(thirdLaneId);
+			lane.setNumberOfRepresentedLanes(1);
+			lane.setStartsAtMeterFromLinkEnd(100.0);
+			lane.setAlignment(0);
+			lane.addToLaneId(fourthLaneId);
+			l2l.addLane(lane);
 			
-			Lane fourthLane = lfactory.createLane(fourthLaneId);
-			fourthLane.setNumberOfRepresentedLanes(1);
-			fourthLane.setStartsAtMeterFromLinkEnd(50.0);
-			fourthLane.setAlignment(0);
-			fourthLane.addToLinkId(linkId3);
-			l2l.addLane(fourthLane);
+			lane = lfactory.createLane(fourthLaneId);
+			lane.setNumberOfRepresentedLanes(1);
+			lane.setStartsAtMeterFromLinkEnd(50.0);
+			lane.setAlignment(0);
+			lane.addToLinkId(LINK_ID3);
+			l2l.addLane(lane);
 			
 			lanes.addLanesToLinkAssignment(l2l);			
 			
 			if(caseNr==4){
 				link2.setFreespeed(76);
 			}
-			if(writeOutput){
+			
+			if(WRITE_OUTPUT){
 				LaneDefinitionsWriter20 writer = new LaneDefinitionsWriter20(lanes);
-				writer.write(OUTPUT_DIR + "4lanes.xml");
+				writer.write(utils.getOutputDirectory() + "4lanes.xml");
 			}
-		}
-		
-
-		/**
-		 * split Link2 in one originalLane of 50m and two parallel lanes of 150m leading to Link3
-																		
-		   Link1     Link2    Link3   
-		   
-		   			  [150m]
-		   			  =====									
-		(1)=====(2)==+     (3)=====(4)
-					  =====
-		[..200m..][..200m..][.200m.]	
-		**/
-		else if(caseNr==5 || caseNr ==6){
-			LaneDefinitions20 lanes = scenario.getLanes();
-			LaneDefinitionsFactory20 lfactory = lanes.getFactory();
+			
+			break;
+		case 5:
+		case 6:
+			// TODO fuer diesen Test reicht eine (statt zwei parallele) 150m lanes. bitte anpassen
+			/*
+			 * split Link2 into one original lane of 50m and two parallel lanes of 150m 
+			 * leading to Link3
+																			
+			   Link1     Link2    Link3   
+			   
+			   			    [150m]
+			   			    =====									
+			  (1)=====(2)==+     (3)=====(4)
+						    =====
+			  [..200m..][..200m..][.200m.]	
+			 */
+			lanes = scenario.getLanes();
+			lfactory = lanes.getFactory();
 			Id<Lane> ol = Id.create("2.ol", Lane.class);
 			Id<Lane> topLane = Id.create("2.top", Lane.class);
 			Id<Lane> bottomLane = Id.create("2.btm", Lane.class);
-			LanesToLinkAssignment20 l2l = lfactory.createLanesToLinkAssignment(linkId2);
+			l2l = lfactory.createLanesToLinkAssignment(LINK_ID2);
 			
 			//create original lane leading to two parallel Lanes
-			Lane olLane = lfactory.createLane(ol);
-			olLane.setNumberOfRepresentedLanes(1);
-			olLane.setStartsAtMeterFromLinkEnd(200.0);
-			olLane.addToLaneId(topLane);
-			olLane.addToLaneId(bottomLane);
-			l2l.addLane(olLane);
+			lane = lfactory.createLane(ol);
+			lane.setNumberOfRepresentedLanes(1);
+			lane.setStartsAtMeterFromLinkEnd(200.0);
+			lane.addToLaneId(topLane);
+			lane.addToLaneId(bottomLane);
+			l2l.addLane(lane);
 			
 			//create two parallel lanes
-			Lane tLane = lfactory.createLane(topLane);
-			tLane.setNumberOfRepresentedLanes(1);
-			tLane.setStartsAtMeterFromLinkEnd(150.0);
-			tLane.setAlignment(1);
-			tLane.addToLinkId(linkId3);
-			l2l.addLane(tLane);
+			lane = lfactory.createLane(topLane);
+			lane.setNumberOfRepresentedLanes(1);
+			lane.setStartsAtMeterFromLinkEnd(150.0);
+			lane.setAlignment(1);
+			lane.addToLinkId(LINK_ID3);
+			l2l.addLane(lane);
 			
-			Lane bLane = lfactory.createLane(bottomLane);
-			bLane.setNumberOfRepresentedLanes(1);
-			bLane.setStartsAtMeterFromLinkEnd(150.0);
-			bLane.setAlignment(-1);
-			bLane.addToLinkId(linkId3);
-			l2l.addLane(bLane);
+			lane = lfactory.createLane(bottomLane);
+			lane.setNumberOfRepresentedLanes(1);
+			lane.setStartsAtMeterFromLinkEnd(150.0);
+			lane.setAlignment(-1);
+			lane.addToLinkId(LINK_ID3);
+			l2l.addLane(lane);
 			
 			lanes.addLanesToLinkAssignment(l2l);			
 			
 			if(caseNr==6){
 				link2.setFreespeed(76);
 			}
-			if(writeOutput){
+			
+			if(WRITE_OUTPUT){
 				LaneDefinitionsWriter20 writer = new LaneDefinitionsWriter20(lanes);
-				writer.write(OUTPUT_DIR + "topBottomlanes.xml");
+				writer.write(utils.getOutputDirectory() + "topBottomlanes.xml");
 			}
-		}
-		
-		
-		/**
-		 * split Link2 in one 50m Link and one 150m Link 
-																
-		   Link1  		Link2	 Link3	
-		   
-		   		 [.50m.][.150m.]							
-		(1)=====(2)===(3)=====(4)====(5)
-		[..200m..][..200m......][.200m.]	
-		**/
-		else if(caseNr==7 || caseNr ==8){
-			Node inbetweenNode = factory.createNode(Id.createNodeId("2.1"), scenario.createCoord(0, 250));
-			Link inbetweenLink = factory.createLink(Id.createLinkId("Link2.1"), scenario.getNetwork().getNodes().get(Id.createNodeId("2")), inbetweenNode);
+			
+			break;			
+		case 7:
+		case 8:
+			/*
+			 * split Link2 in one 50m link and one 150m link 
+																	
+			     Link1 Link2.1 Link 2  Link3	
+			   
+			   		   [.50m.][.150m.]							
+			  (1)=====(2)===(3)=====(4)====(5)
+			  [..200m..][..200m......][.200m.]	
+			 */
+			Node inbetweenNode = factory.createNode(Id.createNodeId("2.1"),
+					scenario.createCoord(0, 250));
+			Link inbetweenLink = factory.createLink(Id.createLinkId("Link2.1"),
+					scenario.getNetwork().getNodes().get(Id.createNodeId("2")),
+					inbetweenNode);
 			inbetweenLink.setLength(50);
 			link2.setFromNode(inbetweenNode);
-			if(caseNr == 7){
-				inbetweenLink.setFreespeed(75);
-			}
-			else if(caseNr==8){
+			inbetweenLink.setFreespeed(75);
+			// TODO was ist mit toNode von Link1 und length von Link2 ??
+			
+			if(caseNr==8){
 				inbetweenLink.setFreespeed(76);
 				link2.setFreespeed(76);
 			}
+			
 			network.addNode(inbetweenNode);			
 			network.addLink(inbetweenLink);
-		}		
+			
+			break;
+		}	
 	}
 	
-	static Config createConfig(){
+	private Config createConfig(){
 		Config config = ConfigUtils.createConfig();
 		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
@@ -336,13 +364,13 @@ public class LinkLaneTTTest2 {
 		return config;
 	}
 	
-	private static void createPopulation(Scenario scenario, int caseNr) {
+	private void createPopulation(Scenario scenario, int caseNr) {
 		
 		Population population = scenario.getPopulation();
         PopulationFactoryImpl popFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Activity workAct = popFactory.createActivityFromLinkId("work", linkId3);
+		Activity workAct = popFactory.createActivityFromLinkId("work", LINK_ID3);
 		
 		Leg leg = popFactory.createLeg("car");
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
@@ -350,15 +378,15 @@ public class LinkLaneTTTest2 {
 			linkIds.add(Id.createLinkId("Link2.1"));
 		}
 
-		linkIds.add(linkId2);
+		linkIds.add(LINK_ID2);
 		
-		NetworkRoute route = (NetworkRoute) routeFactory.createRoute(linkId1, linkId3);
-		route.setLinkIds(linkId1, linkIds, linkId3);
+		NetworkRoute route = (NetworkRoute) routeFactory.createRoute(LINK_ID1, LINK_ID3);
+		route.setLinkIds(LINK_ID1, linkIds, LINK_ID3);
 		leg.setRoute(route);
 		
 		Person person = popFactory.createPerson(Id.createPersonId("P"));
 		Plan plan = popFactory.createPlan();
-		Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", linkId1);
+		Activity homeActLink1_1 = popFactory.createActivityFromLinkId("home", LINK_ID1);
 		homeActLink1_1.setEndTime(100);
 		plan.addActivity(homeActLink1_1);
 		plan.addLeg(leg);

@@ -55,21 +55,26 @@ class LinkLaneTTTestEventHandler2 implements LinkEnterEventHandler,  LinkLeaveEv
 	
 	@Override
 	public void handleEvent(LaneEnterEvent event) {
-			this.laneEnterTimes.put(event.getLaneId(), event.getTime());
+		this.laneEnterTimes.put(event.getLaneId(), event.getTime());
 	}
 	
 	@Override
 	public void handleEvent(LaneLeaveEvent event) {
-			this.laneTravelTimes.put(event.getLaneId(), event.getTime() - this.laneEnterTimes.get(event.getLaneId()));
+		this.laneTravelTimes.put(event.getLaneId(), event.getTime() 
+				- this.laneEnterTimes.get(event.getLaneId()));
 		
 	}	
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if(!(event.getLinkId().equals(Id.create("Link1", Link.class)) ||  				//in some cases there are several links inbetween Link1 and Link3
+		// handle link enter events of links between 1 and 3
+		// (in some cases there are several links between Link1 and Link3)
+		if(!(event.getLinkId().equals(Id.create("Link1", Link.class)) ||  				
 				event.getLinkId().equals(Id.create("Link3", Link.class )))){
+			
 			this.linkEnterTimes.put(event.getLinkId(),event.getTime());
 		}
+		
 		if(event.getLinkId().equals(Id.createLinkId("Link3"))){
 			this.caselinkTravelTimes.put(caseNr, getTTofCase());
 			if(this.caseNr >=3 && this.caseNr <=6){
@@ -81,48 +86,52 @@ class LinkLaneTTTestEventHandler2 implements LinkEnterEventHandler,  LinkLeaveEv
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if(!(event.getLinkId().equals(Id.create("Link1",Link.class)) ||  				//in some cases there are several links inbetween Link1 and Link3
+		// handle link enter events of links between 1 and 3
+		// (in some cases there are several links between Link1 and Link3)
+		if(!(event.getLinkId().equals(Id.create("Link1",Link.class)) ||  				
 				event.getLinkId().equals(Id.create("Link3", Link.class )))){
-			this.linkTravelTimes.put(event.getLinkId() , event.getTime() - this.linkEnterTimes.get(event.getLinkId()));
+			
+			this.linkTravelTimes.put(event.getLinkId() , event.getTime() 
+					- this.linkEnterTimes.get(event.getLinkId()));
 		}
 	}
 
 	private double getTTofCase(){
-		if(this.caseNr >= 1 && this.caseNr <= 6){
-		return this.linkTravelTimes.get(Id.createLinkId("Link2"));
-		}
-		else if(this.caseNr == 7 || this.caseNr == 8){
-			return this.linkTravelTimes.get(Id.createLinkId("Link2")) + this.linkTravelTimes.get(Id.createLinkId("Link2.1")); 
+		if (this.caseNr >= 1 && this.caseNr <= 6) {
+			return this.linkTravelTimes.get(Id.createLinkId("Link2"));
+		} else if (this.caseNr == 7 || this.caseNr == 8) {
+			return this.linkTravelTimes.get(Id.createLinkId("Link2"))
+					+ this.linkTravelTimes.get(Id.createLinkId("Link2.1"));
 		}
 		return -1;
 	}
 	
 	public void printResults(){
 		String laneString;
-		System.out.println("\n-----PRINTING RESULTS-----");
+		System.out.println("\n----- RESULTS -----");
 		
 		System.out.println("\n °°NOTE: See quellcode of LinkLaneTTTest2 for further "
 				+ "information and graphical view of the link configurations°°\n");
 		
-				System.out.println("normal link of 200 m");
-				System.out.println("TT when freespeed is 75:\t" + this.caselinkTravelTimes.get(1));
-				System.out.println("TT when freespeed is 76:\t" + this.caselinkTravelTimes.get(2) + "\n");
-				
-				System.out.println("separated in one 50m link and one 150m link");
-				System.out.println("TT when freespeed is 75:\t" + this.caselinkTravelTimes.get(7));
-				System.out.println("TT when freespeed is 76:\t" + this.caselinkTravelTimes.get(8) + "\n");
-				
-				System.out.println("1 link separated in 1 Lane of 50m and 2 parallel lanes of 150m");
-				laneString =("\t Lane Travel Times:" + this.caseLaneTravelTimes.get(5).toString()); 
-				System.out.println("TT when freespeed is 75:\t" + this.caselinkTravelTimes.get(5) + laneString);
-				laneString =("\t Lane Travel Times:" + this.caseLaneTravelTimes.get(6).toString() + "\n"); 
-				System.out.println("TT when freespeed is 76:\t" + this.caselinkTravelTimes.get(6) + laneString);
+		System.out.println("normal link of 200 m");
+		System.out.println("TT when freespeed is 75:\t" + this.caselinkTravelTimes.get(1));
+		System.out.println("TT when freespeed is 76:\t"	+ this.caselinkTravelTimes.get(2) + "\n");
 
-				System.out.println("1 link separated in 4 lanes of 50m");
-				laneString =("\t Lane Travel Times:" + this.caseLaneTravelTimes.get(3).toString()); 
-				System.out.println("TT when freespeed is 75:\t" + this.caselinkTravelTimes.get(3) + laneString);
-				laneString =("\t Lane Travel Times:" + this.caseLaneTravelTimes.get(4).toString() + "\n"); 
-				System.out.println("TT when freespeed is 76:\t" + this.caselinkTravelTimes.get(4) + laneString);
+		System.out.println("separated in one 50m link and one 150m link");
+		System.out.println("TT when freespeed is 75:\t"	+ this.caselinkTravelTimes.get(7));
+		System.out.println("TT when freespeed is 76:\t"	+ this.caselinkTravelTimes.get(8) + "\n");
+
+		System.out.println("200m link separated in 1 Lane of 50m and 2 parallel lanes of 150m");
+		laneString = ("\t Lane Travel Times:" + this.caseLaneTravelTimes.get(5).toString());
+		System.out.println("TT when freespeed is 75:\t" + this.caselinkTravelTimes.get(5) + laneString);
+		laneString = ("\t Lane Travel Times:" + this.caseLaneTravelTimes.get(6).toString() + "\n");
+		System.out.println("TT when freespeed is 76:\t"	+ this.caselinkTravelTimes.get(6) + laneString);
+
+		System.out.println("200m link separated in 4 lanes of 50m");
+		laneString = ("\t Lane Travel Times:" + this.caseLaneTravelTimes.get(3).toString());
+		System.out.println("TT when freespeed is 75:\t" + this.caselinkTravelTimes.get(3) + laneString);
+		laneString = ("\t Lane Travel Times:" + this.caseLaneTravelTimes.get(4).toString() + "\n");
+		System.out.println("TT when freespeed is 76:\t" + this.caselinkTravelTimes.get(4) + laneString);
 	}
 }
 	
