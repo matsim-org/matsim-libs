@@ -36,6 +36,8 @@ public class ScenarioLoaderImplTest {
 
 	@Test
 	public void testLoadScenario_loadTransitData() {
+		Assert.fail("scenario loader instantiates container when transit is switched on; not the planned use") ;
+		
 		Scenario scenario = ScenarioUtils.createScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
 		Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
 		Assert.assertEquals(0, scenario.getTransitSchedule().getFacilities().size());

@@ -15,11 +15,8 @@
 		<param name="inputPlansFile" value="test/scenarios/equil/plans1.xml" />
 	</module>
 
-	<module name="scenario">
-		<param name="useTransit" value="true" />
-	</module>
-	
 	<module name="transit">
+		<param name="useTransit" value="true" />
 		<param name="transitScheduleFile" value="test/input/org/matsim/core/scenario/ScenarioLoaderImplTest/transitSchedule.xml" />
 		<param name="vehiclesFile" value="test/input/org/matsim/core/scenario/ScenarioLoaderImplTest/transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
