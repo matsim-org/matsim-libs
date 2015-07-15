@@ -206,8 +206,25 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 			activityDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getPerforming_utils_hr();
 		}
 		
-		// Calculate the agent's trip delay disutility (could be done similar to the activity delay disutility).
-		double tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1); // TODO: make this mode dependent!
+		// Calculate the agent's trip delay disutility (TODO: could be done similar to the activity delay disutility).
+		double tripDelayDisutilityOneSec = 0.;
+		
+		if (this.personId2currentTripMode.get(personId).equals("car")) {
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTraveling_utils_hr() * (-1);
+			
+		} else if (this.personId2currentTripMode.get(personId).equals("walk")) {
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingWalk_utils_hr() * (-1);
+
+		} else if (this.personId2currentTripMode.get(personId).equals("pt")) {
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingPt_utils_hr() * (-1);
+
+		} else if (this.personId2currentTripMode.get(personId).equals("bike")) {
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingBike_utils_hr() * (-1);
+			
+		} else {
+			tripDelayDisutilityOneSec = (1.0 / 3600.) * this.scenario.getConfig().planCalcScore().getTravelingOther_utils_hr() * (-1);
+		}
+		
 		// Translate the disutility into monetary units.
 		double delayCostPerSec_usingActivityDelayOneSec = (activityDelayDisutilityOneSec + tripDelayDisutilityOneSec) / this.scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
 
@@ -247,6 +264,32 @@ public class VTTSHandler implements ActivityStartEventHandler, ActivityEndEventH
 				for (Integer tripNr : this.personId2TripNr2VTTSh.get(personId).keySet()){
 					bw.write(personId + ";" + tripNr + ";" + this.personId2TripNr2Mode.get(personId).get(tripNr) + ";" + this.personId2TripNr2VTTSh.get(personId).get(tripNr));
 					bw.newLine();		
+				}
+			}
+			
+			bw.close();
+			log.info("Output written to " + fileName);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void printCarVTTS(String fileName) {
+		
+		File file = new File(fileName);
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write("person Id;TripNr;Mode;VTTS (money/hour)");
+			bw.newLine();
+			
+			for (Id<Person> personId : this.personId2TripNr2VTTSh.keySet()){
+				for (Integer tripNr : this.personId2TripNr2VTTSh.get(personId).keySet()){
+					if (this.personId2TripNr2Mode.get(personId).get(tripNr).equals("car")) {
+						bw.write(personId + ";" + tripNr + ";" + this.personId2TripNr2Mode.get(personId).get(tripNr) + ";" + this.personId2TripNr2VTTSh.get(personId).get(tripNr));
+						bw.newLine();			
+					}
 				}
 			}
 			

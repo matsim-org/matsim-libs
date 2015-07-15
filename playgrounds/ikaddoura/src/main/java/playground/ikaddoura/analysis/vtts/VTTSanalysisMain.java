@@ -46,7 +46,7 @@ public class VTTSanalysisMain {
 			log.info("run directory: " + runDirectory);
 			
 		} else {
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/agentBasedFlowBasedInternalization/output/baseCaseCtd_8_250_flow0.75/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/baseCase/";
 		}
 		
 		VTTSanalysisMain analysis = new VTTSanalysisMain();
@@ -55,12 +55,15 @@ public class VTTSanalysisMain {
 
 	private void run() {
 		
-		String configFile = runDirectory + "output_config.xml.gz";
+//		String configFile = runDirectory + "output_config.xml.gz";
+		String configFile = runDirectory + "output_config_withoutUnknownParameters.xml";
+
 		Config config = ConfigUtils.loadConfig(configFile);	
 		int iteration = config.controler().getLastIteration();
 				
 		String populationFile = null;
-		String networkFile = runDirectory + "output_network.xml.gz";
+		String networkFile = null;
+//		String networkFile = runDirectory + "output_network.xml.gz";
 		
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
@@ -81,6 +84,7 @@ public class VTTSanalysisMain {
 		vttsHandler.computeFinalVTTS();
 				
 		vttsHandler.printVTTS(runDirectory + "ITERS/it." + iteration + "/" + iteration + ".VTTS.csv");
+		vttsHandler.printCarVTTS(runDirectory + "ITERS/it." + iteration + "/" + iteration + ".VTTS_car.csv");
 		vttsHandler.printAvgVTTSperPerson(runDirectory + "ITERS/it." + iteration + "/" + iteration + ".avgVTTS.csv"); 
 	}
 			 
