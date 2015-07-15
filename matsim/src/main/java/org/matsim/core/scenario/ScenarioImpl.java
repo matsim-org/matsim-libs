@@ -48,8 +48,6 @@ import org.matsim.vehicles.Vehicles;
  * @author mrieser
  */
 public final class ScenarioImpl implements Scenario {
-	// setting this to final lead to 97 compile errors (many of them IMO multiple error messages of the same problem). kai, feb'14
-
 	private static final Logger log = Logger.getLogger(ScenarioImpl.class);
 
 	private boolean locked = false ;

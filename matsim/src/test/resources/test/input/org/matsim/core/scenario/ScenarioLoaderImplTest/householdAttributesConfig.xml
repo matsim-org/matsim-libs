@@ -21,10 +21,6 @@
 		<param name="inputPlansFile" value="test/scenarios/equil/plans1.xml" />
 	</module-->
 
-	<module name="scenario">
-		<param name="useTransit" value="false" />
-	</module>
-
 	<module name="controler">
 		<param name="outputDirectory" value="./output/equil" />
 		<param name="firstIteration" value="0" />

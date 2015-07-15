@@ -16,13 +16,10 @@
 	</module>
 
 	<module name="transit">
+		<param name="useTransit" value="true" />
 		<param name="transitScheduleFile" value="test/scenarios/pt-simple-lineswitch/transitschedule.xml" />
 		<param name="vehiclesFile" value="test/scenarios/pt-simple-lineswitch/transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
-	</module>
-
-	<module name="scenario">
-		<param name="useTransit" value="true" />
 	</module>
 
 	<module name="TimeAllocationMutator">
