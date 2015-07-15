@@ -187,7 +187,12 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     	
     } // End Class LegScoring
     
-    //TODO: Verdoppeln und einmal mit und einmal ohne Korrektur anbieten. (Ohne, wenn MatsimStategy anpassungen erlaubt)
+    /**
+     * Bewertet die Aktivität und berücksichtigt dabei die Wartezeiten.
+     * Der Kostensatz ist einheitlich mit 0.008 EUR/s festgelegt. 
+     * @author kt
+     *
+     */
     static class ActivityScoring implements SumScoringFunction.ActivityScoring {
 
     	private static Logger log = Logger.getLogger(ActivityScoring.class);
@@ -261,6 +266,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     /**
      * 
      * Bestimmt die Kosten für die Aktivitäten des Carriers.
+     * Der Kostensatz ist einheitlich mit 0.008 EUR/s festgelegt. 
      * 
      * Korrektur erfolgt für die Wartezeit vor dem ersten Service. Diese wird aus den Kosten rausgerechnet
      * Hintergrund: Fzg fahren in der Simulation mit Depotöffnung los und warten dann vor dem Service
