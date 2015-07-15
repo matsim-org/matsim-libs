@@ -27,7 +27,7 @@ public interface TaxiTask
 {
     static enum TaxiTaskType
     {
-        DRIVE, STAY, //not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
+        DRIVE_EMPTY, STAY, //not directly related to any customer (although may be related to serving a customer; e.g. a pickup drive)
         PICKUP, DRIVE_WITH_PASSENGER, DROPOFF;//serving a customer (TaxiTaskWithRequest)
     }
 

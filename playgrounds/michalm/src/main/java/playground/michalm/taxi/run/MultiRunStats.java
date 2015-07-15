@@ -14,13 +14,8 @@ public class MultiRunStats
     private final SummaryStatistics pc95PassengerWaitTime = new SummaryStatistics();
     private final SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
 
-    private final SummaryStatistics pickupDriveTime = new SummaryStatistics();
-    private final SummaryStatistics pc95PickupDriveTime = new SummaryStatistics();
-    private final SummaryStatistics maxPickupDriveTime = new SummaryStatistics();
-
-    private final SummaryStatistics otherDriveTime = new SummaryStatistics();
     private final SummaryStatistics driveWithPassengerTime = new SummaryStatistics();
-    private final SummaryStatistics pickupTime = new SummaryStatistics();
+    private final SummaryStatistics driveEmptyRatio = new SummaryStatistics();
 
     private final SummaryStatistics computationTime = new SummaryStatistics();
 
@@ -31,28 +26,31 @@ public class MultiRunStats
         pc95PassengerWaitTime.addValue(singleRunStats.passengerWaitTimes.getPercentile(95));
         maxPassengerWaitTime.addValue(singleRunStats.passengerWaitTimes.getMax());
 
-        pickupDriveTime.addValue(singleRunStats.pickupDriveTimes.getMean());
-        pc95PickupDriveTime.addValue(singleRunStats.pickupDriveTimes.getPercentile(95));
-        maxPickupDriveTime.addValue(singleRunStats.pickupDriveTimes.getMax());
-
-        otherDriveTime.addValue(singleRunStats.otherDriveTimes.getMean());
-        driveWithPassengerTime.addValue(singleRunStats.driveWithPassengerTimes.getMean());
-        pickupTime.addValue(singleRunStats.pickupTimes.getMean());
+        driveWithPassengerTime.addValue(singleRunStats.getDriveWithPassengerTimes().getMean());
+        driveEmptyRatio.addValue(singleRunStats.getDriveEmptyRatio());
 
         computationTime.addValue(0.001 * (computationTimeInMillis));
     }
 
 
     static final String HEADER = "cfg\tn\tm\t"//
-            + "PW\tPWp95\tPWmax\t"//
-            + "PD\tPDp95\tPDmax\t"//
-            + "otherD\tDwP\tP\t"//
+            + "PassWait\t"//
+            + "PassWait_p95\t"//
+            + "PassWait_max\t"//
+            + "PassDrive\t"//
+            + "EmptyRatio\t"//
             + "Comp";
 
 
     void printStats(PrintWriter pw, String cfg, VrpData data)
     {
-        pw.printf("%20s\t%d\t%d\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",//
+        pw.printf("%20s\t%d\t%d\t"//
+                + "%.0f\t"//
+                + "%.0f\t"//
+                + "%.0f\t"//
+                + "%.0f\t"//
+                + "%.2f\t"//
+                + "%.1f\n",//
                 cfg,//
                 data.getRequests().size(),//
                 data.getVehicles().size(),//
@@ -61,13 +59,8 @@ public class MultiRunStats
                 pc95PassengerWaitTime.getMean(), //
                 maxPassengerWaitTime.getMean(),//
                 //
-                pickupDriveTime.getMean(),//
-                pc95PickupDriveTime.getMean(), //
-                maxPickupDriveTime.getMean(),//
-                //
-                otherDriveTime.getMean(),//
                 driveWithPassengerTime.getMean(),//
-                pickupTime.getMean(),//
+                driveEmptyRatio.getMean() * 100,//in [%]
                 //
                 computationTime.getMean());
     }

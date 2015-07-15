@@ -35,7 +35,7 @@ public class NPersonsActionCreator extends TaxiActionCreator{
         TaxiTask tt = (TaxiTask)task;
 
         switch (tt.getTaxiTaskType()) {
-            case DRIVE:
+            case DRIVE_EMPTY:
             case DRIVE_WITH_PASSENGER:
                 return legCreator.createLeg((DriveTask)task);
 

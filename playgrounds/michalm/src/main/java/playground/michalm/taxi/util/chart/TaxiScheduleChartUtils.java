@@ -46,7 +46,7 @@ public class TaxiScheduleChartUtils
     private static final Color DRIVE_WITH_PASSENGER_COLOR = new Color(200, 0, 0);
     private static final Color PICKUP_DROPOFF_COLOR = new Color(0, 0, 200);
 
-    private static final Color DRIVE_COLOR = new Color(100, 0, 0);
+    private static final Color DRIVE_EMPTY_COLOR = new Color(100, 0, 0);
     private static final Color STAY_COLOR = new Color(0, 0, 100);
 
     public static final PaintSelector<TaxiTask> TAXI_PAINT_SELECTOR = new PaintSelector<TaxiTask>() {
@@ -60,8 +60,8 @@ public class TaxiScheduleChartUtils
                 case DRIVE_WITH_PASSENGER:
                     return DRIVE_WITH_PASSENGER_COLOR;
 
-                case DRIVE:
-                    return DRIVE_COLOR;
+                case DRIVE_EMPTY:
+                    return DRIVE_EMPTY_COLOR;
 
                 case STAY:
                     return STAY_COLOR;

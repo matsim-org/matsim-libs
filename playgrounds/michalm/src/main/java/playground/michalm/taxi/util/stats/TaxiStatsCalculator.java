@@ -19,6 +19,8 @@
 
 package playground.michalm.taxi.util.stats;
 
+import java.util.EnumMap;
+
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
@@ -55,72 +57,58 @@ public class TaxiStatsCalculator
             return;// do not evaluate - the vehicle is unused
         }
 
-        if (schedule.getTaskCount() < 1) {
-            throw new RuntimeException("count=0 ==> must be unplanned!");
-        }
-
         for (TaxiTask t : schedule.getTasks()) {
-            double time = t.getEndTime() - t.getBeginTime();
+            stats.addTime(t);
 
-            switch (t.getTaxiTaskType()) {
-                case DRIVE:
-                    TaxiTaskType nextTaskType = TaxiSchedules.getNextTaxiTask(t).getTaxiTaskType();
-                    (nextTaskType == TaxiTaskType.PICKUP ? //
-                            stats.pickupDriveTimes : stats.otherDriveTimes).addValue(time);
-
-                    break;
-
-                case DRIVE_WITH_PASSENGER:
-                    stats.driveWithPassengerTimes.addValue(time);
-                    break;
-
-                case PICKUP:
-                    stats.pickupTimes.addValue(time);
-
-                    Request req = ((TaxiPickupTask)t).getRequest();
-                    double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
-                    stats.passengerWaitTimes.addValue(waitTime);
-
-                    break;
-
-                case DROPOFF:
-                    stats.dropoffTimes.addValue(time);
-                    break;
-
-                case STAY:
-                    stats.stayTimes.addValue(time);
+            if (t.getTaxiTaskType() == TaxiTaskType.PICKUP) {
+                Request req = ((TaxiPickupTask)t).getRequest();
+                double waitTime = Math.max(t.getBeginTime() - req.getT0(), 0);
+                stats.passengerWaitTimes.addValue(waitTime);
             }
         }
-
-        stats.taxiOverTimes.addValue(schedule.getEndTime() - schedule.getVehicle().getT1());
     }
 
 
     public static class TaxiStats
     {
         public final DescriptiveStatistics passengerWaitTimes = new DescriptiveStatistics();
-        public final DescriptiveStatistics pickupDriveTimes = new DescriptiveStatistics();
-        public final DescriptiveStatistics otherDriveTimes = new DescriptiveStatistics();
-        public final DescriptiveStatistics driveWithPassengerTimes = new DescriptiveStatistics();
-        public final DescriptiveStatistics pickupTimes = new DescriptiveStatistics();
-        public final DescriptiveStatistics dropoffTimes = new DescriptiveStatistics();
-        public final DescriptiveStatistics stayTimes = new DescriptiveStatistics();
-        public final DescriptiveStatistics taxiOverTimes = new DescriptiveStatistics();
+        public final EnumMap<TaxiTaskType, DescriptiveStatistics> timesByTaskType;
 
-        public static final String HEADER = "PassengerWaitT\t" //
-                + "MaxPassengerWaitT"//
-                //
-                + "PickupDriveT\t" //
-                + "MaxPickupDriveT\t" //
-                //
-                + "OtherDriveT" //
-                + "DriveWithPassengerT\t"//
-                //
-                + "PickupT\t" //
-                + "DropoffT\t" //
-                + "StayT\t" //
-                //
-                + "OverT";
+
+        public TaxiStats()
+        {
+            timesByTaskType = new EnumMap<>(TaxiTaskType.class);
+            for (TaxiTaskType t : TaxiTaskType.values()) {
+                timesByTaskType.put(t, new DescriptiveStatistics());
+            }
+        }
+
+
+        public void addTime(TaxiTask task)
+        {
+            double time = task.getEndTime() - task.getBeginTime();
+            timesByTaskType.get(task.getTaxiTaskType()).addValue(time);
+        }
+
+
+        public double getDriveEmptyRatio()
+        {
+            double empty = timesByTaskType.get(TaxiTaskType.DRIVE_EMPTY).getSum();//not mean!
+            double withPassenger = timesByTaskType.get(TaxiTaskType.DRIVE_WITH_PASSENGER).getSum();//not mean!
+            return empty / (empty + withPassenger);
+        }
+        
+        
+        public DescriptiveStatistics getDriveWithPassengerTimes()
+        {
+            return timesByTaskType.get(TaxiTaskType.DRIVE_WITH_PASSENGER);
+        }
+
+
+        public static final String HEADER = "WaitT\t" //
+                + "MaxWaitT"//
+                + "WithPassengerT"//
+                + "%EmptyDrive\t";
 
 
         @Override
@@ -129,18 +117,8 @@ public class TaxiStatsCalculator
             return new StringBuilder()//
                     .append(passengerWaitTimes.getMean()).append('\t') //
                     .append(passengerWaitTimes.getMax()).append('\t') //
-                    //
-                    .append(passengerWaitTimes.getMean()).append('\t') //
-                    .append(passengerWaitTimes.getMax()).append('\t') //
-                    //
-                    .append(otherDriveTimes.getMean()).append('\t') //
-                    .append(driveWithPassengerTimes.getMean()).append('\t') //
-                    //
-                    .append(pickupTimes.getMean()).append('\t') //
-                    .append(dropoffTimes.getMean()).append('\t') //
-                    .append(stayTimes.getMean()).append('\t') //
-                    //
-                    .append(taxiOverTimes.getMean()).append('\t')//
+                    .append(getDriveWithPassengerTimes().getMean()).append('\t') //
+                    .append(getDriveEmptyRatio()).append('\t') //
                     .toString();
         }
     }

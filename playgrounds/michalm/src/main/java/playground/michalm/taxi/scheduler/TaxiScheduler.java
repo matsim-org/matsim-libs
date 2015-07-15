@@ -144,7 +144,7 @@ public class TaxiScheduler
 
         TaxiTask currentTask = schedule.getCurrentTask();
         if (!Schedules.isLastTask(currentTask)
-                || currentTask.getTaxiTaskType() != TaxiTaskType.DRIVE) {
+                || currentTask.getTaxiTaskType() != TaxiTaskType.DRIVE_EMPTY) {
             return null;
         }
 
@@ -176,7 +176,7 @@ public class TaxiScheduler
         Schedule<TaxiTask> bestSched = TaxiSchedules.asTaxiSchedule(best.vehicle.getSchedule());
         TaxiTask lastTask = Schedules.getLastTask(bestSched);
 
-        if (lastTask.getTaxiTaskType() == TaxiTaskType.DRIVE) {
+        if (lastTask.getTaxiTaskType() == TaxiTaskType.DRIVE_EMPTY) {
             divertDriveToRequest((TaxiDriveTask)lastTask, best);
         }
         else if (lastTask.getTaxiTaskType() == TaxiTaskType.STAY) {
@@ -385,7 +385,7 @@ public class TaxiScheduler
                     break;
                 }
 
-                case DRIVE:
+                case DRIVE_EMPTY:
                 case DRIVE_WITH_PASSENGER: {
                     // cannot be shortened/lengthen, therefore must be moved forward/backward
                     task.setBeginTime(t);
@@ -472,7 +472,7 @@ public class TaxiScheduler
                         schedule.addTask(new TaxiStayTask(tBegin, tEnd, link));
                         return;
 
-                    case DRIVE:
+                    case DRIVE_EMPTY:
                         if (!params.vehicleDiversion) {
                             throw new RuntimeException("Currently won't happen");
                         }
@@ -509,7 +509,7 @@ public class TaxiScheduler
             case DRIVE_WITH_PASSENGER:
                 return 1;
 
-            case DRIVE:
+            case DRIVE_EMPTY:
                 if (params.vehicleDiversion) {
                     return 0;
                 }

@@ -20,7 +20,10 @@
 package playground.michalm.taxi.run;
 
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.*;
+
+import org.apache.commons.lang3.StringUtils;
 
 
 public class ResultsPostProcessor
@@ -38,6 +41,10 @@ public class ResultsPostProcessor
     }
 
 
+    /**
+     * represents a single row in a file created by MultiRunStats all stats in such a file have the
+     * same values for 'n' and 'm'
+     */
     private static class Stats
     {
         private final String cfg;
@@ -131,10 +138,10 @@ public class ResultsPostProcessor
     {
         String field = statsColumns[column];
         try (PrintWriter pw = new PrintWriter(file + "_" + field)) {
-            StringBuffer lineId = new StringBuffer(field);
-            StringBuffer lineN = new StringBuffer("n");
-            StringBuffer lineM = new StringBuffer("m");
-            StringBuffer lineRatio = new StringBuffer("ratio");
+            StringBuffer lineId = new StringBuffer(StringUtils.leftPad(field, 20));
+            StringBuffer lineN = new StringBuffer(StringUtils.leftPad("n", 20));
+            StringBuffer lineM = new StringBuffer(StringUtils.leftPad("m", 20));
+            StringBuffer lineRatio = new StringBuffer(StringUtils.leftPad("ratio", 20));
 
             for (Experiment e : experiments) {
                 if (e == EMPTY_COLUMN) {
@@ -159,10 +166,11 @@ public class ResultsPostProcessor
             pw.println(lineRatio.toString());
 
             int statsCount = experiments[0].stats.size();
+            DecimalFormat format = new DecimalFormat("#.##");
 
             for (int i = 0; i < statsCount; i++) {
                 String cfg0 = experiments[0].stats.get(i).cfg;
-                pw.printf("%s", cfg0);
+                pw.printf("%20s", cfg0);
 
                 for (Experiment e : experiments) {
                     if (e == EMPTY_COLUMN) {
@@ -175,7 +183,7 @@ public class ResultsPostProcessor
                             throw new RuntimeException();
                         }
 
-                        pw.printf("\t%f", s.values[column]);
+                        pw.print("\t" + format.format(s.values[column]));
                     }
                 }
 

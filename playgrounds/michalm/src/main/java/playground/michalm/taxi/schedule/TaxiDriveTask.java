@@ -36,7 +36,7 @@ public class TaxiDriveTask
     @Override
     public TaxiTaskType getTaxiTaskType()
     {
-        return TaxiTaskType.DRIVE;
+        return TaxiTaskType.DRIVE_EMPTY;
     }
 
 
