@@ -54,18 +54,21 @@ public class FacilityLocationAnalyzer {
 		MatsimFacilitiesReader reader = new MatsimFacilitiesReader(scenario);
 		reader.readFile(facilitiesFile);
 
+		initFeatureType(attributeLabel);
+		List <SimpleFeature> features = new ArrayList <SimpleFeature>();
+
 		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			facilityCoords.put(facility.getId(), facility.getCoord());
 			
 //			System.out.println("facility.getActivityOptions().toString() = " + facility.getActivityOptions().toString());
 						
 			for (ActivityOption activityOption : facility.getActivityOptions().values()) {
-				facilityTypes.put(facility.getId(), activityOption.getType());
+				Object[] attributes = new Object[]{facility.getId(), activityOption.getType()};
+				SimpleFeature feature = pointFeatureFactory.createPoint( facility.getCoord(), attributes, null ) ;
+				features.add(feature);
 			}
 		}
 
-		initFeatureType(attributeLabel);
-		Collection <SimpleFeature> features = createFeatures(facilityCoords, facilityTypes);
 		ShapeFileWriter.writeGeometries(features, outputFileName);
 	}
 	
@@ -77,18 +80,5 @@ public class FacilityLocationAnalyzer {
 		addAttribute(attributeLabel[0], String.class).
 		addAttribute(attributeLabel[1], String.class).
 		create();
-	}	
-	
-	
-	private static <T> Collection <SimpleFeature> createFeatures(Map<Id<T>,Coord> facilityCoords, Map<Id<T>,String> facilityTypes) {
-		List <SimpleFeature> features = new ArrayList <SimpleFeature>();
-		for (Id<?> id : facilityCoords.keySet()){
-			Coord coord = facilityCoords.get(id);
-			String type = facilityTypes.get(id);
-			Object[] attributes = new Object[]{id, type};
-			SimpleFeature feature = pointFeatureFactory.createPoint(coord, attributes, null);
-			features.add(feature);
-		}
-		return features;
 	}	
 }
