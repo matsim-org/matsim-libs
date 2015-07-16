@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.replanning;
+package org.matsim.integration.always;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -58,43 +58,39 @@ public class ReRoutingTest extends MatsimTestCase {
 		return scenario;
 	}
 	
-//	public void testReRoutingDijkstra() {
-//		Scenario scenario = this.loadScenario();
-//		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
-//		Controler controler = new Controler(scenario);
-//        controler.getConfig().controler().setCreateGraphs(false);
-//        controler.setDumpDataAtEnd(false);
-//		controler.run();
-//		this.evaluate();
-//	}
-//
-//	public void testReRoutingFastDijkstra() {
-//		Scenario scenario = this.loadScenario();
-//		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
-//		Controler controler = new Controler(scenario);
-//        controler.getConfig().controler().setCreateGraphs(false);
-//        controler.setDumpDataAtEnd(false);
-//		controler.run();
-//		this.evaluate();
-//	}
-//	
-//	/**
-//	 * This test seems to have race conditions somewhere (i.e. it fails intermittently without code changes). kai, aug'13
-//	 */
-//	public void testReRoutingAStarLandmarks() {
-//		Scenario scenario = this.loadScenario();
-//		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
-//		Controler controler = new Controler(scenario);
-//        controler.getConfig().controler().setCreateGraphs(false);
-//        controler.setDumpDataAtEnd(false);
-//		controler.run();
-//		this.evaluate();
-//	}
+	public void testReRoutingDijkstra() {
+		Scenario scenario = this.loadScenario();
+		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
+		Controler controler = new Controler(scenario);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
+		controler.run();
+		this.evaluate();
+	}
 
-	// all 4 of these tests are now ALSO in daily integration.  Thus removing the threee slowest tests from the continuous integration.
-	// might consider to move them to "common" (i.e. run them after _every_ integration).
-	// kai, jul'15
+	public void testReRoutingFastDijkstra() {
+		Scenario scenario = this.loadScenario();
+		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
+		Controler controler = new Controler(scenario);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
+		controler.run();
+		this.evaluate();
+	}
 	
+	/**
+	 * This test seems to have race conditions somewhere (i.e. it fails intermittently without code changes). kai, aug'13
+	 */
+	public void testReRoutingAStarLandmarks() {
+		Scenario scenario = this.loadScenario();
+		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
+		Controler controler = new Controler(scenario);
+        controler.getConfig().controler().setCreateGraphs(false);
+        controler.setDumpDataAtEnd(false);
+		controler.run();
+		this.evaluate();
+	}
+
 	public void testReRoutingFastAStarLandmarks() {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);

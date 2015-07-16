@@ -68,9 +68,9 @@ public class ScenarioImplTest {
 	public void testCreateOnlyOneSchedule() {
 		final ScenarioImpl sc = new ScenarioImpl( ConfigUtils.createConfig() );
 
-		final boolean created = sc.createTransitSchedule();
+		final boolean created = sc.createTransitScheduleContainer();
 		final TransitSchedule schedule = sc.getTransitSchedule();
-		final boolean recreated = sc.createTransitSchedule();
+		final boolean recreated = sc.createTransitScheduleContainer();
 
 		Assert.assertSame(
 				"schedule re-created!",

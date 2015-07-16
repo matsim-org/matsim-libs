@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -45,6 +46,7 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -403,9 +405,11 @@ public class QSimIntegrationTest {
 		public final ScenarioImpl scenario;
 		public Fixture() throws SAXException, ParserConfigurationException, IOException {
 			// setup: config
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			this.scenario.getConfig().transit().setUseTransit(true);
-			this.scenario.getConfig().qsim().setEndTime(8.0*3600);
+			final Config config = ConfigUtils.createConfig();
+			config.transit().setUseTransit(true);	
+			config.qsim().setEndTime(8.0*3600);
+
+			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 			// setup: network
 			Network network = this.scenario.getNetwork();

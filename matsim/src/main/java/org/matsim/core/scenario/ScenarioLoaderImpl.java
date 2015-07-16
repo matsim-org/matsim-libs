@@ -138,10 +138,8 @@ public class ScenarioLoaderImpl {
 		if (this.config.scenario().isUseHouseholds()) {
 			this.loadHouseholds();
 		}
-		if (this.config.transit().isUseTransit()) {
-			this.loadTransit();
-			this.loadTransitVehicles();
-		}
+		this.loadTransit();
+		this.loadTransitVehicles();
 		if (this.config.vehicles().getVehiclesFile()!=null ) {
 			this.loadVehicles() ;
 		}
@@ -255,13 +253,20 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadTransit() throws UncheckedIOException {
-		new TransitScheduleReader(this.scenario).readFile(this.config.transit().getTransitScheduleFile());
-		if ((this.config.transit() != null) && (this.config.transit().getTransitLinesAttributesFile() != null)) {
+		final String transitScheduleFile = this.config.transit().getTransitScheduleFile();
+		if ( transitScheduleFile != null ) {
+			this.scenario.createTransitScheduleContainer() ;
+			new TransitScheduleReader(this.scenario).readFile(transitScheduleFile);
+		}
+		else {
+			log.info("no transit schedule file set in config, not loading any transit schedule");
+		}
+		if ( this.config.transit().getTransitLinesAttributesFile() != null ) {
 			String transitLinesAttributesFileName = this.config.transit().getTransitLinesAttributesFile();
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
 			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes()).parse(transitLinesAttributesFileName);
 		}
-		if ((this.config.transit() != null) && (this.config.transit().getTransitStopsAttributesFile() != null)) {
+		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
 			String transitStopsAttributesFileName = this.config.transit().getTransitStopsAttributesFile();
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);
 			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes()).parse(transitStopsAttributesFileName);
@@ -270,16 +275,24 @@ public class ScenarioLoaderImpl {
 
 	private void loadTransitVehicles() throws UncheckedIOException {
 		final String vehiclesFile = this.config.transit().getVehiclesFile();
-		log.info("loading transit vehicles from " + vehiclesFile );
-		new VehicleReaderV1(this.scenario.getTransitVehicles()).readFile(vehiclesFile);
+		if ( vehiclesFile != null ) {
+			log.info("loading transit vehicles from " + vehiclesFile );
+			this.scenario.createTransitVehicleContainer() ;
+			new VehicleReaderV1(this.scenario.getTransitVehicles()).readFile(vehiclesFile);
+		}
+		else {
+			log.info("no transit vehicles file set in config, not loading any transit vehicles");
+		}
 	}
 	private void loadVehicles() throws UncheckedIOException {
 		final String vehiclesFile = this.config.vehicles().getVehiclesFile();
 		if ( vehiclesFile != null ) {
 			log.info("loading vehicles from " + vehiclesFile );
+			this.scenario.createVehicleContainer() ;
 			new VehicleReaderV1(this.scenario.getVehicles()).readFile(vehiclesFile);
-		} else {
-			log.warn("NOT loading vehicles since filename is null.  If possible, switch of useVehicles in scenario (transit vehicles are now separate).") ;
+		} 
+		else {
+			log.info("no vehicles file set in config, not loading any vehicles");
 		}
 	}
 
@@ -296,13 +309,12 @@ public class ScenarioLoaderImpl {
 						+ "LaneDefinitonsV11ToV20Converter manually in the preprocessing phase.");
 				throw new UncheckedIOException("Wrong lane file format: " + fileTypeGuesser.getSystemId());
 			}
-		}
-		if ((filename != null)) {
+
 			LaneDefinitionsReader reader = new LaneDefinitionsReader(this.scenario);
 			reader.readFile(filename);
 		}
 		else {
-			log.info("no lane definition file set in config or feature disabled, not able to load anything");
+			log.info("no lanes file set in config, not loading any lanes");
 		}
 	}
 

@@ -38,19 +38,19 @@ public class TransitRouterCustomDataTest {
 		scenario.getConfig().transit().setUseTransit(true);
 		createTestSchedule(scenario);
 		
-		TransitRouterConfig config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
+		TransitRouterConfig trConfig = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
 				scenario.getConfig().vspExperimental());
-		config.setBeelineWalkSpeed(0.1); // something very slow, so the agent does not walk over night
-		config.setSearchRadius(200);
+		trConfig.setBeelineWalkSpeed(0.1); // something very slow, so the agent does not walk over night
+		trConfig.setSearchRadius(200);
 		
-		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config);
+		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(trConfig);
 		
 		MockingTransitTravelDisutility disutility = new MockingTransitTravelDisutility(transitRouterNetworkTravelTimeAndDisutility);
 		
-		TransitRouterNetwork transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), config.getBeelineWalkConnectionDistance());
+		TransitRouterNetwork transitNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), trConfig.getBeelineWalkConnectionDistance());
 
-		TransitRouterImpl router = new TransitRouterImpl(config, new PreparedTransitSchedule(scenario.getTransitSchedule()), transitNetwork, transitRouterNetworkTravelTimeAndDisutility, disutility);
+		TransitRouterImpl router = new TransitRouterImpl(trConfig, new PreparedTransitSchedule(scenario.getTransitSchedule()), transitNetwork, transitRouterNetworkTravelTimeAndDisutility, disutility);
 		
 		List<Leg> legs = router.calcRoute(scenario.createCoord(-100, 0), new CoordImpl(3100, 0), 5.9*3600, null);
 		Assert.assertEquals(1, legs.size());

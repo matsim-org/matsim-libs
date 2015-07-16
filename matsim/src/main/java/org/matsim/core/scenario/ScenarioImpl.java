@@ -79,9 +79,13 @@ public final class ScenarioImpl implements Scenario {
 		if (this.config.scenario().isUseLanes()) {
 			createLanesContainer();
 		}
-		if (this.config.transit().isUseTransit()) {
-			this.createTransitSchedule();
-			this.createTransitVehicleContainer();
+		if ( this.config.transit().getTransitScheduleFile() != null || this.config.transit().isUseTransit() ) {
+
+			this.createTransitScheduleContainer() ;
+			this.createTransitVehicleContainer() ;
+
+			this.config.setLocked( true );
+//			// (set the config locked so that we do not get inconsistent behavior from setting the file name to null afterwards --???)
 		}
 	}
 
@@ -95,10 +99,6 @@ public final class ScenarioImpl implements Scenario {
 	 */
 	public final boolean createTransitVehicleContainer(){
 		if ( this.transitVehicles != null ) return false;
-
-		if ( !this.config.transit().isUseTransit() ) {
-			log.info("creating transit vehicles container while transit switch in config set to false. File will not be loaded automatically.");
-		}
 		this.transitVehicles = VehicleUtils.createVehiclesContainer();
 		return true;
 	}
@@ -127,8 +127,10 @@ public final class ScenarioImpl implements Scenario {
 		return true;
 	}
 
-	private void createLanesContainer() {
+	private final boolean createLanesContainer() {
+		if ( this.lanes != null ) return false ;
 		this.lanes = new LaneDefinitions20Impl();
+		return true ;
 	}
 
 	/**
@@ -139,13 +141,8 @@ public final class ScenarioImpl implements Scenario {
 	 *
 	 * @return true if a new container was initialized, false otherwise
 	 */
-	public final boolean createTransitSchedule() {
+	public final boolean createTransitScheduleContainer() {
 		if ( this.transitSchedule != null ) return false;
-
-		if ( !this.config.transit().isUseTransit() ) {
-			log.info( "creating transit schedule while switch in config set to false. File will not be loaded automatically." );
-		}
-
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		return true;
 	}
@@ -230,18 +227,18 @@ public final class ScenarioImpl implements Scenario {
 	public final Vehicles getTransitVehicles() {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.transitVehicles == null ) {
-			if ( this.config.transit().isUseTransit() ) {
-				this.createTransitVehicleContainer();
-			}
-			else {
+//			if ( this.config.transit().isUseTransit() ) {
+//				this.createTransitVehicleContainer();
+//			}
+//			else {
 				// throwing an exception should be the right approach,
 				// but it requires some testing (there may be places in the code
 				// which are happy with getting a null pointer, and would then
 				// not work anymore)
-				// throw new IllegalStateException(
-				log.info(
-						"no transit vehicles container, and transit not activated from config. You must first call the create method of ScenarioImpl." );
-			}
+				 throw new IllegalStateException(
+//				log.info(
+						"no transit vehicles container" );
+//			}
 		}
 
 		return this.transitVehicles;
@@ -251,10 +248,6 @@ public final class ScenarioImpl implements Scenario {
 	final public Vehicles getVehicles() {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.vehicles == null ) {
-				// throwing an exception should be the right approach,
-				// but it requires some testing (there may be places in the code
-				// which are happy with getting a null pointer, and would then
-				// not work anymore)
 				// throw new IllegalStateException(
 				log.info(
 						"no vehicles container, and vehicles not activated from config. You must first call the create method of ScenarioImpl." );
@@ -270,21 +263,17 @@ public final class ScenarioImpl implements Scenario {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.transitSchedule == null ) {
 			if ( this.config.transit().isUseTransit() ) {
-				this.createTransitSchedule();
+				this.createTransitScheduleContainer() ;
+				// (silently creating the container if it is requested and transit is switched on, since this is probably ok.
+				// This has been the behavior for many years, and many tests depend on it. kai, jul'15) 
+				
+				// locking the config so at least nobody can switch of isUseTransit after this:
+				this.config.setLocked(true);
 			}
 			else {
-				// throwing an exception should be the right approach,
-				// but it requires some testing (there may be places in the code
-				// which are happy with getting a null pointer, and would then
-				// not work anymore)
-				//				 throw new IllegalStateException(
+//								 throw new IllegalStateException(
 				log.info(
-						"no transit schedule, and transit not activated from config. You must first call the create method of ScenarioImpl." );
-				// yyyy Could we please avoid warnings in logfiles that one cannot get rid of?
-				// Why is returning null such a problem?  If you do as you are doing here, there is no way to test of the transit schedule exists:
-				// you could have created it but it is switched off in the config.
-				// ???
-				// kai, nov'14
+						"transit schedule is null" );
 			}
 		}
 

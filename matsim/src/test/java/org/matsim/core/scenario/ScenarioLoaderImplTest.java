@@ -25,6 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -36,12 +37,24 @@ public class ScenarioLoaderImplTest {
 
 	@Test
 	public void testLoadScenario_loadTransitData() {
-		Scenario scenario = ScenarioUtils.createScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
+		{
+//			Scenario scenario = ScenarioUtils.createScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
+		ScenarioBuilder builder = new ScenarioBuilder( this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml") ) ;
+		builder.createTransitSchedule() ;
+		// facilities is there by default????
+		Scenario scenario = builder.createScenario() ;
 		Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
 		Assert.assertEquals(0, scenario.getTransitSchedule().getFacilities().size());
 		ScenarioUtils.loadScenario(scenario);
 		Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
 		Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
+		}
+		//----
+		{
+			Scenario scenario = ScenarioUtils.loadScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
+			Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
+			Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
+		}
 	}
 
 	@Test

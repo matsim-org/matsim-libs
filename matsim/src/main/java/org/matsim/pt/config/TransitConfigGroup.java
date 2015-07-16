@@ -97,6 +97,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( TRANSIT_SCHEDULE_FILE )
 	public void setTransitScheduleFile(final String filename) {
+		this.testForLocked();
 		this.transitScheduleFile = filename;
 	}
 
@@ -149,6 +150,7 @@ public class TransitConfigGroup extends ReflectiveConfigGroup {
 	}
 	@StringSetter( USE_TRANSIT )
 	public void setUseTransit( boolean val ) {
+		this.testForLocked();
 		this.useTransit = val ;
 	}
 

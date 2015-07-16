@@ -59,7 +59,9 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(10);
 		config.strategy().addParam("Module_2", "ReRoute");
-		config.strategy().addParam("ModuleProbability_2", "1.0");
+		config.strategy().addParam("ModuleProbability_2", "1.0");		
+		config.transit().setUseTransit(true);
+
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
@@ -86,6 +88,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		config.controler().setLastIteration(10);
 		config.strategy().addParam("Module_2", "ReRoute");
 		config.strategy().addParam("ModuleProbability_2", "1.0");
+		config.transit().setUseTransit(true);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
@@ -198,7 +201,6 @@ public class NonAlternativingPlanElementsIntegrationTest {
 	}
 
 	private void addSimpleTransitServices(Scenario scenario) {
-		scenario.getConfig().transit().setUseTransit(true);
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();

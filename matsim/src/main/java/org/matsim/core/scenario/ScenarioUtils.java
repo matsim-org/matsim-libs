@@ -86,7 +86,7 @@ public class ScenarioUtils {
 		 * This is here if you want to instantiate the empty container
 		 */
 		public ScenarioBuilder createTransitSchedule() {
-			scenario.createTransitSchedule() ;
+			scenario.createTransitScheduleContainer() ;
 			return this ;
 		}
 		public ScenarioBuilder setTransitSchedule( TransitSchedule schedule ) {

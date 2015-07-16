@@ -49,7 +49,7 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 		Map<String,String> map = super.getComments();
 		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
 		map.put(USE_HOUSEHOLDS, "Set this parameter to true if households should be used, false if not.");
-		map.put(USE_TRANSIT, "Set this parameter to true if transit should be simulated, false if not.");
+//		map.put(USE_TRANSIT, "Set this parameter to true if transit should be simulated, false if not.");
 		return map;
 	}
 

@@ -270,7 +270,7 @@ X;Dritte GV;OV;1.000
 		DataPrepare app = new DataPrepare();
 		app.prepareConfig();
 		
-		((ScenarioImpl)app.scenario).createTransitSchedule();
+		((ScenarioImpl)app.scenario).createTransitScheduleContainer();
 		
 		TransitConfigGroup transitConfig = (TransitConfigGroup) app.config.getModule(TransitConfigGroup.GROUP_NAME);
 //		transitConfig.setTransitScheduleFile("/home/johannes/gsv/matsim/studies/netz2030/data/transitSchedule.xml");

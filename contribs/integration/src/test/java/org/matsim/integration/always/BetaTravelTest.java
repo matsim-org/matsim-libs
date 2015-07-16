@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration.daily;
+package org.matsim.integration.always;
 
 import com.google.inject.Singleton;
 import org.apache.log4j.Logger;

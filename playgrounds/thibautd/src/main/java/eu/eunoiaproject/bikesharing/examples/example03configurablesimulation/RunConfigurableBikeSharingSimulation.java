@@ -173,7 +173,7 @@ public class RunConfigurableBikeSharingSimulation {
 				return;
 			}
 
-			((ScenarioImpl) scenario).createTransitSchedule();
+			((ScenarioImpl) scenario).createTransitScheduleContainer();
 			log.info( "read schedule from "+config.transit().getTransitScheduleFile() );
 			new TransitScheduleReader( scenario ).readFile( config.transit().getTransitScheduleFile() );
 
