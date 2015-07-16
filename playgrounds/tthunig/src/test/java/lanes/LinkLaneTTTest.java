@@ -67,7 +67,7 @@ public class LinkLaneTTTest {
 	
 	// needs to be enabled if you want to have output files like events, network
 	// and lanes
-	private static boolean WRITE_OUTPUT = true;
+	private static boolean WRITE_OUTPUT = false;
 	
 	// needs to be modified if you add cases
 	private static final int NUMBER_OF_CASES = 8;									
