@@ -35,6 +35,12 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 	private static final String USE_HOUSEHOLDS = "useHouseholds";
 	private static final String USE_TRANSIT = "useTransit";
 	private static final String USE_VEHICLES = "useVehicles";
+	
+	private static final String message = "This switch is no longer operational.  The  file is loaded if the file name"
+			+ " is different from null.  If you needed this for the creation of the container, use the ScenarioBuilder in "
+			+ "ScenarioUtils.  Note that loading the file does not mean that it is used anywhere; such functionality needs to be "
+			+ "switched on elsewhere (e.g. in qsim, in transit, ...).  If this does not work for you, please let us know. kai, jun'15";
+
 
 	private boolean useLanes = false;
 	private boolean useHouseholds = false;
@@ -75,18 +81,28 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 
 	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
-//	@StringSetter( USE_VEHICLES )
+	@StringSetter( USE_VEHICLES )
 	public void setUseVehicles(@SuppressWarnings("unused") final boolean b) {
-		throw new RuntimeException( "The " + USE_VEHICLES + " switch is no longer operational.  The vehicles file is loaded if the file name"
-				+ " is different from null.  If you needed this for the creation of the vehicles container, use the ScenarioBuilder in "
-				+ "ScenarioUtils.  If this does not work for you, please let us know. kai, jun'15" ) ;
+		throw new RuntimeException( message ) ;
+	}
+	@Deprecated // since jul'15
+	@StringGetter( USE_VEHICLES )
+	public static boolean getUseVehicles() {
+		throw new RuntimeException( message ) ;
 	}
 	
 	@SuppressWarnings("static-method")
-//	@StringSetter( USE_TRANSIT )
+	@StringSetter( USE_TRANSIT )
 	@Deprecated // since jul'15
 	public void setUseTransit(final boolean b) {
 		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
 	}
+	@SuppressWarnings("static-method")
+	@StringGetter( USE_TRANSIT )
+	@Deprecated // since jul'15
+	public boolean getUseTransit(final boolean b) {
+		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
+	}
+	
 
 }
