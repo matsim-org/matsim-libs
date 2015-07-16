@@ -449,26 +449,9 @@
 
 	<module name="scenario" >
 
-		<!-- Set this parameter to true if households should be used, false if not. -->
-		<param name="useHouseholds" value="false" />
-
 		<!-- Set this parameter to true if knowledge should be used, false if not. -->
 		<param name="useKnowledge" value="true" />
 
-		<!-- Set this parameter to true if lanes should be used, false if not. -->
-		<param name="useLanes" value="false" />
-
-		<!-- Set this parameter to true if roadpricing should be used, false if not. -->
-		<param name="useRoadpricing" value="false" />
-
-		<!-- Set this parameter to true if signal systems should be used, false if not. -->
-		<param name="useSignalsystems" value="false" />
-
-		<!-- Set this parameter to true if transit should be simulated, false if not. -->
-		<param name="useTransit" value="false" />
-
-		<!-- Set this parameter to true if vehicles should be used, false if not. -->
-		<param name="useVehicles" value="false" />
 	</module>
 
 <!-- ====================================================================== -->

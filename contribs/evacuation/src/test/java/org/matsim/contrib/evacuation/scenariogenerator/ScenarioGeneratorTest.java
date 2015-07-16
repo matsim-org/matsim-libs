@@ -124,20 +124,20 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 		
 		//simulate and check scenario
 		boolean simulateScenario = true;
-		try {
+//		try {
 			Controler matsimController = new Controler(mc);
 			matsimController.getConfig().controler().setOverwriteFileSetting(
 					true ?
 							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 			matsimController.run();
-		}
-		catch (Exception e)
-		{
-			simulateScenario = false;
-			e.printStackTrace();
-		}
-		assertTrue("scenario was not simulated",simulateScenario);
+//		}
+//		catch (Exception e)
+//		{
+//			simulateScenario = false;
+//			e.printStackTrace();
+//		}
+//		assertTrue("scenario was not simulated",simulateScenario);
 		
 		//parse events, check if closed roads are not being visited
 		LinkEnterEventHandler eventHandler = null;

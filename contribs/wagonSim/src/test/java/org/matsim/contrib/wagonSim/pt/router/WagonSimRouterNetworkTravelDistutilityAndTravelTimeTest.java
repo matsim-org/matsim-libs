@@ -93,7 +93,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		createPersonObjectAttributes(sc);
 		createNetwork(sc);
 		createSchedule(sc);
-		createVehicles(sc);
+		createTransitVehicles(sc);
 		ObjectAttributes locomotiveAttributes = createVehicleLinkSpeedAttributes(sc);
 		VehicleLoad vehLoad = new VehicleLoad(sc.getTransitSchedule());
 		Config config = sc.getConfig(); 
@@ -200,8 +200,9 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		config.planCalcScore().addActivityParams(work);
 		// something very small
 		config.plansCalcRoute().setTeleportedModeSpeed("walk", 0.00000000001);
+		config.transit().setUseTransit(true);
+		
 		Scenario sc = ScenarioUtils.createScenario(config);
-		sc.getConfig().transit().setUseTransit(true);
 		return sc;
 	}
 	
@@ -294,7 +295,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 	 * @param sc
 	 */
 	@SuppressWarnings("deprecation")
-	private void createVehicles(Scenario sc) {
+	private void createTransitVehicles(Scenario sc) {
 		Vehicles veh = ((ScenarioImpl) sc).getTransitVehicles();
 		VehiclesFactory factory = veh.getFactory();
 		
