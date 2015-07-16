@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis;
+package playground.agarwalamit.munich.analysis.userGroup;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -36,7 +36,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author amit
  */
 
-public class TollAveragerUserGroup {
+public class UserGroupToTollData {
 
 	private Map<Id<Person>, Double> person2Toll = new HashMap<Id<Person>, Double>();
 	private Map<UserGroup, Double> userGrpToToll = new TreeMap<UserGroup, Double>();
@@ -48,7 +48,7 @@ public class TollAveragerUserGroup {
 		String inFile = runDir+"/simpleAverageToll.txt";
 		String outFile = runDir+"averagedUserGroupToll.txt";
 
-		TollAveragerUserGroup taug = new TollAveragerUserGroup();
+		UserGroupToTollData taug = new UserGroupToTollData();
 		taug.readFileAndStoreData(inFile);
 		taug.filterAndWriteUserGroupData(outFile);
 
