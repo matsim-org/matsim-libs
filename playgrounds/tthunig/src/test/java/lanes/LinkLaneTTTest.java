@@ -67,7 +67,7 @@ public class LinkLaneTTTest {
 	
 	// needs to be enabled if you want to have output files like events, network
 	// and lanes
-	private static boolean WRITE_OUTPUT = false;
+	private static boolean WRITE_OUTPUT = true;
 	
 	// needs to be modified if you add cases
 	private static final int NUMBER_OF_CASES = 8;									
@@ -123,7 +123,6 @@ public class LinkLaneTTTest {
 				}
 				eventWriter.closeFile();
 			}		
-			System.out.println("-----------------------------------------------");
 			events.resetHandlers(0);
 		}
 		
@@ -264,49 +263,38 @@ public class LinkLaneTTTest {
 			break;
 		case 5:
 		case 6:
-			// TODO fuer diesen Test reicht eine (statt zwei parallele) 150m lanes. bitte anpassen
 			/*
 			 * split Link2 into one original lane of 50m and two parallel lanes of 150m 
 			 * leading to Link3
 																			
 			   Link1     Link2    Link3   
 			   
-			   			    [150m]
-			   			    =====									
-			  (1)=====(2)==+     (3)=====(4)
-						    =====
+			   		   [50m][150m.]
+			  (1)=====(2)==+=====(3)=====(4)
+						   
 			  [..200m..][..200m..][.200m.]	
 			 */
 			lanes = scenario.getLanes();
 			lfactory = lanes.getFactory();
-			Id<Lane> ol = Id.create("2.ol", Lane.class);
-			Id<Lane> topLane = Id.create("2.top", Lane.class);
-			Id<Lane> bottomLane = Id.create("2.btm", Lane.class);
+			Id<Lane> ol = Id.create("2.1", Lane.class);
+			Id<Lane> followingLane = Id.create("2.2", Lane.class);
 			l2l = lfactory.createLanesToLinkAssignment(LINK_ID2);
 			
-			//create original lane leading to two parallel Lanes
+			//create original lane of 50m
 			lane = lfactory.createLane(ol);
 			lane.setNumberOfRepresentedLanes(1);
 			lane.setStartsAtMeterFromLinkEnd(200.0);
-			lane.addToLaneId(topLane);
-			lane.addToLaneId(bottomLane);
+			lane.addToLaneId(followingLane);
 			l2l.addLane(lane);
 			
-			//create two parallel lanes
-			lane = lfactory.createLane(topLane);
+			//create following lane of 150m
+			lane = lfactory.createLane(followingLane);
 			lane.setNumberOfRepresentedLanes(1);
 			lane.setStartsAtMeterFromLinkEnd(150.0);
-			lane.setAlignment(1);
+			lane.setAlignment(0);
 			lane.addToLinkId(LINK_ID3);
 			l2l.addLane(lane);
-			
-			lane = lfactory.createLane(bottomLane);
-			lane.setNumberOfRepresentedLanes(1);
-			lane.setStartsAtMeterFromLinkEnd(150.0);
-			lane.setAlignment(-1);
-			lane.addToLinkId(LINK_ID3);
-			l2l.addLane(lane);
-			
+						
 			lanes.addLanesToLinkAssignment(l2l);			
 			
 			if(caseNr==6){
@@ -326,9 +314,9 @@ public class LinkLaneTTTest {
 																	
 			     Link1 Link2.1 Link 2  Link3	
 			   
-			   		   [.50m.][.150m.]							
-			  (1)=====(2)===(3)=====(4)====(5)
-			  [..200m..][..200m......][.200m.]	
+			   		   [.50m..][.150m.]							
+			  (1)=====(2)===(2.1)=====(4)====(5)
+			  [..200m..][...200m......][.200m.]	
 			 */
 			Node inbetweenNode = factory.createNode(Id.createNodeId("2.1"),
 					scenario.createCoord(0, 250));
@@ -336,9 +324,10 @@ public class LinkLaneTTTest {
 					scenario.getNetwork().getNodes().get(Id.createNodeId("2")),
 					inbetweenNode);
 			inbetweenLink.setLength(50);
-			link2.setFromNode(inbetweenNode);
 			inbetweenLink.setFreespeed(75);
-			// TODO was ist mit toNode von Link1 und length von Link2 ??
+			
+			link2.setFromNode(inbetweenNode);
+			link2.setLength(150);
 			
 			if(caseNr==8){
 				inbetweenLink.setFreespeed(76);
