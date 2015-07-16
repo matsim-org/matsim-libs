@@ -8,6 +8,7 @@
 	</module>
 
 	<module name="transit">
+		<param name="useTransit" value="true" />
 		<param name="transitScheduleFile" value="test/input/org/matsim/pt/counts/transitSchedule.xml"/>
 		<param name="vehiclesFile" value="test/input/org/matsim/pt/counts/vehicles.xml"/>
 		<param name="transitModes" value="pt" />
@@ -19,10 +20,6 @@
 
 	<module name="plans">
 		<param name="inputPlansFile" value="test/input/org/matsim/pt/counts/ptPop.xml" />
-	</module>
-
-	<module name="scenario">
-		<param name="useTransit" value="true" />
 	</module>
 
 	<module name="controler">
