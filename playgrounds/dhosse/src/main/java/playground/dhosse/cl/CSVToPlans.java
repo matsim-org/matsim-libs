@@ -312,12 +312,12 @@ public class CSVToPlans {
 
 			boolean toAdd = true;
 			
-			if(persona.getId().equals("10430102") || persona.getId().equals("12220001") || persona.getId().equals("14676102") || persona.getId().equals("15520101") ||
-					persona.getId().equals("18982103") || persona.getId().equals("22078102") || persona.getId().equals("23832104") || persona.getId().equals("14510001") ||
-					persona.getId().equals("32430002") || persona.getId().equals("24903102") || persona.getId().equals("11390103") || persona.getId().equals("17135101") ||
-					persona.getId().equals("16709103")){
-				continue;
-			}
+//			if(persona.getId().equals("10430102") || persona.getId().equals("12220001") || persona.getId().equals("14676102") || persona.getId().equals("15520101") ||
+//					persona.getId().equals("18982103") || persona.getId().equals("22078102") || persona.getId().equals("23832104") || persona.getId().equals("14510001") ||
+//					persona.getId().equals("32430002") || persona.getId().equals("24903102") || persona.getId().equals("11390103") || persona.getId().equals("17135101") ||
+//					persona.getId().equals("16709103")){
+//				continue;
+//			}
 			
 			Person person = popFactory.createPerson(Id.createPersonId(persona.getId()));
 			
@@ -351,8 +351,10 @@ public class CSVToPlans {
 							
 							if(gOrigin == null || gDest == null){
 								
-								toAdd = false;
-								break;
+								origin = origin == null ? new CoordImpl(0.0, 0.0) : origin;
+								destination = destination == null ? new CoordImpl(0.0, 0.0) : destination;
+//								toAdd = false;
+//								break;
 								
 							} else{
 							
@@ -362,8 +364,11 @@ public class CSVToPlans {
 							}
 							
 						} else{
-							toAdd = false;
-							break;
+							
+							origin = origin == null ? new CoordImpl(0.0, 0.0) : origin;
+							destination = destination == null ? new CoordImpl(0.0, 0.0) : destination;
+//							toAdd = false;
+//							break;
 						}
 						
 					}
@@ -390,8 +395,8 @@ public class CSVToPlans {
 						
 						anterior = popFactory.createActivityFromCoord(actType, origin);
 						if(viaje.getStartTime() < 0){
-							toAdd = false;
-							break;
+//							toAdd = false;
+//							break;
 						}
 						anterior.setEndTime(viaje.getStartTime());
 						
@@ -404,13 +409,13 @@ public class CSVToPlans {
 							double endTime = viaje.getStartTime();
 							
 							if(endTime < 0){
-								toAdd = false;
-								break;
+//								toAdd = false;
+//								break;
 							}
 							
-							if(endTime < anterior.getStartTime()){
-								endTime += 24*3600;
-							}
+//							if(endTime < anterior.getStartTime()){
+//								endTime += 24*3600;
+//							}
 							
 							anterior.setEndTime(endTime);
 						
@@ -436,8 +441,8 @@ public class CSVToPlans {
 						double startTime = viaje.getEndTime();
 						
 						if(startTime < 0){
-							toAdd = false;
-							break;
+//							toAdd = false;
+//							break;
 						}
 
 						lastActivity = lastActivity == null ? anterior : lastActivity;
@@ -497,8 +502,6 @@ public class CSVToPlans {
 				
 			}
 			
-//			if(!toAdd) continue;
-			
 			int nLegs = 0;
 			for(PlanElement pE : planElements){
 				if(pE instanceof Activity){
@@ -514,46 +517,55 @@ public class CSVToPlans {
 			
 			//a plan needs at least 3 plan elements (act - leg - act)
 			int add = 0;
-			if(plan.getPlanElements().size() > 2){
-				if(person.getId().toString().equals("11508001")){
-					System.out.println("");
-				}
-				if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
-					plan.getPlanElements().remove(plan.getPlanElements().size()-1);
-					plan.getPlanElements().remove(plan.getPlanElements().size()-1);
-				}
-				if(plan.getPlanElements().size() < 2) continue;
-				else if(plan.getPlanElements().size() >= 2){
-					if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
-						continue;
-					}
-				}
-				
-				System.out.println(person.getId());
-				if(person.getId().toString().equals("21009101")){
-					System.out.println("");
-				}
-				Plan modifiedPlan = checkConsistencyOfPlan(person.getSelectedPlan());
-				
-				person.removePlan(plan);
-				plan = modifiedPlan;
-				person.addPlan(plan);
-				person.setSelectedPlan(plan);
-				
+//			if(plan.getPlanElements().size() > 2){
+//				if(person.getId().toString().equals("11508001")){
+//					System.out.println("");
+//				}
+//				if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
+//					plan.getPlanElements().remove(plan.getPlanElements().size()-1);
+//					plan.getPlanElements().remove(plan.getPlanElements().size()-1);
+//				}
+//				if(plan.getPlanElements().size() < 2) continue;
+//				else if(plan.getPlanElements().size() >= 2){
+//					if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
+//						continue;
+//					}
+//				}
+//				
+//				System.out.println(person.getId());
+//				if(person.getId().toString().equals("21009101")){
+//					System.out.println("");
+//				}
+//				Plan modifiedPlan = checkConsistencyOfPlan(person.getSelectedPlan());
+//				
+//				person.removePlan(plan);
+//				plan = modifiedPlan;
+//				person.addPlan(plan);
+//				person.setSelectedPlan(plan);
+//				
+//				if(plan.getPlanElements().size() > 2){
+//					if(plan.getPlanElements().get(plan.getPlanElements().size() - 1) instanceof Leg){
+//						plan.getPlanElements().remove(plan.getPlanElements().size() - 1);
+//					}
+//					if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
+//						continue;
+//					}
+//				}
+//				if(plan.getPlanElements().size() <= 2) continue;
 				if(plan.getPlanElements().size() > 2){
-					if(plan.getPlanElements().get(plan.getPlanElements().size() - 1) instanceof Leg){
-						plan.getPlanElements().remove(plan.getPlanElements().size() - 1);
+					for(PlanElement pe : plan.getPlanElements()){
+						if(pe instanceof Activity){
+							Activity act = (Activity)pe;
+							if(act.getCoord() == null){
+								System.out.println(person.getId().toString());
+							}
+						}
 					}
-					if(((Activity)plan.getPlanElements().get(plan.getPlanElements().size()-1)).getType().equals("pt interaction")){
-						continue;
-					}
+					population.addPerson(person);
 				}
-				if(plan.getPlanElements().size() <= 2) continue;
-				
-				population.addPerson(person);
-				add++;
-			}
-			this.legCounter += add * nLegs;
+//				add++;
+//			}
+//			this.legCounter += add * nLegs;
 			
 		}
 		
@@ -701,12 +713,43 @@ public class CSVToPlans {
 	
 	private Map<String, Geometry> createComunaGeometries() {
 		
+		BufferedReader reader = IOUtils.getBufferedReader("C:/Users/Daniel/Documents/work/shared-svn/studies/countries/cl/Kai_und_Daniel/exportedFilesFromDatabase/comunas.csv");
+		
+		Map<String,String> comunaName2Id = new HashMap<>();
+		
+		try {
+			
+			String line = reader.readLine();
+			
+			while( (line = reader.readLine()) != null ){
+				
+				String[] tokens = line.split(";");
+				
+				comunaName2Id.put(tokens[1], tokens[0]);
+				
+			}
+			
+			reader.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(this.shapefile);
 		Map<String, Geometry> geometries = new HashMap<String, Geometry>();
 		
 		for(SimpleFeature feature : features){
 			
-			geometries.put((String) feature.getAttribute("NAME"),(Geometry) feature.getDefaultGeometry());
+			String comuna = (String)feature.getAttribute("NAME");
+			String key = null;
+					
+			for(String c : comunaName2Id.keySet()){
+				if(c.equalsIgnoreCase(comuna)){
+					key = comunaName2Id.get(c);
+				}
+			}
+			
+			geometries.put( key,(Geometry) feature.getDefaultGeometry());
 			
 		}
 		return geometries;
@@ -809,6 +852,16 @@ public class CSVToPlans {
   	   Coord coord = new CoordImpl(p.getX(), p.getY());
 		
 		return coord;
+		
+	}
+	
+	private final double maxWalkingDistance = 5000.0;
+	
+	private Coord shootWalkTrip(Coord origin, Geometry comuna){
+		
+		
+		
+		return null;
 		
 	}
 	

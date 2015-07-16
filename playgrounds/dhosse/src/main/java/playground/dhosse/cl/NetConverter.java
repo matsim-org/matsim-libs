@@ -43,7 +43,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.operation.overlay.PointBuilder;
 
 public class NetConverter {
 	
@@ -64,7 +63,7 @@ public class NetConverter {
 	public void convertTransitSchedule(String file){
 		
 		Config config = ConfigUtils.createConfig();
-		config.transit().setUseTransit(true);
+		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
@@ -184,7 +183,6 @@ public class NetConverter {
 	public void plans2Shape(Population population, String outputFile){
 	
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-		typeBuilder.setCRS(MGC.getCRS("EPSG:32719"));
 		typeBuilder.setName("shape");
 		typeBuilder.add("geometry", Point.class);
 		typeBuilder.add("id", String.class);
@@ -203,7 +201,7 @@ public class NetConverter {
 					Coord coord = act.getCoord();
 					
 					SimpleFeature feature = builder.buildFeature(null, new Object[]{
-							new GeometryFactory().createPoint(MGC.coord2Coordinate(coord)),
+							new GeometryFactory().createPoint(new Coordinate(coord.getX(), coord.getY())),
 							person.getId().toString(),
 							act.getType()
 						});
