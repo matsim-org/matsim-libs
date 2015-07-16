@@ -40,6 +40,12 @@ public class DynAgentLauncherUtils
     public static QSim initQSim(Scenario scenario)
     {
         EventsManager events = EventsUtils.createEventsManager();
+        return initQSim(scenario,events);
+    }
+    
+    
+    public static QSim initQSim(Scenario scenario, EventsManager events)
+    {
         QSim qSim = new QSim(scenario, events);
 
         DynActivityEngine dynActivityEngine = new DynActivityEngine(events, qSim.getAgentCounter());
