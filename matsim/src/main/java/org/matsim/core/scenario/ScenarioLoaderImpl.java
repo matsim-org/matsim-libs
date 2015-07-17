@@ -135,11 +135,9 @@ public class ScenarioLoaderImpl {
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
-		if (this.config.scenario().isUseHouseholds()) {
-			this.loadHouseholds();
-		}
-		this.loadTransit();
-		this.loadTransitVehicles();
+		this.loadHouseholds();
+		this.loadTransit(); // tests internally if the file is there
+		this.loadTransitVehicles(); // tests internally if the file is there
 		if (this.config.vehicles().getVehiclesFile()!=null ) {
 			this.loadVehicles() ;
 		}
@@ -233,16 +231,22 @@ public class ScenarioLoaderImpl {
 	}
 
 	private void loadHouseholds() {
-		if ((this.scenario.getHouseholds() != null) && (this.config.households() != null) && (this.config.households().getInputFile() != null) ) {
-			String hhFileName = this.config.households().getInputFile();
-			log.info("loading households from " + hhFileName);
-			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(hhFileName);
+		final String householdsFile = this.config.households().getInputFile();
+		if ( (this.config.households() != null) && (householdsFile != null) ) {
+			this.scenario.createHouseholdsContainer() ;
+			log.info("loading households from " + householdsFile);
+			new HouseholdsReaderV10(this.scenario.getHouseholds()).parse(householdsFile);
 			log.info("households loaded.");
 		}
 		else {
-			log.info("no households file set in config or feature disabled, not able to load anything");
+			log.info("no households file set in config, not loading households");
 		}
 		if ((this.config.households() != null) && (this.config.households().getInputHouseholdAttributesFile() != null)) {
+
+			this.scenario.createHouseholdsContainer() ;
+			// (there was a test that implied that loading hh attributes without ever loading hhs themselves would be a valid operation. 
+			// The hh container was originally instantiated by the useHouseholds switch, but that is gone now. kai, jul'15)
+			
 			String householdAttributesFileName = this.config.households().getInputHouseholdAttributesFile();
 			log.info("loading household attributes from " + householdAttributesFileName);
 			new ObjectAttributesXmlReader(this.scenario.getHouseholds().getHouseholdAttributes()).parse(householdAttributesFileName);
@@ -262,11 +266,13 @@ public class ScenarioLoaderImpl {
 			log.info("no transit schedule file set in config, not loading any transit schedule");
 		}
 		if ( this.config.transit().getTransitLinesAttributesFile() != null ) {
+			this.scenario.createTransitScheduleContainer() ;
 			String transitLinesAttributesFileName = this.config.transit().getTransitLinesAttributesFile();
 			log.info("loading transit lines attributes from " + transitLinesAttributesFileName);
 			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitLinesAttributes()).parse(transitLinesAttributesFileName);
 		}
 		if ( this.config.transit().getTransitStopsAttributesFile() != null ) {
+			this.scenario.createTransitScheduleContainer() ;
 			String transitStopsAttributesFileName = this.config.transit().getTransitStopsAttributesFile();
 			log.info("loading transit stop facilities attributes from " + transitStopsAttributesFileName);
 			new ObjectAttributesXmlReader(this.scenario.getTransitSchedule().getTransitStopsAttributes()).parse(transitStopsAttributesFileName);

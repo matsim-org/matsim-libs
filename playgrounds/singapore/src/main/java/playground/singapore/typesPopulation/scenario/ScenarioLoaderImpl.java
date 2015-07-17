@@ -139,7 +139,7 @@ public class ScenarioLoaderImpl {
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
-		if (this.config.scenario().isUseHouseholds()) {
+		if (this.config.households().getInputFile()!=null) {
 			this.loadHouseholds();
 		}
 		if (this.config.transit().isUseTransit()) {

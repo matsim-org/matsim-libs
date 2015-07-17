@@ -42,10 +42,10 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	private static final String USE_TRANSIT = "useTransit";
 	private static final String USE_VEHICLES = "useVehicles";
 	
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( ScenarioConfigGroup.class ) ;
 	
 	private boolean useLanes = false;
-	private boolean useHouseholds = false;
 
 	public ScenarioConfigGroup() {
 		super(GROUP_NAME);
@@ -55,8 +55,8 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
-		map.put(USE_HOUSEHOLDS, "Set this parameter to true if households should be used, false if not.");
-		map.put(USE_TRANSIT, "Deprecated, to not use.  See transit section of config file.") ; // since jul'15
+		map.put(USE_HOUSEHOLDS, "Deprecated, do not use.  The file is loaded when the filename is given.  Functionality needs to be switched on elsewhere.");
+		map.put(USE_TRANSIT, "Deprecated, do not use.  See transit section of config file.") ; // since jul'15
 		return map;
 	}
 
@@ -87,7 +87,6 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 		Map<String, String> params = super.getParams();
 
 		params.put(USE_LANES, Boolean.toString( this.isUseLanes() ) ) ;
-		params.put(USE_HOUSEHOLDS, Boolean.toString( this.isUseHouseholds() ) ) ;
 
 		return params;
 	}
@@ -100,12 +99,14 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 		this.useLanes = useLanes;
 	}
 
-	public boolean isUseHouseholds() {
-		return this.useHouseholds;
-	}
+//	public boolean isUseHouseholds() {
+//		return this.useHouseholds;
+//	}
 
-	public void setUseHouseholds(final boolean b) {
-		this.useHouseholds = b;
+	@SuppressWarnings("static-method")
+	@Deprecated // since jul'15
+	public void setUseHouseholds(@SuppressWarnings("unused") final boolean b) {
+		throw new RuntimeException( getMessage( USE_HOUSEHOLDS ) ) ;
 	}
 
 	// if they are not in getParams, they will not be included into the config file dump.
