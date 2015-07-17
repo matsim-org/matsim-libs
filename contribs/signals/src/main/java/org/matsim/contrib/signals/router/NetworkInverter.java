@@ -1,6 +1,5 @@
-package org.matsim.core.router.util;
+package org.matsim.contrib.signals.router;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,6 +12,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
+import org.matsim.core.router.util.NetworkTurnInfoBuilder;
 
 /**
  * Converts a network to an inverted network. Inverted nodes are situated at
@@ -24,7 +24,7 @@ import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
  * @author aneumann
  * @author dgrether
  */
-public class NetworkInverter {
+class NetworkInverter {
 
 	final private static Logger log = Logger.getLogger(NetworkInverter.class);
 
@@ -34,12 +34,12 @@ public class NetworkInverter {
 
 	private Map<Id<Link>, List<TurnInfo>>  inLinkTurnInfoMap = null;
 
-	public NetworkInverter(Network originalNet, Map<Id<Link>, List<TurnInfo>>  inLinkTurnInfoMap) {
+	NetworkInverter(Network originalNet, Map<Id<Link>, List<TurnInfo>>  inLinkTurnInfoMap) {
 		this.originalNetwork = originalNet;
 		this.inLinkTurnInfoMap = inLinkTurnInfoMap;
 	}
 
-	public Network getInvertedNetwork() {
+	Network getInvertedNetwork() {
 		if (this.invertedNetwork == null){
 			invertNetwork();
 		}
@@ -90,12 +90,13 @@ public class NetworkInverter {
 		return numberOfLinksGenerated + 1;
 	}
 
-	public List<Link> convertInvertedNodesToLinks(List<Node> nodes) {
-		List<Link> ret = new ArrayList<Link>(nodes.size());
-		for (Node n : nodes){
-			ret.add(this.originalNetwork.getLinks().get(Id.create(n.getId(), Link.class)));
-		}
-		return ret;
-	}
+//	public List<Link> convertInvertedNodesToLinks(List<Node> nodes) {
+//		List<Link> ret = new ArrayList<Link>(nodes.size());
+//		for (Node n : nodes){
+//			ret.add(this.originalNetwork.getLinks().get(Id.create(n.getId(), Link.class)));
+//		}
+//		return ret;
+//	}
+	// never used. kai, jul'15
 
 }

@@ -17,12 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.router.util;
+package org.matsim.contrib.signals.router;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.LinkToLinkTravelTime;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -30,10 +32,10 @@ import org.matsim.vehicles.Vehicle;
  * Proxy for a LinkToLinkTravelTime instance to make it work with the 
  * LeastCostPathCalculator working on an inverted network.
  * @author dgrether
- * @see org.matsim.core.route.util.NetworkInverter
+ * @see NetworkInverter
  *
  */
-public class TravelTimesInvertedNetProxy implements TravelTime {
+class TravelTimesInvertedNetProxy implements TravelTime {
 
 	private Network originalNetwork;
 	

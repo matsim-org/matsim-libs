@@ -33,7 +33,7 @@ public class InvertedNetworkTripRouterFactoryModule extends AbstractModule {
     @Override
     public void install() {
         install(new LeastCostPathCalculatorModule());
-        install(new TransitRouterModule());
+        install(new TransitRouterModule()); // yy why?  kai, jul'15
         if (getConfig().controler().isLinkToLinkRoutingEnabled()) {
             bind(TripRouterFactory.class).to(LinkToLinkTripRouterFactory.class).in(Singleton.class);
         }
