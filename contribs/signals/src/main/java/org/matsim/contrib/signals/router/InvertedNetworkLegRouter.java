@@ -76,9 +76,10 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		
 		this.invertedNetwork = new NetworkInverter(network, allowedInLinkTurnInfoMap).getInvertedNetwork();
 
-		// method that takes a getLinkTravelTime( link , ...) with a link from the inverted network, converts it into links on the 
-		// original network, and looks up the link2link tttime in the l2ltravelTimes data structure:
+		// convert l2ltravelTimes into something that can be used by the inverted network router:
 		TravelTimesInvertedNetProxy travelTimesProxy = new TravelTimesInvertedNetProxy(network, l2ltravelTimes);
+		// (method that takes a getLinkTravelTime( link , ...) with a link from the inverted network, converts it into links on the 
+		// original network, and looks up the link2link tttime in the l2ltravelTimes data structure)
 		
 		TravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(
 				travelTimesProxy, cnScoringGroup);

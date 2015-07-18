@@ -1,90 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE network SYSTEM "http://matsim.org/files/dtd/network_v1.dtd">
 <network>
-<nodes>
-<node x="4600000.0" y="5800000.0" id="1021"/>
-<node x="4600000.0" y="5799900.0" id="x1021"/>
-<node x="4600000.0" y="5800500.0" id="1121"/>
-<node x="4600000.0" y="5801000.0" id="1221"/>
-<node x="4600000.0" y="5801500.0" id="1321"/>
-<node x="4600000.0" y="5802000.0" id="1421"/>
-<node x="4600000.0" y="5802500.0" id="1521"/>
-<node x="4600333.0" y="5800500.0" id="1124"/>
-<node x="4600333.0" y="5801000.0" id="1224"/>
-<node x="4600333.0" y="5801500.0" id="1324"/>
-<node x="4600333.0" y="5802000.0" id="1424"/>
-<node x="4600333.0" y="5802500.0" id="1524"/>
-<node x="4600374.0" y="5800497.0" id="2124"/>
-<node x="4600416.0" y="5800994.0" id="2224"/>
-<node x="4600457.0" y="5801491.0" id="2324"/>
-<node x="4600498.0" y="5801988.0" id="2424"/>
-<node x="4600539.0" y="5802485.0" id="2524"/>
-<node x="4600959.0" y="5811297.0" id="1125"/>
-<node x="4600918.0" y="5811794.0" id="1225"/>
-<node x="4600000.0" y="5821600.0" id="1022"/>
-<node x="4600000.0" y="5821700.0" id="x1022"/>
-<node x="4600333.3" y="5800000.0" id="1024"/>
-<node x="4600333.3" y="5799900.0" id="x1024"/>
-<node x="4601000.0" y="5810800.0" id="1025"/>
-<node x="4601100.0" y="5810800.0" id="x1025"/>
-<node x="4600333.3" y="5821600.0" id="1026"/>
-<node x="4600333.3" y="5821700.0" id="x1026"/>
-</nodes>
-<links capperiod="10:00:00">
-<!--"fast":-->
-<link id="6"   modes="pt" permlanes="1" capacity="2000" freespeed="111" length="19100" to="1022" from="1521"/>
-<link id="106" modes="pt" permlanes="1" capacity="2000" freespeed="111" length="19100" to="1521" from="1022"/>
+	<nodes>
+		<node x="4600000.0" y="5799750.0" id="821" />
+		<node x="4600000.0" y="5799975.0" id="921" />
+		<node x="4600000.0" y="5800000.0" id="1021" />
+		<node x="4600000.0" y="5821850.0" id="822" />
+		<node x="4600000.0" y="5821625.0" id="922" />
+		<node x="4600000.0" y="5821600.0" id="1022" />
+		<node x="4600333.3" y="5799750.0" id="824" />
+		<node x="4600333.3" y="5799975.0" id="924" />
+		<node x="4600333.3" y="5800000.0" id="1024" />
+		<node x="4601250.0" y="5810800.0" id="825" />
+		<node x="4601025.0" y="5810800.0" id="925" />
+		<node x="4601000.0" y="5810800.0" id="1025" />
+		<node x="4600333.3" y="5821850.0" id="826" />
+		<node x="4600333.3" y="5821625.0" id="926" />
+		<node x="4600333.3" y="5821600.0" id="1026" />
+	</nodes>
+	<links capperiod="10:00:00">
+		<link id="102102" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="921" from="821" />
+		<link id="102101" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="1021" from="921" />
+		<link id="21" modes="pt" permlanes="1" capacity="2000" freespeed="9.23"
+			length="21600" to="1026" from="1024" />
+		<link id="102402" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="924" from="824" />
+		<link id="102401" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="1024" from="924" />
+		<link id="102412" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="824" from="924" />
+		<link id="102411" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="924" from="1024" />
+		<link id="102502" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="925" from="825" />
+		<link id="102501" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="1025" from="925" />
+		<link id="102512" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="825" from="925" />
+		<link id="102511" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="925" from="1025" />
+		<link id="11" modes="pt" permlanes="1" capacity="2000" freespeed="22.5"
+			length="21600" to="1022" from="1021" />
+		<link id="102212" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="822" from="922" />
+		<link id="102211" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="922" from="1022" />
+		<link id="22" modes="pt" permlanes="1" capacity="2000" freespeed="36"
+			length="21600" to="1024" from="1026" />
+		<link id="102602" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="926" from="826" />
+		<link id="102601" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="1026" from="926" />
+		<link id="102612" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="826" from="926" />
+		<link id="102611" modes="pt" permlanes="1" capacity="2000"
+			freespeed="22" length="25" to="926" from="1026" />
+		<link id="31" modes="pt" permlanes="1" capacity="2000" freespeed="13.9"
+			length="10846" to="1025" from="1024" />
+		<link id="41" modes="pt" permlanes="1" capacity="2000" freespeed="13.9"
+			length="10846" to="1026" from="1025" />
 
-<!--"direct":-->
-<link id="12" modes="pt" permlanes="1" capacity="2000" freespeed="15" length="19100" to="1026" from="1524"/>
-<link id="112" modes="pt" permlanes="1" capacity="2000" freespeed="15" length="19100" to="1524" from="1026"/>
 
-<!--"switch" (second long link):-->
-<link id="21"  modes="pt" permlanes="1" capacity="2000" freespeed="23" length="9846" to="1026" from="1225"/>
-<link id="121" modes="pt" permlanes="1" capacity="2000" freespeed="23" length="9846" to="1225" from="1026"/>
-
-<link id="1" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1121" from="1021"/>
-<link id="2" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1221" from="1121"/>
-<link id="3" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1321" from="1221"/>
-<link id="4" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1421" from="1321"/>
-<link id="5" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1521" from="1421"/>
-<link id="7" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1124" from="1024"/>
-<link id="8" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1224" from="1124"/>
-<link id="9" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1324" from="1224"/>
-<link id="10" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1424" from="1324"/>
-<link id="11" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1524" from="1424"/>
-<link id="13" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2124" from="1024"/>
-<link id="14" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2224" from="2124"/>
-<link id="15" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2324" from="2224"/>
-<link id="16" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2424" from="2324"/>
-<link id="17" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2524" from="2424"/>
-<link id="18" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="8346" to="1025" from="2524"/>
-<link id="19" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1125" from="1025"/>
-<link id="20" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1225" from="1125"/>
-<link id="101" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1021" from="1121"/>
-<link id="102" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1121" from="1221"/>
-<link id="103" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1221" from="1321"/>
-<link id="104" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1321" from="1421"/>
-<link id="105" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1421" from="1521"/>
-<link id="107" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1024" from="1124"/>
-<link id="108" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1124" from="1224"/>
-<link id="109" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1224" from="1324"/>
-<link id="110" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1324" from="1424"/>
-<link id="111" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1424" from="1524"/>
-<link id="113" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1024" from="2124"/>
-<link id="114" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2124" from="2224"/>
-<link id="115" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2224" from="2324"/>
-<link id="116" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2324" from="2424"/>
-<link id="117" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2424" from="2524"/>
-<link id="118" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="8346" to="2524" from="1025"/>
-<link id="119" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1025" from="1125"/>
-<link id="120" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1125" from="1225"/>
-
-<link id="1000" modes="pt" permlanes="1" capacity="2000" freespeed="12" length="100" to="1021" from="x1021"/>
-<link id="2000" modes="pt" permlanes="1" capacity="2000" freespeed="12" length="100" to="1024" from="x1024"/>
-<link id="4000" modes="pt" permlanes="1" capacity="2000" freespeed="12" length="100" to="1025" from="x1025"/>
-<link id="1100" modes="pt" permlanes="1" capacity="2000" freespeed="12" length="100" to="1022" from="x1022"/>
-<link id="2100" modes="pt" permlanes="1" capacity="2000" freespeed="12" length="100" to="1026" from="x1026"/>
-
-</links>
+	</links>
 </network>

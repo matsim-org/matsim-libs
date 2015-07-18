@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="1021000001" x="4600000.0" y="5800000.0"
+			linkRefId="102101" />
+		<stopFacility id="1022000001" x="4600000.0" y="5821600.0"
+			linkRefId="102211" />
+		<stopFacility id="1024000001" x="4600333.0" y="5800000.0"
+			linkRefId="102401" />
+		<stopFacility id="1026000001" x="4600333.0" y="5821600.0"
+			linkRefId="102611" />
+		<stopFacility id="1025000001" x="4601000.0" y="5810800.0"
+			linkRefId="102511" />
+		<stopFacility id="1026000002" x="4600333.0" y="5821600.0"
+			linkRefId="102601" />
+		<stopFacility id="1024000002" x="4600333.0" y="5800000.0"
+			linkRefId="102411" />
+		<stopFacility id="1025000002" x="4601000.0" y="5810800.0"
+			linkRefId="102501" />
+	</transitStops>
+	<transitLine id="gelb">
+		<transitRoute id="gelb_1">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="1021000001" departureOffset="00:01:00"
+					arrivalOffset="00:00:00" awaitDeparture="true" />
+				<stop refId="1022000001" departureOffset="00:17:00"
+					arrivalOffset="00:17:00" awaitDeparture="true" />
+			</routeProfile>
+			<route>
+				<link refId="102102" />
+				<link refId="102101" />
+				<link refId="11" />
+				<link refId="102211" />
+				<link refId="102212" />
+			</route>
+			<departures>
+				<departure id="1000" departureTime="06:08:39"
+					vehicleRefId="1000" />
+				<departure id="1003" departureTime="06:38:39"
+					vehicleRefId="1003" />
+				<departure id="1006" departureTime="07:08:39"
+					vehicleRefId="1006" />
+				<departure id="1009" departureTime="07:38:39"
+					vehicleRefId="1009" />
+				<departure id="1012" departureTime="08:08:39"
+					vehicleRefId="1012" />
+				<departure id="1015" departureTime="08:38:39"
+					vehicleRefId="1015" />
+				<departure id="1018" departureTime="09:08:39"
+					vehicleRefId="1018" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="blau">
+		<transitRoute id="blau_1">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="1024000001" departureOffset="00:01:00"
+					arrivalOffset="00:00:00" awaitDeparture="true" />
+				<stop refId="1026000001" departureOffset="00:40:00"
+					arrivalOffset="00:40:00" awaitDeparture="true" />
+			</routeProfile>
+			<route>
+				<link refId="102402" />
+				<link refId="102401" />
+				<link refId="21" />
+				<link refId="102611" />
+				<link refId="102612" />
+			</route>
+			<departures>
+				<departure id="2000" departureTime="06:00:00"
+					vehicleRefId="2000" />
+				<departure id="2003" departureTime="06:30:00"
+					vehicleRefId="2003" />
+				<departure id="2006" departureTime="07:00:00"
+					vehicleRefId="2006" />
+				<departure id="2009" departureTime="07:30:00"
+					vehicleRefId="2009" />
+				<departure id="2012" departureTime="08:00:00"
+					vehicleRefId="2012" />
+				<departure id="2015" departureTime="08:30:00"
+					vehicleRefId="2015" />
+				<departure id="2018" departureTime="09:00:00"
+					vehicleRefId="2018" />
+			</departures>
+		</transitRoute>
+		<transitRoute id="blau_2">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="1026000002" departureOffset="00:01:00"
+					arrivalOffset="00:00:00" awaitDeparture="true" />
+				<stop refId="1024000002" departureOffset="00:11:00"
+					arrivalOffset="00:02:00" awaitDeparture="true" />
+			</routeProfile>
+			<route>
+				<link refId="102602" />
+				<link refId="102601" />
+				<link refId="22" />
+				<link refId="102411" />
+				<link refId="102412" />
+			</route>
+			<departures>
+				<departure id="2001" departureTime="12:46:00"
+					vehicleRefId="2001" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="grün">
+		<transitRoute id="grün_1">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="1024000001" departureOffset="00:01:00"
+					arrivalOffset="00:00:00" awaitDeparture="true" />
+				<stop refId="1025000001" departureOffset="00:14:00"
+					arrivalOffset="00:14:00" awaitDeparture="true" />
+			</routeProfile>
+			<route>
+				<link refId="102402" />
+				<link refId="102401" />
+				<link refId="31" />
+				<link refId="102511" />
+				<link refId="102512" />
+			</route>
+			<departures>
+				<departure id="3000" departureTime="06:00:00"
+					vehicleRefId="3000" />
+				<departure id="3003" departureTime="06:30:00"
+					vehicleRefId="3003" />
+				<departure id="3006" departureTime="07:00:00"
+					vehicleRefId="3006" />
+				<departure id="3009" departureTime="07:30:00"
+					vehicleRefId="3009" />
+				<departure id="3012" departureTime="08:00:00"
+					vehicleRefId="3012" />
+				<departure id="3015" departureTime="08:30:00"
+					vehicleRefId="3015" />
+				<departure id="3018" departureTime="09:00:00"
+					vehicleRefId="3018" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="rot">
+		<transitRoute id="rot_1">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="1025000002" departureOffset="00:00:00"
+					arrivalOffset="00:00:00" awaitDeparture="true" />
+				<stop refId="1026000001" departureOffset="00:14:00"
+					arrivalOffset="00:14:00" awaitDeparture="true" />
+			</routeProfile>
+			<route>
+				<link refId="102502" />
+				<link refId="102501" />
+				<link refId="41" />
+				<link refId="102611" />
+				<link refId="102612" />
+			</route>
+			<departures>
+				<departure id="4000" departureTime="06:16:00"
+					vehicleRefId="4000" />
+				<departure id="4003" departureTime="06:46:00"
+					vehicleRefId="4003" />
+				<departure id="4006" departureTime="07:16:00"
+					vehicleRefId="4006" />
+				<departure id="4009" departureTime="07:46:00"
+					vehicleRefId="4009" />
+				<departure id="4012" departureTime="08:16:00"
+					vehicleRefId="4012" />
+				<departure id="4015" departureTime="08:46:00"
+					vehicleRefId="4015" />
+				<departure id="4018" departureTime="09:16:00"
+					vehicleRefId="4018" />
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>
