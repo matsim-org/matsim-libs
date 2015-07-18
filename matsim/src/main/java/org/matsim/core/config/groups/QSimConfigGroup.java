@@ -177,7 +177,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		{
-			String options = null ;
+			String options = "" ;
 			for ( SnapshotStyle style : SnapshotStyle.values() ) {
 				options += style.toString() + " " ;
 			}
