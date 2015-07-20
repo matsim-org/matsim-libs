@@ -78,7 +78,7 @@ public class Fixture {
 		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFile());
 		conf.network().setLaneDefinitionsFile(lanes20);
 		conf.plans().setInputFile(plansFile);
-		conf.scenario().setUseLanes(true);
+		conf.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		//as signals are configured below we don't need signals on
 		conf.qsim().setStuckTime(1000);

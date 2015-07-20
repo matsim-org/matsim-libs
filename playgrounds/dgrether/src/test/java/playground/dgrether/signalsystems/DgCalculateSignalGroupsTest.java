@@ -112,7 +112,7 @@ public class DgCalculateSignalGroupsTest {
 	@Test
 	public void test3WayCrossingManySignals(){
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
@@ -230,7 +230,7 @@ public class DgCalculateSignalGroupsTest {
 	@Test
 	public void test4WayCrossingManySignals() throws JAXBException, SAXException, ParserConfigurationException, IOException{
 		Config conf = ConfigUtils.createConfig();
-		conf.scenario().setUseLanes(true);
+		conf.qsim().setUseLanes(true);
 		//network
 		String inputDirectory = this.testUtils.getClassInputDirectory();
 		conf.network().setInputFile(inputDirectory + "network.xml.gz");

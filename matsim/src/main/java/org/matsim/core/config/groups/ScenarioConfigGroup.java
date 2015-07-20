@@ -20,15 +20,9 @@
 package org.matsim.core.config.groups;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * @author dgrether
@@ -45,8 +39,6 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( ScenarioConfigGroup.class ) ;
 	
-	private boolean useLanes = false;
-
 	public ScenarioConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -54,9 +46,14 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
-		map.put(USE_HOUSEHOLDS, "Deprecated, do not use.  The file is loaded when the filename is given.  Functionality needs to be switched on elsewhere.");
+		
+		// I don't think that the following is used anywhere: 
+		final String message = "Deprecated, do not use.  The file is loaded when the filename is given.  Functionality needs to be switched on elsewhere.";
+		map.put(USE_LANES, message) ; // since jul'15
+		map.put(USE_HOUSEHOLDS, message); // since jul'15
+		map.put(USE_VEHICLES, message); // since jul'15
 		map.put(USE_TRANSIT, "Deprecated, do not use.  See transit section of config file.") ; // since jul'15
+		
 		return map;
 	}
 
@@ -85,18 +82,30 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 	@Override
 	public final Map<String, String> getParams() {
 		Map<String, String> params = super.getParams();
-
-		params.put(USE_LANES, Boolean.toString( this.isUseLanes() ) ) ;
-
 		return params;
 	}
 
-	public boolean isUseLanes() {
-		return this.useLanes;
-	}
+	// if they are not in getParams, they will not be included into the config file dump.
+	
+	// if they are, however, in addParam, then the methods will be called (which throw exceptions).
+	
+	// Once the methods below are removed throughout the code, those exceptions can be moved into the addParam method.
+	
+	// Eventually, the whole scenario config group can be moved away.
+	
+	// kai, jul'15
 
-	public void setUseLanes(final boolean useLanes) {
-		this.useLanes = useLanes;
+	
+	
+
+//	public boolean isUseLanes() {
+//		return this.useLanes;
+//	}
+
+	@SuppressWarnings("static-method")
+	@Deprecated // since jul'15
+	void setUseLanes(@SuppressWarnings("unused") final boolean useLanes) {
+		throw new RuntimeException( getMessage( USE_LANES ) ) ;
 	}
 
 //	public boolean isUseHouseholds() {
@@ -109,16 +118,6 @@ public final class ScenarioConfigGroup extends ConfigGroup {
 		throw new RuntimeException( getMessage( USE_HOUSEHOLDS ) ) ;
 	}
 
-	// if they are not in getParams, they will not be included into the config file dump.
-	
-	// if they are, however, in addParam, then the methods will be called (which throw exceptions).
-	
-	// Once the methods below are removed throughout the code, those exceptions can be moved into the addParam method.
-	
-	// kai, jul'15
-
-	
-	
 	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
 	public void setUseVehicles(@SuppressWarnings("unused") final Boolean b) {

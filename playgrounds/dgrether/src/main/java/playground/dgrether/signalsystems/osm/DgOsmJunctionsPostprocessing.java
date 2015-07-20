@@ -234,7 +234,7 @@ public class DgOsmJunctionsPostprocessing {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     sc.getConfig().network().setInputFile(net);
     if (lanesInputFile != null){
-    	sc.getConfig().scenario().setUseLanes(true);
+    	sc.getConfig().qsim().setUseLanes(true);
     	sc.getConfig().network().setLaneDefinitionsFile(lanesInputFile);
     }
     ScenarioLoaderImpl loader = new ScenarioLoaderImpl(sc);

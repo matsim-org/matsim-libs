@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.households.Households;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -118,6 +119,11 @@ public class ScenarioUtils {
 		// facilities (always there, although that does not make a lot of sense):
 		public ScenarioBuilder setActivityFacilities( ActivityFacilities facilities ) {
 			scenario.setActivityFacilities(facilities);
+			return this ;
+		}
+		// lanes:
+		public ScenarioBuilder setLanes( LaneDefinitions20 lanes ) {
+			scenario.setLanes(lanes);
 			return this ;
 		}
 		// final creational method:

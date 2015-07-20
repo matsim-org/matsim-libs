@@ -77,7 +77,7 @@ class Utils {
 		NetworkTurnInfoBuilder netTurnInfoBuilder = new NetworkTurnInfoBuilder();
 		netTurnInfoBuilder.createAndAddTurnInfo(TransportMode.car, allowedInLinkTurnInfoMap, sc.getNetwork() );
 	
-		if (sc.getConfig().scenario().isUseLanes()) {
+		if ( sc.getConfig().network().getLaneDefinitionsFile()!=null || sc.getConfig().qsim().isUseLanes()) {
 			LaneDefinitions20 ld = sc.getLanes();
 			Map<Id<Link>, List<TurnInfo>> lanesTurnInfoMap = createTurnInfos(ld);
 			netTurnInfoBuilder.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, lanesTurnInfoMap);

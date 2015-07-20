@@ -76,7 +76,7 @@ public final class ScenarioImpl implements Scenario {
 		if (this.config.households().getInputFile()!=null ){
 			this.createHouseholdsContainer();
 		}
-		if (this.config.scenario().isUseLanes()) {
+		if ( this.config.network().getLaneDefinitionsFile()!=null || this.config.qsim().isUseLanes()) {
 			createLanesContainer();
 		}
 		if ( this.config.transit().getTransitScheduleFile() != null || this.config.transit().isUseTransit() ) {
@@ -122,7 +122,10 @@ public final class ScenarioImpl implements Scenario {
 		return true;
 	}
 
-	private final boolean createLanesContainer() {
+	/**
+	 * need this in ScenarioLoader.  If you need it elsewhere, use {@link ScenarioUtils.ScenarioBuilder}.
+	 */
+	final boolean createLanesContainer() {
 		if ( this.lanes != null ) return false ;
 		this.lanes = new LaneDefinitions20Impl();
 		return true ;
@@ -332,6 +335,9 @@ public final class ScenarioImpl implements Scenario {
 	}
 	final void setTransitVehicles( Vehicles vehicles ) {
 		this.transitVehicles = vehicles ;
+	}
+	final void setLanes( LaneDefinitions20 lanes ) {
+		this.lanes = lanes ;
 	}
 
 }

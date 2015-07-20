@@ -20,11 +20,11 @@
 
 package playground.gregor.grips.complexscenariogenerator;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.evacuation.model.config.EvacuationConfigModule;
 import org.matsim.contrib.evacuation.scenariogenerator.ScenarioGenerator;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.population.PopulationWriter;
 
 public class ComplexScenarioGenerator extends ScenarioGenerator {
@@ -82,8 +82,11 @@ public class ComplexScenarioGenerator extends ScenarioGenerator {
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), gcm.getSampleSize()).write(outputPopulationFile);
 		sc.getConfig().plans().setInputFile(outputPopulationFile);
 
-		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(gcm.getSampleSize());
-		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(gcm.getSampleSize());
+//		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(gcm.getSampleSize());
+//		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(gcm.getSampleSize());
+		Logger.getLogger("dummy").fatal("SimulationConfigGroup is no longer there.  Since `simulation' has been gone for some time now, "
+				+ "I cannot see how the above may have worked so I am not fixing it.  kai, jul'15");
+		System.exit(-1);
 
 		ActivityParams pre = new ActivityParams("pre-evac");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"

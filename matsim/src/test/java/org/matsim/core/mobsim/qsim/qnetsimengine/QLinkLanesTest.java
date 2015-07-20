@@ -62,7 +62,7 @@ public class QLinkLanesTest extends MatsimTestCase {
   }
   
 	private LaneDefinitions20 createOneLane(Scenario scenario, int numberOfRepresentedLanes) {
-		scenario.getConfig().scenario().setUseLanes(true);
+		scenario.getConfig().qsim().setUseLanes(true);
 		LaneDefinitions20 lanes = scenario.getLanes();
 		LaneDefinitionsFactory20 builder = lanes.getFactory();
 		//lanes for link 1
@@ -85,7 +85,7 @@ public class QLinkLanesTest extends MatsimTestCase {
 	}
   
 	private LaneDefinitions20 createLanes(Scenario scenario) {
-		scenario.getConfig().scenario().setUseLanes(true);
+		scenario.getConfig().qsim().setUseLanes(true);
 		LaneDefinitions20 lanes = scenario.getLanes();
 		LaneDefinitionsFactory20 builder = lanes.getFactory();
 		//lanes for link 1
@@ -140,7 +140,7 @@ public class QLinkLanesTest extends MatsimTestCase {
 	
 	public void testCapacityWithOneLaneOneLane() {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 1);
@@ -171,10 +171,10 @@ public class QLinkLanesTest extends MatsimTestCase {
 
 	public void testCapacityWithOneLaneOneLaneTwoLanes() {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
-		scenario.getConfig().scenario().setUseLanes(true);
+		scenario.getConfig().qsim().setUseLanes(true);
 		this.initNetwork(scenario.getNetwork());
 		this.createOneLane(scenario, 2);
 
@@ -206,7 +206,7 @@ public class QLinkLanesTest extends MatsimTestCase {
 	
 	public void testCapacityWithLanes() {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		this.initNetwork(scenario.getNetwork());
 		this.createLanes(scenario);

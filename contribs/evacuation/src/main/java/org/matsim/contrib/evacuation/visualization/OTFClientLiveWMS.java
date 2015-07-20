@@ -71,7 +71,8 @@ public class OTFClientLiveWMS {
 				connectionManager.connectWriterToReader(OTFAgentsListHandler.Writer.class, OTFAgentsListHandler.class);
 
 
-				if (config.scenario().isUseLanes() && (!(boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems())) {
+				if ( (config.network().getLaneDefinitionsFile()!=null || config.qsim().isUseLanes()) 
+						&& (!(boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems())) {
 					connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
 					connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
 					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);

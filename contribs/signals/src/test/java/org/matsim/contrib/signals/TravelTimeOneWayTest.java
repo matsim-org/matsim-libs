@@ -74,7 +74,7 @@ public class TravelTimeOneWayTest {
 				String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
 				new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFile());
 				conf.network().setLaneDefinitionsFile(lanes20);
-				conf.scenario().setUseLanes(true);
+				conf.qsim().setUseLanes(true);
 				signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
 		}
 		else {

@@ -57,7 +57,7 @@ public class LaneDefinitonsV11ToV20Converter {
 	public void convert(String laneDefs11Filename, String laneDefs20Filename, String networkFilename){
 		this.checkFileTypes(laneDefs11Filename, laneDefs20Filename);
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 		Scenario sc = ScenarioUtils.createScenario(config);
 		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
 		netReader.readFile(networkFilename);

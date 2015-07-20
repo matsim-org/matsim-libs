@@ -145,7 +145,7 @@ public class ScenarioLoaderImpl {
 		if ( this.config.vehicles().getVehiclesFile() != null ) {
 			this.loadVehicles();
 		}
-		if (this.config.scenario().isUseLanes()) {
+		if (this.config.network().getLaneDefinitionsFile()!=null ) {
 			this.loadLanes();
 		}
 		return this.scenario;

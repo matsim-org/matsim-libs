@@ -71,7 +71,7 @@ public class FourWaysVisMviTest {
     conf.qsim().setStuckTime(100.0);
     
     conf.network().setLaneDefinitionsFile(lanesFile);
-    conf.scenario().setUseLanes(true);
+    conf.qsim().setUseLanes(true);
 
     ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalFile);
     ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalGroupsFile(signalGroupsFile);

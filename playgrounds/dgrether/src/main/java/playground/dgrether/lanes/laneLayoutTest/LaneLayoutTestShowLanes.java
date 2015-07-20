@@ -50,7 +50,7 @@ public class LaneLayoutTestShowLanes {
 		config.network().setInputFile(LaneLayoutTestFileNames.NETWORK);
 		config.network().setLaneDefinitionsFile(LaneLayoutTestFileNames.LANEDEFINITIONSV2);
 		config.plans().setInputFile(LaneLayoutTestFileNames.POPULATION);
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 //		config.otfVis().setLinkWidth(150.0f);
 		ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setDrawLinkIds(true);
 		config.qsim().setNodeOffset(30);

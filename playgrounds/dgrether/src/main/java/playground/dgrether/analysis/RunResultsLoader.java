@@ -127,7 +127,7 @@ public class RunResultsLoader {
 	
 	private LaneDefinitions20 loadLanes(String path) {
 		Config c = ConfigUtils.createConfig();
-		c.scenario().setUseLanes(true);
+		c.qsim().setUseLanes(true);
 		Scenario sc = ScenarioUtils.createScenario(c);
 		LaneDefinitionsReader reader = new LaneDefinitionsReader(sc);
 		reader.readFile(path);

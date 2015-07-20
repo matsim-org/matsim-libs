@@ -82,7 +82,7 @@ public class FourWaysVis {
 //		converter.convert(lanesFile, lanesFile20, netFile);
 
 		config.network().setLaneDefinitionsFile(lanesFile20);
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		

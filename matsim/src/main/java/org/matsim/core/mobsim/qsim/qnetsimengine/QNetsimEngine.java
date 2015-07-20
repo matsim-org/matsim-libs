@@ -162,7 +162,7 @@ public class QNetsimEngine implements MobsimEngine {
 
 		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
 		// first in ctors calling each other.  kai, feb'12
-		if (sim.getScenario().getConfig().scenario().isUseLanes()) {
+		if (sim.getScenario().getConfig().qsim().isUseLanes()) {
 			log.info("Lanes enabled...");
 			if ( netsimNetworkFactory != null ) {
 				throw new RuntimeException("both `lanes' and `netsimNetworkFactory' are defined; don't know what that means; aborting") ;

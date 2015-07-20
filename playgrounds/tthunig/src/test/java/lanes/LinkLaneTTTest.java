@@ -349,7 +349,7 @@ public class LinkLaneTTTest {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 		return config;
 	}
 	

@@ -141,7 +141,7 @@ public class ScenarioLoaderImpl {
 		if (this.config.vehicles().getVehiclesFile()!=null ) {
 			this.loadVehicles() ;
 		}
-		if (this.config.scenario().isUseLanes()) {
+		if (this.config.network().getLaneDefinitionsFile()!=null ) {
 			this.loadLanes();
 		}
 		return this.scenario;
@@ -315,7 +315,7 @@ public class ScenarioLoaderImpl {
 						+ "LaneDefinitonsV11ToV20Converter manually in the preprocessing phase.");
 				throw new UncheckedIOException("Wrong lane file format: " + fileTypeGuesser.getSystemId());
 			}
-
+			this.scenario.createLanesContainer() ;
 			LaneDefinitionsReader reader = new LaneDefinitionsReader(this.scenario);
 			reader.readFile(filename);
 		}

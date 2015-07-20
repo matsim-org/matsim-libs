@@ -24,7 +24,6 @@ import java.util.Arrays;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -69,7 +68,8 @@ public class DgEquilController {
 		  controler.getConfig().qsim().setSnapshotStyle(SnapshotStyle.queue);
 		}
 		else {
-		  ((SimulationConfigGroup) controler.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(1.0);
+//		  ((SimulationConfigGroup) controler.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(1.0);
+			throw new RuntimeException("no longer supported") ;
 		}
 
 		controler.getConfig().controler().setOverwriteFileSetting(
