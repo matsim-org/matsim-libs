@@ -19,10 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.parking.example;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.PC2.scoring.AbstractParkingBetas;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 
 /**
  * @author jbischoff

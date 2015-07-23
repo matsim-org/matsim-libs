@@ -36,9 +36,7 @@ public class ParkingCostCalculatorExample implements ParkingCostModel {
 	}
 	
 	@Override
-	public double calcParkingCost(double arrivalTimeInSeconds,
-		
-			double durationInSeconds, Id<Person> personId, Id parkingFacilityId) {
+	public double calcParkingCost(double arrivalTimeInSeconds, double durationInSeconds, Id<Person> personId, Id parkingFacilityId) {
 					
 			return hourlyParkingCharge*(durationInSeconds/3600);
 		

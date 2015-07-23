@@ -28,14 +28,12 @@ import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.PC2.GeneralParkingModule;
 import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
-import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.example.ParkingBetaExample;
 import org.matsim.contrib.parking.example.ParkingCostCalculatorExample;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -51,52 +49,37 @@ public class RunParkingExample {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("src/main/ressources/config.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
 
-		//setting Parking Costs - charged parking @ work, free parking @ home
-		ParkingCostModel parkingCostModelWork = new ParkingCostCalculatorExample(1);
-		ParkingCostModel parkingCostModelHome = new ParkingCostCalculatorExample(0);
-		
-		
-		// we need some settings to walk from parking to destination - in this case, we are using default values.
-		PlansCalcRouteConfigGroup cg = new PlansCalcRouteConfigGroup();
-		WalkTravelTime walkTravelTime = new WalkTravelTime(cg);
-		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(walkTravelTime, controler);
+		Controler controler = new Controler(scenario);
+		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+
+		// ---
+
+		// we need some settings to walk from parking to destination:
+		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(new WalkTravelTime(controler.getConfig().plansCalcRoute()), scenario);
 		parkingScoreManager.setParkingScoreScalingFactor(1);
 		parkingScoreManager.setParkingBetas(new ParkingBetaExample());
-		
-		
-		ParkingInfrastructureManager parkingInfrastructureManager = new ParkingInfrastructureManager(parkingScoreManager, controler.getEvents());
-		
-		//parking 1: we place this near the workplace
-		PublicParking workPark = new PublicParking(Id.create("workPark", PC2Parking.class), 98, new CoordImpl(10000,0), parkingCostModelWork, "park");
-		
-		//parking : we place this at home
-		PublicParking homePark = new PublicParking(Id.create("homePark", PC2Parking.class), 98, new CoordImpl(-25000,0), parkingCostModelHome, "park");
 
-		LinkedList<PublicParking> publicParkings = new LinkedList<PublicParking>();
-		
-		publicParkings.add(workPark);
-		publicParkings.add(homePark);
-		parkingInfrastructureManager.setPublicParkings(publicParkings);
-		
-		
-		
-		
-		
+		// ---
+
+		ParkingInfrastructureManager parkingInfrastructureManager = new ParkingInfrastructureManager(parkingScoreManager, controler.getEvents());
+		{
+			LinkedList<PublicParking> publicParkings = new LinkedList<PublicParking>();
+			//parking 1: we place this near the workplace
+			publicParkings.add(new PublicParking(Id.create("workPark", PC2Parking.class), 98, new CoordImpl(10000,0), 
+					new ParkingCostCalculatorExample(1), "park"));
+			//parking 2: we place this at home
+			publicParkings.add(new PublicParking(Id.create("homePark", PC2Parking.class), 98, new CoordImpl(-25000,0), 
+					new ParkingCostCalculatorExample(0), "park"));
+			parkingInfrastructureManager.setPublicParkings(publicParkings);
+		}
+
 
 		//setting up the Parking Module
 		GeneralParkingModule generalParkingModule = new GeneralParkingModule(controler);
 		generalParkingModule.setParkingScoreManager(parkingScoreManager);
-		generalParkingModule.setParkingCostModel(parkingCostModelHome);
 		generalParkingModule.setParkingInfrastructurManager(parkingInfrastructureManager);
-		
-//		controler.setOverwriteFiles(true);
+
 		controler.run();
 	}
 

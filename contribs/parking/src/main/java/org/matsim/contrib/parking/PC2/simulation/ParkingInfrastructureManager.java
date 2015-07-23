@@ -338,16 +338,16 @@ public class ParkingInfrastructureManager {
 
 	}
 
-	public synchronized LinkedList<PC2Parking> getNonFullParking(Collection<PC2Parking> parkings) {
-		LinkedList<PC2Parking> result = new LinkedList<PC2Parking>();
-
-		for (PC2Parking p : parkings) {
-			if (p.getAvailableParkingCapacity() > 0) {
-				result.add(p);
-			}
-		}
-		return result;
-	}
+//	public synchronized LinkedList<PC2Parking> getNonFullParking(Collection<PC2Parking> parkings) {
+//		LinkedList<PC2Parking> result = new LinkedList<PC2Parking>();
+//		for (PC2Parking p : parkings) {
+//			if (p.getAvailableParkingCapacity() > 0) {
+//				result.add(p);
+//			}
+//		}
+//		return result;
+//	}
+	// never used. kai, jul'15
 
 	// TODO: make this method abstract
 	public synchronized PC2Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {

@@ -121,7 +121,7 @@ public class SetupParkingForZHScenario {
 	
 	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule, LinkedList<PParking> parkings) {
 		Controler controler=parkingModule.getControler();
-		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(parkingModule.getControler()), parkingModule.getControler());
+		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(parkingModule.getControler()), controler.getScenario() );
 
 
         ParkingBetas parkingBetas=new ParkingBetas(getHouseHoldIncomeCantonZH(parkingModule.getControler().getScenario().getPopulation()));
