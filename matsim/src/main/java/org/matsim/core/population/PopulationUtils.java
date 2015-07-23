@@ -370,13 +370,15 @@ public final class PopulationUtils {
 	 */
 	public static double calculateSimilarity(List<Leg> legs1, List<Leg> legs2, Network network, 
 			double sameModeReward, double sameRouteReward ) {
-		// yy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
+		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
 
 		// yy kwa points to: 
 		// Schüssler, N. and K.W. Axhausen (2009b) Accounting for similarities in destination choice modelling: A concept, paper presented at the 9th Swiss Transport Research Conference, Ascona, October 2009.
 		//		und 
 		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001). 
 		// A Position-Sensitive Sequence Alignment Method Illustrated for Space-Time Activity-Diary Data¹, Environment and Planning A 33(2): 313­338.
+
+		// Mahdieh Allahviranloo has some work on activity pattern similarity (iatbr'15)
 
 		double simil = 0. ;
 		Iterator<Leg> it1 = legs1.iterator();
@@ -414,13 +416,15 @@ public final class PopulationUtils {
 	 */
 	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypePenalty, 
 			double sameActivityLocationPenalty, double actTimeParameter ) {
-		// yy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
+		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
 
 		// yy kwa points to: 
 		// Schüssler, N. and K.W. Axhausen (2009b) Accounting for similarities in destination choice modelling: A concept, paper presented at the 9th Swiss Transport Research Conference, Ascona, October 2009.
 		//		und 
 		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001). 
 		// A Position-Sensitive Sequence Alignment Method Illustrated for Space-Time Activity-Diary Data¹, Environment and Planning A 33(2): 313­338.
+		
+		// Mahdieh Allahviranloo has some work on activity pattern similarity (iatbr'15)
 
 		double simil = 0. ;
 		Iterator<Activity> it1 = activities1.iterator() ;
