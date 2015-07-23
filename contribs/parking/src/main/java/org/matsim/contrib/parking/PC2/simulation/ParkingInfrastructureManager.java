@@ -371,11 +371,14 @@ public class ParkingInfrastructureManager {
 
 	// TODO: make this method abstract
 	public synchronized PC2Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
-		Id<PC2Parking> parkingFacilityId = parkedVehicles.get(parkingOperationRequestAttributes.personId);
+		final Id<Person> personId = parkingOperationRequestAttributes.personId;
+		Id<PC2Parking> parkingFacilityId = parkedVehicles.get(personId);
 		PC2Parking parking = getAllParkings().get(parkingFacilityId);
-		parkedVehicles.remove(parkingOperationRequestAttributes.personId);
+
+		parkedVehicles.remove(personId);
+		
 		unParkVehicle(parking, parkingOperationRequestAttributes.arrivalTime
-				+ parkingOperationRequestAttributes.parkingDurationInSeconds, parkingOperationRequestAttributes.personId);
+				+ parkingOperationRequestAttributes.parkingDurationInSeconds, personId);
 		return parking;
 	}
 

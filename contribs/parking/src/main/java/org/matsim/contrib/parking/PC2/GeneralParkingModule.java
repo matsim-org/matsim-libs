@@ -36,7 +36,7 @@ public class GeneralParkingModule implements StartupListener, IterationStartsLis
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		parkingSimulation = new ParkingChoiceSimulation(controler, parkingInfrastructureManager);
+		parkingSimulation = new ParkingChoiceSimulation(controler.getScenario(), parkingInfrastructureManager);
 		controler.getEvents().addHandler(parkingSimulation);
 //		controler.addControlerListener(parkingSimulation);
 		// was not doing anything there. kai, jul'15
