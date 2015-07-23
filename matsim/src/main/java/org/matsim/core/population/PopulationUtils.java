@@ -22,6 +22,7 @@ package org.matsim.core.population;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
@@ -515,6 +516,66 @@ public final class PopulationUtils {
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+
+	public static Activity getFirstActivityAfterLastCarLegOfDay(Plan plan){
+		List<PlanElement> planElements = plan.getPlanElements();
+		int indexOfLastCarLegOfDay=-1;
+		for (int i=planElements.size()-1;i>=0;i--){
+			if (planElements.get(i) instanceof Leg){
+				Leg leg = (Leg) planElements.get(i);
+	
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
+					indexOfLastCarLegOfDay=i;
+					break;
+				}
+	
+			}
+		}
+	
+		for (int i=indexOfLastCarLegOfDay+1;i<planElements.size();i++){
+			if (planElements.get(i) instanceof Activity){
+				return (Activity) planElements.get(i);
+			}
+		}
+		return null;
+	}
+
+	public static Activity getFirstActivityOfDayBeforeDepartingWithCar(Plan plan){
+		List<PlanElement> planElements = plan.getPlanElements();
+		int indexOfFirstCarLegOfDay=-1;
+		for (int i=0;i<planElements.size();i++){
+			if (planElements.get(i) instanceof Leg){
+				Leg leg= (Leg) planElements.get(i);
+	
+				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
+					indexOfFirstCarLegOfDay=i;
+					break;
+				}
+	
+			}
+		}
+		for (int i=indexOfFirstCarLegOfDay-1;i>=0;i--){
+			if (planElements.get(i) instanceof Activity){
+				return (Activity) planElements.get(i);
+			}
+		}
+		return null;
+	}
+
+	public static boolean hasCarLeg(Plan plan){
+		List<PlanElement> planElements = plan.getPlanElements();
+		for (int i=0;i<planElements.size();i++){
+			if (planElements.get(i) instanceof Leg){
+				Leg Leg= (Leg) planElements.get(i);
+	
+				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
+					return true;
+				}
+	
+			}
+		}
+		return false;
 	}
 	
 }

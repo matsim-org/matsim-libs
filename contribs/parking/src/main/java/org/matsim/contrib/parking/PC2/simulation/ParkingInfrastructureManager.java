@@ -44,12 +44,8 @@ import org.matsim.facilities.ActivityFacility;
 public class ParkingInfrastructureManager {
 
 	private ParkingScoreManager parkingScoreManager;
-
 	private HashMap<Id<PC2Parking>, PC2Parking> allParkings;
-
-	// personId, parkingFacilityId
 	private HashMap<Id<Person>, Id<PC2Parking>> parkedVehicles;
-
 	private EventsManager eventsManager;
 
 	// facilityId -> parkings available to users of that facility
@@ -120,14 +116,16 @@ public class ParkingInfrastructureManager {
 	public synchronized void reset() {
 		parkedVehicles.clear();
 
-		for (Id<PC2Parking> parkingFacilityId : getAllParkings().keySet()) {
-			PC2Parking parking = getAllParkings().get(parkingFacilityId);
+		for ( PC2Parking parking : getAllParkings().values() ) {
 			if (parking.getAvailableParkingCapacity() == 0) {
-				// I have no idea what this is doing and why.  Why should parking be full at the end of simulation?  Why put it 
+				// yyyyyy I have no idea what this is doing and why.  Why should parking be full at the end of simulation?  Why put it 
 				// into a quad tree?  Maybe this is an implicit marker that has been added during the previous iteration??? kai, jul'15
 				if (!(parking instanceof PrivateParking)) {
 					addParkingToQuadTree(publicParkingsQuadTree, parking);
 					addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
+					// yyyyyy I could speculate that full parking lots are removed from the quad tree, and it is re-added as soon
+					// as space becomes available.  But this is not commented, and it also does not look like it would work in that way.
+					// kai, jul'15
 				}
 			}
 			parking.resetAvailability();
@@ -188,22 +186,32 @@ public class ParkingInfrastructureManager {
 
 		PC2Parking selectedParking = null;
 		boolean parkingFound = false;
+		
+		// first search for parking at selected facility:
 		for (PPRestrictedToFacilities pp : privateParkingsRestrictedToFacilities.get(parkingOperationRequestAttributes.facilityId)) {
 			if (pp.getAvailableParkingCapacity() > 0) {
+
+				// this tells the parking lot to decrease the number of available spaces:
 				pp.parkVehicle();
+
+				// this puts the personId (!!!! yyyyyy) at the parking location:
 				parkedVehicles.put(parkingOperationRequestAttributes.personId, pp.getId());
+				
 				parkingFound = true;
 				selectedParking = pp;
 			}
 		}
 
+		// if not found, search within distance of 300m:
 		double distance = 300;
 		if (!parkingFound) {
 			Collection<PC2Parking> collection = getPublicParkingQuadTree().get(
 					parkingOperationRequestAttributes.destCoordinate.getX(),
 					parkingOperationRequestAttributes.destCoordinate.getY(), distance);
 
-			if (!parkingFound) {
+			if (!parkingFound) { 
+				// yyyyyy no idea why the condition is checked again but it is certainly still valid.  
+				
 				while (collection.size() == 0) {
 					distance *= 2;
 					collection = getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
@@ -216,8 +224,8 @@ public class ParkingInfrastructureManager {
 
 				}
 
+				// put parking that was found into a sorted queue:
 				PriorityQueue<SortableMapObject<PC2Parking>> queue = new PriorityQueue<SortableMapObject<PC2Parking>>();
-
 				for (PC2Parking parking : collection) {
 					double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
 							parkingOperationRequestAttributes.arrivalTime,
@@ -228,11 +236,15 @@ public class ParkingInfrastructureManager {
 
 				// TODO: should I make MNL only on top 5 here?
 
+				// select the best one from the queue:
 				SortableMapObject<PC2Parking> poll = queue.peek();
 				finalScore = poll.getScore();
 				selectedParking = poll.getKey();
+
+				// this puts the personId (!!!! yyyyyy) at the parking location:
 				parkedVehicles.put(parkingOperationRequestAttributes.personId, selectedParking.getId());
 
+				// this tells the parking lot to decrease the number of available spaces:
 				parkVehicle(selectedParking);
 
 //				PC2Parking closestParking = getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
@@ -282,6 +294,8 @@ public class ParkingInfrastructureManager {
 
 		eventsManager.processEvent(new ParkingArrivalEvent(parkingOperationRequestAttributes.arrivalTime, selectedParking.getId(),
 				parkingOperationRequestAttributes.personId, parkingOperationRequestAttributes.destCoordinate, finalScore));
+		// yyyyyy the parking arrival event returns person id, not vehicle id.  Do we change to vehicle id, or add the vehicle
+		// id to the event?  In the code, the person id is used for the walk distance. kai, jul'15
 
 		return selectedParking;
 	}
@@ -323,11 +337,15 @@ public class ParkingInfrastructureManager {
 				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
 			}
 
-			Collection<PC2Parking> collection = publicParkingsQuadTree.get(parking.getCoordinate().getX(), parking.getCoordinate()
-					.getY(), 1);
+			Collection<PC2Parking> collection = publicParkingsQuadTree.get(parking.getCoordinate().getX(), parking.getCoordinate().getY(), 1);
 			if (collection.size() == 1) {
 				for (PC2Parking p : collection) {
+					// yyyyyy no idea why we first test for "size of collection == 1" and then iterate over it.  kai, jul'15
+					
 					if (p.getId().toString().equalsIgnoreCase(parking.getId().toString())) {
+						// (i.e. the found parking is not the same as the one that should be at the coordinate; two parking locations are
+						// on top of each other)
+						
 						DebugLib.stopSystemAndReportInconsistency();
 					}
 				}
@@ -381,6 +399,9 @@ public class ParkingInfrastructureManager {
 			if (!(parking instanceof PrivateParking)) {
 				addParkingToQuadTree(publicParkingsQuadTree, parking);
 				addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
+				// yyyyyy I could speculate that full parking lots are removed from the quad tree, and it is re-added as soon
+				// as space becomes available.  But this is not commented, and it also does not look like it would work in that way.
+				// kai, jul'15
 			}
 		}
 
