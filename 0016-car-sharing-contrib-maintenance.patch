@@ -1,0 +1,25 @@
+From a2dda9db62b99421c531468f673c0ff71ac04959 Mon Sep 17 00:00:00 2001
+From: Kai Nagel <2008@kainagel.org>
+Date: Mon, 27 Jul 2015 10:55:17 +0200
+Subject: [PATCH 16/16] car sharing contrib maintenance
+
+---
+ .../matsim/contrib/carsharing/qsim/CarsharingPersonDriverAgentImpl.java | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/contribs/carsharing/src/main/java/org/matsim/contrib/carsharing/qsim/CarsharingPersonDriverAgentImpl.java b/contribs/carsharing/src/main/java/org/matsim/contrib/carsharing/qsim/CarsharingPersonDriverAgentImpl.java
+index 38f5ed3..0e0c526 100644
+--- a/contribs/carsharing/src/main/java/org/matsim/contrib/carsharing/qsim/CarsharingPersonDriverAgentImpl.java
++++ b/contribs/carsharing/src/main/java/org/matsim/contrib/carsharing/qsim/CarsharingPersonDriverAgentImpl.java
+@@ -129,7 +129,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
+ 				this.getVehicle().getId().toString().startsWith("OW") || 
+ 				this.getVehicle().getId().toString().startsWith("FF"))) 
+ 		{
+-			parkCSVehicle( this.getCurrentLinkId() );			
++			parkCSVehicle();			
+ 		}
+ 		this.basicAgentDelegate.endLegAndComputeNextState(now);
+ 		if ( this.getState()!=State.ABORT ) {
+-- 
+2.3.2 (Apple Git-55)
+

@@ -1,0 +1,850 @@
+From 950388192c071ec2304b597fce13c1c79c46ab2a Mon Sep 17 00:00:00 2001
+From: Kai Nagel <2008@kainagel.org>
+Date: Fri, 17 Jul 2015 16:10:22 +0200
+Subject: [PATCH 03/16] some (unfinished) test of the randomized pt router
+
+---
+ .../RandomizedTransitRouterTest.java               |  63 +++++++++++++
+ .../Network_RandomizedPt.pdf                       | Bin 0 -> 14253 bytes
+ .../common/randomizedtransitrouter/facilities.xml  |  14 +++
+ .../common/randomizedtransitrouter/network.xml     |  90 ++++++++++++++++++
+ .../randomizedtransitrouter/transitVehicles.xml    |  69 ++++++++++++++
+ .../contribs/signals/router/NetworkInverter.java    | 101 +++++++++++++++++++++
+ .../router/TravelTimesInvertedNetProxy.java        |  58 ++++++++++++
+ .../matsim/core/router/util/NetworkInverter.java   | 101 ---------------------
+ .../router/util/TravelTimesInvertedNetProxy.java   |  58 ------------
+ 9 files changed, 395 insertions(+), 159 deletions(-)
+ create mode 100644 contrib/common/src/test/java/org/matsim/contrib/common/randomizedtransitrouter/RandomizedTransitRouterTest.java
+ create mode 100644 contrib/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/Network_RandomizedPt.pdf
+ create mode 100644 contrib/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/facilities.xml
+ create mode 100644 contrib/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/network.xml
+ create mode 100644 contrib/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/transitVehicles.xml
+ create mode 100644 contrib/signals/src/main/java/org/matsim/contrib/signals/router/NetworkInverter.java
+ create mode 100644 contrib/signals/src/main/java/org/matsim/contrib/signals/router/TravelTimesInvertedNetProxy.java
+ delete mode 100644 matsim/src/main/java/org/matsim/core/router/util/NetworkInverter.java
+ delete mode 100644 matsim/src/main/java/org/matsim/core/router/util/TravelTimesInvertedNetProxy.java
+
+diff --git a/contribs/common/src/test/java/org/matsim/contrib/common/randomizedtransitrouter/RandomizedTransitRouterTest.java b/contribs/common/src/test/java/org/matsim/contrib/common/randomizedtransitrouter/RandomizedTransitRouterTest.java
+new file mode 100644
+index 0000000..9848805
+--- /dev/null
++++ b/contribs/common/src/test/java/org/matsim/contrib/common/randomizedtransitrouter/RandomizedTransitRouterTest.java
+@@ -0,0 +1,63 @@
++/* *********************************************************************** *
++ * project: org.matsim.*												   *
++ *                                                                         *
++ * *********************************************************************** *
++ *                                                                         *
++ * copyright       : (C) 2008 by the members listed in the COPYING,        *
++ *                   LICENSE and WARRANTY file.                            *
++ * email           : info at matsim dot org                                *
++ *                                                                         *
++ * *********************************************************************** *
++ *                                                                         *
++ *   This program is free software; you can redistribute it and/or modify  *
++ *   it under the terms of the GNU General Public License as published by  *
++ *   the Free Software Foundation; either version 2 of the License, or     *
++ *   (at your option) any later version.                                   *
++ *   See also COPYING, LICENSE and WARRANTY file                           *
++ *                                                                         *
++ * *********************************************************************** */
++package org.matsim.contrib.common.randomizedtransitrouter;
++
++import org.junit.Rule;
++import org.junit.Test;
++import org.matsim.api.core.v01.Scenario;
++import org.matsim.core.config.Config;
++import org.matsim.core.config.ConfigUtils;
++import org.matsim.core.controler.Controler;
++import org.matsim.core.scenario.ScenarioUtils;
++import org.matsim.testcases.MatsimTestUtils;
++
++/**
++ * @author nagel
++ *
++ */
++public class RandomizedTransitRouterTest {
++	
++	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
++
++	@Test
++	public final void test() {
++		String scenarioDir = utils.getPackageInputDirectory() ;
++		String outputDir = utils.getOutputDirectory() ;
++
++		Config config = ConfigUtils.createConfig();
++		
++		config.controler().setOutputDirectory( outputDir );
++		
++		config.transit().setUseTransit(true);
++		
++		// ---
++		
++		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
++		
++		// ---
++		
++		Controler controler = new Controler( scenario ) ;
++		
++		controler.run();
++		
++		// ---
++		
++	}
++
++}
+diff --git a/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/Network_RandomizedPt.pdf b/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/Network_RandomizedPt.pdf
+new file mode 100644
+index 0000000000000000000000000000000000000000..c51a582be355ac577299aafdc90ebd1612923a36
+GIT binary patch
+literal 14253
+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
+a`xzm@-Ux5Mvua=nG#UuXczEPB6#fsFn9*SX
+
+literal 0
+HcmV?d00001
+
+diff --git a/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/facilities.xml b/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/facilities.xml
+new file mode 100644
+index 0000000..d643709
+--- /dev/null
++++ b/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/facilities.xml
+@@ -0,0 +1,14 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<!DOCTYPE facilities SYSTEM "http://www.matsim.org/files/dtd/facilities_v1.dtd">
++<facilities>
++<facility id="100" y="5821600" x="4600333">
++<activity type="education_100">
++<opentime end_time="12:45:00" start_time="08:10:00" day="wkday"/>
++</activity>
++</facility>
++<facility id="1021" y="5800000" x="4600333">
++<activity type="home">
++<opentime end_time="24:00:00" start_time="00:00:00" day="wk"/>
++</activity>
++</facility>
++</facilities>
+diff --git a/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/network.xml b/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/network.xml
+new file mode 100644
+index 0000000..3264023
+--- /dev/null
++++ b/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/network.xml
+@@ -0,0 +1,90 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!DOCTYPE network SYSTEM "http://matsim.org/files/dtd/network_v1.dtd">
++<network>
++<nodes>
++<node x="4600000.0" y="5800000.0" id="1021"/>
++<node x="4600000.0" y="5799900.0" id="x1021"/>
++<node x="4600000.0" y="5800500.0" id="1121"/>
++<node x="4600000.0" y="5801000.0" id="1221"/>
++<node x="4600000.0" y="5801500.0" id="1321"/>
++<node x="4600000.0" y="5802000.0" id="1421"/>
++<node x="4600000.0" y="5802500.0" id="1521"/>
++<node x="4600333.0" y="5800500.0" id="1124"/>
++<node x="4600333.0" y="5801000.0" id="1224"/>
++<node x="4600333.0" y="5801500.0" id="1324"/>
++<node x="4600333.0" y="5802000.0" id="1424"/>
++<node x="4600333.0" y="5802500.0" id="1524"/>
++<node x="4600374.0" y="5800497.0" id="2124"/>
++<node x="4600416.0" y="5800994.0" id="2224"/>
++<node x="4600457.0" y="5801491.0" id="2324"/>
++<node x="4600498.0" y="5801988.0" id="2424"/>
++<node x="4600539.0" y="5802485.0" id="2524"/>
++<node x="4600959.0" y="5811297.0" id="1125"/>
++<node x="4600918.0" y="5811794.0" id="1225"/>
++<node x="4600000.0" y="5821600.0" id="1022"/>
++<node x="4600000.0" y="5821700.0" id="x1022"/>
++<node x="4600333.3" y="5800000.0" id="1024"/>
++<node x="4600333.3" y="5799900.0" id="x1024"/>
++<node x="4601000.0" y="5810800.0" id="1025"/>
++<node x="4601100.0" y="5810800.0" id="x1025"/>
++<node x="4600333.3" y="5821600.0" id="1026"/>
++<node x="4600333.3" y="5821700.0" id="x1026"/>
++</nodes>
++<links capperiod="10:00:00">
++<!--"fast":-->
++<link id="6"   modes="pt" permlanes="1" capacity="2000" freespeed="111" length="19100" to="1022" from="1521"/>
++<link id="106" modes="pt" permlanes="1" capacity="2000" freespeed="111" length="19100" to="1521" from="1022"/>
++
++<!--"direct":-->
++<link id="12" modes="pt" permlanes="1" capacity="2000" freespeed="15" length="19100" to="1026" from="1524"/>
++<link id="112" modes="pt" permlanes="1" capacity="2000" freespeed="15" length="19100" to="1524" from="1026"/>
++
++<!--"switch" (second long link):-->
++<link id="21"  modes="pt" permlanes="1" capacity="2000" freespeed="23" length="9846" to="1026" from="1225"/>
++<link id="121" modes="pt" permlanes="1" capacity="2000" freespeed="23" length="9846" to="1225" from="1026"/>
++
++<link id="1" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1121" from="1021"/>
++<link id="2" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1221" from="1121"/>
++<link id="3" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1321" from="1221"/>
++<link id="4" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1421" from="1321"/>
++<link id="5" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1521" from="1421"/>
++<link id="7" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1124" from="1024"/>
++<link id="8" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1224" from="1124"/>
++<link id="9" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1324" from="1224"/>
++<link id="10" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1424" from="1324"/>
++<link id="11" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1524" from="1424"/>
++<link id="13" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2124" from="1024"/>
++<link id="14" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2224" from="2124"/>
++<link id="15" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2324" from="2224"/>
++<link id="16" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2424" from="2324"/>
++<link id="17" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2524" from="2424"/>
++<link id="18" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="8346" to="1025" from="2524"/>
++<link id="19" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1125" from="1025"/>
++<link id="20" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1225" from="1125"/>
++<link id="101" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1021" from="1121"/>
++<link id="102" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1121" from="1221"/>
++<link id="103" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1221" from="1321"/>
++<link id="104" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1321" from="1421"/>
++<link id="105" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1421" from="1521"/>
++<link id="107" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1024" from="1124"/>
++<link id="108" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1124" from="1224"/>
++<link id="109" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1224" from="1324"/>
++<link id="110" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1324" from="1424"/>
++<link id="111" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1424" from="1524"/>
++<link id="113" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1024" from="2124"/>
++<link id="114" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2124" from="2224"/>
++<link id="115" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2224" from="2324"/>
++<link id="116" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2324" from="2424"/>
++<link id="117" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="2424" from="2524"/>
++<link id="118" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="8346" to="2524" from="1025"/>
++<link id="119" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1025" from="1125"/>
++<link id="120" modes="pt" permlanes="1" capacity="2000" freespeed="22" length="500" to="1125" from="1225"/>
++
++<link id="1000" modes="pt" permlanes="1" capacity="2000" freespeed="12" length="100" to="1021" from="x1021"/>
++<link id="2000" modes="pt" permlanes="1" capacity="2000" freespeed="12" length="100" to="1024" from="x1024"/>
++<link id="4000" modes="pt" permlanes="1" capacity="2000" freespeed="12" length="100" to="1025" from="x1025"/>
++<link id="1100" modes="pt" permlanes="1" capacity="2000" freespeed="12" length="100" to="1022" from="x1022"/>
++<link id="2100" modes="pt" permlanes="1" capacity="2000" freespeed="12" length="100" to="1026" from="x1026"/>
++
++</links>
++</network>
+diff --git a/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/transitVehicles.xml b/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/transitVehicles.xml
+new file mode 100644
+index 0000000..d11d0cf
+--- /dev/null
++++ b/contribs/common/test/input/org/matsim/contrib/common/randomizedtransitrouter/transitVehicles.xml
+@@ -0,0 +1,69 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<vehicleDefinitions xmlns="http://www.matsim.org/files/dtd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.matsim.org/files/dtd http://www.matsim.org/files/dtd/vehicleDefinitions_v1.0.xsd">
++<vehicleType id="1">
++<description>pt</description>
++<capacity>
++<seats persons="50"/>
++<standingRoom persons="100"/>
++</capacity>
++<length meter="12"/>
++</vehicleType>
++<vehicle id="1000" type="1"/>
++<vehicle id="1003" type="1"/>
++<vehicle id="1006" type="1"/>
++<vehicle id="1009" type="1"/>
++<vehicle id="1009b" type="1"/>
++<vehicle id="1009c" type="1"/>
++<vehicle id="1012" type="1"/>
++<vehicle id="1015" type="1"/>
++<vehicle id="1018" type="1"/>
++<vehicle id="2000" type="1"/>
++<vehicle id="2003" type="1"/>
++<vehicle id="2006" type="1"/>
++<vehicle id="2009" type="1"/>
++<vehicle id="2012" type="1"/>
++<vehicle id="2015" type="1"/>
++<vehicle id="2018" type="1"/>
++<vehicle id="3000" type="1"/>
++<vehicle id="3003" type="1"/>
++<vehicle id="3006" type="1"/>
++<vehicle id="3009" type="1"/>
++<vehicle id="3012" type="1"/>
++<vehicle id="3015" type="1"/>
++<vehicle id="3018" type="1"/>
++<vehicle id="4000" type="1"/>
++<vehicle id="4003" type="1"/>
++<vehicle id="4006" type="1"/>
++<vehicle id="4009" type="1"/>
++<vehicle id="4012" type="1"/>
++<vehicle id="4015" type="1"/>
++<vehicle id="4018" type="1"/>
++<vehicle id="1100" type="1"/>
++<vehicle id="1103" type="1"/>
++<vehicle id="1106" type="1"/>
++<vehicle id="1109" type="1"/>
++<vehicle id="1112" type="1"/>
++<vehicle id="1115" type="1"/>
++<vehicle id="1118" type="1"/>
++<vehicle id="2100" type="1"/>
++<vehicle id="2103" type="1"/>
++<vehicle id="2106" type="1"/>
++<vehicle id="2109" type="1"/>
++<vehicle id="2112" type="1"/>
++<vehicle id="2115" type="1"/>
++<vehicle id="2118" type="1"/>
++<vehicle id="3100" type="1"/>
++<vehicle id="3103" type="1"/>
++<vehicle id="3106" type="1"/>
++<vehicle id="3109" type="1"/>
++<vehicle id="3112" type="1"/>
++<vehicle id="3115" type="1"/>
++<vehicle id="3118" type="1"/>
++<vehicle id="4100" type="1"/>
++<vehicle id="4103" type="1"/>
++<vehicle id="4106" type="1"/>
++<vehicle id="4109" type="1"/>
++<vehicle id="4112" type="1"/>
++<vehicle id="4115" type="1"/>
++<vehicle id="4118" type="1"/>
++</vehicleDefinitions>
+diff --git a/contribs/signals/src/main/java/org/matsim/contrib/signals/router/NetworkInverter.java b/contribs/signals/src/main/java/org/matsim/contrib/signals/router/NetworkInverter.java
+new file mode 100644
+index 0000000..3bfa4a3
+--- /dev/null
++++ b/contribs/signals/src/main/java/org/matsim/contrib/signals/router/NetworkInverter.java
+@@ -0,0 +1,101 @@
++package org.matsim.core.router.util;
++
++import java.util.ArrayList;
++import java.util.List;
++import java.util.Map;
++import java.util.Set;
++
++import org.apache.log4j.Logger;
++import org.matsim.api.core.v01.Id;
++import org.matsim.api.core.v01.network.Link;
++import org.matsim.api.core.v01.network.Network;
++import org.matsim.api.core.v01.network.Node;
++import org.matsim.core.network.LinkImpl;
++import org.matsim.core.network.NetworkImpl;
++import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
++
++/**
++ * Converts a network to an inverted network. Inverted nodes are situated at
++ * the end of the real link. Inverted link attributes are copied from toLink
++ * of the real network, thus every inverted link actually starts at the
++ * location of a real node.
++ * Each link Id of the real network corresponds to a node Id of the inverted network.
++ *
++ * @author aneumann
++ * @author dgrether
++ */
++public class NetworkInverter {
++
++	final private static Logger log = Logger.getLogger(NetworkInverter.class);
++
++	private Network originalNetwork;
++
++	private NetworkImpl invertedNetwork = null;
++
++	private Map<Id<Link>, List<TurnInfo>>  inLinkTurnInfoMap = null;
++
++	public NetworkInverter(Network originalNet, Map<Id<Link>, List<TurnInfo>>  inLinkTurnInfoMap) {
++		this.originalNetwork = originalNet;
++		this.inLinkTurnInfoMap = inLinkTurnInfoMap;
++	}
++
++	public Network getInvertedNetwork() {
++		if (this.invertedNetwork == null){
++			invertNetwork();
++		}
++		return this.invertedNetwork;
++	}
++
++	private void invertNetwork(){
++		this.invertedNetwork = NetworkImpl.createNetwork();
++		int numberOfNodesGenerated = 0;
++		int numberOfLinksGenerated = 0;
++
++		for (Link link : this.originalNetwork.getLinks().values()) {
++			this.invertedNetwork.createAndAddNode(Id.create(link.getId(), Node.class), link.getToNode().getCoord());
++			numberOfNodesGenerated++;
++		}
++
++		NetworkTurnInfoBuilder turnInfoBuilder = new NetworkTurnInfoBuilder();
++		for (Node node : this.originalNetwork.getNodes().values()) {
++			for (Link inLink : node.getInLinks().values()) {
++				for (Link outLink : node.getOutLinks().values()) {
++					List<TurnInfo> turnInfos = this.inLinkTurnInfoMap.get(inLink.getId());
++					TurnInfo ti = turnInfoBuilder.getTurnInfoForOutlinkId(turnInfos, outLink.getId());
++					if (ti != null){
++						numberOfLinksGenerated = this.createInvertedLink(inLink, outLink, numberOfLinksGenerated, ti.getModes());
++					}
++				}
++			}
++		}
++
++		log.info("Generated " + numberOfNodesGenerated + " Nodes and " + numberOfLinksGenerated + " Links");
++
++		// Debug only
++		// NetworkWriter myNetworkWriter = new NetworkWriter(wrappedNetwork,
++		// "wrappedNetwork");
++		// myNetworkWriter.write();
++	}
++
++	private int createInvertedLink(Link inLink, Link outLink, int numberOfLinksGenerated, Set<String> modes){
++		Link link = this.invertedNetwork.createAndAddLink(Id.create(numberOfLinksGenerated + 1, Link.class), // start counting link ids with 1 instead of 0
++				this.invertedNetwork.getNodes().get(Id.create(inLink.getId(), Node.class)), this.invertedNetwork.getNodes().get(Id.create(outLink.getId(), Node.class)),
++				outLink.getLength(),
++				outLink.getFreespeed(),
++				outLink.getCapacity(),
++				outLink.getNumberOfLanes());
++		link.setAllowedModes(modes);
++//		log.error("created inverted link " + link.getId() + " from " + inLink.getId() + " to " + outLink.getId() + " with modes " + modes);
++		((LinkImpl) link).setType(((LinkImpl) outLink).getType());
++		return numberOfLinksGenerated + 1;
++	}
++
++	public List<Link> convertInvertedNodesToLinks(List<Node> nodes) {
++		List<Link> ret = new ArrayList<Link>(nodes.size());
++		for (Node n : nodes){
++			ret.add(this.originalNetwork.getLinks().get(Id.create(n.getId(), Link.class)));
++		}
++		return ret;
++	}
++
++}
+diff --git a/contribs/signals/src/main/java/org/matsim/contrib/signals/router/TravelTimesInvertedNetProxy.java b/contribs/signals/src/main/java/org/matsim/contrib/signals/router/TravelTimesInvertedNetProxy.java
+new file mode 100644
+index 0000000..73def75
+--- /dev/null
++++ b/contribs/signals/src/main/java/org/matsim/contrib/signals/router/TravelTimesInvertedNetProxy.java
+@@ -0,0 +1,58 @@
++/* *********************************************************************** *
++ * project: org.matsim.*
++ * TravelTimesInvertedNetProxy
++ *                                                                         *
++ * *********************************************************************** *
++ *                                                                         *
++ * copyright       : (C) 2009 by the members listed in the COPYING,        *
++ *                   LICENSE and WARRANTY file.                            *
++ * email           : info at matsim dot org                                *
++ *                                                                         *
++ * *********************************************************************** *
++ *                                                                         *
++ *   This program is free software; you can redistribute it and/or modify  *
++ *   it under the terms of the GNU General Public License as published by  *
++ *   the Free Software Foundation; either version 2 of the License, or     *
++ *   (at your option) any later version.                                   *
++ *   See also COPYING, LICENSE and WARRANTY file                           *
++ *                                                                         *
++ * *********************************************************************** */
++package org.matsim.core.router.util;
++
++import org.matsim.api.core.v01.Id;
++import org.matsim.api.core.v01.network.Link;
++import org.matsim.api.core.v01.network.Network;
++import org.matsim.api.core.v01.population.Person;
++import org.matsim.vehicles.Vehicle;
++
++
++/**
++ * Proxy for a LinkToLinkTravelTime instance to make it work with the 
++ * LeastCostPathCalculator working on an inverted network.
++ * @author dgrether
++ * @see org.matsim.core.route.util.NetworkInverter
++ *
++ */
++public class TravelTimesInvertedNetProxy implements TravelTime {
++
++	private Network originalNetwork;
++	
++	private LinkToLinkTravelTime linkToLinkTravelTime;
++
++	public TravelTimesInvertedNetProxy(Network originalNet, LinkToLinkTravelTime l2ltt){
++		this.linkToLinkTravelTime = l2ltt;
++		this.originalNetwork = originalNet;
++	}
++	
++	/**
++	 * In this case the link given as parameter is a link from the inverted network. 
++	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(Link, double, Person, Vehicle)
++	 */
++	@Override
++	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
++		Link fromLink = this.originalNetwork.getLinks().get(Id.create(link.getFromNode().getId(), Link.class));
++		Link toLink = this.originalNetwork.getLinks().get(Id.create(link.getToNode().getId(), Link.class));
++		return this.linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time);
++	}
++
++}
+diff --git a/matsim/src/main/java/org/matsim/core/router/util/NetworkInverter.java b/matsim/src/main/java/org/matsim/core/router/util/NetworkInverter.java
+deleted file mode 100644
+index 3bfa4a3..0000000
+--- a/matsim/src/main/java/org/matsim/core/router/util/NetworkInverter.java
++++ /dev/null
+@@ -1,101 +0,0 @@
+-package org.matsim.core.router.util;
+-
+-import java.util.ArrayList;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Set;
+-
+-import org.apache.log4j.Logger;
+-import org.matsim.api.core.v01.Id;
+-import org.matsim.api.core.v01.network.Link;
+-import org.matsim.api.core.v01.network.Network;
+-import org.matsim.api.core.v01.network.Node;
+-import org.matsim.core.network.LinkImpl;
+-import org.matsim.core.network.NetworkImpl;
+-import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
+-
+-/**
+- * Converts a network to an inverted network. Inverted nodes are situated at
+- * the end of the real link. Inverted link attributes are copied from toLink
+- * of the real network, thus every inverted link actually starts at the
+- * location of a real node.
+- * Each link Id of the real network corresponds to a node Id of the inverted network.
+- *
+- * @author aneumann
+- * @author dgrether
+- */
+-public class NetworkInverter {
+-
+-	final private static Logger log = Logger.getLogger(NetworkInverter.class);
+-
+-	private Network originalNetwork;
+-
+-	private NetworkImpl invertedNetwork = null;
+-
+-	private Map<Id<Link>, List<TurnInfo>>  inLinkTurnInfoMap = null;
+-
+-	public NetworkInverter(Network originalNet, Map<Id<Link>, List<TurnInfo>>  inLinkTurnInfoMap) {
+-		this.originalNetwork = originalNet;
+-		this.inLinkTurnInfoMap = inLinkTurnInfoMap;
+-	}
+-
+-	public Network getInvertedNetwork() {
+-		if (this.invertedNetwork == null){
+-			invertNetwork();
+-		}
+-		return this.invertedNetwork;
+-	}
+-
+-	private void invertNetwork(){
+-		this.invertedNetwork = NetworkImpl.createNetwork();
+-		int numberOfNodesGenerated = 0;
+-		int numberOfLinksGenerated = 0;
+-
+-		for (Link link : this.originalNetwork.getLinks().values()) {
+-			this.invertedNetwork.createAndAddNode(Id.create(link.getId(), Node.class), link.getToNode().getCoord());
+-			numberOfNodesGenerated++;
+-		}
+-
+-		NetworkTurnInfoBuilder turnInfoBuilder = new NetworkTurnInfoBuilder();
+-		for (Node node : this.originalNetwork.getNodes().values()) {
+-			for (Link inLink : node.getInLinks().values()) {
+-				for (Link outLink : node.getOutLinks().values()) {
+-					List<TurnInfo> turnInfos = this.inLinkTurnInfoMap.get(inLink.getId());
+-					TurnInfo ti = turnInfoBuilder.getTurnInfoForOutlinkId(turnInfos, outLink.getId());
+-					if (ti != null){
+-						numberOfLinksGenerated = this.createInvertedLink(inLink, outLink, numberOfLinksGenerated, ti.getModes());
+-					}
+-				}
+-			}
+-		}
+-
+-		log.info("Generated " + numberOfNodesGenerated + " Nodes and " + numberOfLinksGenerated + " Links");
+-
+-		// Debug only
+-		// NetworkWriter myNetworkWriter = new NetworkWriter(wrappedNetwork,
+-		// "wrappedNetwork");
+-		// myNetworkWriter.write();
+-	}
+-
+-	private int createInvertedLink(Link inLink, Link outLink, int numberOfLinksGenerated, Set<String> modes){
+-		Link link = this.invertedNetwork.createAndAddLink(Id.create(numberOfLinksGenerated + 1, Link.class), // start counting link ids with 1 instead of 0
+-				this.invertedNetwork.getNodes().get(Id.create(inLink.getId(), Node.class)), this.invertedNetwork.getNodes().get(Id.create(outLink.getId(), Node.class)),
+-				outLink.getLength(),
+-				outLink.getFreespeed(),
+-				outLink.getCapacity(),
+-				outLink.getNumberOfLanes());
+-		link.setAllowedModes(modes);
+-//		log.error("created inverted link " + link.getId() + " from " + inLink.getId() + " to " + outLink.getId() + " with modes " + modes);
+-		((LinkImpl) link).setType(((LinkImpl) outLink).getType());
+-		return numberOfLinksGenerated + 1;
+-	}
+-
+-	public List<Link> convertInvertedNodesToLinks(List<Node> nodes) {
+-		List<Link> ret = new ArrayList<Link>(nodes.size());
+-		for (Node n : nodes){
+-			ret.add(this.originalNetwork.getLinks().get(Id.create(n.getId(), Link.class)));
+-		}
+-		return ret;
+-	}
+-
+-}
+diff --git a/matsim/src/main/java/org/matsim/core/router/util/TravelTimesInvertedNetProxy.java b/matsim/src/main/java/org/matsim/core/router/util/TravelTimesInvertedNetProxy.java
+deleted file mode 100644
+index 73def75..0000000
+--- a/matsim/src/main/java/org/matsim/core/router/util/TravelTimesInvertedNetProxy.java
++++ /dev/null
+@@ -1,58 +0,0 @@
+-/* *********************************************************************** *
+- * project: org.matsim.*
+- * TravelTimesInvertedNetProxy
+- *                                                                         *
+- * *********************************************************************** *
+- *                                                                         *
+- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+- *                   LICENSE and WARRANTY file.                            *
+- * email           : info at matsim dot org                                *
+- *                                                                         *
+- * *********************************************************************** *
+- *                                                                         *
+- *   This program is free software; you can redistribute it and/or modify  *
+- *   it under the terms of the GNU General Public License as published by  *
+- *   the Free Software Foundation; either version 2 of the License, or     *
+- *   (at your option) any later version.                                   *
+- *   See also COPYING, LICENSE and WARRANTY file                           *
+- *                                                                         *
+- * *********************************************************************** */
+-package org.matsim.core.router.util;
+-
+-import org.matsim.api.core.v01.Id;
+-import org.matsim.api.core.v01.network.Link;
+-import org.matsim.api.core.v01.network.Network;
+-import org.matsim.api.core.v01.population.Person;
+-import org.matsim.vehicles.Vehicle;
+-
+-
+-/**
+- * Proxy for a LinkToLinkTravelTime instance to make it work with the 
+- * LeastCostPathCalculator working on an inverted network.
+- * @author dgrether
+- * @see org.matsim.core.route.util.NetworkInverter
+- *
+- */
+-public class TravelTimesInvertedNetProxy implements TravelTime {
+-
+-	private Network originalNetwork;
+-	
+-	private LinkToLinkTravelTime linkToLinkTravelTime;
+-
+-	public TravelTimesInvertedNetProxy(Network originalNet, LinkToLinkTravelTime l2ltt){
+-		this.linkToLinkTravelTime = l2ltt;
+-		this.originalNetwork = originalNet;
+-	}
+-	
+-	/**
+-	 * In this case the link given as parameter is a link from the inverted network. 
+-	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(Link, double, Person, Vehicle)
+-	 */
+-	@Override
+-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+-		Link fromLink = this.originalNetwork.getLinks().get(Id.create(link.getFromNode().getId(), Link.class));
+-		Link toLink = this.originalNetwork.getLinks().get(Id.create(link.getToNode().getId(), Link.class));
+-		return this.linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time);
+-	}
+-
+-}
+-- 
+2.3.2 (Apple Git-55)
+

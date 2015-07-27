@@ -1,0 +1,289 @@
+From 8a1809c315b7825e6a005e2d4a5a36235a817a7f Mon Sep 17 00:00:00 2001
+From: Kai Nagel <2008@kainagel.org>
+Date: Thu, 16 Jul 2015 20:16:05 +0200
+Subject: [PATCH 01/16] fix more tests.  make ScenarioConfigGroup extend
+ ConfigGroup rather than ReflectiveConfigGroup, since the former is more
+ flexible with respect to error messaging
+
+---
+ .../scenariogenerator/ScenarioGeneratorTest.java   | 16 ++--
+ .../testScenarioGenerator/config.xml               | 17 ----
+ .../org/matsim/contrib/multimodal/pt/Fixture.java  |  6 +-
+ ...rNetworkTravelDistutilityAndTravelTimeTest.java |  7 +-
+ .../core/config/groups/ScenarioConfigGroup.java    | 99 ++++++++++++++--------
+ 5 files changed, 77 insertions(+), 68 deletions(-)
+
+diff --git a/contribs/evacuation/src/test/java/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest.java b/contribs/evacuation/src/test/java/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest.java
+index 226151b..f578a24 100644
+--- a/contribs/evacuation/src/test/java/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest.java
++++ b/contribs/evacuation/src/test/java/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest.java
+@@ -124,20 +124,20 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
+ 		
+ 		//simulate and check scenario
+ 		boolean simulateScenario = true;
+-		try {
++//		try {
+ 			Controler matsimController = new Controler(mc);
+ 			matsimController.getConfig().controler().setOverwriteFileSetting(
+ 					true ?
+ 							OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
+ 							OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+ 			matsimController.run();
+-		}
+-		catch (Exception e)
+-		{
+-			simulateScenario = false;
+-			e.printStackTrace();
+-		}
+-		assertTrue("scenario was not simulated",simulateScenario);
++//		}
++//		catch (Exception e)
++//		{
++//			simulateScenario = false;
++//			e.printStackTrace();
++//		}
++//		assertTrue("scenario was not simulated",simulateScenario);
+ 		
+ 		//parse events, check if closed roads are not being visited
+ 		LinkEnterEventHandler eventHandler = null;
+diff --git a/contribs/evacuation/test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/config.xml b/contribs/evacuation/test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/config.xml
+index e6ef366..46887a2 100644
+--- a/contribs/evacuation/test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/config.xml
++++ b/contribs/evacuation/test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator/config.xml
+@@ -449,26 +449,9 @@
+ 
+ 	<module name="scenario" >
+ 
+-		<!-- Set this parameter to true if households should be used, false if not. -->
+-		<param name="useHouseholds" value="false" />
+-
+ 		<!-- Set this parameter to true if knowledge should be used, false if not. -->
+ 		<param name="useKnowledge" value="true" />
+ 
+-		<!-- Set this parameter to true if lanes should be used, false if not. -->
+-		<param name="useLanes" value="false" />
+-
+-		<!-- Set this parameter to true if roadpricing should be used, false if not. -->
+-		<param name="useRoadpricing" value="false" />
+-
+-		<!-- Set this parameter to true if signal systems should be used, false if not. -->
+-		<param name="useSignalsystems" value="false" />
+-
+-		<!-- Set this parameter to true if transit should be simulated, false if not. -->
+-		<param name="useTransit" value="false" />
+-
+-		<!-- Set this parameter to true if vehicles should be used, false if not. -->
+-		<param name="useVehicles" value="false" />
+ 	</module>
+ 
+ <!-- ====================================================================== -->
+diff --git a/contribs/multimodal/src/test/java/org/matsim/contrib/multimodal/pt/Fixture.java b/contribs/multimodal/src/test/java/org/matsim/contrib/multimodal/pt/Fixture.java
+index b7cda06..5e626b4 100644
+--- a/contribs/multimodal/src/test/java/org/matsim/contrib/multimodal/pt/Fixture.java
++++ b/contribs/multimodal/src/test/java/org/matsim/contrib/multimodal/pt/Fixture.java
+@@ -85,10 +85,10 @@ import java.util.List;
+ 	private final TransitStopFacility[] stopFacilities = new TransitStopFacility[3];
+ 
+ 	public Fixture() {
+-		Config config = ConfigUtils.createConfig();	
+-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+-		this.config = this.scenario.getConfig();
++		this.config = ConfigUtils.createConfig();	
+ 		this.config.transit().setUseTransit(true);
++
++		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+ 		this.network = this.scenario.getNetwork();
+ 		this.schedule = this.scenario.getTransitSchedule();
+ 		this.builder = this.schedule.getFactory();
+diff --git a/contribs/wagonSim/src/test/java/org/matsim/contrib/wagonSim/pt/router/WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest.java b/contribs/wagonSim/src/test/java/org/matsim/contrib/wagonSim/pt/router/WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest.java
+index 9c6ee42..0ab9e69 100644
+--- a/contribs/wagonSim/src/test/java/org/matsim/contrib/wagonSim/pt/router/WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest.java
++++ b/contribs/wagonSim/src/test/java/org/matsim/contrib/wagonSim/pt/router/WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest.java
+@@ -93,7 +93,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
+ 		createPersonObjectAttributes(sc);
+ 		createNetwork(sc);
+ 		createSchedule(sc);
+-		createVehicles(sc);
++		createTransitVehicles(sc);
+ 		ObjectAttributes locomotiveAttributes = createVehicleLinkSpeedAttributes(sc);
+ 		VehicleLoad vehLoad = new VehicleLoad(sc.getTransitSchedule());
+ 		Config config = sc.getConfig(); 
+@@ -200,8 +200,9 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
+ 		config.planCalcScore().addActivityParams(work);
+ 		// something very small
+ 		config.plansCalcRoute().setTeleportedModeSpeed("walk", 0.00000000001);
++		config.transit().setUseTransit(true);
++		
+ 		Scenario sc = ScenarioUtils.createScenario(config);
+-		sc.getConfig().transit().setUseTransit(true);
+ 		return sc;
+ 	}
+ 	
+@@ -294,7 +295,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
+ 	 * @param sc
+ 	 */
+ 	@SuppressWarnings("deprecation")
+-	private void createVehicles(Scenario sc) {
++	private void createTransitVehicles(Scenario sc) {
+ 		Vehicles veh = ((ScenarioImpl) sc).getTransitVehicles();
+ 		VehiclesFactory factory = veh.getFactory();
+ 		
+diff --git a/matsim/src/main/java/org/matsim/core/config/groups/ScenarioConfigGroup.java b/matsim/src/main/java/org/matsim/core/config/groups/ScenarioConfigGroup.java
+index 4463150..a6228e8 100644
+--- a/matsim/src/main/java/org/matsim/core/config/groups/ScenarioConfigGroup.java
++++ b/matsim/src/main/java/org/matsim/core/config/groups/ScenarioConfigGroup.java
+@@ -20,15 +20,21 @@
+ package org.matsim.core.config.groups;
+ 
+ import java.util.Map;
++import java.util.Set;
+ 
+ import org.apache.log4j.Logger;
++import org.matsim.api.core.v01.Id;
++import org.matsim.api.core.v01.network.Link;
++import org.matsim.core.config.ConfigGroup;
+ import org.matsim.core.config.ReflectiveConfigGroup;
++import org.matsim.core.utils.collections.CollectionUtils;
++import org.matsim.core.utils.misc.Time;
+ 
+ /**
+  * @author dgrether
+  *
+  */
+-public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
++public final class ScenarioConfigGroup extends ConfigGroup {
+ 	public static final String GROUP_NAME = "scenario";
+ 
+ 	private static final String USE_LANES = "useLanes";
+@@ -54,59 +60,87 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
+ 		return map;
+ 	}
+ 
+-	@StringGetter( USE_LANES )
++	@Override
++	public final void addParam(final String paramName, final String value) {
++		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
++		if ( "null".equalsIgnoreCase( value ) ) return;
++
++		if (USE_LANES.equals(paramName)) {
++			this.setUseLanes( Boolean.parseBoolean(value) );
++		} else if (USE_HOUSEHOLDS.equals(paramName)) {
++			this.setUseHouseholds( Boolean.parseBoolean(value) );
++		} else if (USE_VEHICLES.equals(paramName)) {
++			this.setUseVehicles( Boolean.parseBoolean(value) );
++		} else if (USE_TRANSIT.equals(paramName)) {
++			this.setUseTransit( Boolean.parseBoolean(value) );
++		} else {
++			throw new IllegalArgumentException("Parameter '" + paramName + "' is not supported by config group '" + GROUP_NAME + "'.");
++		}
++	}
++	@Override
++	public final String getValue(final String param_name) {
++		throw new UnsupportedOperationException("Use getters for accessing values!");
++	}
++
++	@Override
++	public final Map<String, String> getParams() {
++		Map<String, String> params = super.getParams();
++
++		params.put(USE_LANES, Boolean.toString( this.isUseLanes() ) ) ;
++		params.put(USE_HOUSEHOLDS, Boolean.toString( this.isUseHouseholds() ) ) ;
++
++		return params;
++	}
++
+ 	public boolean isUseLanes() {
+ 		return this.useLanes;
+ 	}
+ 
+-	@StringSetter( USE_LANES )
+ 	public void setUseLanes(final boolean useLanes) {
+ 		this.useLanes = useLanes;
+ 	}
+ 
+-	@StringGetter( USE_HOUSEHOLDS )
+ 	public boolean isUseHouseholds() {
+ 		return this.useHouseholds;
+ 	}
+ 
+-	@StringSetter( USE_HOUSEHOLDS )
+ 	public void setUseHouseholds(final boolean b) {
+ 		this.useHouseholds = b;
+ 	}
+ 
+-	private boolean failConsistencyCheck = false ;
++	// if they are not in getParams, they will not be included into the config file dump.
++	
++	// if they are, however, in addParam, then the methods will be called (which throw exceptions).
++	
++	// Once the methods below are removed throughout the code, those exceptions can be moved into the addParam method.
++	
++	// kai, jul'15
+ 
++	
++	
++	@SuppressWarnings("static-method")
+ 	@Deprecated // since jul'15
+-	@StringSetter( USE_VEHICLES )
+ 	public void setUseVehicles(@SuppressWarnings("unused") final Boolean b) {
+-		log.fatal( getMessage( USE_VEHICLES ) ) ;
+-		this.failConsistencyCheck = true ;
+-//		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
++		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
+ 	}
+-	@Deprecated // since jul'15
+-	@StringGetter( USE_VEHICLES )
+-	public Boolean getUseVehicles() {
+-//		log.fatal( getMessage( USE_VEHICLES ) ) ;
+-//		this.failConsistencyCheck = true ;
++	
++//	@SuppressWarnings("static-method")
++//	@Deprecated // since jul'15
++//	public Boolean getUseVehicles() {
+ //		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
+-		return null ;
+-	}
++//	}
+ 	
+-	@StringSetter( USE_TRANSIT )
++	@SuppressWarnings("static-method")
+ 	@Deprecated // since jul'15
+ 	public void setUseTransit(@SuppressWarnings("unused") final Boolean b) {
+-		log.fatal("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
+-		this.failConsistencyCheck = true ;
+-//		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
++		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
+ 	}
+-	@StringGetter( USE_TRANSIT )
+-	@Deprecated // since jul'15
+-	public Boolean getUseTransit() {
+-//		log.fatal("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
+-//		this.failConsistencyCheck = true ;
++
++//	@SuppressWarnings("static-method")
++//	@Deprecated // since jul'15
++//	public Boolean getUseTransit() {
+ //		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
+-		return null ;
+-	}
++//	}
+ 	
+ 	private static String getMessage( String module ) {
+ 		return "The " + module + " switch is no longer operational.  The file is loaded if the file name"
+@@ -115,13 +149,4 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
+ 				+ "switched on elsewhere (e.g. in qsim, in transit, ...).  If this does not work for you, please let us know. kai, jun'15";
+ 	}
+ 	
+-	@Override
+-	protected void checkConsistency() {
+-		if ( this.failConsistencyCheck ) {
+-			throw new RuntimeException( "trying to use a switch that is no longer operational.  cannot fail this right away because some "
+-					+ "tests will fail.  Check error messages to find cause of problem") ;
+-		}
+-
+-}
+-
+ }
+-- 
+2.3.2 (Apple Git-55)
+

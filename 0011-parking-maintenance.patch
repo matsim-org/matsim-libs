@@ -1,0 +1,261 @@
+From 8160e2beeeb9ea9c4aecc3fb12ddbb0b62ca9681 Mon Sep 17 00:00:00 2001
+From: Kai Nagel <2008@kainagel.org>
+Date: Thu, 23 Jul 2015 16:19:52 +0100
+Subject: [PATCH 11/16] parking maintenance
+
+---
+ .../PC2/scoring/ParkingScoringFunction.java        |  1 -
+ .../simulation/ParkingInfrastructureManager.java   | 66 +++++++++++-----------
+ .../ParkingOperationRequestAttributes.java         |  3 +-
+ .../SetupParkingForZHScenario.java                 | 19 ++++---
+ 4 files changed, 46 insertions(+), 43 deletions(-)
+
+diff --git a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/scoring/ParkingScoringFunction.java b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/scoring/ParkingScoringFunction.java
+index f47a2e9..c4586ce 100644
+--- a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/scoring/ParkingScoringFunction.java
++++ b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/scoring/ParkingScoringFunction.java
+@@ -19,7 +19,6 @@
+ package org.matsim.contrib.parking.PC2.scoring;
+ 
+ import org.matsim.api.core.v01.population.Plan;
+-import org.matsim.contrib.parking.lib.DebugLib;
+ import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
+ 
+ public class ParkingScoringFunction implements BasicScoring{
+diff --git a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingInfrastructureManager.java b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingInfrastructureManager.java
+index db8f1e1..c267a9d 100644
+--- a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingInfrastructureManager.java
++++ b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingInfrastructureManager.java
+@@ -26,20 +26,19 @@ import java.util.PriorityQueue;
+ import org.matsim.api.core.v01.Coord;
+ import org.matsim.api.core.v01.Id;
+ import org.matsim.api.core.v01.population.Person;
+-import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
+ import org.matsim.contrib.parking.PC2.infrastructure.PC2Parking;
++import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
+ import org.matsim.contrib.parking.PC2.infrastructure.PrivateParking;
+ import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
+ import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
+ import org.matsim.contrib.parking.lib.DebugLib;
+-import org.matsim.contrib.parking.lib.GeneralLib;
+ import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
+ import org.matsim.contrib.parking.lib.obj.SortableMapObject;
+ import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
+ import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
+ import org.matsim.core.api.experimental.events.EventsManager;
+ import org.matsim.core.utils.collections.QuadTree;
+-import org.matsim.core.utils.geometry.CoordImpl;
++import org.matsim.facilities.ActivityFacility;
+ 
+ // TODO: make abstract and create algorithm in Zuerich case -> provide protected helper methods already here.
+ public class ParkingInfrastructureManager {
+@@ -49,12 +48,12 @@ public class ParkingInfrastructureManager {
+ 	private HashMap<Id<PC2Parking>, PC2Parking> allParkings;
+ 
+ 	// personId, parkingFacilityId
+-	private HashMap<Id<Person>, Id> parkedVehicles;
++	private HashMap<Id<Person>, Id<PC2Parking>> parkedVehicles;
+ 
+ 	private EventsManager eventsManager;
+ 
+ 	// facilityId -> parkings available to users of that facility
+-	private LinkedListValueHashMap<Id, PPRestrictedToFacilities> privateParkingsRestrictedToFacilities;
++	private LinkedListValueHashMap<Id<ActivityFacility>, PPRestrictedToFacilities> privateParkingsRestrictedToFacilities;
+ 
+ 	// TODO: later - to improve parformance, a second variable could be added,
+ 	// where full parking are put.
+@@ -70,7 +69,7 @@ public class ParkingInfrastructureManager {
+ 		this.eventsManager = eventsManager;
+ 		parkedVehicles = new HashMap<>();
+ 		setAllParkings(new HashMap<Id<PC2Parking>, PC2Parking>());
+-		privateParkingsRestrictedToFacilities = new LinkedListValueHashMap<Id, PPRestrictedToFacilities>();
++		privateParkingsRestrictedToFacilities = new LinkedListValueHashMap<>();
+ 	}
+ 
+ 	public synchronized void setPublicParkings(LinkedList<PublicParking> publicParkings) {
+@@ -111,7 +110,7 @@ public class ParkingInfrastructureManager {
+ 
+ 	public synchronized void setPrivateParkingRestrictedToFacilities(LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
+ 		for (PPRestrictedToFacilities pp : ppRestrictedToFacilities) {
+-			for (Id facilityId : pp.getFacilityIds()) {
++			for (Id<ActivityFacility> facilityId : pp.getFacilityIds()) {
+ 				privateParkingsRestrictedToFacilities.put(facilityId, pp);
+ 				getAllParkings().put(pp.getId(), pp);
+ 			}
+@@ -121,15 +120,18 @@ public class ParkingInfrastructureManager {
+ 	public synchronized void reset() {
+ 		parkedVehicles.clear();
+ 
+-		for (Id parkingFacilityId : getAllParkings().keySet()) {
++		for (Id<PC2Parking> parkingFacilityId : getAllParkings().keySet()) {
+ 			PC2Parking parking = getAllParkings().get(parkingFacilityId);
+ 			if (parking.getAvailableParkingCapacity() == 0) {
++				// I have no idea what this is doing and why.  Why should parking be full at the end of simulation?  Why put it 
++				// into a quad tree?  Maybe this is an implicit marker that has been added during the previous iteration??? kai, jul'15
+ 				if (!(parking instanceof PrivateParking)) {
+ 					addParkingToQuadTree(publicParkingsQuadTree, parking);
+ 					addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
+ 				}
+ 			}
+ 			parking.resetAvailability();
++			// (resets the available parking capacity to the maximum parking capacity, which should be > 0. kai, jul15)
+ 
+ 			if (parking.getAvailableParkingCapacity() == 0) {
+ 				DebugLib.stopSystemAndReportInconsistency();
+@@ -164,8 +166,8 @@ public class ParkingInfrastructureManager {
+ 		eventsManager.processEvent(new ParkingArrivalEvent(0, parking.getId(), null, null, 0));
+ 	}
+ 
+-	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, Id personId,
+-			double parkingDurationInSeconds, double arrivalTime) {
++	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName, 
++			Id<Person> personId, double parkingDurationInSeconds, double arrivalTime) {
+ 		PC2Parking parking = parkAtClosestPublicParkingNonPersonalVehicle(destCoordinate, groupName);
+ 
+ 		double walkScore = parkingScoreManager.calcWalkScore(destCoordinate, parking, personId, parkingDurationInSeconds);
+@@ -195,11 +197,6 @@ public class ParkingInfrastructureManager {
+ 			}
+ 		}
+ 
+-		PC2Parking closestParking = getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
+-				parkingOperationRequestAttributes.destCoordinate.getY());
+-		double distanceClosestParking = GeneralLib.getDistance(closestParking.getCoordinate(),
+-				parkingOperationRequestAttributes.destCoordinate);
+-
+ 		double distance = 300;
+ 		if (!parkingFound) {
+ 			Collection<PC2Parking> collection = getPublicParkingQuadTree().get(
+@@ -238,6 +235,11 @@ public class ParkingInfrastructureManager {
+ 
+ 				parkVehicle(selectedParking);
+ 
++//				PC2Parking closestParking = getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
++//				parkingOperationRequestAttributes.destCoordinate.getY());
++//		double distanceClosestParking = GeneralLib.getDistance(closestParking.getCoordinate(),
++//				parkingOperationRequestAttributes.destCoordinate);
++
+ //				double distanceSelectedParking = GeneralLib.getDistance(selectedParking.getCoordinate(),
+ //						parkingOperationRequestAttributes.destCoordinate);
+ //
+@@ -284,23 +286,23 @@ public class ParkingInfrastructureManager {
+ 		return selectedParking;
+ 	}
+ 
+-	private synchronized void availablePublicParkingAtCityCentre() {
+-		CoordImpl lindenHof = new CoordImpl(683235.0, 247497.0);
+-		Collection<PC2Parking> collection2 = getPublicParkingQuadTree().get(lindenHof.getX(), lindenHof.getY(), 1000);
+-
+-		if (collection2.size() > 0) {
+-			DebugLib.emptyFunctionForSettingBreakPoint();
+-		}
+-
+-		printParkingGroupSizes();
+-		DebugLib.emptyFunctionForSettingBreakPoint();
+-	}
++//	private synchronized void availablePublicParkingAtCityCentre() {
++//		CoordImpl lindenHof = new CoordImpl(683235.0, 247497.0);
++//		Collection<PC2Parking> collection2 = getPublicParkingQuadTree().get(lindenHof.getX(), lindenHof.getY(), 1000);
++//
++//		if (collection2.size() > 0) {
++//			DebugLib.emptyFunctionForSettingBreakPoint();
++//		}
++//
++//		printParkingGroupSizes();
++//		DebugLib.emptyFunctionForSettingBreakPoint();
++//	}
+ 
+-	private synchronized void printParkingGroupSizes() {
+-		for (String groupName : publicParkingGroupQuadTrees.keySet()) {
+-			System.out.println(groupName + "\t" + publicParkingGroupQuadTrees.get(groupName).size());
+-		}
+-	}
++//	private synchronized void printParkingGroupSizes() {
++//		for (String groupName : publicParkingGroupQuadTrees.keySet()) {
++//			System.out.println(groupName + "\t" + publicParkingGroupQuadTrees.get(groupName).size());
++//		}
++//	}
+ 
+ 	private synchronized void parkVehicle(PC2Parking parking) {
+ 		int startAvailability = parking.getAvailableParkingCapacity();
+@@ -351,7 +353,7 @@ public class ParkingInfrastructureManager {
+ 
+ 	// TODO: make this method abstract
+ 	public synchronized PC2Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
+-		Id parkingFacilityId = parkedVehicles.get(parkingOperationRequestAttributes.personId);
++		Id<PC2Parking> parkingFacilityId = parkedVehicles.get(parkingOperationRequestAttributes.personId);
+ 		PC2Parking parking = getAllParkings().get(parkingFacilityId);
+ 		parkedVehicles.remove(parkingOperationRequestAttributes.personId);
+ 		unParkVehicle(parking, parkingOperationRequestAttributes.arrivalTime
+diff --git a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingOperationRequestAttributes.java b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingOperationRequestAttributes.java
+index 91337d1..6eb7352 100644
+--- a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingOperationRequestAttributes.java
++++ b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingOperationRequestAttributes.java
+@@ -21,6 +21,7 @@ package org.matsim.contrib.parking.PC2.simulation;
+ import org.matsim.api.core.v01.Coord;
+ import org.matsim.api.core.v01.Id;
+ import org.matsim.api.core.v01.population.Person;
++import org.matsim.facilities.ActivityFacility;
+ 
+ public class ParkingOperationRequestAttributes {
+ 
+@@ -28,7 +29,7 @@ public class ParkingOperationRequestAttributes {
+ 	double arrivalTime;
+ 	double parkingDurationInSeconds;
+ 	Id<Person> personId;
+-	Id facilityId;
++	Id<ActivityFacility> facilityId;
+ 	String actType;
+ 	int legIndex;
+ 
+diff --git a/playgrounds/wrashid/src/main/java/playground/wrashid/parkingChoice/freeFloatingCarSharing/SetupParkingForZHScenario.java b/playgrounds/wrashid/src/main/java/playground/wrashid/parkingChoice/freeFloatingCarSharing/SetupParkingForZHScenario.java
+index f167cf4..0607641 100644
+--- a/playgrounds/wrashid/src/main/java/playground/wrashid/parkingChoice/freeFloatingCarSharing/SetupParkingForZHScenario.java
++++ b/playgrounds/wrashid/src/main/java/playground/wrashid/parkingChoice/freeFloatingCarSharing/SetupParkingForZHScenario.java
+@@ -18,6 +18,11 @@
+  * *********************************************************************** */
+ package playground.wrashid.parkingChoice.freeFloatingCarSharing;
+ 
++import java.util.HashMap;
++import java.util.HashSet;
++import java.util.LinkedList;
++import java.util.Map;
++
+ import org.matsim.api.core.v01.Id;
+ import org.matsim.api.core.v01.network.Link;
+ import org.matsim.api.core.v01.population.Person;
+@@ -25,15 +30,16 @@ import org.matsim.api.core.v01.population.Population;
+ import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
+ import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
+ import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
+-import org.matsim.contrib.parking.PC2.scoring.*;
++import org.matsim.contrib.parking.PC2.scoring.ParkingBetas;
++import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
++import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
++import org.matsim.contrib.parking.PC2.scoring.ParkingScoringFunctionFactory;
++import org.matsim.contrib.parking.PC2.scoring.RandomErrorTermManager;
+ import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
+ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+-import org.matsim.core.api.experimental.events.EventsManager;
+ import org.matsim.core.config.Config;
+ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+ import org.matsim.core.controler.Controler;
+-import org.matsim.core.events.EventsUtils;
+-import org.matsim.core.events.algorithms.EventWriterXML;
+ import org.matsim.core.gbl.MatsimRandom;
+ import org.matsim.facilities.ActivityFacility;
+ import org.matsim.utils.objectattributes.ObjectAttributes;
+@@ -43,11 +49,6 @@ import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
+ import playground.wrashid.parkingChoice.infrastructure.api.PParking;
+ import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
+ 
+-import java.util.HashMap;
+-import java.util.HashSet;
+-import java.util.LinkedList;
+-import java.util.Map;
+-
+ public class SetupParkingForZHScenario {
+ 	
+ 	
+-- 
+2.3.2 (Apple Git-55)
+

@@ -1,0 +1,726 @@
+From b94f675cf37c66995936d8c9982eadc8e9f2023d Mon Sep 17 00:00:00 2001
+From: Kai Nagel <2008@kainagel.org>
+Date: Fri, 24 Jul 2015 16:51:30 +0200
+Subject: [PATCH 14/16] parking maintenance
+
+---
+ .../PC2/analysis/AverageWalkDistanceStats.java     |   2 +-
+ .../parking/PC2/infrastructure/PC2Parking.java     |  12 +-
+ .../parking/PC2/infrastructure/PublicParking.java  |   6 +-
+ .../parking/PC2/scoring/ParkingScoreManager.java   |   2 +-
+ .../PC2/simulation/ParkingChoiceSimulation.java    |  14 +-
+ .../simulation/ParkingInfrastructureManager.java   | 293 +++++++++++----------
+ .../ParkingModuleWithFreeFloatingCarSharing.java   |   4 +-
+ .../core/utils/collections/CollectionUtils.java    |   3 +-
+ .../ParkingModuleWithFFCarSharingZH.java           |  17 +-
+ .../wrashid/PSF/singleAgent/BasicTest.java         |   2 +-
+ 10 files changed, 191 insertions(+), 164 deletions(-)
+
+diff --git a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/analysis/AverageWalkDistanceStats.java b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/analysis/AverageWalkDistanceStats.java
+index 8f73398..178448c 100644
+--- a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/analysis/AverageWalkDistanceStats.java
++++ b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/analysis/AverageWalkDistanceStats.java
+@@ -60,7 +60,7 @@ public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
+ 
+ 				Coord destCoord = ParkingArrivalEvent.getDestCoord(event.getAttributes());
+ 				
+-				double walkDistance = GeneralLib.getDistance(parking.get(parkingId).getCoordinate(),
++				double walkDistance = GeneralLib.getDistance(parking.get(parkingId).getCoord(),
+ 						destCoord);
+ 				
+ 				if (!walkDistances.containsKey(getGroupName(parkingId))){
+diff --git a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/infrastructure/PC2Parking.java b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/infrastructure/PC2Parking.java
+index a9ed347..4532840 100644
+--- a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/infrastructure/PC2Parking.java
++++ b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/infrastructure/PC2Parking.java
+@@ -18,26 +18,22 @@
+  * *********************************************************************** */
+ package org.matsim.contrib.parking.PC2.infrastructure;
+ 
+-import org.matsim.api.core.v01.Coord;
++import org.matsim.api.core.v01.BasicLocation;
+ import org.matsim.api.core.v01.Id;
+ import org.matsim.api.core.v01.population.Person;
+ 
+-public interface PC2Parking {
+-
+-	public Id<PC2Parking> getId();
++public interface PC2Parking extends BasicLocation<PC2Parking> {
+ 
+ 	public int getMaximumParkingCapacity();
+ 
+ 	public int getAvailableParkingCapacity();
+ 
+-	public void parkVehicle();
++	public void incrementParkedVehiclesCount();
+ 
+-	public void unparkVehicle();
++	public void decrementParkedVehiclesCount();
+ 	
+ 	public double getCost(Id<Person> agentId, double arrivalTime, double parkingDurationInSecond);
+ 	
+-	public Coord getCoordinate();
+-
+ 	public String getGroupName();
+ 	
+ 	public void resetAvailability();
+diff --git a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/infrastructure/PublicParking.java b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/infrastructure/PublicParking.java
+index 82d9274..d1e3c37 100644
+--- a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/infrastructure/PublicParking.java
++++ b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/infrastructure/PublicParking.java
+@@ -53,7 +53,7 @@ public class PublicParking implements PC2Parking {
+ 	}
+ 	
+ 	@Override
+-	public Coord getCoordinate(){
++	public Coord getCoord(){
+ 		return coord;
+ 	}
+ 	
+@@ -72,7 +72,7 @@ public class PublicParking implements PC2Parking {
+ 	}
+ 	
+ 	@Override
+-	public void parkVehicle(){
++	public void incrementParkedVehiclesCount(){
+ 		if (availableParking>0){
+ 			availableParking--;
+ 		} else {
+@@ -81,7 +81,7 @@ public class PublicParking implements PC2Parking {
+ 	}
+ 	
+ 	@Override
+-	public void unparkVehicle(){
++	public void decrementParkedVehiclesCount(){
+ 		if (availableParking<capacity){
+ 			availableParking++;
+ 		} else {
+diff --git a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/scoring/ParkingScoreManager.java b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/scoring/ParkingScoreManager.java
+index 258e66f..7aaaf75 100644
+--- a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/scoring/ParkingScoreManager.java
++++ b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/scoring/ParkingScoreManager.java
+@@ -60,7 +60,7 @@ public final class ParkingScoreManager {
+ 
+ 		// protected double walkSpeed = 3.0 / 3.6; // [m/s]
+ 
+-		double walkDistance = GeneralLib.getDistance(destCoord, parking.getCoordinate());
++		double walkDistance = GeneralLib.getDistance(destCoord, parking.getCoord());
+ 		double walkDurationInSeconds = walkDistance / walkSpeed;
+ 
+ 		double walkingTimeTotalInMinutes = walkDurationInSeconds / 60;
+diff --git a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingChoiceSimulation.java b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingChoiceSimulation.java
+index 9402c5a..ef08596 100644
+--- a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingChoiceSimulation.java
++++ b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingChoiceSimulation.java
+@@ -69,6 +69,8 @@ ActivityEndEventHandler {
+ 	
+ 	@Override
+ 	public void handleEvent(PersonDepartureEvent event) {
++		double now = event.getTime() ;
++		
+ 		if (event.getLegMode().equalsIgnoreCase(TransportMode.car)){
+ 			if (!firstDepartureTimeOfDay.containsKey(event.getPersonId())){
+ 				firstDepartureTimeOfDay.put(event.getPersonId(),event.getTime());
+@@ -79,21 +81,27 @@ ActivityEndEventHandler {
+ 				DebugLib.emptyFunctionForSettingBreakPoint();
+ 				ParkingOperationRequestAttributes parkingAttributes = new ParkingOperationRequestAttributes();
+ 				parkingAttributes.personId=event.getPersonId();
+-				// this is a trick to get the correct departure time
+ 				parkingAttributes.arrivalTime=0;
+ 				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(0, event.getTime());
+-				parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
++				parkingInfrastructureManager.personCarDepartureEvent(now, event.getPersonId() );
++				// (i.e. calling the parking infra manager with parking duration from midnight until now, and
++				// w/o scoring)
+ 			} else {
+ 				ParkingOperationRequestAttributes parkingAttributes = parkingOperationRequestAttributes.get(event.getPersonId());
+ 				parkingAttributes.parkingDurationInSeconds=GeneralLib.getIntervalDuration(parkingAttributes.arrivalTime, event.getTime());
+ 				if (parkingAttributes.parkingDurationInSeconds==24*3600){
+ 					// (yyyy no idea what this is and why. kai, jul'15)
++					// (possibly, he always stopped the simulation at 24*3600, and this is for vehicles that stayed at the same location 
++					// the whole time.  but I am only guessing ...  kai, jul'15)
+ 					
+ 					parkingAttributes.parkingDurationInSeconds=1; // not zero, because this might lead to NaN
+ 				}
+ 
+-				PC2Parking parking = parkingInfrastructureManager.personCarDepartureEvent(parkingAttributes);
++				PC2Parking parking = parkingInfrastructureManager.personCarDepartureEvent(now, event.getPersonId() );
++				// (i.e. calling the parking infra manager with parking duration from arrival until now)
++				
+ 				parkingInfrastructureManager.scoreParkingOperation(parkingAttributes,parking);
++				// (calling the scoring with the attributes and the parking location)
+ 			}
+ 
+ 		}
+diff --git a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingInfrastructureManager.java b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingInfrastructureManager.java
+index b4a04de..0b9f579 100644
+--- a/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingInfrastructureManager.java
++++ b/contribs/parking/src/main/java/org/matsim/contrib/parking/PC2/simulation/ParkingInfrastructureManager.java
+@@ -41,11 +41,13 @@ import org.matsim.core.utils.collections.QuadTree;
+ import org.matsim.facilities.ActivityFacility;
+ 
+ // TODO: make abstract and create algorithm in Zuerich case -> provide protected helper methods already here.
+-public class ParkingInfrastructureManager {
++public final class ParkingInfrastructureManager {
++	// "synchronized" means that no two threads can access the method simultaneously.    So this prevents a multi-threaded mobsim
++	// to produce a mess.  On the other hand, it slows things down (as any centralized infrastructure object will).  kai, jul'15
+ 
+ 	private ParkingScoreManager parkingScoreManager;
+ 	private HashMap<Id<PC2Parking>, PC2Parking> allParkings;
+-	private HashMap<Id<Person>, Id<PC2Parking>> parkedVehicles;
++	private HashMap<Id<Person>, PC2Parking> parkedVehicles;
+ 	private EventsManager eventsManager;
+ 
+ 	// facilityId -> parkings available to users of that facility
+@@ -78,14 +80,14 @@ public class ParkingInfrastructureManager {
+ 				DebugLib.stopSystemAndReportInconsistency("parking capacity non-positive: " + parking.getId());
+ 			}
+ 
+-			allPublicParkingRect.registerCoord(parking.getCoordinate());
++			allPublicParkingRect.registerCoord(parking.getCoord());
+ 			getAllParkings().put(parking.getId(), parking);
+ 
+ 			if (!groupRects.containsKey(parking.getGroupName())) {
+ 				groupRects.put(parking.getGroupName(), new EnclosingRectangle());
+ 			}
+ 			EnclosingRectangle groupRect = groupRects.get(parking.getGroupName());
+-			groupRect.registerCoord(parking.getCoordinate());
++			groupRect.registerCoord(parking.getCoord());
+ 		}
+ 		this.publicParkingsQuadTree = (new QuadTreeInitializer<PC2Parking>()).getQuadTree(allPublicParkingRect);
+ 
+@@ -95,15 +97,11 @@ public class ParkingInfrastructureManager {
+ 		}
+ 
+ 		for (PublicParking parking : publicParkings) {
+-			addParkingToQuadTree(publicParkingsQuadTree, parking);
+-			addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
++			addToQuadTree(publicParkingsQuadTree, parking);
++			addToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
+ 		}
+ 	}
+ 
+-	public static void addParkingToQuadTree(QuadTree<PC2Parking> quadTree, PC2Parking parking) {
+-		quadTree.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
+-	}
+-
+ 	public synchronized void setPrivateParkingRestrictedToFacilities(LinkedList<PPRestrictedToFacilities> ppRestrictedToFacilities) {
+ 		for (PPRestrictedToFacilities pp : ppRestrictedToFacilities) {
+ 			for (Id<ActivityFacility> facilityId : pp.getFacilityIds()) {
+@@ -118,14 +116,17 @@ public class ParkingInfrastructureManager {
+ 
+ 		for ( PC2Parking parking : getAllParkings().values() ) {
+ 			if (parking.getAvailableParkingCapacity() == 0) {
+-				// yyyyyy I have no idea what this is doing and why.  Why should parking be full at the end of simulation?  Why put it 
++				// I have no idea what this is doing and why.  Why should parking be full at the end of simulation?  Why put it 
+ 				// into a quad tree?  Maybe this is an implicit marker that has been added during the previous iteration??? kai, jul'15
+ 				if (!(parking instanceof PrivateParking)) {
+-					addParkingToQuadTree(publicParkingsQuadTree, parking);
+-					addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
+-					// yyyyyy I could speculate that full parking lots are removed from the quad tree, and it is re-added as soon
++					addToQuadTree(publicParkingsQuadTree, parking);
++					addToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
++					// I could speculate that full parking lots are removed from the quad tree, and it is re-added as soon
+ 					// as space becomes available.  But this is not commented, and it also does not look like it would work in that way.
+ 					// kai, jul'15
++					
++					// In the end, I think that this is an undocumented optimization: All parkings with available capacity > 0 should
++					// be already in the quad tree anyways.  kai, jul'15
+ 				}
+ 			}
+ 			parking.resetAvailability();
+@@ -139,10 +140,6 @@ public class ParkingInfrastructureManager {
+ 		// availablePublicParkingAtCityCentre();
+ 	}
+ 
+-	protected synchronized QuadTree<PC2Parking> getPublicParkingQuadTree() {
+-		return publicParkingsQuadTree;
+-	}
+-
+ 	public synchronized PC2Parking parkAtClosestPublicParkingNonPersonalVehicle(Coord destCoordinate, String groupName) {
+ 		PC2Parking parking = null;
+ 		if (groupName == null) {
+@@ -186,17 +183,17 @@ public class ParkingInfrastructureManager {
+ 
+ 		PC2Parking selectedParking = null;
+ 		boolean parkingFound = false;
+-		
++
+ 		// first search for parking at selected facility:
+ 		for (PPRestrictedToFacilities pp : privateParkingsRestrictedToFacilities.get(parkingOperationRequestAttributes.facilityId)) {
+ 			if (pp.getAvailableParkingCapacity() > 0) {
+ 
+ 				// this tells the parking lot to decrease the number of available spaces:
+-				pp.parkVehicle();
++				pp.incrementParkedVehiclesCount();
+ 
+ 				// this puts the personId (!!!! yyyyyy) at the parking location:
+-				parkedVehicles.put(parkingOperationRequestAttributes.personId, pp.getId());
+-				
++				parkedVehicles.put(parkingOperationRequestAttributes.personId, pp);
++
+ 				parkingFound = true;
+ 				selectedParking = pp;
+ 			}
+@@ -205,16 +202,16 @@ public class ParkingInfrastructureManager {
+ 		// if not found, search within distance of 300m:
+ 		double distance = 300;
+ 		if (!parkingFound) {
+-			Collection<PC2Parking> collection = getPublicParkingQuadTree().get(
++			Collection<PC2Parking> collection = this.publicParkingsQuadTree.get(
+ 					parkingOperationRequestAttributes.destCoordinate.getX(),
+ 					parkingOperationRequestAttributes.destCoordinate.getY(), distance);
+ 
+ 			if (!parkingFound) { 
+-				// yyyyyy no idea why the condition is checked again but it is certainly still valid.  
+-				
++				// yyyyyy no idea why the condition is checked again but it is certainly still valid.  kai, jul'15
++
+ 				while (collection.size() == 0) {
+ 					distance *= 2;
+-					collection = getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
++					collection = this.publicParkingsQuadTree.get(parkingOperationRequestAttributes.destCoordinate.getX(),
+ 							parkingOperationRequestAttributes.destCoordinate.getY(), distance);
+ 
+ 					if (distance > 100000000) {
+@@ -234,61 +231,19 @@ public class ParkingInfrastructureManager {
+ 					queue.add(new SortableMapObject<PC2Parking>(parking, -1.0 * score));
+ 				}
+ 
+-				// TODO: should I make MNL only on top 5 here?
+-
+-				// select the best one from the queue:
++				// select the best one from the queue (could be replaced by better behavioral model): 
+ 				SortableMapObject<PC2Parking> poll = queue.peek();
+ 				finalScore = poll.getScore();
+ 				selectedParking = poll.getKey();
+ 
+ 				// this puts the personId (!!!! yyyyyy) at the parking location:
+-				parkedVehicles.put(parkingOperationRequestAttributes.personId, selectedParking.getId());
++				parkedVehicles.put(parkingOperationRequestAttributes.personId, selectedParking);
+ 
+ 				// this tells the parking lot to decrease the number of available spaces:
+ 				parkVehicle(selectedParking);
+ 
+-//				PC2Parking closestParking = getPublicParkingQuadTree().get(parkingOperationRequestAttributes.destCoordinate.getX(),
+-//				parkingOperationRequestAttributes.destCoordinate.getY());
+-//		double distanceClosestParking = GeneralLib.getDistance(closestParking.getCoordinate(),
+-//				parkingOperationRequestAttributes.destCoordinate);
++//				codeThatWasCommentedOutWhenIFoundIt(parkingOperationRequestAttributes, selectedParking, collection, queue);
+ 
+-//				double distanceSelectedParking = GeneralLib.getDistance(selectedParking.getCoordinate(),
+-//						parkingOperationRequestAttributes.destCoordinate);
+-//
+-//				if (selectedParking.getId().toString().contains("stp") && distanceSelectedParking>300) {
+-//					DebugLib.emptyFunctionForSettingBreakPoint();
+-//				}
+-//				
+-//				if (distanceSelectedParking > distanceClosestParking * 1.5 && distanceSelectedParking > 200) {
+-//					Id closestParkingId = closestParking.getId();
+-//					Id selectedParkingId = selectedParking.getId();
+-//
+-//					if (closestParkingId.toString().contains("stp") && selectedParkingId.toString().contains("stp")) {
+-//
+-//						for (Parking parking : collection) {
+-//							if (parking.getId().toString().contains("stp")) {
+-//								System.out.println(parking.getId()
+-//										+ "\t"
+-//										+ Math.round(GeneralLib.getDistance(parking.getCoordinate(),
+-//												parkingOperationRequestAttributes.destCoordinate)));
+-//							}
+-//						}
+-//
+-//						while (queue.size() > 0) {
+-//							SortableMapObject<Parking> p = queue.poll();
+-//							double costScore = parkingScoreManager.calcCostScore(parkingOperationRequestAttributes.arrivalTime,
+-//									parkingOperationRequestAttributes.parkingDurationInSeconds, p.getKey(),
+-//									parkingOperationRequestAttributes.personId);
+-//							double walkScore = parkingScoreManager.calcWalkScore(parkingOperationRequestAttributes.destCoordinate,
+-//									p.getKey(), parkingOperationRequestAttributes.personId,
+-//									parkingOperationRequestAttributes.parkingDurationInSeconds);
+-//							System.out.println(p.getKey().getId() + "\t" + p.getScore() + "\t" + costScore + "\t" + walkScore);
+-//						}
+-//
+-//						DebugLib.emptyFunctionForSettingBreakPoint();
+-//					}
+-//
+-//				}
+ 			}
+ 		}
+ 
+@@ -300,52 +255,33 @@ public class ParkingInfrastructureManager {
+ 		return selectedParking;
+ 	}
+ 
+-//	private synchronized void availablePublicParkingAtCityCentre() {
+-//		CoordImpl lindenHof = new CoordImpl(683235.0, 247497.0);
+-//		Collection<PC2Parking> collection2 = getPublicParkingQuadTree().get(lindenHof.getX(), lindenHof.getY(), 1000);
+-//
+-//		if (collection2.size() > 0) {
+-//			DebugLib.emptyFunctionForSettingBreakPoint();
+-//		}
+-//
+-//		printParkingGroupSizes();
+-//		DebugLib.emptyFunctionForSettingBreakPoint();
+-//	}
+-
+-//	private synchronized void printParkingGroupSizes() {
+-//		for (String groupName : publicParkingGroupQuadTrees.keySet()) {
+-//			System.out.println(groupName + "\t" + publicParkingGroupQuadTrees.get(groupName).size());
+-//		}
+-//	}
+ 
+-	private synchronized void parkVehicle(PC2Parking parking) {
++	public synchronized void parkVehicle(PC2Parking parking) {
+ 		int startAvailability = parking.getAvailableParkingCapacity();
+ 
+-		parking.parkVehicle();
++		parking.incrementParkedVehiclesCount();
+ 		if (parking.getAvailableParkingCapacity() == 0) {
+ 			boolean wasRemoved = false;
+-			wasRemoved = publicParkingsQuadTree.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parking);
+-
++			wasRemoved = removeFromQuadTree( publicParkingsQuadTree, parking) ;
+ 			if (!wasRemoved) {
+ 				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
+ 			}
+ 
+-			wasRemoved = publicParkingGroupQuadTrees.get(parking.getGroupName()).remove(parking.getCoordinate().getX(),
+-					parking.getCoordinate().getY(), parking);
+-
++			wasRemoved = removeFromQuadTree( publicParkingGroupQuadTrees.get(parking.getGroupName()), parking );
+ 			if (!wasRemoved) {
+ 				DebugLib.stopSystemAndReportInconsistency(parking.getId().toString());
+ 			}
+ 
+-			Collection<PC2Parking> collection = publicParkingsQuadTree.get(parking.getCoordinate().getX(), parking.getCoordinate().getY(), 1);
++			Collection<PC2Parking> collection = publicParkingsQuadTree.get(parking.getCoord().getX(), parking.getCoord().getY(), 1);
+ 			if (collection.size() == 1) {
+ 				for (PC2Parking p : collection) {
+ 					// yyyyyy no idea why we first test for "size of collection == 1" and then iterate over it.  kai, jul'15
+-					
++					// Maybe this a typo and shoud say ">1"??  kai, jul'15
++
+ 					if (p.getId().toString().equalsIgnoreCase(parking.getId().toString())) {
+ 						// (i.e. the found parking is not the same as the one that should be at the coordinate; two parking locations are
+ 						// on top of each other)
+-						
++
+ 						DebugLib.stopSystemAndReportInconsistency();
+ 					}
+ 				}
+@@ -357,31 +293,52 @@ public class ParkingInfrastructureManager {
+ 		DebugLib.assertTrue(startAvailability - 1 == endAvailability, "not equal");
+ 
+ 	}
+-
+-//	public synchronized LinkedList<PC2Parking> getNonFullParking(Collection<PC2Parking> parkings) {
+-//		LinkedList<PC2Parking> result = new LinkedList<PC2Parking>();
+-//		for (PC2Parking p : parkings) {
+-//			if (p.getAvailableParkingCapacity() > 0) {
+-//				result.add(p);
+-//			}
+-//		}
+-//		return result;
+-//	}
+-	// never used. kai, jul'15
++	
++	// ---
+ 
+ 	// TODO: make this method abstract
+-	public synchronized PC2Parking personCarDepartureEvent(ParkingOperationRequestAttributes parkingOperationRequestAttributes) {
+-		final Id<Person> personId = parkingOperationRequestAttributes.personId;
+-		Id<PC2Parking> parkingFacilityId = parkedVehicles.get(personId);
+-		PC2Parking parking = getAllParkings().get(parkingFacilityId);
++	public synchronized PC2Parking personCarDepartureEvent(double now, Id<Person> personId) {
++		PC2Parking parking = parkedVehicles.get(personId);
+ 
+ 		parkedVehicles.remove(personId);
++
++		unParkVehicle( parking, now, personId ) ;
+ 		
+-		unParkVehicle(parking, parkingOperationRequestAttributes.arrivalTime
+-				+ parkingOperationRequestAttributes.parkingDurationInSeconds, personId);
+ 		return parking;
+ 	}
+ 
++	public synchronized void unParkVehicle(PC2Parking parking, double departureTime, Id<Person> personId) {
++		// yy this design feels a bit incomplete to me.  personCarDepartureEvent removes the vehicle (by personId) from the
++		// parked vehicle data structure; the method here just does general counting.  Some code calls unParkVehicle directly, 
++		// thus bypassing the parkedVehicle data structure.  Very unphysical behavior, thus I do not like it.  kai, jul'15 
++		
++		// yyyyyy Also, I think that it produces a memory leak: vehicles have to be added when they are parked, but
++		// they do not need to be removed when they leave.  So the reference remains there.  Probably not causing any damage
++		// besides memory consumption, but still not how it should be.
++		
++		// The main problem seems to be that the current design equates vehicleId and personId.  Rashid eventually get around
++		// that, but rather than changing this package here, he wrapped around.  In an incomplete way (I think).
++		
++		int availableSpacesBefore = parking.getAvailableParkingCapacity();
++
++		parking.decrementParkedVehiclesCount();
++
++		if (parking.getAvailableParkingCapacity() == 1) {
++			if (!(parking instanceof PrivateParking)) {
++				addToQuadTree(publicParkingsQuadTree, parking);
++				addToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
++				// (since this is _un_parking, the "1" can only be reached from zero, i.e. when the parking was full before.
++				// So it is re-added to the quad tree for searching.)
++			}
++		}
++
++		DebugLib.assertTrue(availableSpacesBefore + 1 == parking.getAvailableParkingCapacity(), "not equal");
++
++		eventsManager.processEvent(new ParkingDepartureEvent(departureTime, parking.getId(), personId));
++	}
++	
++	// ---
++
+ 	public synchronized void scoreParkingOperation(ParkingOperationRequestAttributes parkingOperationRequestAttributes,
+ 			PC2Parking parking) {
+ 		double score = parkingScoreManager.calcScore(parkingOperationRequestAttributes.destCoordinate,
+@@ -390,30 +347,63 @@ public class ParkingInfrastructureManager {
+ 		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
+ 	}
+ 
+-	public synchronized void unParkVehicle(PC2Parking parking, double departureTime, Id<Person> personId) {
+-		if (parking == null) {
+-			DebugLib.emptyFunctionForSettingBreakPoint();
+-		}
+-		int startAvailability = parking.getAvailableParkingCapacity();
++	// === private (=internal) methods below here
+ 
+-		parking.unparkVehicle();
+-
+-		if (parking.getAvailableParkingCapacity() == 1) {
+-			if (!(parking instanceof PrivateParking)) {
+-				addParkingToQuadTree(publicParkingsQuadTree, parking);
+-				addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
+-				// yyyyyy I could speculate that full parking lots are removed from the quad tree, and it is re-added as soon
+-				// as space becomes available.  But this is not commented, and it also does not look like it would work in that way.
+-				// kai, jul'15
+-			}
+-		}
++	private static void addToQuadTree(QuadTree<PC2Parking> quadTree, PC2Parking parking) {
++		quadTree.put(parking.getCoord().getX(), parking.getCoord().getY(), parking);
++	}
+ 
+-		int endAvailability = parking.getAvailableParkingCapacity();
++	private static boolean removeFromQuadTree(QuadTree<PC2Parking> quadTree, PC2Parking parking) {
++		return quadTree.remove(parking.getCoord().getX(), parking.getCoord().getY(), parking);
++	}
+ 
+-		DebugLib.assertTrue(startAvailability + 1 == endAvailability, "not equal");
++//	private void codeThatWasCommentedOutWhenIFoundIt(ParkingOperationRequestAttributes parkingOperationRequestAttributes,
++//			PC2Parking selectedParking, Collection<PC2Parking> collection, PriorityQueue<SortableMapObject<PC2Parking>> queue) {
++//		PC2Parking closestParking = this.publicParkingsQuadTree.get(parkingOperationRequestAttributes.destCoordinate.getX(),
++//				parkingOperationRequestAttributes.destCoordinate.getY());
++//		double distanceClosestParking = GeneralLib.getDistance(closestParking.getCoord(),
++//				parkingOperationRequestAttributes.destCoordinate);
++//
++//		double distanceSelectedParking = GeneralLib.getDistance(selectedParking.getCoord(),
++//				parkingOperationRequestAttributes.destCoordinate);
++//
++//		if (selectedParking.getId().toString().contains("stp") && distanceSelectedParking>300) {
++//			DebugLib.emptyFunctionForSettingBreakPoint();
++//		}
++//
++//		if (distanceSelectedParking > distanceClosestParking * 1.5 && distanceSelectedParking > 200) {
++//			Id closestParkingId = closestParking.getId();
++//			Id selectedParkingId = selectedParking.getId();
++//
++//			if (closestParkingId.toString().contains("stp") && selectedParkingId.toString().contains("stp")) {
++//
++//				for (PC2Parking parking : collection) {
++//					if (parking.getId().toString().contains("stp")) {
++//						System.out.println(parking.getId()
++//								+ "\t"
++//								+ Math.round(GeneralLib.getDistance(parking.getCoord(),
++//										parkingOperationRequestAttributes.destCoordinate)));
++//					}
++//				}
++//
++//				while (queue.size() > 0) {
++//					SortableMapObject<PC2Parking> p = queue.poll();
++//					double costScore = parkingScoreManager.calcCostScore(parkingOperationRequestAttributes.arrivalTime,
++//							parkingOperationRequestAttributes.parkingDurationInSeconds, p.getKey(),
++//							parkingOperationRequestAttributes.personId);
++//					double walkScore = parkingScoreManager.calcWalkScore(parkingOperationRequestAttributes.destCoordinate,
++//							p.getKey(), parkingOperationRequestAttributes.personId,
++//							parkingOperationRequestAttributes.parkingDurationInSeconds);
++//					System.out.println(p.getKey().getId() + "\t" + p.getScore() + "\t" + costScore + "\t" + walkScore);
++//				}
++//
++//				DebugLib.emptyFunctionForSettingBreakPoint();
++//			}
++//
++//		}
++//	}
+ 
+-		eventsManager.processEvent(new ParkingDepartureEvent(departureTime, parking.getId(), personId));
+-	}
++	// === getters and setters.  Some of them should probably go. 
+ 
+ 	public synchronized ParkingScoreManager getParkingScoreManager() {
+ 		return parkingScoreManager;
+@@ -431,7 +421,7 @@ public class ParkingInfrastructureManager {
+ 		return allParkings;
+ 	}
+ 
+-	public void setAllParkings(HashMap<Id<PC2Parking>, PC2Parking> allParkings) {
++	void setAllParkings(HashMap<Id<PC2Parking>, PC2Parking> allParkings) {
+ 		this.allParkings = allParkings;
+ 	}
+ 
+@@ -445,4 +435,35 @@ public class ParkingInfrastructureManager {
+ 
+ 	// also loading of data should
+ 
++	//		private synchronized void availablePublicParkingAtCityCentre() {
++	//		CoordImpl lindenHof = new CoordImpl(683235.0, 247497.0);
++	//		Collection<PC2Parking> collection2 = getPublicParkingQuadTree().get(lindenHof.getX(), lindenHof.getY(), 1000);
++	//
++	//		if (collection2.size() > 0) {
++	//			DebugLib.emptyFunctionForSettingBreakPoint();
++	//		}
++	//
++	//		printParkingGroupSizes();
++	//		DebugLib.emptyFunctionForSettingBreakPoint();
++	//	}
++
++	//	private synchronized void printParkingGroupSizes() {
++	//		for (String groupName : publicParkingGroupQuadTrees.keySet()) {
++	//			System.out.println(groupName + "\t" + publicParkingGroupQuadTrees.get(groupName).size());
++	//		}
++	//	}
++
++	//		public synchronized LinkedList<PC2Parking> getNonFullParking(Collection<PC2Parking> parkings) {
++	//		LinkedList<PC2Parking> result = new LinkedList<PC2Parking>();
++	//		for (PC2Parking p : parkings) {
++	//			if (p.getAvailableParkingCapacity() > 0) {
++	//				result.add(p);
++	//			}
++	//		}
++	//		return result;
++	//	}
++	// never used. kai, jul'15
++
++
++
+ }
+diff --git a/contribs/parking/src/main/java/org/matsim/contrib/parking/parkingChoice/carsharing/ParkingModuleWithFreeFloatingCarSharing.java b/contribs/parking/src/main/java/org/matsim/contrib/parking/parkingChoice/carsharing/ParkingModuleWithFreeFloatingCarSharing.java
+index 07b70b2..6dbcf83 100644
+--- a/contribs/parking/src/main/java/org/matsim/contrib/parking/parkingChoice/carsharing/ParkingModuleWithFreeFloatingCarSharing.java
++++ b/contribs/parking/src/main/java/org/matsim/contrib/parking/parkingChoice/carsharing/ParkingModuleWithFreeFloatingCarSharing.java
+@@ -11,7 +11,7 @@ public interface ParkingModuleWithFreeFloatingCarSharing {
+ 	 * @param coord
+ 	 * @return
+ 	 */
+-	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double time);
++	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double now);
+ 	
+ 	/**
+ 	 * finds closest available parking for vehicle from destCoord
+@@ -21,7 +21,7 @@ public interface ParkingModuleWithFreeFloatingCarSharing {
+ 	 * @param destCoord
+ 	 * @return
+ 	 */
+-	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personId, double time);
++	public ParkingLinkInfo parkFreeFloatingVehicle(Id vehicleId, Coord destCoord, Id personId, double now);
+ 	
+ 	
+ 	public void resetForNewIterationStart();
+diff --git a/matsim/src/main/java/org/matsim/core/utils/collections/CollectionUtils.java b/matsim/src/main/java/org/matsim/core/utils/collections/CollectionUtils.java
+index 07730a9..fd15d17 100644
+--- a/matsim/src/main/java/org/matsim/core/utils/collections/CollectionUtils.java
++++ b/matsim/src/main/java/org/matsim/core/utils/collections/CollectionUtils.java
+@@ -29,7 +29,8 @@ import org.matsim.core.utils.misc.StringUtils;
+ /**
+  * @author mrieser
+  */
+-public abstract class CollectionUtils {
++public final class CollectionUtils {
++	private CollectionUtils(){} // do not instantiate
+ 
+ 	public static final <T> String idSetToString(final Set<Id<T>> values) {
+ 		boolean isFirst = true;
+diff --git a/playgrounds/wrashid/src/main/java/playground/wrashid/parkingChoice/freeFloatingCarSharing/ParkingModuleWithFFCarSharingZH.java b/playgrounds/wrashid/src/main/java/playground/wrashid/parkingChoice/freeFloatingCarSharing/ParkingModuleWithFFCarSharingZH.java
+index bf22aff..83f7d80 100644
+--- a/playgrounds/wrashid/src/main/java/playground/wrashid/parkingChoice/freeFloatingCarSharing/ParkingModuleWithFFCarSharingZH.java
++++ b/playgrounds/wrashid/src/main/java/playground/wrashid/parkingChoice/freeFloatingCarSharing/ParkingModuleWithFFCarSharingZH.java
+@@ -53,7 +53,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
+ 	
+ 	// TODO: we are not considering, that the number of vehicles is too limited, that no vehicle is available
+ 	@Override
+-	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double departureTime) {
++	public ParkingLinkInfo getNextFreeFloatingVehicle(Coord coord, Id personId, double now) {
+ 		Id vehicleId = vehicleLocations.get(coord.getX(), coord.getY());
+ 		
+ 		if (vehicleId==null){
+@@ -66,9 +66,10 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
+ 		
+ 		
+ 		PC2Parking parking=currentVehicleLocation.get(vehicleId);
+-		parkingInfrastructureManager.unParkVehicle(parking, departureTime, personId);
++
++		parkingInfrastructureManager.unParkVehicle(parking, now, personId);
+ 		
+-		vehicleLocations.remove(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
++		vehicleLocations.remove(parking.getCoord().getX(), parking.getCoord().getY(), vehicleId);
+ 
+         NetworkImpl network = (NetworkImpl) getControler().getScenario().getNetwork();
+ 		
+@@ -80,7 +81,7 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
+ 		}
+ 		
+ 
+-		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoordinate())
++		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoord())
+ 				.getId());
+ 	}
+ 
+@@ -98,9 +99,9 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
+ 		
+ 		PC2Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(destCoord, groupName, personId, getAverageActDuration(), arrivalTime);
+ 		currentVehicleLocation.put(vehicleId, parking);
+-		vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), vehicleId);
++		vehicleLocations.put(parking.getCoord().getX(), parking.getCoord().getY(), vehicleId);
+ 		
+-		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoordinate())
++		return new ParkingLinkInfo(vehicleId, NetworkUtils.getNearestLink(network, parking.getCoord())
+ 				.getId());
+ 	}
+ 
+@@ -116,14 +117,14 @@ public class ParkingModuleWithFFCarSharingZH extends GeneralParkingModule implem
+ 			PC2Parking parking=parkingInfrastructureManager.parkAtClosestPublicParkingNonPersonalVehicle(parkInfo.getParkingCoordinate(), groupName);
+ 			parkingInfrastructureManager.logArrivalEventAtTimeZero(parking);
+ 			currentVehicleLocation.put(parkInfo.getVehicleId(), parking);
+-			vehicleLocationsRect.registerCoord(parking.getCoordinate());
++			vehicleLocationsRect.registerCoord(parking.getCoord());
+ 		}
+ 
+         vehicleLocations = (new QuadTreeInitializer<Id>()).getLinkQuadTree((NetworkImpl) getControler().getScenario().getNetwork());
+ 		
+ 		for (ParkingCoordInfo parkInfo : initialDesiredVehicleCoordinates) {
+ 			PC2Parking parking=currentVehicleLocation.get(parkInfo.getVehicleId());
+-			vehicleLocations.put(parking.getCoordinate().getX(), parking.getCoordinate().getY(), parkInfo.getVehicleId());
++			vehicleLocations.put(parking.getCoord().getX(), parking.getCoord().getY(), parkInfo.getVehicleId());
+ 		}
+ 	}
+ 
+diff --git a/playgrounds/wrashid/src/test/java/playground/wrashid/PSF/singleAgent/BasicTest.java b/playgrounds/wrashid/src/test/java/playground/wrashid/PSF/singleAgent/BasicTest.java
+index 8a03e5f..7f756f7 100644
+--- a/playgrounds/wrashid/src/test/java/playground/wrashid/PSF/singleAgent/BasicTest.java
++++ b/playgrounds/wrashid/src/test/java/playground/wrashid/PSF/singleAgent/BasicTest.java
+@@ -64,7 +64,7 @@ public class BasicTest extends MatsimTestCase {
+ 		assertEquals(22989, chargeLogOfAgentOne.getStartChargingTime(),  1);
+ 		// yy for some unknown reason, this assertion
+ 		// * works on the build server
+-		// * works one only this test or only this test class or only this test package is run locally on my machine
++		// * works when only this test or only this test class or only this test package is run locally on my machine
+ 		// * fails when I run all wrashid tests locally on my machine.  It is far off then: 2700 instead of 22989. 
+ 		// kai, may'15
+ 		
+-- 
+2.3.2 (Apple Git-55)
+
