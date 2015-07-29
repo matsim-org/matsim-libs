@@ -43,10 +43,7 @@
 		<param name="storageCapacityFactor" value="1.0" />
 <!-- 		<param name="snapshotStyle" value="queue" /> -->
 <!-- 		<param name="snapshotperiod" value="00:05:00" /> -->
-	</module>
-
-	<module name="scenario" >
-		<param name="useLanes" value="true" />
+ 		<param name="useLanes" value="true" />
 	</module>
 
 	<module name="strategy" >

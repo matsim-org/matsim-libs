@@ -12,13 +12,7 @@
     <param name="randomSeed" value="4711" />
   </module>
   
-  
-  <module name="scenario">
-    <!-- Set this parameter to true if lanes should be used, false if not. -->
-    <param name="useLanes" value="true" />
-  </module>
-
-  <module name="network">
+    <module name="network">
     <param name="inputNetworkFile" value="&INPUTBASE;/network.xml.gz" />
     <param name="laneDefinitionsFile" value="./test/output/org/matsim/contrib/signals/integration/SignalSystemsIntegrationTest/testSignalSystems/testLaneDefinitions_v2.0.xml" />
   </module>
@@ -62,16 +56,10 @@
 
   <module name="controler">
     <param name="enableLinkToLinkRouting" value="true" />
-    <!-- Specifies the file format for writing events. Currently supported: txt,
-      xml. Multiple values can be specified separated by commas (','). -->
     <param name="eventsFileFormat" value="xml" />
     <param name="firstIteration" value="0" />
     <param name="lastIteration" value="10" />
-    <!-- The type of routing (least cost path) algorithm used, may have the values:
-      Dijkstra or AStarLandmarks -->
     <param name="routingAlgorithmType" value="Dijkstra" />
-    <!-- An identifier for the current run which is used as prefix for output files
-      and mentioned in output xml files etc. -->
     <param name="writeEventsInterval" value="1" />
     <param name="mobsim" value="qsim" />
   </module>
@@ -93,11 +81,10 @@
   </module>
 
 	<module name="qsim" >
-		<!-- Use number of threads > 1 for parallel version using the specified number of threads -->
 		<param name="numberOfThreads" value="1" />
 		<param name="removeStuckVehicles" value="false" />
-		<!-- snapshotStyle: `equidist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) -->
-		<param name="stuckTime" value="100.0" />
+		<param name="stuckTime" value="100.0" />    
+		<param name="useLanes" value="true" />
 	</module>
 
   
