@@ -288,24 +288,7 @@
 
 	
 <!-- ====================================================================== -->	
-	
-	<module name="scenario" >
 
-		<!-- Set this parameter to true if households should be used, false if not. -->
-		<param name="useHouseholds" value="false" />
-
-		<!-- Set this parameter to true if knowledge should be used, false if not. -->
-		<!-- <param name="useKnowledge" value="false" />-->
-
-		<!-- Set this parameter to true if lanes should be used, false if not. -->
-		<param name="useLanes" value="false" />
-
-		<!-- Set this parameter to true if roadpricing should be used, false if not. -->
-		<!-- <param name="useRoadpricing" value="false" />-->
-
-	</module>
-
-	
 	<module name="strategy">
  		<param name="maxAgentPlanMemorySize" value="1" /> <!-- 0 means unlimited -->
 
