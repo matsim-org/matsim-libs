@@ -121,7 +121,7 @@ class LinkLaneTTTestEventHandler implements LinkEnterEventHandler,  LinkLeaveEve
 		System.out.println("TT when freespeed is 75:\t"	+ this.caselinkTravelTimes.get(7));
 		System.out.println("TT when freespeed is 76:\t"	+ this.caselinkTravelTimes.get(8) + "\n");
 
-		System.out.println("200m link separated in 1 Lane of 50m and 2 parallel lanes of 150m");
+		System.out.println("200m link separated in 1 Lane of 50m and 1 following lane of 150m");
 		laneString = ("\t Lane Travel Times:" + this.caseLaneTravelTimes.get(5).toString());
 		System.out.println("TT when freespeed is 75:\t" + this.caselinkTravelTimes.get(5) + laneString);
 		laneString = ("\t Lane Travel Times:" + this.caseLaneTravelTimes.get(6).toString() + "\n");
