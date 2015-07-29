@@ -1,6 +1,7 @@
 language: java
-script:
+install:
   - mvn install -DskipTests -pl matsim
+script:
   - mvn test -pl matsim
 env:
   global:
