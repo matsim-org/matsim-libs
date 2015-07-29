@@ -19,7 +19,13 @@
 
 package playground.gregor.grips.scenariogeneratorpt;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,7 +41,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -55,11 +60,22 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.util.*;
+import com.vividsolutions.jts.geom.Geometry;
 
 
 public class ScenarioGeneratorPT extends ScenarioGenerator {
@@ -84,7 +100,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		this.c.transit().setUseTransit(true);
 		this.c.scenario().setUseVehicles(true);
 		
-		this.c.addModule( new SimulationConfigGroup() );
+//		this.c.addModule( new SimulationConfigGroup() );
 		this.c.global().setCoordinateSystem("EPSG:3395");
 		this.c.controler().setOutputDirectory(getEvacuationConfig(this.c).getOutputDir()+"/output");
 		this.sc = ScenarioUtils.createScenario(this.c);
@@ -312,8 +328,11 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), gcm.getSampleSize()).write(outputPopulationFile);
 		sc.getConfig().plans().setInputFile(outputPopulationFile);
 
-		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(gcm.getSampleSize());
-		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(gcm.getSampleSize());
+//		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(gcm.getSampleSize());
+//		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(gcm.getSampleSize());
+		Logger.getLogger("dummy").fatal("SimulationConfigGroup is no longer there.  Since `simulation' has been gone for some time now, "
+				+ "I cannot see how the above may have worked so I am not fixing it.  kai, jul'15");
+		System.exit(-1);
 
 		ActivityParams pre = new ActivityParams("pre-evac");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"

@@ -46,6 +46,7 @@ public class PersonDepartureEvent extends Event implements HasPersonId {
 		this.personId = agentId;
 	}
 	
+	@Override
 	public Id<Person> getPersonId() {
 		return this.personId;
 	}
@@ -58,6 +59,7 @@ public class PersonDepartureEvent extends Event implements HasPersonId {
 		return this.legMode;
 	}
 	
+	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}

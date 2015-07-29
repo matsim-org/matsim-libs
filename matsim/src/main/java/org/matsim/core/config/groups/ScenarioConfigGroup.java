@@ -22,13 +22,13 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.config.ConfigGroup;
 
 /**
  * @author dgrether
  *
  */
-public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
+public final class ScenarioConfigGroup extends ConfigGroup {
 	public static final String GROUP_NAME = "scenario";
 
 	private static final String USE_LANES = "useLanes";
@@ -36,11 +36,9 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 	private static final String USE_TRANSIT = "useTransit";
 	private static final String USE_VEHICLES = "useVehicles";
 	
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger( ScenarioConfigGroup.class ) ;
 	
-	private boolean useLanes = false;
-	private boolean useHouseholds = false;
-
 	public ScenarioConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -48,65 +46,101 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
-		map.put(USE_HOUSEHOLDS, "Set this parameter to true if households should be used, false if not.");
-		map.put(USE_TRANSIT, "Deprecated, to not use.  See transit section of config file.") ; // since jul'15
+		
+		// I don't think that the following is used anywhere: 
+		final String message = "Deprecated, do not use.  The file is loaded when the filename is given.  Functionality needs to be switched on elsewhere.";
+		map.put(USE_LANES, message) ; // since jul'15
+		map.put(USE_HOUSEHOLDS, message); // since jul'15
+		map.put(USE_VEHICLES, message); // since jul'15
+		map.put(USE_TRANSIT, "Deprecated, do not use.  See transit section of config file.") ; // since jul'15
+		
 		return map;
 	}
 
-	@StringGetter( USE_LANES )
-	public boolean isUseLanes() {
-		return this.useLanes;
+	@Override
+	public final void addParam(final String paramName, final String value) {
+		// emulate previous behavior of reader (ignore null values at reading). td Apr'15
+		if ( "null".equalsIgnoreCase( value ) ) return;
+
+		if (USE_LANES.equals(paramName)) {
+			this.setUseLanes( Boolean.parseBoolean(value) );
+		} else if (USE_HOUSEHOLDS.equals(paramName)) {
+			this.setUseHouseholds( Boolean.parseBoolean(value) );
+		} else if (USE_VEHICLES.equals(paramName)) {
+			this.setUseVehicles( Boolean.parseBoolean(value) );
+		} else if (USE_TRANSIT.equals(paramName)) {
+			this.setUseTransit( Boolean.parseBoolean(value) );
+		} else {
+			throw new IllegalArgumentException("Parameter '" + paramName + "' is not supported by config group '" + GROUP_NAME + "'.");
+		}
+	}
+	@Override
+	public final String getValue(final String param_name) {
+		throw new UnsupportedOperationException("Use getters for accessing values!");
 	}
 
-	@StringSetter( USE_LANES )
-	public void setUseLanes(final boolean useLanes) {
-		this.useLanes = useLanes;
+	@Override
+	public final Map<String, String> getParams() {
+		Map<String, String> params = super.getParams();
+		return params;
 	}
 
-	@StringGetter( USE_HOUSEHOLDS )
-	public boolean isUseHouseholds() {
-		return this.useHouseholds;
-	}
+	// if they are not in getParams, they will not be included into the config file dump.
+	
+	// if they are, however, in addParam, then the methods will be called (which throw exceptions).
+	
+	// Once the methods below are removed throughout the code, those exceptions can be moved into the addParam method.
+	
+	// Eventually, the whole scenario config group can be moved away.
+	
+	// kai, jul'15
 
-	@StringSetter( USE_HOUSEHOLDS )
-	public void setUseHouseholds(final boolean b) {
-		this.useHouseholds = b;
-	}
+	
+	
 
-	private boolean failConsistencyCheck = false ;
+//	public boolean isUseLanes() {
+//		return this.useLanes;
+//	}
 
+	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
-	@StringSetter( USE_VEHICLES )
+	void setUseLanes(@SuppressWarnings("unused") final boolean useLanes) {
+		throw new RuntimeException( getMessage( USE_LANES ) ) ;
+	}
+
+//	public boolean isUseHouseholds() {
+//		return this.useHouseholds;
+//	}
+
+	@SuppressWarnings("static-method")
+	@Deprecated // since jul'15
+	public void setUseHouseholds(@SuppressWarnings("unused") final boolean b) {
+		throw new RuntimeException( getMessage( USE_HOUSEHOLDS ) ) ;
+	}
+
+	@SuppressWarnings("static-method")
+	@Deprecated // since jul'15
 	public void setUseVehicles(@SuppressWarnings("unused") final Boolean b) {
-		log.fatal( getMessage( USE_VEHICLES ) ) ;
-		this.failConsistencyCheck = true ;
-//		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
-	}
-	@Deprecated // since jul'15
-	@StringGetter( USE_VEHICLES )
-	public Boolean getUseVehicles() {
-//		log.fatal( getMessage( USE_VEHICLES ) ) ;
-//		this.failConsistencyCheck = true ;
-//		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
-		return null ;
+		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
 	}
 	
-	@StringSetter( USE_TRANSIT )
+//	@SuppressWarnings("static-method")
+//	@Deprecated // since jul'15
+//	public Boolean getUseVehicles() {
+//		throw new RuntimeException( getMessage( USE_VEHICLES ) ) ;
+//	}
+	
+	@SuppressWarnings("static-method")
 	@Deprecated // since jul'15
 	public void setUseTransit(@SuppressWarnings("unused") final Boolean b) {
-		log.fatal("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
-		this.failConsistencyCheck = true ;
-//		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
+		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
 	}
-	@StringGetter( USE_TRANSIT )
-	@Deprecated // since jul'15
-	public Boolean getUseTransit() {
-//		log.fatal("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
-//		this.failConsistencyCheck = true ;
+
+//	@SuppressWarnings("static-method")
+//	@Deprecated // since jul'15
+//	public Boolean getUseTransit() {
 //		throw new RuntimeException("The " + USE_TRANSIT + " switch has moved to the transit section of the config file." ) ;
-		return null ;
-	}
+//	}
 	
 	private static String getMessage( String module ) {
 		return "The " + module + " switch is no longer operational.  The file is loaded if the file name"
@@ -115,13 +149,4 @@ public final class ScenarioConfigGroup extends ReflectiveConfigGroup {
 				+ "switched on elsewhere (e.g. in qsim, in transit, ...).  If this does not work for you, please let us know. kai, jun'15";
 	}
 	
-	@Override
-	protected void checkConsistency() {
-		if ( this.failConsistencyCheck ) {
-			throw new RuntimeException( "trying to use a switch that is no longer operational.  cannot fail this right away because some "
-					+ "tests will fail.  Check error messages to find cause of problem") ;
-		}
-
-}
-
 }

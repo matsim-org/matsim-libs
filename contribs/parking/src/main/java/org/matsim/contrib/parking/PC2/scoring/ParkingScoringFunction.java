@@ -19,7 +19,6 @@
 package org.matsim.contrib.parking.PC2.scoring;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.scoring.SumScoringFunction.BasicScoring;
 
 public class ParkingScoringFunction implements BasicScoring{

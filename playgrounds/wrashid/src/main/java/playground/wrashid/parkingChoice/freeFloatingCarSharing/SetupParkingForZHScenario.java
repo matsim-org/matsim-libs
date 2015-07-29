@@ -18,6 +18,11 @@
  * *********************************************************************** */
 package playground.wrashid.parkingChoice.freeFloatingCarSharing;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -25,15 +30,16 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
-import org.matsim.contrib.parking.PC2.scoring.*;
+import org.matsim.contrib.parking.PC2.scoring.ParkingBetas;
+import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
+import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
+import org.matsim.contrib.parking.PC2.scoring.ParkingScoringFunctionFactory;
+import org.matsim.contrib.parking.PC2.scoring.RandomErrorTermManager;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -42,11 +48,6 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.PParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
 
 public class SetupParkingForZHScenario {
 	
@@ -121,7 +122,7 @@ public class SetupParkingForZHScenario {
 	
 	public static ParkingScoreManager prepareParkingScoreManager(ParkingModuleWithFFCarSharingZH parkingModule, LinkedList<PParking> parkings) {
 		Controler controler=parkingModule.getControler();
-		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(parkingModule.getControler()), parkingModule.getControler());
+		ParkingScoreManager parkingScoreManager = new ParkingScoreManager(getWalkTravelTime(parkingModule.getControler()), controler.getScenario() );
 
 
         ParkingBetas parkingBetas=new ParkingBetas(getHouseHoldIncomeCantonZH(parkingModule.getControler().getScenario().getPopulation()));

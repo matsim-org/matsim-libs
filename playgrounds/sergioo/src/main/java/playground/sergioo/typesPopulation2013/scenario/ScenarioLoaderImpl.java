@@ -136,7 +136,7 @@ public class ScenarioLoaderImpl {
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
-		if (this.config.scenario().isUseHouseholds()) {
+		if (this.config.households().getInputFile()!=null) {
 			this.loadHouseholds();
 		}
 		if (this.config.transit().isUseTransit()) {
@@ -145,7 +145,7 @@ public class ScenarioLoaderImpl {
 		if ( this.config.vehicles().getVehiclesFile() != null ) {
 			this.loadVehicles();
 		}
-		if (this.config.scenario().isUseLanes()) {
+		if (this.config.network().getLaneDefinitionsFile()!=null ) {
 			this.loadLanes();
 		}
 		return this.scenario;

@@ -37,19 +37,21 @@ public class ScenarioLoaderImplTest {
 
 	@Test
 	public void testLoadScenario_loadTransitData() {
+		// test the create/load sequence:
 		{
-//			Scenario scenario = ScenarioUtils.createScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
-		ScenarioBuilder builder = new ScenarioBuilder( this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml") ) ;
-		builder.createTransitSchedule() ;
-		// facilities is there by default????
-		Scenario scenario = builder.createScenario() ;
-		Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
-		Assert.assertEquals(0, scenario.getTransitSchedule().getFacilities().size());
-		ScenarioUtils.loadScenario(scenario);
-		Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
-		Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
+			//			Scenario scenario = ScenarioUtils.createScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
+			ScenarioBuilder builder = new ScenarioBuilder( this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml") ) ;
+			builder.createTransitSchedule() ;
+			// facilities is there by default????
+			Scenario scenario = builder.createScenario() ;
+			Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
+			Assert.assertEquals(0, scenario.getTransitSchedule().getFacilities().size());
+			ScenarioUtils.loadScenario(scenario);
+			Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
+			Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
 		}
-		//----
+
+		// load directly:
 		{
 			Scenario scenario = ScenarioUtils.loadScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
 			Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
@@ -92,7 +94,7 @@ public class ScenarioLoaderImplTest {
 	@Test
 	public void testLoadScenario_loadHouseholdAttributes() {
 		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "householdAttributesConfig.xml");
-		config.scenario().setUseHouseholds(true);
+//		config.scenario().setUseHouseholds(true);
 		config.households().addParam("inputHouseholdAttributesFile", this.util.getClassInputDirectory() + "householdAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getHouseholds().getHouseholdAttributes().getAttribute("1", "hello"));

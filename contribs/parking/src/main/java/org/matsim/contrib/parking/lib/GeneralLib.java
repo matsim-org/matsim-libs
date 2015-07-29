@@ -77,8 +77,7 @@ public class GeneralLib {
 	public static final double numberOfSecondsInDay = 86400;
 	public static final double EPSILON = 1e-10;
 	
-	@Deprecated // matsim standard is to not use global nonfinal variables
-	public static String eclipseLocalTempPath = "C:/eTmp";
+	public static final String eclipseLocalTempPath = "C:/eTmp";
 
 
 	/*
@@ -86,12 +85,11 @@ public class GeneralLib {
 	 * 
 	 * Note: use the other method with the same name, if this poses problems.
 	 */
+	@Deprecated // use centralized infrastructure
 	public static Scenario readScenario(String plansFile, String networkFile) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
-		Population population = scenario.getPopulation();
 
-		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 
 		PopulationReader popReader = new MatsimPopulationReader(scenario);
@@ -103,6 +101,7 @@ public class GeneralLib {
 	/*
 	 * Reads the population from the plans file.
 	 */
+	@Deprecated // use centralized infrastructure
 	public static Scenario readScenario(String plansFile, String networkFile,
 			String facilititiesPath) {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils
@@ -123,6 +122,7 @@ public class GeneralLib {
 	/*
 	 * Reads the network from the network file.
 	 */
+	@Deprecated // use centralized infrastructure
 	public static Network readNetwork(String networkFile) {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
@@ -156,6 +156,7 @@ public class GeneralLib {
 	 * @param facilitiesFile
 	 * @return
 	 */
+	@Deprecated // use centralized infrastructure
 	public static ActivityFacilities readActivityFacilities(
 			String facilitiesFile) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils

@@ -198,7 +198,7 @@ public final class LanesUtils {
 	public static void calculateMissingCapacitiesForLanes20(String networkInputFilename, String lanes20InputFilename, String lanes20OutputFilename){
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(networkInputFilename);
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 		config.network().setLaneDefinitionsFile(lanes20InputFilename);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();

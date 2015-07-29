@@ -105,6 +105,8 @@ public class ScenarioLoaderImpl {
 	public ScenarioLoaderImpl(Config config) {
 		this.config = config;
 		this.scenario = (WeeklyScenarioImpl) ScenarioUtils.createScenario(this.config);
+		throw new RuntimeException("I end up redoing manual refactoring here that I have already done at the original class in the core."
+				+ " Could you please either remove this class, or work with us to achieve code re-use from the core?  Thanks.  kai, jul'15") ;
 	}
 
 	/**
@@ -141,7 +143,7 @@ public class ScenarioLoaderImpl {
 		this.loadNetwork();
 		this.loadActivityFacilities();
 		this.loadPopulation();
-		if (this.config.scenario().isUseHouseholds()) {
+		if (this.config.households().getInputFile()!=null) {
 			this.loadHouseholds();
 		}
 		if (this.config.transit().isUseTransit()) {
@@ -150,7 +152,7 @@ public class ScenarioLoaderImpl {
 		if (this.config.vehicles().getVehiclesFile() != null ) {
 			this.loadVehicles();
 		}
-		if (this.config.scenario().isUseLanes()) {
+		if (this.config.network().getLaneDefinitionsFile() != null ) {
 			this.loadLanes();
 		}
 		return this.scenario;

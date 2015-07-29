@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimesInvertedNetProxy
+ * TravelCost.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,42 +17,46 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.router.util;
 
-import org.matsim.api.core.v01.Id;
+package org.matsim.contrib.evacuation.control.helper.shapetostreetsnapper;
+
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.vehicles.Vehicle;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
 
-/**
- * Proxy for a LinkToLinkTravelTime instance to make it work with the 
- * LeastCostPathCalculator working on an inverted network.
- * @author dgrether
- * @see org.matsim.core.route.util.NetworkInverter
- *
- */
-public class TravelTimesInvertedNetProxy implements TravelTime {
-
-	private Network originalNetwork;
+public class TravelCost implements TravelDisutility {
 	
-	private LinkToLinkTravelTime linkToLinkTravelTime;
+	private final Polygon p;
 
-	public TravelTimesInvertedNetProxy(Network originalNet, LinkToLinkTravelTime l2ltt){
-		this.linkToLinkTravelTime = l2ltt;
-		this.originalNetwork = originalNet;
+	private final GeometryFactory geofac = new GeometryFactory();
+	
+	public TravelCost(Polygon p) {
+		this.p = p;
 	}
 	
-	/**
-	 * In this case the link given as parameter is a link from the inverted network. 
-	 * @see org.matsim.core.router.util.TravelTime#getLinkTravelTime(Link, double, Person, Vehicle)
-	 */
 	@Override
-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		Link fromLink = this.originalNetwork.getLinks().get(Id.create(link.getFromNode().getId(), Link.class));
-		Link toLink = this.originalNetwork.getLinks().get(Id.create(link.getToNode().getId(), Link.class));
-		return this.linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time);
+	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
+		Coordinate c0 = MGC.coord2Coordinate(link.getFromNode().getCoord());
+		Coordinate c1 = MGC.coord2Coordinate(link.getToNode().getCoord());
+		LineString ls = this.geofac.createLineString(new Coordinate[]{c0,c1});
+		if (ls.intersects(this.p) || this.p.covers(ls)) {
+			return Double.POSITIVE_INFINITY;
+		}
+		
+		return link.getLength();
 	}
-
+	
+	@Override
+	public double getLinkMinimumTravelDisutility(Link link) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException();
+	}
+	
 }

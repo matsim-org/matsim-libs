@@ -184,11 +184,9 @@ public class TransitQueueSimulationTest {
         }
 
         scenario.getConfig().addModule( new SimulationConfigGroup() );
-        ((SimulationConfigGroup) scenario.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(1.0*3600); // prevent running the actual simulation
         scenario.getConfig().qsim().setEndTime(1.0*3600); // prevent running the actual simulation
-        // (the previous line was not there when I found this. kai, dec'11)
 
-        QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());
+        QSim sim = QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());
         sim.run();
         List<MobsimAgent> agents = new ArrayList<MobsimAgent>(sim.getAgents());
         Collections.sort(agents, new Comparator<MobsimAgent>() {

@@ -38,7 +38,7 @@ public class CottbusUtils {
 
 	public static ScenarioImpl loadCottbusScenrio(boolean fixedTimeSignals){
 		Config c2 = ConfigUtils.createConfig();
-		c2.scenario().setUseLanes(true);
+		c2.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(c2, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		c2.network().setInputFile(DgCottbusScenarioPaths.NETWORK_FILENAME);
 		c2.network().setLaneDefinitionsFile(DgCottbusScenarioPaths.LANES_FILENAME);

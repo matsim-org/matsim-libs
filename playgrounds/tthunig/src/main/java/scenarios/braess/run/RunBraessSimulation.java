@@ -116,7 +116,7 @@ public class RunBraessSimulation {
 		config.controler().setLastIteration( 100 );
 
 		// able or enable signals and lanes
-		config.scenario().setUseLanes( false );
+		config.qsim().setUseLanes( false );
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,
 				SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 
@@ -209,9 +209,10 @@ public class RunBraessSimulation {
 		netCreator.setRetardMiddleRoute( false );
 		netCreator.createNetwork();
 		
-		if (scenario.getConfig().scenario().isUseLanes()){
+		if ( scenario.getConfig().qsim().isUseLanes() ){
 			netCreator.createLanes();
 		}
+		throw new RuntimeException("careful, need to set lanes in qsim now (delete this line once this is clear). kai, jul'15") ;
 	}
 
 	private void createPopulation(Scenario scenario) {
@@ -292,7 +293,7 @@ public class RunBraessSimulation {
 			runName += "_distCost"
 					+ config.planCalcScore().getMonetaryDistanceCostRateCar();
 
-		if (config.scenario().isUseLanes()) {
+		if (config.qsim().isUseLanes()) {
 			runName += "_lanes";
 		}
 

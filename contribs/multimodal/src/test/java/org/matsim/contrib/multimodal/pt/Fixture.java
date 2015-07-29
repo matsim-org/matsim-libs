@@ -85,10 +85,10 @@ import java.util.List;
 	private final TransitStopFacility[] stopFacilities = new TransitStopFacility[3];
 
 	public Fixture() {
-		Config config = ConfigUtils.createConfig();	
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		this.config = this.scenario.getConfig();
+		this.config = ConfigUtils.createConfig();	
 		this.config.transit().setUseTransit(true);
+
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		this.network = this.scenario.getNetwork();
 		this.schedule = this.scenario.getTransitSchedule();
 		this.builder = this.schedule.getFactory();

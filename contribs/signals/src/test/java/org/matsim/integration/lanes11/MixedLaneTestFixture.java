@@ -63,7 +63,7 @@ public class MixedLaneTestFixture {
 	
 	public MixedLaneTestFixture(){
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 
 		sc = ScenarioUtils.createScenario(config);
 		id0 = Id.create("0", Link.class);
@@ -88,7 +88,7 @@ public class MixedLaneTestFixture {
 
 	public MixedLaneTestFixture(double timeStepSize){
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 
 		config.qsim().setTimeStepSize(timeStepSize);
 

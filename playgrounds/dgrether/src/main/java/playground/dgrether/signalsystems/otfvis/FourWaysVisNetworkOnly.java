@@ -42,7 +42,7 @@ public class FourWaysVisNetworkOnly {
 		String[] netArray = {netFile};
 
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseLanes(true);
+		config.qsim().setUseLanes(true);
 		config.network().setLaneDefinitionsFile(lanesFile);
 
 		//this is run

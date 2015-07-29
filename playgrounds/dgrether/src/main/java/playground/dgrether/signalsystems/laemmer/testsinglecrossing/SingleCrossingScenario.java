@@ -345,7 +345,7 @@ public class SingleCrossingScenario {
 		String network = repos + "shared-svn/studies/dgrether/laemmer/isolatedcrossingtest/network.xml";
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(network);
-		config.scenario().setUseLanes(false);
+		config.qsim().setUseLanes(false);
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		QSimConfigGroup qsim = config.qsim();
 		qsim.setSnapshotStyle( SnapshotStyle.queue ) ;;

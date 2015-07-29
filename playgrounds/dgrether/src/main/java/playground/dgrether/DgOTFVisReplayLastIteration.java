@@ -82,7 +82,7 @@ public class DgOTFVisReplayLastIteration {
 		config.network().setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
 		config.plans()
 				.setInputFile(oldConfControlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
-		if (config.scenario().isUseLanes()) {
+		if ( config.network().getLaneDefinitionsFile()!=null || config.qsim().isUseLanes()) {
 			config.network().setLaneDefinitionsFile(
 					oldConfControlerIO.getOutputFilename(Controler.FILENAME_LANES));
 		}

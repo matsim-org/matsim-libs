@@ -26,14 +26,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterProviderImpl;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
-
-import com.google.inject.Provider;
 
 public class RunWithinDayReplanningFromPlansExample {
 
@@ -49,24 +44,30 @@ public class RunWithinDayReplanningFromPlansExample {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				this.bindMobsim().toProvider(new Provider<Mobsim>() {
-					@Override
-					public Mobsim get() {
-						// construct necessary trip router:
-						TripRouter router = new TripRouterProviderImpl(
-								controler.getScenario(), 
-								controler.getTravelDisutilityFactory(),
-								travelTime, 
-								controler.getLeastCostPathCalculatorFactory(), 
-								controler.getTransitRouterFactory()).get();
-						
-						// construct qsim and insert listeners:
-						QSim qSim = QSimUtils.createDefaultQSim( controler.getScenario(), controler.getEvents() );
-						qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(router)) ;
-						qSim.addQueueSimulationListeners( travelTime );
-						return qSim;
-					}
-				});
+				// construct necessary trip router:
+				final TripRouter router = new TripRouterProviderImpl(
+						controler.getScenario(), 
+						controler.getTravelDisutilityFactory(),
+						travelTime, 
+						controler.getLeastCostPathCalculatorFactory(), 
+						controler.getTransitRouterFactory()).get();
+
+//				this.bindMobsim().toProvider(new Provider<Mobsim>() {
+//					@Override
+//					public Mobsim get() {
+//						
+//						// construct qsim and insert listeners:
+//						QSim qSim = QSimUtils.createDefaultQSim( controler.getScenario(), controler.getEvents() );
+//						qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(router)) ;
+//						qSim.addQueueSimulationListeners( travelTime );
+//						return qSim;
+//					}
+//				});
+				
+				// I think that the two lines below now replace the commented lines above.  Pls check and let us know.  kai, jul'15
+				
+				this.addMobsimListenerBinding().toInstance(new MyWithinDayMobsimListener(router));
+				this.addMobsimListenerBinding().toInstance( travelTime );
 			}
 		});
 		

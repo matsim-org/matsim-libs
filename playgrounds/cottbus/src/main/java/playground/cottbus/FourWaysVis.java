@@ -65,7 +65,7 @@ public class FourWaysVis {
 		scenario.getConfig().plans().setInputFile(popFile);
 		
 		scenario.getConfig().network().setLaneDefinitionsFile(lanesFile);
-		scenario.getConfig().scenario().setUseLanes(true);
+		scenario.getConfig().qsim().setUseLanes(true);
 
 		ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalSystemFile(signalFile);
 		ConfigUtils.addOrGetModule(scenario.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setSignalControlFile(signalConfigFile);

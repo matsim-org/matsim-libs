@@ -21,6 +21,7 @@ package org.matsim.core.controler.corelisteners;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -36,12 +37,16 @@ import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.households.Households;
 import org.matsim.households.HouseholdsWriterV10;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 
 import java.io.File;
 
@@ -73,31 +78,46 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		// dump config
 		new ConfigWriter(scenarioData.getConfig()).write(controlerIO.getOutputFilename(Controler.FILENAME_CONFIG));
 		// dump facilities
-		ActivityFacilities facilities = scenarioData.getActivityFacilities();
-		if (facilities != null) {
-			new FacilitiesWriter(facilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
-		}
+		try {
+			ActivityFacilities facilities = scenarioData.getActivityFacilities();
+			if (facilities != null) {
+				new FacilitiesWriter(facilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
+			}
+		} catch ( Exception ee ) {}
 		if (((NetworkFactoryImpl) scenarioData.getNetwork().getFactory()).isTimeVariant()) {
 			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
 					((NetworkImpl) scenarioData.getNetwork()).getNetworkChangeEvents());
 		}
-		if (this.scenarioData.getConfig().transit().isUseTransit()) {
-			new TransitScheduleWriter(this.scenarioData.getTransitSchedule()).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
-		}
-		if (this.scenarioData.getConfig().transit().isUseTransit()) {
-			new VehicleWriterV1(this.scenarioData.getTransitVehicles()).writeFile(controlerIO.getOutputFilename("output_transitVehicles.xml.gz"));
-		}
-		if (this.scenarioData.getConfig().vehicles().getVehiclesFile() != null ) {
-			new VehicleWriterV1(this.scenarioData.getVehicles()).writeFile(controlerIO.getOutputFilename("output_vehicles.xml.gz"));
-		}
-		if (this.scenarioData.getConfig().scenario().isUseHouseholds()) {
-			new HouseholdsWriterV10(scenarioData.getHouseholds()).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
-		}
-		if (this.scenarioData.getConfig().scenario().isUseLanes()) {
-			new LaneDefinitionsWriter20(
-					scenarioData.getLanes()).write(
-							controlerIO.getOutputFilename(Controler.FILENAME_LANES));
-		}
+		try {			
+			final TransitSchedule transitSchedule = this.scenarioData.getTransitSchedule();
+			if ( transitSchedule != null ) {
+				new TransitScheduleWriter(transitSchedule).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
+			}
+		} catch ( Exception ee ) { }
+		try {
+			final Vehicles transitVehicles = this.scenarioData.getTransitVehicles();
+			if ( transitVehicles != null ) {
+				new VehicleWriterV1(transitVehicles).writeFile(controlerIO.getOutputFilename("output_transitVehicles.xml.gz"));
+			}
+		} catch ( Exception ee ) {} 
+		try {
+			final Vehicles vehicles = this.scenarioData.getVehicles();
+			if ( vehicles != null ) {
+				new VehicleWriterV1(vehicles).writeFile(controlerIO.getOutputFilename("output_vehicles.xml.gz"));
+			}
+		} catch ( Exception ee ) {} 
+		try {
+			final Households households = scenarioData.getHouseholds();
+			if ( households != null ) {
+				new HouseholdsWriterV10(households).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
+			}
+		} catch ( Exception ee ) {}
+		try {
+			final LaneDefinitions20 lanes = scenarioData.getLanes();
+			if ( lanes != null ) { 
+				new LaneDefinitionsWriter20(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
+			}
+		} catch ( Exception ee ) {}
 		if (!event.isUnexpected() && scenarioData.getConfig().vspExperimental().isWritingOutputEvents()) {
 			try {
 				File toFile = new File(	controlerIO.getOutputFilename("output_events.xml.gz"));

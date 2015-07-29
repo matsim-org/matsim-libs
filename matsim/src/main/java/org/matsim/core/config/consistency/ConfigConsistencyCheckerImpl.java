@@ -110,10 +110,9 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	}
 
 	private void checkEventsFormatLanesSignals(final Config c) {
-		ScenarioConfigGroup scg = c.scenario();
-		if (scg.isUseLanes()) {
+		if (c.qsim().isUseLanes()) {
 			if (!c.controler().getEventsFileFormats().contains(EventsFileFormat.xml)){
-				log.error("Xml events are not enabled, but lanes and eventually signal systems" +
+				log.error("Xml events are not enabled, but lanes and possibly signal systems" +
 						"are enalbed. Events from this features will only be written to the xml format, consider" +
 						"to add xml events in the controler config module");
 			}
@@ -161,7 +160,7 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 
 
 	private void checkLaneDefinitionRoutingConfiguration(final Config config) {
-		if ((config.scenario().isUseLanes()) &&
+		if ((config.qsim().isUseLanes()) &&
 		    !config.controler().isLinkToLinkRoutingEnabled()){
 		  	log.warn("Using lanes without enabling linktolinkrouting might not lead to expected simulation results");
 		   }

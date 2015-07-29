@@ -95,13 +95,13 @@ public class InvertedNetworkRoutingTestFixture {
 		ActivityParams params = new ActivityParams("home");
 		params.setTypicalDuration(24.0 * 3600.0);
 		config.planCalcScore().addActivityParams(params);
-		config.scenario().setUseLanes(doCreateLanes);
+		config.qsim().setUseLanes(doCreateLanes);
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(doCreateSignals);
 
 		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		createNetwork();
 		if (doCreateLanes){
-			config.scenario().setUseLanes(true);
+			config.qsim().setUseLanes(true);
 			createLanes();
 		}
 		if (doCreateModes){

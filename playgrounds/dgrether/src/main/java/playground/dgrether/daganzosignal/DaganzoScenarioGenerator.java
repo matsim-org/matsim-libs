@@ -233,7 +233,7 @@ public class DaganzoScenarioGenerator {
 //		createPlans(scenario);
 //		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(plansOut);
 		if (isUseLanes) {
-			config.scenario().setUseLanes(true);
+			config.qsim().setUseLanes(true);
 			config.network().setLaneDefinitionsFile(LANESOUTPUTFILE);
 			//create the lanes and write them
 			LaneDefinitions20 lanes = createLanes(scenario);

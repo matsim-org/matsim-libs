@@ -63,7 +63,7 @@ public class FixedGroupsIdentifier implements GroupIdentifier {
 			final CliquesConfigGroup cliquesConf = (CliquesConfigGroup)
 						config.getModule( CliquesConfigGroup.GROUP_NAME );
 
-			return config.scenario().isUseHouseholds() ?
+			return config.households().getInputFile()!=null ?
 					new FixedGroupsIdentifier(
 							((ScenarioImpl) scenario).getHouseholds() ) :
 					FixedGroupsIdentifierFileParser.readCliquesFile(

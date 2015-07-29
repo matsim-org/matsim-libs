@@ -29,11 +29,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.SignalsTurnInfoBuilder;
-import org.matsim.contrib.signals.data.SignalsData;
-import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.core.population.LegImpl;
@@ -46,9 +41,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.lanes.data.v20.Lane;
-import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 import java.util.*;
 
@@ -72,20 +64,23 @@ public class InvertedNetworkLegRouter implements LegRouter {
 
 	private Network network = null;
 
-	public InvertedNetworkLegRouter(Scenario sc,
+	InvertedNetworkLegRouter(Scenario sc,
 			LeastCostPathCalculatorFactory leastCostPathCalcFactory,
-			TravelDisutilityFactory travelCostCalculatorFactory, LinkToLinkTravelTime travelTimes) {
+			TravelDisutilityFactory travelCostCalculatorFactory, LinkToLinkTravelTime l2ltravelTimes) {
 		PlanCalcScoreConfigGroup cnScoringGroup = sc.getConfig().planCalcScore();
 		this.routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory())
 				.getModeRouteFactory();
 		this.network = sc.getNetwork();
 
-		Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = this.createAllowedTurnInfos(sc);
+		Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = Utils.createAllowedTurnInfos(sc);
 		
-		NetworkInverter networkInverter = new NetworkInverter(network, allowedInLinkTurnInfoMap);
-		this.invertedNetwork = networkInverter.getInvertedNetwork();
+		this.invertedNetwork = new NetworkInverter(network, allowedInLinkTurnInfoMap).getInvertedNetwork();
 
-		TravelTimesInvertedNetProxy travelTimesProxy = new TravelTimesInvertedNetProxy(network, travelTimes);
+		// convert l2ltravelTimes into something that can be used by the inverted network router:
+		TravelTimesInvertedNetProxy travelTimesProxy = new TravelTimesInvertedNetProxy(network, l2ltravelTimes);
+		// (method that takes a getLinkTravelTime( link , ...) with a link from the inverted network, converts it into links on the 
+		// original network, and looks up the link2link tttime in the l2ltravelTimes data structure)
+		
 		TravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(
 				travelTimesProxy, cnScoringGroup);
 
@@ -97,49 +92,6 @@ public class InvertedNetworkLegRouter implements LegRouter {
 			LeastCostPathCalculatorFactory leastCostPathCalcFactory, TravelDisutilityFactory travelCostCalculatorFactory, LinkToLinkTravelTime travelTimes  ) {
 		LegRouter toWrap = new InvertedNetworkLegRouter(sc, leastCostPathCalcFactory, travelCostCalculatorFactory, travelTimes) ;
 		return new LegRouterWrapper( mode, popFact, toWrap ) ;
-	}
-
-	static Map<Id<Link>, List<TurnInfo>> createTurnInfos(LaneDefinitions20 laneDefs) {
-		Map<Id<Link>, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<>();
-		Set<Id<Link>> toLinkIds = new HashSet<>();
-		for (LanesToLinkAssignment20 l2l : laneDefs.getLanesToLinkAssignments().values()) {
-			toLinkIds.clear();
-			for (Lane lane : l2l.getLanes().values()) {
-				if (lane.getToLinkIds() != null
-						&& (lane.getToLaneIds() == null || lane.getToLaneIds().isEmpty())) { // make sure that it is a lane at the
-																																									// end of a link
-					toLinkIds.addAll(lane.getToLinkIds());
-				}
-			}
-			if (!toLinkIds.isEmpty()) {
-				List<TurnInfo> turnInfoList = new ArrayList<TurnInfo>();
-				for (Id<Link> toLinkId : toLinkIds) {
-					turnInfoList.add(new TurnInfo(l2l.getLinkId(), toLinkId));
-				}
-				inLinkIdTurnInfoMap.put(l2l.getLinkId(), turnInfoList);
-			}
-		}
-
-		return inLinkIdTurnInfoMap;
-	}
-
-	private Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos(Scenario sc){
-		Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = new HashMap<>();
-
-		NetworkTurnInfoBuilder netTurnInfoBuilder = new NetworkTurnInfoBuilder();
-		netTurnInfoBuilder.createAndAddTurnInfo(TransportMode.car, allowedInLinkTurnInfoMap, this.network);
-
-		if (sc.getConfig().scenario().isUseLanes()) {
-			LaneDefinitions20 ld = sc.getLanes();
-			Map<Id<Link>, List<TurnInfo>> lanesTurnInfoMap = createTurnInfos(ld);
-			netTurnInfoBuilder.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, lanesTurnInfoMap);
-		}
-		if (ConfigUtils.addOrGetModule(sc.getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
-			SignalSystemsData ssd = ((SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData();
-			Map<Id<Link>, List<TurnInfo>> signalsTurnInfoMap = new SignalsTurnInfoBuilder().createSignalsTurnInfos(ssd);
-			netTurnInfoBuilder.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, signalsTurnInfoMap);
-		}
-		return allowedInLinkTurnInfoMap;
 	}
 
 	@Override
@@ -176,7 +128,11 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		leg.setRoute(route);
 		return travelTime;
 	}
-
+	
+	/**
+	 * This looks like it is taking whatever comes out of the inverted network router and converts it to a normal route which
+	 * can be given to the plan. 
+	 */
 	private NetworkRoute invertPath2NetworkRoute(Path path, Id<Link> fromLinkId, Id<Link> toLinkId) {
 		NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car,
 				fromLinkId, toLinkId);

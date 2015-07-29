@@ -85,7 +85,8 @@ public class OTFVisWithSignals {
 			server.addAdditionalElement(facilityWriter);
 		}
 
-		if (config.scenario().isUseLanes() && (!(boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems())) {
+		if ( (config.qsim().isUseLanes() || config.network().getLaneDefinitionsFile()!=null ) 
+				&& (!(boolean) ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems())) {
 			ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class).setScaleQuadTreeRect(true);
 			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), (LaneDefinitions20) scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), scenario.getConfig());
 			server.addAdditionalElement(otfLaneWriter);

@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd"
+	[
+		<!ENTITY INPUTBASE    "./test/input/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator">
+		<!ENTITY OUTPUTBASE    "./test/output/org/matsim/contrib/evacuation/scenariogenerator/ScenarioGeneratorTest/testScenarioGenerator">
+	]
+>
+<config>
+
+<module name="grips">
+	<param name ="networkFile" value="&INPUTBASE;/lenzen.osm" />
+	<param name="evacuationAreaFile" value="&INPUTBASE;/evacuation_area.shp"/>
+	<param name="populationFile" value="&INPUTBASE;/population.shp" />
+	<param name="outputDir" value="&OUTPUTBASE;" />
+</module>
+</config>

@@ -177,7 +177,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		{
-			String options = null ;
+			String options = "" ;
 			for ( SnapshotStyle style : SnapshotStyle.values() ) {
 				options += style.toString() + " " ;
 			}
@@ -232,7 +232,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 		map.put(FAST_CAPACITY_UPDATE, "normally, the qsim accumulates fractional flows up to one flow unit.  This is impractical with "
 				+ " with smaller PCEs.  If this switch is set to true, cars can enter a link if the accumulated flow is >=0, and the accumulated flow can go "
 				+ "into negative.  Will probably become the default eventually.") ;
-
+		map.put(USE_LANES, "Set this parameter to true if lanes should be used, false if not.");
 		{	
 			StringBuilder stb = new StringBuilder() ;
 			for ( VehiclesSource src : VehiclesSource.values() ) {
@@ -494,6 +494,17 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	@StringSetter(USING_THREADPOOL)
 	public void setUsingThreadpool( boolean val ) {
 		this.usingThreadpool = val ;
+	}
+
+	private static final String USE_LANES="useLanes" ;
+	private boolean useLanes = false ;
+	@StringGetter(USE_LANES)
+	public boolean isUseLanes() {
+		return this.useLanes;
+	}
+	@StringSetter(USE_LANES)
+	public void setUseLanes(final boolean useLanes) {
+		this.useLanes = useLanes;
 	}
 
 }

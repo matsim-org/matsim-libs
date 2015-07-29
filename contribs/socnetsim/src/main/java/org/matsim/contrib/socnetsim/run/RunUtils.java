@@ -180,7 +180,7 @@ public class RunUtils {
 		final GroupReplanningConfigGroup weights =  (GroupReplanningConfigGroup)
 			config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
 
-		if ( config.scenario().isUseHouseholds() && weights.getUseLimitedVehicles() ) {
+		if ( config.households().getInputFile()!=null && weights.getUseLimitedVehicles() ) {
 			scenario.addScenarioElement(
 							VehicleRessources.ELEMENT_NAME,
 							new HouseholdBasedVehicleRessources(

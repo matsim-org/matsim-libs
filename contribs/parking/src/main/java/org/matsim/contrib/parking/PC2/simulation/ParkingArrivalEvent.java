@@ -41,6 +41,8 @@ public class ParkingArrivalEvent extends Event {
 	private Coord destCoordinate;
 	private double score;
 	
+	// yyyyyy the parking arrival event returns person id, not vehicle id.  Do we change to vehicle id, or add the vehicle
+	// id to the event?  It is used for the walk distance; for that we need the person id. kai, jul'15
 
 	public ParkingArrivalEvent(double time, Id parkingId, Id personId, Coord destCoordinate, double score) {
 		super(time);

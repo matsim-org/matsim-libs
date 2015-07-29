@@ -104,7 +104,7 @@ public class ControlerListenerSocial implements StartupListener, IterationStarts
 	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		if(event.getIteration() == 0)
-			if(event.getControler().getConfig().scenario().isUseHouseholds()) {
+			if(event.getControler().getConfig().households().getInputFile()!=null) {
 				final PassivePlannerManager passivePlannerManager = new PassivePlannerManager(1);
 				event.getControler().addControlerListener(passivePlannerManager);
 				event.getControler().addOverridingModule(new AbstractModule() {

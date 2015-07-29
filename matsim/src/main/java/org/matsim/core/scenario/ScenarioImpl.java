@@ -73,10 +73,10 @@ public final class ScenarioImpl implements Scenario {
 		this.network = NetworkImpl.createNetwork();
 		this.population = PopulationUtils.createPopulation(this.config, this.network);
 		this.facilities = new ActivityFacilitiesImpl();
-		if (this.config.scenario().isUseHouseholds()){
+		if (this.config.households().getInputFile()!=null ){
 			this.createHouseholdsContainer();
 		}
-		if (this.config.scenario().isUseLanes()) {
+		if ( this.config.network().getLaneDefinitionsFile()!=null || this.config.qsim().isUseLanes()) {
 			createLanesContainer();
 		}
 		if ( this.config.transit().getTransitScheduleFile() != null || this.config.transit().isUseTransit() ) {
@@ -118,16 +118,14 @@ public final class ScenarioImpl implements Scenario {
 	 */
 	public final boolean createHouseholdsContainer(){
 		if ( this.households != null ) return false;
-
-		if ( !this.config.scenario().isUseHouseholds() ) {
-			log.info( "creating households container while switch in config set to false. File will not be loaded automatically." );
-		}
-
 		this.households = new HouseholdsImpl();
 		return true;
 	}
 
-	private final boolean createLanesContainer() {
+	/**
+	 * need this in ScenarioLoader.  If you need it elsewhere, use {@link ScenarioUtils.ScenarioBuilder}.
+	 */
+	final boolean createLanesContainer() {
 		if ( this.lanes != null ) return false ;
 		this.lanes = new LaneDefinitions20Impl();
 		return true ;
@@ -198,7 +196,7 @@ public final class ScenarioImpl implements Scenario {
 	public final Households getHouseholds() {
 		// yy should throw an exception if null. kai, based on https://matsim.atlassian.net/browse/MATSIM-301 , may'15
 		if ( this.households == null ) {
-			if ( this.config.scenario().isUseHouseholds() ) {
+			if ( this.config.households().getInputFile()!=null ) {
 				this.createHouseholdsContainer();
 			}
 			else {
@@ -337,6 +335,9 @@ public final class ScenarioImpl implements Scenario {
 	}
 	final void setTransitVehicles( Vehicles vehicles ) {
 		this.transitVehicles = vehicles ;
+	}
+	final void setLanes( LaneDefinitions20 lanes ) {
+		this.lanes = lanes ;
 	}
 
 }

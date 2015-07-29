@@ -70,7 +70,8 @@ public class OTFClientLiveWithSignals {
 					connectionManager.connectReceiverToLayer(FacilityDrawer.DataDrawer.class, SimpleSceneLayer.class);
 				}
 
-				if (config.scenario().isUseLanes() && (!ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems())) {
+				if ( (config.qsim().isUseLanes()) 
+						&& (!ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems())) {
 					connectionManager.connectWriterToReader(OTFLaneWriter.class, OTFLaneReader.class);
 					connectionManager.connectReaderToReceiver(OTFLaneReader.class, OTFLaneSignalDrawer.class);
 					connectionManager.connectReceiverToLayer(OTFLaneSignalDrawer.class, SimpleSceneLayer.class);

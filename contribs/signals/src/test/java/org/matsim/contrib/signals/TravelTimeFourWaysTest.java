@@ -64,7 +64,7 @@ public class TravelTimeFourWaysTest {
 		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
 		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFile());
 		conf.network().setLaneDefinitionsFile(lanes20);
-		conf.scenario().setUseLanes(true);
+		conf.qsim().setUseLanes(true);
 		ConfigUtils.addOrGetModule(conf, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(false);
 		Scenario scenario = ScenarioUtils.createScenario(conf);
 

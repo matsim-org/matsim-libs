@@ -1,11 +1,12 @@
 package playground.jjoubert.roadpricing.controler;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+
 import playground.jjoubert.Utilities.matsim2urbansim.controler.MyBasicConfig;
 
 public class SanralControler_base {
@@ -28,9 +29,13 @@ public class SanralControler_base {
 		config.global().setCoordinateSystem("WGS84_UTM35S");
 		config.global().setNumberOfThreads(15);
 		// Simulation.
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(0.1);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(0.28);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(900);
+//		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(0.1);
+//		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(0.28);
+//		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(900);
+		Logger.getLogger("dummy").fatal("SimulationConfigGroup is no longer there.  Since `simulation' has been gone for some time now, "
+				+ "I cannot see how the above may have worked so I am not fixing it.  kai, jul'15");
+		System.exit(-1);
+
 		// Network.
 		config.network().setInputFile(root + "network/gautengNetwork_CleanV0.xml.gz");
 		config.network();

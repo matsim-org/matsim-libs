@@ -1,6 +1,5 @@
 package org.matsim.contrib.parking.PC2;
 
-import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
 import org.matsim.contrib.parking.PC2.simulation.ParkingChoiceSimulation;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
@@ -17,7 +16,6 @@ import org.matsim.core.controler.listener.StartupListener;
 public class GeneralParkingModule implements StartupListener, IterationStartsListener,BeforeMobsimListener, IterationEndsListener {
 
 	private Controler controler;
-	private ParkingCostModel parkingCostModel; // TODO: don't overwrite parking cost model from config, if already set.
 	private ParkingScoreManager parkingScoreManager;
 	public ParkingScoreManager getParkingScoreManager() {
 		return parkingScoreManager;
@@ -36,15 +34,12 @@ public class GeneralParkingModule implements StartupListener, IterationStartsLis
 		controler.addControlerListener(this);
 	}
 	
-	public void setParkingCostModel(ParkingCostModel parkingCostModel){
-		this.parkingCostModel= parkingCostModel;
-	}
-	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		parkingSimulation = new ParkingChoiceSimulation(controler, parkingInfrastructureManager);
+		parkingSimulation = new ParkingChoiceSimulation(controler.getScenario(), parkingInfrastructureManager);
 		controler.getEvents().addHandler(parkingSimulation);
-		controler.addControlerListener(parkingSimulation);
+//		controler.addControlerListener(parkingSimulation);
+		// was not doing anything there. kai, jul'15
 	}
 
 	@Override
@@ -60,6 +55,9 @@ public class GeneralParkingModule implements StartupListener, IterationStartsLis
 		this.parkingInfrastructureManager = parkingInfrastructureManager;
 	}
 
+	@Deprecated
+	// lower level objects may keep back pointers to higher level objects if they have to, but we prefer that they do not provide them
+	// as a service. kai, apr'15
 	public Controler getControler() {
 		return controler;
 	}
