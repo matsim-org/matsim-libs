@@ -1,8 +1,10 @@
 language: java
 install:
   - mvn install -DskipTests -pl matsim
+  - mvn install -DskipTests -pl contribs
 script:
   - mvn test -pl matsim -Dmaven.test.redirectTestOutputToFile
+  - mvn test -pl contribs -Dmaven.test.redirectTestOutputToFile
 env:
   global:
     - MAVEN_OPTS="-XX:MaxPermSize=512m -Xmx4g"
