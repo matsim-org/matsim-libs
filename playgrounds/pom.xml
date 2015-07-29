@@ -80,27 +80,27 @@
 		<module>artemc</module>
 		<module>balac</module>
 		<module>balmermi</module>
-		<module>benjamin</module>
+		<!--<module>benjamin</module>-->
 		<module>bvitins</module>
 		<module>christoph</module>
 		<module>ciarif</module>
 		<module>cottbus</module>
 		<module>dgrether</module>
 		<module>dhisingh</module>
-		<module>dhosse</module>
+		<!--<module>dhosse</module>-->
 		<module>droeder</module>
 		<module>duncan</module>
 		<module>dziemke</module>
 		<module>fabrice</module>
 		<module>fhuelsmann</module>
 		<module>gleich</module>
-		<module>gregor</module>
-		<module>gunnar</module>
+		<!--<module>gregor</module>-->
+		<!--<module>gunnar</module>-->
 		<module>hbecker</module>
 		<module>ikaddoura</module>
 		<module>imob</module>
 		<module>ivtExt</module>
-		<module>jbischoff</module>
+		<!--<module>jbischoff</module>-->
 		<module>jhackney</module>
 		<module>jjoubert</module>
 		<module>johannes</module>
@@ -108,11 +108,11 @@
 		<module>kai</module>
 		<module>kturner</module>
 		<module>kyotouniv</module>
-		<module>lcrociani</module>
+		<!--<module>lcrociani</module>-->
 		<module>lkroeger</module>
 		<module>ma</module>
 		<module>meisterk</module>
-		<module>michalm</module>
+		<!--<module>michalm</module>-->
 		<module>mkillat</module>
 		<module>mmoyo</module>
 		<module>boku</module>
@@ -124,8 +124,8 @@
 		<module>nmviljoen</module>
 		<module>pbouman</module>
 		<module>pieter</module>
-		<module>boescpa</module>
-		<module>qiuhan</module>
+		<!--<module>boescpa</module>-->
+		<!--<module>qiuhan</module>-->
 		<module>run</module>
 		<module>sschroeder</module>
 		<module>sergioo</module>
@@ -134,16 +134,16 @@
 		<module>smetzler</module>
 		<module>southAfrica</module>
 		<module>staheale</module>
-		<module>stockholm</module>
+		<!--<module>stockholm</module>-->
 		<module>telaviv</module>
 		<module>thibautd</module>
 		<module>tobiqui</module>
 		<module>tthunig</module>
 		<module>toronto</module>
 		<module>wisinee</module>
-		<module>wrashid</module>
+		<!--<module>wrashid</module>-->
 		<module>yalcin</module>
-		<module>yu</module>
+		<!--<module>yu</module>-->
 		<module>fuerbas</module>
 		<module>ucsb</module>
 		<module>vsptelematics</module>
