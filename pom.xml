@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.matsim</groupId>
+	<artifactId>matsim-all</artifactId>
+	<packaging>pom</packaging>
+	<version>0.7.0-SNAPSHOT</version>
+	<name>MATSim-All</name>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+					<revisionOnScmFailure>unknown</revisionOnScmFailure>
+					<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
+				</configuration>
+			</plugin>
+            <plugin>
+                <!-- Usage:
+                    * Put a file like release.properties.template in the root directory of this project,
+                      renaming it to release.properties and changing the version numbers in it.
+
+                    * Run the following, changing the version numbers:
+                    mvn release:prepare -Darguments="-DskipTests" -DreleaseVersion=0.7.1 -DdevelopmentVersion=0.7.2-SNAPSHOT -B
+                    mvn release:perform -Darguments="-DskipTests" -DreleaseVersion=0.7.1 -DdevelopmentVersion=0.7.2-SNAPSHOT -B
+
+                    This is ugly in the extreme, but there seems to be a bug in the release plug-in where (for our setup) it asks
+                    which version of the MATSim dependency to use over and over again. So we pretend this question was already settled
+                    by putting that file there, which marks an intermediary stage of the release process. Yuck.
+                -->
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.1</version>
+            </plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.8</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-assembly-plugin</artifactId>
+					<version>2.2.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+					<version>2.10.1</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+	<modules>
+		<module>matsim</module>
+		<module>contribs</module>
+		<module>playgrounds</module>
+	</modules>
+	<repositories>
+		<repository>
+            <!-- Geotools is not on Maven central -->
+            <id>geotools</id>
+            <name>Geotools repository</name>
+            <url>http://download.osgeo.org/webdav/geotools</url>
+        </repository>
+        <repository>
+            <!-- For some dependencies of Geotools which are not on Maven central -->
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net repository</name>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+        <repository>
+			<id>matsim</id>
+            <url>http://dl.bintray.com/matsim/matsim</url>
+        </repository>
+	</repositories>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+</project>
