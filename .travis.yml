@@ -1,4 +1,7 @@
 language: java
+script:
+  - mvn install -DskipTests -pl matsim
+  - mvn test -pl matsim
 env:
   global:
-    - MAVEN_OPTS="-XX:MaxPermSize=512m -Xmx4g -pl $TRAVIS_SUBMODULE"
+    - MAVEN_OPTS="-XX:MaxPermSize=512m -Xmx4g"
