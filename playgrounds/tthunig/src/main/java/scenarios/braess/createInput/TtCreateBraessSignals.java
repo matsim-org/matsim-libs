@@ -54,7 +54,7 @@ public class TtCreateBraessSignals {
 
 		checkInflowSimulation();
 		// check whether lanes are used or not
-		this.lanesUsed = this.scenario.getConfig().scenario().isUseLanes();
+		this.lanesUsed = this.scenario.getConfig().qsim().isUseLanes();
 	}
 
 	/**
