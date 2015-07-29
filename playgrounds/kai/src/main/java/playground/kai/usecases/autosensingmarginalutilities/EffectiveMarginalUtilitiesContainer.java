@@ -6,9 +6,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 
-import playground.southafrica.gauteng.scoring.UtilityOfMoneyI;
 
-public class EffectiveMarginalUtilitiesContainer implements UtilityOfMoneyI, UtilityOfDistanceI, UtilityOfTtimeI {
+public class EffectiveMarginalUtilitiesContainer implements UtilityOfDistanceI, UtilityOfTtimeI {
 	private final Map<Id,Double> effectiveMarginalUtilityOfTravelTime = new HashMap<Id,Double>() ;
 	private final Map<Id,Double> effectiveMarginalUtilityOfDistance = new HashMap<Id,Double>() ;
 	private final Map<Id,Double> marginalUtilityOfMoney = new HashMap<Id,Double>() ;
@@ -58,7 +57,7 @@ public class EffectiveMarginalUtilitiesContainer implements UtilityOfMoneyI, Uti
 	public Double putMarginalUtilityOfMoney( Id personId, double val ) {
 		return this.marginalUtilityOfMoney.put( personId, val) ;
 	}
-	@Override
+	
 	public double getMarginalUtilityOfMoney(Id personId) {
 		return marginalUtilityOfMoney.get(personId) ;
 	}

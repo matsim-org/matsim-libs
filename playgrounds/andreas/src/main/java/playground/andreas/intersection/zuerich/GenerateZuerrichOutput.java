@@ -54,7 +54,7 @@ public class GenerateZuerrichOutput {
 	
 	public GenerateZuerrichOutput() {
 		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseLanes(generateLanes);
+		config.qsim().setUseLanes(generateLanes);
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(generateSignalSystems);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network net = scenario.getNetwork();
