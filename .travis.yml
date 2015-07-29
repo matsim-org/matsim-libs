@@ -1,4 +1,4 @@
 language: java
 env:
   global:
-    - MAVEN_OPTS="-XX:MaxPermSize=512m -Xmx4g"
+    - MAVEN_OPTS="-XX:MaxPermSize=512m -Xmx4g -pl $TRAVIS_SUBMODULE"
