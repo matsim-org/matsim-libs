@@ -34,28 +34,28 @@ import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 
 /**
  * @author johannes
- * 
+ *
  */
 public class Aggregate2Nuts3 {
 
 	private static final String TEMP_ID = "gsv2008";
-	
+
 	private static final String ZONE_KEY = "NO";
 	/**
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-//		String matrixFile = "/home/johannes/sge/prj/matsim/run/826/output/matrices-averaged/miv.sym.xml";
+//		String matrixFile = "/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/ref/modena.all.xml";
 //		String zonesFile = "/home/johannes/gsv/gis/modena/zones.gk3.geojson";
 //		String idMappingsFile = "/home/johannes/gsv/matrices/refmatrices/modena2gsv2008.txt";
 //		String outFile = "/home/johannes/sge/prj/matsim/run/826/output/matrices-averaged/miv.sym.nuts3.xml";
-		
+
 		String matrixFile = args[0];
 		String zonesFile = args[1];
 		String idMappingsFile = args[2];
 		String outFile = args[3];
-		
+
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse(matrixFile);
@@ -80,7 +80,7 @@ public class Aggregate2Nuts3 {
 			}
 		}
 
-		
+
 		m = MatrixOperations.aggregate(m, modenaZones, TEMP_ID);
 
 //		MatrixOperations.symetrize(m);

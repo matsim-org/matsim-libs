@@ -17,51 +17,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.io;
+package playground.johannes.gsv.popsim;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Set;
-
-import playground.johannes.gsv.zones.KeyMatrix;
-import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
- *
  */
-public class KeyMatrxi2Txt {
-
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
-		reader.setValidating(false);
-		reader.parse("/home/johannes/sge/prj/synpop/run/753/output/miv.work.xml");
-		KeyMatrix m = reader.getMatrix();
-
-		playground.johannes.gsv.zones.MatrixOperations.applyFactor(m, 11);
-		playground.johannes.gsv.zones.MatrixOperations.applyDiagonalFactor(m, 1.25);
-		
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/sge/prj/synpop/run/753/output/miv.work.txt"));
-		Set<String> keys = m.keys();
-		for(String i : keys) {
-			for(String j : keys) {
-				Double val = m.get(i, j);
-				if(val != null) {
-					writer.write(i);
-					writer.write(" ");
-					writer.write(j);
-					writer.write(" ");
-					writer.write(String.valueOf(val));
-					writer.newLine();
-				}
-			}
-		}
-		writer.close();
-	}
-
+public class HistoSyncComposite extends Composite<HistogramSync> implements HistogramSync {
+    @Override
+    public void notifyChange(Object attKey, double oldValue, double newValue, ProxyPerson person) {
+        for(HistogramSync element : this.components) {
+            element.notifyChange(attKey, oldValue, newValue, person);
+        }
+    }
 }

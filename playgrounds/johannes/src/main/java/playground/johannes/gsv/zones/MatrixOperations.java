@@ -32,7 +32,7 @@ import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
  * @author johannes
- * 
+ *
  */
 public class MatrixOperations {
 
@@ -86,14 +86,14 @@ public class MatrixOperations {
 
 				if (val2 == null)
 					val2 = new Double(0);
-				
+
 				mErr.set(i, j, val1 - val2);
 			}
 		}
-		
+
 		return mErr;
 	}
-	
+
 	public static void applyFactor(KeyMatrix m, double factor) {
 		Set<String> keys = m.keys();
 		for (String i : keys) {
@@ -131,7 +131,7 @@ public class MatrixOperations {
 
 		return sum;
 	}
-	
+
 	public static double diagonalSum(KeyMatrix m) {
 		double sum = 0;
 		Set<String> keys = m.keys();
@@ -141,7 +141,7 @@ public class MatrixOperations {
 				sum += val;
 			}
 		}
-		
+
 		return sum;
 	}
 
@@ -209,7 +209,7 @@ public class MatrixOperations {
 //		}
 
 		applyFactor(avr, 1/(double)matrices.size());
-		
+
 		return avr;
 	}
 
@@ -260,10 +260,10 @@ public class MatrixOperations {
 
 		return newM;
 	}
-	
+
 	public static KeyMatrix merge(Collection<KeyMatrix> matrices) {
 		KeyMatrix sum = new KeyMatrix();
-		
+
 		for(KeyMatrix m : matrices) {
 			Set<String> keys = m.keys();
 			for(String i : keys) {
@@ -272,16 +272,16 @@ public class MatrixOperations {
 					if(val != null) {
 						Double sumVal = sum.get(i, j);
 						if(sumVal == null) sumVal = 0.0;
-						
+
 						sum.set(i, j, sumVal + val);
 					}
 				}
 			}
 		}
-		
+
 		return sum;
 	}
-	
+
 	public static void randomize(KeyMatrix m, double fraction) {
 		Set<String> keys = m.keys();
 		Random random = new XORShiftRandom();
@@ -296,11 +296,11 @@ public class MatrixOperations {
 			}
 		}
 	}
-	
+
 	public static double weightedCellAverage(KeyMatrix m, KeyMatrix weights) {
 		double sum = 0;
 		double wsum = 0;
-		
+
 		Set<String> keys = m.keys();
 		for(String i : keys) {
 			for(String j : keys) {
@@ -313,14 +313,28 @@ public class MatrixOperations {
 				}
 			}
 		}
-		
+
 		return sum/wsum;
 	}
-	
+
 	public static void removeDiagonal(KeyMatrix m) {
 		Set<String> keys = m.keys();
 		for(String i : keys) {
 			m.set(i, i, null);
+		}
+	}
+
+	public static void add(KeyMatrix m1, KeyMatrix m2) {
+		Set<String> keys = m2.keys();
+		for(String i : keys) {
+			for(String j : keys) {
+				Double val2 = m2.get(i, j);
+				if(val2 != null) {
+					Double val1 = m1.get(i, j);
+					if(val1 == null) val1 = 0.0;
+					m1.set(i, j, val1 + val2);
+				}
+			}
 		}
 	}
 }

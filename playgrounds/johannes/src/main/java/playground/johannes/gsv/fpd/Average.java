@@ -17,52 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.matrices.io;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+package playground.johannes.gsv.fpd;
 
 import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes
- *
  */
-public class VisumOMatrixReader {
+public class Average {
 
-	public static KeyMatrix read(String filename) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader(filename));
+    public static void main(String args[]) {
+        Set<KeyMatrix> matrices = new HashSet<KeyMatrix>();
+        Set<String> files = new HashSet<String>();
+        files.add("/home/johannes/gsv/fpd/telefonica/matrix/09.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrix/10.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrix/11.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrix/12.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrix/13.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrix/14.xml");
+        files.add("/home/johannes/gsv/fpd/telefonica/matrix/15.xml");
 
-		int startLine = 8;
-//		int startLine = 29;
-		for(int i = 0; i < startLine; i++) reader.readLine();
+        KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+        reader.setValidating(false);
+        for(String file : files) {
+            reader.parse(file);
+            matrices.add(reader.getMatrix());
+        }
 
-		KeyMatrix m = new KeyMatrix();
+        KeyMatrix avt = MatrixOperations.average(matrices);
 
-		String line;
-		while((line = reader.readLine()) != null) {
-			if(line.startsWith("*")) {
-				break;
-			}
-			else {
-				line = line.trim();
-				String[] tokens = line.split("\\s+");
-				String i = tokens[0];
-				String j = tokens[1];
-				Double val = new Double(tokens[2]);
-
-				m.set(i, j, val);
-			}
-		}
+        KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+        writer.write(avt, "/home/johannes/gsv/fpd/telefonica/matrix/avr.xml");
+    }
 
 
-		reader.close();
-
-		return m;
-	}
-
-	public static void main(String[] args) throws IOException {
-		VisumOMatrixReader.read("/home/johannes/gsv/prognose-update/iv-2030.txt");
-	}
 }

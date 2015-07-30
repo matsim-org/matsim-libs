@@ -31,15 +31,15 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 public class IncomeMutator extends AttributeMutator {
 
 	private final Random random;
-	
-	public IncomeMutator(Random random, HistogramSync1D histSync) {
+
+	public IncomeMutator(Random random, HistogramSync histSync) {
 		super(random, CommonKeys.HH_INCOME, DistanceVector.INCOME_KEY, histSync);
 		this.random = random;
 	}
 
 	@Override
 	protected Double newValue(ProxyPerson person) {
-		return new Double(random.nextInt(10000));
+		return new Double(random.nextInt(8000));
 	}
 
 }
