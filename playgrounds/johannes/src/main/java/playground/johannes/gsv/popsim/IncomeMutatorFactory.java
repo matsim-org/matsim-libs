@@ -31,14 +31,14 @@ import playground.johannes.gsv.synPop.sim3.MutatorFactory;
 public class IncomeMutatorFactory implements MutatorFactory {
 
 	private final Random random;
-	
-	private final HistogramSync1D histSync;
-	
-	public IncomeMutatorFactory(Random random, HistogramSync1D histSync) {
+
+	private final HistogramSync histSync;
+
+	public IncomeMutatorFactory(Random random, HistogramSync histSync) {
 		this.random = random;
 		this.histSync = histSync;
 	}
-	
+
 	@Override
 	public Mutator newInstance() {
 		return new IncomeMutator(random, histSync);

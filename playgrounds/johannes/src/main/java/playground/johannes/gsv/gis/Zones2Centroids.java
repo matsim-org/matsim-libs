@@ -17,29 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.gis;
 
-import java.util.Random;
+import com.vividsolutions.jts.geom.Point;
+import playground.johannes.gsv.zones.Zone;
+import playground.johannes.gsv.zones.ZoneCollection;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * @author johannes
- *
  */
-public class AgeMutator extends AttributeMutator {
+public class Zones2Centroids {
 
-	private final Random random;
+    public static void main(String args[]) throws IOException {
+        ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.geojson", "NO");
 
-	public AgeMutator(Random random, HistogramSync histSync) {
-		super(random, CommonKeys.PERSON_AGE, DistanceVector.AGE_KEY, histSync);
-		this.random = random;
-	}
+        BufferedWriter writer = new BufferedWriter(new FileWriter("/mnt/cifs/B-drive/U_Benutzer/JohannesIllenberger/qlik/centroids.csv"));
+        writer.write("id,name,lng,lat");
+        writer.newLine();
+        for(Zone zone : zones.zoneSet()) {
+            Point c = zone.getGeometry().getCentroid();
+            String id = zone.getAttribute("NO");
+            String name = zone.getAttribute("NAME");
 
-	@Override
-	protected Double newValue(ProxyPerson person) {
-		return new Double(random.nextInt(100));
-	}
+            writer.write(id);
+            writer.write(",");
+            writer.write(name);
+            writer.write(",");
+            writer.write(String.valueOf(c.getX()));
+            writer.write(",");
+            writer.write(String.valueOf(c.getY()));
+            writer.newLine();
+        }
 
+        writer.close();
+    }
 }

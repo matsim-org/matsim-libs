@@ -37,28 +37,31 @@ import playground.johannes.sna.math.LinearDiscretizer;
  * @author johannes
  *
  */
-public class HistogramSync1D implements Hamiltonian, SamplerListener {
+public class HistogramSync1D implements Hamiltonian, SamplerListener, HistogramSync {
 
 	private TDoubleDoubleHashMap refHist;
-	
+
 	private TDoubleDoubleHashMap simHist;
-	
+
 	private String attName;
-	
+
+	private Object attKey;
+
 	private Discretizer discretizer;
-	
+
 //	private double[] keys;
-	
+
 //	private double partialDelta;
-	
+
 	private double currentDelta;
-	
+
 	private double simFactor;
-	
-	public HistogramSync1D(Collection<ProxyPerson> refPop, Collection<ProxyPerson> simPop, String attName, Discretizer discretizer) {
+
+	public HistogramSync1D(Collection<ProxyPerson> refPop, Collection<ProxyPerson> simPop, String attName, Object attKey, Discretizer discretizer) {
 		this.attName = attName;
+		this.attKey = attKey;
 		this.discretizer = discretizer;
-		
+
 		TDoubleArrayList refValues = new TDoubleArrayList(refPop.size());
 		for(ProxyPerson person : refPop) {
 			String value = person.getAttribute(attName);
@@ -68,11 +71,11 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener {
 		}
 		this.discretizer = new InterpolatingDiscretizer(refValues.toNativeArray());
 //		this.discretizer = new LinearDiscretizer(10);
-		
+
 		refHist = Histogram.createHistogram(refValues.toNativeArray(), this.discretizer, false);
 //		keys = refHist.keys();
 		Histogram.normalize(refHist);
-		
+
 		TDoubleArrayList simValues = new TDoubleArrayList(simPop.size());
 		for(ProxyPerson person : simPop) {
 			String value = person.getAttribute(attName);
@@ -83,42 +86,42 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener {
 		simHist = Histogram.createHistogram(simValues.toNativeArray(), this.discretizer, false);
 		simFactor = 1/(double)simValues.size();
 //		Histogram.normalize(simHist);
-		
+
 		currentDelta = fullDiff();
 	}
-	
-	public void notifyChange(String attName, double prevValue, double newValue) {
-		if(attName.equals(this.attName)) {
+
+	public void notifyChange(Object key, double prevValue, double newValue, ProxyPerson person) {
+		if(key.equals(this.attKey)) {
 			double bin = discretizer.discretize(prevValue);
 			double prevDiff = Math.abs((simHist.get(bin) * simFactor) - refHist.get(bin));
 			simHist.adjustValue(bin, -1);
 			double newDiff = Math.abs((simHist.get(bin) * simFactor) - refHist.get(bin));
 			double partialDelta = newDiff - prevDiff;
-			
-			
-			
+
+
+
 			bin = discretizer.discretize(newValue);
 			prevDiff = Math.abs((simHist.get(bin) * simFactor) - refHist.get(bin));
 			simHist.adjustValue(bin, 1);
 			newDiff = Math.abs((simHist.get(bin) * simFactor) - refHist.get(bin));
 			partialDelta += newDiff - prevDiff;
-			
+
 			currentDelta += partialDelta;
 		}
 	}
-	
+
 	public double fullDiff() {
 		double delta = 0;
 		double[] keys = refHist.keys();
 		for(double key : keys) {
 			if(refHist.containsKey(key)) {
-			double ref = refHist.get(key);
-			double sim = simHist.get(key) * simFactor;
-			
-			delta += Math.abs(sim - ref);
+				double ref = refHist.get(key);
+				double sim = simHist.get(key) * simFactor;
+
+				delta += Math.abs(sim - ref);
 			}
 		}
-		
+
 		return delta;///(double)keys.length;
 	}
 
@@ -137,7 +140,7 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener {
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
 			

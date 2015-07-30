@@ -17,29 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.matrices.analysis;
 
-import java.util.Random;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 
 /**
  * @author johannes
- *
  */
-public class AgeMutator extends AttributeMutator {
+public class CalcSum {
 
-	private final Random random;
+    public static void main(String args[]) {
+        KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+        reader.setValidating(false);
+        reader.parse("/home/johannes/gsv/fpd/telefonica/matrix/15.xml");
+        KeyMatrix m = reader.getMatrix();
 
-	public AgeMutator(Random random, HistogramSync histSync) {
-		super(random, CommonKeys.PERSON_AGE, DistanceVector.AGE_KEY, histSync);
-		this.random = random;
-	}
-
-	@Override
-	protected Double newValue(ProxyPerson person) {
-		return new Double(random.nextInt(100));
-	}
-
+        System.out.println(String.format("Trip sum: %s.", MatrixOperations.sum(m)));
+    }
 }

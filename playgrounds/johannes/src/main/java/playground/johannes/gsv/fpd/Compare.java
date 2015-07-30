@@ -24,11 +24,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Set;
 
+import com.vividsolutions.jts.geom.Point;
+import gnu.trove.TDoubleDoubleHashMap;
 import playground.johannes.gsv.sim.cadyts.ODUtils;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
+import playground.johannes.sna.math.*;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 
 /**
@@ -37,65 +44,68 @@ import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
  */
 public class Compare {
 
+	private static Discretizer disc;
+
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
-		
-		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/24-04-2015/iais.3d.xml");
+
+//		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/24-04-2015/iais.3d.xml");
+		reader.parse("/home/johannes/gsv/fpd/telefonica/matrix/avr.xml");
 		KeyMatrix iais = reader.getMatrix();
 
-		reader.parse("/home/johannes/gsv/matrices/refmatrices/tomtom.de.modena.xml");
+		reader.parse("/home/johannes/gsv/miv-matrix/refmatrices/tomtom.xml");
 		KeyMatrix tomtom = reader.getMatrix();
-		
-		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/ref/modena.all.xml");
+
+		reader.parse("/home/johannes/sge/prj/synpop/run/902/output/nuts3/modena.miv.xml");
 		KeyMatrix model = reader.getMatrix();
-		
-		reader.parse("/home/johannes/gsv/fpd/fraunhofer/study/data/matrix/ref/miv.sym.874.xml");
+
+		reader.parse("/home/johannes/sge/prj/matsim/run/874/output/nuts3/miv.xml");
 		KeyMatrix sim = reader.getMatrix();
-		
+
 //		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/fpd/fraunhofer/study/data/gis/zones.geojson", "NO");
 //		ODUtils.cleanDistances(iais, zones, 10000, WGS84DistanceCalculator.getInstance());
 //		
-		
-		double c = ODUtils.calcNormalization(iais, model);
-		playground.johannes.gsv.zones.MatrixOperations.applyFactor(model, 1/c);
-		
-		c = ODUtils.calcNormalization(iais, tomtom);
-		playground.johannes.gsv.zones.MatrixOperations.applyFactor(tomtom, 1/c);
-		
-		c = ODUtils.calcNormalization(iais, sim);
-		playground.johannes.gsv.zones.MatrixOperations.applyFactor(sim, 1/c);
-		
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/study/analysis/24-04-2015/compare.3d.txt"));
+
+//		double c = ODUtils.calcNormalization(iais, model);
+//		playground.johannes.gsv.zones.MatrixOperations.applyFactor(model, 1/c);
+//
+//		c = ODUtils.calcNormalization(iais, tomtom);
+//		playground.johannes.gsv.zones.MatrixOperations.applyFactor(tomtom, 1/c);
+//
+//		c = ODUtils.calcNormalization(iais, sim);
+//		playground.johannes.gsv.zones.MatrixOperations.applyFactor(sim, 1/c);
+
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/telefonica/analysis/compare.txt"));
 		writer.write("from\tto\tvolIais\tvolTomTom");
 		writer.newLine();
-		
+
 //		TDoubleArrayList iaisVols = new TDoubleArrayList();
 //		TDoubleArrayList tomtomVols = new TDoubleArrayList();
-		
-		BufferedWriter scatterWriter = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/fraunhofer/study/analysis/24-04-2015/scatter.3d.txt"));
+
+		BufferedWriter scatterWriter = new BufferedWriter(new FileWriter("/home/johannes/gsv/fpd/telefonica/analysis/scatter.txt"));
 		scatterWriter.write("iais\ttomtom\tmodel\tsim");
 		scatterWriter.newLine();
-		
+
 		Set<String> keys = iais.keys();
 		for(String i : keys) {
 			for(String j : keys) {
 				Double volIais = iais.get(i, j);
 				if(volIais != null) {
-					
+
 					Double volTomTom = tomtom.get(i, j);
 					if(volTomTom == null) volTomTom = 0.0;
-					
+
 					Double volModel = model.get(i, j);
 					if(volModel == null) volModel = 0.0;
-					
+
 					Double volSim = sim.get(i, j);
 					if(volSim == null) volSim = 0.0;
-					
+
 					writer.write(i);
 					writer.write("\t");
 					writer.write(j);
@@ -104,7 +114,7 @@ public class Compare {
 					writer.write("\t");
 					writer.write(String.valueOf(volTomTom));
 					writer.newLine();
-					
+
 					scatterWriter.write(String.valueOf(volIais));
 					scatterWriter.write("\t");
 					scatterWriter.write(String.valueOf(volTomTom));
@@ -116,9 +126,50 @@ public class Compare {
 				}
 			}
 		}
-		
+
 		writer.close();
 		scatterWriter.close();
+
+		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/nuts/ger/geojson/de.nuts3.gk3.geojson", "gsvId");
+		TDoubleDoubleHashMap hist = calcDistDistribution(zones, iais, iais);
+		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/fpd.dist.txt");
+
+		hist = calcDistDistribution(zones, model, iais);
+		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/model.dist.txt");
+
+		hist = calcDistDistribution(zones, sim, iais);
+		TXTWriter.writeMap(hist, "d", "p", "/home/johannes/gsv/fpd/telefonica/analysis/sim.dist.txt");
 	}
 
+	private static TDoubleDoubleHashMap calcDistDistribution(ZoneCollection zones, KeyMatrix m, KeyMatrix relations) {
+		DistanceCalculator dCalc = new CartesianDistanceCalculator();
+		DescriptivePiStatistics stats = new DescriptivePiStatistics();
+
+		Set<String> keys = relations.keys();
+		for (String i : keys) {
+			Zone zi = zones.get(i);
+			if(zi != null) {
+//			if ("DE".equalsIgnoreCase(zi.getAttribute("ISO_CODE"))) {
+				Point pi = zi.getGeometry().getCentroid();
+				for (String j : keys) {
+					Zone zj = zones.get(j);
+					if(zj != null) {
+//					if ("DE".equalsIgnoreCase(zj.getAttribute("ISO_CODE"))) {
+						Double val = m.get(i, j);
+						Double refVal = relations.get(i, j);
+						if (val != null && refVal != null) {
+							Point pj = zj.getGeometry().getCentroid();
+							double d = dCalc.distance(pi, pj);
+							stats.addValue(d, 1/val);
+						}
+					}
+				}
+			}
+		}
+		if(disc == null) disc = FixedSampleSizeDiscretizer.create(stats.getValues(), 20);
+		TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, disc, true);
+		Histogram.normalize(hist);
+
+		return hist;
+	}
 }

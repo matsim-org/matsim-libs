@@ -17,29 +17,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.matrices.io;
 
-import java.util.Random;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Set;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLReader;
 
 /**
  * @author johannes
  *
  */
-public class AgeMutator extends AttributeMutator {
+public class KeyMatrix2Txt {
 
-	private final Random random;
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws IOException {
+		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
+		reader.setValidating(false);
+		reader.parse(args[0]);
+		KeyMatrix m = reader.getMatrix();
 
-	public AgeMutator(Random random, HistogramSync histSync) {
-		super(random, CommonKeys.PERSON_AGE, DistanceVector.AGE_KEY, histSync);
-		this.random = random;
-	}
+//		playground.johannes.gsv.zones.MatrixOperations.applyFactor(m, 11);
+//		playground.johannes.gsv.zones.MatrixOperations.applyDiagonalFactor(m, 1.25);
 
-	@Override
-	protected Double newValue(ProxyPerson person) {
-		return new Double(random.nextInt(100));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
+		writer.write("from\tto\tvolume");
+		writer.newLine();
+		Set<String> keys = m.keys();
+		for(String i : keys) {
+			for(String j : keys) {
+				Double val = m.get(i, j);
+				if(val != null) {
+					writer.write(i);
+					writer.write("\t");
+					writer.write(j);
+					writer.write("\t");
+					writer.write(String.valueOf(val));
+					writer.newLine();
+				}
+			}
+		}
+		writer.close();
 	}
 
 }

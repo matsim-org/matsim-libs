@@ -37,11 +37,11 @@ import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 public class ApplyFactors {
 
 	private static final double scaleFactor = 11.8;
-	
+
 	private static final double diagonalFactor = 1.3;
-	
+
 	private static final Logger logger = Logger.getLogger(ApplyFactors.class);
-	
+
 	/**
 	 * @param args
 	 */
@@ -56,62 +56,37 @@ public class ApplyFactors {
 		 */
 		String file = String.format("%s/miv.xml", baseDir);
 		KeyMatrix m = loadMatrix(file);
-		
+
 		MatrixOperations.applyFactor(m, scaleFactor);
 		MatrixOperations.applyDiagonalFactor(m, diagonalFactor);
-		
+
 		writeMatrix(m, String.format("%s/miv.xml", outDir));
-		
+
 		double sum = MatrixOperations.sum(m);
-		
+
 		MatrixOperations.symetrize(m);
 		writeMatrix(m, String.format("%s/miv.sym.xml", outDir));
 		/*
 		 * purpose matrices
 		 */
 		String[] types = new String[] { "work", "buisiness", "shop", "edu", "leisure", "vacations_short", "vacations_long", "wecommuter"};
-//		String[] types = new String[] {"wecommuter"};
 		for(String type : types) {
 			logger.info(String.format("Processing matrix %s...", type));
-			
+
 			file = String.format("%s/miv.%s.xml", baseDir, type);
 			m = loadMatrix(file);
-			
+
 			MatrixOperations.applyFactor(m, scaleFactor);
 			MatrixOperations.applyDiagonalFactor(m, diagonalFactor);
-			
+
 			double sum2 = MatrixOperations.sum(m);
 			logger.info(String.format("Trip share: %s", sum2/sum));
-			
+
 			file = String.format("%s/miv.%s.xml", outDir, type);
 			writeMatrix(m, file);
-			
+
 			MatrixOperations.symetrize(m);
 			writeMatrix(m, String.format("%s/miv.%s.sym.xml", outDir, type));
-			/*
-			 * purpose per wkday
-			 */
-			logger.info(String.format("Processing matrix wkday.%s...", type));
-			
-			file = String.format("%s/miv.wkday.%s.xml", baseDir, type);
-			m = loadMatrix(file);
-			
-			MatrixOperations.applyFactor(m, scaleFactor);
-			MatrixOperations.applyDiagonalFactor(m, diagonalFactor);
-			
-			sum2 = MatrixOperations.sum(m);
-			logger.info(String.format("Trip share: wkday.%s", sum2/sum));
-			
-			double f = sum/sum2 * 1.076;
-			MatrixOperations.applyFactor(m, f);
-			logger.info(String.format("Scale factor: wkday", f));
-			
-			logger.info(String.format("Trip share: wkday.%s", MatrixOperations.sum(m)/sum));
-			file = String.format("%s/miv.wkday.%s.xml", outDir, type);
-			writeMatrix(m, file);
-			
-			MatrixOperations.symetrize(m);
-			writeMatrix(m, String.format("%s/miv.wkday.%s.sym.xml", outDir, type));
 		}
 //		System.exit(-1);
 		/*
@@ -124,11 +99,12 @@ public class ApplyFactors {
 		factors.put(CommonKeys.SUNDAY, 0.67);
 		factors.put("dimido", 1.07);
 		factors.put("wkday", 1.076);
-		
+
+		double wkdayf = 0;
 		String[] days = new String[] {CommonKeys.MONDAY, CommonKeys.FRIDAY, CommonKeys.SATURDAY, CommonKeys.SUNDAY, "dimido", "wkday"};
 		for(String day : days) {
 			logger.info(String.format("Processing matrix %s...", day));
-			
+
 			file = String.format("%s/miv.%s.xml", baseDir, day);
 			m = loadMatrix(file);
 
@@ -137,19 +113,52 @@ public class ApplyFactors {
 
 			double sum2 = MatrixOperations.sum(m);
 			logger.info(String.format("Trip share: %s", sum2/sum));
-			
+
 			double f = sum/sum2 * factors.get(day);
 			MatrixOperations.applyFactor(m, f);
 			logger.info(String.format("Scale factor: %s", f));
-			
+
 			logger.info(String.format("Trip share: %s", MatrixOperations.sum(m)/sum));
-			
+
 			file = String.format("%s/miv.%s.xml", outDir, day);
 			writeMatrix(m, file);
-			
+
 			MatrixOperations.symetrize(m);
 			writeMatrix(m, String.format("%s/miv.%s.sym.xml", outDir, day));
+
+			if(day.equalsIgnoreCase("wkday")) {
+				wkdayf = f;
+			}
 		}
+
+//		double wkdayf = sum/wkdaySum * 1.076;
+//		String[] types = new String[] { "work", "buisiness", "shop", "edu", "leisure", "vacations_short", "vacations_long", "wecommuter"};
+		for(String type : types) {
+			/*
+			 * purpose per wkday
+			 */
+			logger.info(String.format("Processing matrix wkday.%s...", type));
+
+			file = String.format("%s/miv.wkday.%s.xml", baseDir, type);
+			m = loadMatrix(file);
+
+			MatrixOperations.applyFactor(m, scaleFactor);
+			MatrixOperations.applyDiagonalFactor(m, diagonalFactor);
+
+//			sum2 = MatrixOperations.sum(m);
+//			logger.info(String.format("Trip share: wkday.%s", sum2/sum));
+
+			MatrixOperations.applyFactor(m, wkdayf);
+			logger.info(String.format("Scale factor: wkday", wkdayf));
+
+//			logger.info(String.format("Trip share: wkday.%s", MatrixOperations.sum(m)/sum));
+			file = String.format("%s/miv.wkday.%s.xml", outDir, type);
+			writeMatrix(m, file);
+
+			MatrixOperations.symetrize(m);
+			writeMatrix(m, String.format("%s/miv.wkday.%s.sym.xml", outDir, type));
+		}
+
 		/*
 		 * season
 		 */
@@ -167,16 +176,16 @@ public class ApplyFactors {
 
 			double sum2 = MatrixOperations.sum(m);
 			logger.info(String.format("Trip share: %s", sum2/sum));
-			
+
 			double f = sum/sum2 * factors.get(season);
 			MatrixOperations.applyFactor(m, f);
 			logger.info(String.format("Scale factor: %s", f));
-			
+
 			logger.info(String.format("Trip share: %s", MatrixOperations.sum(m)/sum));
-			
+
 			file = String.format("%s/miv.%s.xml", outDir, season);
 			writeMatrix(m, file);
-			
+
 			MatrixOperations.symetrize(m);
 			writeMatrix(m, String.format("%s/miv.%s.sym.xml", outDir, season));
 		}
@@ -189,24 +198,24 @@ public class ApplyFactors {
 		MatrixOperations.applyDiagonalFactor(m, diagonalFactor);
 		logger.info(String.format("Trip share: %s", MatrixOperations.sum(m)/sum));
 		writeMatrix(m, String.format("%s/miv.fromHome.xml", outDir));
-		
+
 		logger.info("Processing matrix toHome...");
 		m = loadMatrix(String.format("%s/miv.toHome.xml", baseDir));
 		MatrixOperations.applyFactor(m, scaleFactor);
 		MatrixOperations.applyDiagonalFactor(m, diagonalFactor);
 		logger.info(String.format("Trip share: %s", MatrixOperations.sum(m)/sum));
 		writeMatrix(m, String.format("%s/miv.toHome.xml", outDir));
-		
+
 		logger.info("Done.");
 	}
-	
+
 	private static KeyMatrix loadMatrix(String file) {
 		KeyMatrixXMLReader reader = new KeyMatrixXMLReader();
 		reader.setValidating(false);
 		reader.parse(file);
 		return reader.getMatrix();
 	}
-	
+
 	private static void writeMatrix(KeyMatrix m, String file) {
 		KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
 		writer.write(m, file);

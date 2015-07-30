@@ -17,29 +17,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
+package playground.johannes.gsv.matrices.io;
 
-import java.util.Random;
+import playground.johannes.gsv.zones.KeyMatrix;
+import playground.johannes.gsv.zones.MatrixOperations;
+import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import java.io.IOException;
 
 /**
  * @author johannes
- *
  */
-public class AgeMutator extends AttributeMutator {
+public class JoinMatrices {
 
-	private final Random random;
+    public static void main(String[] args) throws IOException {
+        KeyMatrix sum = new KeyMatrix();
+        for(int i = 0; i < args.length - 1; i++) {
+            KeyMatrix m = VisumOMatrixReader.read(args[i]);
+            MatrixOperations.add(sum, m);
+        }
 
-	public AgeMutator(Random random, HistogramSync histSync) {
-		super(random, CommonKeys.PERSON_AGE, DistanceVector.AGE_KEY, histSync);
-		this.random = random;
-	}
-
-	@Override
-	protected Double newValue(ProxyPerson person) {
-		return new Double(random.nextInt(100));
-	}
-
+        KeyMatrixXMLWriter writer = new KeyMatrixXMLWriter();
+        writer.write(sum, args[args.length - 1]);
+    }
 }

@@ -63,13 +63,11 @@ public class SignalSystemsIntegrationTest {
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.minOfDurationAndEndTime);
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
-		//		config.controler().setOutputDirectory(controlerOutputDir);
-		//		config.addQSimConfigGroup(new QSimConfigGroup());
 		String lanes11 = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
 		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
 		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFile());
 
-		//		config.network().setLaneDefinitionsFile(lanes20);
+		config.network().setLaneDefinitionsFile(lanes20);
 		config.controler().setWriteEventsInterval(10);
 		config.controler().setWritePlansInterval(10);
 		Controler c = new Controler(config);
@@ -137,15 +135,13 @@ public class SignalSystemsIntegrationTest {
 		String configFile = testUtils.getClassInputDirectory() + CONFIG_FILE_NAME;
 		Config config = testUtils.loadConfig(testUtils.getClassInputDirectory() + CONFIG_FILE_NAME);
 		String controlerOutputDir = testUtils.getOutputDirectory() + "controlerOutput/";
-		//		config.controler().setOutputDirectory(controlerOutputDir);
-		//		config.addQSimConfigGroup(new QSimConfigGroup());
 		String lanes11 = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
 		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
 		new LaneDefinitonsV11ToV20Converter().convert(lanes11, lanes20, config.network().getInputFile());
 
-		//		config.network().setLaneDefinitionsFile(lanes20);
+		config.network().setLaneDefinitionsFile(lanes20);
 
-		Controler c = new Controler(configFile);
+		Controler c = new Controler(config);
 		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());

@@ -34,27 +34,27 @@ import playground.johannes.gsv.synPop.sim3.Mutator;
 public abstract class AttributeMutator implements Mutator {
 
 	private final Random random;
-	
+
 	private final ArrayList<ProxyPerson> mutations;
-	
+
 	private Double prevValue;
-	
+
 	private final String strKey;
-	
+
 	private final Object objKey;
-	
-	private final HistogramSync1D histSync;
-	
-	public AttributeMutator(Random random, String strKey, Object objKey, HistogramSync1D histSync) {
+
+	private final HistogramSync histSync;
+
+	public AttributeMutator(Random random, String strKey, Object objKey, HistogramSync histSync) {
 		this.random = random;
 		this.strKey = strKey;
 		this.objKey = objKey;
 		this.histSync = histSync;
-		
+
 		mutations = new ArrayList<>(1);
 		mutations.add(null);
 	}
-	
+
 	@Override
 	public List<ProxyPerson> select(List<ProxyPerson> persons) {
 		mutations.set(0, persons.get(random.nextInt(persons.size())));
@@ -67,21 +67,21 @@ public abstract class AttributeMutator implements Mutator {
 		prevValue = getAttribute(person, strKey, objKey);
 		double newValue = newValue(person);
 		person.setUserData(objKey, newValue);
-		
-		histSync.notifyChange(strKey, prevValue, newValue);
-		
+
+		histSync.notifyChange(objKey, prevValue, newValue, person);
+
 		return true;
 	}
 
 	@Override
 	public void revert(List<ProxyPerson> persons) {
 		ProxyPerson person = persons.get(0);
-		
+
 		double val = getAttribute(person, strKey, objKey);
 		person.setUserData(objKey, prevValue);
-		
-		histSync.notifyChange(strKey, val, prevValue);
-		
+
+		histSync.notifyChange(objKey, val, prevValue, person);
+
 		prevValue = null;
 	}
 
@@ -89,7 +89,7 @@ public abstract class AttributeMutator implements Mutator {
 		Double doubleVal = (Double) person.getUserData(objKey);
 		if (doubleVal == null) {
 			String stringVal = person.getAttribute(strKey);
-			
+
 			if(stringVal != null) {
 				doubleVal = new Double(stringVal);
 				person.setUserData(objKey, doubleVal);
@@ -98,6 +98,6 @@ public abstract class AttributeMutator implements Mutator {
 
 		return doubleVal;
 	}
-	
+
 	protected abstract Double newValue(ProxyPerson person);
 }

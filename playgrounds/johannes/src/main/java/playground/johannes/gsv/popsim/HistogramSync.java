@@ -1,4 +1,4 @@
-/* *********************************************************************** *
+package playground.johannes.gsv.popsim;/* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
@@ -17,29 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.popsim;
-
-import java.util.Random;
-
-import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 
-/**
- * @author johannes
- *
- */
-public class AgeMutator extends AttributeMutator {
+public interface HistogramSync {
 
-	private final Random random;
-
-	public AgeMutator(Random random, HistogramSync histSync) {
-		super(random, CommonKeys.PERSON_AGE, DistanceVector.AGE_KEY, histSync);
-		this.random = random;
-	}
-
-	@Override
-	protected Double newValue(ProxyPerson person) {
-		return new Double(random.nextInt(100));
-	}
-
+    void notifyChange(Object attKey, double oldValue, double newValue, ProxyPerson person);
 }
