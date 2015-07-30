@@ -57,6 +57,11 @@ public class RunControlerWSV {
 				bind(TransitRouter.class).toProvider(new TransitRouterEventsWSVFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes(), vehicleOccupancyCalculator.getVehicleOccupancy()));
 			}
 		});
+		
+		// yyyyyy note that in the above script only the router is modified, but not the scoring.  With standard matsim, a slower bu
+		// less crowded pt route will only be accepted by the agent when the faster but more crowded option was never presented 
+		// to the agent.  kai, jul'15
+		
 		controler.run();
 	}
 	
