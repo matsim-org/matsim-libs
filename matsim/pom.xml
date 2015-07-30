@@ -17,9 +17,9 @@
 		</license>
 	</licenses>
 	<scm>
-        <connection>scm:svn:https://svn.code.sf.net/p/matsim/source/matsim/trunk</connection>
-        <developerConnection>scm:svn:https://svn.code.sf.net/p/matsim/source/matsim/trunk</developerConnection>
-        <url>https://svn.code.sf.net/p/matsim/source/matsim/trunk</url>
+		<url>https://github.com/matsim-org/matsim</url>
+		<connection>scm:git:git://github.com/matsim-org/matsim.git</connection>
+		<developerConnection>scm:git:git@github.com:matsim-org/matsim.git</developerConnection>
 	</scm>
 	<distributionManagement>
 		<snapshotRepository>

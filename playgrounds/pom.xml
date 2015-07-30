@@ -9,12 +9,10 @@
 	<name>MATSim-Playgrounds</name>
 
 	<scm>
-		<connection>scm:svn:https://svn.code.sf.net/p/matsim/source/playgrounds/trunk</connection>
-		<developerConnection>scm:svn:https://svn.code.sf.net/p/matsim/source/playgrounds/trunk</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://svn.code.sf.net/p/matsim/source/playgrounds/trunk</url>
+		<url>https://github.com/matsim-org/matsim</url>
+		<connection>scm:git:git://github.com/matsim-org/matsim.git</connection>
+		<developerConnection>scm:git:git@github.com:matsim-org/matsim.git</developerConnection>
 	</scm>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -158,6 +156,12 @@
 		<repository>
 			<id>matsim</id>
 			<url>http://matsim.org/m2repo</url>
+		</repository>
+		<repository>
+			<id>oss-jfrog-artifactory</id>
+			<name>artifactory-snapshots</name>
+			<snapshots/>
+			<url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
 		</repository>
 	</repositories>
 	
