@@ -24,7 +24,6 @@ import java.util.*;
 import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import com.google.common.collect.Queues;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
@@ -32,38 +31,13 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 public class ZoneFinder
 {
-    private static class ZoneEntry
-        implements Comparable<ZoneEntry>
-    {
-        private final Zone zone;
-        private final double weight;
-
-
-        private ZoneEntry(Zone zone, double weight)
-        {
-            this.zone = zone;
-            this.weight = weight;
-        }
-
-
-        @Override
-        public int compareTo(ZoneEntry o)
-        {
-            return Double.compare(weight, o.weight);
-        }
-    }
-
-
     private final SpatialIndex quadTree = new Quadtree();
-    private final double maxDistance;
-
-    private Point point;
-    private Queue<ZoneEntry> queue;
+    private final double expansionDistance;
 
 
-    public ZoneFinder(Map<Id<Zone>, Zone> zones, double maxDistance)
+    public ZoneFinder(Map<Id<Zone>, Zone> zones, double expansionDistance)
     {
-        this.maxDistance = maxDistance;
+        this.expansionDistance = expansionDistance;
 
         for (Zone z : zones.values()) {
             quadTree.insert(z.getMultiPolygon().getEnvelopeInternal(), z);
@@ -74,61 +48,65 @@ public class ZoneFinder
     @SuppressWarnings("unchecked")
     public Zone findZone(Coord coord)
     {
-        point = MGC.coord2Point(coord);
-        queue = Queues.newPriorityQueue();
-
+        Point point = MGC.coord2Point(coord);
         Envelope env = point.getEnvelopeInternal();
-        queueByArea(quadTree.query(env));
 
-        if (queue.size() > 1) {
-            Zone result = queue.peek().zone;
-            printOutQueue();
-            return result;
+        Zone zone = getSmallestZoneContainingPoint(quadTree.query(env), point);
+        if (zone != null) {
+            return zone;
         }
 
-        if (queue.isEmpty() && maxDistance > 0) {
-            env.expandBy(maxDistance);
-            queueByDistance(quadTree.query(env));
+        if (expansionDistance > 0) {
+            env.expandBy(expansionDistance);
+            zone = getNearestZone(quadTree.query(env), point);
         }
 
-        if (queue.isEmpty()) {
-            return null;
-        }
-
-        return queue.peek().zone;
+        return zone;
     }
 
 
-    private void queueByArea(List<Zone> candidateZones)
+    private Zone getSmallestZoneContainingPoint(List<Zone> zones, Point point)
     {
-        for (Zone z : candidateZones) {
+        if (zones.size() == 1) {//almost 100% cases
+            return zones.get(0);
+        }
+
+        double minArea = Double.MAX_VALUE;
+        Zone smallestZone = null;
+
+        for (Zone z : zones) {
             if (z.getMultiPolygon().contains(point)) {
-                queue.add(new ZoneEntry(z, z.getMultiPolygon().getArea()));
+                double area = z.getMultiPolygon().getArea();
+                if (area < minArea) {
+                    minArea = area;
+                    smallestZone = z;
+                }
             }
         }
+
+        return smallestZone;
     }
 
 
-    private void queueByDistance(List<Zone> candidateZones)
+    private Zone getNearestZone(List<Zone> zones, Point point)
     {
-        for (Zone z : candidateZones) {
+        if (zones.size() == 1) {
+            return zones.get(0);
+        }
+
+        double minDistance = Double.MAX_VALUE;
+        Zone nearestZone = null;
+
+        for (Zone z : zones) {
             double distance = z.getMultiPolygon().distance(point);
-            if (distance <= maxDistance) {
-                queue.add(new ZoneEntry(z, distance));
+            if (distance <= expansionDistance) {
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestZone = z;
+                }
             }
         }
-    }
 
-
-    private void printOutQueue()
-    {
-        StringBuilder sb = new StringBuilder().append(queue.poll().zone.getId());
-
-        do {
-            sb.append(", ").append(queue.poll().zone.getId());
-        }
-        while (!queue.isEmpty());
-
-        System.err.println("Overlaying zones: " + sb.toString());
+        return nearestZone;
     }
 }
