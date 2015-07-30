@@ -141,7 +141,7 @@ public class SignalSystemsIntegrationTest {
 
 		config.network().setLaneDefinitionsFile(lanes20);
 
-		Controler c = new Controler(configFile);
+		Controler c = new Controler(config);
 		c.getScenario().addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsScenarioLoader(ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class)).loadSignalsData());
 		c.addOverridingModule(new SignalsModule());
 		c.addOverridingModule(new InvertedNetworkTripRouterFactoryModule());
