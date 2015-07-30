@@ -140,6 +140,12 @@
 			<id>matsim</id>
             <url>http://dl.bintray.com/matsim/matsim</url>
         </repository>
+		<repository>
+			<id>oss-jfrog-artifactory</id>
+			<name>artifactory-snapshots</name>
+			<snapshots/>
+			<url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
