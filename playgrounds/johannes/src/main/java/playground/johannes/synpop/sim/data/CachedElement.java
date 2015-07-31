@@ -116,16 +116,18 @@ public class CachedElement implements Element {
     }
 
     private void synchronize(String key) {
+        if(cache != null) {
         /*
         Synchronize the cached data with the plain data, if there is a plain-object-key-pair. Do nothing if there is no
         data for a key, i.e. setting a data value to null does not affect the plain value.
          */
-        Object objKey = Converters.getObjectKey(key);
-        if (objKey != null) {
-            Object value = cache.get(objKey);
-            if (value != null) {
-                String plainValue = Converters.toString(objKey, value);
-                delegate.setAttribute(key, plainValue);
+            Object objKey = Converters.getObjectKey(key);
+            if (objKey != null) {
+                Object value = cache.get(objKey);
+                if (value != null) {
+                    String plainValue = Converters.toString(objKey, value);
+                    delegate.setAttribute(key, plainValue);
+                }
             }
         }
     }
