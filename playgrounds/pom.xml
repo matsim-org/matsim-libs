@@ -143,6 +143,12 @@
 	</modules>
 	<repositories>
 		<repository>
+			<!-- Geotools is not on Maven central -->
+			<id>osgeo</id>
+			<name>Geotools repository</name>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+		<repository>
 			<id>matsim</id>
 			<url>http://matsim.org/m2repo</url>
 		</repository>
