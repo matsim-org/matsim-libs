@@ -54,7 +54,7 @@ public class ConcurrentProxyTaskRunner {
 				@Override
 				public void run() {
 					for(PlainPerson p : subPersons) {
-						for(Episode plan : p.getPlans())
+						for(Episode plan : p.getEpisodes())
 							task.apply(plan);
 						
 						ProgressLogger.step();

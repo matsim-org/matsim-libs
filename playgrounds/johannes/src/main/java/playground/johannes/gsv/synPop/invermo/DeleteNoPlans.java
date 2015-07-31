@@ -31,7 +31,7 @@ public class DeleteNoPlans implements ProxyPersonTask {
 
 	@Override
 	public void apply(PlainPerson person) {
-		if(person.getPlans().size() == 0) {
+		if(person.getEpisodes().size() == 0) {
 			person.setAttribute(CommonKeys.DELETE, "true");
 		}
 

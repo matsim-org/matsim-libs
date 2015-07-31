@@ -53,7 +53,7 @@ public class ExtractLongDistancePersons {
 		
 		logger.info("Extracting persons...");
 		for(PlainPerson person : parser.getPersons()) {
-			for(Episode plan : person.getPlans()) {
+			for(Episode plan : person.getEpisodes()) {
 				for(Element leg : plan.getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(val != null) {

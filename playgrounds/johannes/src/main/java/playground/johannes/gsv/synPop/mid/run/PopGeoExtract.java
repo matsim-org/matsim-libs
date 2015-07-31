@@ -101,7 +101,7 @@ public class PopGeoExtract {
 		public void apply(PlainPerson person) {
 			boolean keep = false;
 
-			for (Episode plan : person.getPlans()) {
+			for (Episode plan : person.getEpisodes()) {
 				for (Element act : plan.getActivities()) {
 					Id<ActivityFacility> id = Id.create(act.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					ActivityFacility f = facilities.getFacilities().get(id);

@@ -46,7 +46,7 @@ public class MunicipalityDistanceTask extends AnalyzerTask {
 
         for(PlainPerson person : persons) {
             String xStr = person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS);
-            for(Episode plan : person.getPlans()) {
+            for(Episode plan : person.getEpisodes()) {
                 for(Element leg : plan.getLegs()) {
 
                     String yStr = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);

@@ -84,7 +84,7 @@ public class PopulationDensityTask extends AnalyzerTask {
 		int nozone = 0;
 		
 		for(PlainPerson person : persons) {
-			Episode plan = person.getPlans().get(0);
+			Episode plan = person.getEpisodes().get(0);
 			
 			ActivityFacility home = null;
 			for(Element act : plan.getActivities()) {

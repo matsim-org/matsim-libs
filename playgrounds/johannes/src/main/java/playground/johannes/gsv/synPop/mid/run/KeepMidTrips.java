@@ -56,7 +56,7 @@ public class KeepMidTrips {
 		Set<PlainPerson> keep = new HashSet<>(persons.size());
 		
 		for(PlainPerson person : persons) {
-			for(Episode plan : person.getPlans()) {
+			for(Episode plan : person.getEpisodes()) {
 				if(MIDKeys.MID_TRIPS.equalsIgnoreCase(plan.getAttribute(CommonKeys.DATA_SOURCE))) {
 					if(random.nextDouble() < proba) {
 						keep.add(person);

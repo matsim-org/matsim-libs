@@ -34,12 +34,12 @@ public class CachedPerson extends CachedElement implements Person {
     }
 
     @Override
-    public List<Episode> getPlans() {
-        return ((Person)getDelegate()).getPlans();
+    public List<Episode> getEpisodes() {
+        return ((Person)getDelegate()).getEpisodes();
     }
 
     @Override
-    public void addPlan(Episode episode) {
-        ((Person)getDelegate()).addPlan(episode);
+    public void addEpisode(Episode episode) {
+        ((Person)getDelegate()).addEpisode(episode);
     }
 }

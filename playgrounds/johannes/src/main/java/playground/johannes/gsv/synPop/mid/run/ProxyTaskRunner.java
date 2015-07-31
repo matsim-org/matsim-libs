@@ -49,7 +49,7 @@ public class ProxyTaskRunner {
 		}
 		
 		for(PlainPerson person : persons) {
-			for(Episode plan : person.getPlans())
+			for(Episode plan : person.getEpisodes())
 				task.apply(plan);
 			
 			if(verbose)
@@ -79,14 +79,14 @@ public class ProxyTaskRunner {
 		
 		for(PlainPerson person : persons) {
 			List<Episode> remove = new ArrayList<>();
-			for(Episode plan : person.getPlans()) {
+			for(Episode plan : person.getEpisodes()) {
 				if("true".equalsIgnoreCase(plan.getAttribute(CommonKeys.DELETE))) {
 					remove.add(plan);
 				}
 			}
 			
 			for(Episode plan : remove) {
-				person.getPlans().remove(plan);
+				person.getEpisodes().remove(plan);
 			}
 			
 		}

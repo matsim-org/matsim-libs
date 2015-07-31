@@ -62,7 +62,7 @@ public class ErrorTargetDistanceLogger implements SamplerListener {
 			for(PlainPerson person : population) {
 				err[i] = h.evaluate(person);
 				double sum = 0;
-				for(Element leg : person.getPlans().get(0).getLegs()) {
+				for(Element leg : person.getEpisodes().get(0).getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 					if(val != null) {
 						sum += Double.parseDouble(val);

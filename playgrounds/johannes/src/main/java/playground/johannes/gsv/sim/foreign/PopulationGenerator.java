@@ -300,7 +300,7 @@ public class PopulationGenerator {
 		plan.addLeg(leg);
 		plan.addActivity(targetAct);
 
-		person.addPlan(plan);
+		person.addEpisode(plan);
 		return person;
 	}
 

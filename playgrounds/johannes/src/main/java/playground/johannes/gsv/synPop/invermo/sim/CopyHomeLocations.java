@@ -50,7 +50,7 @@ public class CopyHomeLocations implements SamplerListener {
 		if(iter.get() % interval == 0) {
 			for(PlainPerson thePerson : population) {
 				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-				Episode plan = thePerson.getPlans().get(0);
+				Episode plan = thePerson.getEpisodes().get(0);
 				for(Element act : plan.getActivities()) {
 					if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 						act.setAttribute(CommonKeys.ACTIVITY_FACILITY, home.getId().toString());

@@ -44,7 +44,7 @@ public class AddReturnPlan implements ProxyPersonTask {
 	@Override
 	public void apply(PlainPerson person) {
 		Set<Episode> journeys = new HashSet<>();
-		for (Episode p : person.getPlans()) {
+		for (Episode p : person.getEpisodes()) {
 			if ("midjourneys".equalsIgnoreCase(p.getAttribute("datasource"))) {
 				journeys.add(p);
 			}
@@ -55,7 +55,7 @@ public class AddReturnPlan implements ProxyPersonTask {
 			Collections.reverse(returnPlan.getActivities());
 			Collections.reverse(returnPlan.getLegs());
 
-			person.addPlan(returnPlan);
+			person.addEpisode(returnPlan);
 		}
 	}
 

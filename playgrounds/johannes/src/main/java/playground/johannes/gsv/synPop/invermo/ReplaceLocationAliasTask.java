@@ -35,7 +35,7 @@ public class ReplaceLocationAliasTask implements ProxyPersonTask {
 	 */
 	@Override
 	public void apply(PlainPerson person) {
-		for(Episode plan : person.getPlans()) {
+		for(Episode plan : person.getEpisodes()) {
 			for(Element act : plan.getActivities()) {
 				String desc = act.getAttribute(InvermoKeys.LOCATION);
 				if("home".equals(desc)) {

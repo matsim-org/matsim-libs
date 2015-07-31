@@ -48,7 +48,7 @@ public class TripDayVolumeTask extends AnalyzerTask {
 		
 		for(PlainPerson person : persons) {
 			String day = person.getAttribute(CommonKeys.DAY);
-			for(Episode plan : person.getPlans()) {
+			for(Episode plan : person.getEpisodes()) {
 				
 				int cnt = 0;
 				for(Element leg : plan.getLegs()) {

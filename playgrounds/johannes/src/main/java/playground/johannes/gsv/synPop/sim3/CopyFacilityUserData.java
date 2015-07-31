@@ -49,7 +49,7 @@ public class CopyFacilityUserData implements SamplerListener {
 			int cnt = 0;
 
 			for (PlainPerson person : population) {
-				for (Episode plan : person.getPlans()) {
+				for (Episode plan : person.getEpisodes()) {
 					for (Element act : plan.getActivities()) {
 						ActivityFacility f = (ActivityFacility) ((PlainElement)act).getUserData(ActivityLocationMutator
 								.USER_DATA_KEY);

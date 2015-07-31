@@ -77,7 +77,7 @@ public class PkmTaskSeason extends AnalyzerTask {
 			for (PlainPerson person : persons) {
 				String theSeason = person.getAttribute(CommonKeys.ACTIVITY_TYPE);
 
-				Episode plan = person.getPlans().get(0);
+				Episode plan = person.getEpisodes().get(0);
 
 				for (int i = 1; i < plan.getLegs().size(); i++) {
 					Element leg = plan.getLegs().get(i);

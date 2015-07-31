@@ -50,7 +50,7 @@ public class DistancePopSegmenter implements PopulationSegmenter {
 		
 		for(PlainPerson person : persons) {
 			double max = 0;
-			for(Episode plan : person.getPlans()) {
+			for(Episode plan : person.getEpisodes()) {
 				for(Element leg : plan.getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(val != null) {

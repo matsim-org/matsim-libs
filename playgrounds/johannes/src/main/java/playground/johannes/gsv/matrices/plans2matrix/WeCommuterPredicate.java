@@ -46,7 +46,7 @@ public class WeCommuterPredicate implements Predicate {
 			if (day.equalsIgnoreCase(CommonKeys.THURSDAY) || day.equalsIgnoreCase(CommonKeys.FRIDAY) || day.equalsIgnoreCase(CommonKeys.SATURDAY)
 					|| day.equalsIgnoreCase(CommonKeys.SUNDAY)) {
 				
-				Episode plan = person.getPlans().get(0);
+				Episode plan = person.getEpisodes().get(0);
 				Element weLeg = null;
 				
 				int cnt = 0;

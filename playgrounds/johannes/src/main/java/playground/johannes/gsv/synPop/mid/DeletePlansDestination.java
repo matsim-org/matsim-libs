@@ -37,7 +37,7 @@ public class DeletePlansDestination implements ProxyPersonTask {
 	public void apply(PlainPerson person) {
 		Set<Episode> remove = new HashSet<>();
 
-		for (Episode plan : person.getPlans()) {
+		for (Episode plan : person.getEpisodes()) {
 			if ("midjourneys".equalsIgnoreCase(plan.getAttribute("datasource"))) {
 				for (Element leg : plan.getLegs()) {
 					if (!JourneyDestinationHandler.GERMANY.equals(leg.getAttribute(JourneyDestinationHandler.DESTINATION))) {
@@ -48,7 +48,7 @@ public class DeletePlansDestination implements ProxyPersonTask {
 		}
 
 		for (Episode plan : remove) {
-			person.getPlans().remove(plan);
+			person.getEpisodes().remove(plan);
 		}
 
 	}

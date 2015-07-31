@@ -51,7 +51,7 @@ public class PlainPerson extends PlainElement implements Person {
 			plans.set(0, plan);
 	}
 	
-	public void addPlan(Episode plan) {
+	public void addEpisode(Episode plan) {
 		plans.add(plan);
 	}
 	
@@ -60,7 +60,7 @@ public class PlainPerson extends PlainElement implements Person {
 		return plans.get(0);
 	}
 	
-	public List<Episode> getPlans() {
+	public List<Episode> getEpisodes() {
 		return plans;
 	}
 	
@@ -77,7 +77,7 @@ public class PlainPerson extends PlainElement implements Person {
 		
 //		clone.setPlan(plan.clone());
 		for(Episode plan : plans)
-			clone.addPlan(((PlainEpisode)plan).clone());
+			clone.addEpisode(((PlainEpisode) plan).clone());
 		
 		return clone;
 	}

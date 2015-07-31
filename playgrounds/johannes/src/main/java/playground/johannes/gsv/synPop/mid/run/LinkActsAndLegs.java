@@ -58,7 +58,7 @@ public class LinkActsAndLegs {
 		Random random = new XORShiftRandom();
 
 		for(PlainPerson person : persons) {
-			for(Episode plan : person.getPlans()) {
+			for(Episode plan : person.getEpisodes()) {
 				plan.setAttribute("id", String.valueOf(counter++));
 				Element act = plan.getActivities().get(0);
 				act.setAttribute("id", String.valueOf(counter++));

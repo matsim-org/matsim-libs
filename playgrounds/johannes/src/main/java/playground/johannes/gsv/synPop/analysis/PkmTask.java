@@ -57,7 +57,7 @@ public class PkmTask extends AnalyzerTask {
 		for (String purpose : purposes) {
 			double pkm = 0;
 			for (PlainPerson person : persons) {
-				Episode plan = person.getPlans().get(0);
+				Episode plan = person.getEpisodes().get(0);
 
 				for (int i = 1; i < plan.getLegs().size(); i++) {
 					Element leg = plan.getLegs().get(i);

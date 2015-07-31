@@ -71,7 +71,7 @@ public class RemoveLongTrips {
 		
 		ProgressLogger.init(persons.size(), 2, 10);
 		for(PlainPerson person : persons) {
-			for(Episode plan : person.getPlans()) {
+			for(Episode plan : person.getEpisodes()) {
 				for(int i = 0; i < plan.getLegs().size(); i++) {
 					Element origin = plan.getActivities().get(i);
 					Element destination = plan.getActivities().get(i + 1);

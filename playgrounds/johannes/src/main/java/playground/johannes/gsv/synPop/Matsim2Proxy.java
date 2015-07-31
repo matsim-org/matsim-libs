@@ -81,7 +81,7 @@ public class Matsim2Proxy {
 			PlainPerson plainPerson = proxyPresons.get(matsimPerson.getId().toString());
 			newPlainPersons.add(plainPerson);
 			
-			Episode proxyPlan = plainPerson.getPlans().get(0);
+			Episode proxyPlan = plainPerson.getEpisodes().get(0);
 			
 			if (matsimPerson.getPlans().size() > 1) {
 				matsimPerson.removePlan(matsimPerson.getSelectedPlan());

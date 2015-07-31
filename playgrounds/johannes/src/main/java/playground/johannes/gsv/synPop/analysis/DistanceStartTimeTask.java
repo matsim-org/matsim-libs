@@ -43,7 +43,7 @@ public class DistanceStartTimeTask extends AnalyzerTask {
         TDoubleArrayList startVals = new TDoubleArrayList();
 
         for(PlainPerson person : persons) {
-            for(Episode plan : person.getPlans()) {
+            for(Episode plan : person.getEpisodes()) {
                 for(Element leg : plan.getLegs()) {
                     String xStr = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
                     String startVal = leg.getAttribute(CommonKeys.LEG_START_TIME);

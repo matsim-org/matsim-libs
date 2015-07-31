@@ -26,7 +26,7 @@ import java.util.List;
  */
 public interface Person extends Element {
 
-    public List<Episode> getPlans();
+    public List<Episode> getEpisodes();
 
-    public void addPlan(Episode episode);
+    public void addEpisode(Episode episode);
 }

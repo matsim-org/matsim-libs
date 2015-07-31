@@ -70,11 +70,11 @@ public class CopyAttributes {
 			PlainPerson template = templates.get(id);
 
 			if (template != null) {
-				if (person.getPlans().size() > 1) {
+				if (person.getEpisodes().size() > 1) {
 					throw new RuntimeException("Person has more than one plan.");
 				}
-				Episode plan = person.getPlans().get(0);
-				Episode templatePlan = template.getPlans().get(0);
+				Episode plan = person.getEpisodes().get(0);
+				Episode templatePlan = template.getEpisodes().get(0);
 				for (int i = 0; i < plan.getActivities().size(); i++) {
 					Element act = plan.getActivities().get(i);
 					Element templAct = templatePlan.getActivities().get(i);

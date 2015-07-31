@@ -49,7 +49,7 @@ public class ExtractMidJourneys {
 		
 		Set<PlainPerson> newPersons = new HashSet<>();
 		for(PlainPerson person : persons) {
-			if("midjourneys".equalsIgnoreCase(person.getPlans().get(0).getAttribute("datasource"))) {
+			if("midjourneys".equalsIgnoreCase(person.getEpisodes().get(0).getAttribute("datasource"))) {
 				newPersons.add(person);
 			}
 		}

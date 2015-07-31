@@ -38,8 +38,8 @@ public class CopyDate2PersonTask implements ProxyPersonTask {
 	 */
 	@Override
 	public void apply(PlainPerson person) {
-		if (person.getPlans().size() > 0) {
-			Episode plan = person.getPlans().get(0);
+		if (person.getEpisodes().size() > 0) {
+			Episode plan = person.getEpisodes().get(0);
 
 			person.setAttribute("day", plan.getAttribute("day"));
 			person.setAttribute("month", plan.getAttribute("month"));

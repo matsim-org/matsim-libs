@@ -54,7 +54,7 @@ public class DependendLegVariableAnalyzerTask extends AnalyzerTask {
         TDoubleArrayList yVals = new TDoubleArrayList();
 
         for(PlainPerson person : persons) {
-            for(Episode plan : person.getPlans()) {
+            for(Episode plan : person.getEpisodes()) {
                 for(Element leg : plan.getLegs()) {
                     String xStr = leg.getAttribute(xKey);
                     String yStr = leg.getAttribute(yKey);

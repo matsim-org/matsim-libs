@@ -73,7 +73,7 @@ public class GeocodeLocationsTask implements ProxyPersonTask {
 	@Override
 	public void apply(PlainPerson person) {
 		geocodeField(InvermoKeys.HOME_LOCATION, InvermoKeys.HOME_COORD, person);
-		for (Episode plan : person.getPlans()) {
+		for (Episode plan : person.getEpisodes()) {
 			for (Element act : plan.getActivities()) {
 				geocodeField("location", "coord", act);
 			}

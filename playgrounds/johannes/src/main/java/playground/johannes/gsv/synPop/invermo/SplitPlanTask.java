@@ -45,14 +45,14 @@ public class SplitPlanTask implements ProxyPersonTask {
 	public void apply(PlainPerson person) {
 		List<Episode> newPlans = new ArrayList<Episode>();
 		
-		for (Episode plan : person.getPlans()) {
+		for (Episode plan : person.getEpisodes()) {
 			splitPlan(plan, newPlans);
 		}
 
-		person.getPlans().clear();
+		person.getEpisodes().clear();
 		
 		for(Episode plan : newPlans)
-			person.addPlan(plan);
+			person.addEpisode(plan);
 	}
 	
 	private void splitPlan(Episode plan, List<Episode> newPlans) {

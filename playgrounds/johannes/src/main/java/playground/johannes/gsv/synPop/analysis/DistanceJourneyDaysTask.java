@@ -53,7 +53,7 @@ public class DistanceJourneyDaysTask extends AnalyzerTask {
 			TDoubleArrayList distances = new TDoubleArrayList();
 
 			for (PlainPerson person : persons) {
-				for (Episode plan : person.getPlans()) {
+				for (Episode plan : person.getEpisodes()) {
 					String dayVal = plan.getAttribute(MIDKeys.JOURNEY_DAYS);
 					if (dayVal != null) {
 						for (Element leg : plan.getLegs()) {

@@ -176,7 +176,7 @@ public class TXTReader {
 			} else {
 				String planId = attributes.get("Reisenr");
 				Episode thePlan = null;
-//				for(PlainEpisode plan : person.getPlans()) {
+//				for(PlainEpisode plan : person.getEpisodes()) {
 //					if(plan.getAttribute("id").equals(planId)) {
 //						thePlan = plan;
 //						break;
@@ -185,7 +185,7 @@ public class TXTReader {
 				if(thePlan == null) {
 					thePlan = new PlainEpisode();
 					thePlan.setAttribute("id", planId);
-					person.addPlan(thePlan);
+					person.addEpisode(thePlan);
 					thePlan.setAttribute("datasource", "invermo");
 				}
 				
@@ -311,7 +311,7 @@ public class TXTReader {
 		logger.info("Deleting persons with legs more than 1000 KM...");
 		DeleteShortLongTrips task = new DeleteShortLongTrips(100000, false);
 		for (PlainPerson person : persons) {
-			task.apply(person.getPlans().get(0));
+			task.apply(person.getEpisodes().get(0));
 		}
 		logger.info("Population size = " + persons.size());
 		

@@ -55,7 +55,7 @@ public class XMLWriter extends MatsimXmlWriter {
 		atts.add(new Tuple<String, String>(Constants.ID_KEY, person.getId()));
 		
 		writeStartTag(Constants.PERSON_TAG, atts);
-		for(Episode plan : person.getPlans())
+		for(Episode plan : person.getEpisodes())
 			writePlan(plan);
 		writeEndTag(Constants.PERSON_TAG);
 

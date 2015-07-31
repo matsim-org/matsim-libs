@@ -46,7 +46,7 @@ public class ReplaceMiscType implements ProxyPersonsTask {
 		TObjectIntHashMap<String> typeCounts = new TObjectIntHashMap<>();
 		
 		for(PlainPerson person : persons) {
-			for(Episode plan : person.getPlans()) {
+			for(Episode plan : person.getEpisodes()) {
 				for(Element act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 					if(!ActivityType.HOME.equalsIgnoreCase(type) && !ActivityType.MISC.equalsIgnoreCase(type)) {
@@ -64,7 +64,7 @@ public class ReplaceMiscType implements ProxyPersonsTask {
 		}
 		
 		for(PlainPerson person : persons) {
-			for(Episode plan : person.getPlans()) {
+			for(Episode plan : person.getEpisodes()) {
 				for(Element act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 					if(type == null || type.equalsIgnoreCase(ActivityType.MISC)) {

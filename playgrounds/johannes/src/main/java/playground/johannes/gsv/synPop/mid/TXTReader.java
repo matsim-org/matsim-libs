@@ -152,7 +152,7 @@ public class TXTReader {
 				handler.hanle(plan, attributes);
 			}
 			
-			person.addPlan(plan);
+			person.addEpisode(plan);
 			
 			PlainElement leg = new PlainElement();
 			plan.addLeg(leg);

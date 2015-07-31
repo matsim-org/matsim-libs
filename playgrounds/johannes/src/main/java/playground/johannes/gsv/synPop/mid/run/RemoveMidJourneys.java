@@ -54,7 +54,7 @@ public class RemoveMidJourneys {
 		Set<PlainPerson> remove = new HashSet<>(persons.size());
 		
 		for(PlainPerson person : persons) {
-			for(Episode plan : person.getPlans()) {
+			for(Episode plan : person.getEpisodes()) {
 				if(MIDKeys.MID_JOUNREYS.equalsIgnoreCase(plan.getAttribute(CommonKeys.DATA_SOURCE))) {
 					if(random.nextDouble() < proba) {
 						remove.add(person);

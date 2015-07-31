@@ -49,14 +49,14 @@ public class JourneyPlans2PersonTask implements ProxyPersonTask {
 
 		Set<Episode> journeyPlans = new HashSet<>();
 
-		for (Episode plan : person.getPlans()) {
+		for (Episode plan : person.getEpisodes()) {
 			if ("midjourneys".equalsIgnoreCase(plan.getAttribute("datasource"))) {
 				PlainPerson newPerson = new PlainPerson(String.format("%s.%s", person.getId(), counter++));
 				for (Entry<String, String> entry : person.getAttributes().entrySet()) {
 					newPerson.setAttribute(entry.getKey(), entry.getValue());
 				}
 
-				newPerson.addPlan(plan);
+				newPerson.addEpisode(plan);
 
 				double newW = w * 1 / periode;
 				newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(newW));
@@ -68,7 +68,7 @@ public class JourneyPlans2PersonTask implements ProxyPersonTask {
 		}
 
 		for (Episode plan : journeyPlans) {
-			person.getPlans().remove(plan);
+			person.getEpisodes().remove(plan);
 		}
 
 //		/*
@@ -83,7 +83,7 @@ public class JourneyPlans2PersonTask implements ProxyPersonTask {
 //		for (Entry<String, String> entry : person.getAttributes().entrySet()) {
 //			newPerson.setAttribute(entry.getKey(), entry.getValue());
 //		}
-//		newPerson.addPlan(new PlainEpisode());
+//		newPerson.addEpisode(new PlainEpisode());
 //
 //		newW = w * (365 - counter) / 365.0;
 //		newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(newW));

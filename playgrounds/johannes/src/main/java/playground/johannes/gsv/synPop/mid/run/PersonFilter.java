@@ -92,7 +92,7 @@ public class PersonFilter {
 		logger.info("Extracting MID trips...");
 		Set<PlainPerson> newPersons = new HashSet<>();
 		for(PlainPerson person : persons) {
-			if(MIDKeys.MID_TRIPS.equalsIgnoreCase(person.getPlans().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
+			if(MIDKeys.MID_TRIPS.equalsIgnoreCase(person.getEpisodes().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
 				newPersons.add(person);
 			}
 		}
@@ -102,7 +102,7 @@ public class PersonFilter {
 		logger.info("Extracting MID journeys...");
 		newPersons = new HashSet<>();
 		for(PlainPerson person : persons) {
-			if(MIDKeys.MID_JOUNREYS.equalsIgnoreCase(person.getPlans().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
+			if(MIDKeys.MID_JOUNREYS.equalsIgnoreCase(person.getEpisodes().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
 				newPersons.add(person);
 			}
 		}

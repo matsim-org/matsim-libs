@@ -168,7 +168,7 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 
 		DeleteShortLongTrips task = new DeleteShortLongTrips(100000, false);
 		for (PlainPerson person : parser.getPersons()) {
-			task.apply(person.getPlans().get(0));
+			task.apply(person.getEpisodes().get(0));
 		}
 
 		XMLWriter writer = new XMLWriter();

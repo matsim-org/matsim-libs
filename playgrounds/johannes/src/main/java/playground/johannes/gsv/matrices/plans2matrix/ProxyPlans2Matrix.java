@@ -96,7 +96,7 @@ public class ProxyPlans2Matrix {
 		double pkmGeo = 0;
 
 		for (PlainPerson person : persons) {
-			Episode plan = person.getPlans().get(0);
+			Episode plan = person.getEpisodes().get(0);
 			for (int i = 0; i < plan.getLegs().size(); i++) {
 				Element leg = plan.getLegs().get(i);
 				Element prev = plan.getActivities().get(i);

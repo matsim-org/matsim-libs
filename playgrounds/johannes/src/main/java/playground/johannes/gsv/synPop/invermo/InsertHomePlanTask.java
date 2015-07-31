@@ -37,7 +37,7 @@ public class InsertHomePlanTask implements ProxyPersonTask {
 	 */
 	@Override
 	public void apply(PlainPerson person) {
-		if(person.getPlans().isEmpty()) {
+		if(person.getEpisodes().isEmpty()) {
 			Episode plan = new PlainEpisode();
 			PlainElement act = new PlainElement();
 			act.setAttribute(CommonKeys.ACTIVITY_TYPE, "home");
@@ -46,7 +46,7 @@ public class InsertHomePlanTask implements ProxyPersonTask {
 			act.setAttribute(InvermoKeys.LOCATION, "home");
 			
 			plan.addActivity(act);
-			person.addPlan(plan);
+			person.addEpisode(plan);
 		}
 
 	}
