@@ -1,2 +1,0 @@
-CONFIG = input/config.xml
-MEMORY = -Xms4000m -Xmx8000m
