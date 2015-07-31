@@ -32,7 +32,8 @@ import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
@@ -67,12 +68,12 @@ public class ActivityDistanceTask extends AnalyzerTask {
 
 			for (int i = 1; i < plan.getActivities().size(); i++) {
 
-				ProxyObject thisAct = plan.getActivities().get(i);
-				ProxyObject leg = plan.getLegs().get(i - 1);
+				Element thisAct = plan.getActivities().get(i);
+				Element leg = plan.getLegs().get(i - 1);
 
 				if (mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 					if (purpose == null || purpose.equalsIgnoreCase(thisAct.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-						ProxyObject prevAct = plan.getActivities().get(i - 1);
+						Element prevAct = plan.getActivities().get(i - 1);
 						Id<ActivityFacility> prevId = Id.create(prevAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 						ActivityFacility prevFac = facilities.getFacilities().get(prevId);
 
@@ -97,7 +98,7 @@ public class ActivityDistanceTask extends AnalyzerTask {
 		Set<String> types = new HashSet<String>();
 		for (ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlan();
-			for (ProxyObject act : plan.getActivities()) {
+			for (Element act : plan.getActivities()) {
 				types.add(act.getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}
 		}

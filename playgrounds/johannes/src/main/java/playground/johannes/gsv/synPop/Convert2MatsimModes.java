@@ -20,6 +20,8 @@
 package playground.johannes.gsv.synPop;
 
 
+import playground.johannes.synpop.data.Element;
+
 /**
  * @author johannes
  *
@@ -28,7 +30,7 @@ public class Convert2MatsimModes implements ProxyPlanTask {
 
 	@Override
 	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
+		for(Element leg : plan.getLegs()) {
 			String mode = leg.getAttribute(CommonKeys.LEG_MODE);
 			
 			if(mode == null) {

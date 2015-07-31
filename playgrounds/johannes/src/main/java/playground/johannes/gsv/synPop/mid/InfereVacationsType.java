@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.mid;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 
@@ -39,7 +39,7 @@ public class InfereVacationsType implements ProxyPlanTask {
 	 */
 	@Override
 	public void apply(ProxyPlan plan) {
-		for (ProxyObject act : plan.getActivities()) {
+		for (Element act : plan.getActivities()) {
 			if (act.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase("vacations")) {
 				String val = plan.getAttribute("journeydays");
 				int days = 0;

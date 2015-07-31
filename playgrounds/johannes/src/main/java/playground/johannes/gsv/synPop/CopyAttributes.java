@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.data.Element;
 
 /**
  * @author johannes
@@ -74,8 +75,8 @@ public class CopyAttributes {
 				ProxyPlan plan = person.getPlans().get(0);
 				ProxyPlan templatePlan = template.getPlans().get(0);
 				for (int i = 0; i < plan.getActivities().size(); i++) {
-					ProxyObject act = plan.getActivities().get(i);
-					ProxyObject templAct = templatePlan.getActivities().get(i);
+					Element act = plan.getActivities().get(i);
+					Element templAct = templatePlan.getActivities().get(i);
 
 					act.setAttribute(CommonKeys.ACTIVITY_TYPE, templAct.getAttribute(CommonKeys.ACTIVITY_TYPE));
 				}

@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.invermo;
 import org.joda.time.DateTime;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 
@@ -42,7 +42,7 @@ public class InfereVacationsType implements ProxyPlanTask {
 	@Override
 	public void apply(ProxyPlan plan) {
 		boolean hasVacations = false;
-		for (ProxyObject act : plan.getActivities()) {
+		for (Element act : plan.getActivities()) {
 			if ("vacations".equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 				hasVacations = true;
 				break;
@@ -52,8 +52,8 @@ public class InfereVacationsType implements ProxyPlanTask {
 		if (hasVacations) {
 			boolean isLong = false;
 
-			ProxyObject first = plan.getLegs().get(0);
-			ProxyObject last = plan.getLegs().get(plan.getLegs().size() - 1);
+			Element first = plan.getLegs().get(0);
+			Element last = plan.getLegs().get(plan.getLegs().size() - 1);
 
 			String startStr = first.getAttribute(CommonKeys.LEG_START_TIME);
 			String endStr = last.getAttribute(CommonKeys.LEG_END_TIME);
@@ -67,7 +67,7 @@ public class InfereVacationsType implements ProxyPlanTask {
 				}
 			}
 			
-			for (ProxyObject act : plan.getActivities()) {
+			for (Element act : plan.getActivities()) {
 				if ("vacations".equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					if (isLong) {
 						act.setAttribute(CommonKeys.ACTIVITY_TYPE, "vacations_long");

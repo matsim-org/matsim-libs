@@ -19,6 +19,10 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -27,25 +31,25 @@ import java.util.Map.Entry;
  * @author johannes
  *
  */
-public class ProxyPlan extends ProxyObject {
+public class ProxyPlan extends PlainElement implements Episode {
 
-	private List<ProxyObject> activities = new ArrayList<ProxyObject>();
+	private List<Element> activities = new ArrayList<Element>();
 	
-	private List<ProxyObject> legs = new ArrayList<ProxyObject>();
+	private List<Element> legs = new ArrayList<Element>();
 	
-	public void addLeg(ProxyObject leg) {
+	public void addLeg(Element leg) {
 		legs.add(leg);
 	}
 	
-	public List<ProxyObject> getLegs() {
+	public List<Element> getLegs() {
 		return legs;
 	}
 	
-	public void addActivity(ProxyObject activity) {
+	public void addActivity(Element activity) {
 		activities.add(activity);
 	}
 	
-	public List<ProxyObject> getActivities() {
+	public List<Element> getActivities() {
 		return activities;
 	}
 	
@@ -56,12 +60,12 @@ public class ProxyPlan extends ProxyObject {
 			clone.setAttribute(entry.getKey(), entry.getValue());
 		}
 		
-		for(ProxyObject act : activities) {
-			clone.addActivity(act.clone());
+		for(Element act : activities) {
+			clone.addActivity(((PlainElement)act).clone());
 		}
 		
-		for(ProxyObject leg : legs) {
-			clone.addLeg(leg.clone());
+		for(Element leg : legs) {
+			clone.addLeg(((PlainElement)leg).clone());
 		}
 		
 		return clone;

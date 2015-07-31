@@ -23,7 +23,7 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.sna.util.TXTWriter;
@@ -44,7 +44,7 @@ public class DistanceStartTimeTask extends AnalyzerTask {
 
         for(ProxyPerson person : persons) {
             for(ProxyPlan plan : person.getPlans()) {
-                for(ProxyObject leg : plan.getLegs()) {
+                for(Element leg : plan.getLegs()) {
                     String xStr = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
                     String startVal = leg.getAttribute(CommonKeys.LEG_START_TIME);
 

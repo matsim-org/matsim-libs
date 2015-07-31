@@ -28,7 +28,8 @@ import java.util.Map.Entry;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
@@ -75,12 +76,12 @@ public class XMLWriter extends MatsimXmlWriter {
 		writeEndTag(Constants.PLAN_TAG);
 	}
 
-	private void writeActivity(ProxyObject activity) {
-		writeStartTag(Constants.ACTIVITY_TAG, getAttributes(activity.getAttributes()), true);
+	private void writeActivity(Element activity) {
+		writeStartTag(Constants.ACTIVITY_TAG, getAttributes(((PlainElement)activity).getAttributes()), true);
 	}
 
-	private void writeLeg(ProxyObject leg) {
-		writeStartTag(Constants.LEG_TAG, getAttributes(leg.getAttributes()), true);
+	private void writeLeg(Element leg) {
+		writeStartTag(Constants.LEG_TAG, getAttributes(((PlainElement)leg).getAttributes()), true);
 	}
 
 	private List<Tuple<String, String>> getAttributes(Map<String, String> attributes) {

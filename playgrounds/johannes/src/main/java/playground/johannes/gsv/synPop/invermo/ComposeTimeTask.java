@@ -23,7 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 
@@ -44,14 +44,14 @@ public class ComposeTimeTask implements ProxyPlanTask {
 	 */
 	@Override
 	public void apply(ProxyPlan plan) {
-		for (ProxyObject leg : plan.getLegs()) {
+		for (Element leg : plan.getLegs()) {
 			setStartTime(leg);
 			setEndTime(leg);
 		}
 
 	}
 
-	private void setEndTime(ProxyObject leg) {
+	private void setEndTime(Element leg) {
 		StringBuilder builder = new StringBuilder(100);
 
 		boolean valid = true;
@@ -115,7 +115,7 @@ public class ComposeTimeTask implements ProxyPlanTask {
 		}
 	}
 	
-	private void setStartTime(ProxyObject leg) {
+	private void setStartTime(Element leg) {
 		StringBuilder builder = new StringBuilder(100);
 
 		boolean valid = true;

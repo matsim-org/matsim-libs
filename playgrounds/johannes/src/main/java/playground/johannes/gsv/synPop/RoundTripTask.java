@@ -19,6 +19,9 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,10 +38,10 @@ public class RoundTripTask implements ProxyPlanTask {
 		List<Integer> insertPoints = new ArrayList<Integer>();
 		
 		for(int i = 0; i < plan.getLegs().size(); i++) {
-			ProxyObject leg = plan.getLegs().get(i);
+			Element leg = plan.getLegs().get(i);
 			Boolean val = Boolean.parseBoolean(leg.getAttribute(CommonKeys.LEG_ROUNDTRIP)); 
 			if(val != null && val == true) {
-				ProxyObject act = plan.getActivities().get(i+1);
+				Element act = plan.getActivities().get(i+1);
 				String type = (String) act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 				act.setAttribute(CommonKeys.ACTIVITY_TYPE, type + ROUNDTRIP_SUFFIX);
 				
@@ -50,7 +53,7 @@ public class RoundTripTask implements ProxyPlanTask {
 		for(Integer idx : insertPoints) {
 			int i = idx + offset;
 			
-			ProxyObject toLeg = plan.getLegs().get(i - 2);
+			Element toLeg = plan.getLegs().get(i - 2);
 			int toLegStart = Integer.parseInt(toLeg.getAttribute(CommonKeys.LEG_START_TIME));
 			int toLegEnd = Integer.parseInt(toLeg.getAttribute(CommonKeys.LEG_END_TIME));
 			int dur = toLegEnd - toLegStart;
@@ -67,20 +70,20 @@ public class RoundTripTask implements ProxyPlanTask {
 			/*
 			 * insert a dummy activity with duration 1 s.
 			 */
-			ProxyObject act = new ProxyObject();
+			Element act = new PlainElement();
 			String prevType = (String) plan.getActivities().get(i-2).getAttribute(CommonKeys.ACTIVITY_TYPE);
 			act.setAttribute(CommonKeys.ACTIVITY_TYPE, prevType);
 			plan.getActivities().add(i, act);
 			/*
 			 * insert a return leg with half the duration and distance
 			 */
-			ProxyObject fromLeg = new ProxyObject();
+			Element fromLeg = new PlainElement();
 			fromLeg.setAttribute(CommonKeys.LEG_START_TIME, String.valueOf(toLegStart + dur/2));
 			fromLeg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(toLegEnd));
 			fromLeg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, toLeg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE));
 			fromLeg.setAttribute(CommonKeys.LEG_MODE, toLeg.getAttribute(CommonKeys.LEG_MODE));
 			
-			ProxyObject nextAct = plan.getActivities().get(i);
+			Element nextAct = plan.getActivities().get(i);
 			fromLeg.setAttribute(CommonKeys.LEG_PURPOSE, nextAct.getAttribute(CommonKeys.ACTIVITY_TYPE));
 			plan.getLegs().add(i-1, fromLeg);
 			

@@ -19,18 +19,15 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
@@ -117,7 +114,7 @@ public class TXTReader {
 			String id = personIdBuilder(attributes);
 			ProxyPerson person = persons.get(id);
 			
-			ProxyObject leg = new ProxyObject();
+			PlainElement leg = new PlainElement();
 			for(LegAttributeHandler handler : legAttHandlers)
 				handler.handle(leg, attributes);
 			
@@ -156,7 +153,7 @@ public class TXTReader {
 			
 			person.addPlan(plan);
 			
-			ProxyObject leg = new ProxyObject();
+			PlainElement leg = new PlainElement();
 			plan.addLeg(leg);
 			leg.setAttribute(CommonKeys.LEG_ORIGIN, ActivityType.HOME);
 			for(LegAttributeHandler handler : journeyAttHandlers) {

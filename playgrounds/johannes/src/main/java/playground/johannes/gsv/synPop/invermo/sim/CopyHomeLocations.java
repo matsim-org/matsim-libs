@@ -26,7 +26,7 @@ import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
@@ -52,7 +52,7 @@ public class CopyHomeLocations implements SamplerListener {
 			for(ProxyPerson thePerson : population) {
 				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
 				ProxyPlan plan = thePerson.getPlans().get(0);
-				for(ProxyObject act : plan.getActivities()) {
+				for(Element act : plan.getActivities()) {
 					if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 						act.setAttribute(CommonKeys.ACTIVITY_FACILITY, home.getId().toString());
 					}

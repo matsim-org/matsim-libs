@@ -25,7 +25,8 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLParser;
@@ -55,7 +56,7 @@ public class ExtractLongDistancePersons {
 		logger.info("Extracting persons...");
 		for(ProxyPerson person : parser.getPersons()) {
 			for(ProxyPlan plan : person.getPlans()) {
-				for(ProxyObject leg : plan.getLegs()) {
+				for(Element leg : plan.getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(val != null) {
 						double d = Double.parseDouble(val);

@@ -31,7 +31,7 @@ import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.ProxyPlan;
@@ -104,7 +104,7 @@ public class PopGeoExtract {
 			boolean keep = false;
 
 			for (ProxyPlan plan : person.getPlans()) {
-				for (ProxyObject act : plan.getActivities()) {
+				for (Element act : plan.getActivities()) {
 					Id<ActivityFacility> id = Id.create(act.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					ActivityFacility f = facilities.getFacilities().get(id);
 					Point p = MatsimCoordUtils.coordToPoint(f.getCoord());

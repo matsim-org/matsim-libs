@@ -21,16 +21,16 @@ package playground.johannes.gsv.synPop.invermo;
 
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 
 /**
  * @author johannes
  *
  */
-public class HouseholdWeigthHandler implements AttributeHandler<ProxyObject> {
+public class HouseholdWeigthHandler implements AttributeHandler<PlainElement> {
 
 	@Override
-	public void handleAttribute(ProxyObject object, Map<String, String> attributes) {
+	public void handleAttribute(PlainElement object, Map<String, String> attributes) {
 		String val = attributes.get(ColumnKeys.MOB_WEIGTH);
 		if(ColumnKeys.validate(val)) {
 			object.setAttribute(InvermoKeys.WEIGHT, val);

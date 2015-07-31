@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 
 /**
  * @author johannes
@@ -28,7 +28,7 @@ import playground.johannes.gsv.synPop.ProxyObject;
 public class LegStartLocHandler implements LegAttributeHandler {
 
 	@Override
-	public void handle(ProxyObject leg, int idx, String key, String value) {
+	public void handle(Element leg, int idx, String key, String value) {
 		if(key.contains(ColumnKeys.START1_TRIP1)) {
 			if(value.equalsIgnoreCase("1")) {
 				leg.setAttribute(InvermoKeys.START_LOCATION, "home");

@@ -30,12 +30,11 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
-import playground.johannes.gsv.synPop.ApplySampleProbas;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.FixMissingActTimesTask;
 import playground.johannes.gsv.synPop.InsertActivitiesTask;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
 import playground.johannes.gsv.synPop.ProxyPlan;
@@ -47,12 +46,9 @@ import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.gsv.synPop.invermo.sim.InitializeTargetDistance;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.PersonAttributeHandler;
-import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.RowHandler;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
-import playground.johannes.gsv.synPop.sim3.TargetDistanceHamiltonian;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
-import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -64,11 +60,11 @@ public class TXTReader {
 	
 	private static final Logger logger = Logger.getLogger(TXTReader.class);
 	
-	private Map<String, ProxyObject> households;
+	private Map<String, PlainElement> households;
 	
 	private Map<String, ProxyPerson> persons;
 	
-	private List<AttributeHandler<ProxyObject>> householdAttHandlers = new ArrayList<AttributeHandler<ProxyObject>>();
+	private List<AttributeHandler<PlainElement>> householdAttHandlers = new ArrayList<AttributeHandler<PlainElement>>();
 	
 	private List<PersonAttributeHandler> personAttHandlers = new ArrayList<PersonAttributeHandler>();
 	
@@ -76,7 +72,7 @@ public class TXTReader {
 	private LegHandlerAdaptor legAdaptor = new LegHandlerAdaptor();
 
 	public Collection<ProxyPerson> read(String rootDir) throws IOException {
-		households = new LinkedHashMap<String, ProxyObject>(5000);
+		households = new LinkedHashMap<String, PlainElement>(5000);
 		persons = new LinkedHashMap<String, ProxyPerson>(65000);
 		/*
 		 * read and create persons
@@ -134,13 +130,13 @@ public class TXTReader {
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
 			String id = attributes.get(ColumnKeys.HOUSEHOLD_ID);
-			ProxyObject household = households.get(id);
+			PlainElement household = households.get(id);
 			if(household == null) {
-				household = new ProxyObject();
+				household = new PlainElement();
 				households.put(id, household);
 			}
 			
-			for(AttributeHandler<ProxyObject> handler : householdAttHandlers) {
+			for(AttributeHandler<PlainElement> handler : householdAttHandlers) {
 				handler.handleAttribute(household, attributes);
 			}
 			
@@ -165,7 +161,7 @@ public class TXTReader {
 //			ProxyPerson person = new ProxyPerson(id);
 //			persons.put(person.getId(), person);
 			
-			ProxyObject household = households.get(attributes.get(ColumnKeys.HOUSEHOLD_ID));
+			PlainElement household = households.get(attributes.get(ColumnKeys.HOUSEHOLD_ID));
 			if(household == null) {
 				logger.warn(String.format("Household %s not found.", attributes.get(ColumnKeys.HOUSEHOLD_ID)));
 			} else {

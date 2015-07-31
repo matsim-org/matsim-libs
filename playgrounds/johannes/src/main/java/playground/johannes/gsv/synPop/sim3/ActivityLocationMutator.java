@@ -25,7 +25,8 @@ import java.util.Random;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
@@ -49,7 +50,7 @@ public class ActivityLocationMutator implements SingleMutator {
 
 //	private final double mutationRange = 2000;
 
-	private ProxyObject currentAct;
+	private PlainElement currentAct;
 
 	private ActivityFacility currentFacility;
 
@@ -62,13 +63,13 @@ public class ActivityLocationMutator implements SingleMutator {
 
 	@Override
 	public boolean mutate(ProxyPerson person) {
-		List<ProxyObject> activities = person.getPlan().getActivities();
+		List<Element> activities = person.getPlan().getActivities();
 	
 		int idx = random.nextInt(activities.size());
 		// if(idx == 0 || idx == activities.size() - 1)
 		// return false;
 	
-		ProxyObject act = activities.get(idx);
+		PlainElement act = (PlainElement)activities.get(idx);
 	
 		String type = null;
 		Boolean ignore = (Boolean) act.getUserData(IGNORE_KEY);
@@ -91,8 +92,8 @@ public class ActivityLocationMutator implements SingleMutator {
 	
 			ActivityFacility facility = null;
 //			if (idx > 0 && idx < person.getPlan().getActivities().size() - 1) {
-//				ProxyObject prev = person.getPlan().getActivities().get(idx - 1);
-//				ProxyObject next = person.getPlan().getActivities().get(idx + 1);
+//				PlainElement prev = person.getPlan().getActivities().get(idx - 1);
+//				PlainElement next = person.getPlan().getActivities().get(idx + 1);
 //	
 //				ActivityFacility prevFac = (ActivityFacility) prev.getUserData(USER_DATA_KEY);
 //				if (prevFac == null) {
@@ -111,7 +112,7 @@ public class ActivityLocationMutator implements SingleMutator {
 //				}
 //	
 //				if (prevFac.equals(nextFac)) {
-//					ProxyObject leg = person.getPlan().getLegs().get(idx - 1);
+//					PlainElement leg = person.getPlan().getLegs().get(idx - 1);
 //					String value = leg.getAttribute(MIDKeys.LEG_ROUTE_DISTANCE);
 //					if (value != null) {
 //						double dist = Double.parseDouble(value);

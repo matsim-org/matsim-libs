@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.PlainElement;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -27,7 +29,7 @@ import java.util.Map.Entry;
  * @author johannes
  *
  */
-public class ProxyPerson extends ProxyObject {
+public class ProxyPerson extends PlainElement {
 
 	private String id;
 	

@@ -20,7 +20,7 @@
 package playground.johannes.gsv.matrices.plans2matrix;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
@@ -36,7 +36,7 @@ public class DayPredicate implements Predicate {
 	}
 
 	@Override
-	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
+	public boolean test(ProxyPerson person, Element leg, Element prev, Element next) {
 		if (day == null || day.equalsIgnoreCase(person.getAttribute(CommonKeys.DAY))) {
 			return true;
 		} else {

@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
@@ -90,7 +90,7 @@ public class XMLParser extends MatsimXmlParser {
 			}
 
 		} else if (name.equalsIgnoreCase(Constants.ACTIVITY_TAG)) {
-			ProxyObject act = new ProxyObject();
+			PlainElement act = new PlainElement();
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!blacklist.contains(type)) {
@@ -100,7 +100,7 @@ public class XMLParser extends MatsimXmlParser {
 			plan.addActivity(act);
 
 		} else if (name.equalsIgnoreCase(Constants.LEG_TAG)) {
-			ProxyObject leg = new ProxyObject();
+			PlainElement leg = new PlainElement();
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!blacklist.contains(type)) {

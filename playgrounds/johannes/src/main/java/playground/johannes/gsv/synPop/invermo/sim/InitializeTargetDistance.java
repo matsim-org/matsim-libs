@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
@@ -33,7 +33,6 @@ import playground.johannes.gsv.synPop.invermo.InvermoKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
-import playground.johannes.gsv.synPop.sim3.TargetDistanceHamiltonian;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 
@@ -60,9 +59,9 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 	@Override
 	public void apply(ProxyPlan plan) {
 		for(int i = 0; i < plan.getLegs().size(); i++) {
-			ProxyObject prev = plan.getActivities().get(i);
-			ProxyObject leg = plan.getLegs().get(i);
-			ProxyObject next = plan.getActivities().get(i + 1);
+			Element prev = plan.getActivities().get(i);
+			Element leg = plan.getLegs().get(i);
+			Element next = plan.getActivities().get(i + 1);
 			
 			String sourceStr = prev.getAttribute(InvermoKeys.COORD);
 			String destStr = next.getAttribute(InvermoKeys.COORD);

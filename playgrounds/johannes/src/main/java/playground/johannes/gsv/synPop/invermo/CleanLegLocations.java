@@ -19,7 +19,8 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 
@@ -34,7 +35,7 @@ public class CleanLegLocations implements ProxyPlanTask {
 	 */
 	@Override
 	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
+		for(Element leg : plan.getLegs()) {
 			leg.removeAttribute(InvermoKeys.DESTINATION_LOCATION);
 			leg.removeAttribute(InvermoKeys.START_LOCATION);
 		}

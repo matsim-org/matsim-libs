@@ -31,7 +31,7 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 public class PersonDayHandler implements PersonAttributeHandler {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyObject, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.synpop.data.PlainElement, java.util.Map)
 	 */
 	@Override
 	public void handle(ProxyPerson person, Map<String, String> attributes) {

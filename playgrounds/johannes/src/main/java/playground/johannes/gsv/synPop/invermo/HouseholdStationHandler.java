@@ -21,16 +21,16 @@ package playground.johannes.gsv.synPop.invermo;
 
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 
 /**
  * @author johannes
  *
  */
-public class HouseholdStationHandler implements AttributeHandler<ProxyObject> {
+public class HouseholdStationHandler implements AttributeHandler<PlainElement> {
 
 	@Override
-	public void handleAttribute(ProxyObject household, Map<String, String> attributes) {
+	public void handleAttribute(PlainElement household, Map<String, String> attributes) {
 		String val = attributes.get(ColumnKeys.STATION_NAME);
 		if(ColumnKeys.validate(val)) {
 			household.setAttribute(InvermoKeys.STATION_NAME, val);

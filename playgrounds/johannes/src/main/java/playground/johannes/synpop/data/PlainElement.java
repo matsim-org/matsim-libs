@@ -17,8 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.data;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,7 @@ import java.util.Map.Entry;
  * @author johannes
  *
  */
-public class ProxyObject {
+public class PlainElement implements Element {
 
 	private Map<String, String> attributes;
 	
@@ -58,9 +59,14 @@ public class ProxyObject {
 			return null;
 		}
 	}
-	
-	public ProxyObject clone() {
-		ProxyObject clone = new ProxyObject();
+
+	@Override
+	public Collection<String> keys() {
+		return attributes.keySet();
+	}
+
+	public PlainElement clone() {
+		PlainElement clone = new PlainElement();
 		
 		for(Entry<String, String> entry : attributes.entrySet()) {
 			clone.setAttribute(entry.getKey(), entry.getValue());

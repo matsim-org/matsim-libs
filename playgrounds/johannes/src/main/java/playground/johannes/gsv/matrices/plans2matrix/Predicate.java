@@ -19,7 +19,8 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
@@ -28,6 +29,6 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public interface Predicate {
 
-	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next);
+	public boolean test(ProxyPerson person, Element leg, Element prev, Element next);
 	
 }

@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.Element;
+
 /**
  * @author johannes
  *
@@ -31,7 +33,7 @@ public class SetActivityTimeTask implements ProxyPlanTask {
 	@Override
 	public void apply(ProxyPlan plan) {
 		if(plan.getActivities().size() == 1) {
-			ProxyObject act = plan.getActivities().get(0);
+			Element act = plan.getActivities().get(0);
 			
 			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
 			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
@@ -42,10 +44,10 @@ public class SetActivityTimeTask implements ProxyPlanTask {
 			String startTime = "0";
 			String endTime = "86400";
 			
-			ProxyObject act = plan.getActivities().get(i);
+			Element act = plan.getActivities().get(i);
 			
 			if(i > 0) {
-				ProxyObject prev = plan.getLegs().get(i-1);
+				Element prev = plan.getLegs().get(i-1);
 				startTime = prev.getAttribute(CommonKeys.LEG_END_TIME);
 				
 				if(startTime != null) {
@@ -59,7 +61,7 @@ public class SetActivityTimeTask implements ProxyPlanTask {
 			}
 			
 			if(i < plan.getActivities().size() - 1) {
-				ProxyObject next = plan.getLegs().get(i);
+				Element next = plan.getLegs().get(i);
 				endTime = next.getAttribute(CommonKeys.LEG_START_TIME);
 			}
 			

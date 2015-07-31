@@ -27,7 +27,7 @@ import java.util.Set;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
@@ -61,9 +61,9 @@ public class PkmTask extends AnalyzerTask {
 				ProxyPlan plan = person.getPlans().get(0);
 
 				for (int i = 1; i < plan.getLegs().size(); i++) {
-					ProxyObject leg = plan.getLegs().get(i);
+					Element leg = plan.getLegs().get(i);
 					if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
-						ProxyObject act = plan.getActivities().get(i + 1);
+						Element act = plan.getActivities().get(i + 1);
 						if (purpose == null || purpose.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							String value = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 							if (value != null) {

@@ -28,7 +28,8 @@ import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.gsv.misc.QuadTree;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.gsv.synPop.data.DataPool;
@@ -57,24 +58,26 @@ public class InitHomeBasedActLocations implements ProxyPlanTask {
 		/*
 		 * Assign facilities for act with already set facility id.
 		 */
-		for (ProxyObject act : plan.getActivities()) {
+		for (Element act : plan.getActivities()) {
 			String id = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
 			if (id != null) {
 				Id<ActivityFacility> idObj = Id.create(id, ActivityFacility.class);
 				ActivityFacility f = data.getAll().getFacilities().get(idObj);
-				act.setUserData(ActivityLocationMutator.USER_DATA_KEY, f);
+				((PlainElement)act).setUserData(ActivityLocationMutator.USER_DATA_KEY, f);
 			}
 		}
 
 		for (int i = 0; i < plan.getActivities().size(); i++) {
-			ProxyObject act = plan.getActivities().get(i);
+			PlainElement act = (PlainElement)plan.getActivities().get(i);
 			ActivityFacility f = (ActivityFacility) act.getUserData(ActivityLocationMutator.USER_DATA_KEY);
 			if (f == null) {
 				String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 				if (i > 0) {
-					ProxyObject prev = plan.getActivities().get(i - 1);
-					ProxyObject leg = plan.getLegs().get(i - 1);
-					ActivityFacility prevFac = (ActivityFacility) prev.getUserData(ActivityLocationMutator.USER_DATA_KEY);
+					PlainElement prev = (PlainElement)plan.getActivities().get(i - 1);
+					PlainElement leg = (PlainElement)plan.getLegs().get(i - 1);
+					ActivityFacility prevFac = (ActivityFacility) prev.getUserData
+							(ActivityLocationMutator
+							.USER_DATA_KEY);
 					String targetDist = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 					if (prevFac != null && targetDist != null) {
 						double d = Double.parseDouble(targetDist);

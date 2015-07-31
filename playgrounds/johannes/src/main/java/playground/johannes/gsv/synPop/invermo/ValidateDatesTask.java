@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.invermo;
 import java.util.HashMap;
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 
@@ -47,7 +47,7 @@ public class ValidateDatesTask implements ProxyPlanTask {
 
 	@Override
 	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
+		for(Element leg : plan.getLegs()) {
 			String startYear = leg.getAttribute("startTimeYear");
 			if(startYear != null)
 				leg.setAttribute("startTimeYear", validate(startYear));

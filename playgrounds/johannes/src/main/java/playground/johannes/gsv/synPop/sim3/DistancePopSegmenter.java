@@ -24,7 +24,8 @@ import java.util.Collection;
 import java.util.List;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
@@ -51,7 +52,7 @@ public class DistancePopSegmenter implements PopulationSegmenter {
 		for(ProxyPerson person : persons) {
 			double max = 0;
 			for(ProxyPlan plan : person.getPlans()) {
-				for(ProxyObject leg : plan.getLegs()) {
+				for(Element leg : plan.getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(val != null) {
 						max = Math.max(Double.parseDouble(val), max);

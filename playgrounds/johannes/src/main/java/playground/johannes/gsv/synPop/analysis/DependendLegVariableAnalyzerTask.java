@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.analysis;
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.sna.math.Discretizer;
@@ -55,7 +55,7 @@ public class DependendLegVariableAnalyzerTask extends AnalyzerTask {
 
         for(ProxyPerson person : persons) {
             for(ProxyPlan plan : person.getPlans()) {
-                for(ProxyObject leg : plan.getLegs()) {
+                for(Element leg : plan.getLegs()) {
                     String xStr = leg.getAttribute(xKey);
                     String yStr = leg.getAttribute(yKey);
 

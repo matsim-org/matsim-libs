@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.Element;
+
 /**
  * @author johannes
  *
@@ -32,12 +34,12 @@ public class FixMissingActTimesTask implements ProxyPlanTask {
 	@Override
 	public void apply(ProxyPlan plan) {
 		for(int i = 0; i < plan.getActivities().size(); i++) {
-			ProxyObject act = plan.getActivities().get(i);
+			Element act = plan.getActivities().get(i);
 			
 			if(act.getAttribute(CommonKeys.ACTIVITY_START_TIME) == null) {
 				
 				if(i > 0) {
-					ProxyObject prev = plan.getActivities().get(i - 1);
+					Element prev = plan.getActivities().get(i - 1);
 					String timeStr = prev.getAttribute(CommonKeys.ACTIVITY_END_TIME);
 					if(timeStr != null) {
 						int prevEndTime = Integer.parseInt(timeStr); 
@@ -53,7 +55,7 @@ public class FixMissingActTimesTask implements ProxyPlanTask {
 			if(act.getAttribute(CommonKeys.ACTIVITY_END_TIME) == null) {
 				
 				if(i < plan.getActivities().size() - 2) {
-					ProxyObject next = plan.getActivities().get(i + 1);
+					Element next = plan.getActivities().get(i + 1);
 					String timeStr = next.getAttribute(CommonKeys.ACTIVITY_START_TIME);
 					
 					if(timeStr != null) {

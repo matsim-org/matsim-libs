@@ -34,7 +34,7 @@ import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.sna.gis.CRSUtils;
@@ -89,7 +89,7 @@ public class PopulationDensityTask extends AnalyzerTask {
 			ProxyPlan plan = person.getPlans().get(0);
 			
 			ActivityFacility home = null;
-			for(ProxyObject act : plan.getActivities()) {
+			for(Element act : plan.getActivities()) {
 				if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					String idStr = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
 					Id<ActivityFacility> id = Id.create(idStr, ActivityFacility.class);

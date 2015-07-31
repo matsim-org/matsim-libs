@@ -20,6 +20,8 @@
 package playground.johannes.gsv.synPop;
 
 
+import playground.johannes.synpop.data.Element;
+
 /**
  * @author johannes
  *
@@ -36,8 +38,8 @@ public class SetActivityTypeTask implements ProxyPlanTask {
 		}
 		
 		for(int i = 0; i < plan.getLegs().size(); i++) {
-			ProxyObject leg = plan.getLegs().get(i);
-			ProxyObject act = plan.getActivities().get(i + 1);
+			Element leg = plan.getLegs().get(i);
+			Element act = plan.getActivities().get(i + 1);
 			
 			act.setAttribute(CommonKeys.ACTIVITY_TYPE, leg.getAttribute(CommonKeys.LEG_PURPOSE));
 		}

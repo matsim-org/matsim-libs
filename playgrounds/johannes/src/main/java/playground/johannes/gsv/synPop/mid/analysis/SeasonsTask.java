@@ -30,7 +30,7 @@ import java.util.Set;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
@@ -74,7 +74,7 @@ public class SeasonsTask extends AnalyzerTask {
 			}
 			
 			Set<String> modes = new HashSet<String>();
-			for(ProxyObject leg : person.getPlan().getLegs()) {
+			for(Element leg : person.getPlan().getLegs()) {
 				modes.add(leg.getAttribute(CommonKeys.LEG_MODE));
 			}
 			

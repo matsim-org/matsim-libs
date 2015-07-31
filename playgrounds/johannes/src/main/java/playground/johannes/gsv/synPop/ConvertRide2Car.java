@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 import org.matsim.api.core.v01.TransportMode;
+import playground.johannes.synpop.data.Element;
 
 /**
  * @author johannes
@@ -29,7 +30,7 @@ public class ConvertRide2Car implements ProxyPlanTask {
 
 	@Override
 	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
+		for(Element leg : plan.getLegs()) {
 			if(TransportMode.ride.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 				leg.setAttribute(CommonKeys.LEG_MODE, TransportMode.car);
 			}

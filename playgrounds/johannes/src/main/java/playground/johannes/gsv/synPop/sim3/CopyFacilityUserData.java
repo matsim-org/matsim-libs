@@ -26,7 +26,8 @@ import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
@@ -50,8 +51,9 @@ public class CopyFacilityUserData implements SamplerListener {
 
 			for (ProxyPerson person : population) {
 				for (ProxyPlan plan : person.getPlans()) {
-					for (ProxyObject act : plan.getActivities()) {
-						ActivityFacility f = (ActivityFacility) act.getUserData(ActivityLocationMutator.USER_DATA_KEY);
+					for (Element act : plan.getActivities()) {
+						ActivityFacility f = (ActivityFacility) ((PlainElement)act).getUserData(ActivityLocationMutator
+								.USER_DATA_KEY);
 						if (f != null) {
 							act.setAttribute(CommonKeys.ACTIVITY_FACILITY, f.getId().toString());
 						} else {

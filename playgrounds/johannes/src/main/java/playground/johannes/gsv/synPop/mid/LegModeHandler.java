@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.mid;
 import java.util.Map;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 
 /**
  * @author johannes
@@ -31,10 +31,10 @@ import playground.johannes.gsv.synPop.ProxyObject;
 public class LegModeHandler implements LegAttributeHandler {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyObject, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.synpop.data.PlainElement, java.util.Map)
 	 */
 	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
+	public void handle(PlainElement leg, Map<String, String> attributes) {
 		String mode = attributes.get(MIDKeys.LEG_MODE);
 		if(mode.equalsIgnoreCase("zu Fuß")) {
 			leg.setAttribute(CommonKeys.LEG_MODE, CommonKeys.LEG_MODE_PED);

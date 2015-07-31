@@ -29,7 +29,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.sna.math.LinearDiscretizer;
@@ -60,8 +60,8 @@ public class LegDistanceTask extends AnalyzerTask {
 			ProxyPlan plan = person.getPlan();
 
 			for(int i = 0; i < plan.getLegs().size(); i++) {
-				ProxyObject leg = plan.getLegs().get(i);
-				ProxyObject act = plan.getActivities().get(i + 1);
+				Element leg = plan.getLegs().get(i);
+				Element act = plan.getActivities().get(i + 1);
 			
 				if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 					

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
@@ -48,7 +48,7 @@ public class LegHandlerAdaptor implements AttributeHandler<ProxyPlan> {
 					int idx = Character.getNumericValue(key.charAt(1));
 					idx = idx - 1;
 					while (idx > plan.getLegs().size() - 1) {
-						plan.addLeg(new ProxyObject());
+						plan.addLeg(new PlainElement());
 					}
 
 					for (LegAttributeHandler legHandler : delegates)

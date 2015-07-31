@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
@@ -51,7 +51,7 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 		double cnt = 0;
 		
 		for (int i = 1; i < person.getPlan().getActivities().size(); i++) {
-			ProxyObject leg = person.getPlan().getLegs().get(i - 1);
+			PlainElement leg = (PlainElement)person.getPlan().getLegs().get(i - 1);
 			Double targetDistance = (Double) leg.getUserData(TARGET_DISTANCE_KEY);
 			
 			if (targetDistance == null) {
@@ -64,8 +64,8 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 			if (targetDistance != null) {
 				targetSum += targetDistance;
 
-				ProxyObject prev = person.getPlan().getActivities().get(i - 1);
-				ProxyObject next = person.getPlan().getActivities().get(i);
+				PlainElement prev = (PlainElement)person.getPlan().getActivities().get(i - 1);
+				PlainElement next = (PlainElement)person.getPlan().getActivities().get(i);
 				double dist = distance(prev, next);
 				realSum += dist;
 
@@ -92,7 +92,7 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 		}
 	}
 	
-	private double distance(ProxyObject origin, ProxyObject destination) {
+	private double distance(PlainElement origin, PlainElement destination) {
 		ActivityFacility orgFac = (ActivityFacility) origin.getUserData(ActivityLocationMutator.USER_DATA_KEY);
 		ActivityFacility destFac = (ActivityFacility) destination.getUserData(ActivityLocationMutator.USER_DATA_KEY);
 

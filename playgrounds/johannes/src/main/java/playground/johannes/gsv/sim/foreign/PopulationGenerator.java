@@ -52,7 +52,7 @@ import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLWriter;
@@ -288,16 +288,16 @@ public class PopulationGenerator {
 		ProxyPlan plan = new ProxyPlan();
 		plan.setAttribute(CommonKeys.DATA_SOURCE, "foreign");
 
-		ProxyObject origAct = new ProxyObject();
+		PlainElement origAct = new PlainElement();
 		origAct.setAttribute(CommonKeys.ACTIVITY_TYPE, origType);
 		origAct.setAttribute(CommonKeys.ACTIVITY_FACILITY, orig.getId().toString());
 		origAct.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
 		origAct.setAttribute(CommonKeys.ACTIVITY_END_TIME, "1");
 
-		ProxyObject leg = new ProxyObject();
+		PlainElement leg = new PlainElement();
 		leg.setAttribute(CommonKeys.LEG_MODE, "car");
 
-		ProxyObject targetAct = new ProxyObject();
+		PlainElement targetAct = new PlainElement();
 		targetAct.setAttribute(CommonKeys.ACTIVITY_TYPE, targetType);
 		targetAct.setAttribute(CommonKeys.ACTIVITY_FACILITY, target.getId().toString());
 		targetAct.setAttribute(CommonKeys.ACTIVITY_START_TIME, "86399");

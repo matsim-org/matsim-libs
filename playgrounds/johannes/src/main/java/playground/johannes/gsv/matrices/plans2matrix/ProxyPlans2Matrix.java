@@ -40,7 +40,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLParser;
@@ -100,9 +100,9 @@ public class ProxyPlans2Matrix {
 		for (ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlans().get(0);
 			for (int i = 0; i < plan.getLegs().size(); i++) {
-				ProxyObject leg = plan.getLegs().get(i);
-				ProxyObject prev = plan.getActivities().get(i);
-				ProxyObject next = plan.getActivities().get(i + 1);
+				Element leg = plan.getLegs().get(i);
+				Element prev = plan.getActivities().get(i);
+				Element next = plan.getActivities().get(i + 1);
 
 				legCandidates++;
 				if (predicate.test(person, leg, prev, next)) {

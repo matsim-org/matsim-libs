@@ -24,7 +24,7 @@ import java.util.Map;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 
@@ -58,7 +58,7 @@ public class ReplaceActTypes implements ProxyPlanTask {
 
 	@Override
 	public void apply(ProxyPlan plan) {
-		for (ProxyObject act : plan.getActivities()) {
+		for (Element act : plan.getActivities()) {
 			String origType = act.getAttribute(ORIGINAL_TYPE);
 			if (origType == null) {
 				String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);

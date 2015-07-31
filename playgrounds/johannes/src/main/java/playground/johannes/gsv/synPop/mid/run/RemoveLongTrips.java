@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.data.DataPool;
@@ -74,8 +74,8 @@ public class RemoveLongTrips {
 		for(ProxyPerson person : persons) {
 			for(ProxyPlan plan : person.getPlans()) {
 				for(int i = 0; i < plan.getLegs().size(); i++) {
-					ProxyObject origin = plan.getActivities().get(i);
-					ProxyObject destination = plan.getActivities().get(i + 1);
+					Element origin = plan.getActivities().get(i);
+					Element destination = plan.getActivities().get(i + 1);
 					
 					Id<ActivityFacility> id1 = Id.create(origin.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					Id<ActivityFacility> id2 = Id.create(destination.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);

@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.PlainElement;
+
 /**
  * @author johannes
  *
@@ -33,7 +35,7 @@ public class InsertActivitiesTask implements ProxyPlanTask {
 		int nLegs = plan.getLegs().size();
 		
 		for(int i = 0; i < nLegs+1; i++) {
-			ProxyObject activity = new ProxyObject();
+			PlainElement activity = new PlainElement();
 			plan.addActivity(activity);
 		}
 

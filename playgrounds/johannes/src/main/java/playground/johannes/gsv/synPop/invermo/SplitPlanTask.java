@@ -22,18 +22,18 @@ package playground.johannes.gsv.synPop.invermo;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.iterators.ProxyIterator;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.PlainElement;
 
 /**
  * @author johannes
@@ -69,8 +69,8 @@ public class SplitPlanTask implements ProxyPersonTask {
 		}
 		
 		for (int i = 0; i < plan.getLegs().size(); i++) {
-			ProxyObject leg = plan.getLegs().get(i);
-			ProxyObject act = plan.getActivities().get(i);
+			Element leg = plan.getLegs().get(i);
+			Element act = plan.getActivities().get(i);
 			
 			DateTime current = getDate(leg);
 			if(current == null) {
@@ -86,28 +86,28 @@ public class SplitPlanTask implements ProxyPersonTask {
 			if (nights > 0) {
 				subPlan.setAttribute(MIDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
 
-				subPlan.addActivity(act.clone());
+				subPlan.addActivity(((PlainElement)act).clone());
 				newPlans.add(subPlan);
 				
 				subPlan = new ProxyPlan();
-				subPlan.addActivity(act.clone());
-				subPlan.addLeg(leg.clone());
+				subPlan.addActivity(((PlainElement)act).clone());
+				subPlan.addLeg(((PlainElement)leg).clone());
 			} else {
 				subPlan.setAttribute(MIDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
 				
-				subPlan.addActivity(act.clone());
-				subPlan.addLeg(leg.clone());
+				subPlan.addActivity(((PlainElement)act).clone());
+				subPlan.addLeg(((PlainElement)leg).clone());
 			}
 			
 			prev = current;
 		}
 		
 		int size = plan.getActivities().size();
-		subPlan.addActivity(plan.getActivities().get(size - 1).clone());
+		subPlan.addActivity(((PlainElement)plan.getActivities().get(size - 1)).clone());
 		newPlans.add(subPlan);
 	}
 	
-	private DateTime getDate(ProxyObject leg) {
+	private DateTime getDate(Element leg) {
 		String time = leg.getAttribute(CommonKeys.LEG_START_TIME);
 		if(time == null) {
 			/*

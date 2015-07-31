@@ -29,7 +29,7 @@ import java.util.Map;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
@@ -58,7 +58,7 @@ public class DistanceJourneyDaysTask extends AnalyzerTask {
 				for (ProxyPlan plan : person.getPlans()) {
 					String dayVal = plan.getAttribute(MIDKeys.JOURNEY_DAYS);
 					if (dayVal != null) {
-						for (ProxyObject leg : plan.getLegs()) {
+						for (Element leg : plan.getLegs()) {
 							if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 								String distVal = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 								if (distVal != null) {

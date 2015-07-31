@@ -23,7 +23,7 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
@@ -47,7 +47,7 @@ public class MunicipalityDistanceTask extends AnalyzerTask {
         for(ProxyPerson person : persons) {
             String xStr = person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS);
             for(ProxyPlan plan : person.getPlans()) {
-                for(ProxyObject leg : plan.getLegs()) {
+                for(Element leg : plan.getLegs()) {
 
                     String yStr = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 

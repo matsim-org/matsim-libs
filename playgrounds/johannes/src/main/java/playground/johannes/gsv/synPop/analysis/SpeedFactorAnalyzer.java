@@ -31,7 +31,7 @@ import java.util.Set;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.sna.math.LinearDiscretizer;
@@ -66,7 +66,7 @@ public class SpeedFactorAnalyzer extends AnalyzerTask {
 			double sumDur = 0;
 			for(ProxyPerson person : persons) {
 				ProxyPlan plan = person.getPlan();
-				for(ProxyObject leg : plan.getLegs()) {
+				for(Element leg : plan.getLegs()) {
 					if(mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 					String distVal = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					String startVal = leg.getAttribute(CommonKeys.LEG_START_TIME);

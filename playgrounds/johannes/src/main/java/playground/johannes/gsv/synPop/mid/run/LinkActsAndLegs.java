@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLParser;
@@ -60,15 +60,15 @@ public class LinkActsAndLegs {
 		for(ProxyPerson person : persons) {
 			for(ProxyPlan plan : person.getPlans()) {
 				plan.setAttribute("id", String.valueOf(counter++));
-				ProxyObject act = plan.getActivities().get(0);
+				Element act = plan.getActivities().get(0);
 				act.setAttribute("id", String.valueOf(counter++));
 				act.setAttribute("prevAct", act.getAttribute("id"));
 				act.setAttribute("nextAct", act.getAttribute("id"));
 
 				for(int i = 0; i < plan.getLegs().size(); i++) {
-					ProxyObject prevAct = plan.getActivities().get(i);
-					ProxyObject leg = plan.getLegs().get(i);
-					ProxyObject nextAct = plan.getActivities().get(i+1);
+					Element prevAct = plan.getActivities().get(i);
+					Element leg = plan.getLegs().get(i);
+					Element nextAct = plan.getActivities().get(i+1);
 
 //					prevAct.setAttribute("id", String.valueOf(counter++));
 					leg.setAttribute("id", String.valueOf(counter++));

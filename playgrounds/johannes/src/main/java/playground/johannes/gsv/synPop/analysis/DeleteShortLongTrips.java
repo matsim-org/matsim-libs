@@ -21,7 +21,8 @@ package playground.johannes.gsv.synPop.analysis;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
@@ -46,7 +47,7 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 	@Override
 	public void apply(ProxyPlan plan) {
 		for (int i = 0; i < plan.getLegs().size(); i++) {
-			ProxyObject leg = plan.getLegs().get(i);
+			Element leg = plan.getLegs().get(i);
 			String value = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 			if (value != null) {
 				double dist = Double.parseDouble(value);
@@ -63,21 +64,21 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 		}
 
 		for (int i = 0; i < plan.getLegs().size(); i++) {
-			ProxyObject leg = plan.getLegs().get(i);
+			Element leg = plan.getLegs().get(i);
 			if ("true".equalsIgnoreCase(leg.getAttribute(CommonKeys.DELETE))) {
-				ProxyObject prev = plan.getActivities().get(i);
-				ProxyObject next = plan.getActivities().get(i + 1);
+				Element prev = plan.getActivities().get(i);
+				Element next = plan.getActivities().get(i + 1);
 
 				if (ActivityType.HOME.equalsIgnoreCase(prev.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					if (plan.getActivities().size() > i + 2) {
-						ProxyObject act = plan.getActivities().get(i + 2);
+						Element act = plan.getActivities().get(i + 2);
 						if (ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							next.setAttribute(CommonKeys.DELETE, "true");
 						}
 					}
 				} else if (ActivityType.HOME.equalsIgnoreCase(next.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					if (i - 1 >= 0) {
-						ProxyObject act = plan.getActivities().get(i - 1);
+						Element act = plan.getActivities().get(i - 1);
 						if (ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							prev.setAttribute(CommonKeys.DELETE, "true");
 						}
@@ -90,7 +91,7 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 		 * if there is only one leg
 		 */
 		if(plan.getLegs().size() == 1) {
-			ProxyObject leg = plan.getLegs().get(0);
+			Element leg = plan.getLegs().get(0);
 			if ("true".equalsIgnoreCase(leg.getAttribute(CommonKeys.DELETE))) {
 				plan.getActivities().clear();
 				plan.getLegs().clear();
@@ -100,12 +101,12 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 		boolean flag = true;
 		while (flag) {
 			for (int i = 0; i < plan.getActivities().size(); i++) {
-				ProxyObject act = plan.getActivities().get(i);
+				Element act = plan.getActivities().get(i);
 				if ("true".equalsIgnoreCase(act.getAttribute(CommonKeys.DELETE))) {
 					flag = true;
 
-					ProxyObject nextAct = plan.getActivities().get(i + 1);
-					ProxyObject thisAct = plan.getActivities().get(i - 1);
+					Element nextAct = plan.getActivities().get(i + 1);
+					Element thisAct = plan.getActivities().get(i - 1);
 
 					plan.getActivities().remove(i);
 					plan.getActivities().remove(i);
@@ -124,12 +125,12 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 	}
 
 	private boolean isReturnLeg(ProxyPlan plan, int current, int candidate) {
-		ProxyObject prevAct = plan.getActivities().get(current);
-		ProxyObject nextAct = plan.getActivities().get(current + 1);
+		Element prevAct = plan.getActivities().get(current);
+		Element nextAct = plan.getActivities().get(current + 1);
 
 		if (candidate > 0 && candidate < plan.getLegs().size()) {
-			ProxyObject prevAct2 = plan.getActivities().get(candidate);
-			ProxyObject nextAct2 = plan.getActivities().get(candidate + 1);
+			Element prevAct2 = plan.getActivities().get(candidate);
+			Element nextAct2 = plan.getActivities().get(candidate + 1);
 
 			if (prevAct.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)
 					&& nextAct2.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase(ActivityType.HOME)) {

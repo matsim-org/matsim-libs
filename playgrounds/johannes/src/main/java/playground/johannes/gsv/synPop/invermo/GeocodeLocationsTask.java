@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.ProxyPlan;
@@ -80,14 +80,14 @@ public class GeocodeLocationsTask implements ProxyPersonTask {
 	public void apply(ProxyPerson person) {
 		geocodeField(InvermoKeys.HOME_LOCATION, InvermoKeys.HOME_COORD, person);
 		for (ProxyPlan plan : person.getPlans()) {
-			for (ProxyObject act : plan.getActivities()) {
+			for (Element act : plan.getActivities()) {
 				geocodeField("location", "coord", act);
 			}
 		}
 
 	}
 
-	private void geocodeField(String key1, String key2, ProxyObject obj) {
+	private void geocodeField(String key1, String key2, Element obj) {
 		String start = obj.getAttribute(key1);
 		if (start != null && !start.equalsIgnoreCase("home") && !start.equalsIgnoreCase("work") && !start.equalsIgnoreCase("prev")) {
 			String str = cache.get(start);

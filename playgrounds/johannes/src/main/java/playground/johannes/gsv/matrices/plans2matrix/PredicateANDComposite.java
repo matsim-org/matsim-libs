@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.sna.util.Composite;
 
@@ -30,7 +30,7 @@ import playground.johannes.sna.util.Composite;
 public class PredicateANDComposite extends Composite<Predicate> implements Predicate {
 
 	@Override
-	public boolean test(ProxyPerson person, ProxyObject leg, ProxyObject prev, ProxyObject next) {
+	public boolean test(ProxyPerson person, Element leg, Element prev, Element next) {
 		for(Predicate p : components) {
 			if(!p.test(person, leg, prev, next)) {
 				return false;

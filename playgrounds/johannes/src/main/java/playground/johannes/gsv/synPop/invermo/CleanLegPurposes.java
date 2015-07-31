@@ -20,7 +20,8 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 
@@ -35,7 +36,7 @@ public class CleanLegPurposes implements ProxyPlanTask {
 	 */
 	@Override
 	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
+		for(Element leg : plan.getLegs()) {
 			leg.removeAttribute(CommonKeys.LEG_PURPOSE);
 		}
 

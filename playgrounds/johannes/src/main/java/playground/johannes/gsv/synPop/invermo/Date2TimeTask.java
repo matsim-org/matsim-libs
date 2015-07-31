@@ -25,7 +25,7 @@ import org.joda.time.LocalDateTime;
 import org.joda.time.Seconds;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
@@ -40,7 +40,7 @@ public class Date2TimeTask implements ProxyPlanTask {
 	public void apply(ProxyPlan plan) {
 		LocalDateTime reference = null;
 		
-		for(ProxyObject leg : plan.getLegs()) {
+		for(Element leg : plan.getLegs()) {
 			String start = leg.getAttribute(CommonKeys.LEG_START_TIME);
 			if(start != null) {
 				if(reference == null) {
@@ -51,7 +51,7 @@ public class Date2TimeTask implements ProxyPlanTask {
 				Seconds secs = Seconds.secondsBetween(reference, startDate);
 				
 				leg.setAttribute(CommonKeys.LEG_START_TIME, String.valueOf(secs.getSeconds()));
-				if(!leg.getAttributes().containsKey(MIDKeys.PERSON_MONTH)) {
+				if(!leg.keys().contains(MIDKeys.PERSON_MONTH)) {
 					setPlanDate(startDate, plan);
 				}
 			}
@@ -67,7 +67,7 @@ public class Date2TimeTask implements ProxyPlanTask {
 				
 				leg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(secs.getSeconds()));
 				
-				if(!leg.getAttributes().containsKey(MIDKeys.PERSON_MONTH)) {
+				if(!leg.keys().contains(MIDKeys.PERSON_MONTH)) {
 					setPlanDate(endDate, plan);
 				}
 			}

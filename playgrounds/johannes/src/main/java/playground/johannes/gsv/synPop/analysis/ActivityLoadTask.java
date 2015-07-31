@@ -27,7 +27,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.sna.util.TXTWriter;
@@ -79,7 +80,7 @@ public class ActivityLoadTask implements ProxyAnalyzerTask {
 			ProxyPlan plan = person.getPlan();
 			
 			if(plan.getActivities().size() > 1) {
-			for(ProxyObject act : plan.getActivities()) {
+			for(Element act : plan.getActivities()) {
 				
 				if(type == null || ((String)act.getAttribute(CommonKeys.ACTIVITY_TYPE)).equalsIgnoreCase(type)) {
 					int start = Integer.parseInt(act.getAttribute(CommonKeys.ACTIVITY_START_TIME));

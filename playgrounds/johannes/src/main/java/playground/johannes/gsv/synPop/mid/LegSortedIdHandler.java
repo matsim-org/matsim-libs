@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.mid;
 
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 
 /**
  * @author johannes
@@ -30,7 +30,7 @@ import playground.johannes.gsv.synPop.ProxyObject;
 public class LegSortedIdHandler implements LegAttributeHandler {
 
 	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
+	public void handle(PlainElement leg, Map<String, String> attributes) {
 		String sid = attributes.get("wsid");
 		leg.setAttribute(MIDKeys.LEG_INDEX, sid);
 	}

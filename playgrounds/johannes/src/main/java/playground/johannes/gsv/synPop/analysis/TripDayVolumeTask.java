@@ -28,7 +28,8 @@ import java.util.Map;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
@@ -53,7 +54,7 @@ public class TripDayVolumeTask extends AnalyzerTask {
 			for(ProxyPlan plan : person.getPlans()) {
 				
 				int cnt = 0;
-				for(ProxyObject leg : plan.getLegs()) {
+				for(Element leg : plan.getLegs()) {
 					if(mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 						cnt++;
 					}

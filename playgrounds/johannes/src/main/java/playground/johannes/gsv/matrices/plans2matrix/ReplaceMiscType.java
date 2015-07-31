@@ -27,7 +27,7 @@ import java.util.Collection;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonsTask;
 import playground.johannes.gsv.synPop.ProxyPlan;
@@ -48,7 +48,7 @@ public class ReplaceMiscType implements ProxyPersonsTask {
 		
 		for(ProxyPerson person : persons) {
 			for(ProxyPlan plan : person.getPlans()) {
-				for(ProxyObject act : plan.getActivities()) {
+				for(Element act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 					if(!ActivityType.HOME.equalsIgnoreCase(type) && !ActivityType.MISC.equalsIgnoreCase(type)) {
 						typeCounts.adjustOrPutValue(type, 1, 1);
@@ -66,7 +66,7 @@ public class ReplaceMiscType implements ProxyPersonsTask {
 		
 		for(ProxyPerson person : persons) {
 			for(ProxyPlan plan : person.getPlans()) {
-				for(ProxyObject act : plan.getActivities()) {
+				for(Element act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 					if(type == null || type.equalsIgnoreCase(ActivityType.MISC)) {
 						type = types.randomWeightedChoice();
