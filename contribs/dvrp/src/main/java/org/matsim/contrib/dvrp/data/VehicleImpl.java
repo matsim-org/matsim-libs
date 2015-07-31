@@ -36,7 +36,7 @@ public class VehicleImpl
     private final double t0;
     private double t1;
 
-    private final Schedule<? extends AbstractTask> schedule;
+    private Schedule<? extends AbstractTask> schedule;
 
     private VrpAgentLogic agentLogic;
 
@@ -121,4 +121,8 @@ public class VehicleImpl
     {
         this.t1 = t1;
     }
+    
+    public void resetSchedule(){
+   	 schedule = new ScheduleImpl<AbstractTask>(this);
+   }
 }
