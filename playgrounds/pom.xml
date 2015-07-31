@@ -9,12 +9,10 @@
 	<name>MATSim-Playgrounds</name>
 
 	<scm>
-		<connection>scm:svn:https://svn.code.sf.net/p/matsim/source/playgrounds/trunk</connection>
-		<developerConnection>scm:svn:https://svn.code.sf.net/p/matsim/source/playgrounds/trunk</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://svn.code.sf.net/p/matsim/source/playgrounds/trunk</url>
+		<url>https://github.com/matsim-org/matsim</url>
+		<connection>scm:git:git://github.com/matsim-org/matsim.git</connection>
+		<developerConnection>scm:git:git@github.com:matsim-org/matsim.git</developerConnection>
 	</scm>
-
 	<build>
 		<plugins>
 			<plugin>
@@ -73,7 +71,6 @@
 	</build>
 
 	<modules>
-		<!--<module>acmarmol</module>-->
 		<!--<module>agarwalamit</module>-->
 		<module>andreas</module>
 		<!--<module>anhorni</module>-->
@@ -91,30 +88,24 @@
 		<module>droeder</module>
 		<module>duncan</module>
 		<module>dziemke</module>
-		<module>fabrice</module>
 		<!--<module>fhuelsmann</module>-->
-		<module>gleich</module>
 		<!--<module>gregor</module>-->
 		<!--<module>gunnar</module>-->
 		<!--<module>hbecker</module>-->
 		<module>ikaddoura</module>
 		<module>imob</module>
 		<module>ivtExt</module>
-		<!--<module>jbischoff</module>-->
-		<module>jhackney</module>
+		<module>jbischoff</module>
 		<module>jjoubert</module>
 		<module>johannes</module>
 		<!--<module>juliakern</module>-->
 		<module>kai</module>
 		<module>kturner</module>
-		<module>kyotouniv</module>
 		<!--<module>lcrociani</module>-->
 		<module>lkroeger</module>
 		<module>ma</module>
-		<module>meisterk</module>
-		<!--<module>michalm</module>-->
+		<module>michalm</module>
 		<module>mkillat</module>
-		<module>mmoyo</module>
 		<module>boku</module>
 		<module>mrieser</module>
 		<module>muelleki</module>
@@ -125,7 +116,6 @@
 		<module>pbouman</module>
 		<module>pieter</module>
 		<!--<module>boescpa</module>-->
-		<!--<module>qiuhan</module>-->
 		<module>run</module>
 		<module>sschroeder</module>
 		<module>sergioo</module>
@@ -143,21 +133,30 @@
 		<module>wisinee</module>
 		<!--<module>wrashid</module>-->
 		<module>yalcin</module>
-		<!--<module>yu</module>-->
-		<!--<module>fuerbas</module>-->
 		<module>ucsb</module>
 		<module>vsptelematics</module>
 		<module>vsp</module>
 		<module>vspshk</module>
-		<module>ssix</module>
 		<module>qvanheerden</module>
 		<module>wbean</module>
 		<module>vbmh</module>
 	</modules>
 	<repositories>
 		<repository>
+			<!-- Geotools is not on Maven central -->
+			<id>osgeo</id>
+			<name>Geotools repository</name>
+			<url>http://download.osgeo.org/webdav/geotools</url>
+		</repository>
+		<repository>
 			<id>matsim</id>
 			<url>http://matsim.org/m2repo</url>
+		</repository>
+		<repository>
+			<id>oss-jfrog-artifactory</id>
+			<name>artifactory-snapshots</name>
+			<snapshots/>
+			<url>http://oss.jfrog.org/artifactory/libs-snapshot</url>
 		</repository>
 	</repositories>
 	

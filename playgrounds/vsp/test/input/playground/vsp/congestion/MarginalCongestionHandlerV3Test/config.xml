@@ -116,8 +116,4 @@
 		<param name="randomSeed" value="1499" />
 	</module>
 	
-	<module name="scenario">
-		<param name="useTransit" value="false" />
-	</module>
-	
 </config>

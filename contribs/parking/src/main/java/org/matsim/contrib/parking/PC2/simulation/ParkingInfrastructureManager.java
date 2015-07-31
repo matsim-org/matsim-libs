@@ -391,6 +391,9 @@ public class ParkingInfrastructureManager {
 	}
 
 	public synchronized void unParkVehicle(PC2Parking parking, double departureTime, Id<Person> personId) {
+		// yyyy I would prefer if this could not be called publicly ... since it allows to bypass parkedVehicles.remove(personId);
+		// in personCarDepartureEvent(...).  kai, jul'15
+		
 		if (parking == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
@@ -402,9 +405,11 @@ public class ParkingInfrastructureManager {
 			if (!(parking instanceof PrivateParking)) {
 				addParkingToQuadTree(publicParkingsQuadTree, parking);
 				addParkingToQuadTree(publicParkingGroupQuadTrees.get(parking.getGroupName()), parking);
-				// yyyyyy I could speculate that full parking lots are removed from the quad tree, and it is re-added as soon
+				// I could speculate that full parking lots are removed from the quad tree, and it is re-added as soon
 				// as space becomes available.  But this is not commented, and it also does not look like it would work in that way.
 				// kai, jul'15
+				// No, actually I now think that it works.  When remainingCapacity==0, then the parking is removed from the list, and
+				// when (again) ==1, it is re-inserted.  In addition, it is re-inserted in reset.
 			}
 		}
 

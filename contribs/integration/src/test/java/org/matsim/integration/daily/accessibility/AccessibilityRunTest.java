@@ -50,8 +50,7 @@ public class AccessibilityRunTest {
 	@Test
 	public void doAccessibilityTest() {
 		// Input
-		//		String folderStructure = "../../"; // local
-		String folderStructure = "../../../"; // server
+		String folderStructure = "../../"; // local and server
 
 		String networkFile = folderStructure + "matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
