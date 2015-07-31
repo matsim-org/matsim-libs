@@ -121,11 +121,8 @@ public class VehicleImpl
     {
         this.t1 = t1;
     }
-
-
-    @Override
-    public void resetSchedule()
-    {
-        schedule = new ScheduleImpl<AbstractTask>(this);
-    }
+    
+    public void resetSchedule(){
+   	 schedule = new ScheduleImpl<AbstractTask>(this);
+   }
 }
