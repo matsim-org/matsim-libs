@@ -19,19 +19,18 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -57,7 +56,7 @@ public class KeepMidTrips {
 		Set<ProxyPerson> keep = new HashSet<>(persons.size());
 		
 		for(ProxyPerson person : persons) {
-			for(ProxyPlan plan : person.getPlans()) {
+			for(Episode plan : person.getPlans()) {
 				if(MIDKeys.MID_TRIPS.equalsIgnoreCase(plan.getAttribute(CommonKeys.DATA_SOURCE))) {
 					if(random.nextDouble() < proba) {
 						keep.add(person);

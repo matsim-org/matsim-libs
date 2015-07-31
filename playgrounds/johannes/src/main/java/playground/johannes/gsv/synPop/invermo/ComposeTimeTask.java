@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
+import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import playground.johannes.synpop.data.Element;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
  * @author johannes
@@ -43,7 +43,7 @@ public class ComposeTimeTask implements ProxyPlanTask {
 	 * .gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		for (Element leg : plan.getLegs()) {
 			setStartTime(leg);
 			setEndTime(leg);

@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.sna.util.Composite;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -31,7 +32,7 @@ public class ProxyPlanTaskComposite extends Composite<ProxyPlanTask> implements 
 	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		for(ProxyPlanTask task : components) {
 			task.apply(plan);
 		}

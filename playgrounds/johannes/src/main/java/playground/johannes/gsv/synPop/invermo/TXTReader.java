@@ -19,29 +19,9 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.DeleteModes;
-import playground.johannes.gsv.synPop.DeleteNoLegs;
-import playground.johannes.gsv.synPop.FixMissingActTimesTask;
-import playground.johannes.gsv.synPop.InsertActivitiesTask;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.ProxyPlanTaskComposite;
-import playground.johannes.gsv.synPop.SetActivityTimeTask;
-import playground.johannes.gsv.synPop.SetLegTimes;
-import playground.johannes.gsv.synPop.ValidateActTimesTask;
+import playground.johannes.gsv.synPop.*;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.gsv.synPop.invermo.sim.InitializeTargetDistance;
 import playground.johannes.gsv.synPop.io.XMLWriter;
@@ -49,8 +29,12 @@ import playground.johannes.gsv.synPop.mid.PersonAttributeHandler;
 import playground.johannes.gsv.synPop.mid.RowHandler;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author johannes
@@ -189,7 +173,7 @@ public class TXTReader {
 				logger.warn(String.format("Person %s not found.", id));
 			} else {
 				String planId = attributes.get("Reisenr");
-				ProxyPlan thePlan = null;
+				Episode thePlan = null;
 //				for(ProxyPlan plan : person.getPlans()) {
 //					if(plan.getAttribute("id").equals(planId)) {
 //						thePlan = plan;

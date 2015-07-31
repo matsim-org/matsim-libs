@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.synpop.data.Element;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -37,7 +37,7 @@ public class SetActivityLocations implements ProxyPlanTask {
 	 * .gsv.synPop.ProxyPerson)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 
 		for (int i = 0; i < plan.getLegs().size(); i++) {
 			Element leg = plan.getLegs().get(i);

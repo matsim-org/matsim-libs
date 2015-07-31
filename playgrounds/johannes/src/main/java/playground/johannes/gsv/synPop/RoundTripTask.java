@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainElement;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class RoundTripTask implements ProxyPlanTask {
 	private static final String ROUNDTRIP_SUFFIX = "";//":roundTrip";
 	
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		List<Integer> insertPoints = new ArrayList<Integer>();
 		
 		for(int i = 0; i < plan.getLegs().size(); i++) {

@@ -20,11 +20,10 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import org.joda.time.DateTime;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -40,7 +39,7 @@ public class InfereVacationsType implements ProxyPlanTask {
 	 * .gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		boolean hasVacations = false;
 		for (Element act : plan.getActivities()) {
 			if ("vacations".equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {

@@ -21,17 +21,16 @@ package playground.johannes.gsv.matrices.plans2matrix;
 
 import gnu.trove.TObjectIntHashMap;
 import gnu.trove.TObjectIntIterator;
-
-import java.util.Collection;
-
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonsTask;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.Collection;
 
 /**
  * @author johannes
@@ -47,7 +46,7 @@ public class ReplaceMiscType implements ProxyPersonsTask {
 		TObjectIntHashMap<String> typeCounts = new TObjectIntHashMap<>();
 		
 		for(ProxyPerson person : persons) {
-			for(ProxyPlan plan : person.getPlans()) {
+			for(Episode plan : person.getPlans()) {
 				for(Element act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 					if(!ActivityType.HOME.equalsIgnoreCase(type) && !ActivityType.MISC.equalsIgnoreCase(type)) {
@@ -65,7 +64,7 @@ public class ReplaceMiscType implements ProxyPersonsTask {
 		}
 		
 		for(ProxyPerson person : persons) {
-			for(ProxyPlan plan : person.getPlans()) {
+			for(Episode plan : person.getPlans()) {
 				for(Element act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 					if(type == null || type.equalsIgnoreCase(ActivityType.MISC)) {

@@ -19,19 +19,15 @@
 
 package playground.johannes.gsv.synPop.io;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-
-import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+
+import java.util.*;
 
 /**
  * @author johannes
@@ -45,7 +41,7 @@ public class XMLParser extends MatsimXmlParser {
 
 	private ProxyPerson person;
 
-	private ProxyPlan plan;
+	private Episode plan;
 
 	private List<String> blacklist = new ArrayList<>();
 

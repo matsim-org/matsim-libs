@@ -19,18 +19,14 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.*;
 
 /**
  * @author johannes
@@ -53,7 +49,7 @@ public class ProxyTaskRunner {
 		}
 		
 		for(ProxyPerson person : persons) {
-			for(ProxyPlan plan : person.getPlans())
+			for(Episode plan : person.getPlans())
 				task.apply(plan);
 			
 			if(verbose)
@@ -82,14 +78,14 @@ public class ProxyTaskRunner {
 		run(task, persons);
 		
 		for(ProxyPerson person : persons) {
-			List<ProxyPlan> remove = new ArrayList<>();
-			for(ProxyPlan plan : person.getPlans()) {
+			List<Episode> remove = new ArrayList<>();
+			for(Episode plan : person.getPlans()) {
 				if("true".equalsIgnoreCase(plan.getAttribute(CommonKeys.DELETE))) {
 					remove.add(plan);
 				}
 			}
 			
-			for(ProxyPlan plan : remove) {
+			for(Episode plan : remove) {
 				person.getPlans().remove(plan);
 			}
 			

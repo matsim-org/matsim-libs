@@ -19,21 +19,21 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainElement;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author johannes
@@ -47,20 +47,20 @@ public class SplitPlanTask implements ProxyPersonTask {
 
 	@Override
 	public void apply(ProxyPerson person) {
-		List<ProxyPlan> newPlans = new ArrayList<ProxyPlan>();
+		List<Episode> newPlans = new ArrayList<Episode>();
 		
-		for (ProxyPlan plan : person.getPlans()) {
+		for (Episode plan : person.getPlans()) {
 			splitPlan(plan, newPlans);
 		}
 
 		person.getPlans().clear();
 		
-		for(ProxyPlan plan : newPlans)
+		for(Episode plan : newPlans)
 			person.addPlan(plan);
 	}
 	
-	private void splitPlan(ProxyPlan plan, List<ProxyPlan> newPlans) {
-		ProxyPlan subPlan = new ProxyPlan();
+	private void splitPlan(Episode plan, List<Episode> newPlans) {
+		Episode subPlan = new ProxyPlan();
 
 		DateTime prev = getDate(plan.getLegs().get(0));
 		if(prev == null) {

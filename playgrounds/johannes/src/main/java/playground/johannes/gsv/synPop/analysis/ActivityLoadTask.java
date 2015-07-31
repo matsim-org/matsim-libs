@@ -20,18 +20,16 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author johannes
@@ -48,7 +46,7 @@ public class ActivityLoadTask implements ProxyAnalyzerTask {
 	public void analyze(Collection<ProxyPerson> persons) {
 		Set<String> purposes = new HashSet<String>();
 		for(ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
+			Episode plan = person.getPlan();
 			for(int i = 0; i < plan.getActivities().size(); i++) {
 				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}
@@ -77,7 +75,7 @@ public class ActivityLoadTask implements ProxyAnalyzerTask {
 		TDoubleDoubleHashMap loadMap = new TDoubleDoubleHashMap();
 		
 		for(ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
+			Episode plan = person.getPlan();
 			
 			if(plan.getActivities().size() > 1) {
 			for(Element act : plan.getActivities()) {

@@ -21,21 +21,19 @@ package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.synpop.data.Episode;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author johannes
@@ -52,7 +50,7 @@ public class HomeActChainTask extends AnalyzerTask {
 		TDoubleDoubleHashMap tripCounts = new TDoubleDoubleHashMap();
 		
 		for(ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
+			Episode plan = person.getPlan();
 			
 			List<String> achain = new ArrayList<>();
 			for(int i = 0; i < plan.getActivities().size(); i++) {

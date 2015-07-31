@@ -19,19 +19,19 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.gsv.synPop.ProxyPlan;
-
 /**
  * @author johannes
  * 
  */
-public class LegHandlerAdaptor implements AttributeHandler<ProxyPlan> {
+public class LegHandlerAdaptor implements AttributeHandler<Episode> {
 
 	private List<LegAttributeHandler> delegates = new ArrayList<LegAttributeHandler>();
 
@@ -40,7 +40,7 @@ public class LegHandlerAdaptor implements AttributeHandler<ProxyPlan> {
 	}
 
 	@Override
-	public void handleAttribute(ProxyPlan plan, Map<String, String> attributes) {
+	public void handleAttribute(Episode plan, Map<String, String> attributes) {
 		for (Entry<String, String> entry : attributes.entrySet()) {
 			if (ColumnKeys.validate(entry.getValue())) {
 				String key = entry.getKey();

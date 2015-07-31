@@ -19,27 +19,24 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
+import com.vividsolutions.jts.geom.Point;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.matsim.api.core.v01.Id;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
+import playground.johannes.coopsim.util.MatsimCoordUtils;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.socialnetworks.gis.DistanceCalculator;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.Id;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.ActivityFacility;
-
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
-import playground.johannes.socialnetworks.gis.DistanceCalculator;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * @author johannes
@@ -64,7 +61,7 @@ public class ActivityDistanceTask extends AnalyzerTask {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 
 		for (ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
+			Episode plan = person.getPlan();
 
 			for (int i = 1; i < plan.getActivities().size(); i++) {
 
@@ -97,7 +94,7 @@ public class ActivityDistanceTask extends AnalyzerTask {
 	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> types = new HashSet<String>();
 		for (ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
+			Episode plan = person.getPlan();
 			for (Element act : plan.getActivities()) {
 				types.add(act.getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}

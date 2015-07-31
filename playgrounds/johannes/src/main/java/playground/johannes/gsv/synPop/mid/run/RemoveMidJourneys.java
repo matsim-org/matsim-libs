@@ -19,17 +19,17 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -54,7 +54,7 @@ public class RemoveMidJourneys {
 		Set<ProxyPerson> remove = new HashSet<>(persons.size());
 		
 		for(ProxyPerson person : persons) {
-			for(ProxyPlan plan : person.getPlans()) {
+			for(Episode plan : person.getPlans()) {
 				if(MIDKeys.MID_JOUNREYS.equalsIgnoreCase(plan.getAttribute(CommonKeys.DATA_SOURCE))) {
 					if(random.nextDouble() < proba) {
 						remove.add(person);

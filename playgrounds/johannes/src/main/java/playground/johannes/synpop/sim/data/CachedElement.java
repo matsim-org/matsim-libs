@@ -32,10 +32,14 @@ public class CachedElement implements Element {
 
     private Map<Object, Object> cache;
 
-    private Element delegate;
+    private final Element delegate;
 
     public CachedElement(Element delegate) {
         this.delegate = delegate;
+    }
+
+    protected Element getDelegate() {
+        return  delegate;
     }
 
     @Override

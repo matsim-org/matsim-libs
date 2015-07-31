@@ -19,14 +19,14 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -47,9 +47,9 @@ public class JourneyPlans2PersonTask implements ProxyPersonTask {
 		int counter = 0;
 		double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
 
-		Set<ProxyPlan> journeyPlans = new HashSet<>();
+		Set<Episode> journeyPlans = new HashSet<>();
 
-		for (ProxyPlan plan : person.getPlans()) {
+		for (Episode plan : person.getPlans()) {
 			if ("midjourneys".equalsIgnoreCase(plan.getAttribute("datasource"))) {
 				ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), counter++));
 				for (Entry<String, String> entry : person.getAttributes().entrySet()) {
@@ -67,7 +67,7 @@ public class JourneyPlans2PersonTask implements ProxyPersonTask {
 			}
 		}
 
-		for (ProxyPlan plan : journeyPlans) {
+		for (Episode plan : journeyPlans) {
 			person.getPlans().remove(plan);
 		}
 

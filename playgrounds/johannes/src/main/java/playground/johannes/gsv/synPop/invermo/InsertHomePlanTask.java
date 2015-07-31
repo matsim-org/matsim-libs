@@ -20,10 +20,11 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
 
 /**
  * @author johannes
@@ -37,7 +38,7 @@ public class InsertHomePlanTask implements ProxyPersonTask {
 	@Override
 	public void apply(ProxyPerson person) {
 		if(person.getPlans().isEmpty()) {
-			ProxyPlan plan = new ProxyPlan();
+			Episode plan = new ProxyPlan();
 			PlainElement act = new PlainElement();
 			act.setAttribute(CommonKeys.ACTIVITY_TYPE, "home");
 			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");

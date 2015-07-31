@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.sim.data;
 
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
+
+import java.util.List;
 
 /**
  * @author johannes
- *
  */
-public class ConstrainedPlanTask implements ProxyPlanTask {
+public class CachedPerson extends CachedElement implements Person {
 
-	private final String key;
-	
-	private final String value;
-	
-	private final ProxyPlanTask delegate;
-	
-	public ConstrainedPlanTask(String key, String value, ProxyPlanTask delegate) {
-		this.key = key;
-		this.value = value;
-		this.delegate = delegate;
-	}
-	
-	@Override
-	public void apply(Episode plan) {
-		String val = plan.getAttribute(key);
-		if(value.equals(val)) {
-			delegate.apply(plan);
-		}
-	}
+    public CachedPerson(Person delegate) {
+        super(delegate);
+    }
 
+    @Override
+    public List<Episode> getPlans() {
+        return ((Person)getDelegate()).getPlans();
+    }
+
+    @Override
+    public void addPlan(Episode episode) {
+        ((Person)getDelegate()).addPlan(episode);
+    }
 }

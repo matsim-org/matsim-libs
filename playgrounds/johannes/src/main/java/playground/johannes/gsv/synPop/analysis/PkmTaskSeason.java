@@ -19,18 +19,17 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
 
 /**
  * @author johannes
@@ -77,8 +76,8 @@ public class PkmTaskSeason extends AnalyzerTask {
 			double pkm = 0;
 			for (ProxyPerson person : persons) {
 				String theSeason = person.getAttribute(CommonKeys.ACTIVITY_TYPE);
-				
-				ProxyPlan plan = person.getPlans().get(0);
+
+				Episode plan = person.getPlans().get(0);
 
 				for (int i = 1; i < plan.getLegs().size(); i++) {
 					Element leg = plan.getLegs().get(i);

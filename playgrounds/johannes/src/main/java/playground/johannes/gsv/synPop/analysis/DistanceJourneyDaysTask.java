@@ -21,20 +21,18 @@ package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author johannes
@@ -55,7 +53,7 @@ public class DistanceJourneyDaysTask extends AnalyzerTask {
 			TDoubleArrayList distances = new TDoubleArrayList();
 
 			for (ProxyPerson person : persons) {
-				for (ProxyPlan plan : person.getPlans()) {
+				for (Episode plan : person.getPlans()) {
 					String dayVal = plan.getAttribute(MIDKeys.JOURNEY_DAYS);
 					if (dayVal != null) {
 						for (Element leg : plan.getLegs()) {

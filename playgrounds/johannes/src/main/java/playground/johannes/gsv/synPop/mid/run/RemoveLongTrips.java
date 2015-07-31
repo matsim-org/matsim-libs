@@ -19,19 +19,12 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
@@ -39,6 +32,12 @@ import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -72,7 +71,7 @@ public class RemoveLongTrips {
 		
 		ProgressLogger.init(persons.size(), 2, 10);
 		for(ProxyPerson person : persons) {
-			for(ProxyPlan plan : person.getPlans()) {
+			for(Episode plan : person.getPlans()) {
 				for(int i = 0; i < plan.getLegs().size(); i++) {
 					Element origin = plan.getActivities().get(i);
 					Element destination = plan.getActivities().get(i + 1);

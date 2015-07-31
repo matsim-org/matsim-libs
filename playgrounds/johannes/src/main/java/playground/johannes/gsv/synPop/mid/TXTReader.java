@@ -19,17 +19,18 @@
 
 package playground.johannes.gsv.synPop.mid;
 
+import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
@@ -82,7 +83,7 @@ public class TXTReader {
 		 * add an empty plan to each person
 		 */
 		for(ProxyPerson person : persons.values()) {
-			ProxyPlan plan = new ProxyPlan();
+			Episode plan = new ProxyPlan();
 			plan.setAttribute(CommonKeys.DATA_SOURCE, MIDKeys.MID_TRIPS);
 			person.setPlan(plan);
 		}
@@ -144,8 +145,8 @@ public class TXTReader {
 		protected void handleRow(Map<String, String> attributes) {
 			String id = personIdBuilder(attributes);
 			ProxyPerson person = persons.get(id);
-			
-			ProxyPlan plan = new ProxyPlan();
+
+			Episode plan = new ProxyPlan();
 			plan.setAttribute(CommonKeys.DATA_SOURCE, MIDKeys.MID_JOUNREYS);
 			for(PlanAttributeHandler handler : planAttHandlers) {
 				handler.hanle(plan, attributes);

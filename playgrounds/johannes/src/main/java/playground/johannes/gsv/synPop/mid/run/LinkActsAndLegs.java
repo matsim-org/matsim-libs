@@ -19,20 +19,20 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
-import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -58,7 +58,7 @@ public class LinkActsAndLegs {
 		Random random = new XORShiftRandom();
 
 		for(ProxyPerson person : persons) {
-			for(ProxyPlan plan : person.getPlans()) {
+			for(Episode plan : person.getPlans()) {
 				plan.setAttribute("id", String.valueOf(counter++));
 				Element act = plan.getActivities().get(0);
 				act.setAttribute("id", String.valueOf(counter++));

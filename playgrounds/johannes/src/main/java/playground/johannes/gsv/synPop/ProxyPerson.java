@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainElement;
 
 import java.util.ArrayList;
@@ -29,13 +31,13 @@ import java.util.Map.Entry;
  * @author johannes
  *
  */
-public class ProxyPerson extends PlainElement {
+public class ProxyPerson extends PlainElement implements Person {
 
 	private String id;
 	
 //	private ProxyPlan plan;
 	
-	private List<ProxyPlan> plans = new ArrayList<ProxyPlan>();
+	private List<Episode> plans = new ArrayList<Episode>();
 	
 	public ProxyPerson(String id) {
 		this.id = id;		
@@ -45,7 +47,7 @@ public class ProxyPerson extends PlainElement {
 		return id;
 	}
 	
-	public void setPlan(ProxyPlan plan) {
+	public void setPlan(Episode plan) {
 //		this.plan = plan;
 		if(plans.isEmpty())
 			plans.add(plan);
@@ -53,16 +55,16 @@ public class ProxyPerson extends PlainElement {
 			plans.set(0, plan);
 	}
 	
-	public void addPlan(ProxyPlan plan) {
+	public void addPlan(Episode plan) {
 		plans.add(plan);
 	}
 	
-	public ProxyPlan getPlan() {
+	public Episode getPlan() {
 //		return plan;
 		return plans.get(0);
 	}
 	
-	public List<ProxyPlan> getPlans() {
+	public List<Episode> getPlans() {
 		return plans;
 	}
 	
@@ -78,8 +80,8 @@ public class ProxyPerson extends PlainElement {
 		}
 		
 //		clone.setPlan(plan.clone());
-		for(ProxyPlan plan : plans)
-			clone.addPlan(plan.clone());
+		for(Episode plan : plans)
+			clone.addPlan(((ProxyPlan)plan).clone());
 		
 		return clone;
 	}

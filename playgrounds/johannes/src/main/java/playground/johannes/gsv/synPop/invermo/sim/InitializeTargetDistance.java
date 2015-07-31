@@ -19,15 +19,13 @@
 
 package playground.johannes.gsv.synPop.invermo.sim;
 
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.gsv.synPop.invermo.InvermoKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
@@ -35,10 +33,10 @@ import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -57,7 +55,7 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 	}
 	
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		for(int i = 0; i < plan.getLegs().size(); i++) {
 			Element prev = plan.getActivities().get(i);
 			Element leg = plan.getLegs().get(i);

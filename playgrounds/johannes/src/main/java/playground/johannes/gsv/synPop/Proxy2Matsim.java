@@ -19,17 +19,10 @@
 
 package playground.johannes.gsv.synPop;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -40,12 +33,14 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author johannes
@@ -86,7 +81,7 @@ public class Proxy2Matsim {
 			Person person = factory.createPerson(Id.create(proxyPerson.getId(), Person.class));
 			pop.addPerson(person);
 
-			ProxyPlan proxyPlan = proxyPerson.getPlan();
+			Episode proxyPlan = proxyPerson.getPlan();
 			Plan plan = factory.createPlan();
 			person.addPlan(plan);
 			plans++;

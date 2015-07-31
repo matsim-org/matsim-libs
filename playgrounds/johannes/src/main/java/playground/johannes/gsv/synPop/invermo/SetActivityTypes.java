@@ -20,9 +20,9 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -34,7 +34,7 @@ public class SetActivityTypes implements ProxyPlanTask {
 	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		for(Element act : plan.getActivities()) {
 			if(InvermoKeys.HOME.equals(act.getAttribute(InvermoKeys.LOCATION))) {
 				act.setAttribute(CommonKeys.ACTIVITY_TYPE, InvermoKeys.HOME);

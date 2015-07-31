@@ -19,16 +19,16 @@
 
 package playground.johannes.gsv.synPop;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -72,8 +72,8 @@ public class CopyAttributes {
 				if (person.getPlans().size() > 1) {
 					throw new RuntimeException("Person has more than one plan.");
 				}
-				ProxyPlan plan = person.getPlans().get(0);
-				ProxyPlan templatePlan = template.getPlans().get(0);
+				Episode plan = person.getPlans().get(0);
+				Episode templatePlan = template.getPlans().get(0);
 				for (int i = 0; i < plan.getActivities().size(); i++) {
 					Element act = plan.getActivities().get(i);
 					Element templAct = templatePlan.getActivities().get(i);

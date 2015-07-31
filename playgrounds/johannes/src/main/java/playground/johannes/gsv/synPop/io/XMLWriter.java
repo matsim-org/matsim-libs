@@ -19,19 +19,19 @@
 
 package playground.johannes.gsv.synPop.io;
 
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
@@ -59,14 +59,14 @@ public class XMLWriter extends MatsimXmlWriter {
 		atts.add(new Tuple<String, String>(Constants.ID_KEY, person.getId()));
 		
 		writeStartTag(Constants.PERSON_TAG, atts);
-		for(ProxyPlan plan : person.getPlans())
+		for(Episode plan : person.getPlans())
 			writePlan(plan);
 		writeEndTag(Constants.PERSON_TAG);
 
 	}
 
-	private void writePlan(ProxyPlan plan) {
-		writeStartTag(Constants.PLAN_TAG, getAttributes(plan.getAttributes()));
+	private void writePlan(Episode plan) {
+		writeStartTag(Constants.PLAN_TAG, getAttributes(((ProxyPlan)plan).getAttributes()));
 		for (int i = 0; i < plan.getActivities().size(); i++) {
 			if (i > 0)
 				writeLeg(plan.getLegs().get(i - 1));

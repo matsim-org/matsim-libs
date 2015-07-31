@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
+import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.Episode;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
@@ -35,7 +35,7 @@ public class TrajectoryProxyBuilder {
 
 	public static Trajectory buildTrajectory(ProxyPerson person) {
 		Trajectory t = new Trajectory(null);
-		ProxyPlan plan = person.getPlan();
+		Episode plan = person.getPlan();
 		for(int i = 0; i < plan.getActivities().size(); i++) {
 			ProxyActAdaptor act = new ProxyActAdaptor(plan.getActivities().get(i));
 			t.addElement(act, act.getEndTime());

@@ -19,11 +19,13 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.Episode;
+
 /**
  * @author johannes
  *
  */
 public interface ProxyPlanTask {
 
-	public void apply(ProxyPlan plan);
+	public void apply(Episode plan);
 }

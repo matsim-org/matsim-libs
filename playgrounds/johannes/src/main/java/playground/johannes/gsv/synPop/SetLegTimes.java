@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -32,7 +32,7 @@ public class SetLegTimes implements ProxyPlanTask {
 	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		for(int i = 0; i < plan.getLegs().size(); i++) {
 			Element prev = plan.getActivities().get(i);
 			Element leg = plan.getLegs().get(i);

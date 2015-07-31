@@ -19,14 +19,14 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author johannes
@@ -57,7 +57,7 @@ public class ReplaceActTypes implements ProxyPlanTask {
 	}
 
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		for (Element act : plan.getActivities()) {
 			String origType = act.getAttribute(ORIGINAL_TYPE);
 			if (origType == null) {

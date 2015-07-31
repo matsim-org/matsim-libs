@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -31,7 +32,7 @@ public class ValidateActTimesTask implements ProxyPlanTask {
 	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		int prev = 0;
 		for(int i = 0; i < plan.getActivities().size(); i++) {
 			Element act = plan.getActivities().get(i);

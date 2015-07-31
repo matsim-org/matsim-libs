@@ -20,9 +20,9 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -31,7 +31,7 @@ import playground.johannes.gsv.synPop.ProxyPlanTask;
 public class RestoreActTypes implements ProxyPlanTask {
 
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		for(Element act : plan.getActivities()) {
 			String orig = act.getAttribute(ReplaceActTypes.ORIGINAL_TYPE);
 			if(orig != null) {

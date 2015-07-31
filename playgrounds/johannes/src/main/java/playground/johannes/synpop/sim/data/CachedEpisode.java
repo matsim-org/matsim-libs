@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +17,39 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.sim.data;
 
+import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+
+import java.util.List;
 
 /**
  * @author johannes
- *
  */
-public class ConstrainedPlanTask implements ProxyPlanTask {
+public class CachedEpisode extends CachedElement implements Episode {
 
-	private final String key;
-	
-	private final String value;
-	
-	private final ProxyPlanTask delegate;
-	
-	public ConstrainedPlanTask(String key, String value, ProxyPlanTask delegate) {
-		this.key = key;
-		this.value = value;
-		this.delegate = delegate;
-	}
-	
-	@Override
-	public void apply(Episode plan) {
-		String val = plan.getAttribute(key);
-		if(value.equals(val)) {
-			delegate.apply(plan);
-		}
-	}
+    public CachedEpisode(Episode delegate) {
+        super(delegate);
+    }
 
+    @Override
+    public List<Element> getActivities() {
+        return ((Episode)getDelegate()).getActivities();
+    }
+
+    @Override
+    public List<Element> getLegs() {
+        return ((Episode)getDelegate()).getLegs();
+    }
+
+    @Override
+    public void addActivity(Element activity) {
+        ((Episode)getDelegate()).addActivity(activity);
+    }
+
+    @Override
+    public void addLeg(Element leg) {
+        ((Episode)getDelegate()).addLeg(leg);
+    }
 }

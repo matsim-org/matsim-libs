@@ -19,17 +19,16 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class CopyFacilityUserData implements SamplerListener {
 
@@ -50,7 +49,7 @@ public class CopyFacilityUserData implements SamplerListener {
 			int cnt = 0;
 
 			for (ProxyPerson person : population) {
-				for (ProxyPlan plan : person.getPlans()) {
+				for (Episode plan : person.getPlans()) {
 					for (Element act : plan.getActivities()) {
 						ActivityFacility f = (ActivityFacility) ((PlainElement)act).getUserData(ActivityLocationMutator
 								.USER_DATA_KEY);

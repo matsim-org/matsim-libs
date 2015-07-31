@@ -1,18 +1,19 @@
 package playground.johannes.gsv.synPop;
 
+import org.apache.log4j.Logger;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
-import playground.johannes.synpop.data.Element;
 
 public class SortLegsTimeTask implements ProxyPlanTask {
 
 	private static final Logger logger = Logger.getLogger(SortLegsTimeTask.class);
 	
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		SortedMap<Double, Element> map = new TreeMap<Double, Element>();
 		/*
 		 * Insert leg according to start time or end time, respectively.

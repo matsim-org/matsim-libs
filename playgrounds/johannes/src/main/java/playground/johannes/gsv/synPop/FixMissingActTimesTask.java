@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -32,7 +33,7 @@ public class FixMissingActTimesTask implements ProxyPlanTask {
 	private static final int MIN_ACT_DURATION = 1;
 
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		for(int i = 0; i < plan.getActivities().size(); i++) {
 			Element act = plan.getActivities().get(i);
 			

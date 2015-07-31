@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainElement;
 
 /**
@@ -31,7 +32,7 @@ public class InsertActivitiesTask implements ProxyPlanTask {
 	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		int nLegs = plan.getLegs().size();
 		
 		for(int i = 0; i < nLegs+1; i++) {

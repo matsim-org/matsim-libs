@@ -21,9 +21,9 @@ package playground.johannes.gsv.matrices.plans2matrix;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -46,7 +46,7 @@ public class WeCommuterPredicate implements Predicate {
 			if (day.equalsIgnoreCase(CommonKeys.THURSDAY) || day.equalsIgnoreCase(CommonKeys.FRIDAY) || day.equalsIgnoreCase(CommonKeys.SATURDAY)
 					|| day.equalsIgnoreCase(CommonKeys.SUNDAY)) {
 				
-				ProxyPlan plan = person.getPlans().get(0);
+				Episode plan = person.getPlans().get(0);
 				Element weLeg = null;
 				
 				int cnt = 0;

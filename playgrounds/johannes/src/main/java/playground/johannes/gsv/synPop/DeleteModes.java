@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -36,8 +37,8 @@ public class DeleteModes implements ProxyPersonTask {
 	@Override
 	public void apply(ProxyPerson person) {
 		boolean found = false;
-		
-		ProxyPlan plan = person.getPlan();
+
+		Episode plan = person.getPlan();
 		for(Element leg : plan.getLegs()) {
 			if(mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 				found = true;

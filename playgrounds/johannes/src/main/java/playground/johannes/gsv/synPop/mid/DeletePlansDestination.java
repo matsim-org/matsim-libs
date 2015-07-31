@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -35,9 +35,9 @@ public class DeletePlansDestination implements ProxyPersonTask {
 
 	@Override
 	public void apply(ProxyPerson person) {
-		Set<ProxyPlan> remove = new HashSet<>();
+		Set<Episode> remove = new HashSet<>();
 
-		for (ProxyPlan plan : person.getPlans()) {
+		for (Episode plan : person.getPlans()) {
 			if ("midjourneys".equalsIgnoreCase(plan.getAttribute("datasource"))) {
 				for (Element leg : plan.getLegs()) {
 					if (!JourneyDestinationHandler.GERMANY.equals(leg.getAttribute(JourneyDestinationHandler.DESTINATION))) {
@@ -47,7 +47,7 @@ public class DeletePlansDestination implements ProxyPersonTask {
 			}
 		}
 
-		for (ProxyPlan plan : remove) {
+		for (Episode plan : remove) {
 			person.getPlans().remove(plan);
 		}
 

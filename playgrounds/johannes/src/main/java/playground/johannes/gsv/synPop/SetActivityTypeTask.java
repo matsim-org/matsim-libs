@@ -21,6 +21,7 @@ package playground.johannes.gsv.synPop;
 
 
 import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -32,7 +33,7 @@ public class SetActivityTypeTask implements ProxyPlanTask {
 	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		if(plan.getLegs().isEmpty()) {
 			plan.getActivities().get(0).setAttribute(CommonKeys.ACTIVITY_TYPE, "home");
 		}

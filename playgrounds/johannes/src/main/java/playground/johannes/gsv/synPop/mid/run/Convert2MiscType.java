@@ -21,9 +21,9 @@ package playground.johannes.gsv.synPop.mid.run;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -35,7 +35,7 @@ public class Convert2MiscType implements ProxyPlanTask {
 	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		for(Element act : plan.getActivities()) {
 			String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 			if("pickdrop".equalsIgnoreCase(type)) {

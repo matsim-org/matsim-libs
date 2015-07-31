@@ -21,13 +21,12 @@ package playground.johannes.gsv.synPop.analysis;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.Element;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -45,7 +44,7 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 	}
 
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		for (int i = 0; i < plan.getLegs().size(); i++) {
 			Element leg = plan.getLegs().get(i);
 			String value = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
@@ -124,7 +123,7 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 		}
 	}
 
-	private boolean isReturnLeg(ProxyPlan plan, int current, int candidate) {
+	private boolean isReturnLeg(Episode plan, int current, int candidate) {
 		Element prevAct = plan.getActivities().get(current);
 		Element nextAct = plan.getActivities().get(current + 1);
 

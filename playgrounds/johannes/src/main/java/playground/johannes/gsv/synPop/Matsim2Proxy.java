@@ -19,12 +19,6 @@
 
 package playground.johannes.gsv.synPop;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,10 +30,16 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -80,7 +80,7 @@ public class Matsim2Proxy {
 			ProxyPerson proxyPerson = proxyPresons.get(matsimPerson.getId().toString());
 			newProxyPersons.add(proxyPerson);
 			
-			ProxyPlan proxyPlan = proxyPerson.getPlans().get(0);
+			Episode proxyPlan = proxyPerson.getPlans().get(0);
 			
 			if (matsimPerson.getPlans().size() > 1) {
 				matsimPerson.removePlan(matsimPerson.getSelectedPlan());

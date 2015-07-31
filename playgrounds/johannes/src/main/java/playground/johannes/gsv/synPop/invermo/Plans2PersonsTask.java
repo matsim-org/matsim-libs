@@ -19,14 +19,15 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Episode;
+
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -64,7 +65,7 @@ public class Plans2PersonsTask implements ProxyPersonTask {
 				newPersons.add(newPerson);
 			}
 
-			ProxyPlan plan = person.getPlans().get(0);
+			Episode plan = person.getPlans().get(0);
 			person.getPlans().clear();
 			person.addPlan(plan);
 		}
