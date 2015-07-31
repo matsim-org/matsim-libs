@@ -47,6 +47,7 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -115,16 +116,16 @@ public class GenerateFundamentalDiagramData {
 
 	public static void main(String[] args) {
 
-		String RUN_DIR = "../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/qsim";
+		String RUN_DIR = "../../../repos/shared-svn/projects/mixedTraffic/triangularNetwork/run311";
 
-		String OUTPUT_FOLDER ="/singleModes/motorbike/";
+		String OUTPUT_FOLDER ="/carTruckPassing/";
 		// seepageAllowed, runDir, useHoles, useModifiedNetworkFactory, hole speed, distribution
 
-		String [] travelModes= {"motorbike"};
-		Double [] modalSplit = {1.}; // in pcu
+		String [] travelModes= {"car","truck"};
+		Double [] modalSplit = {1.,1.}; // in pcu
 
 		GenerateFundamentalDiagramData generateFDData = new GenerateFundamentalDiagramData();
-		
+
 		generateFDData.setTravelModes(travelModes);
 		generateFDData.setModalSplit(modalSplit);
 		generateFDData.setPassingAllowed(true);
@@ -133,8 +134,8 @@ public class GenerateFundamentalDiagramData {
 		generateFDData.setWriteInputFiles(true);
 		generateFDData.setRunDirectory(RUN_DIR+OUTPUT_FOLDER);
 		generateFDData.setUseHoles(false);
-		generateFDData.setReduceDataPointsByFactor(20);
-		generateFDData.setUsingSeepNetworkFactory(true);
+		generateFDData.setReduceDataPointsByFactor(4);
+		generateFDData.setUsingSeepNetworkFactory(false);
 		//		HOLE_SPEED = args[4];
 		generateFDData.setIsPlottingDistribution(false);
 		generateFDData.run();
@@ -171,7 +172,7 @@ public class GenerateFundamentalDiagramData {
 		inputs = new InputsForFDTestSetUp();
 		inputs.run();
 		scenario = inputs.getScenario();
-		
+
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 
 		if(WRITE_FD_DATA) openFileAndWriteHeader(RUN_DIR+"/data.txt");
@@ -448,7 +449,7 @@ public class GenerateFundamentalDiagramData {
 				writer.format("%.2f\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).getPermanentAverageVelocity());
 			}
 			writer.format("%.2f\t", passingEventsUpdator.getNoOfCarsPerKm());
-			
+
 			writer.format("%.2f\t", passingEventsUpdator.getTotalBikesPassedByAllCarsPerKm());
 
 			writer.format("%.2f\t", passingEventsUpdator.getAvgBikesPassingRate());
@@ -554,7 +555,7 @@ public class GenerateFundamentalDiagramData {
 			writer.print(strv+"\t");
 		}
 		writer.print("noOfCarsPerkm \t");
-		
+
 		writer.print("totalBikesPassedByAllCarsPerKm \t");
 
 		writer.print("avgBikePassingRatePerkm \t");
@@ -612,12 +613,12 @@ public class GenerateFundamentalDiagramData {
 
 	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
 
-		private MyPersonDriverAgentImpl delegate;
-		public boolean goHome;
+		private PersonDriverAgentImpl delegate;
+		public boolean isArriving;
 
 		public MyRoundAndRoundAgent(Person p, Plan unmodifiablePlan, QSim qSim) {
-			this.delegate = new MyPersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
-			this.goHome = false;//false at start, modified when all data is extracted.
+			this.delegate = new PersonDriverAgentImpl(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
+			this.isArriving = false;//false at start, modified when all data is extracted.
 		}
 
 		@Override
@@ -681,39 +682,54 @@ public class GenerateFundamentalDiagramData {
 		}
 
 		@Override
-		public final void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+		public final void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 			delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
 		}
 
 		@Override
 		public Id<Link> chooseNextLinkId() {
 			if (GenerateFundamentalDiagramData.globalFlowDynamicsUpdator.isPermanent()){ 
-				goHome = true; 
+				isArriving = true; 
 			}
 
-			Id<Link> lastLinkOnTriangularTrack = Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR - 1);
-			Id<Link> lastLinkOfBase = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR - 1);
+			if(delegate.getCurrentLinkId().equals(Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR-1))){
+				if ( isArriving) {
+					return Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR) ;
+				} else {
+					return Id.createLinkId(1) ;
+				}
+			} else if(delegate.getCurrentLinkId().equals(Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR-1))){
+				//last link on the track
+				return Id.createLinkId(0);
+			} else if (delegate.getCurrentLinkId().equals(Id.createLinkId(1))){
+				
+				return Id.createLinkId(2);
+			} else return delegate.chooseNextLinkId();
 
-			if(delegate.getCurrentLinkId().equals(lastLinkOnTriangularTrack)){
-				// person is on the last link of track and thus will continue moving on the track
-				Id<Link> afterLeftTurnLinkId = Id.createLinkId((0));
-				delegate.setCachedNextLinkId(afterLeftTurnLinkId);
-				delegate.setCurrentLinkIdIndex(0);
-				return afterLeftTurnLinkId;
-			} else if(delegate.getCurrentLinkId().equals(lastLinkOfBase) && goHome){
-				// if person is on the last link of the base and permament regime is reached.
-				// send person to arrive.
-				Id<Link> afterGoingStraightForwardLinkId = Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR);
-				delegate.setCachedNextLinkId(afterGoingStraightForwardLinkId);
-				delegate.setCurrentLinkIdIndex(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR);//This does work quite well so far and allows to end simulation.
-				return afterGoingStraightForwardLinkId;
-			} else {
-				return delegate.chooseNextLinkId();
-			}
+//			Id<Link> lastLinkOnTriangularTrack = Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR - 1);
+//			Id<Link> lastLinkOfBase = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR - 1);
+//
+//			if(delegate.getCurrentLinkId().equals(lastLinkOnTriangularTrack)){
+//				// person is on the last link of track and thus will continue moving on the track
+//				Id<Link> afterLeftTurnLinkId = Id.createLinkId((0));
+//				delegate.setCachedNextLinkId(afterLeftTurnLinkId);
+//				delegate.setCurrentLinkIdIndex(0);
+//				return afterLeftTurnLinkId;
+//			} else if(delegate.getCurrentLinkId().equals(lastLinkOfBase) && goHome){
+//				// if person is on the last link of the base and permament regime is reached.
+//				// send person to arrive.
+//				Id<Link> afterGoingStraightForwardLinkId = Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR);
+//				delegate.setCachedNextLinkId(afterGoingStraightForwardLinkId);
+//				delegate.setCurrentLinkIdIndex(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR);//This does work quite well so far and allows to end simulation.
+//				return afterGoingStraightForwardLinkId;
+//			} else {
+//				return delegate.chooseNextLinkId();
+//			}
+			
 		}
 
 		@Override
-		public void notifyMoveOverNode(Id newLinkId) {
+		public void notifyMoveOverNode(Id<Link> newLinkId) {
 			delegate.notifyMoveOverNode(newLinkId);
 		}
 
