@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package analyzer.act2mode;
+package playground.gleich.analyzer.act2mode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
