@@ -44,6 +44,7 @@ public class RunAccessibilityBe {
 		Double upperBound = 7.;
 		Integer range = 9;
 		int symbolSize = 1010;
+		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 				
 				
 //		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
@@ -250,7 +251,7 @@ public class RunAccessibilityBe {
 //				}
 //				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
 				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
-						lowerBound, upperBound, range, symbolSize);
+						lowerBound, upperBound, range, symbolSize, populationThreshold);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}
