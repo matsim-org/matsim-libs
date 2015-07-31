@@ -20,17 +20,15 @@
 package playground.johannes.gsv.synPop.mid.analysis;
 
 import gnu.trove.TObjectDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author johannes
@@ -46,9 +44,9 @@ public class MonthTask extends AnalyzerTask {
 	 * .Collection, java.util.Map)
 	 */
 	@Override
-	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
 		TObjectDoubleHashMap<String> values = new TObjectDoubleHashMap<>();
-		for (ProxyPerson person : persons) {
+		for (PlainPerson person : persons) {
 			String month = person.getAttribute(MIDKeys.PERSON_MONTH);
 			if (month != null) {
 				values.adjustOrPutValue(month, 1.0, 1.0);

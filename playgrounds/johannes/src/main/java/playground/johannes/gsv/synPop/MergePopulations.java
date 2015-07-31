@@ -19,14 +19,14 @@
 
 package playground.johannes.gsv.synPop;
 
+import org.apache.log4j.Logger;
+import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
 
 public class MergePopulations {
 	
@@ -51,17 +51,17 @@ public class MergePopulations {
 		
 		logger.info("Loading persons...");
 		parser.parse(args[0]);
-		Set<ProxyPerson> persons1 = parser.getPersons();
+		Set<PlainPerson> persons1 = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons1.size()));
 
 		logger.info("Loading persons...");
 		parser.parse(args[1]);
-		Set<ProxyPerson> persons2 = parser.getPersons();
+		Set<PlainPerson> persons2 = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons2.size()));
 
 //		logger.info("Loading persons...");
 //		parser.parse(args[2]);
-//		Set<ProxyPerson> persons3 = parser.getPersons();
+//		Set<PlainPerson> persons3 = parser.getPersons();
 //		logger.info(String.format("Loaded %s persons.", persons3.size()));
 
 		double w1 = 1;
@@ -90,10 +90,10 @@ public class MergePopulations {
 		logger.info(String.format("Person from population 2: %s", n2));
 //		logger.info(String.format("Person from population 2: %s", n3));
 		
-		Set<ProxyPerson> newPersons = new HashSet<>(N);
+		Set<PlainPerson> newPersons = new HashSet<>(N);
 		
 		logger.info("Merging population 1...");
-		Iterator<ProxyPerson> it = persons1.iterator();
+		Iterator<PlainPerson> it = persons1.iterator();
 		for(int i = 0; i < n1; i++) {
 			newPersons.add(it.next());
 		}

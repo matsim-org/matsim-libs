@@ -38,6 +38,7 @@ import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,11 +78,11 @@ public class Proxy2Matsim {
 		int legs = 0;
 		int plans = 0;
 
-		for (ProxyPerson proxyPerson : parser.getPersons()) {
-			Person person = factory.createPerson(Id.create(proxyPerson.getId(), Person.class));
+		for (PlainPerson plainPerson : parser.getPersons()) {
+			Person person = factory.createPerson(Id.create(plainPerson.getId(), Person.class));
 			pop.addPerson(person);
 
-			Episode proxyPlan = proxyPerson.getPlan();
+			Episode proxyPlan = plainPerson.getPlan();
 			Plan plan = factory.createPlan();
 			person.addPlan(plan);
 			plans++;

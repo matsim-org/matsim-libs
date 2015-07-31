@@ -19,16 +19,15 @@
 
 package playground.johannes.gsv.popsim;
 
+import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
+import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
+import playground.johannes.gsv.synPop.sim3.SamplerListener;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
-import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
 
 /**
  * @author johannes
@@ -53,7 +52,7 @@ public class AnalyzerListener implements SamplerListener {
 	}
 
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
 
 		if (iters.get() % interval == 0) {
 			String output = String.format("%s/%s", rootDir, String.valueOf(iters));

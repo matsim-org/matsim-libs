@@ -21,12 +21,12 @@ package playground.johannes.gsv.synPop.analysis;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -167,7 +167,7 @@ public class DeleteShortLongTrips implements ProxyPlanTask {
 		parser.parse("/home/johannes/gsv/mid2008/pop/hesen.car.wo3km.midjourneys.xml");
 
 		DeleteShortLongTrips task = new DeleteShortLongTrips(100000, false);
-		for (ProxyPerson person : parser.getPersons()) {
+		for (PlainPerson person : parser.getPersons()) {
 			task.apply(person.getPlans().get(0));
 		}
 

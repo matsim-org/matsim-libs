@@ -19,20 +19,19 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ConvertRide2Car;
 import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.DeleteShortLongTrips;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -52,7 +51,7 @@ public class PersonFilter {
 		logger.info("Loading persons...");
 		parser.parse("/home/johannes/gsv/mid2008/pop/pop.xml");
 //		parser.parse("/Users/jillenberger/Dropbox/work/raw/pop.xml");
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 //		logger.info("Cloning persons...");
@@ -91,8 +90,8 @@ public class PersonFilter {
 		writer.write(outDir + "pop.car.3-1000km.xml", persons);
 		
 		logger.info("Extracting MID trips...");
-		Set<ProxyPerson> newPersons = new HashSet<>();
-		for(ProxyPerson person : persons) {
+		Set<PlainPerson> newPersons = new HashSet<>();
+		for(PlainPerson person : persons) {
 			if(MIDKeys.MID_TRIPS.equalsIgnoreCase(person.getPlans().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
 				newPersons.add(person);
 			}
@@ -102,7 +101,7 @@ public class PersonFilter {
 		
 		logger.info("Extracting MID journeys...");
 		newPersons = new HashSet<>();
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			if(MIDKeys.MID_JOUNREYS.equalsIgnoreCase(person.getPlans().get(0).getAttribute(CommonKeys.DATA_SOURCE))) {
 				newPersons.add(person);
 			}

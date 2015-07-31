@@ -21,10 +21,9 @@ package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -36,7 +35,7 @@ public class TargetDistanceAbsolute implements Hamiltonian {
 
 	private static final Object TARGET_DISTANCE_KEY = new Object();
 
-	public double evaluate(ProxyPerson person) {
+	public double evaluate(PlainPerson person) {
 		double errSum = 0;
 		
 		for (int i = 1; i < person.getPlan().getActivities().size(); i++) {

@@ -19,15 +19,14 @@
 
 package playground.johannes.gsv.popsim;
 
-import java.io.IOException;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -51,7 +50,7 @@ public class Analyzer {
 		
 		parser.parse(personFile);
 
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		
 		
 //		logger.info("Cloning persons...");

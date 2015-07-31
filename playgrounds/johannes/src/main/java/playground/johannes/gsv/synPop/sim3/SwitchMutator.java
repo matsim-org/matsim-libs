@@ -19,12 +19,12 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
 
 public interface SwitchMutator {
 
-	public boolean mutate(ProxyPerson person1, ProxyPerson person2);
+	public boolean mutate(PlainPerson person1, PlainPerson person2);
 	
-	public void revert(ProxyPerson person1, ProxyPerson person2);
+	public void revert(PlainPerson person1, PlainPerson person2);
 	
 }

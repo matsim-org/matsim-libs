@@ -40,7 +40,7 @@ public class ComposeTimeTask implements ProxyPlanTask {
 	 * 
 	 * @see
 	 * playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes
-	 * .gsv.synPop.ProxyPlan)
+	 * .gsv.synPop.PlainEpisode)
 	 */
 	@Override
 	public void apply(Episode plan) {

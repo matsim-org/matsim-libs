@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.util.Collection;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.sna.util.Composite;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Collection;
 
 /**
  * @author johannes
@@ -31,7 +31,7 @@ import playground.johannes.sna.util.Composite;
 public class SamplerListenerComposite extends Composite<SamplerListener> implements SamplerListener {
 
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accpeted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accpeted) {
 		for(SamplerListener listener : components) {
 			listener.afterStep(population, mutations, accpeted);
 		}

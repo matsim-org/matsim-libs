@@ -24,11 +24,11 @@ import gnu.trove.TObjectIntIterator;
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonsTask;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
 
@@ -42,10 +42,10 @@ public class ReplaceMiscType implements ProxyPersonsTask {
 	 * @see playground.johannes.gsv.synPop.ProxyPersonsTask#apply(java.util.Collection)
 	 */
 	@Override
-	public void apply(Collection<ProxyPerson> persons) {
+	public void apply(Collection<PlainPerson> persons) {
 		TObjectIntHashMap<String> typeCounts = new TObjectIntHashMap<>();
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			for(Episode plan : person.getPlans()) {
 				for(Element act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
@@ -63,7 +63,7 @@ public class ReplaceMiscType implements ProxyPersonsTask {
 			types.addChoice(it.key(), it.value());
 		}
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			for(Episode plan : person.getPlans()) {
 				for(Element act : plan.getActivities()) {
 					String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);

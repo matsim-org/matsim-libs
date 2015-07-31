@@ -25,7 +25,6 @@ import com.vividsolutions.jts.geom.Point;
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.gsv.synPop.invermo.InvermoKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
@@ -35,6 +34,7 @@ import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Set;
 
@@ -109,7 +109,7 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 		
 		logger.info("Loading persons...");
 		parser.parse("/home/johannes/gsv/invermo/5.pop.xml");
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
 //		ProxyTaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);

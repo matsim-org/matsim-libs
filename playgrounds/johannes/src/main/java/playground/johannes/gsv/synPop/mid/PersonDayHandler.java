@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.util.Map;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Map;
 
 /**
  * @author johannes
@@ -34,7 +34,7 @@ public class PersonDayHandler implements PersonAttributeHandler {
 	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.synpop.data.PlainElement, java.util.Map)
 	 */
 	@Override
-	public void handle(ProxyPerson person, Map<String, String> attributes) {
+	public void handle(PlainPerson person, Map<String, String> attributes) {
 		String day = attributes.get(MIDKeys.SURVEY_DAY);
 		if(day.equalsIgnoreCase("Montag")) {
 			person.setAttribute(CommonKeys.DAY, CommonKeys.MONDAY);

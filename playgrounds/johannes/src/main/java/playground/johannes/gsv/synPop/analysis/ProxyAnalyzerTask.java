@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import java.util.Collection;
+import playground.johannes.synpop.data.PlainPerson;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
+import java.util.Collection;
 
 /**
  * @author johannes
@@ -29,5 +29,5 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public interface ProxyAnalyzerTask {
 
-	public void analyze(Collection<ProxyPerson> persons);
+	public void analyze(Collection<PlainPerson> persons);
 }

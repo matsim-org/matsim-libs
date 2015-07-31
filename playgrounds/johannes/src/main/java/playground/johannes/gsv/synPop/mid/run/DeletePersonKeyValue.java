@@ -20,8 +20,8 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -39,7 +39,7 @@ public class DeletePersonKeyValue implements ProxyPersonTask {
 	}
 	
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		String val = person.getAttribute(key);
 		if(!value.equalsIgnoreCase(val)) {
 			person.setAttribute(CommonKeys.DELETE, "true");

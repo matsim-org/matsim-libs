@@ -19,16 +19,16 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.util.List;
+import playground.johannes.synpop.data.PlainPerson;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
+import java.util.List;
 
 public interface Mutator {
 
-	public List<ProxyPerson> select(List<ProxyPerson> persons);
+	public List<PlainPerson> select(List<PlainPerson> persons);
 
-	public boolean modify(List<ProxyPerson> persons);
+	public boolean modify(List<PlainPerson> persons);
 	
-	public void revert(List<ProxyPerson> persons);
+	public void revert(List<PlainPerson> persons);
 	
 }

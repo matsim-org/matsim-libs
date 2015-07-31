@@ -19,13 +19,8 @@
 
 package playground.johannes.gsv.synPop.mid.sim;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.LandUseData;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
@@ -34,6 +29,10 @@ import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author johannes
@@ -51,7 +50,7 @@ public class PersonNuts1Name implements Hamiltonian {
 	}
 
 	@Override
-	public double evaluate(ProxyPerson person) {
+	public double evaluate(PlainPerson person) {
 		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
 		String name = nuts1Names.get(home);
 		

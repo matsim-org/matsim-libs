@@ -19,11 +19,11 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
 
 public class SwitchOperator implements Mutator {
 
@@ -31,7 +31,7 @@ public class SwitchOperator implements Mutator {
 	
 	private final Random random;
 	
-	private final List<ProxyPerson> mutations;
+	private final List<PlainPerson> mutations;
 
 	public SwitchOperator(SwitchMutator mutator, Random random) {
 		this.mutator = mutator;
@@ -43,9 +43,9 @@ public class SwitchOperator implements Mutator {
 	}
 	
 	@Override
-	public List<ProxyPerson> select(List<ProxyPerson> persons) {
-		ProxyPerson person1 = persons.get(random.nextInt(persons.size()));
-		ProxyPerson person2 = persons.get(random.nextInt(persons.size()));
+	public List<PlainPerson> select(List<PlainPerson> persons) {
+		PlainPerson person1 = persons.get(random.nextInt(persons.size()));
+		PlainPerson person2 = persons.get(random.nextInt(persons.size()));
 		
 		mutations.set(0, person1);
 		mutations.set(1, person2);
@@ -54,12 +54,12 @@ public class SwitchOperator implements Mutator {
 		
 	}
 	
-	public boolean modify(List<ProxyPerson> persons) {
+	public boolean modify(List<PlainPerson> persons) {
 		return mutator.mutate(persons.get(0), persons.get(1));
 	}
 
 	@Override
-	public void revert(List<ProxyPerson> persons) {
+	public void revert(List<PlainPerson> persons) {
 		mutator.revert(persons.get(0), persons.get(1));
 	}
 

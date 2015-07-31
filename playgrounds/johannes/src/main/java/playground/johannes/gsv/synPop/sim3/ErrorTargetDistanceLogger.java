@@ -20,18 +20,16 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author johannes
@@ -55,13 +53,13 @@ public class ErrorTargetDistanceLogger implements SamplerListener {
 	}
 	
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
 		if(iter.get() % logInterval == 0) {
 			long iterNow = iter.get();
 			double[] err = new double[population.size()];
 			double[] dist = new double[population.size()];
 			int i = 0;
-			for(ProxyPerson person : population) {
+			for(PlainPerson person : population) {
 				err[i] = h.evaluate(person);
 				double sum = 0;
 				for(Element leg : person.getPlans().get(0).getLegs()) {

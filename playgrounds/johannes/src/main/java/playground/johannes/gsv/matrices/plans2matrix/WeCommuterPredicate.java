@@ -21,9 +21,9 @@ package playground.johannes.gsv.matrices.plans2matrix;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -38,7 +38,7 @@ public class WeCommuterPredicate implements Predicate {
 	}
 	
 	@Override
-	public boolean test(ProxyPerson person, Element leg, Element prev, Element next) {
+	public boolean test(PlainPerson person, Element leg, Element prev, Element next) {
 		boolean result = false;
 
 		String day = person.getAttribute(CommonKeys.DAY);

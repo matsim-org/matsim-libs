@@ -34,8 +34,6 @@ import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.zones.Zone;
@@ -46,6 +44,8 @@ import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainEpisode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.File;
 import java.io.IOException;
@@ -161,7 +161,7 @@ public class PopulationGenerator {
 		/*
 		 * load matrix
 		 */
-		Set<ProxyPerson> persons = new HashSet<>();
+		Set<PlainPerson> persons = new HashSet<>();
 
 		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 		Future<?>[] futures = new Future[numThreads];
@@ -266,7 +266,7 @@ public class PopulationGenerator {
 		return intVolume;
 	}
 
-	private static ProxyPerson buildPerson(String id, ActivityFacility orig, ActivityFacility target, String origType, String targetType) {
+	private static PlainPerson buildPerson(String id, ActivityFacility orig, ActivityFacility target, String origType, String targetType) {
 		if(origType.equalsIgnoreCase("vacations")) {
 			origType = vacationProbas.randomWeightedChoice();
 		}
@@ -274,11 +274,11 @@ public class PopulationGenerator {
 			targetType = vacationProbas.randomWeightedChoice();
 		}
 		
-		ProxyPerson person = new ProxyPerson(id);
+		PlainPerson person = new PlainPerson(id);
 		person.setAttribute(CommonKeys.DAY, dayProbas.randomWeightedChoice());
 		person.setAttribute(MIDKeys.PERSON_MONTH, monthProbas.randomWeightedChoice());
 
-		Episode plan = new ProxyPlan();
+		Episode plan = new PlainEpisode();
 		plan.setAttribute(CommonKeys.DATA_SOURCE, "foreign");
 
 		PlainElement origAct = new PlainElement();
@@ -316,7 +316,7 @@ public class PopulationGenerator {
 
 		private double intVolume;
 
-		private final Set<ProxyPerson> persons;
+		private final Set<PlainPerson> persons;
 
 		private final String type;
 
@@ -358,7 +358,7 @@ public class PopulationGenerator {
 								} else {
 									for (int i = 0; i < volume; i++) {
 										ActivityFacility deFac = deList.get(random.nextInt(deList.size()));
-										ProxyPerson person = buildPerson(String.format("foreign.%s.%s.%s.%s", deZoneId, euZoneId, i, type), deFac, euFac,
+										PlainPerson person = buildPerson(String.format("foreign.%s.%s.%s.%s", deZoneId, euZoneId, i, type), deFac, euFac,
 												ActivityType.HOME, type);
 										persons.add(person);
 									}
@@ -379,7 +379,7 @@ public class PopulationGenerator {
 								} else {
 									for (int i = 0; i < volume; i++) {
 										ActivityFacility deFac = deList.get(random.nextInt(deList.size()));
-										ProxyPerson person = buildPerson(String.format("foreign.%s.%s.%s.%s", euZoneId, deZoneId, i, type), euFac, deFac, type,
+										PlainPerson person = buildPerson(String.format("foreign.%s.%s.%s.%s", euZoneId, deZoneId, i, type), euFac, deFac, type,
 												ActivityType.HOME);
 										persons.add(person);
 									}

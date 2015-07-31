@@ -20,19 +20,17 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author illenberger
@@ -73,7 +71,7 @@ public abstract class AnalyzerTask {
 		}
 	}
 	
-	public abstract void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results);
+	public abstract void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results);
 		
 	protected void writeHistograms(DescriptiveStatistics stats, String name, int bins, int minsize) throws IOException {
 		double[] values = stats.getValues();

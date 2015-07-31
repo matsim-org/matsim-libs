@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.util.Map;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Map;
 
 /**
  * @author johannes
@@ -31,10 +31,10 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 public class PersonAgeHandler implements PersonAttributeHandler {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.PersonAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyPerson, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.mid.PersonAttributeHandler#handle(playground.johannes.synpop.data.PlainPerson, java.util.Map)
 	 */
 	@Override
-	public void handle(ProxyPerson person, Map<String, String> attributes) {
+	public void handle(PlainPerson person, Map<String, String> attributes) {
 		String val = attributes.get(MIDKeys.PERSON_AGE);
 
 

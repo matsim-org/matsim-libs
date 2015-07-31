@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -41,7 +41,7 @@ public class ConstrainedPersonTask implements ProxyPersonTask {
 	}
 	
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		String val = person.getAttribute(key);
 		if(value.equals(val)) {
 			delegate.apply(person);

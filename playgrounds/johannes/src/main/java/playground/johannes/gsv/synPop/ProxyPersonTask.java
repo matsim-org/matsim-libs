@@ -19,11 +19,13 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.PlainPerson;
+
 /**
  * @author johannes
  *
  */
 public interface ProxyPersonTask {
 
-	public void apply(ProxyPerson person);
+	public void apply(PlainPerson person);
 }

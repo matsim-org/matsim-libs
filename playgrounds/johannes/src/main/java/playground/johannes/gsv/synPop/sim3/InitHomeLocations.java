@@ -21,30 +21,18 @@ package playground.johannes.gsv.synPop.sim3;
 
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonsTask;
-import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.gsv.synPop.data.LandUseData;
-import playground.johannes.gsv.synPop.data.LandUseDataLoader;
+import playground.johannes.gsv.synPop.data.*;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.*;
 
 /**
  * @author johannes
@@ -64,7 +52,7 @@ public class InitHomeLocations implements ProxyPersonsTask {
 	}
 
 	@Override
-	public void apply(Collection<ProxyPerson> persons) {
+	public void apply(Collection<PlainPerson> persons) {
 		LandUseData landUseData = (LandUseData) dataPool.get(LandUseDataLoader.KEY);
 
 		// ZoneLayer<Map<String, Object>> zoneLayer =
@@ -113,7 +101,7 @@ public class InitHomeLocations implements ProxyPersonsTask {
 
 		logger.info("Assigning facilities to persons...");
 		ProgressLogger.init(persons.size(), 2, 10);
-		List<ProxyPerson> shuffledPersons = new ArrayList<>(persons);
+		List<PlainPerson> shuffledPersons = new ArrayList<>(persons);
 		Collections.shuffle(shuffledPersons, random);
 		TObjectDoubleIterator<Zone<?>> it = zoneProba.iterator();
 		int j = 0;
@@ -138,7 +126,7 @@ public class InitHomeLocations implements ProxyPersonsTask {
 		
 		logger.info("Checking for homeless persons...");
 		int cnt = 0;
-		for(ProxyPerson person : shuffledPersons) {
+		for(PlainPerson person : shuffledPersons) {
 			if(person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY) == null) {
 				ActivityFacility f = homeFacils.get(random.nextInt(homeFacils.size()));
 				person.setUserData(SwitchHomeLocation.USER_FACILITY_KEY, f);

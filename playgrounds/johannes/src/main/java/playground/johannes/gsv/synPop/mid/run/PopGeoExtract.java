@@ -29,7 +29,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
@@ -39,6 +38,7 @@ import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -68,7 +68,7 @@ public class PopGeoExtract {
 
 		logger.info("Loading persons...");
 		parser.parse(infile);
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 		FacilityDataLoader loader = new FacilityDataLoader(facFile, null);
@@ -98,7 +98,7 @@ public class PopGeoExtract {
 		}
 
 		@Override
-		public void apply(ProxyPerson person) {
+		public void apply(PlainPerson person) {
 			boolean keep = false;
 
 			for (Episode plan : person.getPlans()) {

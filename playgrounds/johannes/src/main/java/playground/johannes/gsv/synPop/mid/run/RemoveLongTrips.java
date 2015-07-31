@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
@@ -34,6 +33,7 @@ import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -54,7 +54,7 @@ public class RemoveLongTrips {
 		parser.setValidating(false);
 		parser.parse(args[0]);
 		
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		
 		double proba = Double.parseDouble(args[4]);
 		double threshold = Double.parseDouble(args[3]);
@@ -65,12 +65,12 @@ public class RemoveLongTrips {
 		dataPool.register(new FacilityDataLoader(args[2], random), FacilityDataLoader.KEY);
 		FacilityData fData = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
 		
-		Set<ProxyPerson> remove = new HashSet<>(persons.size());
+		Set<PlainPerson> remove = new HashSet<>(persons.size());
 		
 		logger.info("Processing persons...");
 		
 		ProgressLogger.init(persons.size(), 2, 10);
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			for(Episode plan : person.getPlans()) {
 				for(int i = 0; i < plan.getLegs().size(); i++) {
 					Element origin = plan.getActivities().get(i);
@@ -103,7 +103,7 @@ public class RemoveLongTrips {
 		
 		logger.info(String.format("Removing %s persons.", remove.size()));
 		
-		for(ProxyPerson person : remove) {
+		for(PlainPerson person : remove) {
 			persons.remove(person);
 		}
 		

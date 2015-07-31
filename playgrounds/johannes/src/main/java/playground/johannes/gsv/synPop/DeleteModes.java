@@ -21,6 +21,7 @@ package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -35,7 +36,7 @@ public class DeleteModes implements ProxyPersonTask {
 	}
 	
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		boolean found = false;
 
 		Episode plan = person.getPlan();

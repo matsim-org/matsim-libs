@@ -20,17 +20,11 @@
 package playground.johannes.gsv.synPop.mid;
 
 import gnu.trove.TObjectDoubleHashMap;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.*;
 
 /**
  * @author johannes
@@ -38,21 +32,21 @@ import playground.johannes.sna.util.ProgressLogger;
  */
 public class PersonCloner {
 
-	public static Set<ProxyPerson> weightedClones(Collection<ProxyPerson> persons, int N, Random random) {
+	public static Set<PlainPerson> weightedClones(Collection<PlainPerson> persons, int N, Random random) {
 		if(persons.size() == N) {
-			return new HashSet<ProxyPerson>(persons); //TODO weights are left untouched
+			return new HashSet<PlainPerson>(persons); //TODO weights are left untouched
 		} else if(persons.size() > N) {
 			throw new IllegalArgumentException("Cannot shrink population.");
 		}
 		
-		List<ProxyPerson> templates = new ArrayList<ProxyPerson>(persons);
+		List<PlainPerson> templates = new ArrayList<PlainPerson>(persons);
 		/*
 		 * get max weight
 		 */
-		TObjectDoubleHashMap<ProxyPerson> weights = new TObjectDoubleHashMap<ProxyPerson>(persons.size());
+		TObjectDoubleHashMap<PlainPerson> weights = new TObjectDoubleHashMap<PlainPerson>(persons.size());
 		double maxW = 0;
 //		double minW = Double.MAX_VALUE;
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			String wStr = person.getAttribute(CommonKeys.PERSON_WEIGHT);
 			double w = 0;
 			if(wStr != null) {
@@ -66,9 +60,9 @@ public class PersonCloner {
 		 * adjust weight so that max weight equals probability 1
 		 */
 		ProgressLogger.init(N, 2, 10);
-		Set<ProxyPerson> clones = new HashSet<ProxyPerson>();
+		Set<PlainPerson> clones = new HashSet<PlainPerson>();
 		while(clones.size() < N) {
-			ProxyPerson template = templates.get(random.nextInt(templates.size()));
+			PlainPerson template = templates.get(random.nextInt(templates.size()));
 //			double w = (Double) template.getAttribute(CommonKeys.PERSON_WEIGHT);
 			double w = weights.get(template);
 			double p = w/maxW;
@@ -78,7 +72,7 @@ public class PersonCloner {
 				builder.append("clone");
 				builder.append(clones.size());
 				
-				ProxyPerson clone = template.cloneWithNewId(builder.toString());
+				PlainPerson clone = template.cloneWithNewId(builder.toString());
 				clone.setAttribute(CommonKeys.PERSON_WEIGHT, "1.0");
 				clones.add(clone);
 				ProgressLogger.step();

@@ -25,6 +25,7 @@ import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,25 +49,25 @@ public class CopyAttributes {
 		parser.setValidating(false);
 //		subsample = true;
 		parser.parse(args[0]);
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 
 		parser = new XMLParser();
 		parser.setValidating(false);
 //		subsample = false;
 		parser.parse(args[1]);
 
-		Map<String, ProxyPerson> templates = new HashMap<>();
-		for (ProxyPerson person : parser.getPersons()) {
+		Map<String, PlainPerson> templates = new HashMap<>();
+		for (PlainPerson person : parser.getPersons()) {
 			String id = person.getId(); // extractId(person);
 			templates.put(id, person);
 		}
 
 		int cnt = 0;
 		ProgressLogger.init(persons.size(), 2, 10);
-		for (ProxyPerson person : persons) {
+		for (PlainPerson person : persons) {
 //			String id = person.getId();
 			String id = extractId(person);
-			ProxyPerson template = templates.get(id);
+			PlainPerson template = templates.get(id);
 
 			if (template != null) {
 				if (person.getPlans().size() > 1) {
@@ -94,7 +95,7 @@ public class CopyAttributes {
 		writer.write(args[2], persons);
 	}
 
-	private static String extractId(ProxyPerson person) {
+	private static String extractId(PlainPerson person) {
 		String id = person.getId();
 		int idx = id.indexOf("clone");
 		if (idx > -1) {

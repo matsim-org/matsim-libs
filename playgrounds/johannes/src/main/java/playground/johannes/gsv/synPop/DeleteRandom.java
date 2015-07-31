@@ -19,9 +19,10 @@
 
 package playground.johannes.gsv.synPop;
 
-import java.util.Random;
-
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Random;
 
 /**
  * @author johannes
@@ -43,7 +44,7 @@ public class DeleteRandom implements ProxyPersonTask {
 		this.proba = proba;
 	}
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		if(proba > random.nextDouble()) {
 			person.setAttribute(CommonKeys.DELETE, "true");
 		}

@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -28,10 +29,10 @@ import playground.johannes.synpop.data.Element;
 public class DeleteNegativeDurationTask implements ProxyPersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.gsv.synPop.ProxyPerson)
+	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		for(Element leg : person.getPlan().getLegs()) {
 			String start = leg.getAttribute(CommonKeys.LEG_START_TIME);
 			String end = leg.getAttribute(CommonKeys.LEG_END_TIME);

@@ -20,8 +20,7 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.facilities.ActivityFacility;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -32,17 +31,17 @@ public class SwitchHomeLocation implements SwitchMutator {
 	public static final Object USER_FACILITY_KEY = new Object();
 	
 	@Override
-	public boolean mutate(ProxyPerson person1, ProxyPerson person2) {
+	public boolean mutate(PlainPerson person1, PlainPerson person2) {
 		switchFacilities(person1, person2);
 		return true;
 	}
 
 	@Override
-	public void revert(ProxyPerson person1, ProxyPerson person2) {
+	public void revert(PlainPerson person1, PlainPerson person2) {
 		switchFacilities(person1, person2);
 	}
 	
-	private void switchFacilities(ProxyPerson person1, ProxyPerson person2) {
+	private void switchFacilities(PlainPerson person1, PlainPerson person2) {
 		ActivityFacility f1 = (ActivityFacility) person1.getUserData(USER_FACILITY_KEY);
 		ActivityFacility f2 = (ActivityFacility) person2.getUserData(USER_FACILITY_KEY);
 		

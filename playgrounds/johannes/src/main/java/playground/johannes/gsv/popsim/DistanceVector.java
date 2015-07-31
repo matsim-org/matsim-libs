@@ -19,16 +19,15 @@
 
 package playground.johannes.gsv.popsim;
 
+import org.apache.log4j.Logger;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.sim3.Hamiltonian;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 
 /**
  * @author johannes
@@ -40,7 +39,7 @@ public class DistanceVector implements Hamiltonian {
 
 	public static final Object INCOME_KEY = new Object();
 
-	private final List<ProxyPerson> referencePop;
+	private final List<PlainPerson> referencePop;
 
 	private double ageMin = Double.MAX_VALUE;
 
@@ -58,13 +57,13 @@ public class DistanceVector implements Hamiltonian {
 
 	private final Random random;
 
-	public DistanceVector(Collection<ProxyPerson> referencePop, Random random) {
+	public DistanceVector(Collection<PlainPerson> referencePop, Random random) {
 		this.referencePop = new ArrayList<>(referencePop);
 		this.random = random;
 
 		int cnt = 0;
 
-		for (ProxyPerson person : referencePop) {
+		for (PlainPerson person : referencePop) {
 			Double age = getAttribute(person, CommonKeys.PERSON_AGE, AGE_KEY);
 			Double income = getAttribute(person, CommonKeys.HH_INCOME, INCOME_KEY);
 
@@ -84,15 +83,15 @@ public class DistanceVector implements Hamiltonian {
 	}
 
 	@Override
-	public double evaluate(ProxyPerson person) {
+	public double evaluate(PlainPerson person) {
 		Double age = getAttribute(person, CommonKeys.PERSON_AGE, AGE_KEY);
 //		Double income = getAttribute(person, CommonKeys.HH_INCOME, INCOME_KEY);
 
 		double totalDelta = 0;
 
-		// for (ProxyPerson ref : referencePop) {
+		// for (PlainPerson ref : referencePop) {
 		for (int i = 0; i < 100; i++) {
-			ProxyPerson ref = referencePop.get(random.nextInt(referencePop.size()));
+			PlainPerson ref = referencePop.get(random.nextInt(referencePop.size()));
 
 			Double refAge = getAttribute(ref, CommonKeys.PERSON_AGE, AGE_KEY);
 //			Double refIncome = getAttribute(ref, CommonKeys.HH_INCOME, INCOME_KEY);
@@ -120,7 +119,7 @@ public class DistanceVector implements Hamiltonian {
 		return totalDelta / 100.0;
 	}
 
-	private Double getAttribute(ProxyPerson person, String strKey, Object objKey) {
+	private Double getAttribute(PlainPerson person, String strKey, Object objKey) {
 		Double doubleVal = (Double) person.getUserData(objKey);
 		if (doubleVal == null) {
 			String stringVal = person.getAttribute(strKey);

@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import playground.johannes.synpop.data.Element;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -36,7 +36,7 @@ public class MonthPredicate implements Predicate {
 	}
 
 	@Override
-	public boolean test(ProxyPerson person, Element leg, Element prev, Element next) {
+	public boolean test(PlainPerson person, Element leg, Element prev, Element next) {
 		if (month == null || month.equalsIgnoreCase(person.getAttribute(MIDKeys.PERSON_MONTH))) {
 			return true;
 		} else {

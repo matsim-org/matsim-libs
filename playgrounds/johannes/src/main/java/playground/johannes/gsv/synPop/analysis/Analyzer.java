@@ -19,34 +19,15 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.FacilitiesReaderMatsimV1;
-
-import playground.johannes.coopsim.analysis.ActTypeShareTask;
-import playground.johannes.coopsim.analysis.ActivityDurationTask;
-import playground.johannes.coopsim.analysis.ActivityLoadTask;
-import playground.johannes.coopsim.analysis.ArrivalLoadTask;
-import playground.johannes.coopsim.analysis.DepartureLoadTask;
-import playground.johannes.coopsim.analysis.LegFrequencyTask;
-import playground.johannes.coopsim.analysis.LegLoadTask;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TripDurationTask;
-import playground.johannes.coopsim.analysis.TripPurposeShareTask;
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.analysis.MonthTask;
 import playground.johannes.gsv.synPop.mid.analysis.SeasonsTask;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -70,16 +51,16 @@ public class Analyzer {
 		
 		parser.parse(personFile);
 
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		
-		Set<ProxyPerson> remove = new HashSet<>();
-		for(ProxyPerson person : persons) {
+		Set<PlainPerson> remove = new HashSet<>();
+		for(PlainPerson person : persons) {
 			if(person.getId().startsWith("foreign")) {
 				remove.add(person);
 			}
 		}
 		
-		for(ProxyPerson person : remove) {
+		for(PlainPerson person : remove) {
 			persons.add(person);
 		}
 		logger.info(String.format("Removed %s foreign persons.", remove.size()));

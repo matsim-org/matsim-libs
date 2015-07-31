@@ -30,7 +30,7 @@ import java.util.Map;
 public class JourneyDaysHandler implements PlanAttributeHandler {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.PlanAttributeHandler#hanle(playground.johannes.gsv.synPop.ProxyPlan, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.mid.PlanAttributeHandler#hanle(playground.johannes.synpop.data.PlainEpisode, java.util.Map)
 	 */
 	@Override
 	public void hanle(Episode plan, Map<String, String> attributes) {

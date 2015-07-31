@@ -20,8 +20,8 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -33,7 +33,7 @@ import java.util.Set;
  */
 public class TrajectoryProxyBuilder {
 
-	public static Trajectory buildTrajectory(ProxyPerson person) {
+	public static Trajectory buildTrajectory(PlainPerson person) {
 		Trajectory t = new Trajectory(null);
 		Episode plan = person.getPlan();
 		for(int i = 0; i < plan.getActivities().size(); i++) {
@@ -49,10 +49,10 @@ public class TrajectoryProxyBuilder {
 		return t;
 	}
 	
-	public static Set<Trajectory> buildTrajectories(Collection<ProxyPerson> persons) {
+	public static Set<Trajectory> buildTrajectories(Collection<PlainPerson> persons) {
 		Set<Trajectory> trajectories = new HashSet<Trajectory>(persons.size());
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			trajectories.add(buildTrajectory(person));
 		}
 		

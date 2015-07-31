@@ -30,7 +30,7 @@ import playground.johannes.synpop.data.Episode;
 public class CleanLegLocations implements ProxyPlanTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
+	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.synpop.data.PlainEpisode)
 	 */
 	@Override
 	public void apply(Episode plan) {

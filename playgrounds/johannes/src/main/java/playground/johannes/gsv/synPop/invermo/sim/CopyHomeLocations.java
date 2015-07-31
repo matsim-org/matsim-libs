@@ -22,11 +22,11 @@ package playground.johannes.gsv.synPop.invermo.sim;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
@@ -46,9 +46,9 @@ public class CopyHomeLocations implements SamplerListener {
 	}
 	
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> person, boolean accpeted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> person, boolean accpeted) {
 		if(iter.get() % interval == 0) {
-			for(ProxyPerson thePerson : population) {
+			for(PlainPerson thePerson : population) {
 				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
 				Episode plan = thePerson.getPlans().get(0);
 				for(Element act : plan.getActivities()) {

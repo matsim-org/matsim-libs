@@ -19,15 +19,14 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
+import org.apache.log4j.Logger;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPersonsTask;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPersonsTask;
 
 /**
  * @author johannes
@@ -38,15 +37,15 @@ public class DeleteNoWeight implements ProxyPersonsTask {
 	private static final Logger logger = Logger.getLogger(DeleteNoWeight.class);
 	
 	@Override
-	public void apply(Collection<ProxyPerson> persons) {
-		Set<ProxyPerson> remove = new HashSet<>();
-		for(ProxyPerson person : persons) {
+	public void apply(Collection<PlainPerson> persons) {
+		Set<PlainPerson> remove = new HashSet<>();
+		for(PlainPerson person : persons) {
 			if(!person.getAttributes().containsKey(CommonKeys.PERSON_WEIGHT)) {
 				remove.add(person);
 			}
 		}
 		
-		for(ProxyPerson person : remove) {
+		for(PlainPerson person : remove) {
 			persons.remove(person);
 		}
 

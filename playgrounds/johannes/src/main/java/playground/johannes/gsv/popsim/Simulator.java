@@ -19,29 +19,18 @@
 
 package playground.johannes.gsv.popsim;
 
-import java.io.IOException;
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTaskComposite;
 import playground.johannes.gsv.synPop.analysis.DependendLegVariableAnalyzerTask;
-import playground.johannes.gsv.synPop.analysis.DistanceStartTimeTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.sim3.HamiltonianComposite;
-import playground.johannes.gsv.synPop.sim3.HamiltonianLogger;
-import playground.johannes.gsv.synPop.sim3.MutatorCompositeFactory;
-import playground.johannes.gsv.synPop.sim3.Sampler;
-import playground.johannes.gsv.synPop.sim3.SamplerListenerComposite;
-import playground.johannes.sna.math.DummyDiscretizer;
+import playground.johannes.gsv.synPop.sim3.*;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * @author johannes
@@ -58,9 +47,9 @@ public class Simulator {
 		parser.setValidating(false);
 		parser.parse("/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml");
 
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			String age = person.getAttribute(CommonKeys.PERSON_AGE);
 			if(age != null) person.setUserData(DistanceVector.AGE_KEY, Double.parseDouble(age));
 			String income = person.getAttribute(CommonKeys.HH_INCOME);
@@ -83,9 +72,9 @@ public class Simulator {
 //		h.addComponent(new DistanceVector(persons, random), 100);
 //		Hamiltonian h = new DistanceVector(persons);
 
-		Set<ProxyPerson> simPersons = new HashSet<>(100000);
+		Set<PlainPerson> simPersons = new HashSet<>(100000);
 		for(int i = 0; i < 10000; i++) {
-			ProxyPerson p = new ProxyPerson(String.valueOf(i));
+			PlainPerson p = new PlainPerson(String.valueOf(i));
 
 			p.setAttribute(CommonKeys.HH_INCOME, String.valueOf(random.nextInt(8000)));
 			p.setUserData(DistanceVector.INCOME_KEY, new Double(p.getAttribute(CommonKeys.HH_INCOME)));

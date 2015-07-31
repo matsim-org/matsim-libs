@@ -21,12 +21,12 @@ package playground.johannes.gsv.synPop.mid.run;
 
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -45,7 +45,7 @@ public class KeepMidTrips {
 		parser.setValidating(false);
 		parser.parse(args[0]);
 		
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		
 		logger.info(String.format("Loaded %s perons.", persons.size()));
 		
@@ -53,9 +53,9 @@ public class KeepMidTrips {
 
 		Random random = new XORShiftRandom(4711);
 		
-		Set<ProxyPerson> keep = new HashSet<>(persons.size());
+		Set<PlainPerson> keep = new HashSet<>(persons.size());
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			for(Episode plan : person.getPlans()) {
 				if(MIDKeys.MID_TRIPS.equalsIgnoreCase(plan.getAttribute(CommonKeys.DATA_SOURCE))) {
 					if(random.nextDouble() < proba) {
@@ -66,7 +66,7 @@ public class KeepMidTrips {
 			}
 		}
 		
-//		for(ProxyPerson person : keep) {
+//		for(PlainPerson person : keep) {
 //			persons.remove(person);
 //		}
 		

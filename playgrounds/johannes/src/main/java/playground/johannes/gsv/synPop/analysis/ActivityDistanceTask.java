@@ -26,11 +26,11 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -57,10 +57,10 @@ public class ActivityDistanceTask extends AnalyzerTask {
 		this.mode = mode;
 	}
 
-	protected DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose, String mode) {
+	protected DescriptiveStatistics statistics(Collection<PlainPerson> persons, String purpose, String mode) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 
-		for (ProxyPerson person : persons) {
+		for (PlainPerson person : persons) {
 			Episode plan = person.getPlan();
 
 			for (int i = 1; i < plan.getActivities().size(); i++) {
@@ -91,9 +91,9 @@ public class ActivityDistanceTask extends AnalyzerTask {
 	}
 
 	@Override
-	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> types = new HashSet<String>();
-		for (ProxyPerson person : persons) {
+		for (PlainPerson person : persons) {
 			Episode plan = person.getPlan();
 			for (Element act : plan.getActivities()) {
 				types.add(act.getAttribute(CommonKeys.ACTIVITY_TYPE));

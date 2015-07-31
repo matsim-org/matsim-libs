@@ -34,7 +34,7 @@ public class SetActivityLocations implements ProxyPlanTask {
 	 * 
 	 * @see
 	 * playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes
-	 * .gsv.synPop.ProxyPerson)
+	 * .gsv.synPop.PlainPerson)
 	 */
 	@Override
 	public void apply(Episode plan) {

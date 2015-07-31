@@ -20,11 +20,11 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.*;
 
@@ -34,21 +34,21 @@ import java.util.*;
  */
 public class ProxyTaskRunner {
 
-	public static void run(ProxyPersonTask task, Collection<ProxyPerson> persons) {
-		for(ProxyPerson person : persons)
+	public static void run(ProxyPersonTask task, Collection<PlainPerson> persons) {
+		for(PlainPerson person : persons)
 			task.apply(person);
 	}
 	
-	public static void run(ProxyPlanTask task, Collection<ProxyPerson> persons) {
+	public static void run(ProxyPlanTask task, Collection<PlainPerson> persons) {
 		run(task, persons, false);
 	}
 	
-	public static void run(ProxyPlanTask task, Collection<ProxyPerson> persons, boolean verbose) {
+	public static void run(ProxyPlanTask task, Collection<PlainPerson> persons, boolean verbose) {
 		if(verbose) {
 			ProgressLogger.init(persons.size(), 2, 10);
 		}
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			for(Episode plan : person.getPlans())
 				task.apply(plan);
 			
@@ -60,12 +60,12 @@ public class ProxyTaskRunner {
 			ProgressLogger.termiante();
 	}
 	
-	public static Set<ProxyPerson> runAndDeletePerson(ProxyPersonTask task, Collection<ProxyPerson> persons) {
-		Set<ProxyPerson> newPersons = new HashSet<ProxyPerson>(persons.size());
+	public static Set<PlainPerson> runAndDeletePerson(ProxyPersonTask task, Collection<PlainPerson> persons) {
+		Set<PlainPerson> newPersons = new HashSet<PlainPerson>(persons.size());
 		
 		run(task, persons);
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			if(!"true".equalsIgnoreCase(person.getAttribute(CommonKeys.DELETE))) {
 				newPersons.add(person);
 			}
@@ -74,10 +74,10 @@ public class ProxyTaskRunner {
 		return newPersons;
 	}
 	
-	public static void runAndDeletePerson(ProxyPlanTask task, Collection<ProxyPerson> persons) {
+	public static void runAndDeletePerson(ProxyPlanTask task, Collection<PlainPerson> persons) {
 		run(task, persons);
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			List<Episode> remove = new ArrayList<>();
 			for(Episode plan : person.getPlans()) {
 				if("true".equalsIgnoreCase(plan.getAttribute(CommonKeys.DELETE))) {

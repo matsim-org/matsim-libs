@@ -27,15 +27,14 @@ import org.matsim.facilities.ActivityFacility;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.CRSUtils;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -73,7 +72,7 @@ public class AssignHomeFacilities implements ProxyPersonTask {
 	}
 
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		String str = person.getAttribute("homeCoord");
 		ActivityFacility fac;
 		if(str != null) {

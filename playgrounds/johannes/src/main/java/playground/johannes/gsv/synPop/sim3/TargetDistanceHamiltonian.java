@@ -21,10 +21,9 @@ package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -44,7 +43,7 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 		this.weighted = weighted;
 	}
 
-	public double evaluate(ProxyPerson person) {
+	public double evaluate(PlainPerson person) {
 		double targetSum = 0;
 		double realSum = 0;
 		double errSum = 0;

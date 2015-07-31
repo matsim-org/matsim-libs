@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import java.util.Map;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.mid.PersonAttributeHandler;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Map;
 
 /**
  * @author johannes
@@ -31,7 +31,7 @@ import playground.johannes.gsv.synPop.mid.PersonAttributeHandler;
 public class WorkLocationHandler implements PersonAttributeHandler {
 
 	@Override
-	public void handle(ProxyPerson person, Map<String, String> attributes) {
+	public void handle(PlainPerson person, Map<String, String> attributes) {
 		String foreign = attributes.get("arbland");
 		if (ColumnKeys.validate(foreign)) {
 			if (foreign.equals("1")) {

@@ -20,9 +20,9 @@
 package playground.johannes.gsv.synPop.mid;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.HashSet;
 import java.util.Map.Entry;
@@ -34,16 +34,16 @@ import java.util.Set;
  */
 public class JourneyPlans2PersonTask implements ProxyPersonTask {
 
-	private Set<ProxyPerson> newPersons = new HashSet<>();
+	private Set<PlainPerson> newPersons = new HashSet<>();
 
 	private final double periode = 90;
 	
-	public Set<ProxyPerson> getPersons() {
+	public Set<PlainPerson> getPersons() {
 		return newPersons;
 	}
 	
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		int counter = 0;
 		double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
 
@@ -51,7 +51,7 @@ public class JourneyPlans2PersonTask implements ProxyPersonTask {
 
 		for (Episode plan : person.getPlans()) {
 			if ("midjourneys".equalsIgnoreCase(plan.getAttribute("datasource"))) {
-				ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), counter++));
+				PlainPerson newPerson = new PlainPerson(String.format("%s.%s", person.getId(), counter++));
 				for (Entry<String, String> entry : person.getAttributes().entrySet()) {
 					newPerson.setAttribute(entry.getKey(), entry.getValue());
 				}
@@ -79,11 +79,11 @@ public class JourneyPlans2PersonTask implements ProxyPersonTask {
 //		/*
 //		 * add one person with an empty plan
 //		 */
-//		ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), counter++));
+//		PlainPerson newPerson = new PlainPerson(String.format("%s.%s", person.getId(), counter++));
 //		for (Entry<String, String> entry : person.getAttributes().entrySet()) {
 //			newPerson.setAttribute(entry.getKey(), entry.getValue());
 //		}
-//		newPerson.addPlan(new ProxyPlan());
+//		newPerson.addPlan(new PlainEpisode());
 //
 //		newW = w * (365 - counter) / 365.0;
 //		newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(newW));

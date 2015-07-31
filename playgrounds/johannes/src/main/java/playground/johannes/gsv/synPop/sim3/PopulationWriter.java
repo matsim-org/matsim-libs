@@ -19,13 +19,12 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import org.apache.log4j.Logger;
+import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
@@ -51,7 +50,7 @@ public class PopulationWriter implements SamplerListener {
 	}
 
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
 		if (iteration.get() % interval == 0) {
 			/*
 			 * The use of synchronized should be avoided by using a

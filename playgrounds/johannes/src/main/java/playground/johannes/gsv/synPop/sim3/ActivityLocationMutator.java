@@ -19,18 +19,17 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.List;
+import java.util.Random;
 
 /**
  * @author johannes
@@ -62,7 +61,7 @@ public class ActivityLocationMutator implements SingleMutator {
 	}
 
 	@Override
-	public boolean mutate(ProxyPerson person) {
+	public boolean mutate(PlainPerson person) {
 		List<Element> activities = person.getPlan().getActivities();
 	
 		int idx = random.nextInt(activities.size());
@@ -145,7 +144,7 @@ public class ActivityLocationMutator implements SingleMutator {
 	}
 
 	@Override
-	public void revert(ProxyPerson person) {
+	public void revert(PlainPerson person) {
 //		currentAct.setAttribute(CommonKeys.ACTIVITY_FACILITY, currentFacility.getId().toString());
 		currentAct.setUserData(USER_DATA_KEY, currentFacility);
 

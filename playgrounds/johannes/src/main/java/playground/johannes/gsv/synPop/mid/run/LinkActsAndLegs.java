@@ -19,7 +19,6 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.zones.Zone;
@@ -27,6 +26,7 @@ import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class LinkActsAndLegs {
 		parser.setValidating(false);
 		parser.parse("/home/johannes/gsv/germany-scenario/mid2008/pop/pop.xml");
 
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 
 		ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.de.geojson", "NO");
 		List<Zone> list = new ArrayList<>(zones.zoneSet());
@@ -57,7 +57,7 @@ public class LinkActsAndLegs {
 
 		Random random = new XORShiftRandom();
 
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			for(Episode plan : person.getPlans()) {
 				plan.setAttribute("id", String.valueOf(counter++));
 				Element act = plan.getActivities().get(0);

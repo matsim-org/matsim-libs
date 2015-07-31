@@ -22,10 +22,10 @@ package playground.johannes.gsv.synPop.io;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainEpisode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.*;
 
@@ -37,15 +37,15 @@ public class XMLParser extends MatsimXmlParser {
 
 	private static final Logger logger = Logger.getLogger(XMLParser.class);
 
-	private Set<ProxyPerson> persons;
+	private Set<PlainPerson> persons;
 
-	private ProxyPerson person;
+	private PlainPerson person;
 
 	private Episode plan;
 
 	private List<String> blacklist = new ArrayList<>();
 
-	public Set<ProxyPerson> getPersons() {
+	public Set<PlainPerson> getPersons() {
 		return persons;
 	}
 
@@ -62,10 +62,10 @@ public class XMLParser extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equalsIgnoreCase(Constants.PERSONS_TAG)) {
-			persons = new HashSet<ProxyPerson>();
+			persons = new HashSet<PlainPerson>();
 
 		} else if (name.equalsIgnoreCase(Constants.PERSON_TAG)) {
-			person = new ProxyPerson((String) getAttribute(Constants.ID_KEY, atts));
+			person = new PlainPerson((String) getAttribute(Constants.ID_KEY, atts));
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!type.equalsIgnoreCase(Constants.ID_KEY)) {
@@ -75,7 +75,7 @@ public class XMLParser extends MatsimXmlParser {
 				}
 			}
 		} else if (name.equalsIgnoreCase(Constants.PLAN_TAG)) {
-			plan = new ProxyPlan();
+			plan = new PlainEpisode();
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 

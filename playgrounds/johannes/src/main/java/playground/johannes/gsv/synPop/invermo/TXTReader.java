@@ -31,6 +31,8 @@ import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainEpisode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.*;
@@ -46,18 +48,18 @@ public class TXTReader {
 	
 	private Map<String, PlainElement> households;
 	
-	private Map<String, ProxyPerson> persons;
+	private Map<String, PlainPerson> persons;
 	
 	private List<AttributeHandler<PlainElement>> householdAttHandlers = new ArrayList<AttributeHandler<PlainElement>>();
 	
 	private List<PersonAttributeHandler> personAttHandlers = new ArrayList<PersonAttributeHandler>();
 	
-//	private List<AttributeHandler<ProxyPlan>> planAttHandlers = new ArrayList<AttributeHandler<ProxyPlan>>();
+//	private List<AttributeHandler<PlainEpisode>> planAttHandlers = new ArrayList<AttributeHandler<PlainEpisode>>();
 	private LegHandlerAdaptor legAdaptor = new LegHandlerAdaptor();
 
-	public Collection<ProxyPerson> read(String rootDir) throws IOException {
+	public Collection<PlainPerson> read(String rootDir) throws IOException {
 		households = new LinkedHashMap<String, PlainElement>(5000);
-		persons = new LinkedHashMap<String, ProxyPerson>(65000);
+		persons = new LinkedHashMap<String, PlainPerson>(65000);
 		/*
 		 * read and create persons
 		 */
@@ -81,8 +83,8 @@ public class TXTReader {
 //		/*
 //		 * add an empty plan to each person
 //		 */
-//		for(ProxyPerson person : persons.values()) {
-//			person.setPlan(new ProxyPlan());
+//		for(PlainPerson person : persons.values()) {
+//			person.setPlan(new PlainEpisode());
 //		}
 //		/*
 //		 * read and create legs
@@ -97,7 +99,7 @@ public class TXTReader {
 //		jHandler.read(rootDir + "rw3.txt");
 //		jHandler.read(rootDir + "r4.txt");
 		
-		return new HashSet<ProxyPerson>(persons.values());
+		return new HashSet<PlainPerson>(persons.values());
 	}
 	
 	private String personIdBuilder(Map<String, String> attributes) {
@@ -132,17 +134,17 @@ public class TXTReader {
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
 			String id = personIdBuilder(attributes);
-			ProxyPerson person = persons.get(id);
+			PlainPerson person = persons.get(id);
 			if(person == null) {
 				if(attributes.get(ColumnKeys.PERSON_ID).equals("1")) { 
-					person = new ProxyPerson(id);
+					person = new PlainPerson(id);
 					persons.put(person.getId(), person);
 				}
 			}
 			
 			if(person == null)
 				return;
-//			ProxyPerson person = new ProxyPerson(id);
+//			PlainPerson person = new PlainPerson(id);
 //			persons.put(person.getId(), person);
 			
 			PlainElement household = households.get(attributes.get(ColumnKeys.HOUSEHOLD_ID));
@@ -167,21 +169,21 @@ public class TXTReader {
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
 			String id = personIdBuilder(attributes);
-			ProxyPerson person = persons.get(id);
+			PlainPerson person = persons.get(id);
 			
 			if (person == null) {
 				logger.warn(String.format("Person %s not found.", id));
 			} else {
 				String planId = attributes.get("Reisenr");
 				Episode thePlan = null;
-//				for(ProxyPlan plan : person.getPlans()) {
+//				for(PlainEpisode plan : person.getPlans()) {
 //					if(plan.getAttribute("id").equals(planId)) {
 //						thePlan = plan;
 //						break;
 //					}
 //				}
 				if(thePlan == null) {
-					thePlan = new ProxyPlan();
+					thePlan = new PlainEpisode();
 					thePlan.setAttribute("id", planId);
 					person.addPlan(thePlan);
 					thePlan.setAttribute("datasource", "invermo");
@@ -208,7 +210,7 @@ public class TXTReader {
 		reader.legAdaptor.addHandler(new LegStartTimeHandler());
 		reader.legAdaptor.addHandler(new LegModeHandler());
 		reader.legAdaptor.addHandler(new LegPurposeHandler());
-		Collection<ProxyPerson> persons = reader.read("/home/johannes/gsv/invermo/txt-utf8/");
+		Collection<PlainPerson> persons = reader.read("/home/johannes/gsv/invermo/txt-utf8/");
 		
 		logger.info(String.format("Parsed %s persons.", persons.size()));
 		
@@ -251,7 +253,7 @@ public class TXTReader {
 		new DeleteNoWeight().apply(persons);
 		
 		ProxyTaskRunner.run(plans2Persons, persons);
-		for(ProxyPerson person : plans2Persons.getNewPersons()) {
+		for(PlainPerson person : plans2Persons.getNewPersons()) {
 			persons.add(person);
 		}
 		
@@ -259,7 +261,7 @@ public class TXTReader {
 //		new ApplySampleProbas(82000000).apply(persons);
 //		
 //		double wsum = 0;
-//		for(ProxyPerson person : persons) {
+//		for(PlainPerson person : persons) {
 //			wsum += Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
 //		}
 //		logger.info(String.format("Sum of weigths = %s.", wsum));
@@ -308,7 +310,7 @@ public class TXTReader {
 		
 		logger.info("Deleting persons with legs more than 1000 KM...");
 		DeleteShortLongTrips task = new DeleteShortLongTrips(100000, false);
-		for (ProxyPerson person : persons) {
+		for (PlainPerson person : persons) {
 			task.apply(person.getPlans().get(0));
 		}
 		logger.info("Population size = " + persons.size());

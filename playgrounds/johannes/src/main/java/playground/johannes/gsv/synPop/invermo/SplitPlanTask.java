@@ -24,13 +24,9 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +42,7 @@ public class SplitPlanTask implements ProxyPersonTask {
 	public static DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm");
 
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		List<Episode> newPlans = new ArrayList<Episode>();
 		
 		for (Episode plan : person.getPlans()) {
@@ -60,7 +56,7 @@ public class SplitPlanTask implements ProxyPersonTask {
 	}
 	
 	private void splitPlan(Episode plan, List<Episode> newPlans) {
-		Episode subPlan = new ProxyPlan();
+		Episode subPlan = new PlainEpisode();
 
 		DateTime prev = getDate(plan.getLegs().get(0));
 		if(prev == null) {
@@ -89,7 +85,7 @@ public class SplitPlanTask implements ProxyPersonTask {
 				subPlan.addActivity(((PlainElement)act).clone());
 				newPlans.add(subPlan);
 				
-				subPlan = new ProxyPlan();
+				subPlan = new PlainEpisode();
 				subPlan.addActivity(((PlainElement)act).clone());
 				subPlan.addLeg(((PlainElement)leg).clone());
 			} else {

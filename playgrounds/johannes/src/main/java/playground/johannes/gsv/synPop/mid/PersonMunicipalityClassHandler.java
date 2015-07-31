@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.util.Map;
+import playground.johannes.synpop.data.PlainPerson;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
+import java.util.Map;
 
 /**
  * @author johannes
@@ -30,7 +30,7 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 public class PersonMunicipalityClassHandler implements PersonAttributeHandler {
 
 	@Override
-	public void handle(ProxyPerson person, Map<String, String> attributes) {
+	public void handle(PlainPerson person, Map<String, String> attributes) {
 		String val = attributes.get(MIDKeys.PERSON_MUNICIPALITY);
 
 		if(val.equalsIgnoreCase("unter 5.000 Einw.")) {

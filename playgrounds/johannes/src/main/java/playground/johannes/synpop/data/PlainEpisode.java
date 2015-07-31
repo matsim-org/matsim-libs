@@ -17,10 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
-
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
+package playground.johannes.synpop.data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +26,7 @@ import java.util.Map.Entry;
 /**
  * @author johannes
  */
-public class ProxyPlan extends PlainElement implements playground.johannes.synpop.data.Episode {
+public class PlainEpisode extends PlainElement implements playground.johannes.synpop.data.Episode {
 
     private List<Element> activities = new ArrayList<Element>();
 
@@ -51,8 +48,8 @@ public class ProxyPlan extends PlainElement implements playground.johannes.synpo
         return activities;
     }
 
-    public ProxyPlan clone() {
-        ProxyPlan clone = new ProxyPlan();
+    public PlainEpisode clone() {
+        PlainEpisode clone = new PlainEpisode();
 
         for (Entry<String, String> entry : getAttributes().entrySet()) {
             clone.setAttribute(entry.getKey(), entry.getValue());

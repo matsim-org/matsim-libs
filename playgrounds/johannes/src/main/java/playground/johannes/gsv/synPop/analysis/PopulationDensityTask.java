@@ -30,7 +30,6 @@ import org.matsim.facilities.ActivityFacility;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -38,6 +37,7 @@ import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -78,12 +78,12 @@ public class PopulationDensityTask extends AnalyzerTask {
 	 * @see playground.johannes.gsv.synPop.analysis.AnalyzerTask#analyze(java.util.Collection, java.util.Map)
 	 */
 	@Override
-	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
 		ProgressLogger.init(persons.size(), 1, 10);
 
 		int nozone = 0;
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			Episode plan = person.getPlans().get(0);
 			
 			ActivityFacility home = null;

@@ -19,15 +19,15 @@
 
 package playground.johannes.gsv.popsim;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.sna.util.Composite;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
  */
 public class HistoSyncComposite extends Composite<HistogramSync> implements HistogramSync {
     @Override
-    public void notifyChange(Object attKey, double oldValue, double newValue, ProxyPerson person) {
+    public void notifyChange(Object attKey, double oldValue, double newValue, PlainPerson person) {
         for(HistogramSync element : this.components) {
             element.notifyChange(attKey, oldValue, newValue, person);
         }

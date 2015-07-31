@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.util.Map;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Map;
 
 /**
  * @author johannes
@@ -31,7 +31,7 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 public class PersonWeightHandler implements PersonAttributeHandler {
 
 	@Override
-	public void handle(ProxyPerson person, Map<String, String> attributes) {
+	public void handle(PlainPerson person, Map<String, String> attributes) {
 		double w = Double.parseDouble(attributes.get(MIDKeys.PERSON_WEIGHT));
 		person.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w));
 	}

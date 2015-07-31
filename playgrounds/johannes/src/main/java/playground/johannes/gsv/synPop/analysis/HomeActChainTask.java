@@ -25,9 +25,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,12 +44,12 @@ public class HomeActChainTask extends AnalyzerTask {
 	public static final String KEY = "n.home.act";
 	
 	@Override
-	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
 		TObjectDoubleHashMap<String> chains = new TObjectDoubleHashMap<String>();
 		
 		TDoubleDoubleHashMap tripCounts = new TDoubleDoubleHashMap();
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			Episode plan = person.getPlan();
 			
 			List<String> achain = new ArrayList<>();
