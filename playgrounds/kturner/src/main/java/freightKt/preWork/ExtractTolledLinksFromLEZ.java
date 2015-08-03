@@ -163,7 +163,7 @@ class ExtractTolledLinksFromLEZ {
 		return net;
 	}
 
-	//NW-Step2a: Extract all Features of NW-Shape which are within the ZoneShape, write there IDs into a .txt-File 
+	//NW-Step2a: Extract all Features of NW-Shape which are within the ZoneShape, write their IDs into a .txt-File 
 	// which is designed in a way, that it can get copied easily to a tollFill and create a .shp-File with this Features
 	private static void extractTollLinksArea(Collection<SimpleFeature> linkFeatures, 
 			ArrayList<String> nodesInZone, Collection<SimpleFeature> zoneFeatures, String outputDir) {
