@@ -19,19 +19,14 @@
  * *********************************************************************** */
 package playground.johannes.gsv.synPop.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
  * @author illenberger
@@ -45,13 +40,13 @@ public class ProxyAnalyzer {
 		ProxyAnalyzer.append = append;
 	}
 
-	public static Map<String, DescriptiveStatistics> analyze(Collection<ProxyPerson> person, AnalyzerTask task) {
+	public static Map<String, DescriptiveStatistics> analyze(Collection<PlainPerson> person, AnalyzerTask task) {
 		Map<String, DescriptiveStatistics> results = new HashMap<String, DescriptiveStatistics>();
 		task.analyze(person, results);
 		return results;
 	}
 	
-	public static void analyze(Collection<ProxyPerson> persons, AnalyzerTask task, String output) throws IOException {
+	public static void analyze(Collection<PlainPerson> persons, AnalyzerTask task, String output) throws IOException {
 		task.setOutputDirectory(output);
 		Map<String, DescriptiveStatistics> results = analyze(persons, task);
 		writeStatistics(results, output + "/statistics.txt");

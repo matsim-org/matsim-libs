@@ -19,9 +19,9 @@
 package playground.johannes.gsv.synPop.mid;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author jillenberger
@@ -41,8 +41,8 @@ public class Route2GeoDistance implements ProxyPlanTask {
     }
 
     @Override
-    public void apply(ProxyPlan plan) {
-        for(ProxyObject leg : plan.getLegs()) {
+    public void apply(Episode plan) {
+        for(Element leg : plan.getLegs()) {
             String routeDist = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
             if(routeDist != null) {
                 double rDist = Double.parseDouble(routeDist);

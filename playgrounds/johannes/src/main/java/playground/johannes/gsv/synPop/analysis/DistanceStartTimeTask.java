@@ -23,11 +23,11 @@ import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -38,13 +38,13 @@ import java.util.Map;
  */
 public class DistanceStartTimeTask extends AnalyzerTask {
     @Override
-    public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+    public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
         TDoubleArrayList distVals = new TDoubleArrayList();
         TDoubleArrayList startVals = new TDoubleArrayList();
 
-        for(ProxyPerson person : persons) {
-            for(ProxyPlan plan : person.getPlans()) {
-                for(ProxyObject leg : plan.getLegs()) {
+        for(PlainPerson person : persons) {
+            for(Episode plan : person.getEpisodes()) {
+                for(Element leg : plan.getLegs()) {
                     String xStr = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
                     String startVal = leg.getAttribute(CommonKeys.LEG_START_TIME);
 

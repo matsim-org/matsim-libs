@@ -19,14 +19,15 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainEpisode;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
@@ -34,29 +35,29 @@ import playground.johannes.gsv.synPop.ProxyPlan;
  */
 public class Plans2PersonsTask implements ProxyPersonTask {
 
-	private Set<ProxyPerson> newPersons;
+	private Set<PlainPerson> newPersons;
 
 	public Plans2PersonsTask() {
-		newPersons = new HashSet<ProxyPerson>();
+		newPersons = new HashSet<PlainPerson>();
 	}
 
-	public Set<ProxyPerson> getNewPersons() {
+	public Set<PlainPerson> getNewPersons() {
 		return newPersons;
 	}
 
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		int counter = 0;
 		double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
 
-		if (person.getPlans().size() > 1) {
-			for (int i = 1; i < person.getPlans().size(); i++) {
-				ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), counter++));
+		if (person.getEpisodes().size() > 1) {
+			for (int i = 1; i < person.getEpisodes().size(); i++) {
+				PlainPerson newPerson = new PlainPerson(String.format("%s.%s", person.getId(), counter++));
 				for (Entry<String, String> entry : person.getAttributes().entrySet()) {
 					newPerson.setAttribute(entry.getKey(), entry.getValue());
 				}
 
-				newPerson.addPlan(person.getPlans().get(i));
+				newPerson.addEpisode(person.getEpisodes().get(i));
 
 				double newW = w * 1 / 365.0;
 				newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(newW));
@@ -64,9 +65,9 @@ public class Plans2PersonsTask implements ProxyPersonTask {
 				newPersons.add(newPerson);
 			}
 
-			ProxyPlan plan = person.getPlans().get(0);
-			person.getPlans().clear();
-			person.addPlan(plan);
+			Episode plan = person.getEpisodes().get(0);
+			person.getEpisodes().clear();
+			person.addEpisode(plan);
 		}
 		/*
 		 * adjust the weight of the original person
@@ -76,11 +77,11 @@ public class Plans2PersonsTask implements ProxyPersonTask {
 		/*
 		 * add one person with an empty plan
 		 */
-		ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), counter++));
+		PlainPerson newPerson = new PlainPerson(String.format("%s.%s", person.getId(), counter++));
 		for (Entry<String, String> entry : person.getAttributes().entrySet()) {
 			newPerson.setAttribute(entry.getKey(), entry.getValue());
 		}
-		newPerson.addPlan(new ProxyPlan());
+		newPerson.addEpisode(new PlainEpisode());
 
 		newW = w * (365 - counter) / 365.0;
 		newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(newW));

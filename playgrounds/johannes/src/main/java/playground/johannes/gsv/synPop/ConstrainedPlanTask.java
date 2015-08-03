@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.Episode;
+
 /**
  * @author johannes
  *
@@ -38,7 +40,7 @@ public class ConstrainedPlanTask implements ProxyPlanTask {
 	}
 	
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		String val = plan.getAttribute(key);
 		if(value.equals(val)) {
 			delegate.apply(plan);

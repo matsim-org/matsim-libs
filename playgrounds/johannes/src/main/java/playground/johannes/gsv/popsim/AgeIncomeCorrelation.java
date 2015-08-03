@@ -21,22 +21,19 @@ package playground.johannes.gsv.popsim;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.sna.math.DummyDiscretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.LinearDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * @author johannes
@@ -48,11 +45,11 @@ public class AgeIncomeCorrelation extends AnalyzerTask {
 	 * @see playground.johannes.gsv.synPop.analysis.AnalyzerTask#analyze(java.util.Collection, java.util.Map)
 	 */
 	@Override
-	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
 		TDoubleArrayList ages = new TDoubleArrayList();
 		TDoubleArrayList incomes = new TDoubleArrayList();
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			String aStr = person.getAttribute(CommonKeys.PERSON_AGE);
 			String iStr = person.getAttribute(CommonKeys.HH_INCOME);
 //			String mStr = person.getAttribute(CommonKeys.HH_MEMBERS);

@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.Collection;
 
 /**
@@ -27,6 +29,6 @@ import java.util.Collection;
  */
 public interface ProxyPersonsTask {
 
-	public void apply(Collection<ProxyPerson> persons);
+	public void apply(Collection<PlainPerson> persons);
 	
 }

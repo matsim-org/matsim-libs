@@ -20,9 +20,9 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 public class TruncateDistances implements ProxyPlanTask {
 
@@ -33,8 +33,8 @@ public class TruncateDistances implements ProxyPlanTask {
 	}
 	
 	@Override
-	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
+	public void apply(Episode plan) {
+		for(Element leg : plan.getLegs()) {
 			String val = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 			if(val != null) {
 				double d = Double.parseDouble(val);

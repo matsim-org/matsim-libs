@@ -19,14 +19,13 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -45,12 +44,12 @@ public class ExtractMidJourneys {
 	
 		logger.info("Loading persons...");
 		parser.parse(args[0]);
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
-		Set<ProxyPerson> newPersons = new HashSet<>();
-		for(ProxyPerson person : persons) {
-			if("midjourneys".equalsIgnoreCase(person.getPlans().get(0).getAttribute("datasource"))) {
+		Set<PlainPerson> newPersons = new HashSet<>();
+		for(PlainPerson person : persons) {
+			if("midjourneys".equalsIgnoreCase(person.getEpisodes().get(0).getAttribute("datasource"))) {
 				newPersons.add(person);
 			}
 		}

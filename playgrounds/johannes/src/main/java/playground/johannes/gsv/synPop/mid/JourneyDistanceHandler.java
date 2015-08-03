@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.mid;
 import java.util.Map;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 
 /**
  * @author johannes
@@ -35,10 +35,10 @@ public class JourneyDistanceHandler implements LegAttributeHandler {
 	 * 
 	 * @see
 	 * playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground
-	 * .johannes.gsv.synPop.ProxyObject, java.util.Map)
+	 * .johannes.gsv.synPop.PlainElement, java.util.Map)
 	 */
 	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
+	public void handle(PlainElement leg, Map<String, String> attributes) {
 		int dist = Integer.parseInt(attributes.get("p1016"));
 		
 		if (dist <= 20000) { //range according to mid documentation

@@ -19,23 +19,6 @@
 
 package playground.johannes.gsv.sim.foreign;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -47,14 +30,10 @@ import org.matsim.facilities.MatsimFacilitiesReader;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-
 import playground.johannes.coopsim.mental.choice.ChoiceSet;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.zones.Zone;
@@ -63,6 +42,20 @@ import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainEpisode;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * @author johannes
@@ -168,7 +161,7 @@ public class PopulationGenerator {
 		/*
 		 * load matrix
 		 */
-		Set<ProxyPerson> persons = new HashSet<>();
+		Set<PlainPerson> persons = new HashSet<>();
 
 		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
 		Future<?>[] futures = new Future[numThreads];
@@ -273,7 +266,7 @@ public class PopulationGenerator {
 		return intVolume;
 	}
 
-	private static ProxyPerson buildPerson(String id, ActivityFacility orig, ActivityFacility target, String origType, String targetType) {
+	private static PlainPerson buildPerson(String id, ActivityFacility orig, ActivityFacility target, String origType, String targetType) {
 		if(origType.equalsIgnoreCase("vacations")) {
 			origType = vacationProbas.randomWeightedChoice();
 		}
@@ -281,23 +274,23 @@ public class PopulationGenerator {
 			targetType = vacationProbas.randomWeightedChoice();
 		}
 		
-		ProxyPerson person = new ProxyPerson(id);
+		PlainPerson person = new PlainPerson(id);
 		person.setAttribute(CommonKeys.DAY, dayProbas.randomWeightedChoice());
 		person.setAttribute(MIDKeys.PERSON_MONTH, monthProbas.randomWeightedChoice());
-		
-		ProxyPlan plan = new ProxyPlan();
+
+		Episode plan = new PlainEpisode();
 		plan.setAttribute(CommonKeys.DATA_SOURCE, "foreign");
 
-		ProxyObject origAct = new ProxyObject();
+		PlainElement origAct = new PlainElement();
 		origAct.setAttribute(CommonKeys.ACTIVITY_TYPE, origType);
 		origAct.setAttribute(CommonKeys.ACTIVITY_FACILITY, orig.getId().toString());
 		origAct.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
 		origAct.setAttribute(CommonKeys.ACTIVITY_END_TIME, "1");
 
-		ProxyObject leg = new ProxyObject();
+		PlainElement leg = new PlainElement();
 		leg.setAttribute(CommonKeys.LEG_MODE, "car");
 
-		ProxyObject targetAct = new ProxyObject();
+		PlainElement targetAct = new PlainElement();
 		targetAct.setAttribute(CommonKeys.ACTIVITY_TYPE, targetType);
 		targetAct.setAttribute(CommonKeys.ACTIVITY_FACILITY, target.getId().toString());
 		targetAct.setAttribute(CommonKeys.ACTIVITY_START_TIME, "86399");
@@ -307,7 +300,7 @@ public class PopulationGenerator {
 		plan.addLeg(leg);
 		plan.addActivity(targetAct);
 
-		person.addPlan(plan);
+		person.addEpisode(plan);
 		return person;
 	}
 
@@ -323,7 +316,7 @@ public class PopulationGenerator {
 
 		private double intVolume;
 
-		private final Set<ProxyPerson> persons;
+		private final Set<PlainPerson> persons;
 
 		private final String type;
 
@@ -365,7 +358,7 @@ public class PopulationGenerator {
 								} else {
 									for (int i = 0; i < volume; i++) {
 										ActivityFacility deFac = deList.get(random.nextInt(deList.size()));
-										ProxyPerson person = buildPerson(String.format("foreign.%s.%s.%s.%s", deZoneId, euZoneId, i, type), deFac, euFac,
+										PlainPerson person = buildPerson(String.format("foreign.%s.%s.%s.%s", deZoneId, euZoneId, i, type), deFac, euFac,
 												ActivityType.HOME, type);
 										persons.add(person);
 									}
@@ -386,7 +379,7 @@ public class PopulationGenerator {
 								} else {
 									for (int i = 0; i < volume; i++) {
 										ActivityFacility deFac = deList.get(random.nextInt(deList.size()));
-										ProxyPerson person = buildPerson(String.format("foreign.%s.%s.%s.%s", euZoneId, deZoneId, i, type), euFac, deFac, type,
+										PlainPerson person = buildPerson(String.format("foreign.%s.%s.%s.%s", euZoneId, deZoneId, i, type), euFac, deFac, type,
 												ActivityType.HOME);
 										persons.add(person);
 									}

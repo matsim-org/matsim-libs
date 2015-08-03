@@ -19,17 +19,16 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
@@ -44,10 +43,10 @@ public class PkmTask extends AnalyzerTask {
 	}
 
 	@Override
-	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> purposes = new HashSet<String>();
-		for (ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
+		for (PlainPerson person : persons) {
+			Episode plan = person.getPlan();
 			for (int i = 0; i < plan.getActivities().size(); i++) {
 				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}
@@ -57,13 +56,13 @@ public class PkmTask extends AnalyzerTask {
 
 		for (String purpose : purposes) {
 			double pkm = 0;
-			for (ProxyPerson person : persons) {
-				ProxyPlan plan = person.getPlans().get(0);
+			for (PlainPerson person : persons) {
+				Episode plan = person.getEpisodes().get(0);
 
 				for (int i = 1; i < plan.getLegs().size(); i++) {
-					ProxyObject leg = plan.getLegs().get(i);
+					Element leg = plan.getLegs().get(i);
 					if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
-						ProxyObject act = plan.getActivities().get(i + 1);
+						Element act = plan.getActivities().get(i + 1);
 						if (purpose == null || purpose.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 							String value = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 							if (value != null) {

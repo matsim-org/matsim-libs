@@ -19,15 +19,17 @@
 
 package playground.johannes.gsv.synPop;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -47,35 +49,35 @@ public class CopyAttributes {
 		parser.setValidating(false);
 //		subsample = true;
 		parser.parse(args[0]);
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 
 		parser = new XMLParser();
 		parser.setValidating(false);
 //		subsample = false;
 		parser.parse(args[1]);
 
-		Map<String, ProxyPerson> templates = new HashMap<>();
-		for (ProxyPerson person : parser.getPersons()) {
+		Map<String, PlainPerson> templates = new HashMap<>();
+		for (PlainPerson person : parser.getPersons()) {
 			String id = person.getId(); // extractId(person);
 			templates.put(id, person);
 		}
 
 		int cnt = 0;
 		ProgressLogger.init(persons.size(), 2, 10);
-		for (ProxyPerson person : persons) {
+		for (PlainPerson person : persons) {
 //			String id = person.getId();
 			String id = extractId(person);
-			ProxyPerson template = templates.get(id);
+			PlainPerson template = templates.get(id);
 
 			if (template != null) {
-				if (person.getPlans().size() > 1) {
+				if (person.getEpisodes().size() > 1) {
 					throw new RuntimeException("Person has more than one plan.");
 				}
-				ProxyPlan plan = person.getPlans().get(0);
-				ProxyPlan templatePlan = template.getPlans().get(0);
+				Episode plan = person.getEpisodes().get(0);
+				Episode templatePlan = template.getEpisodes().get(0);
 				for (int i = 0; i < plan.getActivities().size(); i++) {
-					ProxyObject act = plan.getActivities().get(i);
-					ProxyObject templAct = templatePlan.getActivities().get(i);
+					Element act = plan.getActivities().get(i);
+					Element templAct = templatePlan.getActivities().get(i);
 
 					act.setAttribute(CommonKeys.ACTIVITY_TYPE, templAct.getAttribute(CommonKeys.ACTIVITY_TYPE));
 				}
@@ -93,7 +95,7 @@ public class CopyAttributes {
 		writer.write(args[2], persons);
 	}
 
-	private static String extractId(ProxyPerson person) {
+	private static String extractId(PlainPerson person) {
 		String id = person.getId();
 		int idx = id.indexOf("clone");
 		if (idx > -1) {

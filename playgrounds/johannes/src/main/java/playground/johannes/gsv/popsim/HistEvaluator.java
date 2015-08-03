@@ -19,8 +19,8 @@
 
 package playground.johannes.gsv.popsim;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -29,10 +29,10 @@ import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 public class HistEvaluator implements Hamiltonian {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.sim3.Hamiltonian#evaluate(playground.johannes.gsv.synPop.ProxyPerson)
+	 * @see playground.johannes.gsv.synPop.sim3.Hamiltonian#evaluate(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public double evaluate(ProxyPerson person) {
+	public double evaluate(PlainPerson person) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

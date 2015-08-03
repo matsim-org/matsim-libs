@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.mid;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Map;
 
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class PersonCarAvailHandler implements PersonAttributeHandler {
     @Override
-    public void handle(ProxyPerson person, Map<String, String> attributes) {
+    public void handle(PlainPerson person, Map<String, String> attributes) {
         String val = attributes.get(MIDKeys.PERSON_CARAVAIL);
 
         if(val != null) {

@@ -19,12 +19,12 @@
 
 package playground.johannes.gsv.popsim;
 
+import playground.johannes.gsv.synPop.sim3.SamplerListener;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
 
 /**
  * @author johannes
@@ -45,10 +45,10 @@ public class SynchronizeUserData implements SamplerListener {
 	}
 
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
 		if (iters.get() % interval == 0) {
 			for (Map.Entry<Object, String> keyPair : keys.entrySet()) {
-				for (ProxyPerson person : population) {
+				for (PlainPerson person : population) {
 					Object value = person.getUserData(keyPair.getKey());
 					if (value != null) {
 						person.setAttribute(keyPair.getValue(), String.valueOf(value));

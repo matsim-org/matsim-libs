@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -27,6 +27,6 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public interface Hamiltonian {
 
-	public double evaluate(ProxyPerson person);
+	public double evaluate(PlainPerson person);
 	
 }

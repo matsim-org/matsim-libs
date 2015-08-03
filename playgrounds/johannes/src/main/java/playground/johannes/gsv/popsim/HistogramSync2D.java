@@ -20,9 +20,9 @@
 package playground.johannes.gsv.popsim;
 
 import gnu.trove.*;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.math.Discretizer;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -46,7 +46,7 @@ public class HistogramSync2D implements Hamiltonian, HistogramSync {
 
     private double hValue;
 
-    public HistogramSync2D(Set<ProxyPerson> refPop, Set<ProxyPerson> simPop, Object xAttKey, Object yAttKey, Discretizer xDiscretizer) {
+    public HistogramSync2D(Set<PlainPerson> refPop, Set<PlainPerson> simPop, Object xAttKey, Object yAttKey, Discretizer xDiscretizer) {
         this.xAttKey = xAttKey;
         this.yAttKey = yAttKey;
         this.xDiscretizer = xDiscretizer;
@@ -70,12 +70,12 @@ public class HistogramSync2D implements Hamiltonian, HistogramSync {
         hValue = calcFullDiff();
     }
 
-    private void calcMeans(Set<ProxyPerson> persons, TDoubleArrayList sumValues, TIntArrayList countValues) {
+    private void calcMeans(Set<PlainPerson> persons, TDoubleArrayList sumValues, TIntArrayList countValues) {
         TIntDoubleHashMap sumsMap = new TIntDoubleHashMap();
         TIntIntHashMap countsMap = new TIntIntHashMap();
 
         int maxIdx = 0;
-        for(ProxyPerson person : persons) {
+        for(PlainPerson person : persons) {
             Double key = (Double)person.getUserData(xAttKey);
             Double value = (Double)person.getUserData(yAttKey);
             if(key != null && value != null) {
@@ -134,7 +134,7 @@ public class HistogramSync2D implements Hamiltonian, HistogramSync {
         return newValues;
     }
 
-    public void notifyChange(Object attKey, double oldValue, double newValue, ProxyPerson person) {
+    public void notifyChange(Object attKey, double oldValue, double newValue, PlainPerson person) {
         if(attKey.equals(yAttKey)) {
             Double xVal = (Double) person.getUserData(xAttKey);
             int idx = (int)xDiscretizer.index(xVal);
@@ -188,7 +188,7 @@ public class HistogramSync2D implements Hamiltonian, HistogramSync {
 
 
     @Override
-    public double evaluate(ProxyPerson person) {
+    public double evaluate(PlainPerson person) {
         return hValue;
 //        return calcFullDiff();
     }

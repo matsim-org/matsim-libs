@@ -20,8 +20,8 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -30,8 +30,8 @@ import playground.johannes.gsv.synPop.ProxyPersonTask;
 public class DeleteNoPlans implements ProxyPersonTask {
 
 	@Override
-	public void apply(ProxyPerson person) {
-		if(person.getPlans().size() == 0) {
+	public void apply(PlainPerson person) {
+		if(person.getEpisodes().size() == 0) {
 			person.setAttribute(CommonKeys.DELETE, "true");
 		}
 

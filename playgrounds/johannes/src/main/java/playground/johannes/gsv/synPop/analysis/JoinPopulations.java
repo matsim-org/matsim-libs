@@ -19,14 +19,13 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -42,7 +41,7 @@ public class JoinPopulations {
 	
 		logger.info("Loading persons 1...");
 		parser.parse(args[0]);
-		Set<ProxyPerson> persons = new HashSet<>(parser.getPersons());
+		Set<PlainPerson> persons = new HashSet<>(parser.getPersons());
 		
 		logger.info("Loading persons 2...");
 		parser = new XMLParser();

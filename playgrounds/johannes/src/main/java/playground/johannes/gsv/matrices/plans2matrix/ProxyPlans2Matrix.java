@@ -19,12 +19,7 @@
 
 package playground.johannes.gsv.matrices.plans2matrix;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Coordinate;
 import org.apache.log4j.Logger;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -38,11 +33,7 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
@@ -54,8 +45,15 @@ import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -83,7 +81,7 @@ public class ProxyPlans2Matrix {
 		this.predicate = predicate;
 	}
 
-	public KeyMatrix run(Collection<ProxyPerson> persons, ZoneCollection zones, ActivityFacilities facilities, String key) {
+	public KeyMatrix run(Collection<PlainPerson> persons, ZoneCollection zones, ActivityFacilities facilities, String key) {
 
 		KeyMatrix m = new KeyMatrix();
 
@@ -97,12 +95,12 @@ public class ProxyPlans2Matrix {
 		double pkmRoute = 0;
 		double pkmGeo = 0;
 
-		for (ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlans().get(0);
+		for (PlainPerson person : persons) {
+			Episode plan = person.getEpisodes().get(0);
 			for (int i = 0; i < plan.getLegs().size(); i++) {
-				ProxyObject leg = plan.getLegs().get(i);
-				ProxyObject prev = plan.getActivities().get(i);
-				ProxyObject next = plan.getActivities().get(i + 1);
+				Element leg = plan.getLegs().get(i);
+				Element prev = plan.getActivities().get(i);
+				Element next = plan.getActivities().get(i + 1);
 
 				legCandidates++;
 				if (predicate.test(person, leg, prev, next)) {
@@ -185,7 +183,7 @@ public class ProxyPlans2Matrix {
 		parser.parse(args[0]);
 		logger.info(String.format("Loaded %s persons...", parser.getPersons().size()));
 
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 
 		logger.info("Restoring original activity types...");
 		ProxyTaskRunner.run(new RestoreActTypes(), persons, true);

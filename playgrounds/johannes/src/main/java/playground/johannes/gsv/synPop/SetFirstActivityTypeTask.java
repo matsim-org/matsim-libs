@@ -19,6 +19,9 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
 /**
  * @author johannes
  *
@@ -26,13 +29,13 @@ package playground.johannes.gsv.synPop;
 public class SetFirstActivityTypeTask implements ProxyPlanTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
+	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.synpop.data.PlainEpisode)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 		if(plan.getLegs().size() > 0 ) {
-		ProxyObject firstLeg = plan.getLegs().get(0);
-		ProxyObject firstAct = plan.getActivities().get(0);
+		Element firstLeg = plan.getLegs().get(0);
+		Element firstAct = plan.getActivities().get(0);
 		
 		firstAct.setAttribute(CommonKeys.ACTIVITY_TYPE, firstLeg.getAttribute(CommonKeys.LEG_ORIGIN));
 		}

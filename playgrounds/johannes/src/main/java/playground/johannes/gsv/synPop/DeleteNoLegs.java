@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.PlainPerson;
+
 /**
  * @author johannes
  *
@@ -26,10 +28,10 @@ package playground.johannes.gsv.synPop;
 public class DeleteNoLegs implements ProxyPersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
+	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.synpop.data.PlainEpisode)
 	 */
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		if(person.getPlan().getLegs().size() == 0) {
 			person.setAttribute(CommonKeys.DELETE, "true");
 		}

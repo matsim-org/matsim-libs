@@ -17,9 +17,9 @@ package playground.johannes.gsv.popsim;/* **************************************
  *                                                                         *
  * *********************************************************************** */
 
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
 
 public interface HistogramSync {
 
-    void notifyChange(Object attKey, double oldValue, double newValue, ProxyPerson person);
+    void notifyChange(Object attKey, double oldValue, double newValue, PlainPerson person);
 }

@@ -19,33 +19,31 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.prep.PreparedGeometry;
+import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -70,7 +68,7 @@ public class PopGeoExtract {
 
 		logger.info("Loading persons...");
 		parser.parse(infile);
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 		FacilityDataLoader loader = new FacilityDataLoader(facFile, null);
@@ -100,11 +98,11 @@ public class PopGeoExtract {
 		}
 
 		@Override
-		public void apply(ProxyPerson person) {
+		public void apply(PlainPerson person) {
 			boolean keep = false;
 
-			for (ProxyPlan plan : person.getPlans()) {
-				for (ProxyObject act : plan.getActivities()) {
+			for (Episode plan : person.getEpisodes()) {
+				for (Element act : plan.getActivities()) {
 					Id<ActivityFacility> id = Id.create(act.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					ActivityFacility f = facilities.getFacilities().get(id);
 					Point p = MatsimCoordUtils.coordToPoint(f.getCoord());

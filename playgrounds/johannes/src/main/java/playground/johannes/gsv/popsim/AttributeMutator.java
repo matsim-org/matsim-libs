@@ -19,13 +19,12 @@
 
 package playground.johannes.gsv.popsim;
 
+import playground.johannes.gsv.synPop.sim3.Mutator;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.Mutator;
 
 /**
  * @author johannes
@@ -35,7 +34,7 @@ public abstract class AttributeMutator implements Mutator {
 
 	private final Random random;
 
-	private final ArrayList<ProxyPerson> mutations;
+	private final ArrayList<PlainPerson> mutations;
 
 	private Double prevValue;
 
@@ -56,14 +55,14 @@ public abstract class AttributeMutator implements Mutator {
 	}
 
 	@Override
-	public List<ProxyPerson> select(List<ProxyPerson> persons) {
+	public List<PlainPerson> select(List<PlainPerson> persons) {
 		mutations.set(0, persons.get(random.nextInt(persons.size())));
 		return mutations;
 	}
 
 	@Override
-	public boolean modify(List<ProxyPerson> persons) {
-		ProxyPerson person = persons.get(0);
+	public boolean modify(List<PlainPerson> persons) {
+		PlainPerson person = persons.get(0);
 		prevValue = getAttribute(person, strKey, objKey);
 		double newValue = newValue(person);
 		person.setUserData(objKey, newValue);
@@ -74,8 +73,8 @@ public abstract class AttributeMutator implements Mutator {
 	}
 
 	@Override
-	public void revert(List<ProxyPerson> persons) {
-		ProxyPerson person = persons.get(0);
+	public void revert(List<PlainPerson> persons) {
+		PlainPerson person = persons.get(0);
 
 		double val = getAttribute(person, strKey, objKey);
 		person.setUserData(objKey, prevValue);
@@ -85,7 +84,7 @@ public abstract class AttributeMutator implements Mutator {
 		prevValue = null;
 	}
 
-	private Double getAttribute(ProxyPerson person, String strKey, Object objKey) {
+	private Double getAttribute(PlainPerson person, String strKey, Object objKey) {
 		Double doubleVal = (Double) person.getUserData(objKey);
 		if (doubleVal == null) {
 			String stringVal = person.getAttribute(strKey);
@@ -99,5 +98,5 @@ public abstract class AttributeMutator implements Mutator {
 		return doubleVal;
 	}
 
-	protected abstract Double newValue(ProxyPerson person);
+	protected abstract Double newValue(PlainPerson person);
 }

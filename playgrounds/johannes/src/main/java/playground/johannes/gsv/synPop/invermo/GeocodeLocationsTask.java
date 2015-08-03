@@ -19,23 +19,17 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import com.google.code.geocoder.model.LatLng;
+import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
-
-import com.google.code.geocoder.model.LatLng;
 
 /**
  * @author johannes
@@ -77,17 +71,17 @@ public class GeocodeLocationsTask implements ProxyPersonTask {
 	}
 
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		geocodeField(InvermoKeys.HOME_LOCATION, InvermoKeys.HOME_COORD, person);
-		for (ProxyPlan plan : person.getPlans()) {
-			for (ProxyObject act : plan.getActivities()) {
+		for (Episode plan : person.getEpisodes()) {
+			for (Element act : plan.getActivities()) {
 				geocodeField("location", "coord", act);
 			}
 		}
 
 	}
 
-	private void geocodeField(String key1, String key2, ProxyObject obj) {
+	private void geocodeField(String key1, String key2, Element obj) {
 		String start = obj.getAttribute(key1);
 		if (start != null && !start.equalsIgnoreCase("home") && !start.equalsIgnoreCase("work") && !start.equalsIgnoreCase("prev")) {
 			String str = cache.get(start);

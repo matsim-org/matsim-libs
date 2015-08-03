@@ -19,16 +19,10 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.io.IOException;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-
 import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.io.XMLParser;
@@ -37,6 +31,11 @@ import playground.johannes.gsv.synPop.mid.Route2GeoDistance;
 import playground.johannes.gsv.synPop.mid.run.ConcurrentProxyTaskRunner;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.io.IOException;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -74,7 +73,7 @@ public class SetActivityLocations {
 
 		logger.info("Loading persons...");
 		parser.parse(config.findParam(MODULE_NAME, "popInputFile"));
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 
 		logger.info("Replacing activity types...");

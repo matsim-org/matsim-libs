@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -31,12 +31,12 @@ import playground.johannes.gsv.synPop.ProxyPlan;
 public class ReplaceLocationAliasTask implements ProxyPersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.gsv.synPop.ProxyPerson)
+	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public void apply(ProxyPerson person) {
-		for(ProxyPlan plan : person.getPlans()) {
-			for(ProxyObject act : plan.getActivities()) {
+	public void apply(PlainPerson person) {
+		for(Episode plan : person.getEpisodes()) {
+			for(Element act : plan.getActivities()) {
 				String desc = act.getAttribute(InvermoKeys.LOCATION);
 				if("home".equals(desc)) {
 					act.setAttribute(InvermoKeys.LOCATION, person.getAttribute("homeLoc"));

@@ -20,10 +20,11 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainEpisode;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -32,20 +33,20 @@ import playground.johannes.gsv.synPop.ProxyPlan;
 public class InsertHomePlanTask implements ProxyPersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.gsv.synPop.ProxyPerson)
+	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public void apply(ProxyPerson person) {
-		if(person.getPlans().isEmpty()) {
-			ProxyPlan plan = new ProxyPlan();
-			ProxyObject act = new ProxyObject();
+	public void apply(PlainPerson person) {
+		if(person.getEpisodes().isEmpty()) {
+			Episode plan = new PlainEpisode();
+			PlainElement act = new PlainElement();
 			act.setAttribute(CommonKeys.ACTIVITY_TYPE, "home");
 			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
 			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, "86400");
 			act.setAttribute(InvermoKeys.LOCATION, "home");
 			
 			plan.addActivity(act);
-			person.addPlan(plan);
+			person.addEpisode(plan);
 		}
 
 	}

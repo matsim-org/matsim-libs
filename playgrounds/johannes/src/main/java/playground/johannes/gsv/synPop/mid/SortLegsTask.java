@@ -19,13 +19,13 @@
 
 package playground.johannes.gsv.synPop.mid;
 
+import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
  * @author johannes
@@ -34,16 +34,16 @@ import playground.johannes.gsv.synPop.ProxyPlanTask;
 public class SortLegsTask implements ProxyPlanTask {
 
 	@Override
-	public void apply(ProxyPlan plan) {
-		SortedMap<Integer, ProxyObject> map = new TreeMap<Integer, ProxyObject>();
+	public void apply(Episode plan) {
+		SortedMap<Integer, Element> map = new TreeMap<Integer, Element>();
 		
-		for(ProxyObject leg : plan.getLegs()) {
+		for(Element leg : plan.getLegs()) {
 			Integer idx = Integer.parseInt(leg.getAttribute(MIDKeys.LEG_INDEX));
 			map.put(idx, leg);
 		}
 		
 		plan.getLegs().clear();
-		for(Entry<Integer, ProxyObject> entry : map.entrySet()) {
+		for(Entry<Integer, Element> entry : map.entrySet()) {
 			plan.addLeg(entry.getValue());
 		}
 	}

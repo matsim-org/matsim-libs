@@ -19,23 +19,21 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.sna.gis.CRSUtils;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -60,8 +58,8 @@ public class DeleteOutOfBounds implements ProxyPlanTask {
 	}
 	
 	@Override
-	public void apply(ProxyPlan plan) {
-		for(ProxyObject act : plan.getActivities()) {
+	public void apply(Episode plan) {
+		for(Element act : plan.getActivities()) {
 			String coordStr = act.getAttribute(InvermoKeys.COORD);
 			if(coordStr != null) {
 				Point p = string2Point(coordStr);

@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.util.Map;
+import playground.johannes.synpop.data.Episode;
 
-import playground.johannes.gsv.synPop.ProxyPlan;
+import java.util.Map;
 
 /**
  * @author johannes
@@ -30,10 +30,10 @@ import playground.johannes.gsv.synPop.ProxyPlan;
 public class JourneyDaysHandler implements PlanAttributeHandler {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.PlanAttributeHandler#hanle(playground.johannes.gsv.synPop.ProxyPlan, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.mid.PlanAttributeHandler#hanle(playground.johannes.synpop.data.PlainEpisode, java.util.Map)
 	 */
 	@Override
-	public void hanle(ProxyPlan plan, Map<String, String> attributes) {
+	public void hanle(Episode plan, Map<String, String> attributes) {
 		int nights = Integer.parseInt(attributes.get("p1014"));
 		
 		if(nights < 995)

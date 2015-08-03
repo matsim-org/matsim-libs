@@ -21,17 +21,14 @@ package playground.johannes.gsv.popsim;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
-
-import java.util.Collection;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
 import playground.johannes.sna.math.Discretizer;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.math.InterpolatingDiscretizer;
-import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Collection;
 
 /**
  * @author johannes
@@ -57,13 +54,13 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener, HistogramS
 
 	private double simFactor;
 
-	public HistogramSync1D(Collection<ProxyPerson> refPop, Collection<ProxyPerson> simPop, String attName, Object attKey, Discretizer discretizer) {
+	public HistogramSync1D(Collection<PlainPerson> refPop, Collection<PlainPerson> simPop, String attName, Object attKey, Discretizer discretizer) {
 		this.attName = attName;
 		this.attKey = attKey;
 		this.discretizer = discretizer;
 
 		TDoubleArrayList refValues = new TDoubleArrayList(refPop.size());
-		for(ProxyPerson person : refPop) {
+		for(PlainPerson person : refPop) {
 			String value = person.getAttribute(attName);
 			if(value != null) {
 				refValues.add(Double.parseDouble(value));
@@ -77,7 +74,7 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener, HistogramS
 		Histogram.normalize(refHist);
 
 		TDoubleArrayList simValues = new TDoubleArrayList(simPop.size());
-		for(ProxyPerson person : simPop) {
+		for(PlainPerson person : simPop) {
 			String value = person.getAttribute(attName);
 			if(value != null) {
 				simValues.add(Double.parseDouble(value));
@@ -90,7 +87,7 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener, HistogramS
 		currentDelta = fullDiff();
 	}
 
-	public void notifyChange(Object key, double prevValue, double newValue, ProxyPerson person) {
+	public void notifyChange(Object key, double prevValue, double newValue, PlainPerson person) {
 		if(key.equals(this.attKey)) {
 			double bin = discretizer.discretize(prevValue);
 			double prevDiff = Math.abs((simHist.get(bin) * simFactor) - refHist.get(bin));
@@ -126,10 +123,10 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener, HistogramS
 	}
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.sim3.Hamiltonian#evaluate(playground.johannes.gsv.synPop.ProxyPerson)
+	 * @see playground.johannes.gsv.synPop.sim3.Hamiltonian#evaluate(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public double evaluate(ProxyPerson person) {
+	public double evaluate(PlainPerson person) {
 //		return currentDelta;
 		return fullDiff();
 	}
@@ -138,7 +135,7 @@ public class HistogramSync1D implements Hamiltonian, SamplerListener, HistogramS
 	 * @see playground.johannes.gsv.synPop.sim3.SamplerListener#afterStep(java.util.Collection, java.util.Collection, boolean)
 	 */
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
 		// TODO Auto-generated method stub
 
 	}

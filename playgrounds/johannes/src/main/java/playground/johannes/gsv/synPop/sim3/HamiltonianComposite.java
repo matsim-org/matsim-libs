@@ -19,11 +19,11 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import playground.johannes.sna.util.Composite;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
@@ -57,7 +57,7 @@ public class HamiltonianComposite extends Composite<Hamiltonian> implements Hami
 	}
 	
 	@Override
-	public double evaluate(ProxyPerson person) {
+	public double evaluate(PlainPerson person) {
 		double sum = 0;
 		
 		for(int i = 0; i < components.size(); i++) {

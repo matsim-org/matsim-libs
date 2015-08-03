@@ -19,19 +19,15 @@
 
 package playground.johannes.gsv.synPop.io;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainEpisode;
+import playground.johannes.synpop.data.PlainPerson;
 
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
+import java.util.*;
 
 /**
  * @author johannes
@@ -41,15 +37,15 @@ public class XMLParser extends MatsimXmlParser {
 
 	private static final Logger logger = Logger.getLogger(XMLParser.class);
 
-	private Set<ProxyPerson> persons;
+	private Set<PlainPerson> persons;
 
-	private ProxyPerson person;
+	private PlainPerson person;
 
-	private ProxyPlan plan;
+	private Episode plan;
 
 	private List<String> blacklist = new ArrayList<>();
 
-	public Set<ProxyPerson> getPersons() {
+	public Set<PlainPerson> getPersons() {
 		return persons;
 	}
 
@@ -66,10 +62,10 @@ public class XMLParser extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equalsIgnoreCase(Constants.PERSONS_TAG)) {
-			persons = new HashSet<ProxyPerson>();
+			persons = new HashSet<PlainPerson>();
 
 		} else if (name.equalsIgnoreCase(Constants.PERSON_TAG)) {
-			person = new ProxyPerson((String) getAttribute(Constants.ID_KEY, atts));
+			person = new PlainPerson((String) getAttribute(Constants.ID_KEY, atts));
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!type.equalsIgnoreCase(Constants.ID_KEY)) {
@@ -79,7 +75,7 @@ public class XMLParser extends MatsimXmlParser {
 				}
 			}
 		} else if (name.equalsIgnoreCase(Constants.PLAN_TAG)) {
-			plan = new ProxyPlan();
+			plan = new PlainEpisode();
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 
@@ -90,7 +86,7 @@ public class XMLParser extends MatsimXmlParser {
 			}
 
 		} else if (name.equalsIgnoreCase(Constants.ACTIVITY_TAG)) {
-			ProxyObject act = new ProxyObject();
+			PlainElement act = new PlainElement();
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!blacklist.contains(type)) {
@@ -100,7 +96,7 @@ public class XMLParser extends MatsimXmlParser {
 			plan.addActivity(act);
 
 		} else if (name.equalsIgnoreCase(Constants.LEG_TAG)) {
-			ProxyObject leg = new ProxyObject();
+			PlainElement leg = new PlainElement();
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!blacklist.contains(type)) {

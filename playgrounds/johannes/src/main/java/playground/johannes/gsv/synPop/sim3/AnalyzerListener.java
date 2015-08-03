@@ -19,25 +19,16 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
-import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TripGeoDistanceTask;
-import playground.johannes.coopsim.pysical.Trajectory;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.gsv.synPop.analysis.LegGeoDistanceTask;
 import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
-import playground.johannes.gsv.synPop.analysis.TrajectoryProxyBuilder;
 import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author johannes
@@ -71,7 +62,7 @@ public class AnalyzerListener implements SamplerListener {
 	}
 
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
 		// new CopyFacilityUserData().afterStep(population, mutations,
 		// accepted);
 

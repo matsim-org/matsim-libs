@@ -19,12 +19,12 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
+import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
 import java.util.HashMap;
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
  * @author johannes
@@ -46,8 +46,8 @@ public class ValidateDatesTask implements ProxyPlanTask {
 	}
 
 	@Override
-	public void apply(ProxyPlan plan) {
-		for(ProxyObject leg : plan.getLegs()) {
+	public void apply(Episode plan) {
+		for(Element leg : plan.getLegs()) {
 			String startYear = leg.getAttribute("startTimeYear");
 			if(startYear != null)
 				leg.setAttribute("startTimeYear", validate(startYear));

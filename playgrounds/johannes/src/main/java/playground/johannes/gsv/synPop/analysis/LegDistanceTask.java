@@ -19,20 +19,19 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.sna.math.LinearDiscretizer;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.sna.math.LinearDiscretizer;
 
 /**
  * @author johannes
@@ -51,17 +50,17 @@ public class LegDistanceTask extends AnalyzerTask {
 		this.mode = mode;
 	}
 	
-	protected DescriptiveStatistics statistics(Collection<ProxyPerson> persons, String purpose, String mode) {
+	protected DescriptiveStatistics statistics(Collection<PlainPerson> persons, String purpose, String mode) {
 		DescriptiveStatistics stats = new DescriptiveStatistics();
 
 		int cntNoVal = 0;
 
-		for (ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
+		for (PlainPerson person : persons) {
+			Episode plan = person.getPlan();
 
 			for(int i = 0; i < plan.getLegs().size(); i++) {
-				ProxyObject leg = plan.getLegs().get(i);
-				ProxyObject act = plan.getActivities().get(i + 1);
+				Element leg = plan.getLegs().get(i);
+				Element act = plan.getActivities().get(i + 1);
 			
 				if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 					
@@ -97,10 +96,10 @@ public class LegDistanceTask extends AnalyzerTask {
 	}
 	
 	@Override
-	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
 		Set<String> purposes = new HashSet<String>();
-		for (ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
+		for (PlainPerson person : persons) {
+			Episode plan = person.getPlan();
 			for (int i = 0; i < plan.getActivities().size(); i++) {
 				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}

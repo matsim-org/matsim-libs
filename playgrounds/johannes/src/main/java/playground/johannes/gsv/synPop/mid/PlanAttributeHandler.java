@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.util.Map;
+import playground.johannes.synpop.data.Episode;
 
-import playground.johannes.gsv.synPop.ProxyPlan;
+import java.util.Map;
 
 /**
  * @author johannes
@@ -29,6 +29,6 @@ import playground.johannes.gsv.synPop.ProxyPlan;
  */
 public interface PlanAttributeHandler {
 
-	public void hanle(ProxyPlan plan, Map<String, String> attributes);
+	public void hanle(Episode plan, Map<String, String> attributes);
 	
 }

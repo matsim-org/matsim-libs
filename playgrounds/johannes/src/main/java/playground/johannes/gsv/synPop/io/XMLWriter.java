@@ -19,18 +19,15 @@
 
 package playground.johannes.gsv.synPop.io;
 
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.MatsimXmlWriter;
+import playground.johannes.synpop.data.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
@@ -38,13 +35,13 @@ import playground.johannes.gsv.synPop.ProxyPlan;
  */
 public class XMLWriter extends MatsimXmlWriter {
 	
-	public void write(String file, Collection<ProxyPerson> persons) {
+	public void write(String file, Collection<PlainPerson> persons) {
 		openFile(file);
 		
 		writeXmlHead();
 		
 		writeStartTag(Constants.PERSONS_TAG, null);
-		for (ProxyPerson person : persons) {
+		for (PlainPerson person : persons) {
 			writePerson(person);
 		}
 		writeEndTag(Constants.PERSONS_TAG);
@@ -52,20 +49,20 @@ public class XMLWriter extends MatsimXmlWriter {
 		close();
 	}
 
-	private void writePerson(ProxyPerson person) {
+	private void writePerson(PlainPerson person) {
 		List<Tuple<String, String>> atts = getAttributes(person.getAttributes());
 		
 		atts.add(new Tuple<String, String>(Constants.ID_KEY, person.getId()));
 		
 		writeStartTag(Constants.PERSON_TAG, atts);
-		for(ProxyPlan plan : person.getPlans())
+		for(Episode plan : person.getEpisodes())
 			writePlan(plan);
 		writeEndTag(Constants.PERSON_TAG);
 
 	}
 
-	private void writePlan(ProxyPlan plan) {
-		writeStartTag(Constants.PLAN_TAG, getAttributes(plan.getAttributes()));
+	private void writePlan(Episode plan) {
+		writeStartTag(Constants.PLAN_TAG, getAttributes(((PlainEpisode)plan).getAttributes()));
 		for (int i = 0; i < plan.getActivities().size(); i++) {
 			if (i > 0)
 				writeLeg(plan.getLegs().get(i - 1));
@@ -75,12 +72,12 @@ public class XMLWriter extends MatsimXmlWriter {
 		writeEndTag(Constants.PLAN_TAG);
 	}
 
-	private void writeActivity(ProxyObject activity) {
-		writeStartTag(Constants.ACTIVITY_TAG, getAttributes(activity.getAttributes()), true);
+	private void writeActivity(Element activity) {
+		writeStartTag(Constants.ACTIVITY_TAG, getAttributes(((PlainElement)activity).getAttributes()), true);
 	}
 
-	private void writeLeg(ProxyObject leg) {
-		writeStartTag(Constants.LEG_TAG, getAttributes(leg.getAttributes()), true);
+	private void writeLeg(Element leg) {
+		writeStartTag(Constants.LEG_TAG, getAttributes(((PlainElement)leg).getAttributes()), true);
 	}
 
 	private List<Tuple<String, String>> getAttributes(Map<String, String> attributes) {

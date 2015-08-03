@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -43,7 +45,7 @@ public class DeleteDay implements ProxyPersonTask {
 	}
 	
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		String day = person.getAttribute(CommonKeys.DAY);
 		boolean found = false;
 		

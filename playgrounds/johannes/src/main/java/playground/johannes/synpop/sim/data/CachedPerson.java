@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,68 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.sim.data;
 
-import java.util.ArrayList;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
+
 import java.util.List;
-import java.util.Map.Entry;
 
 /**
  * @author johannes
- *
  */
-public class ProxyPerson extends ProxyObject {
+public class CachedPerson extends CachedElement implements Person {
 
-	private String id;
-	
-//	private ProxyPlan plan;
-	
-	private List<ProxyPlan> plans = new ArrayList<ProxyPlan>();
-	
-	public ProxyPerson(String id) {
-		this.id = id;		
-	}
-	
-	public String getId() {
-		return id;
-	}
-	
-	public void setPlan(ProxyPlan plan) {
-//		this.plan = plan;
-		if(plans.isEmpty())
-			plans.add(plan);
-		else
-			plans.set(0, plan);
-	}
-	
-	public void addPlan(ProxyPlan plan) {
-		plans.add(plan);
-	}
-	
-	public ProxyPlan getPlan() {
-//		return plan;
-		return plans.get(0);
-	}
-	
-	public List<ProxyPlan> getPlans() {
-		return plans;
-	}
-	
-	public ProxyPerson clone() {
-		return cloneWithNewId(id);
-	}
-	
-	public ProxyPerson cloneWithNewId(String newId) {
-		ProxyPerson clone = new ProxyPerson(newId);
-		
-		for(Entry<String, String> entry : getAttributes().entrySet()) {
-			clone.setAttribute(entry.getKey(), entry.getValue());
-		}
-		
-//		clone.setPlan(plan.clone());
-		for(ProxyPlan plan : plans)
-			clone.addPlan(plan.clone());
-		
-		return clone;
-	}
+    public CachedPerson(Person delegate) {
+        super(delegate);
+    }
+
+    @Override
+    public List<Episode> getEpisodes() {
+        return ((Person)getDelegate()).getEpisodes();
+    }
+
+    @Override
+    public void addEpisode(Episode episode) {
+        ((Person)getDelegate()).addEpisode(episode);
+    }
 }

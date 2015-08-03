@@ -21,20 +21,18 @@ package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.socialnetworks.statistics.Correlations;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.sna.util.TXTWriter;
-import playground.johannes.socialnetworks.statistics.Correlations;
 
 /**
  * @author johannes
@@ -49,16 +47,16 @@ public class DistanceJourneyDaysTask extends AnalyzerTask {
 	}
 
 	@Override
-	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+	public void analyze(Collection<PlainPerson> persons, Map<String, DescriptiveStatistics> results) {
 		if (outputDirectoryNotNull()) {
 			TDoubleArrayList days = new TDoubleArrayList();
 			TDoubleArrayList distances = new TDoubleArrayList();
 
-			for (ProxyPerson person : persons) {
-				for (ProxyPlan plan : person.getPlans()) {
+			for (PlainPerson person : persons) {
+				for (Episode plan : person.getEpisodes()) {
 					String dayVal = plan.getAttribute(MIDKeys.JOURNEY_DAYS);
 					if (dayVal != null) {
-						for (ProxyObject leg : plan.getLegs()) {
+						for (Element leg : plan.getLegs()) {
 							if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 								String distVal = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 								if (distVal != null) {

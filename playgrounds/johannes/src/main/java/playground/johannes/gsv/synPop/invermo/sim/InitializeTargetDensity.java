@@ -19,13 +19,9 @@
 
 package playground.johannes.gsv.synPop.invermo.sim;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.LandUseData;
@@ -33,6 +29,9 @@ import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Map;
 
 /**
  * @author johannes
@@ -49,7 +48,7 @@ public class InitializeTargetDensity implements ProxyPersonTask {
 	}
 	
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
 		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getNuts3Layer();
 		Zone<Map<String, Object>> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(home.getCoord()));

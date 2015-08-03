@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop;
 
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.Collection;
 
 /**
@@ -34,14 +36,14 @@ public class ApplySampleProbas implements ProxyPersonsTask {
 	}
 	
 	@Override
-	public void apply(Collection<ProxyPerson> persons) {
+	public void apply(Collection<PlainPerson> persons) {
 		double p = 1/(double)N;
 		double wsum = 0;
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			wsum += Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
 		}
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
 			person.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(p * w * persons.size()/wsum));
 		}

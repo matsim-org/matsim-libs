@@ -1,22 +1,24 @@
 package playground.johannes.gsv.synPop;
 
+import org.apache.log4j.Logger;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+
 import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
 
 public class SortLegsTimeTask implements ProxyPlanTask {
 
 	private static final Logger logger = Logger.getLogger(SortLegsTimeTask.class);
 	
 	@Override
-	public void apply(ProxyPlan plan) {
-		SortedMap<Double, ProxyObject> map = new TreeMap<Double, ProxyObject>();
+	public void apply(Episode plan) {
+		SortedMap<Double, Element> map = new TreeMap<Double, Element>();
 		/*
 		 * Insert leg according to start time or end time, respectively.
 		 */
-		for(ProxyObject leg : plan.getLegs()) {
+		for(Element leg : plan.getLegs()) {
 			String val = leg.getAttribute(CommonKeys.LEG_START_TIME);
 			Double time = null;
 			if(val == null) {
@@ -36,7 +38,7 @@ public class SortLegsTimeTask implements ProxyPlanTask {
 		 * Check for overlapping legs.
 		 */
 		double prevEnd = 0;
-		for(Entry<Double, ProxyObject> entry : map.entrySet()) {
+		for(Entry<Double, Element> entry : map.entrySet()) {
 			String startStr = entry.getValue().getAttribute(CommonKeys.LEG_START_TIME);
 			if(startStr != null) {
 				double start = Double.parseDouble(startStr);
@@ -56,7 +58,7 @@ public class SortLegsTimeTask implements ProxyPlanTask {
 		 * Clear old legs an insert sorted legs.
 		 */
 		plan.getLegs().clear();
-		for(Entry<Double, ProxyObject> entry : map.entrySet()) {
+		for(Entry<Double, Element> entry : map.entrySet()) {
 			plan.getLegs().add(entry.getValue());
 		}
 

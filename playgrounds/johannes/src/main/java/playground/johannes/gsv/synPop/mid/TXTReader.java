@@ -19,20 +19,18 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainEpisode;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
@@ -52,7 +50,7 @@ public class TXTReader {
 	
 	private List<PlanAttributeHandler> planAttHandlers = new ArrayList<>();
 	
-	private Map<String, ProxyPerson> persons;
+	private Map<String, PlainPerson> persons;
 	
 
 	public void addPersonAttributeHandler(PersonAttributeHandler handler) {
@@ -75,8 +73,8 @@ public class TXTReader {
 		this.separator = separator;
 	}
 	
-	public Map<String, ProxyPerson> read(String personFile, String legFile, String journeyFile) throws IOException {
-		persons = new LinkedHashMap<String, ProxyPerson>(65000);
+	public Map<String, PlainPerson> read(String personFile, String legFile, String journeyFile) throws IOException {
+		persons = new LinkedHashMap<String, PlainPerson>(65000);
 		/*
 		 * read and create persons
 		 */
@@ -84,8 +82,8 @@ public class TXTReader {
 		/*
 		 * add an empty plan to each person
 		 */
-		for(ProxyPerson person : persons.values()) {
-			ProxyPlan plan = new ProxyPlan();
+		for(PlainPerson person : persons.values()) {
+			Episode plan = new PlainEpisode();
 			plan.setAttribute(CommonKeys.DATA_SOURCE, MIDKeys.MID_TRIPS);
 			person.setPlan(plan);
 		}
@@ -115,9 +113,9 @@ public class TXTReader {
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
 			String id = personIdBuilder(attributes);
-			ProxyPerson person = persons.get(id);
+			PlainPerson person = persons.get(id);
 			
-			ProxyObject leg = new ProxyObject();
+			PlainElement leg = new PlainElement();
 			for(LegAttributeHandler handler : legAttHandlers)
 				handler.handle(leg, attributes);
 			
@@ -130,7 +128,7 @@ public class TXTReader {
 
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
-			ProxyPerson person = new ProxyPerson(personIdBuilder(attributes));
+			PlainPerson person = new PlainPerson(personIdBuilder(attributes));
 			
 			for(PersonAttributeHandler handler : personAttHandlers) {
 				handler.handle(person, attributes);
@@ -146,17 +144,17 @@ public class TXTReader {
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
 			String id = personIdBuilder(attributes);
-			ProxyPerson person = persons.get(id);
-			
-			ProxyPlan plan = new ProxyPlan();
+			PlainPerson person = persons.get(id);
+
+			Episode plan = new PlainEpisode();
 			plan.setAttribute(CommonKeys.DATA_SOURCE, MIDKeys.MID_JOUNREYS);
 			for(PlanAttributeHandler handler : planAttHandlers) {
 				handler.hanle(plan, attributes);
 			}
 			
-			person.addPlan(plan);
+			person.addEpisode(plan);
 			
-			ProxyObject leg = new ProxyObject();
+			PlainElement leg = new PlainElement();
 			plan.addLeg(leg);
 			leg.setAttribute(CommonKeys.LEG_ORIGIN, ActivityType.HOME);
 			for(LegAttributeHandler handler : journeyAttHandlers) {

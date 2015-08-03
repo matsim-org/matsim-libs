@@ -19,17 +19,10 @@
 
 package playground.johannes.gsv.synPop;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -40,10 +33,15 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author johannes
@@ -80,17 +78,17 @@ public class Proxy2Matsim {
 		int legs = 0;
 		int plans = 0;
 
-		for (ProxyPerson proxyPerson : parser.getPersons()) {
-			Person person = factory.createPerson(Id.create(proxyPerson.getId(), Person.class));
+		for (PlainPerson plainPerson : parser.getPersons()) {
+			Person person = factory.createPerson(Id.create(plainPerson.getId(), Person.class));
 			pop.addPerson(person);
 
-			ProxyPlan proxyPlan = proxyPerson.getPlan();
+			Episode proxyPlan = plainPerson.getPlan();
 			Plan plan = factory.createPlan();
 			person.addPlan(plan);
 			plans++;
 
 			for (int i = 0; i < proxyPlan.getActivities().size(); i++) {
-				ProxyObject proxyAct = proxyPlan.getActivities().get(i);
+				Element proxyAct = proxyPlan.getActivities().get(i);
 				ActivityImpl act = null;
 
 				String type = proxyAct.getAttribute(CommonKeys.ACTIVITY_TYPE);
@@ -119,7 +117,7 @@ public class Proxy2Matsim {
 				plan.addActivity(act);
 
 				if (i < proxyPlan.getLegs().size()) {
-					ProxyObject proxyLeg = proxyPlan.getLegs().get(i);
+					Element proxyLeg = proxyPlan.getLegs().get(i);
 					String mode = proxyLeg.getAttribute(CommonKeys.LEG_MODE);
 					if (mode == null) {
 						mode = "undefined";

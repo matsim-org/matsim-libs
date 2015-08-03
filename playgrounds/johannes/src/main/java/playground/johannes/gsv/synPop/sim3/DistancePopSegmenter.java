@@ -19,15 +19,15 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.socialnetworks.utils.CollectionUtils;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.socialnetworks.utils.CollectionUtils;
 
 /**
  * @author johannes
@@ -44,14 +44,14 @@ public class DistancePopSegmenter implements PopulationSegmenter {
 	}
 	
 	@Override
-	public List<ProxyPerson>[] split(Collection<ProxyPerson> persons, int segments) {
-		List<ProxyPerson> shortDist = new ArrayList<>(persons.size());
-		List<ProxyPerson> longDist = new ArrayList<>(persons.size());
+	public List<PlainPerson>[] split(Collection<PlainPerson> persons, int segments) {
+		List<PlainPerson> shortDist = new ArrayList<>(persons.size());
+		List<PlainPerson> longDist = new ArrayList<>(persons.size());
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			double max = 0;
-			for(ProxyPlan plan : person.getPlans()) {
-				for(ProxyObject leg : plan.getLegs()) {
+			for(Episode plan : person.getEpisodes()) {
+				for(Element leg : plan.getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(val != null) {
 						max = Math.max(Double.parseDouble(val), max);
@@ -67,10 +67,10 @@ public class DistancePopSegmenter implements PopulationSegmenter {
 		}
 		
 		int n = (int) Math.ceil(segments/2.0);
-		List<ProxyPerson>[] shortSegements = CollectionUtils.split(shortDist, n);
-		List<ProxyPerson>[] longSegments = CollectionUtils.split(longDist, segments - n);
+		List<PlainPerson>[] shortSegements = CollectionUtils.split(shortDist, n);
+		List<PlainPerson>[] longSegments = CollectionUtils.split(longDist, segments - n);
 		
-		List<ProxyPerson>[] list = new List[segments];
+		List<PlainPerson>[] list = new List[segments];
 		for(int i = 0; i < shortSegements.length; i++) {
 			list[i] = shortSegements[i];
 		}

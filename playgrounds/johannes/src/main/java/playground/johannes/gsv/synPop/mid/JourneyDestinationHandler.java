@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.mid;
 
 import java.util.Map;
 
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.PlainElement;
 
 /**
  * @author johannes
@@ -33,10 +33,10 @@ public class JourneyDestinationHandler implements LegAttributeHandler {
 	
 	public static final String GERMANY = "de";
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.gsv.synPop.ProxyObject, java.util.Map)
+	 * @see playground.johannes.gsv.synPop.mid.LegAttributeHandler#handle(playground.johannes.synpop.data.PlainElement, java.util.Map)
 	 */
 	@Override
-	public void handle(ProxyObject leg, Map<String, String> attributes) {
+	public void handle(PlainElement leg, Map<String, String> attributes) {
 		String dest = attributes.get("p1012");
 			
 		if("innerhalb Deutschlands".equals(dest)) {

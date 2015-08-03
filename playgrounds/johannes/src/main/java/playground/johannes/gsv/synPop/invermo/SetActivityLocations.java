@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
@@ -34,16 +34,16 @@ public class SetActivityLocations implements ProxyPlanTask {
 	 * 
 	 * @see
 	 * playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes
-	 * .gsv.synPop.ProxyPerson)
+	 * .gsv.synPop.PlainPerson)
 	 */
 	@Override
-	public void apply(ProxyPlan plan) {
+	public void apply(Episode plan) {
 
 		for (int i = 0; i < plan.getLegs().size(); i++) {
-			ProxyObject leg = plan.getLegs().get(i);
+			Element leg = plan.getLegs().get(i);
 
-			ProxyObject prev = plan.getActivities().get(i);
-			ProxyObject next = plan.getActivities().get(i + 1);
+			Element prev = plan.getActivities().get(i);
+			Element next = plan.getActivities().get(i + 1);
 
 			String startLoc = leg.getAttribute(InvermoKeys.START_LOCATION);
 			if (startLoc != null) {

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop;
+package playground.johannes.synpop.data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,42 +27,57 @@ import java.util.Map.Entry;
  * @author johannes
  *
  */
-public class ProxyPlan extends ProxyObject {
+public class PlainPerson extends PlainElement implements Person {
 
-	private List<ProxyObject> activities = new ArrayList<ProxyObject>();
+	private String id;
 	
-	private List<ProxyObject> legs = new ArrayList<ProxyObject>();
+//	private PlainEpisode plan;
 	
-	public void addLeg(ProxyObject leg) {
-		legs.add(leg);
+	private List<Episode> plans = new ArrayList<Episode>();
+	
+	public PlainPerson(String id) {
+		this.id = id;		
 	}
 	
-	public List<ProxyObject> getLegs() {
-		return legs;
+	public String getId() {
+		return id;
 	}
 	
-	public void addActivity(ProxyObject activity) {
-		activities.add(activity);
+	public void setPlan(Episode plan) {
+//		this.plan = plan;
+		if(plans.isEmpty())
+			plans.add(plan);
+		else
+			plans.set(0, plan);
 	}
 	
-	public List<ProxyObject> getActivities() {
-		return activities;
+	public void addEpisode(Episode plan) {
+		plans.add(plan);
 	}
 	
-	public ProxyPlan clone() {
-		ProxyPlan clone = new ProxyPlan();
+	public Episode getPlan() {
+//		return plan;
+		return plans.get(0);
+	}
+	
+	public List<Episode> getEpisodes() {
+		return plans;
+	}
+	
+	public PlainPerson clone() {
+		return cloneWithNewId(id);
+	}
+	
+	public PlainPerson cloneWithNewId(String newId) {
+		PlainPerson clone = new PlainPerson(newId);
 		
 		for(Entry<String, String> entry : getAttributes().entrySet()) {
 			clone.setAttribute(entry.getKey(), entry.getValue());
 		}
 		
-		for(ProxyObject act : activities) {
-			clone.addActivity(act.clone());
-		}
-		
-		for(ProxyObject leg : legs) {
-			clone.addLeg(leg.clone());
-		}
+//		clone.setPlan(plan.clone());
+		for(Episode plan : plans)
+			clone.addEpisode(((PlainEpisode) plan).clone());
 		
 		return clone;
 	}

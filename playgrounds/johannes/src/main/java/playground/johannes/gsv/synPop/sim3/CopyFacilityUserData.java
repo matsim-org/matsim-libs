@@ -19,16 +19,16 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.apache.log4j.Logger;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class CopyFacilityUserData implements SamplerListener {
 
@@ -43,15 +43,16 @@ public class CopyFacilityUserData implements SamplerListener {
 	}
 
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
 		if (iter.get() % interval == 0) {
 			logger.debug("Copying facility user data to attributes...");
 			int cnt = 0;
 
-			for (ProxyPerson person : population) {
-				for (ProxyPlan plan : person.getPlans()) {
-					for (ProxyObject act : plan.getActivities()) {
-						ActivityFacility f = (ActivityFacility) act.getUserData(ActivityLocationMutator.USER_DATA_KEY);
+			for (PlainPerson person : population) {
+				for (Episode plan : person.getEpisodes()) {
+					for (Element act : plan.getActivities()) {
+						ActivityFacility f = (ActivityFacility) ((PlainElement)act).getUserData(ActivityLocationMutator
+								.USER_DATA_KEY);
 						if (f != null) {
 							act.setAttribute(CommonKeys.ACTIVITY_FACILITY, f.getId().toString());
 						} else {

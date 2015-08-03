@@ -20,7 +20,8 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainElement;
 
 /**
  * @author johannes
@@ -29,7 +30,7 @@ import playground.johannes.gsv.synPop.ProxyObject;
 public class LegModeHandler implements LegAttributeHandler {
 
 	@Override
-	public void handle(ProxyObject leg, int idx, String key, String value) {
+	public void handle(Element leg, int idx, String key, String value) {
 		setMode(key, "hvm1", value, "plane", leg);
 		setMode(key, "hvm2", value, "rail", leg);
 		setMode(key, "hvm3", value, "rail", leg);
@@ -39,7 +40,7 @@ public class LegModeHandler implements LegAttributeHandler {
 		setMode(key, "hvm10", value, "car", leg);
 	}
 
-	private void setMode(String key, String modeKey, String value, String mode, ProxyObject leg) {
+	private void setMode(String key, String modeKey, String value, String mode, Element leg) {
 		if(key.endsWith(modeKey)) {
 			if(value.equals("1")) {
 				if(leg.setAttribute(CommonKeys.LEG_MODE, mode) != null) {

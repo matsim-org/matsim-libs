@@ -20,6 +20,9 @@
 package playground.johannes.gsv.synPop;
 
 
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.PlainPerson;
+
 /**
  * @author johannes
  *
@@ -27,15 +30,15 @@ package playground.johannes.gsv.synPop;
 public class DeleteOverlappingLegsTask implements ProxyPersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.gsv.synPop.ProxyPerson)
+	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		/*
 		 * Check for overlapping legs.
 		 */
 		double prevEnd = 0;
-		for(ProxyObject leg : person.getPlan().getLegs()) {
+		for(Element leg : person.getPlan().getLegs()) {
 			String startStr = leg.getAttribute(CommonKeys.LEG_START_TIME);
 			if(startStr != null) {
 				double start = Double.parseDouble(startStr);

@@ -20,6 +20,12 @@
 package playground.johannes.gsv.synPop.sim3;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,16 +34,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
-import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
-import playground.johannes.sna.math.Histogram;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author johannes
@@ -80,12 +76,12 @@ public class HamiltonianLogger implements SamplerListener {
 	}
 	
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> mutations, boolean accepted) {
 		if(iter.get() % logInterval == 0) {
 			long iterNow = iter.get();
 			double[] values = new double[population.size()];
 			int i = 0;
-			for(ProxyPerson person : population) {
+			for(PlainPerson person : population) {
 				values[i] = h.evaluate(person);
 				i++;
 			}

@@ -19,16 +19,14 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import org.apache.log4j.Logger;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicLong;
-
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
 
 /**
  * @author johannes
@@ -49,7 +47,7 @@ public class SamplerLogger implements SamplerListener {
 	}
 
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> person, boolean accpeted) {
+	public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> person, boolean accpeted) {
 		task.afterStep(population, person, accpeted);
 
 	}
@@ -80,7 +78,7 @@ public class SamplerLogger implements SamplerListener {
 		}
 
 		@Override
-		public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> original, boolean accepted) {
+		public void afterStep(Collection<PlainPerson> population, Collection<PlainPerson> original, boolean accepted) {
 			iter.incrementAndGet();
 			iters2.incrementAndGet();
 			if (accepted)

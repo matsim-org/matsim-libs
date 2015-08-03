@@ -19,27 +19,14 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.io.IOException;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.ConstrainedPlanTask;
-import playground.johannes.gsv.synPop.DeleteMissingTimesTask;
-import playground.johannes.gsv.synPop.DeleteNegativeDurationTask;
-import playground.johannes.gsv.synPop.DeleteOverlappingLegsTask;
-import playground.johannes.gsv.synPop.FixMissingActTimesTask;
-import playground.johannes.gsv.synPop.InsertActivitiesTask;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
-import playground.johannes.gsv.synPop.ProxyPlanTaskComposite;
-import playground.johannes.gsv.synPop.RoundTripTask;
-import playground.johannes.gsv.synPop.SetActivityTimeTask;
-import playground.johannes.gsv.synPop.SetActivityTypeTask;
-import playground.johannes.gsv.synPop.SetFirstActivityTypeTask;
-import playground.johannes.gsv.synPop.SortLegsTimeTask;
+import playground.johannes.gsv.synPop.*;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.*;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.io.IOException;
+import java.util.Collection;
 
 /**
  * @author johannes
@@ -93,7 +80,7 @@ public class PopulationGenerator {
 		 * read files
 		 */
 		logger.info("Reading persons...");
-		Collection<ProxyPerson> persons = reader.read(personFile, legFile, journeyFile).values();
+		Collection<PlainPerson> persons = reader.read(personFile, legFile, journeyFile).values();
 		logger.info(String.format("Read %s persons.", persons.size()));
 		/*
 		 * sort legs
@@ -144,7 +131,7 @@ public class PopulationGenerator {
 		
 		JourneyPlans2PersonTask plans2persons = new JourneyPlans2PersonTask(); 
 		ProxyTaskRunner.run(plans2persons, persons);
-		for(ProxyPerson person : plans2persons.getPersons()) {
+		for(PlainPerson person : plans2persons.getPersons()) {
 			persons.add(person);
 		}
 		

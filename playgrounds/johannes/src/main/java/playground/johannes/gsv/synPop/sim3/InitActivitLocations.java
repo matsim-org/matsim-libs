@@ -21,14 +21,14 @@ package playground.johannes.gsv.synPop.sim3;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainElement;
 
 public class InitActivitLocations implements ProxyPlanTask {
 
@@ -39,17 +39,17 @@ public class InitActivitLocations implements ProxyPlanTask {
 	}
 
 	@Override
-	public void apply(ProxyPlan plan) {
-		for (ProxyObject act : plan.getActivities()) {
+	public void apply(Episode plan) {
+		for (Element act : plan.getActivities()) {
 			String id = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
 			if (id != null) {
 				Id<ActivityFacility> idObj = Id.create(id, ActivityFacility.class);
 				ActivityFacility f = data.getAll().getFacilities().get(idObj);
-				act.setUserData(ActivityLocationMutator.USER_DATA_KEY, f);
+				((PlainElement)act).setUserData(ActivityLocationMutator.USER_DATA_KEY, f);
 			} else {
 				String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 				ActivityFacility f = data.randomFacility(type);
-				act.setUserData(ActivityLocationMutator.USER_DATA_KEY, f);
+				((PlainElement)act).setUserData(ActivityLocationMutator.USER_DATA_KEY, f);
 
 			}
 		}

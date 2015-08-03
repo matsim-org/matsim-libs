@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.Collection;
 import java.util.List;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
  * @author johannes
@@ -30,5 +30,5 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public interface PopulationSegmenter {
 
-	public List<ProxyPerson>[] split(Collection<ProxyPerson> persons, int segments);
+	public List<PlainPerson>[] split(Collection<PlainPerson> persons, int segments);
 }

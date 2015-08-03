@@ -20,17 +20,16 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import gnu.trove.TDoubleDoubleHashMap;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.sna.util.TXTWriter;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author johannes
@@ -44,10 +43,10 @@ public class ActivityLoadTask implements ProxyAnalyzerTask {
 	 * @see playground.johannes.gsv.synPop.analysis.ProxyAnalyzerTask#analyze(java.util.Collection)
 	 */
 	@Override
-	public void analyze(Collection<ProxyPerson> persons) {
+	public void analyze(Collection<PlainPerson> persons) {
 		Set<String> purposes = new HashSet<String>();
-		for(ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
+		for(PlainPerson person : persons) {
+			Episode plan = person.getPlan();
 			for(int i = 0; i < plan.getActivities().size(); i++) {
 				purposes.add((String) plan.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}
@@ -72,14 +71,14 @@ public class ActivityLoadTask implements ProxyAnalyzerTask {
 
 	private final double resolution = 60;
 
-	private TDoubleDoubleHashMap activityLoad(Collection<ProxyPerson> persons, String type) {
+	private TDoubleDoubleHashMap activityLoad(Collection<PlainPerson> persons, String type) {
 		TDoubleDoubleHashMap loadMap = new TDoubleDoubleHashMap();
 		
-		for(ProxyPerson person : persons) {
-			ProxyPlan plan = person.getPlan();
+		for(PlainPerson person : persons) {
+			Episode plan = person.getPlan();
 			
 			if(plan.getActivities().size() > 1) {
-			for(ProxyObject act : plan.getActivities()) {
+			for(Element act : plan.getActivities()) {
 				
 				if(type == null || ((String)act.getAttribute(CommonKeys.ACTIVITY_TYPE)).equalsIgnoreCase(type)) {
 					int start = Integer.parseInt(act.getAttribute(CommonKeys.ACTIVITY_START_TIME));

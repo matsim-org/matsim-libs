@@ -19,9 +19,9 @@
 
 package playground.johannes.gsv.synPop.mid;
 
-import java.util.Map;
+import playground.johannes.synpop.data.PlainPerson;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
+import java.util.Map;
 
 /**
  * @author johannes
@@ -30,7 +30,7 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 public class PersonMonthHandler implements PersonAttributeHandler {
 
 	@Override
-	public void handle(ProxyPerson person, Map<String, String> attributes) {
+	public void handle(PlainPerson person, Map<String, String> attributes) {
 		String val = attributes.get("stich_m");
 		if(val != null) {
 			if(val.equalsIgnoreCase("Januar")) {

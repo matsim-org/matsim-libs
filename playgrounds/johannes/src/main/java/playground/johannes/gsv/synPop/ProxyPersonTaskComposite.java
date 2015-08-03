@@ -20,6 +20,7 @@
 package playground.johannes.gsv.synPop;
 
 import playground.johannes.sna.util.Composite;
+import playground.johannes.synpop.data.PlainPerson;
 
 /**
  * @author johannes
@@ -28,10 +29,10 @@ import playground.johannes.sna.util.Composite;
 public class ProxyPersonTaskComposite extends Composite<ProxyPersonTask> implements	ProxyPersonTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.gsv.synPop.ProxyPerson)
+	 * @see playground.johannes.gsv.synPop.ProxyPersonTask#apply(playground.johannes.synpop.data.PlainPerson)
 	 */
 	@Override
-	public void apply(ProxyPerson person) {
+	public void apply(PlainPerson person) {
 		for(ProxyPersonTask task : components) {
 			task.apply(person);
 		}

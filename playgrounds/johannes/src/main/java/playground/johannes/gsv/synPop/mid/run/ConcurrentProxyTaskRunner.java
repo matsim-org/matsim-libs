@@ -19,15 +19,15 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.Collection;
-import java.util.List;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
 import playground.johannes.gsv.synPop.ProxyPlanTaskFactory;
 import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author johannes
@@ -35,12 +35,12 @@ import playground.johannes.socialnetworks.utils.CollectionUtils;
  */
 public class ConcurrentProxyTaskRunner {
 
-	public static void run(ProxyPlanTaskFactory factory, Collection<ProxyPerson> persons, int numThreads) {
+	public static void run(ProxyPlanTaskFactory factory, Collection<PlainPerson> persons, int numThreads) {
 		/*
 		 * split collection in approx even segments
 		 */
 		int n = Math.min(persons.size(), numThreads);
-		final List<ProxyPerson>[] segments = CollectionUtils.split(persons, n);
+		final List<PlainPerson>[] segments = CollectionUtils.split(persons, n);
 		/*
 		 * create threads
 		 */
@@ -48,13 +48,13 @@ public class ConcurrentProxyTaskRunner {
 		Thread[] threads = new Thread[numThreads];
 		for(int i = 0; i < numThreads; i++) {
 			final ProxyPlanTask task = factory.getInstance();
-			final List<ProxyPerson> subPersons = segments[i];
+			final List<PlainPerson> subPersons = segments[i];
 			threads[i] = new Thread(new Runnable() {
 				
 				@Override
 				public void run() {
-					for(ProxyPerson p : subPersons) {
-						for(ProxyPlan plan : p.getPlans())
+					for(PlainPerson p : subPersons) {
+						for(Episode plan : p.getEpisodes())
 							task.apply(plan);
 						
 						ProgressLogger.step();

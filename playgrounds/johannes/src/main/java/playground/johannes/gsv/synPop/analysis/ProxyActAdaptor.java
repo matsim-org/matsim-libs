@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.synpop.data.Element;
 
 /**
  * @author johannes
@@ -34,9 +34,9 @@ import playground.johannes.gsv.synPop.ProxyObject;
  */
 public class ProxyActAdaptor implements Activity {
 
-	private final ProxyObject delegate;
+	private final Element delegate;
 	
-	public ProxyActAdaptor(ProxyObject act) {
+	public ProxyActAdaptor(Element act) {
 		this.delegate = act;
 	}
 	

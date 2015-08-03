@@ -19,10 +19,10 @@
 
 package playground.johannes.gsv.popsim;
 
-import java.util.Random;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Random;
 
 /**
  * @author johannes
@@ -38,7 +38,7 @@ public class AgeMutator extends AttributeMutator {
 	}
 
 	@Override
-	protected Double newValue(ProxyPerson person) {
+	protected Double newValue(PlainPerson person) {
 		return new Double(random.nextInt(100));
 	}
 

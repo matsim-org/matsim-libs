@@ -19,16 +19,16 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.socialnetworks.utils.CollectionUtils;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.socialnetworks.utils.CollectionUtils;
 
 /**
  * @author johannes
@@ -46,13 +46,13 @@ public class LongDistSegmenter implements PopulationSegmenter {
 	 * @see playground.johannes.gsv.synPop.sim3.PopulationSegmenter#split(java.util.Collection, int)
 	 */
 	@Override
-	public List<ProxyPerson>[] split(Collection<ProxyPerson> persons, int segments) {
-		Set<ProxyPerson> longDist = new HashSet<>(persons.size());
+	public List<PlainPerson>[] split(Collection<PlainPerson> persons, int segments) {
+		Set<PlainPerson> longDist = new HashSet<>(persons.size());
 		
-		for(ProxyPerson person : persons) {
+		for(PlainPerson person : persons) {
 			double max = 0;
-			for(ProxyPlan plan : person.getPlans()) {
-				for(ProxyObject leg : plan.getLegs()) {
+			for(Episode plan : person.getEpisodes()) {
+				for(Element leg : plan.getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
 					if(val != null) {
 						max = Math.max(Double.parseDouble(val), max);

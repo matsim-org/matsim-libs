@@ -19,17 +19,16 @@
 
 package playground.johannes.gsv.synPop.analysis;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -50,12 +49,12 @@ public class ExtractLongDistancePersons {
 		
 		double threshold = Double.parseDouble(args[3]);
 		
-		Set<ProxyPerson> remove = new HashSet<>();
+		Set<PlainPerson> remove = new HashSet<>();
 		
 		logger.info("Extracting persons...");
-		for(ProxyPerson person : parser.getPersons()) {
-			for(ProxyPlan plan : person.getPlans()) {
-				for(ProxyObject leg : plan.getLegs()) {
+		for(PlainPerson person : parser.getPersons()) {
+			for(Episode plan : person.getEpisodes()) {
+				for(Element leg : plan.getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(val != null) {
 						double d = Double.parseDouble(val);
@@ -70,7 +69,7 @@ public class ExtractLongDistancePersons {
 		}
 		
 		logger.info(String.format("Removing %s persons...", remove.size()));
-		for(ProxyPerson person : remove) {
+		for(PlainPerson person : remove) {
 			parser.getPersons().remove(person);
 		}
 		

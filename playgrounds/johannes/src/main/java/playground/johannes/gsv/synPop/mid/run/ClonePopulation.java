@@ -19,17 +19,16 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
 import playground.johannes.gsv.synPop.ApplySampleProbas;
-import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+import playground.johannes.synpop.data.PlainPerson;
+
+import java.util.Random;
+import java.util.Set;
 
 /**
  * @author johannes
@@ -47,7 +46,7 @@ public class ClonePopulation {
 	
 		logger.info("Loading persons...");
 		parser.parse(args[0]);
-		Set<ProxyPerson> persons = parser.getPersons();
+		Set<PlainPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
 		logger.info("Cloning persons...");
