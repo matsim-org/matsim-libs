@@ -51,12 +51,9 @@ public class MergeNoiseCSVFile {
 	private double startTime = 3600.;
 	private double timeBinSize = 3600.;
 	private double endTime = 24. * 3600.;
-	
-//	private String workingDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/noise_analysis_1_actualSpeed_TempelhoferFeld/analysis_it.100/immissions/";
-//	private String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/noise_analysis_1_actualSpeed_TempelhoferFeld/analysis_it.100/receiverPoints/receiverPoints.csv";
-	
-	private String workingDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_averageCost/ITERS/it.100/immissions/";
-	private String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/receiverPoints/receiverPoints.csv";
+		
+	private String workingDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static/analysis_it.30/immissions/";
+	private String receiverPointsFile = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static/analysis_it.30/receiverPoints/receiverPoints.csv";
 		
 	private String separator = ";";
 	private String label = "immission";

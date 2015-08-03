@@ -25,8 +25,8 @@ package playground.ikaddoura.noise2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -51,7 +51,7 @@ public class NoiseParameters {
 	private double scaleFactor = 1.;
 	private double relevantRadius = 500.;
 	private String hgvIdPrefix = "lkw";
-	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 	private String tunnelLinkIdFile = null;
 	private int writeOutputIteration = 1;
 	private boolean useActualSpeedLevel = true;
@@ -207,7 +207,7 @@ public class NoiseParameters {
 		this.hgvIdPrefix = hgvIdPrefix;
 	}
 
-	public void setTunnelLinkIDs(List<Id<Link>> tunnelLinkIDs) {
+	public void setTunnelLinkIDs(Set<Id<Link>> tunnelLinkIDs) {
 		log.info("Setting tunnel link IDs to " + tunnelLinkIDs.toString());
 		this.tunnelLinkIDs = tunnelLinkIDs;
 	}
@@ -232,7 +232,7 @@ public class NoiseParameters {
 		return hgvIdPrefix;
 	}
 
-	public List<Id<Link>> getTunnelLinkIDs() {
+	public Set<Id<Link>> getTunnelLinkIDs() {
 		return tunnelLinkIDs;
 	}
 

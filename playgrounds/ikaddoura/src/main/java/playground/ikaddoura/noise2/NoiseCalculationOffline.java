@@ -21,8 +21,8 @@ package playground.ikaddoura.noise2;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -53,16 +53,16 @@ import playground.ikaddoura.noise2.handler.PersonActivityTracker;
 public class NoiseCalculationOffline {
 	private static final Logger log = Logger.getLogger(NoiseCalculationOffline.class);
 	
+	private static String runId;
 	private static String runDirectory;
 	private static String outputDirectory;
 	private static int lastIteration;
 	private static double receiverPointGap;
-	private static boolean useActualSpeedLevel;
 				
 	public static void main(String[] args) {
 		
 		if (args.length > 0) {
-			
+						
 			runDirectory = args[0];		
 			log.info("run directory: " + runDirectory);
 			
@@ -74,19 +74,22 @@ public class NoiseCalculationOffline {
 			
 			receiverPointGap = Double.valueOf(args[3]);		
 			log.info("Receiver point gap: " + receiverPointGap);
-			
-			useActualSpeedLevel = Boolean.valueOf(args[4]);
-			log.info("Use actual speed level: " + useActualSpeedLevel);
+
+			throw new RuntimeException("Not yet implemented. Aborting...");
+
 			
 		} else {
 			
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/";
-			lastIteration = 100;
-//			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/noise_analysis_1_freespeed_TempelhoferFeld/";
-//			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/noise_analysis_1_actualSpeed_TempelhoferFeld/";
-			outputDirectory = "/Users/ihab/Desktop/";
-			receiverPointGap = 25.;
-			useActualSpeedLevel = true;
+			runId = "bvg.run190.25pct.dilution001.network20150727.v2.static";
+//			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.I";
+//			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.II";
+//			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.III";
+//			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.IV";
+
+			runDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/input/" + runId + "/";
+			outputDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/" + runId + "/";
+			receiverPointGap = 10.;
+			lastIteration = 30;
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -103,8 +106,8 @@ public class NoiseCalculationOffline {
 		}
 	
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(runDirectory + "output_network.xml.gz");
-		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+		config.network().setInputFile(runDirectory + runId + ".output_network.xml.gz");
+		config.plans().setInputFile(runDirectory + runId + ".output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(lastIteration);
 		
@@ -119,17 +122,23 @@ public class NoiseCalculationOffline {
 //		double xMax = 4594202.;
 //		double yMax = 5821736.;
 		
-		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
-		double xMin = 4591900.;
-		double yMin = 5813265.;
-		double xMax = 4600279.;
-		double yMax = 5818768.;
+//		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
+//		double xMin = 4591900.;
+//		double yMin = 5813265.;
+//		double xMax = 4600279.;
+//		double yMax = 5818768.;
 				
       // Berlin Coordinates: Area of Berlin
 //		double xMin = 4573258.;
 //		double yMin = 5801225.;
 //		double xMax = 4620323.;
 //		double yMax = 5839639.;
+		
+		// Berlin Coordinates: Manteuffelstrasse
+		double xMin = 4595288.82;
+		double yMin = 5817859.97;
+		double xMax = 4598267.52;
+		double yMax = 5820953.98;	
 		
 		gridParameters.setReceiverPointsGridMinX(xMin);
 		gridParameters.setReceiverPointsGridMinY(yMin);
@@ -147,8 +156,8 @@ public class NoiseCalculationOffline {
 		// ################################
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
-		noiseParameters.setUseActualSpeedLevel(useActualSpeedLevel);
-		noiseParameters.setScaleFactor(10.);
+		noiseParameters.setUseActualSpeedLevel(false);
+		noiseParameters.setScaleFactor(4.);
 		noiseParameters.setComputeNoiseDamages(false);
 		noiseParameters.setInternalizeNoiseDamages(false);
 		noiseParameters.setComputeCausingAgents(false);
@@ -156,7 +165,7 @@ public class NoiseCalculationOffline {
 		noiseParameters.setThrowNoiseEventsCaused(false);
 		
 //		 Berlin Tunnel Link IDs
-		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 		tunnelLinkIDs.add(Id.create("108041", Link.class));
 		tunnelLinkIDs.add(Id.create("108142", Link.class));
 		tunnelLinkIDs.add(Id.create("108970", Link.class));
@@ -236,7 +245,7 @@ public class NoiseCalculationOffline {
 		
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
+		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + runId + "." + config.controler().getLastIteration() + ".events.xml.gz");
 		log.info("Reading events file... Done.");
 		
 		timeTracker.computeFinalTimeIntervals();
