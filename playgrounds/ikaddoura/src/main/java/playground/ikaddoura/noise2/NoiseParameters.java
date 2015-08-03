@@ -50,7 +50,7 @@ public class NoiseParameters {
 	private double timeBinSizeNoiseComputation = 3600.0;
 	private double scaleFactor = 1.;
 	private double relevantRadius = 500.;
-	private String hgvIdPrefix = "lkw";
+	private Set<String> hgvIdPrefixes = new HashSet<String>();
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 	private String tunnelLinkIdFile = null;
 	private int writeOutputIteration = 1;
@@ -66,6 +66,8 @@ public class NoiseParameters {
 		
 	// ########################################################################################################
 			
+	
+	
 	public void checkForConsistency() {
 		
 		if (this.internalizeNoiseDamages) {
@@ -153,6 +155,10 @@ public class NoiseParameters {
 		}
 	}
 	
+	public NoiseParameters() {
+		this.hgvIdPrefixes.add("lkw");
+	}
+
 	// ########################################################################################################
 
 	public boolean isThrowNoiseEventsAffected() {
@@ -202,9 +208,9 @@ public class NoiseParameters {
 		this.relevantRadius = relevantRadius;
 	}
 	
-	public void setHgvIdPrefix(String hgvIdPrefix) {
-		log.info("Setting the HGV Id Prefix to " + hgvIdPrefix);
-		this.hgvIdPrefix = hgvIdPrefix;
+	public void setHgvIdPrefixes(Set<String> hgvIdPrefix) {
+		log.info("Setting the HGV Id Prefixes to " + hgvIdPrefix.toString());
+		this.hgvIdPrefixes = hgvIdPrefix;
 	}
 
 	public void setTunnelLinkIDs(Set<Id<Link>> tunnelLinkIDs) {
@@ -228,8 +234,8 @@ public class NoiseParameters {
 		return relevantRadius;
 	}
 
-	public String getHgvIdPrefix() {
-		return hgvIdPrefix;
+	public Set<String> getHgvIdPrefixes() {
+		return hgvIdPrefixes;
 	}
 
 	public Set<Id<Link>> getTunnelLinkIDs() {

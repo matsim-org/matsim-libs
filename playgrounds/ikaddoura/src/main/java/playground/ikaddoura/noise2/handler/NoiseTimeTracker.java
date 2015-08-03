@@ -223,7 +223,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	public void handleEvent(LinkEnterEvent event) {
 				
 		checkTime(event.getTime());
-		
+
 		if (!(noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getVehicleId()))) {
 			// probably public transit
 			
@@ -242,7 +242,15 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				this.noiseContext.getNoiseLinks().put(event.getLinkId(), noiseLink);
 			}
 		
-			if (event.getVehicleId().toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix())) {
+			boolean isHGV = false;
+			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixes()) {
+				if (event.getVehicleId().toString().startsWith(hgvPrefix)) {
+					isHGV = true;
+					break;
+				}
+			}
+			
+			if (isHGV) {			
 				// HGV
 				
 				int hgv = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getHgvAgentsEntering();
@@ -546,7 +554,15 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 					
 					double amount = 0.;
 					
-					if(!(vehicleId.toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix()))) {
+					boolean isHGV = false;
+					for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixes()) {
+						if (vehicleId.toString().startsWith(hgvPrefix)) {
+							isHGV = true;
+							break;
+						}
+					}
+										
+					if(!isHGV) {
 						amount = amountCar;
 					} else {
 						amount = amountHdv;

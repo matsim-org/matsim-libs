@@ -89,7 +89,7 @@ public class NoiseCalculationOffline {
 			runDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/input/" + runId + "/";
 			outputDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/" + runId + "/";
 			receiverPointGap = 10.;
-			lastIteration = 30;
+			lastIteration = 25;
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -163,6 +163,11 @@ public class NoiseCalculationOffline {
 		noiseParameters.setComputeCausingAgents(false);
 		noiseParameters.setThrowNoiseEventsAffected(false);
 		noiseParameters.setThrowNoiseEventsCaused(false);
+		
+		Set<String> hgvIdPrefixes = new HashSet<String>();
+		hgvIdPrefixes.add("lkw");
+		hgvIdPrefixes.add("tr");
+		noiseParameters.setHgvIdPrefixes(hgvIdPrefixes);
 		
 //		 Berlin Tunnel Link IDs
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
