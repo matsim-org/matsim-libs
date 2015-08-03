@@ -57,7 +57,7 @@ public class NoiseContext {
 	private double xCoordMaxLinkNode = Double.MIN_VALUE;
 	private double yCoordMinLinkNode = Double.MAX_VALUE;
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
-		
+	
 	// for routing purposes
 	
 	private Map<Double, Map<Id<Link>, NoiseLink>> timeInterval2linkId2noiseLinks = new HashMap<>();

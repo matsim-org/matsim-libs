@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.noise2;
+package playground.ikaddoura.integrationCN;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -33,25 +33,34 @@ import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioImpl;
 
+import playground.ikaddoura.noise2.NoiseCalculationOnline;
+import playground.ikaddoura.noise2.NoiseParameters;
 import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.routing.NoiseTollDisutilityCalculatorFactory;
+import playground.vsp.congestion.controler.AdvancedMarginalCongestionPricingContolerListener;
+import playground.vsp.congestion.controler.CongestionAnalysisControlerListener;
+import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
+import playground.vsp.congestion.handlers.TollHandler;
+import playground.vsp.congestion.routing.TollDisutilityCalculatorFactory;
 
 /**
  * 
- * @author lkroeger, ikaddoura
+ * @author ikaddoura
  *
  */
 
-public class NoiseOnlineControler {
-	private static final Logger log = Logger.getLogger(NoiseOnlineControler.class);
+public class CNControler {
+	private static final Logger log = Logger.getLogger(CNControler.class);
 
 	private static String configFile;
-	private static String setup;
-	private static String approach;
 
+	private static boolean congestionPricing;
+	private static boolean noisePricing;
+	
 	public static void main(String[] args) throws IOException {
 		
 		if (args.length > 0) {
@@ -59,24 +68,30 @@ public class NoiseOnlineControler {
 			configFile = args[0];
 			log.info("Config file: " + configFile);
 			
-			setup = args[1];		
-			log.info("Setup: " + setup);
+			congestionPricing = Boolean.parseBoolean(args[1]);
+			log.info("Noise Pricing: " + congestionPricing);
 			
-			approach = args[2];		
-			log.info("Approach: " + approach);
+			noisePricing = Boolean.parseBoolean(args[2]);
+			log.info("Noise Pricing: " + noisePricing);
 			
 		} else {
 			
 			configFile = "/Users/ihab/Desktop/test/config.xml";
-			setup = "berlin1";
-			approach = "averageCost";
+			congestionPricing = true;
+			noisePricing = true;
 		}
 				
-		NoiseOnlineControler noiseImmissionControler = new NoiseOnlineControler();
+		CNControler noiseImmissionControler = new CNControler();
 		noiseImmissionControler.run(configFile);
 	}
 
 	private void run(String configFile) {
+		
+		Controler controler = new Controler(configFile);
+	
+		// noise
+		
+		NoiseContext noiseContext = null;
 		
 		// grid parameters
 		
@@ -85,38 +100,16 @@ public class NoiseOnlineControler {
 		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 				
-		if (setup.equals("berlin1")) {
+		gridParameters.setReceiverPointGap(1000.);
 			
-			gridParameters.setReceiverPointGap(100.);
-			
-			String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-			gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
-		
-		} else if (setup.equals("berlin2")) {
-		
-			gridParameters.setReceiverPointGap(100.);
-	
-			String[] consideredActivitiesForDamages = {"home"};
-			gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
-			
-		} else {
-			throw new RuntimeException("Unknown parameter setup. Aborting...");
-		}
-		
+		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+		gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+				
 		// noise parameters
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
-		
-		if (approach.equals("averageCost")) {
-			noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.AverageCost);
-		
-		} else if (approach.equals("marginalCost")) {
-			noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
-		
-		} else {
-			throw new RuntimeException("Unknown noise allocation approach. Aborting...");
-		}
-		
+		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
+				
 		noiseParameters.setScaleFactor(10.);
 		
 		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
@@ -163,21 +156,76 @@ public class NoiseOnlineControler {
 		tunnelLinkIDs.add(Id.create("73496", Link.class));
 		tunnelLinkIDs.add(Id.create("73497", Link.class));
 		noiseParameters.setTunnelLinkIDs(tunnelLinkIDs);
-				
-		// controler
+			
+		if (noisePricing) {	
+			noiseParameters.setInternalizeNoiseDamages(true);
+		} else {
+			noiseParameters.setInternalizeNoiseDamages(false);
+		}
 		
-		Controler controler = new Controler(configFile);
+		noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
 
-		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
-		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-			}
-		});
-		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+		// congestion
+		
+		TollHandler congestionTollHandler;
+		if (congestionPricing) {
+			congestionTollHandler = new TollHandler(controler.getScenario());
+		} else {
+			congestionTollHandler = null;
+		}
+		
+		// toll disutility calculation
+		
+		if (noisePricing && congestionPricing) {
+			// simultaneous noise and congestion pricing
+			
+			final CNTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new CNTollDisutilityCalculatorFactory(noiseContext, congestionTollHandler);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				}
+			});
+			
+			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+		
+		} else if (noisePricing && congestionPricing == false) {
+			// only noise pricing
+			
+			final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				}
+			});
+			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			
+		} else if (noisePricing == false && congestionPricing) {
+			// only congestion pricing
+			
+			final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(congestionTollHandler);
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
+				}
+			});
+			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+			controler.addControlerListener(new AdvancedMarginalCongestionPricingContolerListener(controler.getScenario(), congestionTollHandler, new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
+			
+		} else if (noisePricing == false && congestionPricing == false) {
+			// base case
+			
+			controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
+			controler.addControlerListener(new CongestionAnalysisControlerListener(new CongestionHandlerImplV3(controler.getEvents(), (ScenarioImpl) controler.getScenario())));
 
+		} else {
+			throw new RuntimeException("This setup is not considered. Aborting...");
+		}
+		
 		controler.addOverridingModule(new OTFVisModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();

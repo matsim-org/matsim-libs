@@ -111,7 +111,7 @@ public class CongestionEventsReader extends MatsimXmlParser{
 			this.eventsManager.processEvent(new CongestionEvent(time, constraint, causingAgentId, affectedAgentId, delay, linkId, emergenceTime));
 		}
 		
-		else{
+		else {
 			// other event type
 		}
 	}

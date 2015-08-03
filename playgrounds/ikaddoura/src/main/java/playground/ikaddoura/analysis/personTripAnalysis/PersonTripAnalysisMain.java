@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.analysis.vtts;
+package playground.ikaddoura.analysis.personTripAnalysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -28,16 +28,33 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-/**
- *
- * Analyze the actual VTTS for each trip (applying a linearization for each activity) 
- * 
- * @author ikaddoura
- */
-public class VTTSanalysisMain {
-	private static final Logger log = Logger.getLogger(VTTSanalysisMain.class);
 
+/*
+ * 
+ * trip-based analysis
+ * person ; trip no.; VTTS (trip) ; departure time (trip) ; trip arrival time (trip) ; travel time (trip) ; toll payment (trip) ; caused noise cost (trip) ; caused congestion cost (trip) ; affected congestion cost (trip)
+ * 
+ * person-based analysis
+ * person ; total no. of trips (day) ; VTTS (avg. per trip) ; travel time (day); toll payments (day) ; caused noise cost (day) ; affected noise cost (day) ; caused congestion cost (day) ; affected congestion cost (day)
+ * 
+ * aggregated analysis
+ * total travel time: XXX
+ * total congestion cost: XXX
+ * total noise damages: XXX
+ * total travel related user benefits: XXX
+ * total toll revenues: XXX
+ * system welfare: XXX
+ * 
+ * time-specific analysis
+ * time ; avg. toll (per time) ; avg. travel time (per time)
+ * 
+ */
+public class PersonTripAnalysisMain {
+	private static final Logger log = Logger.getLogger(PersonTripAnalysisMain.class);
+
+	// Provide the run directory and the iteration number.
 	private static String runDirectory;
+	private static int iteration;
 	
 	public static void main(String[] args) {
 		
@@ -45,47 +62,41 @@ public class VTTSanalysisMain {
 			runDirectory = args[0];		
 			log.info("run directory: " + runDirectory);
 			
+			iteration = Integer.valueOf(args[1]);		
+			log.info("iteration number: " + iteration);
+			
 		} else {
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/baseCase/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_equal_vs_different_VTTS/output/internalization_differentVTTS/";
+			iteration = 100;
 		}
 		
-		VTTSanalysisMain analysis = new VTTSanalysisMain();
+		PersonTripAnalysisMain analysis = new PersonTripAnalysisMain();
 		analysis.run();
 	}
 
 	private void run() {
 		
-//		String configFile = runDirectory + "output_config.xml.gz";
-		String configFile = runDirectory + "output_config_withoutUnknownParameters.xml";
-
-		Config config = ConfigUtils.loadConfig(configFile);	
-		int iteration = config.controler().getLastIteration();
-				
-		String populationFile = null;
-		String networkFile = null;
-//		String networkFile = runDirectory + "output_network.xml.gz";
+		String populationFile = runDirectory + "output_plans.xml.gz";
+		String networkFile = runDirectory + "output_network.xml.gz";
 		
+		Config config = ConfigUtils.createConfig();		
 		config.plans().setInputFile(populationFile);
+		config.plans().setInputFile(null);
 		config.network().setInputFile(networkFile);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		VTTSHandler vttsHandler = new VTTSHandler(scenario);
-		events.addHandler(vttsHandler);
-						
+		TripEventHandler tripHandler = new TripEventHandler(scenario);
+		events.addHandler(tripHandler);
+				
 		String eventsFile = runDirectory + "ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
-
-		log.info("Reading the events file...");
+		
+		log.info("Reading the event file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
-		log.info("Reading the events file... Done.");
-		
-		vttsHandler.computeFinalVTTS();
+		log.info("Reading the event file... Done.");
 				
-		vttsHandler.printVTTS(runDirectory + "ITERS/it." + iteration + "/" + iteration + ".VTTS.csv");
-		vttsHandler.printCarVTTS(runDirectory + "ITERS/it." + iteration + "/" + iteration + ".VTTS_car.csv");
-		vttsHandler.printAvgVTTSperPerson(runDirectory + "ITERS/it." + iteration + "/" + iteration + ".avgVTTS.csv"); 
 	}
 			 
 }
