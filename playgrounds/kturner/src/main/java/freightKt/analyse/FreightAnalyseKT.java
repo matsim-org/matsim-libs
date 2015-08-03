@@ -23,8 +23,8 @@ public class FreightAnalyseKT {
 	//TODO: VEhicleTypes in Simulation als ebenfalls in OutputDir schreiben lassen, damit Zuordnugn zru Simulation erkennbar ist.
 //	private static final String RUN_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Berlin/aldi/base_rushhourTrue/Run_1/" ;
 //	private static final String RUN_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Berlin/aldi/CordonTollOnHeavy/Run_1/" ;
-//	private static final String RUN_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Berlin/aldi/ElectroWithoutUCC/Run_1/" ;
-	private static final String RUN_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Berlin/aldi/UCC/Run_1/" ;
+	private static final String RUN_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Berlin/aldi/ElectroWithoutUCC/Run_1/" ;
+//	private static final String RUN_DIR = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/output/JSprit/Berlin/aldi/UCC/Run_1/" ;
 
 	//	private static final String VEHTYPEFILE = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Grid_Szenario/grid-vehTypes_kt.xml";
 	private static final String VEHTYPEFILE = "F:/OneDrive/Dokumente/Masterarbeit/MATSIM/input/Berlin_Szenario/vehicleTypes.xml"; 

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+
+<roadpricing type="cordon" name="grid cordon-toll">
+
+        <description>A simple cordon toll scheme for the grid-network: City-toll in the center.</description>
+
+        <links>
+				<link id="i(4,5)" />
+				<link id="i(7,4)R" />
+				<link id="i(7,6)R" />
+				<link id="j(4,7)R" />
+				<link id="j(5,4)" />
+				<link id="j(6,7)R" />
+        </links>
+
+        <!-- amount: [monetary unit] / [traveling across a tolled link.] -->
+        <cost start_time="00:00" end_time="01:00" amount="10.00" />
+        <cost start_time="01:00" end_time="02:00" amount="20.00" />
+        <cost start_time="02:00" end_time="23:00" amount="30.00" />
+
+</roadpricing>
+ 
