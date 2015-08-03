@@ -8,10 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import jsprit.core.problem.job.Service;
-
-//import jsprit.core.problem.vehicle.VehicleType;
-
 import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,7 +33,16 @@ class UccCarrierCreator {
 
 	/**
 	 * @author: Kturner
-	 * TODO: Dokumentieren
+	 * Erstellt auf Grundlage einer definierten Zone (aktuell über ein Mautfile)
+	 * einen neuen Carrier, der zukünftig die Service an den Links der Zonendefinition bedient.
+	 * Diese Services werden dann nicht mehr von Ihrem eigentlichen Carrier bedient.
+	 * 
+	 * Für den neuen Carrier wird mind. ein Depot erschaffen, von welchem er operiert.
+	 * Diese(s) wird vom bisherige Carrier versorgt, sodass der Warenstrom immer 
+	 * noch im ursprünglichen Depot beginnt.
+	 * 
+	 * Dem neuen Carrier werden bestimmte Elektrofahrzeugtypen zugeordnet.
+	 * 
 	 * UCC: Urban Consolidation Center -> transshipment center 
 	 */
 
@@ -70,7 +75,7 @@ class UccCarrierCreator {
 	void setTimeShiftUccClosingTime(double uccClosingTime) {
 		this.timeShiftUccClosingTime = uccClosingTime;
 	}
-	
+
 	Carriers getExtractedCarriers() {
 		return extractedCarriers;
 	}
@@ -81,7 +86,7 @@ class UccCarrierCreator {
 
 
 	/**
-	 * Constructor, sets uccOpeningTime to 06:00:00 and uccClosingTime to 21:00:00 
+	 * Constructor, no time-shifts for UCC
 	 * @param carriers: carriers to be handled
 	 * @param vehicleTypes: vehicleTypes for solving the problem (must include the vehTypes of later used UCCcarriers)
 	 * @param zonefile: path of zonefile -> Services at links defined here were moved to UccCarrier
@@ -126,7 +131,7 @@ class UccCarrierCreator {
 		this.timeShiftUccOpeningTime = uccOpeningTime;
 		this.timeShiftUccClosingTime = uccClosingTime;
 	}
-	
+
 	/**
 	 * Reduced constructor if only method "extractCarriers(Carriers carriers, String[] retailerNames)" 
 	 * is used. Otherwise use other constructor.
@@ -137,15 +142,15 @@ class UccCarrierCreator {
 		this.carriers = carriers;
 		this.retailerNames = retailerNames;
 	}
-	
+
 	//Standard constructor (empty)
 	UccCarrierCreator() {
 	}
 
-	 void createSplittedUccCarrriers() {
+	void createSplittedUccCarrriers() {
 		//Step1 Analysis of Carriers: not done here any more....
 		//Step 2: Extrahieren einzelner Carrier (alle, die mit dem RetailerNamen beginnen)
-		 extractedCarriers = extractCarriers(carriers, retailerNames); 		
+		extractedCarriers = extractCarriers(carriers, retailerNames); 		
 		//Step3: Nachfrage auf Carrier UCC und normal aufteilen.
 		splittedCarriers = createUCCCarrier(extractedCarriers, vehicleTypes, 
 				zonefile, uccDepotsLinkIds, timeShiftUccOpeningTime, timeShiftUccClosingTime);	
@@ -232,76 +237,76 @@ class UccCarrierCreator {
 				System.out.println("Zeitfenster: " + timeWindows.toString());
 				for (TimeWindow tw : timeWindows) {
 					addVehicles(uccCarrier, vehicleTypes, uccDepotsLinkIds2, 
-						Math.max(0, tw.getStart() -uccEarlierOpeningTime), Math.min(24*3500, tw.getEnd() +uccLaterClosingTime)); 
+							Math.max(0, tw.getStart() -uccEarlierOpeningTime), Math.min(24*3500, tw.getEnd() +uccLaterClosingTime)); 
 				}
 				checkCapacity(uccCarrier, vehicleTypes);
 				uccCarrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
 				splittedCarriers.addCarrier(uccCarrier);
 			}
-			
-			
-//			// Fahrzeug steht über maximale Zeitspanne zur Verfügung.
-//			if (!uccCarrier.getServices().isEmpty()){		//keinen UCC ohne Nachfrage übernehmen.
-//				TimeWindow tw = calcMaxRangeOfStartTimeWindow(uccCarrier);
-//				//Depotzeiten: Zeitfenster +- 1h
-//				addVehicles(uccCarrier, vehicleTypes, uccDepotsLinkIds2, 
-//						Math.max(0, tw.getStart() -uccEarlierOpeningTime), Math.min(24*3500, tw.getEnd() +uccLaterClosingTime)); 
-//				uccCarrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
-//				splittedCarriers.addCarrier(uccCarrier);
-//			}
+
+
+			//			// Fahrzeug steht über maximale Zeitspanne zur Verfügung.
+			//			if (!uccCarrier.getServices().isEmpty()){		//keinen UCC ohne Nachfrage übernehmen.
+			//				TimeWindow tw = calcMaxRangeOfStartTimeWindow(uccCarrier);
+			//				//Depotzeiten: Zeitfenster +- 1h
+			//				addVehicles(uccCarrier, vehicleTypes, uccDepotsLinkIds2, 
+			//						Math.max(0, tw.getStart() -uccEarlierOpeningTime), Math.min(24*3500, tw.getEnd() +uccLaterClosingTime)); 
+			//				uccCarrier.getCarrierCapabilities().setFleetSize(FleetSize.INFINITE);
+			//				splittedCarriers.addCarrier(uccCarrier);
+			//			}
 		}
 		return splittedCarriers;
 	}
 
 
 	/**Überprüft, ob die Services auf Grund der Kapazität der zur Verfügung stehenden Flotte bedient werden kann.
-	 * Falls nicht, wird der betreffende Service durch mehrere Kleinere ersetzt, die sich an der größten 
-	 * zur VErfügugn stehenden Fzg-Kapazität orientiert.
+	 * Falls nicht, wird der betreffende Service durch mehrere kleinere ersetzt, die sich an der größten 
+	 * zur Verfügugn stehenden Fzg-Kapazität orientiert.
 	 * @param carrier
 	 * @param vehicleTypes
 	 */
 	private void checkCapacity(Carrier carrier, CarrierVehicleTypes vehicleTypes) {
 		Set<CarrierService> servicesToRemove= new HashSet<CarrierService>(); 
 		Set<CarrierService> servicesToAdd= new HashSet<CarrierService>(); 
-		
+
 		for (CarrierService service : carrier.getServices()){
 			//Alphabetsliste erstellen
 			List<Character> alph = new ArrayList<Character>() ;
 			for(char c='a'; c<='z'; c++) {
 				alph.add(c);
 			}
-			
+
 			int totalServiceDemand = service.getCapacityDemand();
 			double totalServiceDuration = service.getServiceDuration();
-			
+
 			//Calc max VehicleCapacity
 			int maxVehicleCapacity = -1;
 			for (CarrierVehicle vehicle : carrier.getCarrierCapabilities().getCarrierVehicles()) {
-				 if (maxVehicleCapacity < vehicle.getVehicleType().getCarrierVehicleCapacity()){
-					 maxVehicleCapacity = vehicle.getVehicleType().getCarrierVehicleCapacity();
-				 }
+				if (maxVehicleCapacity < vehicle.getVehicleType().getCarrierVehicleCapacity()){
+					maxVehicleCapacity = vehicle.getVehicleType().getCarrierVehicleCapacity();
+				}
 			}
-//			System.out.println("MaxVehicleCapacity: " + maxVehicleCapacity);
+			//			System.out.println("MaxVehicleCapacity: " + maxVehicleCapacity);
 			// Neuerstellung geteilter Services
 			if (totalServiceDemand > maxVehicleCapacity){
 				int demandtoAssignLeft = totalServiceDemand;
-//				System.out.println("Totel Service Demand: " + totalServiceDemand);
-//				System.out.println("Demand2AssignLeft1: " + demandtoAssignLeft);
+				//				System.out.println("Totel Service Demand: " + totalServiceDemand);
+				//				System.out.println("Demand2AssignLeft1: " + demandtoAssignLeft);
 				int numberOfNewServices = 1;
 				//Assign with heighest deliverable Capacity
 				while ((demandtoAssignLeft / maxVehicleCapacity) > 0.){
-//					System.out.println("AssignLeft/vehCap: "+ demandtoAssignLeft / maxVehicleCapacity);
+					//					System.out.println("AssignLeft/vehCap: "+ demandtoAssignLeft / maxVehicleCapacity);
 					int assignDemand = maxVehicleCapacity;
-//					System.out.println("AssignDemand1: " + assignDemand);
+					//					System.out.println("AssignDemand1: " + assignDemand);
 					Id<CarrierService> id = Id.create(service.getId().toString() + "_" + alph.get(numberOfNewServices-1), CarrierService.class);
 					CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, service.getLocationLinkId());
 					serviceBuilder.setCapacityDemand(assignDemand)
-						.setServiceStartTimeWindow(service.getServiceStartTimeWindow())
-						.setServiceDuration(totalServiceDuration*assignDemand/totalServiceDemand); 
+					.setServiceStartTimeWindow(service.getServiceStartTimeWindow())
+					.setServiceDuration(totalServiceDuration*assignDemand/totalServiceDemand); 
 					servicesToAdd.add(serviceBuilder.build());
 					demandtoAssignLeft = demandtoAssignLeft - assignDemand;
-//					System.out.println("Demand2AssignLeft2: " + demandtoAssignLeft);
-//					System.out.println("AssignLeft/vehCap2: "+ demandtoAssignLeft / maxVehicleCapacity);
+					//					System.out.println("Demand2AssignLeft2: " + demandtoAssignLeft);
+					//					System.out.println("AssignLeft/vehCap2: "+ demandtoAssignLeft / maxVehicleCapacity);
 					numberOfNewServices++;
 				}
 				//Assign Rest
@@ -309,19 +314,19 @@ class UccCarrierCreator {
 					Id<CarrierService> id = Id.create(service.getId().toString() + "_" + alph.get(numberOfNewServices-1), CarrierService.class);
 					CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, service.getLocationLinkId());
 					serviceBuilder.setCapacityDemand(demandtoAssignLeft)
-						.setServiceStartTimeWindow(service.getServiceStartTimeWindow())
-						.setServiceDuration(totalServiceDuration*demandtoAssignLeft/totalServiceDemand);
+					.setServiceStartTimeWindow(service.getServiceStartTimeWindow())
+					.setServiceDuration(totalServiceDuration*demandtoAssignLeft/totalServiceDemand);
 					servicesToAdd.add(serviceBuilder.build());
 				}
 				servicesToRemove.add(service);
 			}
 		}
-		
+
 		//neue Schleife, da sonst innerhalb der Schleife das Set modifiziert wird..
 		for (CarrierService service: servicesToAdd){ 
 			carrier.getServices().add(service);
 		}
-		
+
 		//neue Schleife, da sonst innerhalb der Schleife das Set modifiziert wird..
 		for (CarrierService service: servicesToRemove){ 
 			carrier.getServices().remove(service);	//und lösche ihn aus dem normalen Carrier raus
@@ -340,7 +345,7 @@ class UccCarrierCreator {
 		if (carrier.getId().toString().endsWith("TIEFKUEHL")){
 			for (Id<Link> linkId : uccDepotsLinkIds ){
 				carrier.getCarrierCapabilities().getCarrierVehicles()
-					.add(CarrierVehicle.Builder.newInstance(Id.create("light8telectro_frozen", Vehicle.class), linkId)
+				.add(CarrierVehicle.Builder.newInstance(Id.create("light8telectro_frozen", Vehicle.class), linkId)
 						.setType(vehicleTypes.getVehicleTypes().get(Id.create("light8telectro_frozen", VehicleType.class)))
 						.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
 						.build());
@@ -348,13 +353,13 @@ class UccCarrierCreator {
 		} else {
 			for (Id<Link> linkId : uccDepotsLinkIds ){
 				carrier.getCarrierCapabilities().getCarrierVehicles()
-					.add(CarrierVehicle.Builder.newInstance(Id.create("light8telectro", Vehicle.class), linkId)
+				.add(CarrierVehicle.Builder.newInstance(Id.create("light8telectro", Vehicle.class), linkId)
 						.setType(vehicleTypes.getVehicleTypes().get(Id.create("light8telectro", VehicleType.class)))
 						.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
 						.build());
 
 				carrier.getCarrierCapabilities().getCarrierVehicles()
-					.add(CarrierVehicle.Builder.newInstance(Id.create("medium18telectro", Vehicle.class), linkId)
+				.add(CarrierVehicle.Builder.newInstance(Id.create("medium18telectro", Vehicle.class), linkId)
 						.setType(vehicleTypes.getVehicleTypes().get(Id.create("medium18telectro", VehicleType.class)))
 						.setEarliestStart(uccOpeningTime).setLatestEnd(uccClosingTime)
 						.build());
@@ -376,8 +381,8 @@ class UccCarrierCreator {
 		for (Carrier carrier : carriers.getCarriers().values()){
 			//zählt mit, wie oft Id für diesen Carrier vergeben wurde
 			Map<String, Integer> nuOfVehPerId = new TreeMap<String, Integer>();
-			
-			//da Änderung der vorhanden Fahrzeuge sonst nicht ging, Umweg über 
+
+			//da Änderung der vorhandenen Fahrzeuge sonst nicht ging, Umweg über 
 			//temporären neuen Carrier & setzen der Eigenschaften.
 			CarrierCapabilities tempCc = CarrierCapabilities.newInstance();
 			tempCc.setFleetSize(carrier.getCarrierCapabilities().getFleetSize());
@@ -393,10 +398,10 @@ class UccCarrierCreator {
 					Assert.assertTrue("No more chars to add to vehicleId",  nuOfVehPerId.get(vehIdwLink) <= alph.size());
 					newVehId = vehIdwLink + alph.get(nuOfVehPerId.get(vehIdwLink)-1);
 				}	
-				
+
 				//Vehicle neu erstellen, da setVehicleId nicht verfügbar.
 				//Dabei eindeutigen Buchstaben für jede VehId-DepotLink-Kombination einfügen
-				
+
 				tempCc.getCarrierVehicles().add(CarrierVehicle.Builder
 						.newInstance(Id.create(newVehId, Vehicle.class), cv.getLocation())
 						.setType(cv.getVehicleType())
@@ -415,7 +420,7 @@ class UccCarrierCreator {
 			for (Carrier nonUccC : nonUccCarriers.getCarriers().values()){
 				//TODO: Sicherstellen, dass jeder Service auch erstellt wird--> Sicherheitsabfrage, ansonsten Fehler erzeugen!	
 				if (uccC.getId().toString().equals(uccC_prefix+nonUccC.getId().toString())){
-					
+
 					//Zählt nachfrage an UCC-LinkID
 					Map<Id<Link>, Integer> demandAtUCC = new HashMap<Id<Link>, Integer>();
 					//für die einzelnen Touren die Nachfrage an den einzelnen Depots zählen
@@ -429,15 +434,15 @@ class UccCarrierCreator {
 								demand += serviceAct.getService().getCapacityDemand();
 							}
 						}
-						
+
 						if (demandAtUCC.containsKey(uccLocationId)){
 							demandAtUCC.put(uccLocationId, demandAtUCC.get(uccLocationId)+demand);  
 						} else  {
 							demandAtUCC.put(uccLocationId, demand);
 						}
 					}
-					
-					
+
+
 					//TODO: Sicherstellen (assert), dass bisher kein Service mit UCC_Prefix existiert, da sonst doppelte Einträge -> Fehler
 					//TODO: Absicherung einbauen, dass UCC von den Zeitfenstern her beliefert werden kann. -> ggf Zeitfenster anpassen, an 
 					//neue Services erstellen des nonUccC zum Depot des uccC.
@@ -445,43 +450,43 @@ class UccCarrierCreator {
 						for (int i = 1; i<=demandAtUCC.get(linkId); i++){
 							double earliestVehDepUCC = calcEarliestDep(uccC ,linkId);	
 							CarrierService.Builder csBuilder = CarrierService.Builder
-								.newInstance(Id.create("to_"+uccC_prefix+linkId.toString()+"_"+i, CarrierService.class), linkId)
-							//Jeder Service nur Nachfrage = 1, damit Fzg Aufteilung frei erfolgen kann
-								.setCapacityDemand(1)		
-								.setServiceDuration(60)	//60sec = 1min
-							// Innerhalb der ersten 2 Stunden nach Öffnungszeit soll die Ware dort ankommen 
-							//(Da aus Gründen der Vergleichbarkeit bisher die Öffnungszeiten der Hauptdepots nicht verändert werden)
-								.setServiceStartTimeWindow(TimeWindow.newInstance(
-									Math.max(0, earliestVehDepUCC), Math.max(0, earliestVehDepUCC +7200 ))); 
+									.newInstance(Id.create("to_"+uccC_prefix+linkId.toString()+"_"+i, CarrierService.class), linkId)
+									//Jeder Service nur Nachfrage = 1, damit Fzg Aufteilung frei erfolgen kann
+									.setCapacityDemand(1)		
+									.setServiceDuration(60)	//60sec = 1min
+									// Innerhalb der ersten 2 Stunden nach Öffnungszeit soll die Ware dort ankommen 
+									//(Da aus Gründen der Vergleichbarkeit bisher die Öffnungszeiten der Hauptdepots nicht verändert werden)
+									.setServiceStartTimeWindow(TimeWindow.newInstance(
+											Math.max(0, earliestVehDepUCC), Math.max(0, earliestVehDepUCC +7200 ))); 
 							nonUccC.getServices().add(csBuilder.build());
 						}	
 					}
-					
+
 				} //end if
 			}
 		}
-	return nonUccCarriers;	
+		return nonUccCarriers;	
 	}
 
 	//Früheste Abfahrt eines Fahrzeuges des Carriers vom angebenenen Depot
-//	TODO: Asserts gegen Null testen ;)
+	//	TODO: Asserts gegen Null testen ;)
 	private double calcEarliestDep(Carrier carrier, Id<Link> linkId) {
 		Assert.assertNotNull("linkId must not be null!: " + linkId);
 		double earliestDepTime = 24*3600.0; 	//24 Uhr 
-		  for (CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()) {
-			  Assert.assertNotNull("DepotLocation must not be null!: " + cv.toString(), cv.getLocation());
-			  if (cv.getLocation() == linkId){
-				  Assert.assertNotNull("aerliestDepartureTime must not be null!: " + cv.toString(), cv.getEarliestStartTime());
-					 if (cv.getEarliestStartTime() < earliestDepTime) {
-						 earliestDepTime = cv.getEarliestStartTime();
-					 } 
-			  }
-		  }
+		for (CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()) {
+			Assert.assertNotNull("DepotLocation must not be null!: " + cv.toString(), cv.getLocation());
+			if (cv.getLocation() == linkId){
+				Assert.assertNotNull("aerliestDepartureTime must not be null!: " + cv.toString(), cv.getEarliestStartTime());
+				if (cv.getEarliestStartTime() < earliestDepTime) {
+					earliestDepTime = cv.getEarliestStartTime();
+				} 
+			}
+		}
 		return earliestDepTime;
 	}
-	
+
 	//Früheste Abfahrt eines Fahrzeuges des Carriers 
-//	TODO: Test gegen Null (cv.getEarliestStartTime) testen ;)
+	//	TODO: Test gegen Null (cv.getEarliestStartTime) testen ;)
 	private double calcEarliestDep(Carrier carrier) {
 		double earliestDepTime = 24*3600.0; 	//24 Uhr 
 		for (CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()) {
@@ -512,7 +517,7 @@ class UccCarrierCreator {
 		TimeWindow timeWindow = TimeWindow.newInstance(earliestServiceStartBeginTime, latestServiceStartEndTime);
 		return timeWindow;
 	}
-	
+
 	/**
 	 * Gibt die verschiedenenZeitfenster (früheste Startzeit, späteste Endzeit) 
 	 * der Service-Zeiten des Carriers an, zu denen ein Service begonnen werden darf.
@@ -531,7 +536,7 @@ class UccCarrierCreator {
 		}
 		return timeWindows;
 	}
-	
+
 	private boolean timeInTimeWindow(ArrayList<TimeWindow> timeWindows ,TimeWindow timewindow){
 		for (TimeWindow tw : timeWindows){
 			if (tw.getStart() == timewindow.getStart() && tw.getEnd() == timewindow.getEnd()) {

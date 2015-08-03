@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<carriers>
+		<carrier id="gridCarrier2">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="gridVehicle01_i(6,0)" depotLinkId="i(6,0)" typeId="gridType01" earliestStart="00:30:00" latestEnd="23:59:59"/>
+				</vehicles>
+
+			</capabilities>
+
+			<services>
+				<service id="to_UCC-j(10,5)_1" to="j(10,5)" capacityDemand="1" earliestStart="10:00:00" latestEnd="12:00:00" serviceDuration="00:01:00"/>
+			</services>
+
+			<plan score="-17.51600000000002" selected="true">
+				<tour vehicleId="gridVehicle01_i(6,0)">
+					<act type="start" end_time="00:30:00"/>
+					<leg expected_dep_time="00:30:00" expected_transp_time="00:15:00">
+						<route>i(7,0) i(8,0) i(9,0) i(10,0) j(10,1) j(10,2) j(10,3) j(10,4)</route>
+					</leg>
+					<act type="service" serviceId="to_UCC-j(10,5)_1" />
+					<leg expected_dep_time="10:01:00" expected_transp_time="00:18:20">
+						<route>j(10,5)R i(10,4)R i(9,4)R i(8,4)R i(7,4)R j(6,4)R j(6,3)R j(6,2)R j(6,1)R i(6,0)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+
+		</carrier>
+
+		<carrier id="gridCarrier3">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="gridVehicle10_i(6,0)" depotLinkId="i(6,0)" typeId="gridType10" earliestStart="00:30:00" latestEnd="23:59:59"/>
+				</vehicles>
+
+			</capabilities>
+
+			<services>
+				<service id="to_UCC-j(10,5)_1" to="j(10,5)" capacityDemand="1" earliestStart="10:00:00" latestEnd="12:00:00" serviceDuration="00:01:00"/>
+			</services>
+
+			<plan score="-170.67999999999995" selected="true">
+				<tour vehicleId="gridVehicle10_i(6,0)">
+					<act type="start" end_time="00:30:00"/>
+					<leg expected_dep_time="00:30:00" expected_transp_time="00:15:00">
+						<route>i(7,0) i(8,0) i(9,0) i(10,0) j(10,1) j(10,2) j(10,3) j(10,4)</route>
+					</leg>
+					<act type="service" serviceId="to_UCC-j(10,5)_1" />
+					<leg expected_dep_time="10:01:00" expected_transp_time="00:18:20">
+						<route>j(10,5)R i(10,4)R i(9,4)R i(8,4)R i(7,4)R j(6,4)R j(6,3)R j(6,2)R j(6,1)R i(6,0)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+
+		</carrier>
+
+		<carrier id="UCC-gridCarrier1">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="light8telectro_j(0,5)" depotLinkId="j(0,5)" typeId="light8telectro" earliestStart="03:00:00" latestEnd="04:00:00"/>
+					<vehicle id="medium18telectro_j(0,5)" depotLinkId="j(0,5)" typeId="medium18telectro" earliestStart="03:00:00" latestEnd="04:00:00"/>
+					<vehicle id="light8telectro_j(10,5)" depotLinkId="j(10,5)" typeId="light8telectro" earliestStart="03:00:00" latestEnd="04:00:00"/>
+					<vehicle id="medium18telectro_j(10,5)" depotLinkId="j(10,5)" typeId="medium18telectro" earliestStart="03:00:00" latestEnd="04:00:00"/>
+					<vehicle id="light8telectro_j(0,5)b" depotLinkId="j(0,5)" typeId="light8telectro" earliestStart="04:00:00" latestEnd="05:00:00"/>
+					<vehicle id="medium18telectro_j(0,5)b" depotLinkId="j(0,5)" typeId="medium18telectro" earliestStart="04:00:00" latestEnd="05:00:00"/>
+					<vehicle id="light8telectro_j(10,5)b" depotLinkId="j(10,5)" typeId="light8telectro" earliestStart="04:00:00" latestEnd="05:00:00"/>
+					<vehicle id="medium18telectro_j(10,5)b" depotLinkId="j(10,5)" typeId="medium18telectro" earliestStart="04:00:00" latestEnd="05:00:00"/>
+					<vehicle id="light8telectro_j(0,5)c" depotLinkId="j(0,5)" typeId="light8telectro" earliestStart="06:00:00" latestEnd="07:00:00"/>
+					<vehicle id="medium18telectro_j(0,5)c" depotLinkId="j(0,5)" typeId="medium18telectro" earliestStart="06:00:00" latestEnd="07:00:00"/>
+					<vehicle id="light8telectro_j(10,5)c" depotLinkId="j(10,5)" typeId="light8telectro" earliestStart="06:00:00" latestEnd="07:00:00"/>
+					<vehicle id="medium18telectro_j(10,5)c" depotLinkId="j(10,5)" typeId="medium18telectro" earliestStart="06:00:00" latestEnd="07:00:00"/>
+					<vehicle id="light8telectro_j(0,5)d" depotLinkId="j(0,5)" typeId="light8telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+					<vehicle id="medium18telectro_j(0,5)d" depotLinkId="j(0,5)" typeId="medium18telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+					<vehicle id="light8telectro_j(10,5)d" depotLinkId="j(10,5)" typeId="light8telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+					<vehicle id="medium18telectro_j(10,5)d" depotLinkId="j(10,5)" typeId="medium18telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+				</vehicles>
+
+			</capabilities>
+
+			<services>
+				<service id="3" to="i(5,5)" capacityDemand="1" earliestStart="03:00:00" latestEnd="04:00:00" serviceDuration="00:10:00"/>
+				<service id="4" to="i(4,4)R" capacityDemand="1" earliestStart="04:00:00" latestEnd="05:00:00" serviceDuration="00:10:00"/>
+				<service id="6" to="i(6,6)R" capacityDemand="1" earliestStart="06:00:00" latestEnd="07:00:00" serviceDuration="00:10:00"/>
+				<service id="10" to="i(7,4)R" capacityDemand="1" earliestStart="10:00:00" latestEnd="11:00:00" serviceDuration="00:10:00"/>
+			</services>
+
+			<plan score="-357.192" selected="true">
+				<tour vehicleId="light8telectro_j(10,5)c">
+					<act type="start" end_time="06:00:00"/>
+					<leg expected_dep_time="06:00:00" expected_transp_time="00:10:00">
+						<route>j(10,6) i(10,6)R i(9,6)R i(8,6)R i(7,6)R</route>
+					</leg>
+					<act type="service" serviceId="6" />
+					<leg expected_dep_time="06:20:00" expected_transp_time="00:16:40">
+						<route>j(5,7) i(6,7) i(7,7) i(8,7) i(9,7) i(10,7) j(10,7)R j(10,6)R j(10,5)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+				<tour vehicleId="light8telectro_j(0,5)">
+					<act type="start" end_time="03:00:00"/>
+					<leg expected_dep_time="03:00:00" expected_transp_time="00:08:20">
+						<route>i(1,5) i(2,5) i(3,5) i(4,5)</route>
+					</leg>
+					<act type="service" serviceId="3" />
+					<leg expected_dep_time="03:18:20" expected_transp_time="00:08:20">
+						<route>j(5,6) i(5,6)R j(4,6)R j(4,5)R</route>
+					</leg>
+					<act type="service" serviceId="4" />
+					<leg expected_dep_time="04:10:00" expected_transp_time="00:06:40">
+						<route>i(3,4)R i(2,4)R i(1,4)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+				<tour vehicleId="light8telectro_j(10,5)d">
+					<act type="start" end_time="10:00:00"/>
+					<leg expected_dep_time="10:00:00" expected_transp_time="00:08:20">
+						<route>j(10,5)R i(10,4)R i(9,4)R i(8,4)R</route>
+					</leg>
+					<act type="service" serviceId="10" />
+					<leg expected_dep_time="10:18:20" expected_transp_time="00:11:40">
+						<route>j(6,4)R i(7,3) i(8,3) i(9,3) i(10,3) j(10,4)</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+
+		</carrier>
+
+		<carrier id="UCC-gridCarrier2">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="light8telectro_j(0,5)" depotLinkId="j(0,5)" typeId="light8telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+					<vehicle id="medium18telectro_j(0,5)" depotLinkId="j(0,5)" typeId="medium18telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+					<vehicle id="light8telectro_j(10,5)" depotLinkId="j(10,5)" typeId="light8telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+					<vehicle id="medium18telectro_j(10,5)" depotLinkId="j(10,5)" typeId="medium18telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+				</vehicles>
+
+			</capabilities>
+
+			<services>
+				<service id="10" to="i(7,4)R" capacityDemand="1" earliestStart="10:00:00" latestEnd="11:00:00" serviceDuration="00:10:00"/>
+			</services>
+
+			<plan score="-109.56" selected="true">
+				<tour vehicleId="light8telectro_j(10,5)">
+					<act type="start" end_time="10:00:00"/>
+					<leg expected_dep_time="10:00:00" expected_transp_time="00:08:20">
+						<route>j(10,5)R i(10,4)R i(9,4)R i(8,4)R</route>
+					</leg>
+					<act type="service" serviceId="10" />
+					<leg expected_dep_time="10:18:20" expected_transp_time="00:11:40">
+						<route>j(6,4)R i(7,3) i(8,3) i(9,3) i(10,3) j(10,4)</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+
+		</carrier>
+
+		<carrier id="gridCarrier">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="gridVehicle3_i(6,0)" depotLinkId="i(6,0)" typeId="gridType03" earliestStart="00:00:00" latestEnd="23:59:59"/>
+				</vehicles>
+
+			</capabilities>
+
+			<services>
+				<service id="1" to="i(3,9)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="2" to="j(1,5)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="5" to="i(4,7)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="7" to="j(9,4)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="8" to="i(7,7)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="9" to="j(6,3)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="to_UCC-j(10,5)_1" to="j(10,5)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:01:00"/>
+				<service id="to_UCC-j(10,5)_2" to="j(10,5)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:01:00"/>
+				<service id="to_UCC-j(10,5)_3" to="j(10,5)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:01:00"/>
+				<service id="to_UCC-j(10,5)_4" to="j(10,5)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:01:00"/>
+			</services>
+
+			<plan score="-279.485" selected="true">
+				<tour vehicleId="gridVehicle3_i(6,0)">
+					<act type="start" end_time="00:00:00"/>
+					<leg expected_dep_time="00:00:00" expected_transp_time="00:11:40">
+						<route>i(7,0) j(7,1) j(7,2) j(7,3) i(8,3) i(9,3)</route>
+					</leg>
+					<act type="service" serviceId="7" />
+					<leg expected_dep_time="00:21:40" expected_transp_time="00:06:40">
+						<route>j(9,5) i(10,5) j(10,5)R</route>
+					</leg>
+					<act type="service" serviceId="to_UCC-j(10,5)_1" />
+					<leg expected_dep_time="00:29:20" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="to_UCC-j(10,5)_3" />
+					<leg expected_dep_time="00:30:20" expected_transp_time="00:18:20">
+						<route>j(10,5)R i(10,4)R i(9,4)R i(8,4)R i(7,4)R j(6,4)R j(6,3)R j(6,2)R j(6,1)R i(6,0)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+				<tour vehicleId="gridVehicle3_i(6,0)">
+					<act type="start" end_time="00:00:00"/>
+					<leg expected_dep_time="00:00:00" expected_transp_time="00:16:40">
+						<route>i(6,0)R i(5,0)R i(4,0)R i(3,0)R i(2,0)R j(1,1) j(1,2) j(1,3) j(1,4)</route>
+					</leg>
+					<act type="service" serviceId="2" />
+					<leg expected_dep_time="00:26:40" expected_transp_time="00:10:00">
+						<route>j(1,6) j(1,7) j(1,8) j(1,9) i(2,9)</route>
+					</leg>
+					<act type="service" serviceId="1" />
+					<leg expected_dep_time="00:46:40" expected_transp_time="00:11:40">
+						<route>j(3,10) i(3,10)R j(2,10)R j(2,9)R j(2,8)R i(3,7)</route>
+					</leg>
+					<act type="service" serviceId="5" />
+					<leg expected_dep_time="01:08:20" expected_transp_time="00:15:00">
+						<route>j(4,7)R j(4,6)R j(4,5)R j(4,4)R j(4,3)R j(4,2)R j(4,1)R i(5,0)</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+				<tour vehicleId="gridVehicle3_i(6,0)">
+					<act type="start" end_time="00:00:00"/>
+					<leg expected_dep_time="00:00:00" expected_transp_time="00:16:40">
+						<route>i(6,0)R j(5,1) j(5,2) j(5,3) j(5,4) j(5,5) j(5,6) j(5,7) i(6,7)</route>
+					</leg>
+					<act type="service" serviceId="8" />
+					<leg expected_dep_time="00:26:40" expected_transp_time="00:11:40">
+						<route>i(8,7) i(9,7) i(10,7) j(10,7)R j(10,6)R j(10,5)R</route>
+					</leg>
+					<act type="service" serviceId="to_UCC-j(10,5)_2" />
+					<leg expected_dep_time="00:39:20" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="to_UCC-j(10,5)_4" />
+					<leg expected_dep_time="00:40:20" expected_transp_time="00:18:20">
+						<route>j(10,5)R i(10,4)R i(9,4)R i(8,4)R i(7,4)R j(6,4)R j(6,3)R j(6,2)R j(6,1)R i(6,0)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+				<tour vehicleId="gridVehicle3_i(6,0)">
+					<act type="start" end_time="00:00:00"/>
+					<leg expected_dep_time="00:00:00" expected_transp_time="00:10:00">
+						<route>i(6,0)R j(5,1) j(5,2) j(5,3) i(6,3)</route>
+					</leg>
+					<act type="service" serviceId="9" />
+					<leg expected_dep_time="00:20:00" expected_transp_time="00:06:40">
+						<route>j(6,2)R j(6,1)R i(6,0)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+
+		</carrier>
+
+		<carrier id="UCC-gridCarrier3">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="light8telectro_j(0,5)" depotLinkId="j(0,5)" typeId="light8telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+					<vehicle id="medium18telectro_j(0,5)" depotLinkId="j(0,5)" typeId="medium18telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+					<vehicle id="light8telectro_j(10,5)" depotLinkId="j(10,5)" typeId="light8telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+					<vehicle id="medium18telectro_j(10,5)" depotLinkId="j(10,5)" typeId="medium18telectro" earliestStart="10:00:00" latestEnd="11:00:00"/>
+				</vehicles>
+
+			</capabilities>
+
+			<services>
+				<service id="10" to="i(7,4)R" capacityDemand="1" earliestStart="10:00:00" latestEnd="11:00:00" serviceDuration="00:10:00"/>
+			</services>
+
+			<plan score="-109.50399999999999" selected="true">
+				<tour vehicleId="light8telectro_j(10,5)">
+					<act type="start" end_time="10:00:00"/>
+					<leg expected_dep_time="10:00:00" expected_transp_time="00:08:20">
+						<route>j(10,5)R i(10,4)R i(9,4)R i(8,4)R</route>
+					</leg>
+					<act type="service" serviceId="10" />
+					<leg expected_dep_time="10:18:20" expected_transp_time="00:11:40">
+						<route>j(6,4)R i(7,3) i(8,3) i(9,3) i(10,3) j(10,4)</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+
+		</carrier>
+
+		<carrier id="UCC-gridCarrier">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="light8telectro_j(0,5)" depotLinkId="j(0,5)" typeId="light8telectro" earliestStart="00:00:00" latestEnd="02:00:00"/>
+					<vehicle id="medium18telectro_j(0,5)" depotLinkId="j(0,5)" typeId="medium18telectro" earliestStart="00:00:00" latestEnd="02:00:00"/>
+					<vehicle id="light8telectro_j(10,5)" depotLinkId="j(10,5)" typeId="light8telectro" earliestStart="00:00:00" latestEnd="02:00:00"/>
+					<vehicle id="medium18telectro_j(10,5)" depotLinkId="j(10,5)" typeId="medium18telectro" earliestStart="00:00:00" latestEnd="02:00:00"/>
+				</vehicles>
+
+			</capabilities>
+
+			<services>
+				<service id="3" to="i(5,5)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="4" to="i(4,4)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="6" to="i(6,6)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="10" to="i(7,4)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+			</services>
+
+			<plan score="-142.24" selected="true">
+				<tour vehicleId="light8telectro_j(10,5)">
+					<act type="start" end_time="00:00:00"/>
+					<leg expected_dep_time="00:00:00" expected_transp_time="00:10:00">
+						<route>j(10,6) i(10,6)R i(9,6)R i(8,6)R i(7,6)R</route>
+					</leg>
+					<act type="service" serviceId="6" />
+					<leg expected_dep_time="00:20:00" expected_transp_time="00:06:40">
+						<route>i(5,6)R j(4,6)R j(4,5)R</route>
+					</leg>
+					<act type="service" serviceId="4" />
+					<leg expected_dep_time="00:36:40" expected_transp_time="00:05:00">
+						<route>j(3,5) i(4,5)</route>
+					</leg>
+					<act type="service" serviceId="3" />
+					<leg expected_dep_time="00:51:40" expected_transp_time="00:10:00">
+						<route>i(6,5) j(6,5)R j(6,4)R i(7,3) j(7,4)</route>
+					</leg>
+					<act type="service" serviceId="10" />
+					<leg expected_dep_time="01:11:40" expected_transp_time="00:11:40">
+						<route>j(6,4)R i(7,3) i(8,3) i(9,3) i(10,3) j(10,4)</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+
+		</carrier>
+
+		<carrier id="gridCarrier1">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="gridVehicle10_i(6,0)" depotLinkId="i(6,0)" typeId="gridType10" earliestStart="00:15:00" latestEnd="23:59:59"/>
+				</vehicles>
+
+			</capabilities>
+
+			<services>
+				<service id="1" to="i(3,9)" capacityDemand="1" earliestStart="01:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="2" to="j(1,5)" capacityDemand="1" earliestStart="02:00:00" latestEnd="03:00:00" serviceDuration="00:10:00"/>
+				<service id="5" to="i(4,7)" capacityDemand="1" earliestStart="05:00:00" latestEnd="06:00:00" serviceDuration="00:10:00"/>
+				<service id="7" to="j(9,4)" capacityDemand="1" earliestStart="07:00:00" latestEnd="08:00:00" serviceDuration="00:10:00"/>
+				<service id="8" to="i(7,7)" capacityDemand="1" earliestStart="08:00:00" latestEnd="09:00:00" serviceDuration="00:10:00"/>
+				<service id="9" to="j(6,3)R" capacityDemand="1" earliestStart="09:00:00" latestEnd="10:00:00" serviceDuration="00:10:00"/>
+				<service id="to_UCC-j(0,5)_1" to="j(0,5)" capacityDemand="1" earliestStart="03:00:00" latestEnd="05:00:00" serviceDuration="00:01:00"/>
+				<service id="to_UCC-j(0,5)_2" to="j(0,5)" capacityDemand="1" earliestStart="03:00:00" latestEnd="05:00:00" serviceDuration="00:01:00"/>
+				<service id="to_UCC-j(10,5)_1" to="j(10,5)" capacityDemand="1" earliestStart="03:00:00" latestEnd="05:00:00" serviceDuration="00:01:00"/>
+				<service id="to_UCC-j(10,5)_2" to="j(10,5)" capacityDemand="1" earliestStart="03:00:00" latestEnd="05:00:00" serviceDuration="00:01:00"/>
+			</services>
+
+			<plan score="-482.312" selected="true">
+				<tour vehicleId="gridVehicle10_i(6,0)">
+					<act type="start" end_time="00:15:00"/>
+					<leg expected_dep_time="00:15:00" expected_transp_time="00:26:40">
+						<route>i(6,0)R i(5,0)R i(4,0)R i(3,0)R i(2,0)R j(1,1) j(1,2) j(1,3) j(1,4) j(1,5) j(1,6) j(1,7) j(1,8) j(1,9) i(2,9)</route>
+					</leg>
+					<act type="service" serviceId="1" />
+					<leg expected_dep_time="01:10:00" expected_transp_time="00:16:40">
+						<route>j(3,10) i(3,10)R j(2,10)R j(2,9)R j(2,8)R j(2,7)R j(2,6)R j(2,5)R i(2,4)R</route>
+					</leg>
+					<act type="service" serviceId="2" />
+					<leg expected_dep_time="02:10:00" expected_transp_time="00:08:20">
+						<route>j(1,6) i(1,6)R j(0,6)R j(0,5)R</route>
+					</leg>
+					<act type="service" serviceId="to_UCC-j(0,5)_1" />
+					<leg expected_dep_time="03:01:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="to_UCC-j(0,5)_2" />
+					<leg expected_dep_time="03:02:00" expected_transp_time="00:20:00">
+						<route>i(1,5) i(2,5) i(3,5) i(4,5) i(5,5) i(6,5) i(7,5) i(8,5) i(9,5) i(10,5) j(10,5)R</route>
+					</leg>
+					<act type="service" serviceId="to_UCC-j(10,5)_2" />
+					<leg expected_dep_time="03:23:00" expected_transp_time="00:00:00">
+						<route></route>
+					</leg>
+					<act type="service" serviceId="to_UCC-j(10,5)_1" />
+					<leg expected_dep_time="03:24:00" expected_transp_time="00:16:40">
+						<route>j(10,6) i(10,6)R i(9,6)R i(8,6)R i(7,6)R i(6,6)R i(5,6)R i(4,6)R j(3,7)</route>
+					</leg>
+					<act type="service" serviceId="5" />
+					<leg expected_dep_time="05:10:00" expected_transp_time="00:16:40">
+						<route>j(4,7)R j(4,6)R j(4,5)R j(4,4)R i(5,3) i(6,3) i(7,3) i(8,3) i(9,3)</route>
+					</leg>
+					<act type="service" serviceId="7" />
+					<leg expected_dep_time="07:10:00" expected_transp_time="00:15:00">
+						<route>i(9,4)R i(8,4)R i(7,4)R i(6,4)R j(5,5) j(5,6) j(5,7) i(6,7)</route>
+					</leg>
+					<act type="service" serviceId="8" />
+					<leg expected_dep_time="08:10:00" expected_transp_time="00:13:20">
+						<route>j(7,8) i(7,8)R j(6,8)R j(6,7)R j(6,6)R j(6,5)R j(6,4)R</route>
+					</leg>
+					<act type="service" serviceId="9" />
+					<leg expected_dep_time="09:10:00" expected_transp_time="00:06:40">
+						<route>j(6,2)R j(6,1)R i(6,0)R</route>
+					</leg>
+					<act type="end"/>
+				</tour>
+			</plan>
+
+		</carrier>
+
+	</carriers>
