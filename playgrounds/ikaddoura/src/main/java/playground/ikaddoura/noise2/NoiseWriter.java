@@ -144,7 +144,7 @@ public class NoiseWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			
-			bw.write("Link Id;Demand (Car) " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + "; Demand (HGV) " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + "; vCar " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + "; vHGV " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + "; Noise Emission "  + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.write("Link Id;Demand (Car) " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";Demand (HGV) " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";vCar " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";vHGV " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";Noise Emission "  + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 			bw.newLine();
 			
 			for (Id<Link> linkId : noiseContext.getNoiseLinks().keySet()){

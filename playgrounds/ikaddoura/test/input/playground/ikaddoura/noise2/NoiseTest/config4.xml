@@ -146,10 +146,6 @@
 		<param name="randomSeed" value="1499" />
 	</module>
 	
-	<module name="scenario">
-		<param name="useTransit" value="false" />
-	</module>
-	
 	<module name="planscalcroute" >
 
 		<param name="beelineDistanceFactor" value="1.3" />
