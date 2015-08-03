@@ -144,22 +144,44 @@ public class NoiseWriter {
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			
-			bw.write("Link Id;Demand (Car) " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + "; Demand (HGV) " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + ";Noise Emission "  + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
+			bw.write("Link Id;Demand (Car) " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + "; Demand (HGV) " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + "; vCar " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + "; vHGV " + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS) + "; Noise Emission "  + Time.writeTime(timeInterval, Time.TIMEFORMAT_HHMMSS));
 			bw.newLine();
 			
 			for (Id<Link> linkId : noiseContext.getNoiseLinks().keySet()){
 				
 				int cars = 0;
 				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
-					cars = noiseContext.getNoiseLinks().get(linkId).getCarAgents();
+					cars = noiseContext.getNoiseLinks().get(linkId).getCarAgentsEntering();
 				}
 				
 				int hgv = 0;
 				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
-					hgv = noiseContext.getNoiseLinks().get(linkId).getHgvAgents();
+					hgv = noiseContext.getNoiseLinks().get(linkId).getHgvAgentsEntering();
 				}
 				
-				bw.write(linkId.toString() + ";" + (cars * noiseContext.getNoiseParams().getScaleFactor()) + ";" + (hgv * noiseContext.getNoiseParams().getScaleFactor()) + ";" + noiseContext.getNoiseLinks().get(linkId).getEmission());
+				double vCar = noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed() * 3.6;
+				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
+					double averageTravelTimeCar_sec = 0.;
+					if (noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving() > 0) {
+						averageTravelTimeCar_sec = noiseContext.getNoiseLinks().get(linkId).getTravelTimeCar_sec() / noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving();	
+					}
+					if (averageTravelTimeCar_sec > 0.) {
+						vCar = 3.6 * (noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTimeCar_sec );
+					}
+				}
+				
+				double vHdv = vCar;
+				if (noiseContext.getNoiseLinks().containsKey(linkId)) {
+					double averageTravelTimeHGV_sec = 0.;
+					if (noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving() > 0) {
+						averageTravelTimeHGV_sec = noiseContext.getNoiseLinks().get(linkId).getTravelTimeHGV_sec() / noiseContext.getNoiseLinks().get(linkId).getHgvAgentsLeaving();
+					}
+					if (averageTravelTimeHGV_sec > 0.) {
+						vHdv = 3.6 * (noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTimeHGV_sec );
+					}
+				}
+				
+				bw.write(linkId.toString() + ";" + (cars * noiseContext.getNoiseParams().getScaleFactor()) + ";" + (hgv * noiseContext.getNoiseParams().getScaleFactor()) + ";" + vCar + ";" + vHdv + ";" + noiseContext.getNoiseLinks().get(linkId).getEmission());
 				bw.newLine();
 			}
 			
@@ -174,7 +196,7 @@ public class NoiseWriter {
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file2));
-			bw.write("\"String\",\"Real\",\"Real\",\"Real\"");
+			bw.write("\"String\",\"Real\",\"Real\",\"Real\"\"Real\"\"Real\"");
 						
 			bw.newLine();
 			

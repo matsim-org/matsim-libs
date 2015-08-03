@@ -40,8 +40,12 @@ public class NoiseLink {
 
 	private final Id<Link> id;	
 	private List<Id<Vehicle>> enteringVehicleIds = new ArrayList<Id<Vehicle>>();
-	private int carAgents = 0; // carAgents x scaleFactor = cars
-	private int hgvAgents = 0; // hgvAgents x scaleFactor = hgv
+	private int carAgentsEntering = 0; // carAgents x scaleFactor = cars
+	private int hgvAgentsEntering = 0; // hgvAgents x scaleFactor = hgv
+	private int carAgentsLeaving = 0; 
+	private int hgvAgentsLeaving = 0;
+	private double travelTimeCar_Sec = 0.;
+	private double travelTimeHGV_Sec = 0.;
 	private double emission = 0.;
 	
 	private double emissionPlusOneCar = 0.;
@@ -58,6 +62,18 @@ public class NoiseLink {
 	public NoiseLink(Id<Link> linkId) {
 		this.id = linkId;
 	}
+	public int getCarAgentsLeaving() {
+		return carAgentsLeaving;
+	}
+	public void setCarAgentsLeaving(int carAgentsLeaving) {
+		this.carAgentsLeaving = carAgentsLeaving;
+	}
+	public int getHgvAgentsLeaving() {
+		return hgvAgentsLeaving;
+	}
+	public void setHgvAgentsLeaving(int hgvAgentsLeaving) {
+		this.hgvAgentsLeaving = hgvAgentsLeaving;
+	}
 	public Id<Link> getId() {
 		return id;
 	}
@@ -67,17 +83,17 @@ public class NoiseLink {
 	public void setEnteringVehicleIds(List<Id<Vehicle>> enteringVehicleIds) {
 		this.enteringVehicleIds = enteringVehicleIds;
 	}
-	public int getCarAgents() {
-		return carAgents;
+	public int getCarAgentsEntering() {
+		return carAgentsEntering;
 	}
-	public void setCarAgents(int cars) {
-		this.carAgents = cars;
+	public void setCarAgentsEntering(int carsEntering) {
+		this.carAgentsEntering = carsEntering;
 	}
-	public int getHgvAgents() {
-		return hgvAgents;
+	public int getHgvAgentsEntering() {
+		return hgvAgentsEntering;
 	}
-	public void setHgvAgents(int hgv) {
-		this.hgvAgents = hgv;
+	public void setHgvAgentsEntering(int hgvEntering) {
+		this.hgvAgentsEntering = hgvEntering;
 	}
 	public double getDamageCost() {
 		return damageCost;
@@ -139,11 +155,23 @@ public class NoiseLink {
 	public void setMarginalDamageCostPerHgv(double marginalDamageCostPerHgv) {
 		this.marginalDamageCostPerHgv = marginalDamageCostPerHgv;
 	}
+	public double getTravelTimeCar_sec() {
+		return travelTimeCar_Sec;
+	}
+	public void setTravelTimeCar_Sec(double travelTimeCar_Sec) {
+		this.travelTimeCar_Sec = travelTimeCar_Sec;
+	}
+	public double getTravelTimeHGV_sec() {
+		return travelTimeHGV_Sec;
+	}
+	public void setTravelTimeHGV_Sec(double travelTimeHGV_Sec) {
+		this.travelTimeHGV_Sec = travelTimeHGV_Sec;
+	}
 	@Override
 	public String toString() {
 		return "NoiseLink [id=" + id + ", enteringVehicleIds="
-				+ enteringVehicleIds + ", carAgents=" + carAgents
-				+ ", hgvAgents=" + hgvAgents + ", emission=" + emission
+				+ enteringVehicleIds + ", carAgents=" + carAgentsEntering
+				+ ", hgvAgents=" + hgvAgentsEntering + ", emission=" + emission
 				+ ", emissionPlusOneCar=" + emissionPlusOneCar
 				+ ", emissionPlusOneHGV=" + emissionPlusOneHGV
 				+ ", immissionPlusOneCar=" + immissionPlusOneCar
@@ -152,7 +180,10 @@ public class NoiseLink {
 				+ averageDamageCostPerCar + ", averageDamageCostPerHgv="
 				+ averageDamageCostPerHgv + ", marginalDamageCostPerCar="
 				+ marginalDamageCostPerCar + ", marginalDamageCostPerHgv="
-				+ marginalDamageCostPerHgv + "]";
+				+ marginalDamageCostPerHgv + ", travelTimeCar="
+				+ travelTimeCar_Sec + ", travelTimeHGV="
+				+ travelTimeHGV_Sec + "]";
 	}
+	
 	
 }
