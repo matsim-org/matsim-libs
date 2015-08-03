@@ -229,7 +229,6 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			
 		} else {
 			
-			// for all vehicle types
 			if (this.noiseContext.getNoiseLinks().containsKey(event.getLinkId())) {
 				this.noiseContext.getNoiseLinks().get(event.getLinkId()).getEnteringVehicleIds().add(event.getVehicleId());
 			
@@ -246,20 +245,20 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			if (event.getVehicleId().toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix())) {
 				// HGV
 				
-				int hgv = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getHgvAgents();
+				int hgv = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getHgvAgentsEntering();
 				hgv++;
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setHgvAgents(hgv);
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setHgvAgentsEntering(hgv);
 				
 			} else {
 				// Car
 				
-				int cars = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getCarAgents();
+				int cars = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getCarAgentsEntering();
 				cars++;
-				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCarAgents(cars);			
+				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCarAgentsEntering(cars);			
 			}
 		}
 	}
-
+	
 	private void calculateNoiseDamageCosts() {
 		
 		log.info("Calculating noise damage costs for each receiver point...");
@@ -386,12 +385,12 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				
 			int nCarAgents = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
-				nCarAgents = this.noiseContext.getNoiseLinks().get(linkId).getCarAgents();
+				nCarAgents = this.noiseContext.getNoiseLinks().get(linkId).getCarAgentsEntering();
 			}
 			
 			int nHdvAgents = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
-				nHdvAgents = this.noiseContext.getNoiseLinks().get(linkId).getHgvAgents();
+				nHdvAgents = this.noiseContext.getNoiseLinks().get(linkId).getHgvAgentsEntering();
 			}
 			
 			double vCar = (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
@@ -686,22 +685,54 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	private void calculateNoiseEmission() {
 				
 		for (Id<Link> linkId : this.noiseContext.getScenario().getNetwork().getLinks().keySet()){
-			
 			double vCar = (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
 			double vHdv = vCar;
-			
+						
+			double freespeedCar = vCar;
+
+			if (this.noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
+				
+				// use the actual speed level if possible
+				if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
+					
+					// Car
+					if (this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeCar_sec() == 0. || this.noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving() == 0) {
+						// use the maximum speed level
+						
+					} else {
+						double averageTravelTimeCar_sec = this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeCar_sec() / this.noiseContext.getNoiseLinks().get(linkId).getCarAgentsLeaving();	
+						vCar = 3.6 * (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTimeCar_sec );
+					}
+					
+					// HGV
+					if (this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeHGV_sec() == 0. || this.noiseContext.getNoiseLinks().get(linkId).getHgvAgentsLeaving() == 0) {
+						// use the actual car speed level
+						vHdv = vCar;
+		
+					} else {
+						double averageTravelTimeHGV_sec = this.noiseContext.getNoiseLinks().get(linkId).getTravelTimeHGV_sec() / this.noiseContext.getNoiseLinks().get(linkId).getHgvAgentsLeaving();
+						vHdv = 3.6 * (this.noiseContext.getScenario().getNetwork().getLinks().get(linkId).getLength() / averageTravelTimeHGV_sec );
+					}		
+					
+				}
+			}
+					
+			if (vCar > freespeedCar) {
+				throw new RuntimeException(vCar + " > " + freespeedCar + ". This should not be possible. Aborting...");
+			}
+							
 			double noiseEmission = 0.;
 			double noiseEmissionPlusOneCar = 0.;
 			double noiseEmissionPlusOneHgv = 0.;
 			
 			int n_car = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
-				n_car = this.noiseContext.getNoiseLinks().get(linkId).getCarAgents();
+				n_car = this.noiseContext.getNoiseLinks().get(linkId).getCarAgentsEntering();
 			}
 			
 			int n_hgv = 0;
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {
-				n_hgv = this.noiseContext.getNoiseLinks().get(linkId).getHgvAgents();
+				n_hgv = this.noiseContext.getNoiseLinks().get(linkId).getHgvAgentsEntering();
 			}
 			int n = n_car + n_hgv;
 									
@@ -742,7 +773,7 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 			noiseEmissionPlusOneHgv = mittelungspegelPlusOneHgv + DvPlusOneHgv;
 			
 			if (noiseEmissionPlusOneCar < noiseEmission || noiseEmissionPlusOneHgv < noiseEmission) {
-				throw new RuntimeException("vCar: " + vCar + " - vHGV: " + vHdv + " - p: " + p + " - n_car: " + n_car + " - n_hgv: " + n_hgv + " - n: " + n + " - pPlusOneCar: " + pPlusOneCar + " - pPlusOneHgv: " + pPlusOneHgv + " - noise emission: " + noiseEmission + " - noise emission plus one car: " + noiseEmissionPlusOneCar + " - noise emission plus one hgv: " + noiseEmissionPlusOneHgv + ". This should not happen. Aborting..."); 
+				log.warn("vCar: " + vCar + " - vHGV: " + vHdv + " - p: " + p + " - n_car: " + n_car + " - n_hgv: " + n_hgv + " - n: " + n + " - pPlusOneCar: " + pPlusOneCar + " - pPlusOneHgv: " + pPlusOneHgv + " - noise emission: " + noiseEmission + " - noise emission plus one car: " + noiseEmissionPlusOneCar + " - noise emission plus one hgv: " + noiseEmissionPlusOneHgv + ". This should not happen. Aborting..."); 
 			}
 			
 			if (this.noiseContext.getNoiseLinks().containsKey(linkId)) {

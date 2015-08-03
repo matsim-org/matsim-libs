@@ -25,14 +25,15 @@ import org.matsim.facilities.FacilitiesUtils;
 public class RunAccessibilityNMBM {
 	public static final Logger log = Logger.getLogger(RunAccessibilityNMBM.class);
 	
-	private static final double cellSize = 1000.;
+	private static final double cellSize = 200.;
 
 	
 	public static void main(String[] args) {
 		// Input and output	
-		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
+//		String networkFile = "../../matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
+		String networkFile = "../../accessibility-sa/data/NMBM_Network_CleanV7_highspeed.xml.gz";
 		String facilitiesFile = "../../matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
-		String outputDirectory = "../../accessibility-sa/data/13/";
+		String outputDirectory = "../../accessibility-sa/data/18/";
 //		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelTimeMatrix.csv.gz";
 //		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/travelDistanceMatrix.csv.gz";
 //		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_06/measuringPointsAsStops.csv.gz";
@@ -41,12 +42,13 @@ public class RunAccessibilityNMBM {
 //		String measuringPointsAsPtStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i_07/measuringPointsAsStops.csv";
 		
 		// Parameters
-		boolean includeDensityLayer = false;
+		boolean includeDensityLayer = true;
 		String crs = TransformationFactory.WGS84_SA_Albers;
-		Double lowerBound = 2.;
-		Double upperBound = 5.5;
+		Double lowerBound = 0.5;
+		Double upperBound = 4.;
 		Integer range = 9;
-		int symbolSize = 1010;
+		int symbolSize = 200;
+		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 
 		// extends of the network are (as they can looked up by using the bounding box):
 		// minX = 111083.9441831379, maxX = 171098.03695045778, minY = -3715412.097693177,	maxY = -3668275.43481496
@@ -79,7 +81,6 @@ public class RunAccessibilityNMBM {
 			}
 		}
 
-		
 
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
 		Controler controler = new Controler(scenario) ;
@@ -88,7 +89,11 @@ public class RunAccessibilityNMBM {
 		
 		// loop over activity types to add one GridBasedAccessibilityControlerListenerV3 for each combination
 		for ( String actType : activityTypes ) {
-			if ( !actType.equals("w") ) {
+//			if ( !actType.equals("s") ) {
+//				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//				continue ;
+//			}
+			if (actType.equals("h") || actType.equals("minor")) {
 				log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 				continue ;
 			}
@@ -135,12 +140,16 @@ public class RunAccessibilityNMBM {
 			String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
 
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
-				if ( !actType.equals("w") ) {
+//				if ( !actType.equals("s") ) {
+//					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+//					continue ;
+//				}
+				if (actType.equals("h") || actType.equals("minor")) {
 					log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
 					continue ;
 				}
 				VisualizationUtilsDZ.createQGisOutput(actType, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
-						lowerBound, upperBound, range, symbolSize);
+						lowerBound, upperBound, range, symbolSize, populationThreshold);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 		}

@@ -54,6 +54,7 @@ public class NoiseParameters {
 	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
 	private String tunnelLinkIdFile = null;
 	private int writeOutputIteration = 1;
+	private boolean useActualSpeedLevel = true;
 	
 	private boolean throwNoiseEventsAffected = true;
 	private boolean computeNoiseDamages = true;
@@ -274,6 +275,15 @@ public class NoiseParameters {
 	public void setTunnelLinkIdFile(String tunnelLinkIdFile) {
 		log.info("Setting file which contains the tunnel link Ids to " + tunnelLinkIdFile + ".");
 		this.tunnelLinkIdFile = tunnelLinkIdFile;
+	}
+
+	public boolean isUseActualSpeedLevel() {
+		return useActualSpeedLevel;
+	}
+
+	public void setUseActualSpeedLevel(boolean useActualSpeedLevel) {
+		log.info("Using the actual speed level for noise calculation: " + useActualSpeedLevel);
+		this.useActualSpeedLevel = useActualSpeedLevel;
 	}
 	
 }

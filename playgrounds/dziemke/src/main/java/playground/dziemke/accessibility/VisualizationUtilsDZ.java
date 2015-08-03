@@ -48,7 +48,7 @@ public class VisualizationUtilsDZ {
 		
 	public static void createQGisOutput(String actType, Modes4Accessibility mode, double[] mapViewExtent,
 			String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
-			Double upperBound, Integer range, int symbolSize) {
+			Double upperBound, Integer range, int symbolSize, int populationThreshold) {
 		
 		// create Mapnik file that is needed to have OSM layer in QGis project
 		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
@@ -77,7 +77,7 @@ public class VisualizationUtilsDZ {
 					"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
 			densityLayer.setXField(Labels.X_COORDINATE);
 			densityLayer.setYField(Labels.Y_COORDINATE);
-			AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
+			AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer, populationThreshold, symbolSize);
 			dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
 			writer.addLayer(densityLayer);
 		}

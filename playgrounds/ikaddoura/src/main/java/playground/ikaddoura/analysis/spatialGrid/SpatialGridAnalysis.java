@@ -93,9 +93,9 @@ public class SpatialGridAnalysis {
 			
 		} else {
 			
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
-			eventsFileWithNoiseEvents = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/baseCase_2_noiseAnalysis/r31341/noiseAnalysis_BlnBC2_2/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
-//			eventsFileWithNoiseEvents = null;
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_averageCost/";
+//			eventsFileWithNoiseEvents = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/baseCase_2_noiseAnalysis/r31341/noiseAnalysis_BlnBC2_2/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
+			eventsFileWithNoiseEvents = null;
 			outputFilePath = runDirectory + "analysis_spatial_grid_2/";
 			
 			receiverPointGap = 100.;
@@ -141,11 +141,12 @@ public class SpatialGridAnalysis {
 			
 		// scenario
 		
-		String configFile = runDirectory + "output_config.xml.gz";
+//		String configFile = runDirectory + "output_config.xml.gz";
 		String populationFile = runDirectory + "output_plans.xml.gz";
 		String networkFile = runDirectory + "output_network.xml.gz";
 	
-		Config config = ConfigUtils.loadConfig(configFile);		
+//		Config config = ConfigUtils.loadConfig(configFile);		
+		Config config = ConfigUtils.createConfig();		
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
 		
@@ -162,7 +163,8 @@ public class SpatialGridAnalysis {
 		
 		String eventsFile;
 		if (eventsFileWithNoiseEvents == null) {
-			int iteration = config.controler().getLastIteration();
+//			int iteration = config.controler().getLastIteration();
+			int iteration = 100;
 			eventsFile = runDirectory + "ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
 		} else {
 			eventsFile = eventsFileWithNoiseEvents;
