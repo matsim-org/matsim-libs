@@ -26,13 +26,13 @@ import java.util.List;
  */
 public interface Episode extends Element {
 
-    public List<Element> getActivities();
+    public List<Segment> getActivities();
 
-    public List<Element> getLegs();
+    public List<Segment> getLegs();
 
-    public void addActivity(Element activity);
+    public void addActivity(Segment activity);
 
-    public void addLeg(Element leg);
+    public void addLeg(Segment leg);
 
     public Person getPerson();
 }

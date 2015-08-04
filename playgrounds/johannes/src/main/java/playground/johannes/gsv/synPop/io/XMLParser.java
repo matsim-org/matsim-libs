@@ -23,9 +23,9 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.synpop.data.PlainEpisode;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.PlainSegment;
 
 import java.util.*;
 
@@ -86,7 +86,7 @@ public class XMLParser extends MatsimXmlParser {
 			}
 
 		} else if (name.equalsIgnoreCase(Constants.ACTIVITY_TAG)) {
-			PlainElement act = new PlainElement();
+			PlainSegment act = new PlainSegment();
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!blacklist.contains(type)) {
@@ -96,7 +96,7 @@ public class XMLParser extends MatsimXmlParser {
 			plan.addActivity(act);
 
 		} else if (name.equalsIgnoreCase(Constants.LEG_TAG)) {
-			PlainElement leg = new PlainElement();
+			PlainSegment leg = new PlainSegment();
 			for (int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if (!blacklist.contains(type)) {

@@ -29,7 +29,7 @@ import java.util.Map.Entry;
  * @author johannes
  *
  */
-public class PlainElement implements Element {
+public abstract class PlainElement implements Element {
 
 	private Map<String, String> attributes;
 	
@@ -66,7 +66,7 @@ public class PlainElement implements Element {
 	}
 
 	public PlainElement clone() {
-		PlainElement clone = new PlainElement();
+		PlainElement clone = new PlainSegment();
 		
 		for(Entry<String, String> entry : attributes.entrySet()) {
 			clone.setAttribute(entry.getKey(), entry.getValue());

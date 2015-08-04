@@ -24,9 +24,9 @@ import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Segment;
 
 import java.util.List;
 import java.util.Random;
@@ -62,7 +62,7 @@ public class ActivityLocationMutator implements SingleMutator {
 
 	@Override
 	public boolean mutate(PlainPerson person) {
-		List<Element> activities = person.getPlan().getActivities();
+		List<Segment> activities = person.getPlan().getActivities();
 	
 		int idx = random.nextInt(activities.size());
 		// if(idx == 0 || idx == activities.size() - 1)

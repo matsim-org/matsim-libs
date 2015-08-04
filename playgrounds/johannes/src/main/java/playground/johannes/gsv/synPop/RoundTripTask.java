@@ -21,7 +21,8 @@ package playground.johannes.gsv.synPop;
 
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.PlainSegment;
+import playground.johannes.synpop.data.Segment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,14 +72,14 @@ public class RoundTripTask implements ProxyPlanTask {
 			/*
 			 * insert a dummy activity with duration 1 s.
 			 */
-			Element act = new PlainElement();
+			Segment act = new PlainSegment();
 			String prevType = (String) plan.getActivities().get(i-2).getAttribute(CommonKeys.ACTIVITY_TYPE);
 			act.setAttribute(CommonKeys.ACTIVITY_TYPE, prevType);
 			plan.getActivities().add(i, act);
 			/*
 			 * insert a return leg with half the duration and distance
 			 */
-			Element fromLeg = new PlainElement();
+			Segment fromLeg = new PlainSegment();
 			fromLeg.setAttribute(CommonKeys.LEG_START_TIME, String.valueOf(toLegStart + dur/2));
 			fromLeg.setAttribute(CommonKeys.LEG_END_TIME, String.valueOf(toLegEnd));
 			fromLeg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, toLeg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE));

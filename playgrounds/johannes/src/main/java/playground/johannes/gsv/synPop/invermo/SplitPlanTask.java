@@ -82,24 +82,24 @@ public class SplitPlanTask implements ProxyPersonTask {
 			if (nights > 0) {
 				subPlan.setAttribute(MIDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
 
-				subPlan.addActivity(((PlainElement)act).clone());
+				subPlan.addActivity(((PlainSegment)act).clone());
 				newPlans.add(subPlan);
 				
 				subPlan = new PlainEpisode();
-				subPlan.addActivity(((PlainElement)act).clone());
-				subPlan.addLeg(((PlainElement)leg).clone());
+				subPlan.addActivity(((PlainSegment)act).clone());
+				subPlan.addLeg(((PlainSegment)leg).clone());
 			} else {
 				subPlan.setAttribute(MIDKeys.JOURNEY_DAYS, String.valueOf(nights + 1));
 				
-				subPlan.addActivity(((PlainElement)act).clone());
-				subPlan.addLeg(((PlainElement)leg).clone());
+				subPlan.addActivity(((PlainSegment)act).clone());
+				subPlan.addLeg(((PlainSegment)leg).clone());
 			}
 			
 			prev = current;
 		}
 		
 		int size = plan.getActivities().size();
-		subPlan.addActivity(((PlainElement)plan.getActivities().get(size - 1)).clone());
+		subPlan.addActivity(((PlainSegment)plan.getActivities().get(size - 1)).clone());
 		newPlans.add(subPlan);
 	}
 	

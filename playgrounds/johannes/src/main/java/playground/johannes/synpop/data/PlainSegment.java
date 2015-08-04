@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,46 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo;
-
-import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainSegment;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+package playground.johannes.synpop.data;
 
 /**
  * @author johannes
- * 
  */
-public class LegHandlerAdaptor implements AttributeHandler<Episode> {
+public class PlainSegment extends  PlainElement implements Segment{
+    @Override
+    public Episode getEpisode() {
+        return null;
+    }
 
-	private List<LegAttributeHandler> delegates = new ArrayList<LegAttributeHandler>();
+    public PlainSegment clone() {
+        PlainSegment clone = new PlainSegment();
 
-	public void addHandler(LegAttributeHandler handler) {
-		delegates.add(handler);
-	}
+        for(String key : keys()) {
+            clone.setAttribute(key, getAttribute(key));
+        }
 
-	@Override
-	public void handleAttribute(Episode plan, Map<String, String> attributes) {
-		for (Entry<String, String> entry : attributes.entrySet()) {
-			if (ColumnKeys.validate(entry.getValue())) {
-				String key = entry.getKey();
-				if (key.startsWith("e")) {
-					int idx = Character.getNumericValue(key.charAt(1));
-					idx = idx - 1;
-					while (idx > plan.getLegs().size() - 1) {
-						plan.addLeg(new PlainSegment());
-					}
-
-					for (LegAttributeHandler legHandler : delegates)
-						legHandler.handle(plan.getLegs().get(idx), idx, key, entry.getValue());
-				}
-			}
-		}
-
-	}
-
+        return clone;
+    }
 }

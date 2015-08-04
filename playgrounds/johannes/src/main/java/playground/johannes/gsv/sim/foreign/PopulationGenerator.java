@@ -43,9 +43,9 @@ import playground.johannes.sna.util.ProgressLogger;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 import playground.johannes.synpop.data.Episode;
-import playground.johannes.synpop.data.PlainElement;
 import playground.johannes.synpop.data.PlainEpisode;
 import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.PlainSegment;
 
 import java.io.File;
 import java.io.IOException;
@@ -281,16 +281,16 @@ public class PopulationGenerator {
 		Episode plan = new PlainEpisode();
 		plan.setAttribute(CommonKeys.DATA_SOURCE, "foreign");
 
-		PlainElement origAct = new PlainElement();
+		PlainSegment origAct = new PlainSegment();
 		origAct.setAttribute(CommonKeys.ACTIVITY_TYPE, origType);
 		origAct.setAttribute(CommonKeys.ACTIVITY_FACILITY, orig.getId().toString());
 		origAct.setAttribute(CommonKeys.ACTIVITY_START_TIME, "0");
 		origAct.setAttribute(CommonKeys.ACTIVITY_END_TIME, "1");
 
-		PlainElement leg = new PlainElement();
+		PlainSegment leg = new PlainSegment();
 		leg.setAttribute(CommonKeys.LEG_MODE, "car");
 
-		PlainElement targetAct = new PlainElement();
+		PlainSegment targetAct = new PlainSegment();
 		targetAct.setAttribute(CommonKeys.ACTIVITY_TYPE, targetType);
 		targetAct.setAttribute(CommonKeys.ACTIVITY_FACILITY, target.getId().toString());
 		targetAct.setAttribute(CommonKeys.ACTIVITY_START_TIME, "86399");
