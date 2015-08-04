@@ -51,6 +51,7 @@ public class NoiseParameters {
 	private double scaleFactor = 1.;
 	private double relevantRadius = 500.;
 	private Set<String> hgvIdPrefixes = new HashSet<String>();
+	private Set<String> busIdPrefixes = new HashSet<String>();
 	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 	private String tunnelLinkIdFile = null;
 	private int writeOutputIteration = 1;
@@ -290,6 +291,15 @@ public class NoiseParameters {
 	public void setUseActualSpeedLevel(boolean useActualSpeedLevel) {
 		log.info("Using the actual speed level for noise calculation: " + useActualSpeedLevel);
 		this.useActualSpeedLevel = useActualSpeedLevel;
+	}
+
+	public Set<String> getBusIdPrefixes() {
+		return busIdPrefixes;
+	}
+
+	public void setBusIdPrefixes(Set<String> busIdPrefixes) {
+		log.info("Setting the bus Id prefixes to : " + busIdPrefixes.toString());
+		this.busIdPrefixes = busIdPrefixes;
 	}
 	
 }

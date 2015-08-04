@@ -31,7 +31,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -56,7 +58,7 @@ import playground.ikaddoura.noise2.events.NoiseEventCaused;
  *
  */
 
-public class NoiseTimeTracker implements LinkEnterEventHandler {
+public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverStartsEventHandler {
 
 	private static final Logger log = Logger.getLogger(NoiseTimeTracker.class);
 	
@@ -78,6 +80,45 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 		this.outputDirectoryBasic = outputDirectory;
 		this.outputDirectory = outputDirectory;
 		this.events = events;	
+	}
+	
+	int cWarn1 = 0;
+	int cWarn2 = 0;
+
+	@Override
+	public void handleEvent(TransitDriverStartsEvent event) {
+		
+		if (this.noiseContext.getNoiseParams().getBusIdPrefixes().isEmpty()) {
+			if (cWarn1 == 0) {
+				log.warn("Simulated public transit detected. "
+						+ "To calculate noise caused by road vehicles, e.g. buses, "
+						+ "please provide a char sequence which marks a bus in the transit line Id. "
+						+ "This message is only given once.");
+				cWarn1++;
+			}
+			
+		} else {
+			boolean isBus = false;
+			for (String busIdPrefix : this.noiseContext.getNoiseParams().getBusIdPrefixes()) {
+				if (event.getTransitLineId().toString().contains(busIdPrefix)) {
+					isBus = true;
+					break;
+				}
+			}
+			if (isBus) {
+				if (!this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
+					this.noiseContext.getBusVehicleIDs().add(event.getVehicleId());
+				}
+
+			} else {
+				if (cWarn2 == 0) {
+					log.warn("This noise computation approach does not account for transit vehicles other than road vehicles. "
+							+ "Vehicle " + event.getVehicleId() + " belonging to transit line " + event.getTransitLineId() + " will not be considered. "
+							+ "This message is only given once");
+					cWarn2++;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -221,13 +262,11 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-				
 		checkTime(event.getTime());
 
-		if (!(noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getVehicleId()))) {
-			// probably public transit
-			
-		} else {
+		if (this.noiseContext.getScenario().getPopulation().getPersons().containsKey(event.getVehicleId())
+				|| this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
+			// car, lkw or bus
 			
 			if (this.noiseContext.getNoiseLinks().containsKey(event.getLinkId())) {
 				this.noiseContext.getNoiseLinks().get(event.getLinkId()).getEnteringVehicleIds().add(event.getVehicleId());
@@ -250,9 +289,9 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				}
 			}
 			
-			if (isHGV) {			
-				// HGV
-				
+			if (isHGV || this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {			
+				// HGV or Bus
+								
 				int hgv = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getHgvAgentsEntering();
 				hgv++;
 				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setHgvAgentsEntering(hgv);
@@ -264,6 +303,9 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 				cars++;
 				this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCarAgentsEntering(cars);			
 			}
+			
+		} else {
+			// a transit vehicle which is not considered
 		}
 	}
 	
@@ -562,10 +604,10 @@ public class NoiseTimeTracker implements LinkEnterEventHandler {
 						}
 					}
 										
-					if(!isHGV) {
-						amount = amountCar;
-					} else {
+					if(isHGV || this.noiseContext.getBusVehicleIDs().contains(vehicleId)) {
 						amount = amountHdv;
+					} else {
+						amount = amountCar;
 					}
 					
 					if (amount != 0.) {

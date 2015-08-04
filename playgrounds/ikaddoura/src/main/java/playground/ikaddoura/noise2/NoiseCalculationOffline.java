@@ -42,6 +42,7 @@ import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.handler.LinkSpeedCalculation;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
+import playground.ikaddoura.noise2.utils.ProcessNoiseImmissions;
 
 /**
  * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
@@ -88,8 +89,8 @@ public class NoiseCalculationOffline {
 
 			runDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/input/" + runId + "/";
 			outputDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/" + runId + "/";
-			receiverPointGap = 10.;
-			lastIteration = 25;
+			receiverPointGap = 25.;
+			lastIteration = 30;
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -166,8 +167,11 @@ public class NoiseCalculationOffline {
 		
 		Set<String> hgvIdPrefixes = new HashSet<String>();
 		hgvIdPrefixes.add("lkw");
-		hgvIdPrefixes.add("tr");
 		noiseParameters.setHgvIdPrefixes(hgvIdPrefixes);
+		
+		Set<String> busIdPrefixes = new HashSet<String>();
+		busIdPrefixes.add("-B-");
+		noiseParameters.setBusIdPrefixes(busIdPrefixes);
 		
 //		 Berlin Tunnel Link IDs
 		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
@@ -259,6 +263,10 @@ public class NoiseCalculationOffline {
 			eventWriter.closeFile();
 		}
 		log.info("Noise calculation completed.");
+		
+		log.info("Processing the noise immissions...");
+		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv");
+		process.run();
 	}
 }
 		
