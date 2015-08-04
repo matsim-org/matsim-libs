@@ -78,8 +78,13 @@ class TaxiLauncher
             VrpPopulationUtils.convertLegModes(passengerIds, TaxiUtils.TAXI_MODE, scenario);
         }
         
-        zones = Zones.readZones(scenario, params.zonesXmlFile, params.zonesShpFile);
-        System.err.println("No conversion of SRS is done");
+        if (params.zonesXmlFile != null && params.zonesShpFile != null) {
+            zones = Zones.readZones(scenario, params.zonesXmlFile, params.zonesShpFile);
+            System.err.println("No conversion of SRS is done");
+        }
+        else {
+            zones = null;
+        }
 
         //TaxiDemandUtils.preprocessPlansBasedOnCoordsOnly(scenario);
     }
