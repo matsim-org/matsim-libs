@@ -92,8 +92,10 @@ public class ZonalTaxiOptimizer
             if (optimConfig.scheduler.isIdle(veh)) {
                 Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
                 Zone zone = linkToZone.get(link.getId());
-                PriorityQueue<Vehicle> queue = zoneToIdleVehicleQueue.get(zone.getId());
-                queue.add(veh);
+                if (zone != null) {
+                    PriorityQueue<Vehicle> queue = zoneToIdleVehicleQueue.get(zone.getId());
+                    queue.add(veh);
+                }
             }
         }
     }
