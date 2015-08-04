@@ -18,7 +18,7 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 import playground.mzilske.gtfs.GtfsConverter;
 
-public class GtfsTests extends MatsimTestCase {
+public class GtfsTest extends MatsimTestCase {
 	
 	
 	public void testGtfsStandardConversion(){
