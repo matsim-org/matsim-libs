@@ -19,9 +19,9 @@
 
 package playground.michalm.taxi.run;
 
-import java.util.List;
+import java.util.*;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.*;
 import org.matsim.contrib.dvrp.extensions.taxi.TaxiUtils;
 import org.matsim.contrib.dvrp.passenger.*;
@@ -45,6 +45,7 @@ import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.filter.*;
 import playground.michalm.taxi.scheduler.*;
 import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
+import playground.michalm.zone.*;
 
 
 class TaxiLauncher
@@ -52,7 +53,8 @@ class TaxiLauncher
     final TaxiLauncherParams params;
     MatsimVrpContext context;
     final Scenario scenario;
-
+    final Map<Id<Zone>, Zone> zones;
+    
     TravelTimeCalculator travelTimeCalculator;
     LeastCostPathCalculatorWithCache routerWithCache;
     VrpPathCalculator pathCalculator;
@@ -75,6 +77,9 @@ class TaxiLauncher
                     .readTaxiCustomerIds(params.taxiCustomersFile);
             VrpPopulationUtils.convertLegModes(passengerIds, TaxiUtils.TAXI_MODE, scenario);
         }
+        
+        zones = Zones.readZones(scenario, params.zonesXmlFile, params.zonesShpFile);
+        System.err.println("No conversion of SRS is done");
 
         //TaxiDemandUtils.preprocessPlansBasedOnCoordsOnly(scenario);
     }
@@ -170,7 +175,7 @@ class TaxiLauncher
                 params.nearestRequestsLimit, params.nearestVehiclesLimit);
 
         return new TaxiOptimizerConfiguration(context, pathCalculator, scheduler, vrpFinder,
-                filterFactory, params.algorithmConfig.goal, params.outputDir);
+                filterFactory, params.algorithmConfig.goal, params.outputDir, zones);
     }
 
 

@@ -38,6 +38,9 @@ class TaxiLauncherParams
     String taxiCustomersFile;
     String taxisFile;
     String ranksFile;
+    
+    String zonesXmlFile;
+    String zonesShpFile;
 
     String eventsFile;
     String changeEventsFile;
@@ -79,6 +82,9 @@ class TaxiLauncherParams
         taxiCustomersFile = getInputPath(TAXI_CUSTOMERS_FILE);
         ranksFile = getInputPath("ranksFile");
         taxisFile = getInputPath("taxisFile");
+        
+        zonesXmlFile = getInputPath("zonesXmlFile");
+        zonesShpFile = getInputPath("zonesShpFile");
 
         eventsFile = getInputPath("eventsFile");
         changeEventsFile = getInputPath("changeEventsFile");
