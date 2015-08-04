@@ -18,20 +18,19 @@ class GtfsSource {
 	private List<String> header;
 	
 	private List<String[]> content;
-	
 
 	static GtfsSource parseGtfsFile(String filename){
 		GtfsSource newFile = new GtfsSource();
 		newFile.filename = filename;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
-			newFile.header = new ArrayList<String>(Arrays.asList(splitRow(br.readLine(),true)));
-			newFile.content = new ArrayList<String[]>();
+			newFile.header = new ArrayList<>(Arrays.asList(splitRow(br.readLine(), true)));
+			newFile.content = new ArrayList<>();
 			String row = br.readLine();
 			while(row!= null){
 				newFile.content.add(splitRow(row,false));
 				row = br.readLine();
-			};
+			}
 		} catch (FileNotFoundException e) {
 			System.out.println(filename + " not found!");
 		} catch (IOException e) {
@@ -55,7 +54,7 @@ class GtfsSource {
 	}
 
 	static String[] splitRow(String row, boolean header){
-		List<String> entries = new ArrayList<String>();
+		List<String> entries = new ArrayList<>();
 		boolean quotes = false;
 		StringBuilder sb = new StringBuilder();
 		for(int i =0; i<row.length(); i++){
