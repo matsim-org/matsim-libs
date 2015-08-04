@@ -474,7 +474,6 @@ public class Config {
 	}
 
 	public final void setLocked(boolean locked) {
-		checkIfLocked();
 		this.locked = locked;
 	}
 
