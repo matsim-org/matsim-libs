@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.noise2.routing;
+package playground.ikaddoura.integrationCN;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -31,22 +31,25 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
 import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.vsp.congestion.handlers.TollHandler;
 
 /**
  * @author ikaddoura
  *
  */
-public class TollDisutilityCalculatorFactory implements TravelDisutilityFactory {
+public class CNTollDisutilityCalculatorFactory implements TravelDisutilityFactory {
 
-	private NoiseContext noiseContext;
+	private final NoiseContext noiseContext;
+	private final TollHandler tollHandler;
 
-	public TollDisutilityCalculatorFactory(NoiseContext noiseContext) {
+	public CNTollDisutilityCalculatorFactory(NoiseContext noiseContext, TollHandler tollHandler) {
 		this.noiseContext = noiseContext;
+		this.tollHandler = tollHandler;
 	}
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		final TollTravelDisutilityCalculator ttdc = new TollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, noiseContext);
+		final CNTollTravelDisutilityCalculator ttdc = new CNTollTravelDisutilityCalculator(timeCalculator, cnScoringGroup, noiseContext, tollHandler);
 
 		return new TravelDisutility(){
 

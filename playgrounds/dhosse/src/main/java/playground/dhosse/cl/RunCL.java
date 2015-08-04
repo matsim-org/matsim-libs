@@ -16,8 +16,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 
-import playground.agarwalamit.munich.inputs.ReadAndAddSubActivities;
-
 public class RunCL {
 
 	static String svnWorkingDir = "C:/Users/dhosse/workspace/shared-svn/studies/countries/cl/";

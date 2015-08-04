@@ -33,12 +33,11 @@ import org.matsim.contrib.otfvis.OTFVisModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
 import playground.ikaddoura.noise2.data.NoiseContext;
-import playground.ikaddoura.noise2.routing.TollDisutilityCalculatorFactory;
+import playground.ikaddoura.noise2.routing.NoiseTollDisutilityCalculatorFactory;
 
 /**
  * 
@@ -170,7 +169,7 @@ public class NoiseOnlineControler {
 		Controler controler = new Controler(configFile);
 
 		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
-		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(noiseContext);
+		final NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseContext);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

@@ -58,7 +58,7 @@ public class CongestionPricingControlerDifferentVTTS {
 			log.info("config file: "+ configFile);
 
 		} else {
-			configFile = "../../runs-svn/internalizationCar/input/config_internalizationCar.xml";
+			configFile = "../../shared-svn/studies/ihab/test_siouxFalls/input/config.xml";
 		}
 
 		CongestionPricingControlerDifferentVTTS main = new CongestionPricingControlerDifferentVTTS();

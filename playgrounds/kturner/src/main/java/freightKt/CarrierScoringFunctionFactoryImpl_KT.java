@@ -33,7 +33,7 @@ import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Defines example carrier scoring function (factory).
+ * Defines carrier scoring function (factory).
  *
  * @author Kt, based on stefan
  * from sschroeder: package org.matsim.contrib.freight.usecases.chessboard ;
@@ -175,7 +175,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
                 assert timeCosts >= 0.0 : "timeCosts must be positive";
                 score += (-1) * timeCosts;
                 
-                leg.setMode(vehicle.getVehicleType().getId().toString());		//KT: 28.03.2015 Zuweisung des VehicleTxpes als Mode -> Sinnvoll? Zuminderst Besser als "car".
+                leg.setMode(vehicle.getVehicleType().getId().toString());		//KT: 28.03.2015 Zuweisung des VehicleTxpes als Mode -> Sinnvoll? Zumindest besser als "car".
                 
                 legWriter.writeLegToFile(leg);
                 legWriter.writeTextLineToFile("LegTimeCosts per s: \t"+ getTimeParameter(vehicle)+ "\t LegTimeCosts: "+ timeCosts  +  "\t LegDistanceCosts per m: "+ getDistanceParameter(vehicle) + "\t LegDistanceCosts: " + distanceCosts );
@@ -188,10 +188,12 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
     } // End Class LegScoring
     
     /**
-     * Bewertet die Aktivität und berücksichtigt dabei die Wartezeiten.
+     * Bewertet die Aktivität und berücksichtigt dabei alle Wartezeiten.
      * Der Kostensatz ist einheitlich mit 0.008 EUR/s festgelegt. 
+     * 
+     * Es erfolgt KEINE Korrektur der Wartezeit für den ersten Service.
+     * 
      * @author kt
-     *
      */
     static class ActivityScoring implements SumScoringFunction.ActivityScoring {
 
@@ -207,7 +209,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 			this.carrier = carrier;
 		}
     	
-    	//Added Activity Writer to log the Activities
+    	//Added ActivityWriter to log the Activities
 		WriteActivitiesInclScore activityWriterInclScore = new WriteActivitiesInclScore(new File(outputDir + "#ActivitiesForScoringInforInclScore.txt")); //KT
 		
 		@Override
@@ -228,7 +230,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 		@Override
 		public void handleFirstActivity(Activity act) { 
 			activityWriterInclScore.addFirstActToWriter(act, 0.0);
-			//Am Start geschieht nichts; ggf kann man hier noch Bewertung für Beladung des Fzgs einfügen, KT 14.04.15
+			//Am Start geschieht nichts; ggf kann man hier noch Bewertung für Beladungszeit des Fzgs einfügen (wenn irgendwann mehrere Touren möglich sind), KT 14.04.15
 		}
 
 		@Override
@@ -246,7 +248,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 			}			
 		}
 
-		//Costs für Zeit von Begin bis Ende der Aktivität (enthält aktuell jun '15 auch Wartezeit bis Service beginnt)
+		//Kosten für Zeit von Beginn bis Ende der Aktivität (enthält aktuell jun '15 auch Wartezeit bis Service beginnt)
 		private double calcActCosts(FreightActivity act) {
 				// deduct score for the time spent at the facility:
 				final double actStartTime = act.getStartTime();
@@ -295,7 +297,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 			this.carrier = carrier;
 		}
     	
-    	//Added Activity Writer to log the Activities
+    	//Added ActivityWriter to log the Activities
 		WriteActivitiesInclScore activityWriterInclScore = new WriteActivitiesInclScore(new File(outputDir + "#ActivitiesForScoringInforInclScore.txt")); //KT
 		
 		@Override
@@ -329,9 +331,8 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 				FreightActivity act = (FreightActivity) activity;
 				
 				actCosts = calcActCosts(act);		//costs for whole Activity, inkl waiting.
-				//Identify the first serviceActivity on tour and correct costs 
 				
-				//TODO: Sicherstellen, dass man richtigen Servie erwischt: Bisher nur grobe Zuordnung via Location, Zeitfenster und Act-Type.
+				//Identify the first serviceActivity on tour and correct costs 
 				boolean isfirstAct = isFirstServiceAct(act);
 				if (isfirstAct){
 					actCosts -= correctFirstService(act);  //Ziehe die zuviel berechneten Kosten ab. 
@@ -359,6 +360,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 				return (actEndTime - actStartTime) * this.margUtlOfTime_s ;
 		}
 		
+		//Aussage erfolgt über derzeit über  Location, Zeitfenster und Act-Type.
 		private boolean isFirstServiceAct(FreightActivity act) {
 			boolean isfirstAct = false;
 			
@@ -397,44 +399,7 @@ public class CarrierScoringFunctionFactoryImpl_KT implements CarrierScoringFunct
 
     }  //End Class ActivityScoring
     
-    //TODO: Sollte TollScoring übernehmen, funktioniert jedoch nicht, da keine amounts generiert werden. -> Wird nicht verwendet
-//    static class MoneyScoring implements SumScoringFunction.MoneyScoring {
-//
-//    	private double score = 0.;
-//    	private Carrier carrier; 
-//    	
-//    	MoneyScoring (Carrier carrier){
-//    		super();
-//    		this.carrier = carrier;
-//    	}
-//    	
-//     	WriteMoney moneyWriter = new WriteMoney(new File(TEMP_DIR + "#MoneyForScoringInfor.txt"), carrier); //KT
-//     	
-//		@Override
-//		public void finish() {	
-//			moneyWriter.writeCarrierLine(carrier);
-////			moneyWriter.writeAmountsToFile();
-//			moneyWriter.writeTextLineToFile("finish aufgerufen");
-//			moneyWriter.writeTextLineToFile(System.getProperty("line.separator"));
-//		}
-//
-//		@Override
-//		public double getScore() {
-//			moneyWriter.writeTextLineToFile("get Score aufgerufen");
-//			return this.score;
-//		}
-//
-//		@Override
-//		public void addMoney(double amount) {
-//			moneyWriter.writeTextLineToFile("add-Money aufgerufen");
-//			moneyWriter.writeMoneyToFile(amount);
-////			moneyWriter.addAmountToWriter(amount); 
-//			score += (-1)* amount;			
-//		}
-//    	
-//    } // End class MoneyScoring
-    
-    //Alternatives TollScoring von Stefan Schroeder {@see org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImp.TollScoring}
+  //TollScoring von Stefan Schroeder {@see org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFactoryImp.TollScoring}
     static class TollScoring implements SumScoringFunction.BasicScoring, SumScoringFunction.ArbitraryEventScoring {
 
         private double score = 0.;

@@ -20,6 +20,7 @@
 package playground.ikaddoura.noise2;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -37,6 +39,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.handler.LinkSpeedCalculation;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
 
@@ -54,6 +57,7 @@ public class NoiseCalculationOffline {
 	private static String outputDirectory;
 	private static int lastIteration;
 	private static double receiverPointGap;
+	private static boolean useActualSpeedLevel;
 				
 	public static void main(String[] args) {
 		
@@ -71,17 +75,18 @@ public class NoiseCalculationOffline {
 			receiverPointGap = Double.valueOf(args[3]);		
 			log.info("Receiver point gap: " + receiverPointGap);
 			
+			useActualSpeedLevel = Boolean.valueOf(args[4]);
+			log.info("Use actual speed level: " + useActualSpeedLevel);
+			
 		} else {
 			
-			runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/bln4/output/baseCase/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/";
 			lastIteration = 100;
-			outputDirectory = "/Users/ihab/Desktop/ils4/kaddoura/bln4/output/baseCase/noise_analysis_2/";
-			receiverPointGap = 100.;
-			
-//			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
-//			lastIteration = 5;
-//			outputDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
-//			receiverPointGap = 250.;
+//			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/noise_analysis_1_freespeed_TempelhoferFeld/";
+//			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/noise_analysis_1_actualSpeed_TempelhoferFeld/";
+			outputDirectory = "/Users/ihab/Desktop/";
+			receiverPointGap = 25.;
+			useActualSpeedLevel = true;
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -89,6 +94,13 @@ public class NoiseCalculationOffline {
 	}
 
 	private void run() {
+		
+		OutputDirectoryLogging.catchLogEntries();
+		try {
+			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(runDirectory + "output_network.xml.gz");
@@ -101,37 +113,47 @@ public class NoiseCalculationOffline {
 		GridParameters gridParameters = new GridParameters();
 		gridParameters.setReceiverPointGap(receiverPointGap);
 		
-//		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
+		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
 //		double xMin = 4590855.;
 //		double yMin = 5819679.;
 //		double xMax = 4594202.;
 //		double yMax = 5821736.;
 		
-//      // Berlin Coordinates: Area of Berlin
+		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
+		double xMin = 4591900.;
+		double yMin = 5813265.;
+		double xMax = 4600279.;
+		double yMax = 5818768.;
+				
+      // Berlin Coordinates: Area of Berlin
 //		double xMin = 4573258.;
 //		double yMin = 5801225.;
 //		double xMax = 4620323.;
 //		double yMax = 5839639.;
-//		
-//		gridParameters.setReceiverPointsGridMinX(xMin);
-//		gridParameters.setReceiverPointsGridMinY(yMin);
-//		gridParameters.setReceiverPointsGridMaxX(xMax);
-//		gridParameters.setReceiverPointsGridMaxY(yMax);
+		
+		gridParameters.setReceiverPointsGridMinX(xMin);
+		gridParameters.setReceiverPointsGridMinY(yMin);
+		gridParameters.setReceiverPointsGridMaxX(xMax);
+		gridParameters.setReceiverPointsGridMaxY(yMax);
 		
 		// Berlin Activity Types
 //		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		String[] consideredActivitiesForDamages = {"home"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+//		String[] consideredActivitiesForDamages = {"home"};
+//		gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
 		
-		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+//		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 		
 		// ################################
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
+		noiseParameters.setUseActualSpeedLevel(useActualSpeedLevel);
 		noiseParameters.setScaleFactor(10.);
+		noiseParameters.setComputeNoiseDamages(false);
 		noiseParameters.setInternalizeNoiseDamages(false);
 		noiseParameters.setComputeCausingAgents(false);
+		noiseParameters.setThrowNoiseEventsAffected(false);
+		noiseParameters.setThrowNoiseEventsCaused(false);
 		
 //		 Berlin Tunnel Link IDs
 		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
@@ -186,21 +208,31 @@ public class NoiseCalculationOffline {
 		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		File file = new File(outputFilePath);
 		file.mkdirs();
-		
-		EventsManager events = EventsUtils.createEventsManager();
-		
-		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
-			
+					
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
 				
+		EventsManager events = EventsUtils.createEventsManager();
+
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
 		events.addHandler(timeTracker);
 		
-		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
-		events.addHandler(actTracker);
+		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
+			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation(noiseContext);
+			events.addHandler(linkSpeedCalculator);	
+		}
+		
+		EventWriterXML eventWriter = null;
+		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
+			eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+			events.addHandler(eventWriter);	
+		}
+		
+		if (noiseContext.getNoiseParams().isComputeNoiseDamages()) {
+			PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
+			events.addHandler(actTracker);
+		}
 		
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -209,7 +241,9 @@ public class NoiseCalculationOffline {
 		
 		timeTracker.computeFinalTimeIntervals();
 
-		eventWriter.closeFile();
+		if (noiseContext.getNoiseParams().isComputeNoiseDamages()) {
+			eventWriter.closeFile();
+		}
 		log.info("Noise calculation completed.");
 	}
 }

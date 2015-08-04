@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 3 carriers, services are defined in a way, that the optimal sequenz is clear: 1..2..3....-->
+<!-- only use VehicleType-Definition: "grid-vehTypes_kt.xml" ; Capcities (and costs) can be changed by typeId, allowed are: 01, 02, 05, or 10. -->
+
+
+	<carriers>
+	<!-- analoges Beispiel from sschroeder - jspriot Network-based VRP ; Service-Zeit auf 10min gesetzt-->
+		<carrier id="gridCarrier">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="gridVehicle3" depotLinkId="i(6,0)" typeId="gridType03" earliestStart="00:00:00" latestEnd="23:59:59"/>
+					<vehicle id="gridVehicle3" depotLinkId="i(6,0)" typeId="gridType03" earliestStart="00:00:00" latestEnd="23:59:59"/>
+				</vehicles>
+
+			</capabilities>
+
+			<services>
+				<service id="1" to="i(3,9)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="2" to="j(1,5)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="3" to="i(5,5)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="4" to="i(4,4)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="5" to="i(4,7)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="6" to="i(6,6)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="7" to="j(9,4)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="8" to="i(7,7)" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="9" to="j(6,3)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="10" to="i(7,4)R" capacityDemand="1" earliestStart="00:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+
+			</services>
+
+		</carrier>
+	
+		<!-- 1 carrier, services are defined in a way, that the optimal sequenz is clear: 1..2..3.... -->
+		<carrier id="gridCarrier1">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="gridVehicle10" depotLinkId="i(6,0)" typeId="gridType10" earliestStart="00:15:00" latestEnd="23:59:59"/>
+				</vehicles>
+			</capabilities>
+
+			<services>
+				<service id="1" to="i(3,9)" capacityDemand="1" earliestStart="01:00:00" latestEnd="02:00:00" serviceDuration="00:10:00"/>
+				<service id="2" to="j(1,5)" capacityDemand="1" earliestStart="02:00:00" latestEnd="03:00:00" serviceDuration="00:10:00"/>
+				<service id="3" to="i(5,5)" capacityDemand="1" earliestStart="03:00:00" latestEnd="04:00:00" serviceDuration="00:10:00"/>
+				<service id="4" to="i(4,4)R" capacityDemand="1" earliestStart="04:00:00" latestEnd="05:00:00" serviceDuration="00:10:00"/>
+				<service id="5" to="i(4,7)" capacityDemand="1" earliestStart="05:00:00" latestEnd="06:00:00" serviceDuration="00:10:00"/>
+				<service id="6" to="i(6,6)R" capacityDemand="1" earliestStart="06:00:00" latestEnd="07:00:00" serviceDuration="00:10:00"/>
+				<service id="7" to="j(9,4)" capacityDemand="1" earliestStart="07:00:00" latestEnd="08:00:00" serviceDuration="00:10:00"/>
+				<service id="8" to="i(7,7)" capacityDemand="1" earliestStart="08:00:00" latestEnd="09:00:00" serviceDuration="00:10:00"/>
+				<service id="9" to="j(6,3)R" capacityDemand="1" earliestStart="09:00:00" latestEnd="10:00:00" serviceDuration="00:10:00"/>
+				<service id="10" to="i(7,4)R" capacityDemand="1" earliestStart="10:00:00" latestEnd="11:00:00" serviceDuration="00:10:00"/>
+			</services>
+
+		</carrier> 
+		
+		
+		<carrier id="gridCarrier2">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="gridVehicle01" depotLinkId="i(6,0)" typeId="gridType01" earliestStart="00:30:00" latestEnd="23:59:59"/>
+				</vehicles>
+			</capabilities>
+
+			<services>
+				<service id="10" to="i(7,4)R" capacityDemand="1" earliestStart="10:00:00" latestEnd="11:00:00" serviceDuration="00:10:00"/>
+			</services>
+
+		</carrier>
+		
+		<carrier id="gridCarrier3">
+			<capabilities fleetSize="INFINITE">
+				<vehicles>
+					<vehicle id="gridVehicle10" depotLinkId="i(6,0)" typeId="gridType10" earliestStart="00:30:00" latestEnd="23:59:59"/>
+				</vehicles>
+
+			</capabilities>
+
+			<services>
+				<service id="10" to="i(7,4)R" capacityDemand="1" earliestStart="10:00:00" latestEnd="11:00:00" serviceDuration="00:10:00"/>
+			</services>
+
+		</carrier>
+		
+		
+	</carriers>
