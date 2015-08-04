@@ -53,6 +53,7 @@ public class PlainPerson extends PlainElement implements Person {
 	
 	public void addEpisode(Episode plan) {
 		plans.add(plan);
+		((PlainEpisode)plan).setPerson(this);
 	}
 	
 	public Episode getPlan() {

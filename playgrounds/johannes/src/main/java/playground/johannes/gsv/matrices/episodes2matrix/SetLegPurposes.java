@@ -17,22 +17,35 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.data;
+package playground.johannes.gsv.matrices.episodes2matrix;
 
-import java.util.List;
+import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Episode;
 
 /**
  * @author johannes
  */
-public interface Episode extends Element {
+public class SetLegPurposes implements ProxyPlanTask {
 
-    public List<Element> getActivities();
 
-    public List<Element> getLegs();
-
-    public void addActivity(Element activity);
-
-    public void addLeg(Element leg);
-
-    public Person getPerson();
+    @Override
+    public void apply(Episode episode) {
+        for(int i = 0; i < episode.getLegs().size(); i++) {
+            Element leg = episode.getLegs().get(i);
+            String nextType = episode.getActivities().get(i + 1).getAttribute(CommonKeys.ACTIVITY_TYPE);
+            /*
+            If the next activity is a home activity, use the type of the previous activity as purpose, otherwise use
+            the next activity type.
+             */
+            if(ActivityType.HOME.equalsIgnoreCase(nextType)) {
+                String prevType = episode.getActivities().get(i).getAttribute(CommonKeys.ACTIVITY_TYPE);
+                leg.setAttribute(CommonKeys.LEG_PURPOSE, prevType);
+            } else {
+                leg.setAttribute(CommonKeys.LEG_PURPOSE, nextType);
+            }
+        }
+    }
 }

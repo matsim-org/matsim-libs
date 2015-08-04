@@ -32,8 +32,15 @@ public class PlainEpisode extends PlainElement implements playground.johannes.sy
 
     private List<Element> legs = new ArrayList<Element>();
 
+    private Person person;
+
     public void addLeg(Element leg) {
         legs.add(leg);
+    }
+
+    @Override
+    public Person getPerson() {
+        return person;
     }
 
     public List<Element> getLegs() {
@@ -50,6 +57,7 @@ public class PlainEpisode extends PlainElement implements playground.johannes.sy
 
     public PlainEpisode clone() {
         PlainEpisode clone = new PlainEpisode();
+//        clone.setPerson(person); not clear if should do this here.
 
         for (Entry<String, String> entry : getAttributes().entrySet()) {
             clone.setAttribute(entry.getKey(), entry.getValue());
@@ -64,5 +72,14 @@ public class PlainEpisode extends PlainElement implements playground.johannes.sy
         }
 
         return clone;
+    }
+
+    void setPerson(Person person) {
+        this.person = person;
+    }
+
+    @Override
+    public Episode getEpisode() {
+        return null;
     }
 }

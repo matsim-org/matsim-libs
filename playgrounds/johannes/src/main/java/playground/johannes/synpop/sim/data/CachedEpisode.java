@@ -21,6 +21,7 @@ package playground.johannes.synpop.sim.data;
 
 import playground.johannes.synpop.data.Element;
 import playground.johannes.synpop.data.Episode;
+import playground.johannes.synpop.data.Person;
 
 import java.util.List;
 
@@ -51,5 +52,10 @@ public class CachedEpisode extends CachedElement implements Episode {
     @Override
     public void addLeg(Element leg) {
         ((Episode)getDelegate()).addLeg(leg);
+    }
+
+    @Override
+    public Person getPerson() {
+        return ((Episode)getDelegate()).getPerson();
     }
 }
