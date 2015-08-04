@@ -236,7 +236,6 @@ public class ProcessNoiseImmissions {
 			e1.printStackTrace();
 		}
 
-		String time = "16:00:00";
 		String qGisProjectFile = "immission.qgs";
 		
 		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
@@ -251,7 +250,7 @@ public class ProcessNoiseImmissions {
 		noiseLayer.setYField("y");
 		
 		NoiseRenderer renderer = new NoiseRenderer(noiseLayer);
-		renderer.setRenderingAttribute("immission_" + time);
+		renderer.setRenderingAttribute("Lden");
 		
 		writer.addLayer(noiseLayer);
 		
