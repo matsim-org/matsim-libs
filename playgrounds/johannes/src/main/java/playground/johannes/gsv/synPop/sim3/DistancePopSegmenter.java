@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.sim3;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -51,7 +51,7 @@ public class DistancePopSegmenter implements PopulationSegmenter {
 		for(PlainPerson person : persons) {
 			double max = 0;
 			for(Episode plan : person.getEpisodes()) {
-				for(Element leg : plan.getLegs()) {
+				for(Attributable leg : plan.getLegs()) {
 					String val = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 					if(val != null) {
 						max = Math.max(Double.parseDouble(val), max);

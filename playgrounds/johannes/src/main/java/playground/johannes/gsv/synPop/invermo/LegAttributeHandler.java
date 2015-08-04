@@ -19,8 +19,7 @@
 
 package playground.johannes.gsv.synPop.invermo;
 
-import playground.johannes.synpop.data.Element;
-import playground.johannes.synpop.data.PlainElement;
+import playground.johannes.synpop.data.Attributable;
 
 /**
  * @author johannes
@@ -28,5 +27,5 @@ import playground.johannes.synpop.data.PlainElement;
  */
 public interface LegAttributeHandler {
 
-	public void handle(Element leg, int idx, String key, String value);
+	public void handle(Attributable leg, int idx, String key, String value);
 }

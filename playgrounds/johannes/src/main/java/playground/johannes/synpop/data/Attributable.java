@@ -24,7 +24,7 @@ import java.util.Collection;
 /**
  * @author johannes
  */
-public interface Element {
+public interface Attributable {
 
     public String getAttribute(String key);
 

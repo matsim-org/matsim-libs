@@ -22,7 +22,7 @@ package playground.johannes.gsv.matrices.episodes2matrix;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
@@ -46,9 +46,9 @@ public class InfereWeCommuter implements ProxyPlanTask {
                 .equalsIgnoreCase(CommonKeys.SATURDAY) || day.equalsIgnoreCase(CommonKeys.SUNDAY)) {
 
             for(int i = 0; i < plan.getLegs().size(); i++) {
-                Element leg = plan.getLegs().get(i);
-                Element prev = plan.getActivities().get(i);
-                Element next = plan.getActivities().get(i + 1);
+                Attributable leg = plan.getLegs().get(i);
+                Attributable prev = plan.getActivities().get(i);
+                Attributable next = plan.getActivities().get(i + 1);
 
                 String distanceVal = leg.getAttribute(CommonKeys.LEG_GEO_DISTANCE);
                 if(distanceVal != null) {

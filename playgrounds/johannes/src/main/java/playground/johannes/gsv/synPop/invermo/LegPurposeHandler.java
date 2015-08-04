@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 
 /**
  * @author johannes
@@ -30,7 +30,7 @@ import playground.johannes.synpop.data.Element;
 public class LegPurposeHandler implements LegAttributeHandler {
 
 	@Override
-	public void handle(Element leg, int idx, String key, String value) {
+	public void handle(Attributable leg, int idx, String key, String value) {
 		if(key.endsWith("zweck1")) {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations");
 		} else if(key.endsWith("zweck2")) {

@@ -26,7 +26,7 @@ import playground.johannes.sna.math.Discretizer;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -55,7 +55,7 @@ public class DependendLegVariableAnalyzerTask extends AnalyzerTask {
 
         for(PlainPerson person : persons) {
             for(Episode plan : person.getEpisodes()) {
-                for(Element leg : plan.getLegs()) {
+                for(Attributable leg : plan.getLegs()) {
                     String xStr = leg.getAttribute(xKey);
                     String yStr = leg.getAttribute(yKey);
 

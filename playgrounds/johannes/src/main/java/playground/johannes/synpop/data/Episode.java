@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author johannes
  */
-public interface Episode extends Element {
+public interface Episode extends Attributable {
 
     public List<Segment> getActivities();
 

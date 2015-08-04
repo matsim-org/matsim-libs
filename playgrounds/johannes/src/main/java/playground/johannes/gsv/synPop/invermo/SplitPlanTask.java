@@ -65,8 +65,8 @@ public class SplitPlanTask implements ProxyPersonTask {
 		}
 		
 		for (int i = 0; i < plan.getLegs().size(); i++) {
-			Element leg = plan.getLegs().get(i);
-			Element act = plan.getActivities().get(i);
+			Attributable leg = plan.getLegs().get(i);
+			Attributable act = plan.getActivities().get(i);
 			
 			DateTime current = getDate(leg);
 			if(current == null) {
@@ -103,7 +103,7 @@ public class SplitPlanTask implements ProxyPersonTask {
 		newPlans.add(subPlan);
 	}
 	
-	private DateTime getDate(Element leg) {
+	private DateTime getDate(Attributable leg) {
 		String time = leg.getAttribute(CommonKeys.LEG_START_TIME);
 		if(time == null) {
 			/*

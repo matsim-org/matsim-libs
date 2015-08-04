@@ -27,7 +27,7 @@ import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -47,7 +47,7 @@ public class MunicipalityDistanceTask extends AnalyzerTask {
         for(PlainPerson person : persons) {
             String xStr = person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS);
             for(Episode plan : person.getEpisodes()) {
-                for(Element leg : plan.getLegs()) {
+                for(Attributable leg : plan.getLegs()) {
 
                     String yStr = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
 

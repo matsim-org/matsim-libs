@@ -24,9 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.facilities.ActivityFacility;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 
 /**
  * @author johannes
@@ -34,9 +33,9 @@ import playground.johannes.synpop.data.Element;
  */
 public class ProxyActAdaptor implements Activity {
 
-	private final Element delegate;
+	private final Attributable delegate;
 	
-	public ProxyActAdaptor(Element act) {
+	public ProxyActAdaptor(Attributable act) {
 		this.delegate = act;
 	}
 	

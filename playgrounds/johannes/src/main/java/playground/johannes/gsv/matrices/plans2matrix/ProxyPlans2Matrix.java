@@ -45,7 +45,7 @@ import playground.johannes.gsv.zones.io.KeyMatrixXMLWriter;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -98,9 +98,9 @@ public class ProxyPlans2Matrix {
 		for (PlainPerson person : persons) {
 			Episode plan = person.getEpisodes().get(0);
 			for (int i = 0; i < plan.getLegs().size(); i++) {
-				Element leg = plan.getLegs().get(i);
-				Element prev = plan.getActivities().get(i);
-				Element next = plan.getActivities().get(i + 1);
+				Attributable leg = plan.getLegs().get(i);
+				Attributable prev = plan.getActivities().get(i);
+				Attributable next = plan.getActivities().get(i + 1);
 
 				legCandidates++;
 				if (predicate.test(person, leg, prev, next)) {

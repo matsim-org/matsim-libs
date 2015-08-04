@@ -28,7 +28,7 @@ import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -65,12 +65,12 @@ public class ActivityDistanceTask extends AnalyzerTask {
 
 			for (int i = 1; i < plan.getActivities().size(); i++) {
 
-				Element thisAct = plan.getActivities().get(i);
-				Element leg = plan.getLegs().get(i - 1);
+				Attributable thisAct = plan.getActivities().get(i);
+				Attributable leg = plan.getLegs().get(i - 1);
 
 				if (mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 					if (purpose == null || purpose.equalsIgnoreCase(thisAct.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-						Element prevAct = plan.getActivities().get(i - 1);
+						Attributable prevAct = plan.getActivities().get(i - 1);
 						Id<ActivityFacility> prevId = Id.create(prevAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 						ActivityFacility prevFac = facilities.getFacilities().get(prevId);
 
@@ -95,7 +95,7 @@ public class ActivityDistanceTask extends AnalyzerTask {
 		Set<String> types = new HashSet<String>();
 		for (PlainPerson person : persons) {
 			Episode plan = person.getPlan();
-			for (Element act : plan.getActivities()) {
+			for (Attributable act : plan.getActivities()) {
 				types.add(act.getAttribute(CommonKeys.ACTIVITY_TYPE));
 			}
 		}

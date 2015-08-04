@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.mid;
 
 import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -39,7 +39,7 @@ public class DeletePlansDestination implements ProxyPersonTask {
 
 		for (Episode plan : person.getEpisodes()) {
 			if ("midjourneys".equalsIgnoreCase(plan.getAttribute("datasource"))) {
-				for (Element leg : plan.getLegs()) {
+				for (Attributable leg : plan.getLegs()) {
 					if (!JourneyDestinationHandler.GERMANY.equals(leg.getAttribute(JourneyDestinationHandler.DESTINATION))) {
 						remove.add(plan);
 					}

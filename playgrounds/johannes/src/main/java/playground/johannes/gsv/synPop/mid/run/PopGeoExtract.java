@@ -36,7 +36,7 @@ import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.io.Zone2GeoJSON;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -102,7 +102,7 @@ public class PopGeoExtract {
 			boolean keep = false;
 
 			for (Episode plan : person.getEpisodes()) {
-				for (Element act : plan.getActivities()) {
+				for (Attributable act : plan.getActivities()) {
 					Id<ActivityFacility> id = Id.create(act.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					ActivityFacility f = facilities.getFacilities().get(id);
 					Point p = MatsimCoordUtils.coordToPoint(f.getCoord());

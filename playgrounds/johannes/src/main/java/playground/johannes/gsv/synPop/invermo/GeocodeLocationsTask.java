@@ -22,7 +22,7 @@ package playground.johannes.gsv.synPop.invermo;
 import com.google.code.geocoder.model.LatLng;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.socialnetworks.survey.ivt2009.util.GoogleGeoCoder;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -74,14 +74,14 @@ public class GeocodeLocationsTask implements ProxyPersonTask {
 	public void apply(PlainPerson person) {
 		geocodeField(InvermoKeys.HOME_LOCATION, InvermoKeys.HOME_COORD, person);
 		for (Episode plan : person.getEpisodes()) {
-			for (Element act : plan.getActivities()) {
+			for (Attributable act : plan.getActivities()) {
 				geocodeField("location", "coord", act);
 			}
 		}
 
 	}
 
-	private void geocodeField(String key1, String key2, Element obj) {
+	private void geocodeField(String key1, String key2, Attributable obj) {
 		String start = obj.getAttribute(key1);
 		if (start != null && !start.equalsIgnoreCase("home") && !start.equalsIgnoreCase("work") && !start.equalsIgnoreCase("prev")) {
 			String str = cache.get(start);

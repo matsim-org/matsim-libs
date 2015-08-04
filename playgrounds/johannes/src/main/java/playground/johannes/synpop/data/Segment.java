@@ -22,7 +22,7 @@ package playground.johannes.synpop.data;
 /**
  * @author johannes
  */
-public interface Segment extends Element {
+public interface Segment extends Attributable {
 
     public Episode getEpisode();
 }

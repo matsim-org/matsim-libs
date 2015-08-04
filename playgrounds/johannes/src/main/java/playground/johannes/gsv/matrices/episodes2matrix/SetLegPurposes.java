@@ -22,7 +22,7 @@ package playground.johannes.gsv.matrices.episodes2matrix;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
@@ -34,7 +34,7 @@ public class SetLegPurposes implements ProxyPlanTask {
     @Override
     public void apply(Episode episode) {
         for(int i = 0; i < episode.getLegs().size(); i++) {
-            Element leg = episode.getLegs().get(i);
+            Attributable leg = episode.getLegs().get(i);
             String nextType = episode.getActivities().get(i + 1).getAttribute(CommonKeys.ACTIVITY_TYPE);
             /*
             If the next activity is a home activity, use the type of the previous activity as purpose, otherwise use

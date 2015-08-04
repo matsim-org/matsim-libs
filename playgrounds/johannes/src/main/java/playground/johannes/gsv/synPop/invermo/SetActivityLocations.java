@@ -20,7 +20,7 @@
 package playground.johannes.gsv.synPop.invermo;
 
 import playground.johannes.gsv.synPop.ProxyPlanTask;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
@@ -40,10 +40,10 @@ public class SetActivityLocations implements ProxyPlanTask {
 	public void apply(Episode plan) {
 
 		for (int i = 0; i < plan.getLegs().size(); i++) {
-			Element leg = plan.getLegs().get(i);
+			Attributable leg = plan.getLegs().get(i);
 
-			Element prev = plan.getActivities().get(i);
-			Element next = plan.getActivities().get(i + 1);
+			Attributable prev = plan.getActivities().get(i);
+			Attributable next = plan.getActivities().get(i + 1);
 
 			String startLoc = leg.getAttribute(InvermoKeys.START_LOCATION);
 			if (startLoc != null) {

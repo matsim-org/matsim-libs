@@ -24,7 +24,7 @@ import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.zones.Zone;
 import playground.johannes.gsv.zones.ZoneCollection;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -60,15 +60,15 @@ public class LinkActsAndLegs {
 		for(PlainPerson person : persons) {
 			for(Episode plan : person.getEpisodes()) {
 				plan.setAttribute("id", String.valueOf(counter++));
-				Element act = plan.getActivities().get(0);
+				Attributable act = plan.getActivities().get(0);
 				act.setAttribute("id", String.valueOf(counter++));
 				act.setAttribute("prevAct", act.getAttribute("id"));
 				act.setAttribute("nextAct", act.getAttribute("id"));
 
 				for(int i = 0; i < plan.getLegs().size(); i++) {
-					Element prevAct = plan.getActivities().get(i);
-					Element leg = plan.getLegs().get(i);
-					Element nextAct = plan.getActivities().get(i+1);
+					Attributable prevAct = plan.getActivities().get(i);
+					Attributable leg = plan.getLegs().get(i);
+					Attributable nextAct = plan.getActivities().get(i+1);
 
 //					prevAct.setAttribute("id", String.valueOf(counter++));
 					leg.setAttribute("id", String.valueOf(counter++));

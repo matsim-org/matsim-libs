@@ -25,7 +25,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.sna.util.TXTWriter;
 import playground.johannes.socialnetworks.statistics.Correlations;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -44,7 +44,7 @@ public class DistanceStartTimeTask extends AnalyzerTask {
 
         for(PlainPerson person : persons) {
             for(Episode plan : person.getEpisodes()) {
-                for(Element leg : plan.getLegs()) {
+                for(Attributable leg : plan.getLegs()) {
                     String xStr = leg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE);
                     String startVal = leg.getAttribute(CommonKeys.LEG_START_TIME);
 

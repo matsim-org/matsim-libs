@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainSegment;
 import playground.johannes.synpop.data.Segment;
@@ -40,10 +40,10 @@ public class RoundTripTask implements ProxyPlanTask {
 		List<Integer> insertPoints = new ArrayList<Integer>();
 		
 		for(int i = 0; i < plan.getLegs().size(); i++) {
-			Element leg = plan.getLegs().get(i);
+			Attributable leg = plan.getLegs().get(i);
 			Boolean val = Boolean.parseBoolean(leg.getAttribute(CommonKeys.LEG_ROUNDTRIP)); 
 			if(val != null && val == true) {
-				Element act = plan.getActivities().get(i+1);
+				Attributable act = plan.getActivities().get(i+1);
 				String type = (String) act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 				act.setAttribute(CommonKeys.ACTIVITY_TYPE, type + ROUNDTRIP_SUFFIX);
 				
@@ -55,7 +55,7 @@ public class RoundTripTask implements ProxyPlanTask {
 		for(Integer idx : insertPoints) {
 			int i = idx + offset;
 			
-			Element toLeg = plan.getLegs().get(i - 2);
+			Attributable toLeg = plan.getLegs().get(i - 2);
 			int toLegStart = Integer.parseInt(toLeg.getAttribute(CommonKeys.LEG_START_TIME));
 			int toLegEnd = Integer.parseInt(toLeg.getAttribute(CommonKeys.LEG_END_TIME));
 			int dur = toLegEnd - toLegStart;
@@ -85,7 +85,7 @@ public class RoundTripTask implements ProxyPlanTask {
 			fromLeg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, toLeg.getAttribute(CommonKeys.LEG_ROUTE_DISTANCE));
 			fromLeg.setAttribute(CommonKeys.LEG_MODE, toLeg.getAttribute(CommonKeys.LEG_MODE));
 			
-			Element nextAct = plan.getActivities().get(i);
+			Attributable nextAct = plan.getActivities().get(i);
 			fromLeg.setAttribute(CommonKeys.LEG_PURPOSE, nextAct.getAttribute(CommonKeys.ACTIVITY_TYPE));
 			plan.getLegs().add(i-1, fromLeg);
 			

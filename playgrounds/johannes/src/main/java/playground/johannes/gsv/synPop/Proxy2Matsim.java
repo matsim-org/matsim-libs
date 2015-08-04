@@ -36,7 +36,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -88,7 +88,7 @@ public class Proxy2Matsim {
 			plans++;
 
 			for (int i = 0; i < proxyPlan.getActivities().size(); i++) {
-				Element proxyAct = proxyPlan.getActivities().get(i);
+				Attributable proxyAct = proxyPlan.getActivities().get(i);
 				ActivityImpl act = null;
 
 				String type = proxyAct.getAttribute(CommonKeys.ACTIVITY_TYPE);
@@ -117,7 +117,7 @@ public class Proxy2Matsim {
 				plan.addActivity(act);
 
 				if (i < proxyPlan.getLegs().size()) {
-					Element proxyLeg = proxyPlan.getLegs().get(i);
+					Attributable proxyLeg = proxyPlan.getLegs().get(i);
 					String mode = proxyLeg.getAttribute(CommonKeys.LEG_MODE);
 					if (mode == null) {
 						mode = "undefined";

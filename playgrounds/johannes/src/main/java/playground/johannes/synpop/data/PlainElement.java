@@ -29,7 +29,7 @@ import java.util.Map.Entry;
  * @author johannes
  *
  */
-public abstract class PlainElement implements Element {
+public abstract class PlainElement implements Attributable {
 
 	private Map<String, String> attributes;
 	

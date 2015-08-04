@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 
 /**
@@ -34,8 +34,8 @@ public class SetFirstActivityTypeTask implements ProxyPlanTask {
 	@Override
 	public void apply(Episode plan) {
 		if(plan.getLegs().size() > 0 ) {
-		Element firstLeg = plan.getLegs().get(0);
-		Element firstAct = plan.getActivities().get(0);
+		Attributable firstLeg = plan.getLegs().get(0);
+		Attributable firstAct = plan.getActivities().get(0);
 		
 		firstAct.setAttribute(CommonKeys.ACTIVITY_TYPE, firstLeg.getAttribute(CommonKeys.LEG_ORIGIN));
 		}

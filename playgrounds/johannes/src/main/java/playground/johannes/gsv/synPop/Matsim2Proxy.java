@@ -32,7 +32,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -93,14 +93,14 @@ public class Matsim2Proxy {
 			for(int i = 0; i < matsimPlan.getPlanElements().size(); i++) {
 				if(i % 2 == 0) {
 					Activity matsimAct = (Activity) matsimPlan.getPlanElements().get(i);
-					Element proxyAct = proxyPlan.getActivities().get(i / 2);
+					Attributable proxyAct = proxyPlan.getActivities().get(i / 2);
 					
 					proxyAct.setAttribute(CommonKeys.ACTIVITY_FACILITY, matsimAct.getFacilityId().toString());
 					proxyAct.setAttribute(CommonKeys.ACTIVITY_START_TIME, String.valueOf(matsimAct.getStartTime())); // not sure if this is maintained
 					proxyAct.setAttribute(CommonKeys.ACTIVITY_END_TIME, String.valueOf(matsimAct.getEndTime()));
 				} else {
 					Leg matsimLeg = (Leg) matsimPlan.getPlanElements().get(i);
-					Element proxyLeg = proxyPlan.getLegs().get((i-1)/2);
+					Attributable proxyLeg = proxyPlan.getLegs().get((i-1)/2);
 					
 					proxyLeg.setAttribute(CommonKeys.LEG_ROUTE_DISTANCE, String.valueOf(matsimLeg.getRoute().getDistance())); // not sure if this is maintained
 				}

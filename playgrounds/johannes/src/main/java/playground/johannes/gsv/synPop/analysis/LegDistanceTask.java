@@ -23,7 +23,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.sna.math.LinearDiscretizer;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -59,8 +59,8 @@ public class LegDistanceTask extends AnalyzerTask {
 			Episode plan = person.getPlan();
 
 			for(int i = 0; i < plan.getLegs().size(); i++) {
-				Element leg = plan.getLegs().get(i);
-				Element act = plan.getActivities().get(i + 1);
+				Attributable leg = plan.getLegs().get(i);
+				Attributable act = plan.getActivities().get(i + 1);
 			
 				if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
 					

@@ -21,7 +21,7 @@ package playground.johannes.gsv.matrices.plans2matrix;
 
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainPerson;
 
 /**
@@ -31,7 +31,7 @@ import playground.johannes.synpop.data.PlainPerson;
 public class FromHomePredicate implements Predicate {
 
 	@Override
-	public boolean test(PlainPerson person, Element leg, Element prev, Element next) {
+	public boolean test(PlainPerson person, Attributable leg, Attributable prev, Attributable next) {
 		String prevType = prev.getAttribute(CommonKeys.ACTIVITY_TYPE);
 		
 		if (ActivityType.HOME.equalsIgnoreCase(prevType)) {

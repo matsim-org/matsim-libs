@@ -63,11 +63,11 @@ public class PlainEpisode extends PlainElement implements playground.johannes.sy
             clone.setAttribute(entry.getKey(), entry.getValue());
         }
 
-        for (Element act : activities) {
+        for (Attributable act : activities) {
             clone.addActivity(((PlainSegment) act).clone());
         }
 
-        for (Element leg : legs) {
+        for (Attributable leg : legs) {
             clone.addLeg(((PlainSegment) leg).clone());
         }
 

@@ -21,9 +21,8 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-
 import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 
 /**
  * @author johannes
@@ -31,9 +30,9 @@ import playground.johannes.synpop.data.Element;
  */
 public class ProxyLegAdaptor implements Leg {
 
-	private final Element delegate;
+	private final Attributable delegate;
 	
-	public ProxyLegAdaptor(Element leg) {
+	public ProxyLegAdaptor(Attributable leg) {
 		this.delegate = leg;
 	}
 	

@@ -25,7 +25,7 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.PlainPerson;
 
 import java.util.Collection;
@@ -72,7 +72,7 @@ public class SeasonsTask extends AnalyzerTask {
 			}
 			
 			Set<String> modes = new HashSet<String>();
-			for(Element leg : person.getPlan().getLegs()) {
+			for(Attributable leg : person.getPlan().getLegs()) {
 				modes.add(leg.getAttribute(CommonKeys.LEG_MODE));
 			}
 			

@@ -19,7 +19,7 @@
 
 package playground.johannes.synpop.sim.data;
 
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 
 import java.util.Collection;
 import java.util.IdentityHashMap;
@@ -28,17 +28,17 @@ import java.util.Map;
 /**
  * @author johannes
  */
-public class CachedElement implements Element {
+public class CachedElement implements Attributable {
 
     private Map<Object, Object> cache;
 
-    private final Element delegate;
+    private final Attributable delegate;
 
-    public CachedElement(Element delegate) {
+    public CachedElement(Attributable delegate) {
         this.delegate = delegate;
     }
 
-    protected Element getDelegate() {
+    protected Attributable getDelegate() {
         return  delegate;
     }
 

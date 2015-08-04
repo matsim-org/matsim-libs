@@ -19,7 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
-import playground.johannes.synpop.data.Element;
+import playground.johannes.synpop.data.Attributable;
 import playground.johannes.synpop.data.Episode;
 import playground.johannes.synpop.data.PlainPerson;
 
@@ -40,12 +40,12 @@ public class DeleteLegs implements ProxyPersonTask {
 		Episode plan = person.getPlan();
 		
 		for(int i = 0; i < plan.getLegs().size(); i++) {
-			Element leg = plan.getLegs().get(i);
+			Attributable leg = plan.getLegs().get(i);
 			
 			if(mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
-				Element prevAct = plan.getActivities().get(i);
+				Attributable prevAct = plan.getActivities().get(i);
 				for(int k = i+1; k < plan.getActivities().size(); k++) {
-					Element nextAct = plan.getActivities().get(k);
+					Attributable nextAct = plan.getActivities().get(k);
 					
 				}
 			}
