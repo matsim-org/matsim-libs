@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,26 +16,23 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.speedPCUVariation;
 
-import playground.agarwalamit.analysis.congestion.AbsoluteDelays;
-import playground.agarwalamit.analysis.emission.AbsoluteEmissions;
-
+package playground.jbischoff.bussharing.passenger;
 /**
- * @author amit
+ * @author  jbischoff
+ *
  */
+import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.core.api.experimental.events.EventsManager;
 
-public class EquilAnalysis {
-	
-	private String [] runCases =  {"allCar_20","allCar_30","allCar_40","allCar_50","allCar_60","allCar_70","allCar_80","allCar_90","allCar_100"};
-	private String outDir = "./equil/output/";
-	
-	public static void main(String[] args) {
-		new EquilAnalysis().run();
+public class SBPassengerEngine extends PassengerEngine {
+
+	public SBPassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
+			VrpOptimizer optimizer, MatsimVrpContext context) {
+		super(mode, eventsManager, requestCreator, optimizer, context);
 	}
-	
-	private void run(){
-		new AbsoluteEmissions(outDir).runAndWrite(runCases);
-		new AbsoluteDelays(outDir).runAndWrite(runCases);
-	}
+//pre booking at activity end time!
 }
