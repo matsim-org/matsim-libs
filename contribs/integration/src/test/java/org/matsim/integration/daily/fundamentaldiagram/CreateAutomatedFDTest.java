@@ -50,6 +50,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -99,18 +100,20 @@ import org.matsim.vehicles.VehicleUtils;
 public class CreateAutomatedFDTest {
 
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
+		
 		private static int counter = 0 ;
-		private MobsimVehicle vehicle;
+		private MobsimVehicle vehicle ;
+		public boolean isArriving= false;
+		private Id<Link> currentLinkId = Id.createLinkId("home"); ;
 
 		@Override
 		public Id<Link> getCurrentLinkId() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented");
+			return this.currentLinkId;
 		}
 
 		@Override
 		public Id<Link> getDestinationLinkId() {
-			return null ;
+			return Id.createLinkId("work");
 		}
 
 		@Override
@@ -121,8 +124,24 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Id<Link> chooseNextLinkId() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented");
+			if (globalFlowDynamicsUpdator.isPermanent()){ 
+				isArriving = true; 
+			}
+
+			if(this.getCurrentLinkId().equals(Id.createLinkId("home"))){
+				return Id.createLinkId(0);
+			} else if(this.getCurrentLinkId().equals(Id.createLinkId(0))){
+				if ( isArriving) {
+					return Id.createLinkId("work") ;
+				} else {
+					return Id.createLinkId(1) ;
+				}
+			} else if(this.getCurrentLinkId().equals(Id.createLinkId(1))){
+				return Id.createLinkId(2);
+			} else if(this.getCurrentLinkId().equals(Id.createLinkId(2))){
+				return Id.createLinkId(0);
+			} else return this.chooseNextLinkId();
+			 
 		}
 
 		@Override
@@ -152,20 +171,17 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public State getState() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented");
+			return MobsimAgent.State.ACTIVITY;
 		}
 
 		@Override
 		public double getActivityEndTime() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented");
+			return (new Random().nextDouble())*900;
 		}
 
 		@Override
 		public void endActivityAndComputeNextState(double now) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented");
+			this.endActivityAndComputeNextState(now);
 		}
 
 		@Override
@@ -194,8 +210,8 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public String getMode() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented");
+			return TransportMode.car;
+//			return this.vehicle.getDriver().getMode();
 		}
 
 		@Override
@@ -326,26 +342,29 @@ public class CreateAutomatedFDTest {
 			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
 			qSim.addMobsimEngine(teleportationEngine);
 
-			AgentFactory agentFactory = new MyAgentFactory(qSim);
+//			AgentFactory agentFactory = new MyAgentFactory(qSim);
+//			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 
-			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-
-//			AgentSource agentSource = new AgentSource(){
-//				@Override
-//				public void insertAgentsIntoMobsim() {
-//					for ( int ii=0 ; ii<2000 ; ii++ ) {
-//						MobsimAgent agent = new MySimplifiedRoundAndRoundAgent() ;
-//						qSim.insertAgentIntoMobsim(agent);
-//					}
-//
-//				}
-//			} ;
+//			see package tutorial.programming.ownMobsimAgent.RunAgentSourceExample;
+			AgentSource agentSource = new AgentSource(){
+				@Override
+				public void insertAgentsIntoMobsim() {
+					for ( int ii=0 ; ii< scenario.getPopulation().getPersons().size() ; ii++ ) {
+						MobsimAgent agent = new MySimplifiedRoundAndRoundAgent();
+						qSim.insertAgentIntoMobsim(agent);
+						
+						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
+                        final Id<Link> linkId4VehicleInsertion = Id.createLinkId("home");
+                        qSim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+					}
+				}
+			};
 
 			Map<String, VehicleType> travelModesTypes = new HashMap<String, VehicleType>();
 			for(String mode :travelModes){
 				travelModesTypes.put(mode, modeVehicleTypes.get(mode));
 			}
-			agentSource.setModeVehicleTypes(travelModesTypes);
+//			agentSource.setModeVehicleTypes(travelModesTypes);
 
 			qSim.addAgentSource(agentSource);
 
