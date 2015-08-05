@@ -17,42 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.gis;
+package playground.johannes.gsv.matrices.episodes2matrix;
 
-import com.vividsolutions.jts.geom.Point;
-import playground.johannes.gsv.zones.Zone;
-import playground.johannes.gsv.zones.ZoneCollection;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
  */
-public class Zones2Centroids {
+public interface LegPredicate {
 
-    public static void main(String args[]) throws IOException {
-        ZoneCollection zones = ZoneCollection.readFromGeoJSON("/home/johannes/gsv/gis/modena/geojson/zones.geojson", "NO");
+    public boolean test(Segment leg);
 
-        BufferedWriter writer = new BufferedWriter(new FileWriter("/mnt/cifs/B-drive/U_Benutzer/JohannesIllenberger/qlik/centroids.csv"));
-        writer.write("id,name,lng,lat");
-        writer.newLine();
-        for(Zone zone : zones.zoneSet()) {
-            Point c = zone.getGeometry().getCentroid();
-            String id = zone.getAttribute("NO");
-            String name = zone.getAttribute("NAME");
-
-            writer.write(id);
-            writer.write(",");
-            writer.write(name);
-            writer.write(",");
-            writer.write(String.valueOf(c.getX()));
-            writer.write(",");
-            writer.write(String.valueOf(c.getY()));
-            writer.newLine();
-        }
-
-        writer.close();
-    }
 }

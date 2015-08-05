@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.synpop.data;
+package playground.johannes.gsv.matrices.episodes2matrix;
+
+import playground.johannes.gsv.matrices.plans2matrix.Predicate;
+import playground.johannes.sna.util.Composite;
+import playground.johannes.synpop.data.Attributable;
+import playground.johannes.synpop.data.PlainPerson;
+import playground.johannes.synpop.data.Segment;
 
 /**
  * @author johannes
+ *
  */
-public class PlainSegment extends  PlainElement implements Segment{
+public class PredicateANDComposite extends Composite<LegPredicate> implements LegPredicate {
 
-    private Episode episode;
+	@Override
+	public boolean test(Segment leg) {
+		for(LegPredicate p : components) {
+			if(!p.test(leg)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
 
-    @Override
-    public Episode getEpisode() {
-        return episode;
-    }
-
-    void setEpisode(Episode episode) {
-        this.episode = episode;
-    }
-
-    public PlainSegment clone() {
-        PlainSegment clone = new PlainSegment();
-
-        for(String key : keys()) {
-            clone.setAttribute(key, getAttribute(key));
-        }
-
-        return clone;
-    }
 }

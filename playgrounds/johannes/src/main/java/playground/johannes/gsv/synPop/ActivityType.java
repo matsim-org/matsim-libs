@@ -38,5 +38,9 @@ public interface ActivityType {
 	public static final String SHOP = "shop";
 	
 	public static final String MISC = "misc";
+
+	String VACATIONS_SHORT = "vacations_short";
+
+	String VACATIONS_LONG = "vacations_long";
 	
 }

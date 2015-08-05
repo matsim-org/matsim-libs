@@ -30,7 +30,7 @@ import playground.johannes.synpop.data.PlainPerson;
 public class PredicateORComposite extends Composite<Predicate> implements Predicate {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.matrices.Predicate#test(playground.johannes.synpop.data.PlainElement, playground.johannes.synpop.data.PlainElement, playground.johannes.synpop.data.PlainElement)
+	 * @see playground.johannes.gsv.matrices.LegPredicate#test(playground.johannes.synpop.data.PlainElement, playground.johannes.synpop.data.PlainElement, playground.johannes.synpop.data.PlainElement)
 	 */
 	@Override
 	public boolean test(PlainPerson person, Attributable leg, Attributable prev, Attributable next) {

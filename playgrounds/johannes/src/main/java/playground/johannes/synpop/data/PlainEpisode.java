@@ -36,6 +36,7 @@ public class PlainEpisode extends PlainElement implements playground.johannes.sy
 
     public void addLeg(Segment leg) {
         legs.add(leg);
+        ((PlainSegment)leg).setEpisode(this);
     }
 
     @Override
@@ -49,6 +50,7 @@ public class PlainEpisode extends PlainElement implements playground.johannes.sy
 
     public void addActivity(Segment activity) {
         activities.add(activity);
+        ((PlainSegment)activity).setEpisode(this);
     }
 
     public List<Segment> getActivities() {
