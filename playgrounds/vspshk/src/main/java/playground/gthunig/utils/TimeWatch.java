@@ -31,4 +31,16 @@ public class TimeWatch {
     public long timeInSec() {
     	return time(TimeUnit.SECONDS);
     }
+    
+    public long timeInMin() {
+    	return time(TimeUnit.MINUTES);
+    }
+    
+    public String getElapsedTime() {
+    	long time = time(TimeUnit.SECONDS);
+    	int hours = (int) time / 3600;
+    	int minutes = (int) (time - hours * 3600) / 60;
+    	int seconds = (int) (time - hours * 3600 - minutes * 60);
+    	return hours + ":" + minutes + ":" + seconds;
+    }
 }

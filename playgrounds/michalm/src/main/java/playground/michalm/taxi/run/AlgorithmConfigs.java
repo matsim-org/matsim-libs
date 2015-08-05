@@ -25,6 +25,12 @@ class AlgorithmConfigs
             RULE_DSE_15M //
             );
 
+    static final EnumSet<AlgorithmConfig> ZONE_TW_xx = EnumSet.of(//
+            ZONE_TW_TD,//
+            ZONE_TW_FF,//
+            ZONE_TW_15M //
+            );
+
     static final EnumSet<AlgorithmConfig> FIFO_RES_TW_xx = EnumSet.of(//
             FIFO_RES_TW_FF, //
             FIFO_RES_TW_15M//

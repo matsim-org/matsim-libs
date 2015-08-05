@@ -127,7 +127,7 @@ public class PrtQSimFactory implements MobsimFactory{
 			FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
 			
 			return new TaxiOptimizerConfiguration(context, calculator, scheduler, vrpFinder, filterFactory,
-					algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory());
+					algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), null);
 			
 		}
 		
@@ -136,7 +136,7 @@ public class PrtQSimFactory implements MobsimFactory{
 		FilterFactory filterFactory = new DefaultFilterFactory(scheduler, 0, 0);
 		
 		return new TaxiOptimizerConfiguration(context, calculator, scheduler, vrpFinder, filterFactory,
-				algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory());
+				algorithmConfig.getGoal(), prtConfig.getPrtOutputDirectory(), null);
 		
 	}
 	

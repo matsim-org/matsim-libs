@@ -18,7 +18,7 @@ public class GtfsConversionAccessibility {
 		TimeWatch watch = TimeWatch.start();
 		
 		Config config = ConfigUtils.createConfig();
-        config.transit().setUseTransit(true);
+        config.scenario().setUseTransit(true);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		String filepath = "C:/Users/Gabriel/workspace/otp-matsim/input/routeTest/gtfs/129384";
 		GtfsConverter gtfs = new GtfsConverter(filepath, scenario, new IdentityTransformation());

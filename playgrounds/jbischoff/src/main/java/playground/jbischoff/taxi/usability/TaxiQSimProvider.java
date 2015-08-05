@@ -123,7 +123,7 @@ public class TaxiQSimProvider implements Provider<QSim> {
 
 		TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(
 				context, calculator, scheduler, vrpFinder, filterFactory,
-				Goal.MIN_WAIT_TIME, tcg.getOutputDir());
+				Goal.MIN_WAIT_TIME, tcg.getOutputDir(), null);
 		optimizer = new RuleBasedTaxiOptimizer(optimConfig);
 
 	}

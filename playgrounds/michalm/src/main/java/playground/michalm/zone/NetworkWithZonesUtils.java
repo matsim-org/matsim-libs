@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,41 +17,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.util.sim;
+package playground.michalm.zone;
 
-import java.util.Arrays;
+import java.util.*;
 
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.*;
 
 
-public class SimLauncher
+public class NetworkWithZonesUtils
 {
-    public static void main(String[] args)
+    //if SRSs of the network and zones are different, zoneFinder should convert between CRSs
+    public static Map<Id<Link>, Zone> createLinkToZoneMap(Network network, ZoneFinder zoneFinder)
     {
-        String dir;
-        String cfgFile;
+        Map<Id<Link>, Zone> linkToZone = new HashMap<>();
 
-        if (args.length == 1 && args[0].equals("test")) {// for testing
-            dir = "d:/PP-rad/taxi/mielec-2-peaks/2013_02/input/";
-            cfgFile = "siec-config.xml";
-            // dir = "d:\\PP-rad\\taxi\\poznan\\";
-            // cfgFile = "poznan-config.xml";
-        }
-        else if (args.length == 2) {
-            dir = args[0];
-            cfgFile = args[1];
-        }
-        else {
-            throw new IllegalArgumentException("Incorrect program arguments: "
-                    + Arrays.toString(args));
+        for (Link l : network.getLinks().values()) {
+            linkToZone.put(l.getId(), zoneFinder.findZone(l.getToNode().getCoord()));
         }
 
-        Controler controler = new Controler(new String[] { dir + cfgFile });
-        controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-        controler.run();
+        return linkToZone;
     }
 }
