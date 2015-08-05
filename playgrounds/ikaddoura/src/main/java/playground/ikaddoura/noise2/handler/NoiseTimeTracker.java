@@ -211,14 +211,15 @@ public class NoiseTimeTracker implements LinkEnterEventHandler, TransitDriverSta
 		calculateNoiseImmission();
 		if (writeOutput()) NoiseWriter.writeNoiseImmissionStatsPerHour(noiseContext, outputDirectory);
 		log.info("Calculating noise immissions... Done.");
-		
-		if (this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
-			
+	
+		if (this.noiseContext.getNoiseParams().isComputePopulationUnits()) {
 			log.info("Calculating the number of affected agent units...");
 			calculateAffectedAgentUnits();
 			if (writeOutput()) NoiseWriter.writePersonActivityInfoPerHour(noiseContext, outputDirectory);
 			log.info("Calculating the number of affected agent units... Done.");
-		
+		}
+	
+		if (this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
 			log.info("Calculating noise damage costs...");
 			calculateNoiseDamageCosts();
 			log.info("Calculating noise damage costs... Done.");

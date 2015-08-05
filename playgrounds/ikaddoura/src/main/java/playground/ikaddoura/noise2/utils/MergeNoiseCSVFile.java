@@ -52,11 +52,11 @@ public class MergeNoiseCSVFile {
 	private double timeBinSize = 3600.;
 	private double endTime = 24. * 3600.;
 		
-	private String workingDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static/analysis_it.30/immissions/";
-	private String receiverPointsFile = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static/analysis_it.30/receiverPoints/receiverPoints.csv";
+	private String workingDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static_populationUnits_250_home_education/analysis_it.30/consideredAgentUnits/";
+	private String receiverPointsFile = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static_populationUnits_250_home_education/analysis_it.30/receiverPoints/receiverPoints.csv";
 		
 	private String separator = ";";
-	private String label = "immission";
+	private String label = "consideredAgentUnits";
 	
 	private String outputPath = workingDirectory;
 	
@@ -182,28 +182,28 @@ public class MergeNoiseCSVFile {
 			e1.printStackTrace();
 		}
 
-		String time = "16:00:00";
-		String qGisProjectFile = "immission.qgs";
-		
-		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
-			
-// ################################################################################################################################################
-		double[] extent = {4568808,5803042,4622772,5844280};
-		writer.setExtent(extent);
-				
-		VectorLayer noiseLayer = new VectorLayer("noise", outputFile, QGisConstants.geometryType.Point, true);
-		noiseLayer.setDelimiter(";");
-		noiseLayer.setXField("x");
-		noiseLayer.setYField("y");
-		
-		NoiseRenderer renderer = new NoiseRenderer(noiseLayer);
-		renderer.setRenderingAttribute("immission_" + time);
-		
-		writer.addLayer(noiseLayer);
-		
-// ################################################################################################################################################
-		
-		writer.write(qGisProjectFile);
+//		String time = "16:00:00";
+//		String qGisProjectFile = "immission.qgs";
+//		
+//		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
+//			
+//// ################################################################################################################################################
+//		double[] extent = {4568808,5803042,4622772,5844280};
+//		writer.setExtent(extent);
+//				
+//		VectorLayer noiseLayer = new VectorLayer("noise", outputFile, QGisConstants.geometryType.Point, true);
+//		noiseLayer.setDelimiter(";");
+//		noiseLayer.setXField("x");
+//		noiseLayer.setYField("y");
+//		
+//		NoiseRenderer renderer = new NoiseRenderer(noiseLayer);
+//		renderer.setRenderingAttribute("immission_" + time);
+//		
+//		writer.addLayer(noiseLayer);
+//		
+//// ################################################################################################################################################
+//		
+//		writer.write(qGisProjectFile);
 		
 	}
 

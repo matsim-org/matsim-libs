@@ -73,7 +73,7 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 			event.getControler().getEvents().addHandler(linkSpeedCalculator);	
 		}
 		
-		if (this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
+		if (this.noiseContext.getNoiseParams().isComputePopulationUnits()) {
 			this.actTracker = new PersonActivityTracker(noiseContext);
 			event.getControler().getEvents().addHandler(this.actTracker);
 		}

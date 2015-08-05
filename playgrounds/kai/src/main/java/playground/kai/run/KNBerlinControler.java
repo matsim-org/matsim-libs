@@ -150,7 +150,7 @@ class KNBerlinControler {
 		gridParameters.setReceiverPointGap(1000.);
 
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
 		
 		// noise parameters
 		NoiseParameters noiseParameters = new NoiseParameters();

@@ -89,7 +89,9 @@ public class NoiseCalculationOffline {
 
 			runDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/input/" + runId + "/";
 			outputDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/" + runId + "/";
+//			outputDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/" + runId + "_populationUnits_250_home_education/";
 			receiverPointGap = 10.;
+//			receiverPointGap = 250.;
 			lastIteration = 30;
 		}
 		
@@ -146,12 +148,17 @@ public class NoiseCalculationOffline {
 		gridParameters.setReceiverPointsGridMaxX(xMax);
 		gridParameters.setReceiverPointsGridMaxY(yMax);
 		
-		// Berlin Activity Types
+//		 Berlin Activity Types
 //		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
 //		String[] consideredActivitiesForDamages = {"home"};
-//		gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+//		String[] consideredActivitiesForDamages = {"work"};
+//		String[] consideredActivitiesForDamages = {"educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		String[] consideredActivitiesForDamages = {"leisure"};
+//		String[] consideredActivitiesForDamages = {"home", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
 		
 //		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga", "leisure"};
 //		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 		
 		// ################################
@@ -159,6 +166,7 @@ public class NoiseCalculationOffline {
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setUseActualSpeedLevel(false);
 		noiseParameters.setScaleFactor(4.);
+		noiseParameters.setComputePopulationUnits(false);
 		noiseParameters.setComputeNoiseDamages(false);
 		noiseParameters.setInternalizeNoiseDamages(false);
 		noiseParameters.setComputeCausingAgents(false);
@@ -247,7 +255,7 @@ public class NoiseCalculationOffline {
 			events.addHandler(eventWriter);	
 		}
 		
-		if (noiseContext.getNoiseParams().isComputeNoiseDamages()) {
+		if (noiseContext.getNoiseParams().isComputePopulationUnits()) {
 			PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
 			events.addHandler(actTracker);
 		}
@@ -259,7 +267,7 @@ public class NoiseCalculationOffline {
 		
 		timeTracker.computeFinalTimeIntervals();
 
-		if (noiseContext.getNoiseParams().isComputeNoiseDamages()) {
+		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
 			eventWriter.closeFile();
 		}
 		log.info("Noise calculation completed.");

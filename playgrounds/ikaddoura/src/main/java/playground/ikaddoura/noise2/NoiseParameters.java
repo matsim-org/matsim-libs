@@ -62,6 +62,7 @@ public class NoiseParameters {
 	private boolean internalizeNoiseDamages = true;
 	private boolean computeCausingAgents = true; 
 	private boolean throwNoiseEventsCaused = true;
+	private boolean computePopulationUnits = true;
 	
 	private NoiseAllocationApproach noiseAllocationApproach = NoiseAllocationApproach.AverageCost;
 		
@@ -97,6 +98,20 @@ public class NoiseParameters {
 			if (this.computeNoiseDamages == false) {
 				log.warn("Inconsistent parameters will be adjusted:");
 				this.setComputeNoiseDamages(true);
+			}
+			
+			if (this.computePopulationUnits == false) {
+				log.warn("Inconsistent parameters will be adjusted:");
+				this.setComputePopulationUnits(true);
+			}
+		}
+		
+		if (this.computeNoiseDamages) {
+		
+			// required			
+			if (this.computePopulationUnits == false) {
+				log.warn("Inconsistent parameters will be adjusted:");
+				this.setComputePopulationUnits(true);
 			}
 		}
 		
@@ -300,6 +315,15 @@ public class NoiseParameters {
 	public void setBusIdPrefixes(Set<String> busIdPrefixes) {
 		log.info("Setting the bus Id prefixes to : " + busIdPrefixes.toString());
 		this.busIdPrefixes = busIdPrefixes;
+	}
+
+	public boolean isComputePopulationUnits() {
+		return computePopulationUnits;
+	}
+
+	public void setComputePopulationUnits(boolean computePopulationUnits) {
+		log.info("Computing population units: " + computePopulationUnits);
+		this.computePopulationUnits = computePopulationUnits;
 	}
 	
 }

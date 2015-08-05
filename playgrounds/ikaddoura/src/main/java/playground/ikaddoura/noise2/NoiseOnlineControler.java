@@ -90,14 +90,14 @@ public class NoiseOnlineControler {
 			gridParameters.setReceiverPointGap(100.);
 			
 			String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-			gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+			gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
 		
 		} else if (setup.equals("berlin2")) {
 		
 			gridParameters.setReceiverPointGap(100.);
 	
 			String[] consideredActivitiesForDamages = {"home"};
-			gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+			gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
 			
 		} else {
 			throw new RuntimeException("Unknown parameter setup. Aborting...");
