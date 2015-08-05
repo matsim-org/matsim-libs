@@ -32,7 +32,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler{
-
 	
 	private Map<Integer, Map<Id<Link>, EmissionsAndVehicleKm>> intervals2links2emissions;
 	private WarmPollutant warmPollutant;
@@ -58,7 +57,6 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -74,7 +72,6 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 			EmissionsAndVehicleKm eavk = currentInterval.get(linkId);
 			eavk.add(emissionValue, linkLenghtKm);
 			currentInterval.put(linkId, eavk);
-			
 		}
 	}
 
@@ -91,11 +88,9 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 			eavk.add(emissionValue, 0.0);
 			currentInterval.put(linkId, eavk);
 		}
-		
 	}
 
 	public Map<Integer, Map<Id<Link>, EmissionsAndVehicleKm>> getTimeIntervals2EmissionsPerLink() {
 		return this.intervals2links2emissions;
 	}
-
 }
