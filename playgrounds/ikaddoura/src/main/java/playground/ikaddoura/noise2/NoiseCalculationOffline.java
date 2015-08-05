@@ -83,9 +83,9 @@ public class NoiseCalculationOffline {
 			
 //			runId = "bvg.run190.25pct.dilution001.network20150727.v2.static";
 //			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.I";
-			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.II";
+//			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.II";
 //			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.III";
-//			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.IV";
+			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.IV";
 
 			runDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/input/" + runId + "/";
 			outputDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/" + runId + "/";
