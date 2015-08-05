@@ -46,31 +46,40 @@ import playground.ikaddoura.noise2.data.ReceiverPoint;
  * @author ikaddoura
  *
  */
-public class MergeNoiseCSVFile {
+public class ProcessNoiseImmissions {
 
-	private double startTime = 3600.;
-	private double timeBinSize = 3600.;
-	private double endTime = 24. * 3600.;
+	private final double startTime = 3600.;
+	private final double timeBinSize = 3600.;
+	private final double endTime = 24. * 3600.;
 		
-	private String workingDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static_populationUnits_250_home_education/analysis_it.30/consideredAgentUnits/";
-	private String receiverPointsFile = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static_populationUnits_250_home_education/analysis_it.30/receiverPoints/receiverPoints.csv";
+	private final String workingDirectory;
+	private String receiverPointsFile;
 		
-	private String separator = ";";
-	private String label = "consideredAgentUnits";
+	private final String separator = ";";
+	private final String label = "immission";
 	
-	private String outputPath = workingDirectory;
+	private final String outputPath;
 	
 	private BufferedWriter bw;
 	private Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<Double, Map<Id<ReceiverPoint>, Double>>();
 	
+	public ProcessNoiseImmissions(String workingDirectory, String receiverPointsFile) {
+		this.workingDirectory = workingDirectory;
+		this.receiverPointsFile = receiverPointsFile;
+		this.outputPath = workingDirectory;
+	}
+
 	public static void main(String[] args) {
-		MergeNoiseCSVFile readNoiseFile = new MergeNoiseCSVFile();
+		String workingDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static/analysis_it.30/immissions/";
+		String receiverPointsFile = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/bvg.run190.25pct.dilution001.network20150727.v2.static/analysis_it.30/receiverPoints/receiverPoints.csv";
+
+		ProcessNoiseImmissions readNoiseFile = new ProcessNoiseImmissions(workingDirectory, receiverPointsFile);
 		readNoiseFile.run();
 	}
 	
-	private void run() {
+	public void run() {
 		
-		String outputFile = outputPath + label + "_merged.csv";
+		String outputFile = outputPath + label + "_processed.csv";
 		
 		try {
 			
@@ -78,7 +87,6 @@ public class MergeNoiseCSVFile {
 				
 				System.out.println("Reading time bin: " + time);
 
-//				String fileName = workingDirectory + "100." + label + "_" + Double.toString(time) + ".csv";
 				String fileName = workingDirectory + label + "_" + Double.toString(time) + ".csv";
 				BufferedReader br = IOUtils.getBufferedReader(fileName);
 				
@@ -161,6 +169,8 @@ public class MergeNoiseCSVFile {
 			for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 				bw.write(";" + label + "_" + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS));
 			}
+			
+			bw.write(";Lden;L_6-9;L_16-19");
 
 			bw.newLine();
 
@@ -171,6 +181,50 @@ public class MergeNoiseCSVFile {
 				for (double time = startTime; time <= endTime; time = time + timeBinSize) {
 					bw.write(";" + time2rp2value.get(time).get(rp));
 				}
+				
+				// aggregate time intervals
+	
+				double termDay = 0.;
+				// day: 7-19
+				for (double time = 8 * 3600.; time <= 19 * 3600.; time = time + timeBinSize) {
+					termDay = termDay + Math.pow(10, time2rp2value.get(time).get(rp) / 10);
+				}
+				
+				double termEvening = 0.;
+				// evening: 19-23
+				for (double time = 20 * 3600.; time <= 23 * 3600.; time = time + timeBinSize) {
+					termEvening = termEvening + Math.pow(10, (time2rp2value.get(time).get(rp) + 5) / 10);
+				}
+
+				double termNight = 0.;
+				// night: 23-7
+				
+				// nightA: 23-24
+				for (double time = 24 * 3600.; time <= 24 * 3600.; time = time + timeBinSize) {
+					termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
+				}
+				// nightB: 0-7
+				for (double time = 1 * 3600.; time <= 7 * 3600.; time = time + timeBinSize) {
+					termNight = termNight + Math.pow(10, (time2rp2value.get(time).get(rp) + 10) / 10);
+				}
+			
+				double Lden = 10 * Math.log10(1./24. * (termDay + termEvening + termNight));
+				bw.write(";" + Lden);
+				
+				double term69 = 0.;
+				for (double time = 7 * 3600.; time <= 9 * 3600.; time = time + timeBinSize) {
+					term69 = term69 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
+				}
+				double L_69 = 10 * Math.log10(1./3. * term69);
+				bw.write(";" + L_69);
+				
+				double term1619 = 0.;
+				for (double time = 17 * 3600.; time <= 19 * 3600.; time = time + timeBinSize) {
+					term1619 = term1619 + Math.pow(10, (time2rp2value.get(time).get(rp)) / 10);
+				}
+				double L_1619 = 10 * Math.log10(1./3. * term1619);
+				bw.write(";" + L_1619);
+				
 				bw.newLine();
 			}				
 			
@@ -182,28 +236,27 @@ public class MergeNoiseCSVFile {
 			e1.printStackTrace();
 		}
 
-//		String time = "16:00:00";
-//		String qGisProjectFile = "immission.qgs";
-//		
-//		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
-//			
-//// ################################################################################################################################################
-//		double[] extent = {4568808,5803042,4622772,5844280};
-//		writer.setExtent(extent);
-//				
-//		VectorLayer noiseLayer = new VectorLayer("noise", outputFile, QGisConstants.geometryType.Point, true);
-//		noiseLayer.setDelimiter(";");
-//		noiseLayer.setXField("x");
-//		noiseLayer.setYField("y");
-//		
-//		NoiseRenderer renderer = new NoiseRenderer(noiseLayer);
-//		renderer.setRenderingAttribute("immission_" + time);
-//		
-//		writer.addLayer(noiseLayer);
-//		
-//// ################################################################################################################################################
-//		
-//		writer.write(qGisProjectFile);
+		String qGisProjectFile = "immission.qgs";
+		
+		QGisWriter writer = new QGisWriter(TransformationFactory.DHDN_GK4, workingDirectory);
+			
+// ################################################################################################################################################
+		double[] extent = {4568808,5803042,4622772,5844280};
+		writer.setExtent(extent);
+				
+		VectorLayer noiseLayer = new VectorLayer("noise", outputFile, QGisConstants.geometryType.Point, true);
+		noiseLayer.setDelimiter(";");
+		noiseLayer.setXField("x");
+		noiseLayer.setYField("y");
+		
+		NoiseRenderer renderer = new NoiseRenderer(noiseLayer);
+		renderer.setRenderingAttribute("Lden");
+		
+		writer.addLayer(noiseLayer);
+		
+// ################################################################################################################################################
+		
+		writer.write(qGisProjectFile);
 		
 	}
 

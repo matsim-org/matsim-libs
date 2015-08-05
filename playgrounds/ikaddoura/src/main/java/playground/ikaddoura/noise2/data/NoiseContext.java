@@ -24,8 +24,10 @@ package playground.ikaddoura.noise2.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -34,6 +36,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.vehicles.Vehicle;
 
 import playground.ikaddoura.noise2.NoiseParameters;
 import playground.ikaddoura.noise2.handler.NoiseEquations;
@@ -57,6 +60,8 @@ public class NoiseContext {
 	private double xCoordMaxLinkNode = Double.MIN_VALUE;
 	private double yCoordMinLinkNode = Double.MAX_VALUE;
 	private double yCoordMaxLinkNode = Double.MIN_VALUE;
+	
+	private Set<Id<Vehicle>> busVehicleIDs = new HashSet<Id<Vehicle>>();
 	
 	// for routing purposes
 	
@@ -107,8 +112,8 @@ public class NoiseContext {
 		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
 		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
 
-		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForDamages().length; i++) {
-			consideredActivitiesForDamagesList.add(this.grid.getGridParams().getConsideredActivitiesForDamages()[i]);
+		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForSpatialFunctionality().length; i++) {
+			consideredActivitiesForDamagesList.add(this.grid.getGridParams().getConsideredActivitiesForSpatialFunctionality()[i]);
 		}
 		
 		for (int i = 0; i < this.grid.getGridParams().getConsideredActivitiesForReceiverPointGrid().length; i++) {
@@ -480,6 +485,14 @@ public class NoiseContext {
 
 	public final Grid getGrid() {
 		return grid;
+	}
+
+	public Set<Id<Vehicle>> getBusVehicleIDs() {
+		return busVehicleIDs;
+	}
+
+	public void setBusVehicleIDs(Set<Id<Vehicle>> busVehicleIDs) {
+		this.busVehicleIDs = busVehicleIDs;
 	}
 
 }

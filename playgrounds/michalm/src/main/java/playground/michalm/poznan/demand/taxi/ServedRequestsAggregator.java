@@ -51,7 +51,7 @@ public class ServedRequestsAggregator
         requests = PoznanServedRequests.filterRequestsWithinAgglomeration(requests);
 
         //aggregateRequests
-        ZoneFinder zoneFinder = new ZoneFinder(zones, 200);
+        ZoneFinder zoneFinder = new ZoneFinderImpl(zones, 200);
         final FormatBasedDateDiscretizer hourlyDateDiscretizer = new FormatBasedDateDiscretizer(
                 FormatBasedDateDiscretizer.YMDH);
         DemandAggregator demandAggregator = new DemandAggregator(zoneFinder, hourlyDateDiscretizer);

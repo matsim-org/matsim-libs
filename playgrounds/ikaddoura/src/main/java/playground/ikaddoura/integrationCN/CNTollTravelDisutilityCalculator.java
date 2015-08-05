@@ -111,8 +111,16 @@ public class CNTollTravelDisutilityCalculator implements TravelDisutility{
 			
 		} else {
 			
-			if (personId.toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix())) {
+			boolean isHGV = false;
+			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixes()) {
+				if (personId.toString().startsWith(hgvPrefix)) {
+					isHGV = true;
+					break;
+				}
+			}
 			
+			if (isHGV) {
+						
 				if (this.noiseContext.getNoiseParams().getNoiseAllocationApproach() == NoiseAllocationApproach.AverageCost) {	
 					linkExpectedNoiseToll = this.noiseContext.getTimeInterval2linkId2noiseLinks().get(timeIntervalEndTime).get(linkId).getAverageDamageCostPerHgv();
 					

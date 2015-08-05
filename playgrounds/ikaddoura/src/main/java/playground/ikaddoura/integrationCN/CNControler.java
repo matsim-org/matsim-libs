@@ -23,8 +23,8 @@
 package playground.ikaddoura.integrationCN;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -103,7 +103,7 @@ public class CNControler {
 		gridParameters.setReceiverPointGap(1000.);
 			
 		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
 				
 		// noise parameters
 		
@@ -112,7 +112,7 @@ public class CNControler {
 				
 		noiseParameters.setScaleFactor(10.);
 		
-		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 		tunnelLinkIDs.add(Id.create("108041", Link.class));
 		tunnelLinkIDs.add(Id.create("108142", Link.class));
 		tunnelLinkIDs.add(Id.create("108970", Link.class));

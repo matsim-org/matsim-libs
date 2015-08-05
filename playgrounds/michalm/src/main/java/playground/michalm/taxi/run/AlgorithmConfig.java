@@ -33,6 +33,7 @@ import playground.michalm.taxi.optimizer.assignment.AssignmentTaxiOptimizer;
 import playground.michalm.taxi.optimizer.fifo.FifoTaxiOptimizer;
 import playground.michalm.taxi.optimizer.mip.MIPTaxiOptimizer;
 import playground.michalm.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
+import playground.michalm.taxi.optimizer.zonal.ZonalTaxiOptimizer;
 
 
 enum AlgorithmConfig
@@ -54,6 +55,12 @@ enum AlgorithmConfig
     RULE_DSE_FF(RULES, DEMAND_SUPPLY_EQUIL, FREE_FLOW_SPEED, TIME),
 
     RULE_DSE_15M(RULES, DEMAND_SUPPLY_EQUIL, EVENTS, TIME),
+
+    ZONE_TW_TD(ZONES, MIN_WAIT_TIME, FREE_FLOW_SPEED, DISTANCE),
+
+    ZONE_TW_FF(ZONES, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
+
+    ZONE_TW_15M(ZONES, MIN_WAIT_TIME, EVENTS, TIME),
 
     FIFO_RES_TW_FF(FIFO_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME),
 
@@ -80,6 +87,7 @@ enum AlgorithmConfig
     static enum AlgorithmType
     {
         RULES, //
+        ZONES, //
         FIFO_SCHEDULING, //
         ASSIGNMENT, //
         MIP;
@@ -107,6 +115,9 @@ enum AlgorithmConfig
         switch (algorithmType) {
             case RULES:
                 return new RuleBasedTaxiOptimizer(optimConfig);
+
+            case ZONES:
+                return new ZonalTaxiOptimizer(optimConfig);
 
             case FIFO_SCHEDULING:
                 return new FifoTaxiOptimizer(optimConfig);

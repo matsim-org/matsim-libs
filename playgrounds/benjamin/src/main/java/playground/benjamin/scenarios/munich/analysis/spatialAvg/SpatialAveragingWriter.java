@@ -40,44 +40,46 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class SpatialAveragingWriter {
+	private static final Logger logger = Logger.getLogger(SpatialAveragingWriter.class);
 
 	private CoordinateReferenceSystem targetCRS;
 	private int noOfXbins;
 	private int noOfYbins;
+
 	private Double yMin;
 	private Double yMax;
 	private Double xMin;
 	private Double xMax;
-	private boolean useVisBoundary = false;
 	
+	private boolean useVisBoundary;
 	Collection<SimpleFeature> featuresInVisBoundary;
-
-	private static final Logger logger = Logger.getLogger(SpatialAveragingWriter.class);
 	
-	public SpatialAveragingWriter(double xMin, double xMax, double yMin, double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, 
-//			String munichShapeFile, 
-			CoordinateReferenceSystem targetCRS, boolean useVisBoundary){
-		this.xMin = xMin;
-		this.xMax = xMax;
-		this.yMin = yMin;
-		this.yMax = yMax;
-		this.noOfXbins = noOfXbins;
-		this.noOfYbins = noOfYbins;
-//		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(munichShapeFile);
-		this.targetCRS = targetCRS;
-		this.useVisBoundary=useVisBoundary;
-	}
+//	public SpatialAveragingWriter(double xMin, double xMax, double yMin, double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, 
+////			String munichShapeFile, 
+//			CoordinateReferenceSystem targetCRS, boolean useVisBoundary){
+//		this.xMin = xMin;
+//		this.xMax = xMax;
+//		this.yMin = yMin;
+//		this.yMax = yMax;
+//		this.noOfXbins = noOfXbins;
+//		this.noOfYbins = noOfYbins;
+////		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(munichShapeFile);
+//		this.targetCRS = targetCRS;
+//		this.useVisBoundary = useVisBoundary;
+//	}
 	
 	public SpatialAveragingWriter(SpatialAveragingInputData inputData, int noOfXbins, int noOfYbins, double smoothingRadius_m, boolean useVisBoundary) {
-		this(	inputData.getMinX(),
-				inputData.getMaxX(), 
-				inputData.getMinY(),
-				inputData.getMaxY(), 
-				noOfXbins, noOfYbins, 
-				smoothingRadius_m, 
-//				inputData.getMunichShapeFile(),
-				inputData.getTargetCRS(), 
-				useVisBoundary);
+		this.xMin = inputData.getMinX();
+		this.xMax = inputData.getMaxX(); 
+		this.yMin = inputData.getMinY();
+		this.yMax = inputData.getMaxY(); 
+		this.noOfXbins = noOfXbins;
+		this.noOfYbins = noOfYbins; 
+//		this.smoothingRadius = smoothingRadius_m; 
+//		inputData.getMunichShapeFile();
+		this.targetCRS = inputData.getTargetCRS(); 
+		this.useVisBoundary = inputData.isUseVisBoundary();
+		if(this.useVisBoundary)	this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(inputData.getVisBoundaryShapeFile());
 	}
 
 	public SpatialAveragingWriter(SpatialAveragingInputData inputData,
@@ -110,10 +112,14 @@ public class SpatialAveragingWriter {
 				//table contents
 				for(int xIndex = 0; xIndex < doubles.length; xIndex++){ 
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-					if(isInVisBoundary(cellCentroid)){
-						valueString += Double.toString(doubles[xIndex][yIndex]) + "\t"; 
+					if(useVisBoundary){
+						if(isInVisBoundary(cellCentroid)){
+							valueString += Double.toString(doubles[xIndex][yIndex]) + "\t"; 
+						} else {
+							valueString += "NA" + "\t";
+						}
 					} else {
-						valueString += "NA" + "\t";
+						valueString += Double.toString(doubles[xIndex][yIndex]) + "\t"; 
 					}
 				}
 				buffW.write(valueString);
@@ -128,7 +134,6 @@ public class SpatialAveragingWriter {
 	}
 
 	void writeGISoutput(Double[][] doubles, String outputPathForGIS, Double endTimeOfInterval) throws IOException {
-		
 		PointFeatureFactory factory = new PointFeatureFactory.Builder()
 		.setCrs(this.targetCRS)
 		.setName("EmissionPoint")
@@ -137,21 +142,26 @@ public class SpatialAveragingWriter {
 		.create();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		
-		
-//			if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
-				for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
-					for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
-						Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+//		if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
+			for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
+				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+					if(useVisBoundary){
 						if(isInVisBoundary(cellCentroid)){
 							String dateTimeString = convertSeconds2dateTimeFormat(endTimeOfInterval);
 							double result = doubles[xIndex][yIndex];
 							SimpleFeature feature = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()), new Object[] {dateTimeString, result}, null);
 							features.add(feature);
 						}
+					} else {
+						String dateTimeString = convertSeconds2dateTimeFormat(endTimeOfInterval);
+						double result = doubles[xIndex][yIndex];
+						SimpleFeature feature = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()), new Object[] {dateTimeString, result}, null);
+						features.add(feature);
 					}
 				}
-//			}
-		
+			}
+//		}
 		ShapeFileWriter.writeGeometries(features, outputPathForGIS);
 		logger.info("Finished writing output for GIS to " + outputPathForGIS);
 	}
@@ -167,17 +177,16 @@ public class SpatialAveragingWriter {
 	}
 	
 	private boolean isInVisBoundary(Coord cellCentroid) {
-		if(useVisBoundary==false)return true;
-		boolean isInMunichShape = false;
+		boolean isInShape = false;
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()));
 		for(SimpleFeature feature : this.featuresInVisBoundary){
 			if(((Geometry) feature.getDefaultGeometry()).contains(geo)){
-				isInMunichShape = true;
+				isInShape = true;
 				break;
 			}
 		}
-		return isInMunichShape;
+		return isInShape;
 	}
 	
 	public Coord findCellCentroid(int xIndex, int yIndex) {

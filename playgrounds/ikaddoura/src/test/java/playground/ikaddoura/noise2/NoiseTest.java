@@ -101,7 +101,7 @@ public class NoiseTest {
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1.);
 		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivities);
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivities);
 		
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
@@ -173,7 +173,7 @@ public class NoiseTest {
 		gridParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivities);
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivities);
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1.);
@@ -929,7 +929,7 @@ public class NoiseTest {
 		gridParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivities);
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivities);
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1.);
@@ -1040,7 +1040,7 @@ public class NoiseTest {
 		gridParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivities);
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivities);
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1.);

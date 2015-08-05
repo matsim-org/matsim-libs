@@ -25,8 +25,8 @@ package playground.ikaddoura.noise2;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -50,8 +50,9 @@ public class NoiseParameters {
 	private double timeBinSizeNoiseComputation = 3600.0;
 	private double scaleFactor = 1.;
 	private double relevantRadius = 500.;
-	private String hgvIdPrefix = "lkw";
-	private List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+	private Set<String> hgvIdPrefixes = new HashSet<String>();
+	private Set<String> busIdPrefixes = new HashSet<String>();
+	private Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 	private String tunnelLinkIdFile = null;
 	private int writeOutputIteration = 1;
 	private boolean useActualSpeedLevel = true;
@@ -61,11 +62,14 @@ public class NoiseParameters {
 	private boolean internalizeNoiseDamages = true;
 	private boolean computeCausingAgents = true; 
 	private boolean throwNoiseEventsCaused = true;
+	private boolean computePopulationUnits = true;
 	
 	private NoiseAllocationApproach noiseAllocationApproach = NoiseAllocationApproach.AverageCost;
 		
 	// ########################################################################################################
 			
+	
+	
 	public void checkForConsistency() {
 		
 		if (this.internalizeNoiseDamages) {
@@ -94,6 +98,20 @@ public class NoiseParameters {
 			if (this.computeNoiseDamages == false) {
 				log.warn("Inconsistent parameters will be adjusted:");
 				this.setComputeNoiseDamages(true);
+			}
+			
+			if (this.computePopulationUnits == false) {
+				log.warn("Inconsistent parameters will be adjusted:");
+				this.setComputePopulationUnits(true);
+			}
+		}
+		
+		if (this.computeNoiseDamages) {
+		
+			// required			
+			if (this.computePopulationUnits == false) {
+				log.warn("Inconsistent parameters will be adjusted:");
+				this.setComputePopulationUnits(true);
 			}
 		}
 		
@@ -153,6 +171,10 @@ public class NoiseParameters {
 		}
 	}
 	
+	public NoiseParameters() {
+		this.hgvIdPrefixes.add("lkw");
+	}
+
 	// ########################################################################################################
 
 	public boolean isThrowNoiseEventsAffected() {
@@ -202,12 +224,12 @@ public class NoiseParameters {
 		this.relevantRadius = relevantRadius;
 	}
 	
-	public void setHgvIdPrefix(String hgvIdPrefix) {
-		log.info("Setting the HGV Id Prefix to " + hgvIdPrefix);
-		this.hgvIdPrefix = hgvIdPrefix;
+	public void setHgvIdPrefixes(Set<String> hgvIdPrefix) {
+		log.info("Setting the HGV Id Prefixes to " + hgvIdPrefix.toString());
+		this.hgvIdPrefixes = hgvIdPrefix;
 	}
 
-	public void setTunnelLinkIDs(List<Id<Link>> tunnelLinkIDs) {
+	public void setTunnelLinkIDs(Set<Id<Link>> tunnelLinkIDs) {
 		log.info("Setting tunnel link IDs to " + tunnelLinkIDs.toString());
 		this.tunnelLinkIDs = tunnelLinkIDs;
 	}
@@ -228,11 +250,11 @@ public class NoiseParameters {
 		return relevantRadius;
 	}
 
-	public String getHgvIdPrefix() {
-		return hgvIdPrefix;
+	public Set<String> getHgvIdPrefixes() {
+		return hgvIdPrefixes;
 	}
 
-	public List<Id<Link>> getTunnelLinkIDs() {
+	public Set<Id<Link>> getTunnelLinkIDs() {
 		return tunnelLinkIDs;
 	}
 
@@ -284,6 +306,24 @@ public class NoiseParameters {
 	public void setUseActualSpeedLevel(boolean useActualSpeedLevel) {
 		log.info("Using the actual speed level for noise calculation: " + useActualSpeedLevel);
 		this.useActualSpeedLevel = useActualSpeedLevel;
+	}
+
+	public Set<String> getBusIdPrefixes() {
+		return busIdPrefixes;
+	}
+
+	public void setBusIdPrefixes(Set<String> busIdPrefixes) {
+		log.info("Setting the bus Id prefixes to : " + busIdPrefixes.toString());
+		this.busIdPrefixes = busIdPrefixes;
+	}
+
+	public boolean isComputePopulationUnits() {
+		return computePopulationUnits;
+	}
+
+	public void setComputePopulationUnits(boolean computePopulationUnits) {
+		log.info("Computing population units: " + computePopulationUnits);
+		this.computePopulationUnits = computePopulationUnits;
 	}
 	
 }

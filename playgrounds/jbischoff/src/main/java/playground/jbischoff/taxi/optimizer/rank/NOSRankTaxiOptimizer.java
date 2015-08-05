@@ -88,7 +88,7 @@ public class NOSRankTaxiOptimizer
         };
         
         TaxiOptimizerConfiguration optimConfig = new TaxiOptimizerConfiguration(context,
-                calculator, scheduler, vrpFinder, filterFactory, Goal.MIN_WAIT_TIME, workingDir);
+                calculator, scheduler, vrpFinder, filterFactory, Goal.MIN_WAIT_TIME, workingDir, null);
 
         return new NOSRankTaxiOptimizer(optimConfig, idleVehicleFinder);
     }

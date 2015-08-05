@@ -61,8 +61,16 @@ public class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEve
 		if (this.vehicleId2enterTime.containsKey(event.getVehicleId())) {
 			double traveltime = event.getTime() - this.vehicleId2enterTime.get(event.getVehicleId());
 			
-			if (event.getVehicleId().toString().startsWith(this.noiseContext.getNoiseParams().getHgvIdPrefix())) {
-				// HGV
+			boolean isHGV = false;
+			for (String hgvPrefix : this.noiseContext.getNoiseParams().getHgvIdPrefixes()) {
+				if (event.getVehicleId().toString().startsWith(hgvPrefix)) {
+					isHGV = true;
+					break;
+				}
+			}
+			
+			if (isHGV || this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
+				// HGV or Bus
 				if (this.noiseContext.getNoiseLinks().containsKey(event.getLinkId())) {
 					double travelTimeSum = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getTravelTimeHGV_sec() + traveltime;
 					this.noiseContext.getNoiseLinks().get(event.getLinkId()).setTravelTimeHGV_Sec(travelTimeSum);
