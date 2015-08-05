@@ -249,7 +249,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identif
 	}
 	@Override
 	public final PlanElement getNextPlanElement() {
-		if ( this.currentPlanElementIndex < this.plan.getPlanElements().size() ) {
+		if ( this.currentPlanElementIndex < this.plan.getPlanElements().size()-1 ) {
 			return this.plan.getPlanElements().get( this.currentPlanElementIndex+1 ) ;
 		} else {
 			return null ;
