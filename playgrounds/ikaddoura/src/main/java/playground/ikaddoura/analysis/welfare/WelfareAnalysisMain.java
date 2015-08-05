@@ -83,10 +83,10 @@ public class WelfareAnalysisMain {
 			
 		} else {
 			
-			runDirectory1 = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/baseCase/";
-			runDirectory2 = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/";
-			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/";
-			outputFile = "baseCase_int1";
+			runDirectory1 = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/baseCase/";
+			runDirectory2 = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_marginalCost/";
+			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/";
+			outputFile = "baseCase_marginalCostPricing_1";
 			iteration = 100;
 			eventsFileWithNoiseEvents1 = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalizationCar/output/baseCase_2_noiseAnalysis/r31341/noiseAnalysis_BlnBC2_1/analysis_it.100/100.events_NoiseImmission_Offline.xml.gz";
 			eventsFileWithNoiseEvents2 = null;
@@ -109,20 +109,26 @@ public class WelfareAnalysisMain {
 		Set<Id<Person>> stuckingPersonIDs = new HashSet<>(); // based on the events
 		Set<Id<Person>> invalidScoreOrStuckingPersonIDs = new HashSet<>(); // stucking agents or invalid score
 
-		Set<Id<Person>> invalidScorePersonIDs1 = getInvalidScorePersonIDs(scenario1.getPopulation());
-		Set<Id<Person>> invalidScorePersonIDs2 = getInvalidScorePersonIDs(scenario2.getPopulation());
+		Set<Id<Person>> invalidScorePersonIDs1 = new HashSet<>();
+		Set<Id<Person>> invalidScorePersonIDs2 = new HashSet<>();
+		Set<Id<Person>> stuckingPersonIDs1 = new HashSet<>();
+		Set<Id<Person>> stuckingPersonIDs2 = new HashSet<>();
 
-		invalidScorePersonIDs.addAll(invalidScorePersonIDs1);		
-		invalidScorePersonIDs.addAll(invalidScorePersonIDs2);		
-		
-		Set<Id<Person>> stuckingPersonIDs1 = getStuckingAgentIDs(runDirectory1);
-		Set<Id<Person>> stuckingPersonIDs2 = getStuckingAgentIDs(runDirectory2);
 
-		stuckingPersonIDs.addAll(stuckingPersonIDs1);
-		stuckingPersonIDs.addAll(stuckingPersonIDs2);
-
-		invalidScoreOrStuckingPersonIDs.addAll(invalidScorePersonIDs);
-		invalidScoreOrStuckingPersonIDs.addAll(stuckingPersonIDs);
+//		Set<Id<Person>> invalidScorePersonIDs1 = getInvalidScorePersonIDs(scenario1.getPopulation());
+//		Set<Id<Person>> invalidScorePersonIDs2 = getInvalidScorePersonIDs(scenario2.getPopulation());
+//
+//		invalidScorePersonIDs.addAll(invalidScorePersonIDs1);		
+//		invalidScorePersonIDs.addAll(invalidScorePersonIDs2);		
+//		
+//		Set<Id<Person>> stuckingPersonIDs1 = getStuckingAgentIDs(runDirectory1);
+//		Set<Id<Person>> stuckingPersonIDs2 = getStuckingAgentIDs(runDirectory2);
+//
+//		stuckingPersonIDs.addAll(stuckingPersonIDs1);
+//		stuckingPersonIDs.addAll(stuckingPersonIDs2);
+//
+//		invalidScoreOrStuckingPersonIDs.addAll(invalidScorePersonIDs);
+//		invalidScoreOrStuckingPersonIDs.addAll(stuckingPersonIDs);
 		
 		// events analysis
 		

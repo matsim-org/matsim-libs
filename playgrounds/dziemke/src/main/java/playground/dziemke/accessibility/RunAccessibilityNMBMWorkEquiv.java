@@ -45,6 +45,7 @@ public class RunAccessibilityNMBMWorkEquiv {
 		Double upperBound = 5.5;
 		Integer range = 9;
 		int symbolSize = 1010;
+		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
 		
 
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
@@ -115,7 +116,7 @@ public class RunAccessibilityNMBMWorkEquiv {
 			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
 //				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer);
 				VisualizationUtilsDZ.createQGisOutput(typeWEQ, mode, mapViewExtent, workingDirectory, crs, includeDensityLayer,
-						lowerBound, upperBound, range, symbolSize);
+						lowerBound, upperBound, range, symbolSize, populationThreshold);
 				VisualizationUtilsDZ.createSnapshot(actSpecificWorkingDirectory, mode, osName);
 			}
 //		}

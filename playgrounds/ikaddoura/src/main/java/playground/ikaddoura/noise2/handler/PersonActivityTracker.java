@@ -64,7 +64,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 	public PersonActivityTracker(NoiseContext noiseContext) {
 		this.noiseContext = noiseContext;
 		
-		String[] consideredActTypesArray = noiseContext.getGrid().getGridParams().getConsideredActivitiesForDamages();
+		String[] consideredActTypesArray = noiseContext.getGrid().getGridParams().getConsideredActivitiesForSpatialFunctionality();
 		for (int i = 0; i < consideredActTypesArray.length; i++) {
 			this.consideredActivityTypes.add(consideredActTypesArray[i]);
 		}
@@ -84,6 +84,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 		setFirstActivities();
 	}
 	
+	private int countWarn = 0;
 	private void setFirstActivities() {
 		
 		log.info("Receiving first activities from the selected plans...");
@@ -103,16 +104,23 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 					actInfo.setEndTime(30 * 3600.);
 					actInfo.setActivityType(firstActivity.getType());
 					
-					if (rpId == null) {
+					if (rpId == null && this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
 						throw new RuntimeException("No receiver point for " + person.getId() + ". Aborting...");
-					}
-					
-					if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(person.getId())) {
-						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(person.getId()).add(actInfo);
+					} else if (rpId == null) {
+						if (countWarn == 0) {
+							log.warn("Please note that population units are only calculated for a predefined area. Thus, not all agents' activities are mapped to a receiver point. "
+									+ "The boarder receiver points should not be used for analysis. "
+									+ "This message is only given once.");
+							countWarn++;
+						}
 					} else {
-						ArrayList<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
-						personActivityInfos.add(actInfo);
-						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().put(person.getId(), personActivityInfos);
+						if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(person.getId())) {
+							this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(person.getId()).add(actInfo);
+						} else {
+							ArrayList<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
+							personActivityInfos.add(actInfo);
+							this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().put(person.getId(), personActivityInfos);
+						}
 					}
 				}
 			}
@@ -151,12 +159,16 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 					actInfo.setEndTime(30 * 3600.); // assuming this activity to be the last one in the agents' plan, will be overwritten if it is not the last activity
 					actInfo.setActivityType(event.getActType());
 					
-					if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(event.getPersonId())) {
-						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId()).add(actInfo);
-					} else {
-						ArrayList<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
-						personActivityInfos.add(actInfo);
-						this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().put(event.getPersonId(), personActivityInfos);
+					if (this.noiseContext.getReceiverPoints().containsKey(rpId)) {
+						
+						if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(event.getPersonId())) {
+							this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId()).add(actInfo);
+						
+						} else {
+							ArrayList<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
+							personActivityInfos.add(actInfo);
+							this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().put(event.getPersonId(), personActivityInfos);
+						}
 					}
 				}
 			}
@@ -176,7 +188,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 					Coord coord = noiseContext.getGrid().getPersonId2listOfConsideredActivityCoords().get(event.getPersonId()).get(this.personId2currentActNr.get(event.getPersonId()));
 					Id<ReceiverPoint> rpId = noiseContext.getGrid().getActivityCoord2receiverPointId().get(coord);
 
-					if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(event.getPersonId())) {
+					if (this.noiseContext.getReceiverPoints().containsKey(rpId) && this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().containsKey(event.getPersonId())) {
 						for (PersonActivityInfo actInfo : this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId())) {
 							if (actInfo.getEndTime() == 30 * 3600.) {
 								actInfo.setEndTime(event.getTime());

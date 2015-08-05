@@ -71,20 +71,20 @@
 	</build>
 
 	<modules>
-		<!--<module>agarwalamit</module>-->
+		<module>agarwalamit</module>
 		<module>andreas</module>
 		<!--<module>anhorni</module>-->
 		<module>artemc</module>
 		<module>balac</module>
 		<module>balmermi</module>
-		<!--<module>benjamin</module>-->
+		<module>benjamin</module>
 		<module>bvitins</module>
 		<!--<module>christoph</module>-->
 		<!--<module>ciarif</module>-->
 		<module>cottbus</module>
 		<module>dgrether</module>
 		<module>dhisingh</module>
-		<!--<module>dhosse</module>-->
+		<module>dhosse</module>
 		<module>droeder</module>
 		<module>duncan</module>
 		<module>dziemke</module>

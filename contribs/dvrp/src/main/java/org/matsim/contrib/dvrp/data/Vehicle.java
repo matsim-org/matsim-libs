@@ -54,4 +54,7 @@ public interface Vehicle
 
 
     void setAgentLogic(VrpAgentLogic agentLogic);
+
+
+    void resetSchedule();
 }

@@ -63,7 +63,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseAllocationApproach;
@@ -73,10 +72,10 @@ import playground.ikaddoura.noise2.data.PersonActivityInfo;
 import playground.ikaddoura.noise2.data.ReceiverPoint;
 import playground.ikaddoura.noise2.events.NoiseEventAffected;
 import playground.ikaddoura.noise2.events.NoiseEventCaused;
+import playground.ikaddoura.noise2.handler.LinkSpeedCalculation;
 import playground.ikaddoura.noise2.handler.NoiseEquations;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
-import playground.ikaddoura.noise2.routing.TollDisutilityCalculatorFactory;
 
 /**
  * @author ikaddoura
@@ -102,7 +101,7 @@ public class NoiseTest {
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1.);
 		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivities);
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivities);
 		
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
@@ -174,10 +173,11 @@ public class NoiseTest {
 		gridParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivities);
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivities);
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1.);
+		noiseParameters.setUseActualSpeedLevel(false);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
@@ -467,6 +467,7 @@ public class NoiseTest {
 			String[] keys = line.split(separator);
 			for(int i = 0; i < keys.length; i++){
 				idxFromKey.put(keys[i], i);
+				System.out.println(keys[i]);
 			}
 			
 			int idxLinkId = idxFromKey.get("Link Id");
@@ -928,11 +929,12 @@ public class NoiseTest {
 		gridParameters.setReceiverPointGap(250.);	
 		
 		String[] consideredActivities = {"home", "work"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivities);
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivities);
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
 		noiseParameters.setScaleFactor(1.);
 		noiseParameters.setNoiseAllocationApproach(NoiseAllocationApproach.MarginalCost);
+		noiseParameters.setUseActualSpeedLevel(false);
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		
@@ -1012,6 +1014,153 @@ public class NoiseTest {
 		Assert.assertTrue("No event found to be tested.", tested2);
 		Assert.assertEquals("Wrong number of total events.", 3, counter2, MatsimTestUtils.EPSILON);
 		
+	 }
+	
+	// same test as 2a, but using the actual speed level
+	@Test
+	public final void test2c(){
+		
+		// start a simple MATSim run with a single iteration
+		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
+		Controler controler = new Controler(configFile);
+		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
+		controler.run();
+		
+		// run the noise analysis for the final iteration (offline)
+		
+		String runDirectory = controler.getConfig().controler().getOutputDirectory() + "/";
+		
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(runDirectory + "output_network.xml.gz");
+		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+		config.controler().setOutputDirectory(runDirectory);
+		config.controler().setLastIteration(controler.getConfig().controler().getLastIteration());
+		
+		GridParameters gridParameters = new GridParameters();
+		gridParameters.setReceiverPointGap(250.);	
+		
+		String[] consideredActivities = {"home", "work"};
+		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivities);
+		
+		NoiseParameters noiseParameters = new NoiseParameters();
+		noiseParameters.setScaleFactor(1.);
+		noiseParameters.setUseActualSpeedLevel(true);
+		
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		
+		String outputFilePath = runDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
+		File file = new File(outputFilePath);
+		file.mkdirs();
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		
+		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+		events.addHandler(eventWriter);
+			
+		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
+		noiseContext.initialize();
+		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
+		
+		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
+		events.addHandler(actTracker);
+		
+		LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation(noiseContext);
+		events.addHandler(linkSpeedCalculator);	
+		
+		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
+		events.addHandler(timeTracker);
+				
+		final Map<Id<Person>, List<Event>> eventsPerPersonId = new HashMap<Id<Person>, List<Event>>();
+		
+		events.addHandler(new ActivityStartEventHandler() {
+			
+			@Override
+			public void reset(int iteration) {
+				
+			}
+			
+			@Override
+			public void handleEvent(ActivityStartEvent event) {
+				
+				if(!eventsPerPersonId.containsKey(event.getPersonId())){
+					eventsPerPersonId.put(event.getPersonId(), new ArrayList<Event>());
+				}
+				eventsPerPersonId.get(event.getPersonId()).add(event);
+				
+			}
+		});
+		
+		events.addHandler(new ActivityEndEventHandler() {
+			
+			@Override
+			public void reset(int iteration) {
+				
+			}
+			
+			@Override
+			public void handleEvent(ActivityEndEvent event) {
+				
+				if(!eventsPerPersonId.containsKey(event.getPersonId())){
+					eventsPerPersonId.put(event.getPersonId(), new ArrayList<Event>());
+				}
+				eventsPerPersonId.get(event.getPersonId()).add(event);
+				
+			}
+		});
+		
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
+		
+		timeTracker.computeFinalTimeIntervals();
+
+		eventWriter.closeFile();
+		
+		double endTime = 39600;
+		
+		String separator = ";";
+		String line = null;
+		
+		Map<String, Integer> idxFromKey = new ConcurrentHashMap<String, Integer>();
+		BufferedReader br;
+
+		// #################################
+		// test emissions per link and time
+		// #################################
+
+		line = null;
+		
+		String pathToEmissionsFile = runDirectory + "analysis_it.0/emissions/emission_" + Double.toString(endTime) + ".csv";
+		
+		Map<Id<Link>, Double> emissionsPerLink = new HashMap<Id<Link>, Double>();
+		idxFromKey = new ConcurrentHashMap<String, Integer>();
+		
+		br = IOUtils.getBufferedReader(pathToEmissionsFile);
+		
+		try {
+			
+			line = br.readLine();
+			String[] keys = line.split(separator);
+			for(int i = 0; i < keys.length; i++){
+				idxFromKey.put(keys[i], i);
+			}
+			
+			int idxLinkId = idxFromKey.get("Link Id");
+			int idxNoiseEmission = idxFromKey.get("Noise Emission " + Time.writeTime(endTime, Time.TIMEFORMAT_HHMMSS));
+			
+			while((line = br.readLine()) != null){
+				
+				keys = line.split(separator);
+				emissionsPerLink.put(Id.create(keys[idxLinkId], Link.class), Double.parseDouble(keys[idxNoiseEmission]));
+				
+			}
+		
+			Assert.assertEquals("Wrong amount of emission!", 56.4418948379387, emissionsPerLink.get(Id.create("link2", Link.class)), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong amount of emission!", 77.3994680630406, emissionsPerLink.get(Id.create("linkA5", Link.class)), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong amount of emission!", 0., emissionsPerLink.get(Id.create("link4", Link.class)), MatsimTestUtils.EPSILON);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	 }
 	
 	// tests the static methods within class "noiseEquations"
@@ -1193,37 +1342,5 @@ public class NoiseTest {
 		Assert.assertEquals("Error in damage calculation!", expectedCostsEvening, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 19.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, costsNight, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Error in damage calculation!", expectedCostsNight, NoiseEquations.calculateDamageCosts(resultingNoiseImmission, nPersons, 23.*3600, annualCostRate, 3600.), MatsimTestUtils.EPSILON);	
-	}
-	
-	@Ignore
-	@Test
-	public final void test4(){
-		
-		// start a noise internalization run
-		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config4.xml";
-		
-		NoiseParameters noiseParameters = new NoiseParameters();
-		GridParameters gridParameters = new GridParameters();
-		
-		Controler controler = new Controler(configFile);
-
-		NoiseContext noiseContext = new NoiseContext(controler.getScenario(), gridParameters, noiseParameters);
-		
-		final TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(noiseContext);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-			}
-		});
-
-		controler.addControlerListener(new NoiseCalculationOnline(noiseContext));
-
-		controler.addOverridingModule(new OTFVisModule());
-		controler.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
-		controler.run();
-		
-		// and test i.e. the routing relevant information... TODO
-	}
+	}	
 }

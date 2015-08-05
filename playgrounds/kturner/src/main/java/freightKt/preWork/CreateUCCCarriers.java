@@ -74,7 +74,8 @@ import com.vividsolutions.jts.geom.LineString;
 
 class CreateUCCCarriers {
 
-	/**
+	/*
+	 * !!!ACHTUNG: MEthoden sind veraltet: siehe stattdessen; freigtKt.UccCarrierCreator
 	 * @author: Kturner
 	 * Ziele:
 	 *  1.) Analyse der Carrier aus dem Schroeder/Liedtke-Berlin-Szenario.

@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.Person;
 /**
  * @author dgrether
  * @author tthunig
+ * test
  *
  */
 public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
@@ -69,8 +70,8 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
 			Double earliestLinkExitTime = this.earliestLinkExitTimeByPerson.remove(event.getPersonId());
 			if (earliestLinkExitTime != null) {
+				// add the number of seconds the agent is later as the earliest link exit time as delay
 				this.totalDelay += event.getTime() - earliestLinkExitTime;
-//				creates 1 second delay per link because of matsims step logik (?!) TODO test and fix. Theresa, Jul'2015
 			}
 		}
 	}
@@ -80,9 +81,9 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
 			Link link = this.network.getLinks().get(event.getLinkId());
 			double freespeedTT = link.getLength()/link.getFreespeed();
-			// idea to fix (see above):
-//			double matsimFreespeedTT = Math.floor(freespeedTT + 1);
-			this.earliestLinkExitTimeByPerson.put(event.getPersonId(), event.getTime() + freespeedTT);
+			// this is the earliest time where matsim sets the agent to the next link
+			double matsimFreespeedTT = Math.floor(freespeedTT + 1);
+			this.earliestLinkExitTimeByPerson.put(event.getPersonId(), event.getTime() + matsimFreespeedTT);
 		}
 	}
 
@@ -90,7 +91,7 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 	public void handleEvent(PersonStuckEvent event) {
 		this.earliestLinkExitTimeByPerson.remove(event.getPersonId());
 		log.warn("Agent " + event.getPersonId() + " got stucked at link "
-				+ event.getLinkId() + ". His delay is not considered in the total delay.");
+				+ event.getLinkId() + ". His delay at this link is not considered in the total delay.");
 	}
 
 	@Override
@@ -106,7 +107,8 @@ public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (this.network.getLinks().containsKey(event.getLinkId())){
-			this.earliestLinkExitTimeByPerson.put(event.getPersonId(), event.getTime());
+			// for the first link every agent needs one second
+			this.earliestLinkExitTimeByPerson.put(event.getPersonId(), event.getTime() + 1);
 		}
 	}
 

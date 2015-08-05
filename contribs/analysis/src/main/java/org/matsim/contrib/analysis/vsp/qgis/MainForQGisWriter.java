@@ -74,6 +74,9 @@ public class MainForQGisWriter {
 		Double upperBound = 7.;
 		Integer range = 9;
 		int symbolSize = 1010;
+		int cellSize = 1000;
+		int populationThreshold = (int) (200 / (1000/cellSize * 1000/cellSize));
+		
 		writer.setExtent(extent);
 		
 		//example for adding a raster layer
@@ -86,7 +89,7 @@ public class MainForQGisWriter {
 				QGisConstants.geometryType.Point);
 		densityLayer.setXField(1);
 		densityLayer.setYField(2);
-		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer);
+		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer, populationThreshold, symbolSize);
 		dRenderer.setRenderingAttribute(8);
 		writer.addLayer(densityLayer);
 		

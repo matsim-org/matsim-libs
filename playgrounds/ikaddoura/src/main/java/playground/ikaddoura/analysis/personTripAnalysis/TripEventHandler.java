@@ -80,8 +80,8 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 	private List<Id<Person>> ptDrivers = new ArrayList<Id<Person>>();
 	private Scenario scenario;
 	
-	private double distance = 2000.; // TODO: set dynamically!
-	private double maxDistance = 20 * distance; // TODO: set dynamically!
+	private double distance = 1000.; // TODO: set dynamically!
+	private double maxDistance = 100 * distance; // TODO: set dynamically!
 	private double timeBinSize = 3600.0; // TODO: set dynamically!
 	
 	public TripEventHandler(Scenario scenario) {

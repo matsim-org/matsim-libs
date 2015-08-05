@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE roadpricing SYSTEM "http://www.matsim.org/files/dtd/roadpricing_v1.dtd">
+
+<roadpricing type="area" name="LEZ">
+
+        <description>Defines the LowEmissionZone </description>
+
+        <links>
+                <link id="i(4,4)R" />
+				<link id="i(5,4)R" />
+				<link id="i(6,4)R" />
+				<link id="i(7,4)R" />
+				<link id="i(4,5)" />
+				<link id="i(5,5)" />
+				<link id="i(6,5)" />
+				<link id="i(7,5)" />
+				<link id="i(4,6)R" />
+				<link id="i(5,6)R" />
+                <link id="i(6,6)R" />
+				<link id="i(7,6)R" />
+				<link id="j(4,4)R" />
+				<link id="j(4,5)R" />
+				<link id="j(4,6)R" />
+				<link id="j(4,7)R" />
+				<link id="j(5,4)" />
+				<link id="j(5,5)" />
+				<link id="j(5,6)" />
+				<link id="j(5,7)" />
+				<link id="j(6,4)R" />
+				<link id="j(6,5)R" />
+				<link id="j(6,6)R" />
+				<link id="j(6,7)R" />
+        </links>
+
+        <!-- amount: [monetary unit] / [traveling across a tolled link.] -->
+        <cost amount="0.00" />
+
+
+</roadpricing>
+ 

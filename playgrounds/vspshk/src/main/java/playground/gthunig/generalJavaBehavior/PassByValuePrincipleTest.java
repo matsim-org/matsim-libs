@@ -1,4 +1,4 @@
-package playground.gthunig.generalJavaBehaviorTests;
+package playground.gthunig.generalJavaBehavior;
 
 import org.junit.Test;
 

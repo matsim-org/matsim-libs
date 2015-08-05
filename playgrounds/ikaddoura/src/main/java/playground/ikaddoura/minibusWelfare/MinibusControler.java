@@ -54,7 +54,7 @@ public class MinibusControler {
 		Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setCreateGraphs(true);
 		controler.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
+				OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		PModule builder = new PModule() ;
 		builder.configureControler(controler);

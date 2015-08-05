@@ -19,9 +19,10 @@ public class CalculateCompositeAccessibility {
 	
 
 	public static void main(String[] args) {
-		String directoryRoot = "../../accessibility-sa/data/01/";
+		String directoryRoot = "../../accessibility-sa/data/18/";
 		String[] activityTypes = {"s", "l", "t", "e"};
 		boolean includeDensityLayer = true;
+		double cellSize = 200.;
 		
 		// create maps
 		Map<String,Map<Modes4Accessibility,SpatialGrid>> accessibilityGrids = 
@@ -110,7 +111,7 @@ public class CalculateCompositeAccessibility {
 		System.out.println("minX = " + minX + " -- maxX = " + maxX + " -- minY = " + minY + " -- maxY = " + maxY);
 	
 		
-		double cellSize = 1000.;
+		
 		
 		
 		// create spatial grids

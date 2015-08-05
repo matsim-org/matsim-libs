@@ -142,11 +142,11 @@ public class GridParameters {
 		this.consideredActivitiesForReceiverPointGrid = consideredActivitiesForReceiverPointGrid;
 	}
 	
-	public String[] getConsideredActivitiesForDamages() {		
+	public String[] getConsideredActivitiesForSpatialFunctionality() {		
 		return consideredActivitiesForSpatialFunctionality;
 	}
 
-	public void setConsideredActivitiesForDamages(String[] consideredActivities) {
+	public void setConsideredActivitiesForSpatialFunctionality(String[] consideredActivities) {
 		log.info("Setting considered activities to: ");
 		for (int i = 0; i < consideredActivities.length; i++) {
 			log.info(consideredActivities[i]);

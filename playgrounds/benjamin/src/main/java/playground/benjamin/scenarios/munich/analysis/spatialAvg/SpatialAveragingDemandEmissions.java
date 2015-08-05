@@ -46,15 +46,16 @@ import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveraging
 public class SpatialAveragingDemandEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDemandEmissions.class);
 
-	private String baseCase = "exposureInternalization"; // exposureInternalization, latsis, 981
+	private String baseCase = "manteuffel";
 	/*
 	 * When 'base' is used no comparison to a policy case is calculated.
 	 */
-	private String compareCase = "zone30"; // base, zone30, pricing, exposurePricing, 983
+	private String compareCase = "p4";
 	
 	final int noOfTimeBins = 1;
 	
 	final String pollutant2analyze = WarmPollutant.NOX.toString();
+//	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
 	
@@ -62,7 +63,7 @@ public class SpatialAveragingDemandEmissions {
 	 * is to use the "pointMethod", i.e. mapping emissions to the center
 	 * of each link.
 	 */
-	final boolean useLineMethod = false;
+	final boolean useLineMethod = true;
 	private boolean useCellMethod = false;
 
 	private SpatialAveragingParameters parameter;
@@ -77,49 +78,35 @@ public class SpatialAveragingDemandEmissions {
 	private SpatialAveragingInputData inputData;
 	
 	private void run() throws IOException{
-		
 		inputData = new SpatialAveragingInputData(baseCase, compareCase);
 		parameter = new SpatialAveragingParameters();
-		
 		if(useLineMethod){
 			linkWeightUtil = new LinkLineWeightUtil(inputData, parameter);
 		}else{
 			linkWeightUtil = new LinkPointWeightUtil(inputData, parameter);
 		}
-
 		this.saWriter = new SpatialAveragingWriter(inputData, parameter);
-		
 		this.simulationEndTime = inputData.getEndTime();
-		
 		this.network = loadNetwork(inputData.getNetworkFile());		
-		
 		runBaseCase();
-		
 		if(!(compareCase.equals("base"))){
 			runCompareCase(inputData.getEmissionFileForCompareCase());
 		}
-		
 		logger.info("Done with spatial averaging.");
 	}
 	
 	private void runBaseCase() throws IOException{
-
 		outPathStub = inputData.getAnalysisOutPathForBaseCase();
-		
 		parseEmissionFile(inputData.getEmissionFileForBaseCase());
-		
 		Map<Integer, Map<Id<Link>, EmissionsAndVehicleKm>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
-		
 		timeInterval2GridBaseCase= new SpatialGrid[noOfTimeBins];
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
 			logger.info("Calculating grid values for time interval " + (timeInterval+1) + " of " + noOfTimeBins + " time intervals.");
 			SpatialGrid sGrid = new SpatialGrid(inputData, parameter.getNoOfXbins(), parameter.getNoOfYbins());
-			
 			if(useCellMethod){
 				linkWeightUtil = new CellWeightUtil((Collection<Link>) network.getLinks().values(), sGrid);
 			}
-			
 			for(Id<Link> linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
@@ -137,12 +124,9 @@ public class SpatialAveragingDemandEmissions {
 		}
 	
 	private void runCompareCase(String emissionFile) throws IOException{
-	
 		logger.info("Starting with compare case.");
 		outPathStub = inputData.getAnalysisOutPathForSpatialComparison();
-		
 		parseEmissionFile(inputData.getEmissionFileForCompareCase());
-		
 		Map<Integer, Map<Id<Link>, EmissionsAndVehicleKm>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
@@ -175,9 +159,11 @@ public class SpatialAveragingDemandEmissions {
 			throws IOException {
 		if(writeRoutput){
 			logger.info("Starting to write R output.");
-			this.saWriter.writeRoutput(sGrid.getWeightedValuesOfGrid(), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
-			this.saWriter.writeRoutput(sGrid.getWeightsOfGrid(), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
-			this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
+//			this.saWriter.writeRoutput(sGrid.getWeightedValuesOfGrid(), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
+//			this.saWriter.writeRoutput(sGrid.getWeightedValuesOfGrid(), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + "21600-32400.0" + ".txt");
+			this.saWriter.writeRoutput(sGrid.getWeightedValuesOfGrid(), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + "57600-68400.0" + ".txt");
+//			this.saWriter.writeRoutput(sGrid.getWeightsOfGrid(), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
+//			this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
 			}
 		if(writeGisOutput){
 			this.saWriter.writeGISoutput(sGrid.getWeightedValuesOfGrid(), outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp", endOfTimeInterval);

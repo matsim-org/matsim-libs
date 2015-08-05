@@ -20,8 +20,9 @@
 package playground.ikaddoura.noise2;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -30,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -37,8 +39,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.noise2.data.GridParameters;
 import playground.ikaddoura.noise2.data.NoiseContext;
+import playground.ikaddoura.noise2.handler.LinkSpeedCalculation;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
+import playground.ikaddoura.noise2.utils.ProcessNoiseImmissions;
 
 /**
  * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
@@ -50,6 +54,7 @@ import playground.ikaddoura.noise2.handler.PersonActivityTracker;
 public class NoiseCalculationOffline {
 	private static final Logger log = Logger.getLogger(NoiseCalculationOffline.class);
 	
+	private static String runId;
 	private static String runDirectory;
 	private static String outputDirectory;
 	private static int lastIteration;
@@ -58,7 +63,7 @@ public class NoiseCalculationOffline {
 	public static void main(String[] args) {
 		
 		if (args.length > 0) {
-			
+						
 			runDirectory = args[0];		
 			log.info("run directory: " + runDirectory);
 			
@@ -70,18 +75,24 @@ public class NoiseCalculationOffline {
 			
 			receiverPointGap = Double.valueOf(args[3]);		
 			log.info("Receiver point gap: " + receiverPointGap);
+
+			throw new RuntimeException("Not yet implemented. Aborting...");
+
 			
 		} else {
 			
-			runDirectory = "/Users/ihab/Desktop/ils4/kaddoura/bln4/output/baseCase/";
-			lastIteration = 100;
-			outputDirectory = "/Users/ihab/Desktop/ils4/kaddoura/bln4/output/baseCase/noise_analysis_2/";
-			receiverPointGap = 100.;
-			
-//			runDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
-//			lastIteration = 5;
-//			outputDirectory = "../../shared-svn/studies/ihab/noiseTestScenario/output/";
+//			runId = "bvg.run190.25pct.dilution001.network20150727.v2.static";
+//			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.I";
+//			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.II";
+//			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.III";
+			runId = "bvg.run190.25pct.dilution001.network.20150731.LP2.IV";
+
+			runDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/input/" + runId + "/";
+			outputDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/" + runId + "/";
+//			outputDirectory = "/Users/ihab/Documents/VSP/@Projects/Manteuffelstrasse/output/" + runId + "_populationUnits_250_home_education/";
+			receiverPointGap = 10.;
 //			receiverPointGap = 250.;
+			lastIteration = 30;
 		}
 		
 		NoiseCalculationOffline noiseCalculation = new NoiseCalculationOffline();
@@ -89,10 +100,17 @@ public class NoiseCalculationOffline {
 	}
 
 	private void run() {
+		
+		OutputDirectoryLogging.catchLogEntries();
+		try {
+			OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(runDirectory + "output_network.xml.gz");
-		config.plans().setInputFile(runDirectory + "output_plans.xml.gz");
+		config.network().setInputFile(runDirectory + runId + ".output_network.xml.gz");
+		config.plans().setInputFile(runDirectory + runId + ".output_plans.xml.gz");
 		config.controler().setOutputDirectory(runDirectory);
 		config.controler().setLastIteration(lastIteration);
 		
@@ -101,40 +119,70 @@ public class NoiseCalculationOffline {
 		GridParameters gridParameters = new GridParameters();
 		gridParameters.setReceiverPointGap(receiverPointGap);
 		
-//		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
+		// Berlin Coordinates: Area around the city center of Berlin (Tiergarten)
 //		double xMin = 4590855.;
 //		double yMin = 5819679.;
 //		double xMax = 4594202.;
 //		double yMax = 5821736.;
 		
-//      // Berlin Coordinates: Area of Berlin
+//		// Berlin Coordinates: Area around the Tempelhofer Feld 4591900,5813265 : 4600279,5818768
+//		double xMin = 4591900.;
+//		double yMin = 5813265.;
+//		double xMax = 4600279.;
+//		double yMax = 5818768.;
+				
+      // Berlin Coordinates: Area of Berlin
 //		double xMin = 4573258.;
 //		double yMin = 5801225.;
 //		double xMax = 4620323.;
 //		double yMax = 5839639.;
-//		
-//		gridParameters.setReceiverPointsGridMinX(xMin);
-//		gridParameters.setReceiverPointsGridMinY(yMin);
-//		gridParameters.setReceiverPointsGridMaxX(xMax);
-//		gridParameters.setReceiverPointsGridMaxY(yMax);
 		
-		// Berlin Activity Types
+		// Berlin Coordinates: Manteuffelstrasse
+		double xMin = 4595288.82;
+		double yMin = 5817859.97;
+		double xMax = 4598267.52;
+		double yMax = 5820953.98;	
+		
+		gridParameters.setReceiverPointsGridMinX(xMin);
+		gridParameters.setReceiverPointsGridMinY(yMin);
+		gridParameters.setReceiverPointsGridMaxX(xMax);
+		gridParameters.setReceiverPointsGridMaxY(yMax);
+		
+//		 Berlin Activity Types
 //		String[] consideredActivitiesForDamages = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		String[] consideredActivitiesForDamages = {"home"};
-		gridParameters.setConsideredActivitiesForDamages(consideredActivitiesForDamages);
+//		String[] consideredActivitiesForDamages = {"home"};
+//		String[] consideredActivitiesForDamages = {"work"};
+//		String[] consideredActivitiesForDamages = {"educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		String[] consideredActivitiesForDamages = {"leisure"};
+//		String[] consideredActivitiesForDamages = {"home", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		gridParameters.setConsideredActivitiesForSpatialFunctionality(consideredActivitiesForDamages);
 		
-		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
-		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
+//		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga"};
+//		String[] consideredActivitiesForReceiverPointGrid = {"home", "work", "educ_primary", "educ_secondary", "educ_higher", "kiga", "leisure"};
+//		gridParameters.setConsideredActivitiesForReceiverPointGrid(consideredActivitiesForReceiverPointGrid);
 		
 		// ################################
 		
 		NoiseParameters noiseParameters = new NoiseParameters();
-		noiseParameters.setScaleFactor(10.);
+		noiseParameters.setUseActualSpeedLevel(false);
+		noiseParameters.setScaleFactor(4.);
+		noiseParameters.setComputePopulationUnits(false);
+		noiseParameters.setComputeNoiseDamages(false);
 		noiseParameters.setInternalizeNoiseDamages(false);
 		noiseParameters.setComputeCausingAgents(false);
+		noiseParameters.setThrowNoiseEventsAffected(false);
+		noiseParameters.setThrowNoiseEventsCaused(false);
+		
+		Set<String> hgvIdPrefixes = new HashSet<String>();
+		hgvIdPrefixes.add("lkw");
+		noiseParameters.setHgvIdPrefixes(hgvIdPrefixes);
+		
+		Set<String> busIdPrefixes = new HashSet<String>();
+		busIdPrefixes.add("-B-");
+		noiseParameters.setBusIdPrefixes(busIdPrefixes);
 		
 //		 Berlin Tunnel Link IDs
-		List<Id<Link>> tunnelLinkIDs = new ArrayList<Id<Link>>();
+		Set<Id<Link>> tunnelLinkIDs = new HashSet<Id<Link>>();
 		tunnelLinkIDs.add(Id.create("108041", Link.class));
 		tunnelLinkIDs.add(Id.create("108142", Link.class));
 		tunnelLinkIDs.add(Id.create("108970", Link.class));
@@ -186,31 +234,47 @@ public class NoiseCalculationOffline {
 		String outputFilePath = outputDirectory + "analysis_it." + config.controler().getLastIteration() + "/";
 		File file = new File(outputFilePath);
 		file.mkdirs();
-		
-		EventsManager events = EventsUtils.createEventsManager();
-		
-		EventWriterXML eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
-		events.addHandler(eventWriter);
-			
+					
 		NoiseContext noiseContext = new NoiseContext(scenario, gridParameters, noiseParameters);
 		noiseContext.initialize();
 		NoiseWriter.writeReceiverPoints(noiseContext, outputFilePath + "/receiverPoints/");
 				
+		EventsManager events = EventsUtils.createEventsManager();
+
 		NoiseTimeTracker timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
 		events.addHandler(timeTracker);
 		
-		PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
-		events.addHandler(actTracker);
+		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
+			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation(noiseContext);
+			events.addHandler(linkSpeedCalculator);	
+		}
+		
+		EventWriterXML eventWriter = null;
+		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
+			eventWriter = new EventWriterXML(outputFilePath + config.controler().getLastIteration() + ".events_NoiseImmission_Offline.xml.gz");
+			events.addHandler(eventWriter);	
+		}
+		
+		if (noiseContext.getNoiseParams().isComputePopulationUnits()) {
+			PersonActivityTracker actTracker = new PersonActivityTracker(noiseContext);
+			events.addHandler(actTracker);
+		}
 		
 		log.info("Reading events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + config.controler().getLastIteration() + ".events.xml.gz");
+		reader.readFile(runDirectory + "ITERS/it." + config.controler().getLastIteration() + "/" + runId + "." + config.controler().getLastIteration() + ".events.xml.gz");
 		log.info("Reading events file... Done.");
 		
 		timeTracker.computeFinalTimeIntervals();
 
-		eventWriter.closeFile();
+		if (noiseContext.getNoiseParams().isThrowNoiseEventsAffected() || noiseContext.getNoiseParams().isThrowNoiseEventsCaused()) {
+			eventWriter.closeFile();
+		}
 		log.info("Noise calculation completed.");
+		
+		log.info("Processing the noise immissions...");
+		ProcessNoiseImmissions process = new ProcessNoiseImmissions(outputFilePath + "immissions/", outputFilePath + "receiverPoints/receiverPoints.csv");
+		process.run();
 	}
 }
 		

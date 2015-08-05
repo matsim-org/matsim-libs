@@ -32,6 +32,7 @@ import org.matsim.core.controler.listener.StartupListener;
 
 import playground.ikaddoura.noise2.data.NoiseContext;
 import playground.ikaddoura.noise2.data.NoiseReceiverPoint;
+import playground.ikaddoura.noise2.handler.LinkSpeedCalculation;
 import playground.ikaddoura.noise2.handler.NoisePricingHandler;
 import playground.ikaddoura.noise2.handler.NoiseTimeTracker;
 import playground.ikaddoura.noise2.handler.PersonActivityTracker;
@@ -67,7 +68,12 @@ public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsim
 		this.timeTracker = new NoiseTimeTracker(noiseContext, event.getControler().getEvents(), event.getControler().getConfig().controler().getOutputDirectory() + "/ITERS/");			
 		event.getControler().getEvents().addHandler(this.timeTracker);
 	
-		if (this.noiseContext.getNoiseParams().isComputeNoiseDamages()) {
+		if (this.noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
+			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation(noiseContext);
+			event.getControler().getEvents().addHandler(linkSpeedCalculator);	
+		}
+		
+		if (this.noiseContext.getNoiseParams().isComputePopulationUnits()) {
 			this.actTracker = new PersonActivityTracker(noiseContext);
 			event.getControler().getEvents().addHandler(this.actTracker);
 		}

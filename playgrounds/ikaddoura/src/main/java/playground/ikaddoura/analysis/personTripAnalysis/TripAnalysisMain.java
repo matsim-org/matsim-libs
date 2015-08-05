@@ -33,6 +33,7 @@ public class TripAnalysisMain {
 	private static final Logger log = Logger.getLogger(TripAnalysisMain.class);
 
 	private static String runDirectory;
+	private static int iteration;
 	
 	public static void main(String[] args) {
 		
@@ -40,8 +41,12 @@ public class TripAnalysisMain {
 			runDirectory = args[0];		
 			log.info("run directory: " + runDirectory);
 			
+			iteration = Integer.valueOf(args[1]);		
+			log.info("iteration number: " + iteration);
+			
 		} else {
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise/output/noise_int_1a/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/berlin_internalization_noise_averageVSmarginal/output/int_1_averageCost/";
+			iteration = 0;
 		}
 		
 		TripAnalysisMain analysis = new TripAnalysisMain();
@@ -50,12 +55,11 @@ public class TripAnalysisMain {
 
 	private void run() {
 		
-		String configFile = runDirectory + "output_config.xml.gz";
 		String populationFile = null;
 //		String populationFile = runDirectory + "output_plans.xml.gz";
 		String networkFile = runDirectory + "output_network.xml.gz";
 		
-		Config config = ConfigUtils.loadConfig(configFile);		
+		Config config = ConfigUtils.createConfig();		
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
 		
@@ -65,7 +69,6 @@ public class TripAnalysisMain {
 		TripEventHandler tripHandler = new TripEventHandler(scenario);
 		events.addHandler(tripHandler);
 				
-		int iteration = config.controler().getLastIteration();
 		String eventsFile = runDirectory + "ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
 		
 		log.info("Reading the event file...");
@@ -73,7 +76,7 @@ public class TripAnalysisMain {
 		reader.readFile(eventsFile);
 		log.info("Reading the event file... Done.");
 				
-		TripWriter tripWriter = new TripWriter(tripHandler, runDirectory);
+		TripWriter tripWriter = new TripWriter(tripHandler, runDirectory + "analysis.it." + iteration + "/");
 		tripWriter.writeDetailedResults(TransportMode.car);
 		tripWriter.writeAvgTollPerDistance(TransportMode.car);
 		tripWriter.writeAvgTollPerTimeBin(TransportMode.car);

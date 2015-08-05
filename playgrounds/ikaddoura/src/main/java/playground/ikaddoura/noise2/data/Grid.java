@@ -76,7 +76,7 @@ public class Grid {
 		this.gridParams = gridParams;
 		this.receiverPoints = new HashMap<Id<ReceiverPoint>, ReceiverPoint>();
 		
-		String[] consideredActTypesForDamagesArray = gridParams.getConsideredActivitiesForDamages();
+		String[] consideredActTypesForDamagesArray = gridParams.getConsideredActivitiesForSpatialFunctionality();
 		for (int i = 0; i < consideredActTypesForDamagesArray.length; i++) {
 			this.consideredActivitiesForSpatialFunctionality.add(consideredActTypesForDamagesArray[i]);
 		}

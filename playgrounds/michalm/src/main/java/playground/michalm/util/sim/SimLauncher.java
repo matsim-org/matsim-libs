@@ -27,7 +27,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class SimLauncher
 {
-    @SuppressWarnings("deprecation")
     public static void main(String[] args)
     {
         String dir;
