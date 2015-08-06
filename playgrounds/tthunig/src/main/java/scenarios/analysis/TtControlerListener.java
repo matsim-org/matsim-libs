@@ -1,4 +1,4 @@
-package scenarios.braess.analysis;
+package scenarios.analysis;
 
 import java.io.File;
 
@@ -9,15 +9,21 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
 /**
+ * Class to bind the analyze tool (given in the constructor) and the writing
+ * tool to the simulation. It works for all analyze tools that extend the
+ * abstract analyze tool TtAbstractAnalyzeTool.
+ * 
  * @author tthunig
  */
-public class TtBraessControlerListener implements StartupListener, IterationEndsListener {
+public class TtControlerListener implements StartupListener, IterationEndsListener {
 
 	Scenario scenario;
-	TtBraessResultsWriter writer;
+	TtAbstractAnalysisTool handler;
+	TtAnalyzedResultsWriter writer;
 	
-	public TtBraessControlerListener(Scenario scenario) {
+	public TtControlerListener(Scenario scenario, TtAbstractAnalysisTool handler) {
 		this.scenario = scenario;
+		this.handler = handler;
 	}
 
 	@Override
@@ -34,13 +40,12 @@ public class TtBraessControlerListener implements StartupListener, IterationEnds
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		// add the analysis tool as events handler to the events manager
-		TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
 		event.getControler().getEvents().addHandler(handler);
 		
 		// prepare the results writer
 		String outputDir = scenario.getConfig().controler().getOutputDirectory() + "analysis/";
 		new File(outputDir).mkdir();
-		this.writer = new TtBraessResultsWriter(handler, outputDir);
+		this.writer = new TtAnalyzedResultsWriter(handler, outputDir);
 	}
 
 }
