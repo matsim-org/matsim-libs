@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,23 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.jbischoff.taxibus.run;
 
-package playground.jbischoff.bussharing.passenger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.jbischoff.taxibus.passenger.TaxibusPassengerOrderManager;
+import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
+import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
+
 /**
- * @author  jbischoff
+ * @author jbischoff
  *
  */
-import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerEngine;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.core.api.experimental.events.EventsManager;
+public class RunConfigSth {
 
-public class SBPassengerEngine extends PassengerEngine {
-
-	public SBPassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
-			VrpOptimizer optimizer, MatsimVrpContext context) {
-		super(mode, eventsManager, requestCreator, optimizer, context);
+	public static void main(String[] args) {
+		
+		Config config = ConfigUtils.loadConfig("../../matsim/examples/equil/config.xml");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
+	
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scenario);
+		
+		controler.run();
 	}
-//pre booking at activity end time!
 }
