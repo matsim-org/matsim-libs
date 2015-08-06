@@ -17,48 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.jbischoff.bussharing.network;
+package playground.jbischoff.taxibus.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.OsmNetworkReader;
+
+import playground.jbischoff.taxibus.run.configuration.ConfigBasedTaxibusLaunchUtils;
+import playground.jbischoff.taxibus.run.configuration.TaxibusConfigGroup;
 
 /**
  * @author jbischoff
  *
  */
-public class WOBBSNetworkGenerator {
+public class RunConfigBasedExample {
 
-	
 	public static void main(String[] args) {
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		String dir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/scenario/network/generation/";
-		String epsg = "EPSG:25832";
-		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, epsg);
-		OsmNetworkReader onr = new OsmNetworkReader(scenario.getNetwork(), ct, true);
 		
-		// all big roads
-		onr.setHierarchyLayer(53.0098, 9.6158, 52.0542, 11.9064, 4);
-		
-		//Wolfsburg-BS-Helmstedt-Gifhorn, incl. secondary roads
-		onr.setHierarchyLayer(52.5313,10.3848,52.1436,11.1346, 5);
-		
-		//everything:
-		//Braunschweig
-		onr.setHierarchyLayer(52.3664,10.4315,52.2139,10.6100,6);
+		Config config = ConfigUtils.loadConfig("C:/Users/Joschka/Documents/shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/test/one_taxi/taxiconfig.xml", new TaxibusConfigGroup());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 	
-		//Wolfsburg+Gifhorn
-		onr.setHierarchyLayer(52.5346, 10.4610, 52.3664, 10.8984, 6);
-		
-		onr.parse(dir+"complete_area.osm");
-		
-		new NetworkWriter(scenario.getNetwork()).write(dir+"network.xml");
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		
-		
+		Controler controler = new Controler(scenario);
+		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
+		controler.run();
 	}
 }

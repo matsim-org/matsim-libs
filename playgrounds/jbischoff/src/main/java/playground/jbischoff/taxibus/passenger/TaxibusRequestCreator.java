@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.passenger;
-
-import java.util.*;
+package playground.jbischoff.taxibus.passenger;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.passenger.PassengerRequest;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+
+import playground.michalm.taxi.data.TaxiRequest;
 
 
-public class AwaitingPickupStorage
+public class TaxibusRequestCreator
+    implements PassengerRequestCreator
 {
-    //passenger's request id -> driver's stay task
-    private final Map<Id<Request>, PassengerPickupActivity> awaitingPickups = new HashMap<>();
-
-
-    public void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity)
+    @Override
+    public PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink,
+            Link toLink, double t0, double t1, double now)
     {
-        awaitingPickups.put(request.getId(), pickupActivity);
-    }
-
-
-    public PassengerPickupActivity retrieveAwaitingPickup(PassengerRequest request)
-    {
-        return awaitingPickups.remove(request.getId());
+        return new TaxiRequest(id, passenger, fromLink, toLink, t0, now);
     }
 }
