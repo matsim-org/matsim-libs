@@ -25,12 +25,18 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -38,10 +44,14 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.MatsimFacilitiesReader;
 
+import playground.southafrica.projects.complexNetworks.pathDependence.DigicorePathDependentNetworkReader_v2;
+import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork;
+import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork.PathDependentNode;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
@@ -62,7 +72,9 @@ public class FacilityMatcher {
 		String facilitiesFile = args[0];
 		String producerFile = args[1];
 		String processorFile = args[2];
-		String output = args[3];
+		String network = args[3];
+		String output = args[4];
+		String outputRange = args[5];
 		
 		/* Clear the output file. */
 		File file = new File(output);
@@ -88,15 +100,64 @@ public class FacilityMatcher {
 		}
 		
 		FacilityMatcher fm = new FacilityMatcher();
-		QuadTree<ActivityFacility> qtFacilities = fm.buildFacilitiesQT(facilitiesFile);
+		
+		/* Parse the facilities resulting from clustering. */
+		ActivityFacilities facilities = fm.parseFacilities(facilitiesFile);
+
+		/* Match the facilities with the nodes in the network. */
+		DigicorePathDependentNetworkReader_v2 nr = new DigicorePathDependentNetworkReader_v2();
+		nr.parse(network);
+		PathDependentNetwork pdn = nr.getPathDependentNetwork();
+		pdn.writeNetworkStatisticsToConsole();
+		ActivityFacilities matchedFacilities = fm.matchFacilitiesWithNetworkNodes(facilities, pdn);
+		
+		QuadTree<ActivityFacility> qtFacilities = fm.buildFacilitiesQT(matchedFacilities);
+		
+		/* Perform basic range analyses. */
 		fm.matchRange(producerFile, 6, 5, 2, 1, qtFacilities, output);
 		fm.matchRange(processorFile, 5, 4, 1, 2, qtFacilities, output);
+		
+		/* Evaluate the network reach, in stages. */
+		double rangeThreshold = 50.0;
+		fm.evaluateNetworkReach(qtFacilities, pdn, producerFile, rangeThreshold, 6, 5, 2, outputRange);
+		
 		
 		Header.printFooter();
 	}
 	
 	public FacilityMatcher() {
 
+	}
+	
+	public ActivityFacilities matchFacilitiesWithNetworkNodes(ActivityFacilities facilities, PathDependentNetwork network){
+		log.info("Matching the facilities with the nodes in the network...");
+		log.info("          Facilities file: " + facilities.getName());
+		log.info("   Path-dependent network: " + network.getDescription());
+		
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		for(Id<ActivityFacility> id : facilities.getFacilities().keySet()){
+			boolean isNodeInNetwork = network.getPathDependentNodes().containsKey(Id.create(id.toString(), Node.class));
+			if(isNodeInNetwork){
+				sc.getActivityFacilities().addActivityFacility(facilities.getFacilities().get(id));
+			}
+		}
+		
+		log.info("Done matching.");
+		log.info("----------------------------------------------");
+		log.info("         Number of facilities: " + facilities.getFacilities().size());
+		log.info("     Number of nodes matching: " + sc.getActivityFacilities().getFacilities().size());
+		log.info("----------------------------------------------");
+		
+		return sc.getActivityFacilities();
+	}
+	
+	
+	public ActivityFacilities parseFacilities(String filename){
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimFacilitiesReader(scenario ).parse(filename);
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+		return facilities;
 	}
 	
 	
@@ -106,7 +167,7 @@ public class FacilityMatcher {
 	 * @param filename
 	 * @return
 	 */
-	public QuadTree<ActivityFacility> buildFacilitiesQT(String filename){
+	public QuadTree<ActivityFacility> buildFacilitiesQT(ActivityFacilities facilities){
 		log.info("Populating the QuadTree of facilities.");
 		/* Determine the extent of the facilities file. */
 		double minX = Double.POSITIVE_INFINITY;
@@ -114,9 +175,6 @@ public class FacilityMatcher {
 		double maxX = Double.NEGATIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
 		
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimFacilitiesReader(scenario ).parse(filename);
-		ActivityFacilities facilities = scenario.getActivityFacilities();
 		for(Id<ActivityFacility> id : facilities.getFacilities().keySet()){
 			ActivityFacility facility = facilities.getFacilities().get(id);
 			Coord c = facility.getCoord();
@@ -170,6 +228,13 @@ public class FacilityMatcher {
 				}
 				Coord cAlbers = ct.transform(cWgs);
 				
+				boolean oddCoord = false;
+				if(Math.abs(cWgs.getX()) > 90.0 || Math.abs(cWgs.getY()) > 90.0){
+					oddCoord = true;
+					log.debug("Why is there a coordinate out of range?!");
+					log.debug(String.format("    %s: (%.4f; %.4f)", sa[idField], cWgs.getX(), cWgs.getY()));
+				}
+				
 				Collection<ActivityFacility> within0050 = qt.get(cAlbers.getX(), cAlbers.getY(), 50.0);
 				Collection<ActivityFacility> within0100 = qt.get(cAlbers.getX(), cAlbers.getY(), 100.0);
 				Collection<ActivityFacility> within0250 = qt.get(cAlbers.getX(), cAlbers.getY(), 250.0);
@@ -213,6 +278,7 @@ public class FacilityMatcher {
 		
 		/* Report ranges. */
 		log.info("Total number of input locations: " + producers);
+		log.info("------------------------------------------");
 		log.info("   Facilities within...");
 		log.info("        50m: " + numberWithin0050);
 		log.info("       100m: " + (numberWithin0100 - numberWithin0050));
@@ -220,6 +286,109 @@ public class FacilityMatcher {
 		log.info("       500m: " + (numberWithin0500 - numberWithin0250));
 		log.info("      1000m: " + (numberWithin1000 - numberWithin0500));
 		log.info("     >1000m: " + (producers - numberWithin1000));
+		log.info("------------------------------------------");
+		log.info("Done evaluating facilities within range.");
+	}
+	
+	public void evaluateNetworkReach(QuadTree<ActivityFacility> qt, 
+			PathDependentNetwork network, String producers, 
+			double rangeThreshold, int xField, int yField, int idField,
+			String output){
+		log.info("Evaluating the network reach...");
+		
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
+		
+		Counter counter = new Counter("   producers # ");
+
+		BufferedReader br = IOUtils.getBufferedReader(producers);
+		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(output);
+		try{
+			String line = br.readLine(); // Header.
+			while((line = br.readLine()) != null){
+				String[] sa = line.split(",");
+				Coord cWgs = null;
+				try{
+					cWgs = new CoordImpl(Double.parseDouble(sa[xField]), Double.parseDouble(sa[yField]));
+				} catch(NumberFormatException ee){
+					log.debug("Ooops!!");
+				} catch(ArrayIndexOutOfBoundsException eee){
+					log.debug("Ooops!!");
+				}
+				Coord cAlbers = ct.transform(cWgs);
+				
+				Collection<ActivityFacility> withinRange = qt.get(cAlbers.getX(), cAlbers.getY(), rangeThreshold);
+				Iterator<ActivityFacility> iterator = withinRange.iterator();
+				List<String> outputStrings = new ArrayList<String>();
+				while(iterator.hasNext()){
+					ActivityFacility af = iterator.next();
+					Id<Node> thisNodeId = Id.createNodeId(af.getId().toString());
+					
+					/* Only check for facilities that do occur in the path-dependent network. */
+					if(network.getPathDependentNode(thisNodeId) != null){
+						
+						/* Check the first order range upstream. */
+						outputStrings.addAll(this.getUpstreamOutput(network, thisNodeId, 1));
+						
+						
+						/* Now write them all to file. */
+						for(String s : outputStrings){
+							bw.write(s);
+							bw.newLine();
+						}
+					}
+					
+					counter.incCounter();
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot read from " + producers);
+		} finally{
+			try {
+				br.close();
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + producers);
+			}
+		}
+		counter.printCounter();
+		
+		log.info("Done evaluating network reach.");
+	}
+	
+	private List<String> getUpstreamOutput(PathDependentNetwork network, Id<Node> nodeId, int level){
+		List<String> list = new ArrayList<String>();
+
+		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84_SA_Albers", "WGS84");
+		
+		Coord thisCoord = ct.transform(network.getPathDependentNode(nodeId).getCoord());
+
+		Iterator<Id<Node>> inIterator = network.getConnectedInNodeIds(nodeId).iterator();
+		while(inIterator.hasNext()){
+			Id<Node> inNodeId = inIterator.next();
+			PathDependentNode inNode = network.getPathDependentNode(inNodeId);
+			
+			/*FIXME Remove after debugging. */
+			if(inNode == null){
+				log.debug("Oops!! Null node!!");
+			}
+			
+			
+			
+			Coord inCoord = ct.transform(inNode.getCoord());
+			String sIn = String.format("%s,%.6f,%.6f,%s,%.6f,%.6f,%d", 
+					inNodeId.toString(),
+					inCoord.getX(),
+					inCoord.getY(),
+					nodeId.toString(),
+					thisCoord.getX(),
+					thisCoord.getY(),
+					level);
+			list.add(sIn);
+		}
+		
+		return list;
 	}
 
 }
