@@ -50,17 +50,11 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
@@ -69,20 +63,12 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheck
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.testcases.MatsimTestUtils;
@@ -100,11 +86,22 @@ import org.matsim.vehicles.VehicleUtils;
 public class CreateAutomatedFDTest {
 
 	static class MySimplifiedRoundAndRoundAgent implements MobsimAgent, MobsimDriverAgent {
-		
-		private static int counter = 0 ;
+
+		public MySimplifiedRoundAndRoundAgent(Id<Person> agentId, double actEndTime, String travelMode) {
+			personId = agentId;
+			mode = travelMode;
+			this.actEndTime = actEndTime;
+		}
+
+		private final Id<Person> personId;
+		private final String mode;
+		private final double actEndTime;
+
 		private MobsimVehicle vehicle ;
 		public boolean isArriving= false;
-		private Id<Link> currentLinkId = Id.createLinkId("home"); ;
+
+		private Id<Link> currentLinkId = Id.createLinkId("home");
+		private State agentState= MobsimAgent.State.ACTIVITY;;
 
 		@Override
 		public Id<Link> getCurrentLinkId() {
@@ -118,8 +115,7 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Id<Person> getId() {
-			counter++ ;
-			return Id.createPersonId("simpleRoundAndRoundAgent" + counter ) ;
+			return this.personId;
 		}
 
 		@Override
@@ -140,18 +136,22 @@ public class CreateAutomatedFDTest {
 				return Id.createLinkId(2);
 			} else if(this.getCurrentLinkId().equals(Id.createLinkId(2))){
 				return Id.createLinkId(0);
-			} else return this.chooseNextLinkId();
-			 
+			} else return null; // returning null so that agent will arrive.
+
 		}
 
 		@Override
 		public void notifyMoveOverNode(Id<Link> newLinkId) {
+			this.currentLinkId = newLinkId;
 		}
 
 		@Override
 		public boolean isWantingToArriveOnCurrentLink() {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented");
+			if ( this.chooseNextLinkId()==null ) {
+				return true ;
+			} else {
+				return false ;
+			}
 		}
 
 		@Override
@@ -166,57 +166,51 @@ public class CreateAutomatedFDTest {
 
 		@Override
 		public Id<Vehicle> getPlannedVehicleId() {
-			return null ;
+			return Id.create(this.getId(), Vehicle.class);
 		}
 
 		@Override
 		public State getState() {
-			return MobsimAgent.State.ACTIVITY;
+			return agentState;
 		}
 
 		@Override
 		public double getActivityEndTime() {
-			return (new Random().nextDouble())*900;
+			return this.actEndTime;
 		}
 
 		@Override
 		public void endActivityAndComputeNextState(double now) {
-			this.endActivityAndComputeNextState(now);
+			agentState= MobsimAgent.State.LEG;
 		}
 
 		@Override
 		public void endLegAndComputeNextState(double now) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented");
+			agentState=MobsimAgent.State.ACTIVITY;
 		}
 
 		@Override
 		public void setStateToAbort(double now) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented");
 		}
 
 		@Override
 		public Double getExpectedTravelTime() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented");
 		}
 
 		@Override
 		public Double getExpectedTravelDistance() {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented");
 		}
 
 		@Override
 		public String getMode() {
-			return TransportMode.car;
-//			return this.vehicle.getDriver().getMode();
+			return mode;
 		}
 
 		@Override
 		public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
-			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented");
 		}
 
@@ -230,6 +224,7 @@ public class CreateAutomatedFDTest {
 
 	private LinkDynamics linkDynamics;
 	private TrafficDynamics trafficDynamics;
+	private final Map<Id<Person>,String> person2Mode = new HashMap<Id<Person>, String>();
 
 	@Parameters
 	public static Collection<Object[]> createFds() {
@@ -242,21 +237,21 @@ public class CreateAutomatedFDTest {
 		return Arrays.asList(fdData);
 	}
 
-	@Test
-	public void FDs_carTruck(){
-		this.travelModes = new String [] {"car","truck"};
-		run(this.linkDynamics, this.trafficDynamics,false);
-	}
+		@Test
+		public void FDs_carTruck(){
+			this.travelModes = new String [] {"car","truck"};
+			run(this.linkDynamics, this.trafficDynamics,false);
+		}
 
 	@Test
 	public void FDs_carBike(){
 		run(this.linkDynamics, this.trafficDynamics,false);
 	}
 
-	@Test 
-	public void Fds_carBike_fastCapacityUpdate(){
-		run(this.linkDynamics,this.trafficDynamics,true);
-	}
+		@Test 
+		public void Fds_carBike_fastCapacityUpdate(){
+			run(this.linkDynamics,this.trafficDynamics,true);
+		}
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
@@ -322,14 +317,18 @@ public class CreateAutomatedFDTest {
 
 			System.out.println("\n \n \t \t Running points "+point2run.toString()+"\n \n");
 
-			createPopulationAndVehicles(point2run);
+			int count = 0;
+			person2Mode.clear();
 
 			for(String mode : point2run.keySet()){
+				for(int ii =0; ii < point2run.get(mode); ii++){
+					person2Mode.put(Id.createPersonId(count++), mode);
+				}
 				this.mode2FlowData.get(modeVehicleTypes.get(mode).getId()).setnumberOfAgents(point2run.get(mode));
 			}
 
 			EventsManager events = EventsUtils.createEventsManager();
-			globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(scenario, mode2FlowData);
+			globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(mode2FlowData);
 			events.addHandler(globalFlowDynamicsUpdator);
 
 			final QSim qSim = new QSim(scenario, events);
@@ -339,32 +338,29 @@ public class CreateAutomatedFDTest {
 			QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
-			qSim.addMobsimEngine(teleportationEngine);
 
-//			AgentFactory agentFactory = new MyAgentFactory(qSim);
-//			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+			final Map<String, VehicleType> travelModesTypes = new HashMap<String, VehicleType>();
 
-//			see package tutorial.programming.ownMobsimAgent.RunAgentSourceExample;
-			AgentSource agentSource = new AgentSource(){
-				@Override
-				public void insertAgentsIntoMobsim() {
-					for ( int ii=0 ; ii< scenario.getPopulation().getPersons().size() ; ii++ ) {
-						MobsimAgent agent = new MySimplifiedRoundAndRoundAgent();
-						qSim.insertAgentIntoMobsim(agent);
-						
-						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
-                        final Id<Link> linkId4VehicleInsertion = Id.createLinkId("home");
-                        qSim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
-					}
-				}
-			};
-
-			Map<String, VehicleType> travelModesTypes = new HashMap<String, VehicleType>();
 			for(String mode :travelModes){
 				travelModesTypes.put(mode, modeVehicleTypes.get(mode));
 			}
-//			agentSource.setModeVehicleTypes(travelModesTypes);
+
+			AgentSource agentSource = new AgentSource(){
+				@Override
+				public void insertAgentsIntoMobsim() {
+					for ( Id<Person> personId : person2Mode.keySet()) {
+						String travelMode = person2Mode.get(personId);
+						double actEndTime = (new Random().nextDouble())*900;
+
+						MobsimAgent agent = new MySimplifiedRoundAndRoundAgent(personId, actEndTime, travelMode);
+						qSim.insertAgentIntoMobsim(agent);
+
+						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), travelModesTypes.get(travelMode));
+						final Id<Link> linkId4VehicleInsertion = Id.createLinkId("home");
+						qSim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+					}
+				}
+			};
 
 			qSim.addAgentSource(agentSource);
 
@@ -401,39 +397,6 @@ public class CreateAutomatedFDTest {
 
 		//plotting data
 		scatterPlot(outData,outFile);
-	}
-
-	private void createPopulationAndVehicles(Map<String, Integer> point2run){
-		Population pop = scenario.getPopulation();
-		pop.getPersons().clear();
-
-		for(String mode : point2run.keySet()){
-			for(int j=0;j<point2run.get(mode);j++){
-				int popSizeSoFar = pop.getPersons().size();
-				Person p = pop.getFactory().createPerson(Id.createPersonId(popSizeSoFar));
-				Plan plan = pop.getFactory().createPlan();
-
-				Activity actHome = pop.getFactory().createActivityFromLinkId("home", Id.createLinkId("home"));
-				actHome.setEndTime((new Random().nextDouble())*900);
-				plan.addActivity(actHome);
-
-				Leg leg = pop.getFactory().createLeg(mode);
-				NetworkRoute route = new LinkNetworkRouteImpl(Id.createLinkId("home"), Id.createLinkId("work"));
-				List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
-				routeLinks.add(Id.createLinkId(0));
-				routeLinks.add(Id.createLinkId(1));
-				routeLinks.add(Id.createLinkId(2));
-				route.setLinkIds(Id.createLinkId("home"), routeLinks, Id.createLinkId("work"));
-				leg.setRoute(route);
-				plan.addLeg(leg);
-
-				Activity workHome = pop.getFactory().createActivityFromLinkId("work", Id.createLinkId("work"));
-				plan.addActivity(workHome);
-
-				p.addPlan(plan);
-				pop.addPerson(p);
-			}
-		}
 	}
 
 	private void storeVehicleTypeInfo() {
@@ -808,158 +771,8 @@ public class CreateAutomatedFDTest {
 
 	//=======================================
 
-	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
-
-		private PersonDriverAgentImpl delegate;
-		public boolean isArriving;
-
-		public MyRoundAndRoundAgent(Person p, Plan unmodifiablePlan, QSim qSim) {
-			this.delegate = new PersonDriverAgentImpl(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), qSim);
-			this.isArriving = false;//false at start, modified when all data is extracted.
-		}
-
-		@Override
-		public final void endActivityAndComputeNextState(double now) {
-			delegate.endActivityAndComputeNextState(now);
-		}
-
-		@Override
-		public final void endLegAndComputeNextState(double now) {
-			delegate.endLegAndComputeNextState(now);
-		}
-
-		@Override
-		public final void setStateToAbort(double now) {
-			delegate.setStateToAbort(now);
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			return delegate.equals(obj);
-		}
-
-		@Override
-		public final double getActivityEndTime() {
-			return delegate.getActivityEndTime();
-		}
-
-		@Override
-		public final Id<Link> getCurrentLinkId() {
-			return delegate.getCurrentLinkId();
-		}
-
-		@Override
-		public final Double getExpectedTravelTime() {
-			return delegate.getExpectedTravelTime();
-		}
-
-		@Override
-		public Double getExpectedTravelDistance() {
-			return delegate.getExpectedTravelDistance();
-		}
-
-		@Override
-		public final String getMode() {
-			return delegate.getMode();
-		}
-
-		@Override
-		public final Id<Link> getDestinationLinkId() {
-			return delegate.getDestinationLinkId();
-		}
-
-		@Override
-		public final Id<Person> getId() {
-			return delegate.getId();
-		}
-
-		@Override
-		public State getState() {
-			return delegate.getState();
-		}
-
-		@Override
-		public final void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
-			delegate.notifyArrivalOnLinkByNonNetworkMode(linkId);
-		}
-
-		@Override
-		public Id<Link> chooseNextLinkId() {
-			if (globalFlowDynamicsUpdator.isPermanent()){ 
-				isArriving = true; 
-			}
-
-			if(delegate.getCurrentLinkId().equals(Id.createLinkId("home"))){
-				return Id.createLinkId(0);
-			} else if(delegate.getCurrentLinkId().equals(Id.createLinkId(0))){
-				if ( isArriving) {
-					return Id.createLinkId("work") ;
-				} else {
-					return Id.createLinkId(1) ;
-				}
-			} else if(delegate.getCurrentLinkId().equals(Id.createLinkId(1))){
-				return Id.createLinkId(2);
-			} else if(delegate.getCurrentLinkId().equals(Id.createLinkId(2))){
-				return Id.createLinkId(0);
-			} else return delegate.chooseNextLinkId();
-			
-		} 
-
-		@Override
-		public void notifyMoveOverNode(Id<Link> newLinkId) {
-			delegate.notifyMoveOverNode(newLinkId);
-		}
-
-		@Override
-		public void setVehicle(MobsimVehicle veh) {
-			delegate.setVehicle(veh);
-		}
-
-		@Override
-		public MobsimVehicle getVehicle() {
-			return delegate.getVehicle();
-		}
-
-		@Override
-		public Id<Vehicle > getPlannedVehicleId() {
-			return delegate.getPlannedVehicleId();
-		}
-
-		@Override
-		public boolean isWantingToArriveOnCurrentLink() {
-			// The following is the old condition: Being at the end of the plan means you arrive anyways, no matter if you are on the right or wrong link.
-			// kai, nov'14
-			if ( this.chooseNextLinkId()==null ) {
-				return true ;
-			} else {
-				return false ;
-			}
-		}
-
-	}
-
-	//=======================================
-
-	private static class MyAgentFactory implements AgentFactory {
-
-		private QSim qSim;
-
-		public MyAgentFactory(QSim qSim) {
-			this.qSim = qSim;
-		}
-
-		@Override
-		public MobsimAgent createMobsimAgentFromPerson(Person p) {
-			MyRoundAndRoundAgent agent = new MyRoundAndRoundAgent(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.qSim);
-			return agent;
-		}
-	}
-
-	//=======================================
-
 	class GlobalFlowDynamicsUpdator implements LinkEnterEventHandler {
 
-		private Scenario scenario;
 		private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModesFlowData;
 		private TravelModesFlowDynamicsUpdator globalFlowData;
 
@@ -968,14 +781,13 @@ public class CreateAutomatedFDTest {
 		/**
 		 * container to store static properties of vehicles and dynamic flow properties during simulation 
 		 */
-		public GlobalFlowDynamicsUpdator(Scenario sc, Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer){
-			this.scenario =  sc;
+		public GlobalFlowDynamicsUpdator(Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> travelModeFlowDataContainer){
 			this.travelModesFlowData = travelModeFlowDataContainer;
 			for (int i=0; i<travelModes.length; i++){
 				this.travelModesFlowData.get(Id.create(travelModes[i],VehicleType.class)).initDynamicVariables();
 			}
 			this.globalFlowData = new TravelModesFlowDynamicsUpdator();
-			this.globalFlowData.setnumberOfAgents(sc.getPopulation().getPersons().size());
+			this.globalFlowData.setnumberOfAgents(person2Mode.size());
 			this.globalFlowData.initDynamicVariables();
 			this.permanentRegime = false;
 		}
@@ -995,14 +807,8 @@ public class CreateAutomatedFDTest {
 				double pcu_person = 0.;
 
 				//Disaggregated data updating methods
-				String travelMode = "NA";
-				List<PlanElement> pes = scenario.getPopulation().getPersons().get(personId).getSelectedPlan().getPlanElements();
-				for(PlanElement pe :pes){
-					if(pe instanceof Leg){
-						travelMode =((Leg)pe).getMode().toString();
-						break;
-					}
-				}
+				String travelMode = person2Mode.get(personId);
+
 				Id<VehicleType> transportMode = modeVehicleTypes.get(travelMode).getId();
 				this.travelModesFlowData.get(transportMode).handle(event);
 				pcu_person = modeVehicleTypes.get(travelMode).getPcuEquivalents();
