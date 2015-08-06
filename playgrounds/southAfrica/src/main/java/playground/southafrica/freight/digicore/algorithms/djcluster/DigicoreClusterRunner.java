@@ -50,6 +50,7 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.southafrica.freight.digicore.algorithms.concaveHull.ConcaveHull;
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.ClusterActivity;
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.DigicoreCluster;
+import playground.southafrica.freight.digicore.analysis.postClustering.ClusteredChainGenerator;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.containers.MyZone;
@@ -63,7 +64,14 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-
+/**
+ * Class to cluster the activities of Digicore vehicles' activity chains using
+ * the {@link DJCluster} approach. Once clustered, the activity chains are <i>not</i>
+ * adjusted. Rather, the clustering outputs can be used as inputs to a class 
+ * such as {@link ClusteredChainGenerator}. 
+ *
+ * @author jwjoubert
+ */
 public class DigicoreClusterRunner {
 	private final static Logger LOG = Logger.getLogger(DigicoreClusterRunner.class);
 	private final static int BLOCK_SIZE = 100; 
@@ -114,9 +122,9 @@ public class DigicoreClusterRunner {
 		LOG.info("-------------------------------------------------------------");
 		LOG.info(" Clustering the points...");
 		
-		/* These values should be set following Quintin's Design-of-Experiment inputs. */
-		double[] radii = {15}; ////, 10, 15, 20, 25, 30, 35, 40};
-		int[] pmins = {15}; //, 10, 15, 20, 25};
+		/* These values should be set following Meintjes and Joubert, City Logistics paper? */
+		double[] radii = {20}; ////, 10, 15, 20, 25, 30, 35, 40};
+		int[] pmins = {20}; //, 10, 15, 20, 25};
 
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
