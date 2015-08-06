@@ -53,28 +53,15 @@ public class SignalsTurnInfoBuilder {
 						log.warn("Turning move restrictions for signals are implemented for TransportMode.car only, yet!");
 						warnCount++;
 					}
-					if ( inLinkIdTurnInfoMap.containsKey( signal.getLinkId() ) ) { 
-						throw new RuntimeException( "There is already a signal on this link.") ;
+					if (!inLinkIdTurnInfoMap.containsKey(signal.getLinkId())){
+						inLinkIdTurnInfoMap.put(signal.getLinkId(), new ArrayList<TurnInfo>());
 					}
-					inLinkIdTurnInfoMap.put(signal.getLinkId(), new ArrayList<TurnInfo>());
 					Set<String> modeCar = new HashSet<String>();
 					modeCar.add(TransportMode.car);
 					for (Id<Link> toLinkId : signal.getTurningMoveRestrictions()){
 						TurnInfo ti = new TurnInfo(signal.getLinkId(), toLinkId, modeCar);
 						inLinkIdTurnInfoMap.get(signal.getLinkId()).add(ti);
 					}
-					
-//					if ( !inLinkIdTurnInfoMap.containsKey( signal.getLinkId() ) ) { 
-//						inLinkIdTurnInfoMap.put(signal.getLinkId(), new ArrayList<TurnInfo>());
-//					}
-//					Set<String> modeCar = new HashSet<String>();
-//					modeCar.add(TransportMode.car);
-//					for (Id<Link> toLinkId : signal.getTurningMoveRestrictions()){
-//						TurnInfo ti = new TurnInfo(signal.getLinkId(), toLinkId, modeCar);
-//						inLinkIdTurnInfoMap.get(signal.getLinkId()).add(ti);
-//					}
-					
-					
 				}
 			}
 		}
