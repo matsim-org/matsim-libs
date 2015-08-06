@@ -37,22 +37,22 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	private int TTPerLink = 3;
 	
-	private boolean AGENTS_TO_STUCK = false;
+	private boolean agentsToStuck = false;
 	
 	private String outputdir;
 	
 	
 	/**
-	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraessRouteDistributionAndTT#getTotalTT()}.
+	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraess#getTotalTT()}.
 	 */	
 	@Test
 	public void testGetTotalTT() {
 		outputdir = utils.getOutputDirectory() + "/Test_LinkTT" + TTPerLink;
 		//TTperLink must not be 0;
 		if(TTPerLink == 0) TTPerLink = 1;
-		runSimulation();
+		runSimulation(agentsToStuck);
 		EventsManager events = EventsUtils.createEventsManager();
-		TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
+		TtAnalyzeBraess handler = new TtAnalyzeBraess();
 		events.addHandler(handler);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -79,12 +79,12 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	}
 	
 
-	private void runSimulation() {
+	private void runSimulation(boolean agentsToStuck) {
 		
 		// prepare config and scenario		
 		Config config = defineConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		adaptNetwork(scenario);
+		adaptNetwork(scenario, agentsToStuck);
 		createPopulation(scenario);
 		
 		// prepare the controller
@@ -129,19 +129,18 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		return config;
 	}
 
-	private void adaptNetwork(Scenario scenario) {		
+	private void adaptNetwork(Scenario scenario , boolean agentsToStuck) {		
 		// set the links' travel times (by adapting free speed) and capacity (to unlimited)
 		
 		for(Link l : scenario.getNetwork().getLinks().values()){
 			// modify the capacity and/or length of the middle link to let agents stuck
-			l.setLength(200);
-			if(AGENTS_TO_STUCK && l.getId().equals(Id.createLinkId("3_4"))){
+			if(agentsToStuck && l.getId().equals(Id.createLinkId("3_4"))){
 						scenario.getConfig().qsim().setStuckTime(TTPerLink + 1);
-						scenario.getConfig().qsim().setRemoveStuckVehicles(false);
+						scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 						l.setFreespeed(200/(TTPerLink+10));
-						l.setCapacity(0);				
+						l.setCapacity(1);				
 			}
-			else if (AGENTS_TO_STUCK && l.getId().equals(Id.createLinkId("4_5"))){
+			else if (agentsToStuck && l.getId().equals(Id.createLinkId("4_5"))){
 				l.setCapacity(1);
 			}	
 			else{	
@@ -153,12 +152,14 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	private void createPopulation(Scenario scenario) {	
 		
-		// initialize all agents with only one route (the middle route)
-		int numberOfInitialRoutes = 1;
+		TtCreateBraessPopulation popCreator = new TtCreateBraessPopulation(
+				scenario.getPopulation(), scenario.getNetwork());
 		
-		TtCreateBraessPopulation popCreator = new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
-		popCreator.createPersons( numberOfInitialRoutes , null);
+		
+		// initialize all agents with only one route (the middle route) and no
+		// initial score
+		popCreator.createPersons(TtCreateBraessPopulation.InitRoutes.ONLY_MIDDLE, null);
 	}
 
 	
