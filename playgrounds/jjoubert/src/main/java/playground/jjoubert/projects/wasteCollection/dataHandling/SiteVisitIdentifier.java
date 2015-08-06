@@ -46,7 +46,7 @@ import playground.southafrica.utilities.Header;
 public class SiteVisitIdentifier {
 	private final static Logger LOG = Logger.getLogger(SiteVisitIdentifier.class);
 	private final static Double DISTANCE_THRESHOLD = 50.0;
-	private final static Double MINUTE_THRESHOLD = 120.0;
+	private final static Double MINUTE_THRESHOLD = 90.0;
 	
 	private static CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
 	private Map<Id<Vehicle>, Map<String, List<GregorianCalendar>>> map = new TreeMap<Id<Vehicle>, Map<String, List<GregorianCalendar>>>();
