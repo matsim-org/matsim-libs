@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.Person;
 /**
  * @author dgrether
  * @author tthunig
- * test
  *
  */
 public class TtTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
