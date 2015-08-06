@@ -86,5 +86,11 @@
   	<artifactId>analysis</artifactId>
   	<version>0.7.0-SNAPSHOT</version>
   </dependency>
+<dependency>
+   <groupId>org.geotools.jdbc</groupId>
+   <artifactId>gt-jdbc-postgis</artifactId>
+   <version>13.0</version>
+ </dependency>
+
   </dependencies>
 </project>

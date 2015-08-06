@@ -1,12 +1,21 @@
 package org.matsim.contrib.accessibility;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
@@ -26,10 +35,19 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.roadpricing.RoadPricingScheme;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * improvements sep'11:
@@ -281,6 +299,13 @@ public final class GridBasedAccessibilityControlerListenerV3
 			writePlottingData(matsimOutputDirectory + "/" + outputSubdirectory);
 		}
 		
+		try {
+			fillDatabase();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 
 		if(accessibilityControlerListener.getSpatialGridDataExchangeListenerList() != null){
 			log.info("Triggering " + accessibilityControlerListener.getSpatialGridDataExchangeListenerList().size() + " SpatialGridDataExchangeListener(s) ...");
@@ -288,6 +313,78 @@ public final class GridBasedAccessibilityControlerListenerV3
 				accessibilityControlerListener.getSpatialGridDataExchangeListenerList().get(i).setAndProcessSpatialGrids( getAccessibilityGrids() );
 		}
 
+	}
+
+
+	private void fillDatabase() throws IOException {
+		GeometryFactory fac = new GeometryFactory();
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setName("accessibilities");
+		b.setCRS(MGC.getCRS(TransformationFactory.WGS84));
+		b.add("the_geom", Point.class);
+		b.add("x", Double.class);
+		b.add("y", Double.class);
+		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+			if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
+				b.add(mode.toString(), Double.class);
+			}
+		}
+		SimpleFeatureType featureType = b.buildFeatureType();
+		DefaultFeatureCollection collection = new DefaultFeatureCollection("internal", featureType);        
+
+        SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
+		final SpatialGrid spatialGrid = this.getAccessibilityGrids().get( Modes4Accessibility.freeSpeed ) ;
+		// yy for time being, have to assume that this is always there
+		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SA_Albers, TransformationFactory.WGS84);
+
+		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
+			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
+				Coord saAlbersCoord = new CoordImpl(x + 0.5*spatialGrid.getResolution(),y + 0.5*spatialGrid.getResolution());
+				Coord wgs84Coord = transformation.transform(saAlbersCoord);
+		        featureBuilder.add(fac.createPoint(MGC.coord2Coordinate(wgs84Coord)));
+		        featureBuilder.add(x);
+		        featureBuilder.add(y);
+
+				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
+					if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
+						final SpatialGrid theSpatialGrid = this.getAccessibilityGrids().get(mode);
+						final double value = theSpatialGrid.getValue(x, y);
+						if (Double.isNaN(value)) {
+							featureBuilder.add(null);
+						} else {
+							featureBuilder.add(value);
+						}
+					}
+				}
+				
+				SimpleFeature feature = featureBuilder.buildFeature(null);
+				collection.add(feature);
+
+			}
+				
+		}
+
+        
+	    
+	    Map<String,Object> params = new HashMap<String,Object>();
+	    params.put( "dbtype", "postgis");
+	    params.put( "host", "wiki.vsp.tu-berlin.de");
+	    params.put( "port", 5432);
+	    params.put( "schema", "public");
+	    params.put( "database", "vspgeo");
+	    params.put( "user", "postgres");
+	    params.put( "passwd", "jafs30_A");
+	    
+	    DataStore dataStore = DataStoreFinder.getDataStore(params);
+	    try {
+		    dataStore.removeSchema("accessibilities");
+	    } catch (IllegalArgumentException e) {
+	    	log.warn("Could not remove schema. Perhaps it does not exist. Probably doesn't matter.");
+	    }
+	    dataStore.createSchema(featureType);
+
+	    SimpleFeatureStore featureStore = (SimpleFeatureStore) dataStore.getFeatureSource("accessibilities");
+	    featureStore.addFeatures(collection);
 	}
 
 
@@ -314,7 +411,6 @@ public final class GridBasedAccessibilityControlerListenerV3
 		// different separators have to be used to make this output useable by gnuplot or QGis, respectively
 		log.info("Writing plotting data for other analyis into " + adaptedOutputDirectory + " ...");
 		
-//		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SA_Albers, TransformationFactory.WGS84);
 
 		final CSVWriter writer = new CSVWriter(adaptedOutputDirectory + "/" + CSVWriter.FILE_NAME ) ;
 		
@@ -335,11 +431,6 @@ public final class GridBasedAccessibilityControlerListenerV3
 		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
 				
-//				Coord saAlbersCoord = new CoordImpl(x + 0.5*spatialGrid.getResolution(),y + 0.5*spatialGrid.getResolution());
-//				Coord wgs84Coord = transformation.transform(saAlbersCoord);
-//				
-//				writer.writeField( wgs84Coord.getX() ) ;
-//				writer.writeField( wgs84Coord.getY() ) ;
 				
 				writer.writeField( x + 0.5*spatialGrid.getResolution() ) ;
 				writer.writeField( y + 0.5*spatialGrid.getResolution() ) ;

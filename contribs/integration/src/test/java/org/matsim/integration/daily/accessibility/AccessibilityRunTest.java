@@ -8,15 +8,27 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureWriter;
+import org.geotools.data.Transaction;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.FeatureCollections;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -29,35 +41,71 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+
+
+
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
+
+
+
+
+
+
+
+
+
+
+
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+
+
+
+
+
+
+
+
+//for postgres connection
+import java.sql.*;
+import java.util.*;
+import java.io.IOException;
+import java.lang.*;
+
 public class AccessibilityRunTest {
 	public static final Logger log = Logger.getLogger( AccessibilityRunTest.class ) ;
 	
-	private static final double cellSize = 1000.;
+	private static final double cellSize = 10000.;
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
 	
 	@Test
-	public void doAccessibilityTest() {
+	public void doAccessibilityTest() throws IOException {
+		
 		System.out.println("Working Directory = " + System.getProperty("user.dir"));
 		System.out.println("package input directory = " + utils.getPackageInputDirectory());
 		System.out.println("class input directory = " + utils.getClassInputDirectory());
 		System.out.println("input directory = " + utils.getInputDirectory());
 
-		String folderStructure = "../../../"; // local
+		String folderStructure = "../../"; // local
+//		String folderStructure = "../../../"; // server
 			
 		String networkFile = folderStructure + "matsimExamples/countries/za/nmbm/network/NMBM_Network_CleanV7.xml.gz";
 		String facilitiesFile = folderStructure + "matsimExamples/countries/za/nmbm/facilities/20121010/facilities.xml.gz";
-		String minibusPtTravelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
-		String minibusPtTravelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
-		String measuringPointsAsPtStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/measuringPointsAsStops/stops.csv.gz";
+//		String travelTimeMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelTimeMatrix.csv.gz";
+//		String travelDistanceMatrix = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/JTLU_14i/travelDistanceMatrix.csv.gz";
+//		String ptStops = folderStructure + "matsimExamples/countries/za/nmbm/minibus-pt/measuringPointsAsStops/stops.csv.gz";
 
 //		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup() ) ;
 		Config config = ConfigUtils.createConfig( new AccessibilityConfigGroup(), new MatrixBasedPtRouterConfigGroup()) ;
@@ -89,10 +137,10 @@ public class AccessibilityRunTest {
 		
 //		scenario.getConfig().scenario().setUseTransit(true);
 		
-		mbpcg.setUsingTravelTimesAndDistances(true);
-		mbpcg.setPtStopsInputFile(measuringPointsAsPtStops);
-		mbpcg.setPtTravelTimesInputFile(minibusPtTravelTimeMatrix);
-		mbpcg.setPtTravelDistancesInputFile(minibusPtTravelDistanceMatrix);
+//		mbpcg.setUsingTravelTimesAndDistances(true);
+//		mbpcg.setPtStopsInputFile(ptStops);
+//		mbpcg.setPtTravelTimesInputFile(travelTimeMatrix);
+//		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrix);
 		
 		PlansCalcRouteConfigGroup plansCalcRoute = config.plansCalcRoute();
         
@@ -183,7 +231,7 @@ public class AccessibilityRunTest {
         // choose map view a bit bigger
         double[] mapViewExtent = {100000,-3720000,180000,-3675000};
 			
-		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
+//		PtMatrix ptMatrix = PtMatrix.createPtMatrix(plansCalcRoute, boundingBox, mbpcg);
 		// end new
 		
 		Map<String, ActivityFacilities> activityFacilitiesMap = new HashMap<String, ActivityFacilities>();
@@ -192,6 +240,7 @@ public class AccessibilityRunTest {
 				true ?
 						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
 						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+//		config.controler().setOverwriteFileSetting( OverwriteFileSetting.deleteDirectoryIfExists );
 
 		log.warn( "found activity types: " + activityTypes );
 		// yyyy there is some problem with activity types: in some algorithms, only the first letter is interpreted, in some
@@ -217,15 +266,15 @@ public class AccessibilityRunTest {
 			activityFacilitiesMap.put(actType, opportunities);
 
 			GridBasedAccessibilityControlerListenerV3 listener = 
-//					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
-					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
+					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), config, scenario.getNetwork());
+//					new GridBasedAccessibilityControlerListenerV3(activityFacilitiesMap.get(actType), ptMatrix, config, scenario.getNetwork());
 				
 			// define the mode that will be considered
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 			listener.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
-			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
+//			listener.setComputingAccessibilityForMode(Modes4Accessibility.pt, true);
 				
 			listener.addAdditionalFacilityData(homes) ;
 			listener.generateGridsAndMeasuringPointsByNetwork(cellSize);
@@ -236,60 +285,109 @@ public class AccessibilityRunTest {
 
 			controler.addControlerListener(listener);
 		}
-
-	controler.run();
-			
-	String workingDirectory =  config.controler().getOutputDirectory();
+					
+		controler.run();
+				
+		String workingDirectory =  config.controler().getOutputDirectory();
 	
-	Utils.createQGisOutput(activityTypes, mapViewExtent, workingDirectory);
-	}
-
+		
+		
+		String osName = System.getProperty("os.name");
 	
-	/**
-	 * This method creates a snapshot of the accessibility map that is held in the created QGis file.
-	 * The syntax within the method is different dependent on the operating system.
-	 * 
-	 * @param workingDirectory The directory where the QGisProjectFile (the data source of the to-be-created snapshot) is stored
-	 * @param mode
-	 * @param osName
-	 */
-	static void createSnapshot(String workingDirectory, Modes4Accessibility mode, String osName) {
+		for (String actType : activityTypes) {
+			String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
 		
-		//TODO adapt this method so that maps for different modes are created.
-		
-		// if OS is Windows
-		// example (daniel r) // os.arch=amd64 // os.name=Windows 7 // os.version=6.1
-		if ( osName.contains("Win") || osName.contains("win")) {
-			// On Windows, the PATH variables need to be set correctly to be able to call "qgis.bat" on the command line
-			// This needs to be done manually. It does not seem to be set automatically when installing QGis
-			String cmd = "qgis.bat " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
-					" --snapshot " + workingDirectory + "snapshot_" + mode + ".png";
-
-			String stdoutFileName = workingDirectory + "snapshot_" + mode + ".log";
-			int timeout = 99999;
-
-			ExeRunner.run(cmd, stdoutFileName, timeout);
-		
-		// if OS is Macintosh
-		// example (dominik) // os.arch=x86_64 // os.name=Mac OS X // os.version=10.10.2
-		} else if ( osName.contains("Mac") || osName.contains("mac") ) {
-			String cmd = "/Applications/QGIS.app/Contents/MacOS/QGIS " + workingDirectory + "QGisProjectFile_" + mode + ".qgs" +
-					" --snapshot " + workingDirectory + "snapshot_" + mode + ".png";
-
-					String stdoutFileName = workingDirectory + "snapshot_" + mode + ".log";
-			
-			int timeout = 99999;
-
-			ExeRunner.run(cmd, stdoutFileName, timeout);
-		
-		// if OS is Linux
-		// example (benjamin) // os.arch=amd64 // os.name=Linux	// os.version=3.13.0-45-generic
-		//} else if ( osName.contains("Lin") || osName.contains("lin") ) {
-			// TODO for linux
-			
-		// if OS is other
-		} else {
-			log.warn("generating png files not implemented for os.arch=" + System.getProperty("os.arch") );
+			for ( Modes4Accessibility mode : Modes4Accessibility.values()) {
+				if ( !actType.equals("w") ) {
+					AccessibilityRunTest.log.error("skipping everything except work for debugging purposes; remove in production code. kai, feb'14") ;
+					continue ;
+				}
+				VisualizationUtils.createQGisOutput(actType, mode, mapViewExtent, workingDirectory);
+				VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode, osName);
+			}
 		}
+		   
 	}
 }
+	    
+		// writing to PostresDB
+		
+//		System.out.println("Working Directory is now = " + workingDirectory);
+//		// Working Directory is now = test/output/org/matsim/integration/daily/accessibility/AccessibilityRunTest/doAccessibilityTest/
+//		
+//				
+//				System.out.println("starting to build export csv data to VSP's opengeo server");
+//		
+//				System.out.println("-------- PostgreSQL "
+//						+ "JDBC Connection Testing ------------");
+//		 
+//				try {
+//		 
+//					Class.forName("org.postgresql.Driver");
+//		 
+//				} catch (ClassNotFoundException e) {
+//		 
+//					System.out.println("Where is your PostgreSQL JDBC Driver? "
+//							+ "Include in your library path!");
+//					e.printStackTrace();
+//					return;
+//		 
+//				}
+//		 
+//				System.out.println("PostgreSQL JDBC Driver Registered!");
+//		 
+//				Connection connection = null;
+//		 
+//				try {
+//		 
+//					connection = DriverManager.getConnection(
+//							"jdbc:postgresql://wiki.vsp.tu-berlin.de:5432/vspgeo", "postgres",
+//							"jafs30_A");
+//		 
+//				} catch (SQLException e) {
+//		 
+//					System.out.println("Connection Failed! Check output console");
+//					e.printStackTrace();
+//					return;
+//		 
+//				}
+//		 
+//				if (connection != null) {
+//					System.out.println("connection established");
+//				    
+//					//Execute SQL query
+//				    //System.out.println("Inserting records into the table...");
+//					try {
+//						Statement stmt = connection.createStatement();
+//						
+//						String locationCSV = "test/input/org/matsim/integration/daily/Accessibility";
+//											  
+//					    String sql = "COPY accessibilities(xcoord,ycoord,freespeed_accessibility,car_accessibility,bike_accessibility,walk_accessibility,pt_accessibility,population_density1,population_density2) " +
+//					    			  "FROM '" + locationCSV + "/accessibilities_WGS84_conv.csv' DELIMITERS ',' CSV HEADER;";
+//					    
+//					    System.out.println("SQL statement is  = " + sql);
+//					    //SQL statement is  = COPY accessibilities(xcoord,ycoord,freespeed_accessibility,car_accessibility,bike_accessibility,walk_accessibility,pt_accessibility,population_density1,population_density2) \
+//					    //FROM 'test/output/org/matsim/integration/daily/accessibility/AccessibilityRunTest/doAccessibilityTest/../../../../../../../../input/org/matsim/integration/daily/Accessibility/accessibilities_WGS84_conv.csv' DELIMITERS ',' CSV HEADER;
+//					    
+//					    //commented out due to: cannot find CSV file
+//					    //stmt.executeUpdate(sql);
+//					    
+//					    sql = "UPDATE accessibilities " +
+//					    		"SET the_geom = ST_GeomFromText('POINT(' || xcoord || ' ' || ycoord || ')',4326)";
+//					    //stmt.executeUpdate(sql);
+//
+//					    //System.out.println("Inserted data from accessibilities.csv into table vspgeo");
+//					} catch (SQLException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//				    
+//				    
+//				} else {
+//					System.out.println("Failed to make connection!");
+//				}
+//			}
+//		 
+		
+		// End of writing to PostgresDB
+	
