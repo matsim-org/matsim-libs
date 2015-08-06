@@ -17,6 +17,13 @@ import playground.southafrica.freight.digicore.containers.DigicoreRecord;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
+/**
+ * The second step in processing the DigiCore data file. This class reads vehicle files 
+ * split from the DigiCore data set and sort them chronologically according to the time 
+ * stamp.
+ * 
+ * @author jwjoubert
+ */
 public class DigicoreFilesSorter {
 	private final static Logger log = Logger.getLogger(DigicoreFilesSorter.class);
 	private final static String DELIMITER = ","; // this could be "," or "\t"
@@ -32,13 +39,11 @@ public class DigicoreFilesSorter {
 		this.root = root;
 	}
 	
-	
 	/**
-	 * The second step in processing the DigiCore data file. This class reads vehicle files 
-	 * split from the DigiCore data set and sort them chronologically according to the time 
-	 * stamp.
+	 * Implementing the file sorter.
 	 * 
-	 * @author jwjoubert
+	 * @param args only a single argument: the absolute path of the folder 
+	 * containing the unsorted vehicle files. 
 	 */
 	public static void main (String args[] ){
 		Header.printHeader(DigicoreFilesSorter.class.toString(), args);
@@ -84,6 +89,9 @@ public class DigicoreFilesSorter {
 			writeList(theFile, sortedList, true);
 			
 			fileCounter.incCounter();
+			
+			/* Delete the unsorted file once sorted. */
+			FileUtils.delete(theFile);
 		}
 		fileCounter.printCounter();
 		

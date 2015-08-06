@@ -23,7 +23,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-import playground.southafrica.projects.digicore.scoring.wp3.Wp3RiskCube;
+import playground.southafrica.projects.digicore.scoring.DIGICORE_EVENT;
 
 /**
  * Building a risk space from purely recorded extreme events. In this approach,
@@ -39,8 +39,7 @@ public class DigicoreEventGrid extends DigiGrid {
 	double pointsConsidered = 0.0;
 
 	/* Specific risk space objects. */
-	private Map<String, Integer> countMap = new TreeMap<>();
-	private Map<String, Integer> riskMap;
+	private Map<DIGICORE_EVENT, Integer> countMap = new TreeMap<>();
 
 	
 	public DigicoreEventGrid() {
@@ -64,9 +63,25 @@ public class DigicoreEventGrid extends DigiGrid {
 	
 	public void incrementCell(String record){
 		String[] sa = record.split(",");
-		
+		DIGICORE_EVENT event = DIGICORE_EVENT.getEvent(Integer.parseInt(sa[2]));
+		if(!countMap.containsKey(event)){
+			countMap.put(event, 1);
+		} else{
+			int oldValue = countMap.get(event);
+			countMap.put(event, oldValue+1);
+		}
 		
 		pointsConsidered++;
+	}
+	
+	public void reportEventCounts(){
+		LOG.info("=======================================================");
+		LOG.info("Summary of the number of each event type observed:");
+		LOG.info("-------------------------------------------------------");
+		for(DIGICORE_EVENT event : countMap.keySet()){
+			LOG.info(String.format("%20s: %d", event.toString(), countMap.get(event)));
+		}
+		LOG.info("=======================================================");
 	}
 	
 }

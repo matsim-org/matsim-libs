@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.passenger;
+package playground.jbischoff.taxibus.utils;
+/**
+ * @author  jbischoff
+ *
+ */
+public class TaxibusUtils {
+    public static final String TAXIBUS_MODE = "taxibus";
 
-import java.util.*;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.Request;
-
-
-public class AwaitingPickupStorage
-{
-    //passenger's request id -> driver's stay task
-    private final Map<Id<Request>, PassengerPickupActivity> awaitingPickups = new HashMap<>();
-
-
-    public void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity)
-    {
-        awaitingPickups.put(request.getId(), pickupActivity);
-    }
-
-
-    public PassengerPickupActivity retrieveAwaitingPickup(PassengerRequest request)
-    {
-        return awaitingPickups.remove(request.getId());
-    }
 }

@@ -37,7 +37,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	private int TTPerLink = 3;
 	
-	private boolean agentsToStuck = false;
+	private boolean AGENTS_TO_STUCK = false;
 	
 	private String outputdir;
 	
@@ -50,7 +50,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		outputdir = utils.getOutputDirectory() + "/Test_LinkTT" + TTPerLink;
 		//TTperLink must not be 0;
 		if(TTPerLink == 0) TTPerLink = 1;
-		runSimulation(agentsToStuck);
+		runSimulation();
 		EventsManager events = EventsUtils.createEventsManager();
 		TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
 		events.addHandler(handler);
@@ -79,12 +79,12 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	}
 	
 
-	private void runSimulation(boolean agentsToStuck) {
+	private void runSimulation() {
 		
 		// prepare config and scenario		
 		Config config = defineConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		adaptNetwork(scenario, agentsToStuck);
+		adaptNetwork(scenario);
 		createPopulation(scenario);
 		
 		// prepare the controller
@@ -129,18 +129,19 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		return config;
 	}
 
-	private void adaptNetwork(Scenario scenario , boolean agentsToStuck) {		
+	private void adaptNetwork(Scenario scenario) {		
 		// set the links' travel times (by adapting free speed) and capacity (to unlimited)
 		
 		for(Link l : scenario.getNetwork().getLinks().values()){
 			// modify the capacity and/or length of the middle link to let agents stuck
-			if(agentsToStuck && l.getId().equals(Id.createLinkId("3_4"))){
+			l.setLength(200);
+			if(AGENTS_TO_STUCK && l.getId().equals(Id.createLinkId("3_4"))){
 						scenario.getConfig().qsim().setStuckTime(TTPerLink + 1);
-						scenario.getConfig().qsim().setRemoveStuckVehicles(true);
+						scenario.getConfig().qsim().setRemoveStuckVehicles(false);
 						l.setFreespeed(200/(TTPerLink+10));
-						l.setCapacity(1);				
+						l.setCapacity(0);				
 			}
-			else if (agentsToStuck && l.getId().equals(Id.createLinkId("4_5"))){
+			else if (AGENTS_TO_STUCK && l.getId().equals(Id.createLinkId("4_5"))){
 				l.setCapacity(1);
 			}	
 			else{	

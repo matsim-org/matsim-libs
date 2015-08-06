@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,29 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.jbischoff.taxibus.sim;
 
-package org.matsim.contrib.dvrp.passenger;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.router.DefaultTripRouterFactoryImpl;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 
-import java.util.*;
+/**
+ * @author jbischoff
+ *
+ */
+public class TaxibusTripRouterFactory implements TripRouterFactory {
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.dvrp.data.Request;
+	private Controler controler; 
+	
+	public TaxibusTripRouterFactory(Controler controler) {
+		this.controler = controler;
+	}
+	
+	@Override
+	public TripRouter instantiateAndConfigureTripRouter(
+			RoutingContext routingContext) {
+        final TripRouterFactory delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(controler.getScenario());
 
+        TripRouter tr = delegate.instantiateAndConfigureTripRouter(routingContext);
+        tr.setRoutingModule("taxibus", new TaxibusServiceRoutingModule(controler));
+		return tr;
+	}
 
-public class AwaitingPickupStorage
-{
-    //passenger's request id -> driver's stay task
-    private final Map<Id<Request>, PassengerPickupActivity> awaitingPickups = new HashMap<>();
-
-
-    public void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity)
-    {
-        awaitingPickups.put(request.getId(), pickupActivity);
-    }
-
-
-    public PassengerPickupActivity retrieveAwaitingPickup(PassengerRequest request)
-    {
-        return awaitingPickups.remove(request.getId());
-    }
 }

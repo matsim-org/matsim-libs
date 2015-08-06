@@ -19,37 +19,54 @@
 /**
  * 
  */
-package playground.nmviljoen.grain;
+package playground.nmviljoen.grain.extractNetworks;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 
+import playground.nmviljoen.grain.GrainUtils;
 import playground.southafrica.freight.digicore.extract.step1_split.DigicoreFileSplitter;
-import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
 /**
- * Split all the available monthly files, applying the extraction procedures 
+ * Split a set of available monthly files, applying the extraction procedures 
  * of {@link DigicoreFileSplitter} to each file.
+ * 
  * @author jwjoubert
  */
 public class MonthlyFileSplitter {
 	final private static Logger LOG = Logger.getLogger(MonthlyFileSplitter.class);
 
 	/**
-	 * @param args
+	 * Executing the vehicle extractor for the 12 months March 2013 to 
+	 * February 2014.
+	 *  
+	 * @param args the following (all required) arguments, in this sequence:
+	 * <ol>
+	 * 		<li> the folder containing the raw monthly GPS trace files; and
+	 * 		<li> the folder where the different monthly output folders, each
+	 * 			 containing a <code>Vehicles/</code> folder, will be created.
+	 * 		<li> the number of threads over which the job will be spread. Each
+	 * 			 month will be assigned to a thread. 
+	 * </ol>
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(MonthlyFileSplitter.class.toString(), args);
 		
 		String rawFolder = args[0];
 		String outputFolder = args[1];
+		int numberOfThreads = Integer.parseInt(args[2]);
 		
-		File inputFolder = new File(rawFolder);
-		List<File> inputFiles = FileUtils.sampleFiles(inputFolder, Integer.MAX_VALUE, FileUtils.getFileFilter(".csv.gz"));
+		/* Set up multi-threaded infrastructure. */
+		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
+		List<MonthSplitter> jobs = new ArrayList<MonthlyFileSplitter.MonthSplitter>();
+		
+		List<File> inputFiles = GrainUtils.getRawGpsTraceFiles(rawFolder);
 		for(File month : inputFiles){
 			/* Extract the specific month, and generate it's output folder.
 			 * Note: If it already exists, it will not first be DELETED, but 
@@ -80,12 +97,39 @@ public class MonthlyFileSplitter {
 							"1",						// Field number: Latitude. 
 							"4",						// Field number: Ignition status.
 							"3"};						// Field number: Speed.
-					DigicoreFileSplitter.main(sa);
+					
+					/* Submit the job to be executed. */
+					MonthSplitter job = new MonthSplitter(sa);
+					threadExecutor.execute(job);
+					jobs.add(job);
 				}
 			}
 		}
+		
+		threadExecutor.shutdown();
+		while(!threadExecutor.isTerminated()){
+		}
 
 		Header.printFooter();
+	}
+
+	/**
+	 * Class to handle the multi-threaded execution of splitting a raw GPS 
+	 * trace file into its individual vehicle files.
+	 * 
+	 * @author jwjoubert
+	 */
+	private static class MonthSplitter implements Runnable{
+		private String[] arguments;
+		
+		public MonthSplitter(String[] arguments) {
+			this.arguments = arguments;
+		}
+
+		@Override
+		public void run() {
+			DigicoreFileSplitter.main(arguments);
+		}
 	}
 
 }
