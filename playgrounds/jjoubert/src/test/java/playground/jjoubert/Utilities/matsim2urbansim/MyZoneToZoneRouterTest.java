@@ -59,7 +59,7 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 	public void testProcessZones(){
 		setupNetwork();
 		MatsimPopulationReader pr = new MatsimPopulationReader(scenario);
-		pr.readFile(inputFolder + "/output_plans.xml.gz");
+		pr.readFile(inputFolder + "/plans100.xml"); /* Standard equil plans100.xml file. */
 		
 		MyPlansProcessor mpp = new MyPlansProcessor(scenario, zones);
 		mpp.processPlans();
@@ -137,6 +137,6 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
 		// Read plans and network.
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
-		nr.readFile(inputFolder + "/output_network.xml.gz");
+		nr.readFile(inputFolder + "/network.xml");
 	}
 }
