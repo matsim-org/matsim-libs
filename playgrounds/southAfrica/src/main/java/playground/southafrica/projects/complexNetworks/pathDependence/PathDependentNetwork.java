@@ -637,7 +637,7 @@ public class PathDependentNetwork {
 				if(!outId.equals(sink) && !outId.equals(unknown)){
 					nodes.add(outId);
 				} else{
-					LOG.debug("found the sink node");
+//					LOG.debug("found the sink node");
 				}
 			}
 		}
