@@ -29,7 +29,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author nagel
  *
  */
-public class IntegrationTests {
+public class IntegrationTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
 	/**
