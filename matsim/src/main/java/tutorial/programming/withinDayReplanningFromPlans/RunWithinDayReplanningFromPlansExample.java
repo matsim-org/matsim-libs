@@ -27,7 +27,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterProviderImpl;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 public class RunWithinDayReplanningFromPlansExample {
@@ -37,42 +39,18 @@ public class RunWithinDayReplanningFromPlansExample {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 		// define the travel time collector (/predictor) that you want to use for routing:
-		Set<String> analyzedModes = new HashSet<String>();
+		Set<String> analyzedModes = new HashSet<>();
 		analyzedModes.add(TransportMode.car);
 		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
-		controler.getEvents().addHandler( travelTime );
+		controler.getEvents().addHandler(travelTime);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				// construct necessary trip router:
-				final TripRouter router = new TripRouterProviderImpl(
-						controler.getScenario(), 
-						controler.getTravelDisutilityFactory(),
-						travelTime, 
-						controler.getLeastCostPathCalculatorFactory(), 
-						controler.getTransitRouterFactory()).get();
-
-//				this.bindMobsim().toProvider(new Provider<Mobsim>() {
-//					@Override
-//					public Mobsim get() {
-//						
-//						// construct qsim and insert listeners:
-//						QSim qSim = QSimUtils.createDefaultQSim( controler.getScenario(), controler.getEvents() );
-//						qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(router)) ;
-//						qSim.addQueueSimulationListeners( travelTime );
-//						return qSim;
-//					}
-//				});
-				
-				// I think that the two lines below now replace the commented lines above.  Pls check and let us know.  kai, jul'15
-				
-				this.addMobsimListenerBinding().toInstance(new MyWithinDayMobsimListener(router));
-				this.addMobsimListenerBinding().toInstance( travelTime );
+				this.bind(TravelTime.class).toInstance(travelTime);
+				this.addMobsimListenerBinding().to(MyWithinDayMobsimListener.class);
+				this.addMobsimListenerBinding().toInstance(travelTime);
 			}
 		});
-		
-		// I just made this a lot shorter.  There is, however, no test for functionality, so keep your eyes open. kai, may'15
-
 		controler.run();
 	}
 	

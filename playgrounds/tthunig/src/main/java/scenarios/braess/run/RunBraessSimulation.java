@@ -26,7 +26,6 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.DgPaths;
-import playground.vsp.zzArchive.bvwpOld.BvwpTest;
 import scenarios.analysis.TtControlerListener;
 import scenarios.braess.analysis.TtAnalyzeBraess;
 import scenarios.braess.createInput.TtCreateBraessNetworkAndLanes;
