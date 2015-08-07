@@ -42,7 +42,7 @@ public class JourneyPurposeHandler implements LegAttributeHandler {
 		} else if(purpose.equalsIgnoreCase("andere Privatreise")) {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, "vacations");
 		} else if(purpose.equalsIgnoreCase("Dienst- oder Geschäftsreise")) {
-			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.BUISINESS);
+			leg.setAttribute(CommonKeys.LEG_PURPOSE, ActivityType.BUSINESS);
 		} else if(purpose.equalsIgnoreCase("Fahrt als Berufspendler | Wochenendpendler")) {
 			leg.setAttribute(CommonKeys.LEG_PURPOSE, "wecommuter");
 		} else {

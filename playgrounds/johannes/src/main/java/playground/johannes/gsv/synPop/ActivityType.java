@@ -29,7 +29,7 @@ public interface ActivityType {
 
 	public static final String WORK = "work";
 	
-	public static final String BUISINESS = "buisiness";
+	public static final String BUSINESS = "buisiness";
 	
 	public static final String LEISURE = "leisure";
 	

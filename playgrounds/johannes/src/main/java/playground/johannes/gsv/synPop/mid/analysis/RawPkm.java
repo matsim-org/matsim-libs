@@ -94,7 +94,7 @@ public class RawPkm {
 				return ActivityType.WORK;
 
 			} else if (typeId.equalsIgnoreCase("dienstlich oder geschäftlich")) {
-				return ActivityType.BUISINESS;
+				return ActivityType.BUSINESS;
 
 			} else if (typeId.equalsIgnoreCase("Erreichen der Ausbildungsstätte oder Schule")) {
 				return ActivityType.EDUCATION;

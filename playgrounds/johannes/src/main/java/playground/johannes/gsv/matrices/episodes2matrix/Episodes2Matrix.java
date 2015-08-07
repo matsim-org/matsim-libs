@@ -19,11 +19,14 @@
 
 package playground.johannes.gsv.matrices.episodes2matrix;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import playground.johannes.gsv.matrices.plans2matrix.ReplaceMiscType;
 import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.gsv.synPop.sim3.RestoreActTypes;
 import playground.johannes.gsv.zones.KeyMatrix;
 import playground.johannes.gsv.zones.io.KeyMatrixTxtIO;
 import playground.johannes.synpop.data.Episode;
@@ -31,15 +34,16 @@ import playground.johannes.synpop.data.Person;
 import playground.johannes.synpop.data.PlainPerson;
 import playground.johannes.synpop.data.Segment;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
+
 
 /**
  * @author johannes
  */
 public class Episodes2Matrix {
+
+    private static final Logger logger = Logger.getLogger(Episodes2Matrix.class);
 
     public static final String DIMIDO = "dimido";
 
@@ -50,20 +54,30 @@ public class Episodes2Matrix {
     private static final String DIM_SEPARATOR = ".";
 
     public static void main(String[] args) throws IOException {
-        String in = null;
-        String rootDir = null;
+        String in = args[0];
+        String rootDir = args[1];
 
+        logger.info("Loading persons...");
         XMLParser reader = new XMLParser();
         reader.setValidating(false);
         reader.parse(in);
-
         Collection<PlainPerson> persons = reader.getPersons();
+        logger.info(String.format("Loaded %s persons.", persons.size()));
+
+        logger.info("Restoring original activity types...");
+        ProxyTaskRunner.run(new RestoreActTypes(), persons, true);
+        logger.info("Replaceing misc types...");
+        new ReplaceMiscType().apply(persons);
+        logger.info("Assigning leg purposes...");
+        ProxyTaskRunner.run(new SetLegPurposes(), persons);
+        logger.info("Infering wecommuter purpose...");
+        ProxyTaskRunner.run(new InfereWeCommuter(100000), persons);
 
         Map<String, LegPredicate> modePreds = new LinkedHashMap<>();
         modePreds.put("car", new LegKeyValuePredicate(CommonKeys.LEG_MODE, "car"));
 
         Map<String, LegPredicate> purposePreds = new LinkedHashMap<>();
-        purposePreds.put(ActivityType.BUISINESS, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.BUISINESS));
+        purposePreds.put(ActivityType.BUSINESS, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.BUSINESS));
         purposePreds.put(ActivityType.EDUCATION, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.EDUCATION));
         purposePreds.put(ActivityType.LEISURE, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.LEISURE));
         purposePreds.put(ActivityType.SHOP, new LegKeyValuePredicate(CommonKeys.LEG_PURPOSE, ActivityType.SHOP));
@@ -104,6 +118,12 @@ public class Episodes2Matrix {
         seasonPreds.put(WINTER, winterPred);
 
         Map<String, LegPredicate> directionPreds = new LinkedHashMap<>();
+        directionPreds.put(DirectionPredicate.OUTWARD, new DirectionPredicate(DirectionPredicate.OUTWARD));
+        directionPreds.put(DirectionPredicate.RETURN, new DirectionPredicate(DirectionPredicate.RETURN));
+        directionPreds.put(DirectionPredicate.INTERMEDIATE, new DirectionPredicate(DirectionPredicate.INTERMEDIATE));
+
+        logger.info("Extracting full matrix...");
+        KeyMatrixTxtIO.write(getMatrix(persons, modePreds.get("car")), String.format("%s/car.txt.gz", rootDir));
 
         for (Map.Entry<String, LegPredicate> mode : modePreds.entrySet()) {
             for (Map.Entry<String, LegPredicate> purpose : purposePreds.entrySet()) {
@@ -118,8 +138,6 @@ public class Episodes2Matrix {
                             comp.addComponent(season.getValue());
                             comp.addComponent(direction.getValue());
 
-                            KeyMatrix m = getMatrix(persons, comp);
-
                             StringBuilder builder = new StringBuilder();
                             builder.append(mode.getKey());
                             builder.append(DIM_SEPARATOR);
@@ -131,13 +149,18 @@ public class Episodes2Matrix {
                             builder.append(DIM_SEPARATOR);
                             builder.append(direction.getKey());
 
-                            String out = String.format("%s/%s.txt", rootDir, builder.toString());
+                            logger.info(String.format("Extracting matrix %s...", builder.toString()));
+                            KeyMatrix m = getMatrix(persons, comp);
+
+                            String out = String.format("%s/%s.txt.gz", rootDir, builder.toString());
                             KeyMatrixTxtIO.write(m, out);
                         }
                     }
                 }
             }
         }
+
+        logger.info("Done.");
     }
 
     private static KeyMatrix getMatrix(Collection<PlainPerson> persons, LegPredicate pred) {
@@ -154,17 +177,22 @@ public class Episodes2Matrix {
                         String origin = prev.getAttribute(SetZones.ZONE_KEY);
                         String dest = next.getAttribute(SetZones.ZONE_KEY);
 
-                        Double volume = m.get(origin, dest);
-                        if (volume == null) volume = 0.0;
-
-                        volume++;
-
-                        m.set(origin, dest, volume);
+                        if(origin != null && dest != null) {
+                            m.add(origin, dest, 1);
+                        }
                     }
                 }
             }
         }
 
         return m;
+    }
+
+    private static class DummyPredicate implements LegPredicate {
+
+        @Override
+        public boolean test(Segment leg) {
+            return true;
+        }
     }
 }

@@ -123,7 +123,8 @@ public class XMLParser extends MatsimXmlParser {
 			if (persons.size() % 50000 == 0)
 				logger.info(String.format("Parsed %s persons...", persons.size()));
 		} else if (name.equalsIgnoreCase(Constants.PLAN_TAG)) {
-			person.setPlan(plan);
+//			person.setPlan(plan);
+			person.addEpisode(plan);
 			plan = null;
 		}
 

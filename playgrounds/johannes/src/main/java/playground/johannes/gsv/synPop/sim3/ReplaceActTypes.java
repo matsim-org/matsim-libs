@@ -46,7 +46,7 @@ public class ReplaceActTypes implements ProxyPlanTask {
 			typeMapping.put("visit", ActivityType.LEISURE);
 			typeMapping.put("culture", ActivityType.LEISURE);
 			typeMapping.put("gastro", ActivityType.LEISURE);
-			typeMapping.put(ActivityType.BUISINESS, ActivityType.WORK);
+			typeMapping.put(ActivityType.BUSINESS, ActivityType.WORK);
 			typeMapping.put("private", ActivityType.MISC);
 			typeMapping.put("pickdrop", ActivityType.MISC);
 			typeMapping.put("sport", ActivityType.LEISURE);
