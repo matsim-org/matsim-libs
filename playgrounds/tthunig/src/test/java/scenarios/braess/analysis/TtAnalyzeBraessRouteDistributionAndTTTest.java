@@ -43,7 +43,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	
 	/**
-	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraessRouteDistributionAndTT#getTotalTT()}.
+	 * Test method for {@link scenarios.braess.analysis.TtAnalyzeBraess#getTotalTT()}.
 	 */	
 	@Test
 	public void testGetTotalTT() {
@@ -52,7 +52,7 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 		if(TTPerLink == 0) TTPerLink = 1;
 		runSimulation(agentsToStuck);
 		EventsManager events = EventsUtils.createEventsManager();
-		TtAnalyzeBraessRouteDistributionAndTT handler = new TtAnalyzeBraessRouteDistributionAndTT();
+		TtAnalyzeBraess handler = new TtAnalyzeBraess();
 		events.addHandler(handler);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -152,12 +152,14 @@ public class TtAnalyzeBraessRouteDistributionAndTTTest {
 	
 	private void createPopulation(Scenario scenario) {	
 		
-		// initialize all agents with only one route (the middle route)
-		int numberOfInitialRoutes = 1;
+		TtCreateBraessPopulation popCreator = new TtCreateBraessPopulation(
+				scenario.getPopulation(), scenario.getNetwork());
 		
-		TtCreateBraessPopulation popCreator = new TtCreateBraessPopulation(scenario.getPopulation(), scenario.getNetwork());
 		popCreator.setNumberOfPersons(NUMBER_OF_PERSONS);
-		popCreator.createPersons( numberOfInitialRoutes , null);
+		
+		// initialize all agents with only one route (the middle route) and no
+		// initial score
+		popCreator.createPersons(TtCreateBraessPopulation.InitRoutes.ONLY_MIDDLE, null);
 	}
 
 	

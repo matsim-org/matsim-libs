@@ -80,7 +80,7 @@ public class Cottbus2KS2010 {
 		// String scenarioDescription =
 		// "run run1728 output plans between 13:30 and 18:30";
 
-		TtMatsim2KS2015 converter = new TtMatsim2KS2015(signalSystemsFilename,
+		TtMatsim2KS2015.convertMatsim2KS(signalSystemsFilename,
 				signalGroupsFilename, signalControlFilename, networkFilename,
 				lanesFilename, populationFilename, startTime, endTime,
 				signalsBoundingBoxOffset, cuttingBoundingBoxOffset,
@@ -88,8 +88,6 @@ public class Cottbus2KS2010 {
 				matsimPopSampleSize, ksModelCommoditySampleSize,
 				minCommodityFlow, cellsX, cellsY, scenarioDescription,
 				dateFormat, outputDirectory);
-
-		converter.convertMatsim2KS();
 
 	}
 
