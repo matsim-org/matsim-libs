@@ -38,16 +38,16 @@ import org.matsim.core.mobsim.qsim.interfaces.*;
 public class PassengerEngine
     implements MobsimEngine, DepartureHandler
 {
-    private final String mode;
+    protected final String mode;
 
     private EventsManager eventsManager;
-    private InternalInterface internalInterface;
-    private final MatsimVrpContext context;
-    private final PassengerRequestCreator requestCreator;
-    private final VrpOptimizer optimizer;
+    protected InternalInterface internalInterface;
+    protected final MatsimVrpContext context;
+    protected final PassengerRequestCreator requestCreator;
+    protected final VrpOptimizer optimizer;
 
-    private final AdvancedRequestStorage advancedRequestStorage;
-    private final AwaitingPickupStorage awaitingPickupStorage;
+    protected final AdvancedRequestStorage advancedRequestStorage;
+    protected final AwaitingPickupStorage awaitingPickupStorage;
 
 
     public PassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
@@ -101,6 +101,7 @@ public class PassengerEngine
      * @param leg -- contains information about the departure time. yyyy Michal, Joschka, note that
      *        in MATSim leg departure times may be meaningless; the only thing that truly matters is
      *        the activity end time. Is your code defensive against that? kai, jul'14
+     *        I (jb) only use this functionality after I explicitly set the Leg departure time (aug '15)
      * @return
      */
     public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Leg leg)
@@ -165,7 +166,7 @@ public class PassengerEngine
     private int nextId = 0;
 
 
-    private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
+    protected PassengerRequest createRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
             Id<Link> toLinkId, double departureTime, double now)
     {
         Map<Id<Link>, ? extends Link> links = context.getScenario().getNetwork().getLinks();

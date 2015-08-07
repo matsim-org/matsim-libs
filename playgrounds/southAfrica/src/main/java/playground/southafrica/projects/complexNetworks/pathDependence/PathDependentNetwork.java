@@ -22,6 +22,7 @@ package playground.southafrica.projects.complexNetworks.pathDependence;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -596,6 +597,53 @@ public class PathDependentNetwork {
 		LOG.info("  |_ revised next nodes: " + sinkOnly);
 		LOG.info("  |_ revised sink nodes: " + noSink);
 	}
+	
+	
+	/**
+	 * Returns a {@link Collection} of {@link Id}s of all nodes connected to
+	 * the given node on the upstream side. That is, all nodes connecting into
+	 * the given node. Consequently the node itself, as source, is omitted.
+	 * 
+	 * @param node
+	 * @return
+	 */
+	public Collection<Id<Node>> getConnectedInNodeIds(Id<Node> node){
+		Collection<Id<Node>> nodes = new ArrayList<Id<Node>>();
+		
+		Id<Node> source = Id.createNodeId("source");
+		Id<Node> unknown = Id.createNodeId("unknown");
+		for(Id<Node> id : this.getPathDependentNode(node).getPathDependence().keySet()){
+			if(!id.equals(source) && !id.equals(unknown)){
+				nodes.add(id);
+			} else{
+//				LOG.debug("found the source node");
+			}
+		}
+		return nodes;
+	}
+	
+	
+	
+	public Collection<Id<Node>> getConnectedOutNodeIds(Id<Node> node){
+		Collection<Id<Node>> nodes = new ArrayList<Id<Node>>();
+		
+		PathDependentNode thisNode = this.getPathDependentNode(node);
+
+		Id<Node> sink = Id.createNodeId("sink");
+		Id<Node> unknown = Id.createNodeId("unknown");
+		/* Check all incoming nodes. */
+		for(Id<Node> inId : thisNode.getPathDependence().keySet()){
+			for(Id<Node> outId : thisNode.getPathDependentNextNodes(inId).keySet()){
+				if(!outId.equals(sink) && !outId.equals(unknown)){
+					nodes.add(outId);
+				} else{
+					LOG.debug("found the sink node");
+				}
+			}
+		}
+
+		return nodes;
+	}
 
 
 	public class PathDependentNode implements Identifiable<Node> {
@@ -843,5 +891,6 @@ public class PathDependentNetwork {
 			
 			return sinkWeight;
 		}
+		
 	}
 }

@@ -4,9 +4,13 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -37,6 +41,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilitiesImpl;
@@ -55,6 +62,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
 
+import playground.southafrica.population.utilities.PopulationUtils;
 import playground.southafrica.utilities.Header;
 
 /**
@@ -109,7 +117,7 @@ public class AccessibilityCalculator {
 		
 		Config config = ConfigUtils.createConfig();
 		config.transit().setUseTransit(true);
-		config.scenario().setUseVehicles(true);
+//		config.scenario().setUseVehicles(true);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		
 		/* Read households. */
@@ -125,6 +133,7 @@ public class AccessibilityCalculator {
 		MatsimPopulationReader mpr = new MatsimPopulationReader(sc);
 		mpr.readFile(populationFile);
 		LOG.info("Number of persons: " + sc.getPopulation().getPersons().size());
+//		PopulationUtils.printActivityStatistics(populationFile);
 		
 		/* Read population attributes */
 		String personAttributesFile = args[2];
@@ -132,7 +141,7 @@ public class AccessibilityCalculator {
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
 		oar.parse(personAttributesFile);
 		/* Add attributes to population. */
-		for(Id id : sc.getPopulation().getPersons().keySet()){
+		for(Id<Person> id : sc.getPopulation().getPersons().keySet()){
 			String hhId = (String) oa.getAttribute(id.toString(), "householdId");
 			sc.getPopulation().getPersons().get(id).getCustomAttributes().put("householdId", Id.create(hhId, Household.class));
 			Double hhIncome = (Double) oa.getAttribute(id.toString(), "householdIncome");
@@ -359,7 +368,7 @@ public class AccessibilityCalculator {
 					}
 					
 					/* Also need to deal with taxis here. */
-					for(Id linkId : route.getRoute().getLinkIds()){
+					for(Id<Link> linkId : route.getRoute().getLinkIds()){
 						NodeImpl toNode = (NodeImpl) transitNetwork.getLinks().get(linkId).getToNode();
 						if(toNode.getOutLinks().size() > 1 || toNode.getInLinks().size() > 1){
 							/* Only consider intersections. */
@@ -368,7 +377,7 @@ public class AccessibilityCalculator {
 							if(closestTaxiStop == null){
 								taxiStops.put(albersIntersection.getX(), albersIntersection.getY(), albersIntersection);
 							} else{
-								double distanceToClosestTaxiStop = albersIntersection.calcDistance(closestTaxiStop); 
+								double distanceToClosestTaxiStop = CoordUtils.calcDistance(albersIntersection, closestTaxiStop); 
 //								LOG.info("Distance: " + distanceToClosestTaxiStop);
 								if( distanceToClosestTaxiStop > 200){
 									taxiStops.put(albersIntersection.getX(), albersIntersection.getY(), albersIntersection);
@@ -409,7 +418,7 @@ public class AccessibilityCalculator {
 		LOG.info("Start running...");
 		Counter counter = new Counter("   person # ");
 		
-		Map<Id, Tuple<Double, Integer>> householdScoreMap = new TreeMap<Id, Tuple<Double,Integer>>();
+		Map<Id<Household>, Tuple<Double, Integer>> householdScoreMap = new TreeMap<Id<Household>, Tuple<Double,Integer>>();
 
 		String bwName = outputFolder + "accessibility.txt";
 		BufferedWriter bw = IOUtils.getBufferedWriter(bwName);
@@ -419,7 +428,7 @@ public class AccessibilityCalculator {
 				double accessibility = calculateAccessibility((PersonImpl)person);
 				
 				/* Add the individual's score to that of the household. */
-				Id householdId = (Id) person.getCustomAttributes().get("householdId");
+				Id<Household> householdId = Id.create(person.getCustomAttributes().get("householdId").toString(), Household.class);
 				if(!householdScoreMap.containsKey(householdId)){
 					householdScoreMap.put(householdId, new Tuple<Double, Integer>(accessibility, 1));
 				} else{
@@ -458,7 +467,7 @@ public class AccessibilityCalculator {
 			bw.newLine();
 			
 			/* Calculate the household average. */
-			for(Id householdId : householdScoreMap.keySet()){
+			for(Id<Household> householdId : householdScoreMap.keySet()){
 				Tuple<Double, Integer> tuple = householdScoreMap.get(householdId);
 				double householdAverage = tuple.getFirst() / ((double) tuple.getSecond());
 				
@@ -549,7 +558,8 @@ public class AccessibilityCalculator {
 			score_mobility = s4/3;
 			break;
 		case 5:
-			double s5 = getHealthcareScore( getTravelTimeToHealthcare(person) );
+			double s5 = 0.0;
+			s5 = getHealthcareScore( getTravelTimeToHealthcare(person) );
 			s5 += getShoppingScore( getTravelTimeToShopping(person) );
 			score_mobility = s5/2;
 			break;			
@@ -937,6 +947,13 @@ public class AccessibilityCalculator {
 	 * Get the walking time from the given {@link Person}'s home location (assumed 
 	 * to be the first activity in the selected plan) to the closest healthcare 
 	 * facility.
+	 * 
+	 * FIXME JWJ: In July'15 I realized that there are no health care facilities 
+	 * in the facilities file we used for the accessibility calculation. The 
+	 * short-term plan is to simply return a fixed travel time equal to 20min. 
+	 * This will result in everyone having the highest access-to-health-care
+	 * score. This, however, must be fixed!!
+	 * 
 	 * @param person
 	 * @return walking time (in seconds) (TODO check that it is indeed seconds)
 	 * @see {@link #setupRouterForWalking(PreProcessLandmarks)}
@@ -945,12 +962,17 @@ public class AccessibilityCalculator {
 		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
 		
-		Coord healthcareCoord = healthcareQT.get(homeCoord.getX(), homeCoord.getY()).getCoord();
-		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(healthcareCoord);
-		
-		Path path = routerWalk.calcLeastCostPath(fromNode, toNode, 25200, null, null);
-		
-		return path.travelTime;		
+		ActivityFacility healthCareFacility = healthcareQT.get(homeCoord.getX(), homeCoord.getY());
+		if(healthCareFacility != null){
+			Coord healthcareCoord = healthCareFacility.getCoord();
+			Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(healthcareCoord);
+			
+			Path path = routerWalk.calcLeastCostPath(fromNode, toNode, 25200, null, null);
+			
+			return path.travelTime;		
+		}else{
+			return 20.0*60.0;
+		}
 	}
 	
 	
@@ -963,20 +985,67 @@ public class AccessibilityCalculator {
 	 * @see {@link #setupRouterForWalking(PreProcessLandmarks)}
 	 */
 	private double getTravelTimeToShopping(Person person){
-		Logger.getLogger( this.getClass() ).fatal("other than stated in the javadoc of this method, the code "
-				+ "actually returns the same result as getTravelTimeToHealthcare(...).  kai/dz, mar'15") ;
-		System.exit(-1);
+//		Logger.getLogger( this.getClass() ).fatal("other than stated in the javadoc of this method, the code "
+//				+ "actually returns the same result as getTravelTimeToHealthcare(...).  kai/dz, mar'15") ;
+//		System.exit(-1);
 		
-		
-		Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		final Coord homeCoord = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 		Node fromNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(homeCoord);
 		
-		Coord healthcareCoord = healthcareQT.get(homeCoord.getX(), homeCoord.getY()).getCoord();
-		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(healthcareCoord);
+		/* New code. ====================== */
+		double searchDistance = 100.0;
+		int searchTries = 0;
+
+		Collection<ActivityFacility> facilitiesInSearchArea = new HashSet<ActivityFacility>();
+		while(facilitiesInSearchArea.size() < 5 && searchTries < 1000){
+			facilitiesInSearchArea = shoppingQT.get(homeCoord.getX(), homeCoord.getY(), searchDistance);
+			
+			searchTries++;
+			searchDistance *= 1.5;
+		}
+		if(searchTries >= 1000){
+			LOG.error("Could not find 5 shopping facilities within 1000 tries!!");
+			if(facilitiesInSearchArea.size() == 0){
+				LOG.fatal("No facilities found. Terminating.");
+				System.exit(-1);
+			} else{
+				LOG.error("Using " + facilitiesInSearchArea.size() + " instead.");
+			}
+		}
+
+		/* Create the comparator that will sort the facilities from closest to farthest. */
+		Comparator<ActivityFacility> comparator = new Comparator<ActivityFacility>() {
+			
+			@Override
+			public int compare(ActivityFacility o1, ActivityFacility o2) {
+				Double d1 = CoordUtils.calcDistance(homeCoord, o1.getCoord());
+				Double d2 = CoordUtils.calcDistance(homeCoord, o2.getCoord());
+				return d1.compareTo(d2);
+			}
+		};
+		Collection<ActivityFacility> sortedFacilities = new TreeSet<ActivityFacility>(comparator);
+		sortedFacilities.addAll(facilitiesInSearchArea);
 		
-		Path path = routerWalk.calcLeastCostPath(fromNode, toNode, 25200, null, null);
+		int numberOfElements = 0;
+		double total = 0.0;
+		Iterator<ActivityFacility> iterator = sortedFacilities.iterator();
+		while(iterator.hasNext() && numberOfElements++ < 5){
+			ActivityFacility shop = iterator.next();
+			Node shopNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(shop.getCoord());
+			Path shopPath = routerWalk.calcLeastCostPath(fromNode, shopNode, 25200, null, null);
+			
+			total += shopPath.travelTime;
+		}
+		double meanTravelTime = total / ((double)numberOfElements);
+		return meanTravelTime;
+		/* New code. ====================== */
 		
-		return path.travelTime;		
+		/* Old code. ====================== */
+//		Coord healthcareCoord = healthcareQT.get(homeCoord.getX(), homeCoord.getY()).getCoord();
+//		Node toNode = ((NetworkImpl)this.sc.getNetwork()).getNearestNode(healthcareCoord);
+//		Path path = routerWalk.calcLeastCostPath(fromNode, toNode, 25200, null, null);
+//		return path.travelTime;		
+		/* Old code. ====================== */
 	}
 
 	

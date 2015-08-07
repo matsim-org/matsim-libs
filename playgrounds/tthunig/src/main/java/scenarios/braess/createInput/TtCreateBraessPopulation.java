@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -16,13 +15,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.DgPaths;
 
@@ -37,37 +32,46 @@ import playground.dgrether.DgPaths;
  */
 public class TtCreateBraessPopulation {
 
+	public enum InitRoutes{
+		ALL, ONLY_MIDDLE, ONLY_OUTER, NONE
+	}
+	
 	private Population population;
 	private Network network;
 	
 	private int numberOfPersons;
 	
-	private boolean simulateInflowCap7 = false;
-	private boolean simulateInflowCap9 = false;
+	private boolean simulateInflowCap23 = false;
+	private boolean simulateInflowCap24 = false;
+	private boolean simulateInflowCap45 = false;
+	private boolean middleLinkExists = true;
+	
+	private boolean writePopFile = false;
+	private String pathToPopFile = "C:/Users/Theresa/Desktop/braess/plans3600.xml";
 	
 	public TtCreateBraessPopulation(Population pop, Network net) {
 		this.population = pop;
 		this.network = net;
 		
-		checkInflowSimulation();
+		checkNetworkProperties();
 	}
 
 	/**
-	 * Checks whether the network simulates inflow capacity at links 2_3 and 4_5
-	 * or not.
-	 * 
-	 * If the network contains nodes 7 or 9, it simulates inflow capacity;
-	 * otherwise it doesn't.
-	 * 
-	 * The boolean simulateInflowCap is necessary for creating initial plans in
-	 * createPersons(...)
+	 * Checks several properties of the network.
 	 */
-	private void checkInflowSimulation() {
+	private void checkNetworkProperties() {
 		
-		if (this.network.getNodes().containsKey(Id.createNodeId(7)))
-			this.simulateInflowCap7 = true;
-		if (this.network.getNodes().containsKey(Id.createNodeId(9)))
-			this.simulateInflowCap9 = true;
+		// check whether the network simulates inflow capacity
+		if (this.network.getNodes().containsKey(Id.createNodeId(23)))
+			this.simulateInflowCap23 = true;
+		if (this.network.getNodes().containsKey(Id.createNodeId(24)))
+			this.simulateInflowCap24 = true;
+		if (this.network.getNodes().containsKey(Id.createNodeId(45)))
+			this.simulateInflowCap45 = true;
+		
+		// check whether the network contains the middle link
+		if (!this.network.getLinks().containsKey(Id.createLinkId("3_4")))
+			this.middleLinkExists = false;
 	}
 
 	/**
@@ -83,101 +87,60 @@ public class TtCreateBraessPopulation {
 	 * scenario, whereby every second agent gets the upper and every other agent
 	 * the lower route as initial selected route.
 	 * 
-	 * @param numberOfInitRoutes
-	 *            number of routes that the agents get as initial plans
+	 * @param initRouteSpecification
+	 *            specification which routes should be used as initial routes
+	 *            (see enum RouteInitialization for the possibilities)
 	 * @param initPlanScore
 	 *            initial score for all plans the persons will get. Use null for
 	 *            no scores.
 	 */
-	public void createPersons(int numberOfInitRoutes, Double initPlanScore) {
+	public void createPersons(InitRoutes initRouteSpecification, Double initPlanScore) {
+		
+		if (initRouteSpecification.equals(InitRoutes.ONLY_MIDDLE)
+				&& !this.middleLinkExists){
+			throw new IllegalArgumentException("You are trying to create agents "
+					+ "with an initial middle route, although no middle link exists.");
+		}
 		
 		for (int i = 0; i < this.numberOfPersons; i++) {
 
-			// create a person and a plan container
+			// create a person
 			Person person = population.getFactory().createPerson(
 					Id.createPersonId(i));
-			Plan plan = population.getFactory().createPlan();
 
-			// add a start activity at link 0_1
+			// create a start activity at link 0_1
 			Activity startAct = population.getFactory()
 					.createActivityFromLinkId("dummy", Id.createLinkId("0_1"));
-		
 			// 8:00 am. plus i seconds
 			startAct.setEndTime(8 * 3600 + i);
 		
-			plan.addActivity(startAct);
-
-			// add a leg
-			Leg leg = population.getFactory().createLeg(TransportMode.car);
-			if (numberOfInitRoutes >= 1) {
-				// create a route for the Z path
-				List<Id<Link>> pathZ = new ArrayList<>();
-				pathZ.add(Id.createLinkId("1_2"));
-				if (!this.simulateInflowCap7){
-					pathZ.add(Id.createLinkId("2_3"));
-				}
-				else{
-					pathZ.add(Id.createLinkId("2_7"));
-					pathZ.add(Id.createLinkId("7_3"));
-				}
-				pathZ.add(Id.createLinkId("3_4"));
-				if (!this.simulateInflowCap9){
-					pathZ.add(Id.createLinkId("4_5"));
-				}
-				else{
-					pathZ.add(Id.createLinkId("4_9"));
-					pathZ.add(Id.createLinkId("9_5"));
-				}
-				Route routeZ = new LinkNetworkRouteImpl(
-						Id.createLinkId("0_1"), pathZ, Id.createLinkId("5_6"));
-				leg.setRoute(routeZ);
-			}
-			plan.addLeg(leg);
-			
-			// set an initial plan score
-			plan.setScore(initPlanScore);
-
-			// add a drain activity at link 5_6
+			// create a drain activity at link 5_6
 			Activity drainAct = population.getFactory().createActivityFromLinkId(
 					"dummy", Id.createLinkId("5_6"));
-			plan.addActivity(drainAct);
-
+			
+			// create a leg with or without a route
+			Leg leg1 = population.getFactory().createLeg(TransportMode.car);
+			if (this.middleLinkExists && 
+					(initRouteSpecification.equals(InitRoutes.ONLY_MIDDLE)
+							|| initRouteSpecification.equals(InitRoutes.ALL))) {
+				
+				leg1 = createMiddleLeg();
+			}
+			
+			// create a first plan for the person
+			Plan plan1 = createPlan(startAct, leg1, drainAct, initPlanScore);
 			// store information in population
-			person.addPlan(plan);
+			person.addPlan(plan1);
 			population.addPerson(person);
 
-			// copy plan if different routes should be created
-			if (numberOfInitRoutes >= 2) {
-				// create the second plan
-				Plan plan2 = population.getFactory().createPlan();
-
-				// add the same start activity as for the first plan
-				plan2.addActivity(startAct);
-
-				// add a leg with the upper path
-				Leg legUp = population.getFactory()
-						.createLeg(TransportMode.car);
-				List<Id<Link>> pathUp = new ArrayList<>();
-				pathUp.add(Id.createLinkId("1_2"));
-				if (!this.simulateInflowCap7){
-					pathUp.add(Id.createLinkId("2_3"));
-				}
-				else{
-					pathUp.add(Id.createLinkId("2_7"));
-					pathUp.add(Id.createLinkId("7_3"));
-				}
-				pathUp.add(Id.createLinkId("3_5"));
-				Route routeUp = new LinkNetworkRouteImpl(
-						Id.createLinkId("0_1"), pathUp, Id.createLinkId("5_6"));
-				legUp.setRoute(routeUp);
-				plan2.addLeg(legUp);
+			// create further plans if different routes should be initialized
+			if (initRouteSpecification.equals(InitRoutes.ONLY_OUTER) 
+					|| initRouteSpecification.equals(InitRoutes.ALL)) {
 				
-				// set an initial plan score
-				plan2.setScore(initPlanScore);
-				
-				// add the same drain activity as for the first plan
-				plan2.addActivity(drainAct);
-
+				// create a second plan for the person (with the same start and
+				// end activity but a different leg)
+				Leg leg2 = createUpperLeg();
+				Plan plan2 = createPlan(startAct, leg2, drainAct, initPlanScore);	
 				person.addPlan(plan2);
 				
 				// select plan2 for every second person (with even id)
@@ -185,51 +148,132 @@ public class TtCreateBraessPopulation {
 					person.setSelectedPlan(plan2);
 				}
 
-				if (numberOfInitRoutes >= 3){
-					// create the third plan
-					Plan plan3 = population.getFactory().createPlan();
+				// create a third plan for the person (with the same start and
+				// end activity but a different leg)
+				Leg leg3 = createLowerLeg();
+				Plan plan3 = createPlan(startAct, leg3, drainAct, initPlanScore);
+				person.addPlan(plan3);
 
-					// add the same start activity as for the first plan
-					plan3.addActivity(startAct);
-
-					// add a leg with the lower path
-					Leg legDown = population.getFactory().createLeg(
-							TransportMode.car);
-					List<Id<Link>> pathDown = new ArrayList<>();
-					pathDown.add(Id.createLinkId("1_2"));
-					pathDown.add(Id.createLinkId("2_4"));
-					if (!this.simulateInflowCap9){
-						pathDown.add(Id.createLinkId("4_5"));
-					}
-					else{
-						pathDown.add(Id.createLinkId("4_9"));
-						pathDown.add(Id.createLinkId("9_5"));
-					}
-					Route routeDown = new LinkNetworkRouteImpl(
-							Id.createLinkId("0_1"), pathDown,
-							Id.createLinkId("5_6"));
-					legDown.setRoute(routeDown);
-					plan3.addLeg(legDown);
-
-					// set an initial plan score
-					plan3.setScore(initPlanScore);
-
-					// add the same drain activity as for the first plan
-					plan3.addActivity(drainAct);
-
-					person.addPlan(plan3);
-					
-					// select plan3 for every second person (with odd id)
-					if (i % 2 == 1){
-						person.setSelectedPlan(plan3);
-					}
-				}
+				// select plan3 for every second person (with odd id)
+				if (i % 2 == 1) {
+					person.setSelectedPlan(plan3);
+				}				
 			}
 		}
+		
+		// write population file if flag is enabled
+		if (this.writePopFile){
+			PopulationWriter popWriter = new PopulationWriter(population);
+			popWriter.write(this.pathToPopFile);
+		}
+	}
+
+	private Plan createPlan(Activity startAct, Leg leg, Activity drainAct,
+			Double initPlanScore) {
+		
+		Plan plan = population.getFactory().createPlan();
+
+		plan.addActivity(startAct);
+		plan.addLeg(leg);
+		plan.addActivity(drainAct);
+		plan.setScore(initPlanScore);
+		
+		return plan;
+	}
+
+	/**
+	 * Creates a leg with the middle path.
+	 */
+	private Leg createMiddleLeg() {
+		Leg legZ = population.getFactory()
+				.createLeg(TransportMode.car);
+		
+		List<Id<Link>> pathZ = new ArrayList<>();
+		pathZ.add(Id.createLinkId("1_2"));
+		if (!this.simulateInflowCap23){
+			pathZ.add(Id.createLinkId("2_3"));
+		}
+		else{
+			pathZ.add(Id.createLinkId("2_23"));
+			pathZ.add(Id.createLinkId("23_3"));
+		}
+		pathZ.add(Id.createLinkId("3_4"));
+		if (!this.simulateInflowCap45){
+			pathZ.add(Id.createLinkId("4_5"));
+		}
+		else{
+			pathZ.add(Id.createLinkId("4_45"));
+			pathZ.add(Id.createLinkId("45_5"));
+		}
+		
+		Route routeZ = new LinkNetworkRouteImpl(
+				Id.createLinkId("0_1"), pathZ, Id.createLinkId("5_6"));
+		
+		legZ.setRoute(routeZ);
+		return legZ;
+	}
+
+	/**
+	 * Creates a leg with the upper path.
+	 */
+	private Leg createUpperLeg() {
+		Leg legUp = population.getFactory()
+				.createLeg(TransportMode.car);
+		
+		List<Id<Link>> pathUp = new ArrayList<>();
+		pathUp.add(Id.createLinkId("1_2"));
+		if (!this.simulateInflowCap23){
+			pathUp.add(Id.createLinkId("2_3"));
+		}
+		else{
+			pathUp.add(Id.createLinkId("2_23"));
+			pathUp.add(Id.createLinkId("23_3"));
+		}
+		pathUp.add(Id.createLinkId("3_5"));
+		
+		Route routeUp = new LinkNetworkRouteImpl(
+				Id.createLinkId("0_1"), pathUp, Id.createLinkId("5_6"));
+		
+		legUp.setRoute(routeUp);
+		return legUp;
+	}
+
+	/**
+	 * Creates a leg with the lower path. 
+	 */
+	private Leg createLowerLeg() {
+		Leg legDown = population.getFactory().createLeg(
+				TransportMode.car);
+		
+		List<Id<Link>> pathDown = new ArrayList<>();
+		pathDown.add(Id.createLinkId("1_2"));
+		if (!this.simulateInflowCap24) {
+			pathDown.add(Id.createLinkId("2_4"));
+		} else {
+			pathDown.add(Id.createLinkId("2_24"));
+			pathDown.add(Id.createLinkId("24_4"));
+		}
+		if (!this.simulateInflowCap45) {
+			pathDown.add(Id.createLinkId("4_5"));
+		} else {
+			pathDown.add(Id.createLinkId("4_45"));
+			pathDown.add(Id.createLinkId("45_5"));
+		}
+		
+		Route routeDown = new LinkNetworkRouteImpl(
+				Id.createLinkId("0_1"), pathDown,
+				Id.createLinkId("5_6"));
+		
+		legDown.setRoute(routeDown);
+		return legDown;
 	}
 
 	public void setNumberOfPersons(int numberOfPersons) {
 		this.numberOfPersons = numberOfPersons;
+	}
+
+	public void writePopulation(String file) {
+		new PopulationWriter(population).write(file);
 	}
 
 }

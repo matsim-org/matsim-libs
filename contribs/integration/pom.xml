@@ -87,9 +87,9 @@
   	<version>0.7.0-SNAPSHOT</version>
   </dependency>
   <dependency>
-    <groupId>org.postgresql</groupId>
-    <artifactId>postgresql</artifactId>
-    <version>9.4-1201-jdbc41</version>
-	</dependency>
-  </dependencies>
+    <groupId>org.geotools.jdbc</groupId>
+    <artifactId>gt-jdbc-postgis</artifactId>
+    <version>13.0</version>
+  </dependency>
+ </dependencies>
 </project>

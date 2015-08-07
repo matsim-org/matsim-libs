@@ -32,17 +32,17 @@ public class RunSiteVisitIdentifier {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		SiteVisitIdentifier.main(getOneDayArgumentsForMacMini());
-		SiteVisitIdentifier.main(getOneDayArgumentsForMacbook());
+		SiteVisitIdentifier.main(getOneDayArgumentsForMacMini());
+//		SiteVisitIdentifier.main(getOneDayArgumentsForMacbook());
 	}
 	
 	
 	public static String[] getOneDayArgumentsForMacMini(){
 		String[] result = {
 				"/Users/jwjoubert/Documents/Projects/CapeTownWaste/data/waste.txt.gz",
-				"200000",
+				"1000000000",
 				"/Users/jwjoubert/Documents/Projects/CapeTownWaste/wasteSiteCoordinates.csv",
-				"/Users/jwjoubert/Documents/Projects/CapeTownWaste/wasteSiteVisits.csv",
+				"/Users/jwjoubert/workspace/r-CapeTownWaste/data/wasteSiteVisits.csv",
 		};
 		
 		return result;

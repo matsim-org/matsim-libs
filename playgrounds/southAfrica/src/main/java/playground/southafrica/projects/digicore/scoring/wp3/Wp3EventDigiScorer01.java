@@ -35,7 +35,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.projects.digicore.grid.DigicoreEventGrid;
-import playground.southafrica.projects.digicore.scoring.DigicoreEvent;
+import playground.southafrica.projects.digicore.scoring.DIGICORE_EVENT;
 import playground.southafrica.projects.digicore.scoring.DigiScorer;
 import playground.southafrica.utilities.Header;
 
@@ -135,6 +135,7 @@ public class Wp3EventDigiScorer01 implements DigiScorer {
 
 		this.grid.rankGridCells();
 		LOG.info("Done building scoring model.");
+		this.grid.reportEventCounts();
 	}
 
 	@Override
@@ -238,7 +239,7 @@ public class Wp3EventDigiScorer01 implements DigiScorer {
 		
 		String[] sa = record.split(",");
 		int eventId = Integer.parseInt(sa[2]);
-		return DigicoreEvent.getEvent(eventId).getRiskGroup();
+		return DIGICORE_EVENT.getEvent(eventId).getRiskGroup();
 	}
 	
 }
