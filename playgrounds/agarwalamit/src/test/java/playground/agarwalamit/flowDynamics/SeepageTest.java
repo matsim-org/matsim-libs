@@ -45,6 +45,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -157,11 +158,13 @@ public class SeepageTest {
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
 			config.qsim().setMainModes(Arrays.asList(TransportMode.car,TransportMode.walk));
-			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
-
-			config.setParam("seepage", "isSeepageAllowed", "true");
+//			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ.name());
+			config.qsim().setLinkDynamics(LinkDynamics.SeepageQ.name());
+			
+//			config.setParam("seepage", "isSeepageAllowed", "true");
 			config.setParam("seepage", "seepMode", "walk");
 			config.setParam("seepage","isSeepModeStorageFree","false");
+			config.setParam("seepage", "isRestrictingNumberOfSeepMode", "false");
 
 			network = (NetworkImpl) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
