@@ -82,6 +82,7 @@ public class QVehicle extends QItem implements MobsimVehicle {
 		} else {
 			// do *not* subtract one for the driver! Most pt vehicles define the capacity without the driver.
 			// for private cars, think about if we should subtract one from the capacity if the driver is set?
+			// But if we do, change the number of seats of the default vehicle from 4 to 5.
 			this.passengerCapacity = capacity.getSeats() +
 					(capacity.getStandingRoom() == null ? 0 : capacity.getStandingRoom());
 		}
