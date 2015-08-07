@@ -98,7 +98,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup implements Mobs
 	// ---
 	private double nodeOffset = 0;
 	private float linkWidth = 30;
-	private boolean usingThreadpool = false ;
+	private boolean usingThreadpool = true;
 
 	public static final String LINK_WIDTH = "linkWidth";
 
