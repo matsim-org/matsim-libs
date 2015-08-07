@@ -374,8 +374,6 @@ public class FacilityMatcher {
 				log.debug("Oops!! Null node!!");
 			}
 			
-			
-			
 			Coord inCoord = ct.transform(inNode.getCoord());
 			String sIn = String.format("%s,%.6f,%.6f,%s,%.6f,%.6f,%d", 
 					inNodeId.toString(),
