@@ -237,21 +237,21 @@ public class CreateAutomatedFDTest {
 		return Arrays.asList(fdData);
 	}
 
-		@Test
-		public void FDs_carTruck(){
-			this.travelModes = new String [] {"car","truck"};
-			run(this.linkDynamics, this.trafficDynamics,false);
-		}
+	@Test
+	public void FDs_carTruck(){
+		this.travelModes = new String [] {"car","truck"};
+		run(this.linkDynamics, this.trafficDynamics,false);
+	}
 
 	@Test
 	public void FDs_carBike(){
 		run(this.linkDynamics, this.trafficDynamics,false);
 	}
 
-		@Test 
-		public void Fds_carBike_fastCapacityUpdate(){
-			run(this.linkDynamics,this.trafficDynamics,true);
-		}
+	@Test 
+	public void Fds_carBike_fastCapacityUpdate(){
+		run(this.linkDynamics,this.trafficDynamics,true);
+	}
 
 	@Rule public MatsimTestUtils helper = new MatsimTestUtils();
 
@@ -307,8 +307,17 @@ public class CreateAutomatedFDTest {
 			for (String mode:travelModes){
 				pointToRun.put(mode,minSteps.get(mode)*m*reduceNoOfDataPointsInPlot);
 			}
-			System.out.println("Number of Agents - \t"+pointToRun.toString());
-			points2Run.add(pointToRun);
+
+			double density =0 ;
+			for (String mode :pointToRun.keySet()){
+				double pcu = this.modeVehicleTypes.get(mode).getPcuEquivalents();
+				density += pcu * pointToRun.get(mode);
+			}
+
+			if(density <= networkDensity+10){
+				System.out.println("Number of Agents - \t"+pointToRun.toString());
+				points2Run.add(pointToRun);
+			}
 		}
 
 		Map<Double, Map<String, Tuple<Double, Double>>> outData = new HashMap<Double, Map<String,Tuple<Double,Double>>>();
