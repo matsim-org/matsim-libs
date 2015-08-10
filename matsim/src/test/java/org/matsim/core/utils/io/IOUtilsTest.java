@@ -30,7 +30,6 @@ import java.nio.charset.Charset;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -116,7 +115,6 @@ public class IOUtilsTest {
 	 * @author mrieser
 	 */
 	@Test
-	@Ignore
 	public void testRenameFile_UnreadableFromFile() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 		String fromDirName = outputDir + "a";
@@ -152,7 +150,6 @@ public class IOUtilsTest {
 	 * @author mrieser
 	 */
 	@Test
-	@Ignore
 	public void testRenameFile_LockedDestinationDirectory() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 		String fromFileName = outputDir + "a.txt";
