@@ -23,9 +23,9 @@ import org.junit.runners.Suite;
 import org.matsim.core.controler.ControlerTest;
 import org.matsim.core.mobsim.qsim.FlowStorageSpillbackTest;
 import org.matsim.core.mobsim.qsim.QSimTest;
-import org.matsim.core.mobsim.qsim.pt.QSimIntegrationTest;
 import org.matsim.core.replanning.ReRoutingTest;
 import org.matsim.examples.EquilTest;
+import org.matsim.integration.timevariantnetworks.QSimIntegrationTest;
 import org.matsim.modules.ScoreStatsModuleTest;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
 
