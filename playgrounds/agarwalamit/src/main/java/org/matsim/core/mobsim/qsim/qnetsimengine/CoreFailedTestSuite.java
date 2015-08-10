@@ -23,12 +23,12 @@ import org.junit.runners.Suite;
 import org.matsim.core.controler.ControlerTest;
 import org.matsim.core.mobsim.qsim.FlowStorageSpillbackTest;
 import org.matsim.core.mobsim.qsim.QSimTest;
+import org.matsim.core.mobsim.qsim.TransitQueueNetworkTest;
 import org.matsim.core.replanning.ReRoutingTest;
 import org.matsim.examples.EquilTest;
 import org.matsim.integration.timevariantnetworks.QSimIntegrationTest;
 import org.matsim.modules.ScoreStatsModuleTest;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
-
 
 /**
  * @author amit
@@ -46,7 +46,20 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
 	ScoreStatsModuleTest.class,
 	QLinkTest.class,	
 	QSimTest.class, //(4)
-	QSimIntegrationTest.class
+	QSimIntegrationTest.class, // bug fix for timeVarientNetwork and flowcap_accumulate.timeStep = bufferLastMoveTime
+	
+	// if flowcap_accumulate.timeStep = bufferLastMoveTime instead of bufferLastMoveTime -1 then failed tests are 
+	
+	FlowStorageSpillbackTest.class, 
+	EquilTest.class,
+	TravelTimeCollectorTest.class,
+	StorageCapOnSimultaneousSpillBack.class,
+	ReRoutingTest.class, //(4)
+	ScoreStatsModuleTest.class,
+	JavaRoundingErrorInQsim.class, // rounding error
+	QLinkTest.class,	
+	QSimTest.class, //(4)
+	TransitQueueNetworkTest.class
 	
 })
 
