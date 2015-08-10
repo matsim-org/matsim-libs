@@ -1,4 +1,4 @@
-package freightKt.analyse;
+package playground.kturner.freightKt.analyse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
