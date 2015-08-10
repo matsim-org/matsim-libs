@@ -62,7 +62,7 @@ import org.matsim.vehicles.VehicleUtils;
  * @author amit
  */
 
-public class DeparturesOnSameLinkSameTime {
+public class DeparturesOnSameLinkSameTimeTest {
 
 	/**
 	 * Two cases where two motorbikes or two cars depart at the same time on link l_1.

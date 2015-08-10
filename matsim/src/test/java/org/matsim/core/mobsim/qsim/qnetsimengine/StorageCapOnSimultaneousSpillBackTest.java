@@ -58,7 +58,7 @@ import java.util.Map;
  * @author amit
  */
 
-public class StorageCapOnSimultaneousSpillBack {
+public class StorageCapOnSimultaneousSpillBackTest {
 
 	private final int numberOfPersonInPlan = 4;
 
