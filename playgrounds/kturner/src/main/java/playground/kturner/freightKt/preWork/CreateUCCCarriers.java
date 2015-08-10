@@ -1,4 +1,4 @@
-package freightKt.preWork;
+package playground.kturner.freightKt.preWork;
 
 import java.io.File;
 import java.io.FileWriter;

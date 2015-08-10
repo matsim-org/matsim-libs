@@ -1,4 +1,4 @@
-package santiago;
+package playground.kturner.santiago;
 
 import java.util.ArrayList;
 import java.util.Map;
