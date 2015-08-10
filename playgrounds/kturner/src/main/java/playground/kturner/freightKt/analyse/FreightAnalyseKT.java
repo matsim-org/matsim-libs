@@ -1,4 +1,4 @@
-package freightKt.analyse;
+package playground.kturner.freightKt.analyse;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.carrier.Carrier;

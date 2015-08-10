@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package freightKt;
+package playground.kturner.freightKt;
 
 import jsprit.analysis.toolbox.Plotter;
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
@@ -141,7 +141,7 @@ public class KTFreight_v3 {
 	//	//Dateinamen ohne XML-Endung
 	//	private static final String NETFILE_NAME = "grid-network" ;
 	//	private static final String VEHTYPES_NAME = "grid-vehTypes_kt" ;
-	//	private static final String CARRIERS_NAME = "grid-carrier_kt2" ;
+	//	private static final String CARRIERS_NAME = "grid-carrier_kt" ;
 	//	private static final String ALGORITHM_NAME = "mdvrp_algorithmConfig_2" ;
 	//	private static final String TOLL_NAME = "grid-tollDistance";
 	//	private static final String LEZ_NAME = "grid-tollArea"; 

@@ -20,7 +20,7 @@
 /**
  * 
  */
-package freightKt.analyse;
+package playground.kturner.freightKt.analyse;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,7 +37,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.vehicles.VehicleType;
 
-import freightKt.analyse.TripEventHandler.VehicleTypeSpezificCapabilities;
+import playground.kturner.freightKt.analyse.TripEventHandler.VehicleTypeSpezificCapabilities;
 
 /**
  * @author ikaddoura , lkroeger
