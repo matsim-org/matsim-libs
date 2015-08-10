@@ -40,7 +40,7 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
 	FlowStorageSpillbackTest.class, 
 	EquilTest.class,
 	TravelTimeCollectorTest.class,
-	StorageCapOnSimultaneousSpillBack.class,
+	StorageCapOnSimultaneousSpillBackTest.class,
 	ControlerTest.class,
 	ReRoutingTest.class, //(4)
 	ScoreStatsModuleTest.class,
@@ -53,10 +53,10 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorTest;
 	FlowStorageSpillbackTest.class, 
 	EquilTest.class,
 	TravelTimeCollectorTest.class,
-	StorageCapOnSimultaneousSpillBack.class,
+	StorageCapOnSimultaneousSpillBackTest.class,
 	ReRoutingTest.class, //(4)
 	ScoreStatsModuleTest.class,
-	JavaRoundingErrorInQsim.class, // rounding error
+	JavaRoundingErrorInQsimTest.class, // rounding error
 	QLinkTest.class,	
 	QSimTest.class, //(4)
 	TransitQueueNetworkTest.class
