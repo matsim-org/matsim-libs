@@ -77,9 +77,10 @@ public class EventsConverter{
 	static String option;
 	static HashSet<Id<Person>> handledPersons = new HashSet<>(); //persons with departureEvent
 	static HashSet<Id<Person>> personInfo = new HashSet<>(); //persons in tripInfo-file
+	static HashSet<Id<Vehicle>> missingVehicleData = new HashSet<>();
 
 	static String configFileName = "../../matsim/examples/siouxfalls-2014/config_renamed.xml";
-	static String populationInput = "../../matsim/output/siouxfalls-2014_renamed/output_plans.xml.gz";
+	static String populationInput = "../../matsim/output/siouxfalls-2014/output_plans.xml.gz";
 
 	static Config config = ConfigUtils.loadConfig(configFileName);
 	static Scenario scenario = ScenarioUtils.createScenario(config);
@@ -147,7 +148,7 @@ public class EventsConverter{
 			eventsManager.processEvent(event);
 		}
 		eventWriterXML.closeFile();
-
+		System.out.println("vehicles with no stop information: " + missingVehicleData.toString());
 		System.out.println("number of persons: " + personInfo.size() + "    number of persons with departureEvent (excl. bus driver): " + handledPersons.size());
 	}
 
@@ -387,7 +388,8 @@ public class EventsConverter{
 											break;
 										}
 									}else
-										System.out.println("vehicle " + busId + " has no busStopDeparture for " + firstLinkId + " [person: " + personId + "]");
+										missingVehicleData.add(busId);
+//										System.out.println("vehicle " + busId + " has no busStopDeparture for " + firstLinkId + " [person: " + personId + "]");
 									if (i - lines.length + 1 == 0)
 										System.out.println("no PersonEnters- and PersonLeavesVehicleEvents created for person: " + personId.toString());
 								}

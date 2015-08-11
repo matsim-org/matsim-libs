@@ -1,4 +1,4 @@
-package freightKt;
+package playground.kturner.freightKt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +18,8 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypeReader;
 import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.testcases.MatsimTestUtils;
+
+import playground.kturner.freightKt.UccCarrierCreator;
 
 /**
  * 

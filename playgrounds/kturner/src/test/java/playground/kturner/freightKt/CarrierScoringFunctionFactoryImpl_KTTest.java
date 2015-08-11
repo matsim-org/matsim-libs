@@ -1,4 +1,4 @@
-package freightKt;
+package playground.kturner.freightKt;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +34,8 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
+
+import playground.kturner.freightKt.CarrierScoringFunctionFactoryImpl_KT;
 
 public class CarrierScoringFunctionFactoryImpl_KTTest {
 	

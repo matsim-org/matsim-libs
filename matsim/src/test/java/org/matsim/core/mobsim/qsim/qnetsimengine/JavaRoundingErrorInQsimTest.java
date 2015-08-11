@@ -67,7 +67,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author amit
  */
 
-public class JavaRoundingErrorInQsim {
+public class JavaRoundingErrorInQsimTest {
 
 	@Test
 	public void printDecimalSum(){
@@ -102,7 +102,7 @@ public class JavaRoundingErrorInQsim {
 
 		// agent 1 should have 1000/25 +1 + 10 = 51 but, it may be 52 sec sometimes due to rounding errors in java. Rounding errors is eliminated at the moment if accumulating flow to zero instead of one. 
 		Assert.assertEquals( "Wrong travel time for on link 2 for person 1" , 51.0 , personLinkTravelTimes.get(Id.createPersonId(1))  , MatsimTestUtils.EPSILON);
-		Logger.getLogger(JavaRoundingErrorInQsim.class).warn("Although the test is passing instead of failing for person 1. This is done intentionally in order to keep this in mind for future.");
+		Logger.getLogger(JavaRoundingErrorInQsimTest.class).warn("Although the test is passing instead of failing for person 1. This is done intentionally in order to keep this in mind for future.");
 	}
 
 	private QSim createQSim (PseudoInputs net, EventsManager manager){

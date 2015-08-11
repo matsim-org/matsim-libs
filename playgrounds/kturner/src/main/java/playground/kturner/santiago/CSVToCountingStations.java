@@ -1,4 +1,4 @@
-package santiago;
+package playground.kturner.santiago;
 
 import java.io.BufferedReader;
 import java.io.IOException;
