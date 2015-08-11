@@ -1,21 +1,7 @@
 package org.matsim.contrib.accessibility;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.simple.SimpleFeatureStore;
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
@@ -31,23 +17,14 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * improvements sep'11:
@@ -235,8 +212,8 @@ public final class GridBasedAccessibilityControlerListenerV3
 			return ; // don't need this a second time, which can happen if the irregular shutdown is called within the regular shutdown
 		}
 		alreadyActive = true ;
-		log.info("Entering notifyShutdown ..." );
-		accessibilityControlerListener.initDefaultContributionCalculators( event.getControler() );
+		log.info("Entering notifyShutdown ...");
+		accessibilityControlerListener.initDefaultContributionCalculators(event.getControler());
 
 		// make sure that measuring points are set.
 		if(accessibilityControlerListener.getMeasuringPoints() == null){
@@ -298,14 +275,6 @@ public final class GridBasedAccessibilityControlerListenerV3
 		} else {
 			writePlottingData(matsimOutputDirectory + "/" + outputSubdirectory);
 		}
-		
-		try {
-			fillDatabase();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 
 		if(accessibilityControlerListener.getSpatialGridDataExchangeListenerList() != null){
 			log.info("Triggering " + accessibilityControlerListener.getSpatialGridDataExchangeListenerList().size() + " SpatialGridDataExchangeListener(s) ...");
@@ -315,98 +284,11 @@ public final class GridBasedAccessibilityControlerListenerV3
 
 	}
 
-
-	private void fillDatabase() throws IOException {
-		GeometryFactory fac = new GeometryFactory();
-		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
-		b.setName("accessibilities");
-		b.setCRS(MGC.getCRS(TransformationFactory.WGS84));
-		b.add("the_geom", Point.class);
-		b.add("x", Double.class);
-		b.add("y", Double.class);
-		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-			if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
-				b.add(mode.toString(), Double.class);
-			}
-		}
-		SimpleFeatureType featureType = b.buildFeatureType();
-		DefaultFeatureCollection collection = new DefaultFeatureCollection("internal", featureType);        
-
-        SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
-		final SpatialGrid spatialGrid = this.getAccessibilityGrids().get( Modes4Accessibility.freeSpeed ) ;
-		// yy for time being, have to assume that this is always there
-		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_SA_Albers, TransformationFactory.WGS84);
-
-		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
-			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
-				Coord saAlbersCoord = new CoordImpl(x + 0.5*spatialGrid.getResolution(),y + 0.5*spatialGrid.getResolution());
-				Coord wgs84Coord = transformation.transform(saAlbersCoord);
-		        featureBuilder.add(fac.createPoint(MGC.coord2Coordinate(wgs84Coord)));
-		        featureBuilder.add(x);
-		        featureBuilder.add(y);
-
-				for (Modes4Accessibility mode : Modes4Accessibility.values()) {
-					if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
-						final SpatialGrid theSpatialGrid = this.getAccessibilityGrids().get(mode);
-						final double value = theSpatialGrid.getValue(x, y);
-						if (Double.isNaN(value)) {
-							featureBuilder.add(null);
-						} else {
-							featureBuilder.add(value);
-						}
-					}
-				}
-				
-				SimpleFeature feature = featureBuilder.buildFeature(null);
-				collection.add(feature);
-
-			}
-				
-		}
-
-        
-	    
-	    Map<String,Object> params = new HashMap<String,Object>();
-	    params.put( "dbtype", "postgis");
-	    params.put( "host", "wiki.vsp.tu-berlin.de");
-	    params.put( "port", 5432);
-	    params.put( "schema", "public");
-	    params.put( "database", "vspgeo");
-	    params.put( "user", "postgres");
-	    params.put( "passwd", "jafs30_A");
-	    
-	    DataStore dataStore = DataStoreFinder.getDataStore(params);
-	    try {
-		    dataStore.removeSchema("accessibilities");
-	    } catch (IllegalArgumentException e) {
-	    	log.warn("Could not remove schema. Perhaps it does not exist. Probably doesn't matter.");
-	    }
-	    dataStore.createSchema(featureType);
-
-	    SimpleFeatureStore featureStore = (SimpleFeatureStore) dataStore.getFeatureSource("accessibilities");
-	    featureStore.addFeatures(collection);
-	}
-
-
 	/**
 	 * This writes the accessibility grid data into the MATSim output directory
 	 */
 	private final void writePlottingData(String adaptedOutputDirectory) {
 
-//		log.info("Writing plotting data for R analyis into " + adaptedOutputDirectory + " ...");
-//		for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
-//			if ( this.isComputingMode.get(mode) ) {
-//				final SpatialGrid spatialGrid = this.getAccessibilityGrids().get(mode);
-//
-//				// output for R:
-//				GridUtils.writeSpatialGridTable( spatialGrid, adaptedOutputDirectory
-//						+ "/" + mode.toString() + Labels.ACCESSIBILITY_CELLSIZE + spatialGrid.getResolution() + ".txt");
-//
-//			}
-//		}
-//		log.info("Writing plotting data for R done!");
-
-		
 		// in the following, the data used for gnuplot or QGis is written. dz, feb'15
 		// different separators have to be used to make this output useable by gnuplot or QGis, respectively
 		log.info("Writing plotting data for other analyis into " + adaptedOutputDirectory + " ...");
@@ -461,37 +343,6 @@ public final class GridBasedAccessibilityControlerListenerV3
 
 		log.info("Writing plotting data for other analysis done!");
 		
-		
-		// Write accessibility (so far only for mode freeSpeed) to a shapefile
-		
-		// this was used to create point objects with accessibility values in a shapefile and then load this
-		// shapefile in QGis and draw theses points as tiles coloured with respect to their accessibility values
-		// now that we know how handling csv files in QGis works, the conversion into points and storing them
-		// in a shapefile does not seem to be needed anymore
-//		PointFeatureFactory factory = new PointFeatureFactory.Builder()
-//		.setCrs(MGC.getCRS(TransformationFactory.WGS84))
-//		.setName("accessibility")
-//		.addAttribute("access", Double.class)
-//		.create();
-//		
-//		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-//		
-//		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
-//			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
-//				// so far only for mode freeSpeed
-//				final SpatialGrid theSpatialGrid = this.accessibilityGrids.get(Modes4Accessibility.freeSpeed);
-//				final double value = theSpatialGrid.getValue(x, y);
-//				
-//				CoordImpl coord = new CoordImpl(x, y);
-//				factory.createPoint(MGC.coord2Coordinate(coord), new Object[] {value}, null);
-//				SimpleFeature feature = factory.createPoint(MGC.coord2Coordinate(coord), new Object[] {value}, null);
-//				features.add(feature);
-//			}
-//		}
-//				
-//		log.info("Writing accessibilities and densities to shapefile... ");
-//		ShapeFileWriter.writeGeometries(features, adaptedOutputDirectory + "/accessibilities.shp");
-//		log.info("Writing accessibilities and densities to shapefile... Done. ");
 	}
 	
 
@@ -548,7 +399,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		log.info("Using the boundary of the network file to determine the area for accessibility computation.");
 		log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
 		if (cellSize <= 0) {
-			new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
+			throw new RuntimeException("Cell Size needs to be assigned a value greater than zero.");
 		}
 		BoundingBox bb = BoundingBox.createBoundingBox(network);
 		generateGridsAndMeasuringPoints(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
