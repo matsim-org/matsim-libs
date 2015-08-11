@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -56,6 +57,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 
+ * This test is created to determine that which agent will move to bottleneck link 
+ * if spill back occurs on two upstream link simultaneously. 
+ * 
+ * <p> This also depends on the capacity of the links as mentioned in the <code>QNode.doSimStep(now)</code> method. 
+ * 
  * @author amit
  */
 
@@ -73,6 +80,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		 * second will also be forced to move on next link. 
 		 * 
 		 */
+		
 		Tuple<Id<Link>, Id<Link>> startLinkIds = new Tuple<Id<Link>, Id<Link>>(Id.createLinkId(1), Id.createLinkId(4)); // agent 2,4 depart on link 1
 		Map<Id<Person>, Tuple<Double,Double>> person2EnterTime = getPerson2LinkEnterTime(startLinkIds);
 
@@ -96,15 +104,18 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		
 		Assert.assertEquals("Person 4 is entering on link 2 at wrong time.", 14.0, person2EnterTime.get(Id.createPersonId(4)).getFirst(),MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Person 4 is leaving from link 2 at wrong time.", 24.0, person2EnterTime.get(Id.createPersonId(4)).getSecond(),MatsimTestUtils.EPSILON);
-		
 	}
 
 	private Map<Id<Person>, Tuple<Double,Double>> getPerson2LinkEnterTime(Tuple<Id<Link>, Id<Link>> startLinkIds){
+		
+		MatsimRandom.reset(); // resetting the random nos with default seed.
+		
 		MergingNetworkAndPlans pseudoInputs = new MergingNetworkAndPlans();
 		pseudoInputs.createNetwork();
 		pseudoInputs.createPopulation(numberOfPersonInPlan, startLinkIds );
 		Scenario sc = pseudoInputs.scenario;
 
+		ScenarioUtils.loadScenario(sc);
 		Map<Id<Person>, Tuple<Double,Double>> person2LinkEnterTime = new HashMap<>();
 
 		EventsManager events = EventsUtils.createEventsManager();
@@ -142,8 +153,6 @@ public class StorageCapOnSimultaneousSpillBackTest {
 				personLinkEnterLeaveTime.put(Id.createPersonId(event.getVehicleId()), new Tuple<Double, Double>(event.getTime(), 0.));
 			}
 		}
-
-
 	}
 
 
@@ -197,6 +206,7 @@ public class StorageCapOnSimultaneousSpillBackTest {
 		private MergingNetworkAndPlans(){
 			config=ConfigUtils.createConfig();
 			config.qsim().setStuckTime(3600.);
+			config.global().setRandomSeed(2546);
 			this.scenario = ScenarioUtils.loadScenario(config);
 			network =  (NetworkImpl) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
