@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
@@ -68,9 +67,6 @@ import java.util.concurrent.ConcurrentHashMap;
 	private ActivityFacilitiesImpl parcels;
 	// destinations, opportunities like jobs etc ...
 	private AggregationObject[] aggregatedOpportunities;
-	
-	// storing the accessibility results
-	private Map<Modes4Accessibility,SpatialGrid> accessibilityGrids = new HashMap<>() ;
 
 	private Map<Modes4Accessibility,Boolean> isComputingMode = new HashMap<>() ;
 	private Map<Modes4Accessibility, AccessibilityContributionCalculator> calculators = new HashMap<>();
@@ -92,8 +88,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 	// counter for warning that capacities are not used so far ... in order not to give the same warning multiple times; dz, apr'14
 	private static int cnt = 0 ;
-
-	protected boolean urbansimMode = true;
 
 	AccessibilityControlerListenerDelegate() {
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
@@ -250,9 +244,7 @@ import java.util.concurrent.ConcurrentHashMap;
 	
 	final void accessibilityComputation(
 			AccessibilityCSVWriter writer,
-			Scenario scenario,
-			boolean isGridBased ) {
-
+			Scenario scenario) {
 		SumOfExpUtils[] gcs = new SumOfExpUtils[Modes4Accessibility.values().length] ;
 		// this could just be a double array, or a Map.  Not using a Map for computational speed reasons (untested);
 		// not using a simple double array for type safety in long argument lists. kai, feb'14
@@ -333,10 +325,6 @@ import java.util.concurrent.ConcurrentHashMap;
 							// yyyy why _multiply_ with "inverseOfLogitScaleParameter"??  If anything, would need to take the power:
 							// a * ln(b) = ln( b^a ).  kai, jan'14
 						}
-						if( isGridBased ){ // only for cell-based accessibility computation
-							// assign log sums to current starZone[[???]] object and spatial grid
-							this.accessibilityGrids.get(mode).setValue( accessibilities.get(mode), origin.getCoord().getX(), origin.getCoord().getY() ) ;
-						}
 					}
 				}
 
@@ -391,34 +379,12 @@ import java.util.concurrent.ConcurrentHashMap;
 		this.zoneDataExchangeListenerList.add(l);
 	}
 
-
-	// ////////////////////////////////////////////////////////////////////
-	// inner classes
-	// ////////////////////////////////////////////////////////////////////
-
-
-	/**
-	 * Set to true if you are using this module in urbansim mode.  With false, some (or all) of the m4u output files are not written
-	 * (since they cannot be modified anyways).
-	 */
-	public void setUrbansimMode(boolean urbansimMode) {
-		this.urbansimMode = urbansimMode;
-	}
-
-	public Map<Modes4Accessibility,SpatialGrid> getAccessibilityGrids() {
-		return accessibilityGrids;
-	}
-
 	public ActivityFacilitiesImpl getParcels() {
 		return parcels;
 	}
 
 	public void setParcels(ActivityFacilitiesImpl parcels) {
 		this.parcels = parcels;
-	}
-
-	public AggregationObject[] getAggregatedOpportunities() {
-		return aggregatedOpportunities;
 	}
 
 	public void setAggregatedOpportunities(AggregationObject[] aggregatedOpportunities) {

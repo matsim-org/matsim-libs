@@ -8,7 +8,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.facilities.ActivityFacilitiesImpl;
-import org.matsim.run.Benchmark;
 
 /**
  *  improvements feb'12
@@ -124,7 +123,7 @@ public final class ZoneBasedAccessibilityControlerListenerV3 implements Shutdown
 			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 			log.info(delegate.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 			
-			delegate.accessibilityComputation( urbanSimZoneCSVWriterV2 , controler.getScenario(), false);
+			delegate.accessibilityComputation( urbanSimZoneCSVWriterV2 , controler.getScenario());
 			
 			System.out.println();
 			// finalizing/closing csv file containing accessibility measures

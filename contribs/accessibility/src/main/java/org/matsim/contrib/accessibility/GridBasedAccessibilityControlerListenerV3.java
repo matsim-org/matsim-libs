@@ -10,7 +10,6 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.utils.collections.Tuple;
@@ -122,6 +121,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 	// required in order not to confuse the output
 	private String outputSubdirectory;
 	private boolean urbanSimMode;
+	private SpatialGridAggregator spatialGridAggregator;
 
 
 	// ////////////////////////////////////////////////////////////////////
@@ -146,6 +146,8 @@ public final class GridBasedAccessibilityControlerListenerV3
 		// one can also use FacilitiesUtils.createActivitiesFacilities(), put everything in there, and give that to this constructor. kai, feb'14
 
 		log.info("Initializing  ...");
+		spatialGridAggregator = new SpatialGridAggregator();
+		accessibilityControlerListener.addZoneDataExchangeListener(spatialGridAggregator);
 
 		accessibilityControlerListener.setPtMatrix(ptMatrix);	// this could be zero if no input files for pseudo pt are given ...
 		assert (config != null);
@@ -212,7 +214,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 		log.info(accessibilityControlerListener.getMeasuringPoints().getFacilities().values().size() + " measurement points are now processing ...");
 
-		accessibilityControlerListener.accessibilityComputation(urbansimAccessibilityWriter, event.getControler().getScenario(), true);
+		accessibilityControlerListener.accessibilityComputation(urbansimAccessibilityWriter, event.getControler().getScenario());
 
 		if (urbansimAccessibilityWriter != null) {
 			urbansimAccessibilityWriter.close();
@@ -230,7 +232,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 
 		log.info("Triggering " + spatialGridDataExchangeListener.size() + " SpatialGridDataExchangeListener(s) ...");
 		for (SpatialGridDataExchangeInterface spatialGridDataExchangeInterface : spatialGridDataExchangeListener) {
-			spatialGridDataExchangeInterface.setAndProcessSpatialGrids(accessibilityControlerListener.getAccessibilityGrids());
+			spatialGridDataExchangeInterface.setAndProcessSpatialGrids(spatialGridAggregator.getAccessibilityGrids());
 		}
 
 	}
@@ -261,7 +263,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		writer.writeField(Labels.POPULATION_DENSITIY);
 		writer.writeNewLine();
 
-		final SpatialGrid spatialGrid = accessibilityControlerListener.getAccessibilityGrids().get(Modes4Accessibility.freeSpeed) ;
+		final SpatialGrid spatialGrid = spatialGridAggregator.getAccessibilityGrids().get(Modes4Accessibility.freeSpeed) ;
 		// yy for time being, have to assume that this is always there
 		for(double y = spatialGrid.getYmin(); y <= spatialGrid.getYmax() ; y += spatialGrid.getResolution()) {
 			for(double x = spatialGrid.getXmin(); x <= spatialGrid.getXmax(); x += spatialGrid.getResolution()) {
@@ -271,7 +273,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 				writer.writeField( y + 0.5*spatialGrid.getResolution() ) ;
 				for ( Modes4Accessibility mode : Modes4Accessibility.values()  ) {
 					if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
-						final SpatialGrid theSpatialGrid = accessibilityControlerListener.getAccessibilityGrids().get(mode);
+						final SpatialGrid theSpatialGrid = spatialGridAggregator.getAccessibilityGrids().get(mode);
 						final double value = theSpatialGrid.getValue(x, y);
 						if ( !Double.isNaN(value ) ) { 
 							writer.writeField( value ) ;
@@ -320,7 +322,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		accessibilityControlerListener.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
-				accessibilityControlerListener.getAccessibilityGrids().put(mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize)) ;
+				spatialGridAggregator.getAccessibilityGrids().put(mode, GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize)) ;
 			}
 		}
 	}
@@ -372,7 +374,7 @@ public final class GridBasedAccessibilityControlerListenerV3
 		accessibilityControlerListener.setMeasuringPoints(GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize));
 		for ( Modes4Accessibility mode : Modes4Accessibility.values() ) {
 			if ( accessibilityControlerListener.getIsComputingMode().get(mode) ) {
-				accessibilityControlerListener.getAccessibilityGrids().put(mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN)) ;
+				spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(minX, minY, maxX, maxY, cellSize, Double.NaN)) ;
 			}
 		}
 		lockedForAdditionalFacilityData  = true ;
